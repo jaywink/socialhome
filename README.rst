@@ -14,7 +14,7 @@ Moved to settings_.
 
 A basic env file is provided, see `env.example`. Copy this to `env.local` and fill with correct values. When running `manage.py` commands, these environment variables will be automatically loaded. For other usage (like `py.test`), load the environment in your shell with:
 
-    export `cat env.local`
+    export \`cat env.local\`
 
 Basic Commands
 --------------
