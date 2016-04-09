@@ -12,7 +12,9 @@ Moved to settings_.
 
 .. _settings: http://cookiecutter-django.readthedocs.org/en/latest/settings.html
 
-A basic env file is provided, see `env.example`.
+A basic env file is provided, see `env.example`. Copy this to `env.local` and fill with correct values. When running `manage.py` commands, these environment variables will be automatically loaded. For other usage (like `py.test`), load the environment in your shell with:
+
+    export `cat env.local`
 
 Basic Commands
 --------------

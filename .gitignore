@@ -64,5 +64,8 @@ tests/.hitch
 # MailHog binary
 mailhog
 
+# Pytest
+.cache
+
 # Socialhome environment file
 env.local
