@@ -3,10 +3,7 @@ Socialhome
 
 A federated social home.
 
-
-
 LICENSE: MIT
-
 
 Settings
 ------------
@@ -14,6 +11,8 @@ Settings
 Moved to settings_.
 
 .. _settings: http://cookiecutter-django.readthedocs.org/en/latest/settings.html
+
+A basic env file is provided, see `env.example`.
 
 Basic Commands
 --------------
@@ -53,7 +52,6 @@ Moved to `Live reloading and SASS compilation`_.
 .. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.org/en/latest/live-reloading-and-sass-compilation.html
 
 
-
 Celery
 ^^^^^^
 
@@ -68,14 +66,7 @@ To run a celery worker:
 
 Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
 
-
-
-
-
-
-
 It's time to write the code!!!
-
 
 Running end to end integration tests
 ------------------------------------
@@ -99,7 +90,6 @@ This will download and compile python, postgres and redis and install all python
 Subsequent test runs will be much quicker.
 
 The testing framework runs Django, Celery (if enabled), Postgres, HitchSMTP (a mock SMTP server), Firefox/Selenium and Redis.
-
 
 Deployment
 ----------
