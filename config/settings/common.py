@@ -44,7 +44,7 @@ THIRD_PARTY_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'socialhome.users',  # custom users app
-    # Your stuff: custom apps go here
+    "socialhome.federate",
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -237,3 +237,7 @@ BROKER_URL = env("CELERY_BROKER_URL", default='django://')
 ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
+
+# SOCIALHOME
+# ------------------------------------------------------------------------------
+SOCIALHOME_DOMAIN = env("SOCIALHOME_DOMAIN", default='socialhome.local')
