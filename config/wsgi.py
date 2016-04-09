@@ -26,6 +26,13 @@ from whitenoise.django import DjangoWhiteNoise
 # os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.production"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 
+# Load local environment
+with open("../env.local") as envfile:
+    for line in envfile:
+        if line.strip():
+            setting = line.strip().split("=", maxsplit=1)
+            os.environ.setdefault(setting[0], setting[1])
+
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
