@@ -1,0 +1,31 @@
+# Pro-tip: Try not to put anything here. There should be no dependency in
+#	production that isn't in development.
+-r base.txt
+
+
+
+# WSGI Handler
+# ------------------------------------------------
+
+# there's no python 3 support in stable, have to use the latest release candidate for gevent
+gevent==1.1rc5
+
+gunicorn==19.4.5
+
+# Static and Media Storage
+# ------------------------------------------------
+boto==2.39.0
+django-storages-redux==1.3.2
+
+
+# Mailgun Support
+# ---------------
+django-mailgun==0.8.0
+
+
+
+
+
+# Opbeat agent for performance monitoring
+# -----------------------------------------
+opbeat
