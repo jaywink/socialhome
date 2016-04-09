@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 '''
 Production Configurations
-
-- Use djangosecure
-- Use Amazon's S3 for storing static files and uploaded media
-- Use mailgun to send emails
-- Use Redis on Heroku
-
-
 - Use opbeat for error reporting
 
 '''
 from __future__ import absolute_import, unicode_literals
 
-from boto.s3.connection import OrdinaryCallingFormat
-from django.utils import six
-
-
 from .common import *  # noqa
+
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -29,28 +19,12 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# django-secure
+# Django security middleware
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ("djangosecure", )
-
 SECURITY_MIDDLEWARE = (
-    'djangosecure.middleware.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',
 )
 
-
-# Make sure djangosecure.middleware.SecurityMiddleware is listed first
-MIDDLEWARE_CLASSES = SECURITY_MIDDLEWARE + MIDDLEWARE_CLASSES
-# opbeat integration
-# See https://opbeat.com/languages/django/
-# INSTALLED_APPS += ('opbeat.contrib.django',)
-# OPBEAT = {
-#     'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
-#     'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
-#     'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
-# }
-# MIDDLEWARE_CLASSES = (
-#     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-# ) + MIDDLEWARE_CLASSES
 # set this to 60 seconds and then to 518400 when you can prove it works
 SECURE_HSTS_SECONDS = 60
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
@@ -63,14 +37,28 @@ SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
+# Make sure djangosecure.middleware.SecurityMiddleware is listed first
+MIDDLEWARE_CLASSES = SECURITY_MIDDLEWARE + MIDDLEWARE_CLASSES
+
+# opbeat integration
+# See https://opbeat.com/languages/django/
+# TODO enable once in ansible role
+# INSTALLED_APPS += ('opbeat.contrib.django',)
+# OPBEAT = {
+#     'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
+#     'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
+#     'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
+# }
+# MIDDLEWARE_CLASSES = (
+#     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+# ) + MIDDLEWARE_CLASSES
+
 # SITE CONFIGURATION
 # ------------------------------------------------------------------------------
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['jasonrobinson.me'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['socialhome.local'])
 # END SITE CONFIGURATION
-
-# INSTALLED_APPS += ("gunicorn", )
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -81,29 +69,6 @@ INSTALLED_APPS += (
     'storages',
 )
 
-# AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
-# AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
-# AWS_STORAGE_BUCKET_NAME = env('DJANGO_AWS_STORAGE_BUCKET_NAME')
-# AWS_AUTO_CREATE_BUCKET = True
-# AWS_QUERYSTRING_AUTH = False
-# AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
-
-# AWS cache settings, don't change unless you know what you're doing:
-# AWS_EXPIRY = 60 * 60 * 24 * 7
-
-# TODO See: https://github.com/jschneier/django-storages/issues/47
-# Revert the following and use str after the above-mentioned bug is fixed in
-# either django-storage-redux or boto
-# AWS_HEADERS = {
-#     'Cache-Control': six.b('max-age=%d, s-maxage=%d, must-revalidate' % (
-#         AWS_EXPIRY, AWS_EXPIRY))
-# }
-
-# URL that handles the media served from MEDIA_ROOT, used for managing
-# stored files.
-# MEDIA_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
-
-
 # Static Assets
 # ------------------------
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
@@ -112,10 +77,9 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 # EMAIL
 # ------------------------------------------------------------------------------
 DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL',
-                         default='Socialhome <noreply@jasonrobinson.me>')
-EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-# MAILGUN_ACCESS_KEY = env('DJANGO_MAILGUN_API_KEY')
-# MAILGUN_SERVER_NAME = env('DJANGO_MAILGUN_SERVER_NAME')
+                         default='Socialhome <noreply@socialhome.local>')
+# TODO fix mails
+# EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
 EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default='[Socialhome] ')
 SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 
@@ -136,7 +100,6 @@ DATABASES['default'] = env.db("DATABASE_URL")
 
 # CACHING
 # ------------------------------------------------------------------------------
-# Heroku URL does not pass the DB number, so we parse it in
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
