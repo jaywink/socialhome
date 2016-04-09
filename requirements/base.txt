@@ -48,3 +48,6 @@ celery==3.1.21
 
 
 # Your custom requirements go here
+
+# Federation
+git+https://github.com/jaywink/social-federation.git@v0.2.0#egg=federation
