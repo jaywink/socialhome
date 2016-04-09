@@ -4,8 +4,6 @@ import sys
 
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
-
     # Load environment variables from env.local, if option --load-env specified.
     # Good for injecting environment into PyCharm run configurations for example and no need to
     # manually load the env values for manage.py commands
@@ -16,6 +14,9 @@ if __name__ == "__main__":
                     setting = line.strip().split("=", maxsplit=1)
                     os.environ.setdefault(setting[0], setting[1])
         sys.argv.remove("--load-env")
+
+    # Fail safe settings module
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
     from django.core.management import execute_from_command_line
 
