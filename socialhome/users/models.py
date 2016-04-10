@@ -18,7 +18,7 @@ class User(AbstractUser):
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
 
     # Globally unique identifier
-    guid = models.UUIDField(_("GUID"), default=uuid.uuid4, editable=False)
+    guid = models.UUIDField(_("GUID"), default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
         return self.username
