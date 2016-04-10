@@ -10,7 +10,7 @@ from socialhome.users.models import User
 
 def host_meta_view(request):
     """Generate a `.well-known/host-meta` document"""
-    host_meta = generate_host_meta("diaspora", webfinger_host=settings.SOCIALHOME_DOMAIN)
+    host_meta = generate_host_meta("diaspora", webfinger_host=settings.SOCIALHOME_URL)
     return HttpResponse(host_meta, content_type="application/xrd+xml")
 
 
@@ -24,7 +24,7 @@ def webfinger_view(request):
     webfinger = generate_legacy_webfinger(
         "diaspora",
         handle="{username}@{domain}".format(username=user.username, domain=settings.SOCIALHOME_DOMAIN),
-        host=settings.SOCIALHOME_DOMAIN,
+        host=settings.SOCIALHOME_URL,
         guid=str(user.guid),
         public_key=user.rsa_public_key
     )

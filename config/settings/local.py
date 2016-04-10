@@ -65,3 +65,7 @@ CELERY_ALWAYS_EAGER = True
 ########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings
+
+# SOCIALHOME
+# ------------------------------------------------------------------------------
+SOCIALHOME_HTTPS = False

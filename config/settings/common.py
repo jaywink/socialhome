@@ -241,3 +241,9 @@ ADMIN_URL = r'^admin/'
 # SOCIALHOME
 # ------------------------------------------------------------------------------
 SOCIALHOME_DOMAIN = env("SOCIALHOME_DOMAIN", default='socialhome.local')
+SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", True)
+# A full url with protocol
+SOCIALHOME_URL = "{protocol}://{domain}".format(
+    protocol="https" if SOCIALHOME_HTTPS else "http",
+    domain=SOCIALHOME_DOMAIN
+)
