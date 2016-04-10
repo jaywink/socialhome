@@ -19,3 +19,5 @@ class TestFederationDiscovery(object):
         UserFactory(username="foobar")
         response = client.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
         assert response.status_code == 200
+        response = client.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
+        assert response.status_code == 200

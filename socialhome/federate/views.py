@@ -19,7 +19,10 @@ def webfinger_view(request):
     q = request.GET.get("q")
     if not q:
         return Http404
-    user = get_object_or_404(User, username=q.split("@")[0])
+    username = q.split("@")[0]
+    if username.startswith("acct:"):
+        username = username.replace("acct:", "", 1)
+    user = get_object_or_404(User, username=username)
     # Create webfinger document
     webfinger = generate_legacy_webfinger(
         "diaspora",
