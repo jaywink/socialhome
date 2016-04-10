@@ -17,3 +17,9 @@ class TestUser(TestCase):
             self.user.get_absolute_url(),
             '/users/testuser/'
         )
+
+    def test_generate_new_rsa_key(self):
+        self.user.generate_new_rsa_key()
+        self.user.save()
+        self.assertIsNotNone(self.user.rsa_private_key)
+        self.assertIsNotNone(self.user.rsa_public_key)

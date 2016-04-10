@@ -26,6 +26,6 @@ def webfinger_view(request):
         handle="{username}@{domain}".format(username=user.username, domain=settings.SOCIALHOME_DOMAIN),
         host=settings.SOCIALHOME_DOMAIN,
         guid=user.guid,
-        public_key=user.public_key
+        public_key=user.rsa_public_key
     )
     return HttpResponse(webfinger, content_type="application/xrd+xml")
