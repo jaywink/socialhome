@@ -34,21 +34,33 @@ def webfinger_view(request):
     return HttpResponse(webfinger, content_type="application/xrd+xml")
 
 
+def get_photo_urls():
+    """Temporary function to return some pony urls which will not change.
+
+    Once User can have a profile photo and profile updates are sent out, use proper static images urls instead.
+    """
+    base_url = "{url}{staticpath}images/pony[size].png".format(
+        url=settings.SOCIALHOME_URL, staticpath=settings.STATIC_URL
+    )
+    return base_url.replace("[size]", "300"), base_url.replace("[size]", "100"), base_url.replace("[size]", "50")
+
+
 def hcard_view(request, guid):
     """Generate a hcard document."""
     try:
         user = get_object_or_404(User, guid=guid)
     except ValueError:
         raise Http404()
+    photo300, photo100, photo50 = get_photo_urls()
     hcard = generate_hcard(
         "diaspora",
         hostname=settings.SOCIALHOME_URL,
         fullname=user.name,
         firstname=user.get_first_name(),
         lastname=user.get_last_name(),
-        photo300="",
-        photo100="",
-        photo50="",
+        photo300=photo300,
+        photo100=photo100,
+        photo50=photo50,
         searchable="true"  # TODO: allow user to set this
     )
     return HttpResponse(hcard)
