@@ -21,3 +21,12 @@ class TestFederationDiscovery(object):
         assert response.status_code == 200
         response = client.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
         assert response.status_code == 200
+
+    def test_hcard_responds_on_404_on_unknown_user(self, client):
+        response = client.get(reverse("federate:hcard", kwargs={"guid": "fehwuyfehiufhewiuhfiuhuiewfew"}))
+        assert response.status_code == 404
+
+    def test_hcard_responds_on_200_on_known_user(self, client):
+        user = UserFactory()
+        response = client.get(reverse("federate:hcard", kwargs={"guid": str(user.guid)}))
+        assert response.status_code == 200

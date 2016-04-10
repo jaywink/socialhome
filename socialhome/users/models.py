@@ -40,3 +40,22 @@ class User(AbstractUser):
         key = generate_rsa_private_key()
         self.rsa_public_key = key.publickey().exportKey()
         self.rsa_private_key = key.exportKey()
+
+    def get_first_name(self):
+        """Return User.first_name or part of User.name"""
+        if self.first_name:
+            return self.first_name
+        elif self.name:
+            return self.name.split(" ")[0]
+        return ""
+
+    def get_last_name(self):
+        """Return User.last_name or part of User.name"""
+        if self.last_name:
+            return self.last_name
+        elif self.name:
+            try:
+                return self.name.split(" ", 1)[1]
+            except IndexError:
+                return ""
+        return ""
