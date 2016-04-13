@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import HttpResponse
-from django.http.response import Http404
+from django.http.response import Http404, JsonResponse
 from django.shortcuts import get_object_or_404
 
-from federation.hostmeta.generators import generate_host_meta, generate_legacy_webfinger, generate_hcard
+from federation.hostmeta.generators import (
+    generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo)
+
+from socialhome import __version__ as version
 from socialhome.users.models import User
 
 
@@ -64,3 +67,22 @@ def hcard_view(request, guid):
         searchable="true"  # TODO: allow user to set this
     )
     return HttpResponse(hcard)
+
+
+def nodeinfo_well_known_view(request):
+    """Generate .well-known/nodeinfo."""
+    wellknown = get_nodeinfo_well_known_document(settings.SOCIALHOME_URL)
+    return JsonResponse(wellknown)
+
+
+def nodeinfo_view(request):
+    """Generate a NodeInfo document."""
+    nodeinfo = NodeInfo(
+        software={"name": "socialhome", "version": version},
+        protocols={"inbound": ["diaspora"], "outbound": ["diaspora"]},
+        services={"inbound": [], "outbound": []},
+        open_registrations=settings.ACCOUNT_ALLOW_REGISTRATION,
+        usage={"users": {}},
+        metadata={"nodeName": "Socialhome"}
+    )
+    return JsonResponse(nodeinfo.doc)

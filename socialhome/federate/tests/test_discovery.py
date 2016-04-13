@@ -30,3 +30,11 @@ class TestFederationDiscovery(object):
         user = UserFactory()
         response = client.get(reverse("federate:hcard", kwargs={"guid": str(user.guid)}))
         assert response.status_code == 200
+
+    def test_nodeinfo_wellknown_responds(self, client):
+        response = client.get(reverse("federate:nodeinfo-wellknown"))
+        assert response.status_code == 200
+
+    def test_nodeinfo_responds(self, client):
+        response = client.get(reverse("federate:nodeinfo"))
+        assert response.status_code == 200
