@@ -38,3 +38,7 @@ class TestFederationDiscovery(object):
     def test_nodeinfo_responds(self, client):
         response = client.get(reverse("federate:nodeinfo"))
         assert response.status_code == 200
+
+    def test_social_relay_responds(self, client):
+        response = client.get(reverse("federate:social-relay"))
+        assert response.status_code == 200

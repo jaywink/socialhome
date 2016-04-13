@@ -5,7 +5,8 @@ from django.http.response import Http404, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from federation.hostmeta.generators import (
-    generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo)
+    generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
+    SocialRelayWellKnown)
 
 from socialhome import __version__ as version
 from socialhome.users.models import User
@@ -86,3 +87,9 @@ def nodeinfo_view(request):
         metadata={"nodeName": "Socialhome"}
     )
     return JsonResponse(nodeinfo.doc)
+
+
+def social_relay_view(request):
+    """Generate a .well-known/x-social-relay document."""
+    relay = SocialRelayWellKnown(subscribe=True)
+    return JsonResponse(relay.doc)
