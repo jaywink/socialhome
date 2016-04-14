@@ -149,6 +149,15 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
+        "application_file": {
+            "filename": env("SOCIALHOME_LOGFILE", default='/tmp/socialhome.log'),
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "maxBytes": 10485760,  # 10mb
+            "backupCount": 10,
+
+        }
     },
     'loggers': {
         'django.request': {
@@ -160,6 +169,11 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['console', 'mail_admins'],
             'propagate': True
+        },
+        "socialhome": {
+            "level": "DEBUG",
+            "handlers": ["application_file"],
+            "propagate": True
         }
     }
 }
