@@ -35,7 +35,7 @@ def receive_public_task(payload):
         if isinstance(entity, DiasporaPost):
             if not user:
                 # TODO: Don't use a dummy user once we have remote profiles
-                user = User.objects.get_or_create(username="dummy")
+                user, created = User.objects.get_or_create(username="dummy")
             try:
                 post = Post.objects.create(
                     text=entity.raw_content,
