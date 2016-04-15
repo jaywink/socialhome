@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome)
 # Socialhome
 
 A federated social home.
