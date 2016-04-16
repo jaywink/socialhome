@@ -6,6 +6,7 @@ from federation.entities.diaspora.entities import DiasporaPost
 from federation.exceptions import NoSuitableProtocolFoundError
 
 from socialhome.content.models import Post
+from socialhome.federate.utils import safe_make_aware
 from socialhome.taskapp.celery import tasks
 from socialhome.users.models import User
 
@@ -28,6 +29,11 @@ def receive_public_task(payload):
     if not entities:
         logger.warning("No entities in payload")
         return
+    process_entities(entities)
+
+
+def process_entities(entities):
+    """Process a list of entities."""
     user = None
     for entity in entities:
         logging.info("Entity: %s" % entity)
@@ -37,15 +43,15 @@ def receive_public_task(payload):
                 # TODO: Don't use a dummy user once we have remote profiles
                 user, created = User.objects.get_or_create(username="dummy")
             try:
-                post = Post.objects.create(
-                    text=entity.raw_content,
-                    guid=entity.guid,
-                    user=user,
-                    public=entity.public,
-                    remote_created=entity.created_at,
-                    service_label=entity.provider_display_name,
-                )
-                logger.info("Saved Post: %s" % post)
+                values = {
+                    "text": entity.raw_content, "user": user, "public": entity.public,
+                    "remote_created": safe_make_aware(entity.created_at, "UTC"),
+                    "service_label": entity.provider_display_name or "",
+                }
+                post, created = Post.objects.update_or_create(guid=entity.guid, defaults=values)
+                if created:
+                    logger.info("Saved Post: %s" % post)
+                else:
+                    logger.info("Updated Post: %s" % post)
             except Exception:
-                logger.exception("Failed to save Post: %s" % entity.guid)
-
+                logger.exception("Failed to handle %s: %s" % (entity.guid, entity.__name__))
