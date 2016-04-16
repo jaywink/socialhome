@@ -53,4 +53,4 @@ django-extensions==1.6.1
 # Your custom requirements go here
 
 # Federation
-git+https://github.com/jaywink/social-federation.git@v0.3.1#egg=Social-Federation==0.3.1
+git+https://github.com/jaywink/social-federation.git@master#egg=Social-Federation
