@@ -1,6 +1,8 @@
-
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
 import os
+
 from celery import Celery
 from django.apps import AppConfig
 from django.conf import settings
@@ -11,7 +13,7 @@ if not settings.configured:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")  # pragma: no cover
 
 
-app = Celery('socialhome')
+tasks = Celery('socialhome')
 
 
 class CeleryConfig(AppConfig):
@@ -21,10 +23,8 @@ class CeleryConfig(AppConfig):
     def ready(self):
         # Using a string here means the worker will not have to
         # pickle the object when using Windows.
-        app.config_from_object('django.conf:settings')
-        app.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
-
-        
+        tasks.config_from_object('django.conf:settings')
+        tasks.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
 
         if hasattr(settings, 'OPBEAT'):
             from opbeat.contrib.django.models import client as opbeat_client
@@ -41,6 +41,6 @@ class CeleryConfig(AppConfig):
                 opbeat_register_handlers()
 
 
-@app.task(bind=True)
+@tasks.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))  # pragma: no cover

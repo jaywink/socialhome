@@ -26,6 +26,10 @@ class User(AbstractUser):
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
     rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
 
+    # Local vs remote users
+    # Remote users cannot log in and don't have basic local user identity things like a private key
+    local = models.BooleanField(_("Local"), default=True, editable=False)
+
     def __str__(self):
         return self.username
 

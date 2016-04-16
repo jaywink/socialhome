@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import HttpResponse
-from django.http.response import Http404, JsonResponse
+from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
+from django.views.generic import View
 
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
 
 from socialhome import __version__ as version
+from socialhome.federate.tasks import receive_public_task
 from socialhome.users.models import User
 
 
@@ -93,3 +95,13 @@ def social_relay_view(request):
     """Generate a .well-known/x-social-relay document."""
     relay = SocialRelayWellKnown(subscribe=True)
     return JsonResponse(relay.doc)
+
+
+class ReceivePublicView(View):
+    """Diaspora /receive/public view."""
+    def post(self, request, *args, **kwargs):
+        payload = request.POST.get("xml")
+        if not payload:
+            return HttpResponseBadRequest()
+        receive_public_task.delay(payload)
+        return HttpResponse(status=202)
