@@ -89,7 +89,8 @@ EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.s
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = (
-    ("""Socialhome Admin""", 'info@socialhome.local'),
+    (env("DJANGO_ADMIN_NAME", default="Socialhome Admin"),
+     env("DJANGO_ADMIN_MAIL", default='info@socialhome.local')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
