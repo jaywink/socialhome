@@ -22,6 +22,7 @@ module.exports = function (grunt) {
       images: this.app + '/static/images',
       js: this.app + '/static/js',
       manageScript: 'manage.py',
+      bower: "bower_components",
     }
   };
 
@@ -64,7 +65,7 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
-              '<%= paths.css %>/project.css': '<%= paths.sass %>/project.scss'
+              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss'
           },
       },
       dist: {
@@ -74,9 +75,30 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
-              '<%= paths.css %>/project.css': '<%= paths.sass %>/project.scss'
+              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss'
           },
       }
+    },
+
+    concat: {
+      js: {
+        src: [
+          "<%= paths.bower %>/jquery/dist/jquery.min.js",
+          "<%= paths.bower %>/tether/dist/js/tether.min.js",
+          "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
+        ],
+        dest: "<%= paths.js %>/project.js",
+        nonull: true,
+      },
+      css: {
+        src: [
+          "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
+          "<%= paths.bower %>/tether/dist/css/tether.min.css",
+          "<%= paths.css %>/common.css",
+        ],
+        dest: "<%= paths.css %>/project.css",
+        nonull: true,
+      },
     },
 
     //see https://github.com/nDmitry/grunt-postcss
@@ -117,18 +139,23 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('serve', [
-    
     'bgShell:runDjango',
     'watch'
   ]);
 
   grunt.registerTask('build', [
     'sass:dist',
-    'postcss'
+    'postcss',
+    'concat',
+  ]);
+
+  grunt.registerTask('dev', [
+    'sass:dev',
+    'concat',
   ]);
 
   grunt.registerTask('default', [
-    'build'
+    'dev'
   ]);
 
 };

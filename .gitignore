@@ -72,3 +72,10 @@ env.local
 
 # Compiled CSS
 socialhome/static/css/project.css
+socialhome/static/css/common.css
+
+# Compiled JS
+socialhome/static/js/project.js
+
+# Bower
+/bower_components/
