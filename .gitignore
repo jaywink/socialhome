@@ -69,3 +69,6 @@ mailhog
 
 # Socialhome environment file
 env.local
+
+# Compiled CSS
+socialhome/static/css/project.css
