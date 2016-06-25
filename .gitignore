@@ -71,8 +71,7 @@ mailhog
 env.local
 
 # Compiled CSS
-socialhome/static/css/project.css
-socialhome/static/css/common.css
+socialhome/static/css/*.css
 
 # Compiled JS
 socialhome/static/js/project.js

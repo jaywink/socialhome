@@ -65,7 +65,7 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
-              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss'
+              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
           },
       },
       dist: {
@@ -75,7 +75,8 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
-              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss'
+              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
+              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss'
           },
       }
     },
@@ -86,6 +87,8 @@ module.exports = function (grunt) {
           "<%= paths.bower %>/jquery/dist/jquery.min.js",
           "<%= paths.bower %>/tether/dist/js/tether.min.js",
           "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
+          "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
+          "<%= paths.js %>/grids.js",
         ],
         dest: "<%= paths.js %>/project.js",
         nonull: true,
@@ -95,6 +98,7 @@ module.exports = function (grunt) {
           "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
           "<%= paths.bower %>/tether/dist/css/tether.min.css",
           "<%= paths.css %>/common.css",
+          "<%= paths.css %>/grids.css",
         ],
         dest: "<%= paths.css %>/project.css",
         nonull: true,

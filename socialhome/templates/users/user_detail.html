@@ -1,36 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}User: {{ object.username }}{% endblock %}
+{% block title %}{{ object.username }}{% endblock %}
 
 {% block content %}
-<div class="container">
-
-  <div class="row">
-    <div class="col-sm-12">
-
-      <h2>{{ object.username }}</h2>
-      {% if object.name %}
-        <p>{{ object.name }}</p>
-      {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="grid">
+                    <div class="grid-item">
+                        <h2>{{ object.username }}</h2>
+                        {% if object.name %}
+                            <p>{{ object.name }}</p>
+                        {% endif %}
+                    </div>
+                    {% if object == request.user %}
+                        <div class="grid-item">
+                            <!-- Action buttons -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <a class="btn btn-primary" href="{% url 'users:update' %}">My Info</a>
+                                    <a class="btn btn-primary" href="{% url 'account_email' %}">E-Mail</a>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- End Action buttons -->
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-{% if object == request.user %}
-<!-- Action buttons -->
-<div class="row">
-
-  <div class="col-sm-12 ">
-    <a class="btn btn-primary" href="{% url 'users:update' %}">My Info</a>
-    <a class="btn btn-primary" href="{% url 'account_email' %}">E-Mail</a>
-    <!-- Your Stuff: Custom user template urls -->
-  </div>
-
-</div>
-<!-- End Action buttons -->
-{% endif %}
-
-
-</div>
 {% endblock content %}
-
