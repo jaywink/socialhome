@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
+from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.content.enums import ContentTarget, Visibility
 from socialhome.users.models import User
 
 
@@ -23,4 +27,22 @@ class Post(models.Model):
     def __str__(self):
         return "{text} ({guid})".format(
             text=truncate_letters(self.text, 100), guid=self.guid
+        )
+
+
+class Content(models.Model):
+    """Model representing a piece of content.
+
+    Actual content is linked by a GenericForeignKey. User and visibility is cached here for faster access.
+    """
+    target = EnumIntegerField(ContentTarget)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Content owner"))
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+    visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC)
+
+    def __str__(self):
+        return "%s (%s, %s, %s)" % (
+            self.content_type, self.object_id, self.target, self.visibility
         )
