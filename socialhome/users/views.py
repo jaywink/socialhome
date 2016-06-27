@@ -6,6 +6,8 @@ from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from socialhome.content.enums import ContentTarget
+from socialhome.content.models import Content
 from .models import User
 
 
@@ -14,6 +16,14 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     # These next two lines tell the view to index lookups by username
     slug_field = "username"
     slug_url_kwarg = "username"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        contents = Content.objects.filter(target=ContentTarget.PROFILE, user=self.request.user)
+        context["contents"] = []
+        for content in contents:
+            context["contents"].append(content.content_object.render())
+        return context
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):

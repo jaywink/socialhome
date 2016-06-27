@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+from uuid import uuid4
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
+from markdownx.utils import markdownify
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.enums import ContentTarget, Visibility
@@ -28,6 +31,15 @@ class Post(models.Model):
         return "{text} ({guid})".format(
             text=truncate_letters(self.text, 100), guid=self.guid
         )
+
+    def save(self, user=None, *args, **kwargs):
+        if not self.pk and user:
+            self.guid = uuid4()
+            self.user = user
+        return super(Post, self).save(*args, **kwargs)
+
+    def render(self):
+        return markdownify(self.text)
 
 
 class Content(models.Model):

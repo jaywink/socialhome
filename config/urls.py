@@ -20,8 +20,11 @@ urlpatterns = [
     url(r'^u/', include("socialhome.users.urls", namespace="users")),
     url(r'^accounts/', include('allauth.urls')),
 
-    # Your stuff: custom urls includes go here
+    # Markdownx
+    url(r'^markdownx/', include('markdownx.urls')),
 
+    # Content
+    url(r"^content/", include("socialhome.content.urls", namespace="content")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

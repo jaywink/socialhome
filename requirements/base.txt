@@ -50,3 +50,6 @@ django-extensions==1.6.1
 
 # Federation
 git+https://github.com/jaywink/social-federation.git@master#egg=Social-Federation
+
+# Content
+django-markdownx==1.6

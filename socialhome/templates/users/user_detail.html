@@ -16,7 +16,6 @@
                     </div>
                     {% if object == request.user %}
                         <div class="grid-item">
-                            <!-- Action buttons -->
                             <div class="row">
                                 <div class="col-sm-12">
                                     <a class="btn btn-primary" href="{% url 'users:update' %}">My Info</a>
@@ -24,8 +23,12 @@
                                 </div>
                             </div>
                         </div>
-                    <!-- End Action buttons -->
                     {% endif %}
+                    {% for content in contents %}
+                        <div class="grid-item">
+                            {{ content|safe }}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
