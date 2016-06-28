@@ -88,6 +88,7 @@ module.exports = function (grunt) {
           "<%= paths.bower %>/tether/dist/js/tether.min.js",
           "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
           "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
+          "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
           "<%= paths.js %>/grids.js",
         ],
         dest: "<%= paths.js %>/project.js",

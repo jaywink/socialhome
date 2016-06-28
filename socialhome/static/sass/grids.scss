@@ -1,11 +1,15 @@
-.grid {
-  margin: 0 auto;
+.grid-sizer,
+.grid-item {
+  width: 46%;
+  padding: 1%;
+  margin: 1%;
 }
 
 .grid-item {
-  width: 350px;
-  padding: 15px;
-  margin: 15px;
   background-color: #F1F1F1;
   border-radius: 6px;
+
+  img {
+    max-width: 100%;
+  }
 }
