@@ -22,7 +22,10 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         contents = Content.objects.filter(target=ContentTarget.PROFILE, user=self.request.user)
         context["contents"] = []
         for content in contents:
-            context["contents"].append(content.content_object.render())
+            context["contents"].append({
+                "content": content.content_object.render(),
+                "obj": content,
+            })
         return context
 
 

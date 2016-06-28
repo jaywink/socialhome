@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Create" %}
+    {% else %}
+        {% trans "Update" %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h1>
+        {% if object %}
+            {% trans "Create" %}
+        {% else %}
+            {% trans "Update" %}
+        {% endif %}
+    </h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock %}

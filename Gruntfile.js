@@ -65,6 +65,8 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
+              '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
+              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
               '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
           },
       },
@@ -75,8 +77,9 @@ module.exports = function (grunt) {
               precision: 10
           },
           files: {
+              '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
               '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
-              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss'
+              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
           },
       }
     },
@@ -98,6 +101,7 @@ module.exports = function (grunt) {
         src: [
           "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
           "<%= paths.bower %>/tether/dist/css/tether.min.css",
+          "<%= paths.css %>/fontawesome.css",
           "<%= paths.css %>/common.css",
           "<%= paths.css %>/grids.css",
         ],
@@ -131,6 +135,15 @@ module.exports = function (grunt) {
       }
     },
 
+    copy: {
+      font_awesome: {
+        expand: true,
+        flatten: true,
+        src: ['<%= paths.bower %>/fontawesome/fonts/*'],
+        dest: '<%= paths.fonts %>'
+      }
+    },
+
     // see: https://npmjs.org/package/grunt-bg-shell
     bgShell: {
       _defaults: {
@@ -152,11 +165,13 @@ module.exports = function (grunt) {
     'sass:dist',
     'postcss',
     'concat',
+    'copy',
   ]);
 
   grunt.registerTask('dev', [
     'sass:dev',
     'concat',
+    'copy',
   ]);
 
   grunt.registerTask('default', [

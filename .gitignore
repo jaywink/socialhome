@@ -78,3 +78,6 @@ socialhome/static/js/project.js
 
 # Bower
 /bower_components/
+
+# Collected fonts
+socialhome/static/fonts/

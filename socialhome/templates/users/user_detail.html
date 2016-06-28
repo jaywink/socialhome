@@ -27,7 +27,12 @@
                     {% endif %}
                     {% for content in contents %}
                         <div class="grid-item">
-                            {{ content|safe }}
+                            <div class="grid-item-actions text-sm-right">
+                                {% if content.obj.user == request.user %}
+                                    <a href="{% url "content:update" content.obj.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                {% endif %}
+                            </div>
+                            {{ content.content|safe }}
                         </div>
                     {% endfor %}
                 </div>
