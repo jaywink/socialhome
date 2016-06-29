@@ -1,10 +1,12 @@
 import pytest
+from django.core.urlresolvers import reverse
 
 from socialhome.content.enums import ContentTarget, Visibility
 from socialhome.content.forms import PostForm
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView
+from socialhome.users.models import User
 from socialhome.users.tests.factories import UserFactory
 
 
@@ -52,6 +54,10 @@ class TestContentCreateView(object):
         request, view = self._get_request_and_view(rf)
         assert view.get_success_url() == "/u/%s/" % request.user.username
 
+    def test_create_view_renders(self, admin_client, rf):
+        response = admin_client.get(reverse("content:create", kwargs={"location": "profile"}))
+        assert response.status_code == 200
+
 
 @pytest.mark.usefixtures("admin_client", "rf")
 class TestContentUpdateView(object):
@@ -90,3 +96,9 @@ class TestContentUpdateView(object):
     def test_get_success_url(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
         assert view.get_success_url() == "/u/%s/" % request.user.username
+
+    def test_update_view_renders(self, admin_client, rf):
+        admin = User.objects.get(username="admin")
+        content = ContentFactory(user=admin, content_object__user=admin)
+        response = admin_client.get(reverse("content:update", kwargs={"pk": content.id}))
+        assert response.status_code == 200
