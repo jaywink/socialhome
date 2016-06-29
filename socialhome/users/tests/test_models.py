@@ -15,7 +15,7 @@ class TestUser(TestCase):
     def test_get_absolute_url(self):
         self.assertEqual(
             self.user.get_absolute_url(),
-            '/users/testuser/'
+            '/u/testuser/'
         )
 
     def test_generate_new_rsa_key(self):
