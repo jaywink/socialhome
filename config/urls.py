@@ -8,9 +8,11 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
 
+from socialhome.content.views import HomeView
+
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
-    url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name="home"),
+    url(r'^$', HomeView.as_view(), name="home"),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name="about"),
 
     # Django Admin, use {% url 'admin:index' %}

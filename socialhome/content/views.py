@@ -1,10 +1,12 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 
 from socialhome.content.enums import ContentTarget, Visibility
 from socialhome.content.forms import PostForm
 from socialhome.content.models import Content, Post
+from socialhome.users.views import UserDetailView
 
 
 class ContentCreateView(CreateView):
@@ -61,3 +63,13 @@ class ContentUpdateView(UpdateView):
         if self.object.target == ContentTarget.PROFILE:
             return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
+
+
+class HomeView(TemplateView):
+    template_name = "pages/home.html"
+
+    def get(self, request, *args, **kwargs):
+        """Redirect to user detail view if root page is a profile."""
+        if settings.SOCIALHOME_ROOT_PROFILE:
+            return UserDetailView.as_view()(request, username=settings.SOCIALHOME_ROOT_PROFILE)
+        return super(HomeView, self).get(request, *args, **kwargs)

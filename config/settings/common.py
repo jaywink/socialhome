@@ -239,12 +239,15 @@ BROKER_URL = env("CELERY_BROKER_URL", default='django://')
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 
-# Your common stuff: Below this line define 3rd party library settings
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
 SOCIALHOME_DOMAIN = env("SOCIALHOME_DOMAIN", default='socialhome.local')
 SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", True)
+# Username of profile living at root ie "/"
+# Instead of normal site landing page, this user profile will be shown.
+# This only makes sense on single user sites.
+SOCIALHOME_ROOT_PROFILE = env("SOCIALHOME_ROOT_PROFILE", default=None)
 # A full url with protocol
 SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
