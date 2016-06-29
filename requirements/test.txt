@@ -1,6 +1,7 @@
 # Test dependencies go here.
 -r base.txt
 
+codecov
 coverage
 django_coverage_plugin
 flake8
