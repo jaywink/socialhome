@@ -1,18 +1,27 @@
-sudo: true
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
-  - sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev libwebp-dev
-  - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv python-pip
-  - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev libreadline-dev
-  - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev wget curl llvm
+sudo: false
 language: python
 python:
-- "3.5"
-
+  - "3.4"
+  - "3.5"
+services:
+  - redis-server
+  - postgresql
 install:
-  - "pip install hitch"
-  - "cd tests"
-  - "hitch init"
-script:
-  - "hitch test . --extra '{\"xvfb\":true, \"pause_on_failure\":false}'"
+  - pip install -U pip
+  - pip install -r requirements/test.txt
+  - pip freeze
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - bower_components/
+    - node_modules/
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - npm install
+  - bower install
+  - node_modules/.bin/grunt build
+script: py.test --cov=./
+after_success:
+  - codecov
+env:
+ - DATABASE_URL=postgres://postgres@127.0.0.1:5432/travis_ci_test DJANGO_SETTINGS_MODULE=config.settings.local DJANGO_SECRET_KEY='hfuiwhiufhuiwehfiuwhfuiwehfiuwehfiuehfiwehuiwf' DJANGO_ALLOWED_HOSTS=127.0.0.1 DJANGO_SECURE_SSL_REDIRECT=False SOCIALHOME_DOMAIN=127.0.0.1:8000 SOCIALHOME_HTTPS=False
