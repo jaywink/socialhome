@@ -10,7 +10,8 @@ from enumfields import EnumIntegerField
 from markdownx.utils import markdownify
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
-from socialhome.content.enums import ContentTarget, Visibility
+from socialhome.content.enums import ContentTarget
+from socialhome.enums import Visibility
 from socialhome.users.models import User
 
 
