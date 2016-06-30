@@ -7,6 +7,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import enumfields.fields
 import socialhome.content.enums
+import socialhome.enums
 
 
 class Migration(migrations.Migration):
@@ -24,7 +25,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('target', enumfields.fields.EnumIntegerField(enum=socialhome.content.enums.ContentTarget)),
                 ('object_id', models.PositiveIntegerField()),
-                ('visibility', enumfields.fields.EnumIntegerField(default=0, enum=socialhome.content.enums.Visibility)),
+                ('visibility', enumfields.fields.EnumIntegerField(default=0, enum=socialhome.enums.Visibility)),
                 ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Content owner')),
             ],

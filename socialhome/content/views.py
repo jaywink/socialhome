@@ -3,7 +3,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView, UpdateView, TemplateView
 
-from socialhome.content.enums import ContentTarget, Visibility
+from socialhome.content.enums import ContentTarget
+from socialhome.enums import Visibility
 from socialhome.content.forms import PostForm
 from socialhome.content.models import Content, Post
 from socialhome.users.views import UserDetailView

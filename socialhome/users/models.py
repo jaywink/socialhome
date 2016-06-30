@@ -8,7 +8,9 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from enumfields import EnumIntegerField
 
+from socialhome.enums import Visibility
 from socialhome.federate.utils import generate_rsa_private_key
 
 
@@ -29,6 +31,9 @@ class User(AbstractUser):
     # Local vs remote users
     # Remote users cannot log in and don't have basic local user identity things like a private key
     local = models.BooleanField(_("Local"), default=True, editable=False)
+
+    # Profile visibility
+    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.SELF)
 
     def __str__(self):
         return self.username

@@ -4,14 +4,15 @@ from __future__ import absolute_import, unicode_literals
 from django.core.urlresolvers import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.enums import ContentTarget
 from socialhome.content.models import Content
+from socialhome.enums import Visibility
 from .models import User
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
+class UserDetailView(AccessMixin, DetailView):
     model = User
     # These next two lines tell the view to index lookups by username
     slug_field = "username"
@@ -19,14 +20,50 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
-        contents = Content.objects.filter(target=ContentTarget.PROFILE, user=self.request.user)
-        context["contents"] = []
-        for content in contents:
-            context["contents"].append({
+        context["contents"] = self._collect_contents()
+        return context
+
+    def _collect_contents(self):
+        """Collect rendered content objects."""
+        contents_qs = self._get_contents_queryset()
+        contents = []
+        for content in contents_qs:
+            contents.append({
                 "content": content.content_object.render(),
                 "obj": content,
             })
-        return context
+        return contents
+
+    def _get_contents_queryset(self):
+        """Get queryset for content objects.
+
+        Limit by content visibility.
+        """
+        contents = Content.objects.filter(target=ContentTarget.PROFILE, user=self.object)
+        if not self.request.user.is_authenticated():
+            contents = contents.filter(visibility=Visibility.PUBLIC)
+        elif self.request.user != self.target_user:
+            # TODO: filter out also LIMITED until contacts implemented
+            contents = contents.exclude(visibility__in=[Visibility.LIMITED, Visibility.SELF])
+        return contents
+
+    def dispatch(self, request, *args, **kwargs):
+        """Handle profile visibility checks.
+
+        Redirect to login if not allowed to see profile.
+        """
+        self.target_user = User.objects.get(username=self.kwargs.get("username"))
+        if self.target_user.visibility == Visibility.PUBLIC:
+            return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated():
+            if self.target_user.visibility == Visibility.SITE:
+                return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+            # TODO: handle Visibility.LIMITED once contacts are implemented
+            # Currently falls back to lowest level, ie SELF
+            elif self.target_user.visibility in (Visibility.SELF, Visibility.LIMITED) and \
+                    request.user == self.target_user:
+                return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+        return self.handle_no_permission()
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
@@ -39,7 +76,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
-    fields = ['name', ]
+    fields = ["name", "visibility"]
 
     # we already imported User in the view code above, remember?
     model = User
