@@ -1,4 +1,5 @@
-[![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome)
+[![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Requirements Status](https://requires.io/github/jaywink/socialhome/requirements.svg?branch=master)](https://requires.io/github/jaywink/socialhome/requirements/?branch=master) [![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master)
+
 # Socialhome
 
 A federated social home.
