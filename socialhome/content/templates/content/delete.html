@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Confirm delete" %}
+{% endblock %}
+
+{% block content %}
+    <h1>
+        {% trans "Confirm delete" %}
+    </h1>
+    <div>
+        {{ content|safe }}
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">{% trans "Delete" %}</button>
+        <button type="button" onclick="window.history.back();" class="btn btn-default">{% trans "Cancel" %}</button>
+    </form>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 
 from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
@@ -64,6 +64,27 @@ class ContentUpdateView(UpdateView):
         if self.object.target == ContentTarget.PROFILE:
             return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
+
+
+class ContentDeleteView(DeleteView):
+    model = Content
+    template_name = "content/delete.html"
+
+    def get_success_url(self):
+        if self.object.target == ContentTarget.PROFILE:
+            return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse("home")
+
+    def get_context_data(self, **kwargs):
+        context = super(ContentDeleteView, self).get_context_data(**kwargs)
+        context["content"] = self.object.content_object.render()
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        """Delete also linked object."""
+        redirection = super(ContentDeleteView, self).delete(request, *args, **kwargs)
+        self.object.content_object.delete()
+        return redirection
 
 
 class HomeView(TemplateView):

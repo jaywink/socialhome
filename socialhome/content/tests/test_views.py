@@ -4,9 +4,9 @@ from django.core.urlresolvers import reverse
 from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
 from socialhome.content.forms import PostForm
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Post
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.content.views import ContentCreateView, ContentUpdateView
+from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.users.models import User
 from socialhome.users.tests.factories import UserFactory
 
@@ -103,3 +103,34 @@ class TestContentUpdateView(object):
         content = ContentFactory(user=admin, content_object__user=admin)
         response = admin_client.get(reverse("content:update", kwargs={"pk": content.id}))
         assert response.status_code == 200
+
+
+@pytest.mark.usefixtures("admin_client", "rf")
+class TestContentDeleteView(object):
+    def _get_request_view_and_content(self, rf):
+        request = rf.get("/")
+        request.user = UserFactory()
+        content = ContentFactory(user=request.user, content_object__user=request.user)
+        view = ContentDeleteView(request=request, kwargs={"pk": content.id})
+        view.object = content
+        return request, view, content
+
+    def test_get_success_url(self, admin_client, rf):
+        request, view, content = self._get_request_view_and_content(rf)
+        assert view.get_success_url() == "/u/%s/" % request.user.username
+
+    def test_delete_view_renders(self, admin_client, rf):
+        admin = User.objects.get(username="admin")
+        content = ContentFactory(user=admin, content_object__user=admin)
+        response = admin_client.get(reverse("content:delete", kwargs={"pk": content.id}))
+        assert response.status_code == 200
+
+    def test_delete_deletes_content(self, admin_client, rf):
+        admin = User.objects.get(username="admin")
+        content = ContentFactory(user=admin, content_object__user=admin)
+        request = rf.post("/")
+        request.user = admin
+        response = admin_client.post(reverse("content:delete", kwargs={"pk": content.id}))
+        assert response.status_code == 302
+        assert Content.objects.count() == 0
+        assert Post.objects.count() == 0
