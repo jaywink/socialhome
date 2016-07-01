@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ object.username }}{% endblock %}
 
@@ -29,7 +29,8 @@
                         <div class="grid-item">
                             <div class="grid-item-actions text-sm-right">
                                 {% if content.obj.user == request.user %}
-                                    <a href="{% url "content:update" content.obj.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                    <a href="{% url "content:update" content.obj.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
+                                    <a href="{% url "content:delete" content.obj.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
                                 {% endif %}
                             </div>
                             {{ content.content|safe }}

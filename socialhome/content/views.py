@@ -1,7 +1,9 @@
+from braces.views import UserPassesTestMixin
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.http.response import Http404
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 
 from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
@@ -39,7 +41,16 @@ class ContentCreateView(CreateView):
         return reverse("home")
 
 
-class ContentUpdateView(UpdateView):
+class UserOwnsContentMixin(UserPassesTestMixin):
+    raise_exception = Http404
+
+    def test_func(self, user):
+        """Ensure user owns content."""
+        object = self.get_object()
+        return bool(object) and object.user == user
+
+
+class ContentUpdateView(UserOwnsContentMixin, UpdateView):
     model = Content
     template_name = "content/edit.html"
 
@@ -64,6 +75,27 @@ class ContentUpdateView(UpdateView):
         if self.object.target == ContentTarget.PROFILE:
             return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
+
+
+class ContentDeleteView(UserOwnsContentMixin, DeleteView):
+    model = Content
+    template_name = "content/delete.html"
+
+    def get_success_url(self):
+        if self.object.target == ContentTarget.PROFILE:
+            return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse("home")
+
+    def get_context_data(self, **kwargs):
+        context = super(ContentDeleteView, self).get_context_data(**kwargs)
+        context["content"] = self.object.content_object.render()
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        """Delete also linked object."""
+        redirection = super(ContentDeleteView, self).delete(request, *args, **kwargs)
+        self.object.content_object.delete()
+        return redirection
 
 
 class HomeView(TemplateView):
