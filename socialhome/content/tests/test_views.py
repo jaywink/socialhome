@@ -104,6 +104,27 @@ class TestContentUpdateView(object):
         response = admin_client.get(reverse("content:update", kwargs={"pk": content.id}))
         assert response.status_code == 200
 
+    def test_update_view_raises_if_user_does_not_own_content(self, admin_client, rf):
+        user = UserFactory()
+        content = ContentFactory(user=user, content_object__user=user)
+        response = admin_client.post(reverse("content:update", kwargs={"pk": content.id}), {
+            "text": "foobar",
+            "public": False,
+        })
+        assert response.status_code == 404
+
+    def test_update_view_updates_content(self, admin_client, rf):
+        admin = User.objects.get(username="admin")
+        content = ContentFactory(user=admin, content_object__user=admin)
+        response = admin_client.post(reverse("content:update", kwargs={"pk": content.id}), {
+            "text": "foobar",
+            "public": False,
+        })
+        assert response.status_code == 302
+        content.refresh_from_db()
+        assert content.content_object.text == "foobar"
+        assert not content.content_object.public
+
 
 @pytest.mark.usefixtures("admin_client", "rf")
 class TestContentDeleteView(object):
@@ -134,3 +155,9 @@ class TestContentDeleteView(object):
         assert response.status_code == 302
         assert Content.objects.count() == 0
         assert Post.objects.count() == 0
+
+    def test_delete_view_raises_if_user_does_not_own_content(self, admin_client, rf):
+        user = UserFactory()
+        content = ContentFactory(user=user, content_object__user=user)
+        response = admin_client.post(reverse("content:delete", kwargs={"pk": content.id}))
+        assert response.status_code == 404

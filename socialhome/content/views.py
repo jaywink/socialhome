@@ -1,6 +1,8 @@
+from braces.views import UserPassesTestMixin
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.http.response import Http404
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 
 from socialhome.content.enums import ContentTarget
@@ -39,7 +41,16 @@ class ContentCreateView(CreateView):
         return reverse("home")
 
 
-class ContentUpdateView(UpdateView):
+class UserOwnsContentMixin(UserPassesTestMixin):
+    raise_exception = Http404
+
+    def test_func(self, user):
+        """Ensure user owns content."""
+        object = self.get_object()
+        return bool(object) and object.user == user
+
+
+class ContentUpdateView(UserOwnsContentMixin, UpdateView):
     model = Content
     template_name = "content/edit.html"
 
@@ -66,7 +77,7 @@ class ContentUpdateView(UpdateView):
         return reverse("home")
 
 
-class ContentDeleteView(DeleteView):
+class ContentDeleteView(UserOwnsContentMixin, DeleteView):
     model = Content
     template_name = "content/delete.html"
 
