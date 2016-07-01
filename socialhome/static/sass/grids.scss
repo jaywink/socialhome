@@ -1,3 +1,5 @@
+@import "variables";
+
 .grid-sizer,
 .grid-item {
   width: 46%;
@@ -16,5 +18,31 @@
 
   img {
     max-width: 100%;
+  }
+}
+
+// Responsive tweaks to grid sizes
+@media all and (min-width: $largeLower) {
+  .grid-sizer,
+  .grid-item {
+    width: 32%;
+    padding: 1%;
+    margin: 0.5%;
+  }
+}
+@media all and (max-width: $mediumUpper) and (min-width: $mediumLower) {
+  .grid-sizer,
+  .grid-item {
+    width: 46%;
+    padding: 1%;
+    margin: 1%;
+  }
+}
+@media all and (max-width: $smallUpper) and (min-width: $smallLower) {
+  .grid-sizer,
+  .grid-item {
+    width: 100%;
+    padding: 1%;
+    margin: 1% 0;
   }
 }
