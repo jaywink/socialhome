@@ -1,18 +1,10 @@
 # Local development dependencies go here
 -r base.txt
-coverage==4.0.3
-django_coverage_plugin==1.2.2
 Sphinx
-Werkzeug==0.11.4
-django-test-plus==1.0.12
-factory_boy==2.6.1
+Werkzeug
 
 # django-debug-toolbar that works with Django 1.5+
-django-debug-toolbar==1.4
+django-debug-toolbar
 
 # improved REPL
-ipdb==0.9.0
-
-# pytest!
-pytest-django==2.9.1
-pytest-sugar==0.5.1
+ipdb
