@@ -37,7 +37,7 @@ unicode-slugify==0.1.3
 django-autoslug==1.9.3
 
 # Time zones support
-pytz==2015.7
+pytz==2016.4
 
 # Redis support
 django-redis==4.4.3
