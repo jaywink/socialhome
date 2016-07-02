@@ -19,10 +19,11 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Django security middleware
+# Production middleware
 # ------------------------------------------------------------------------------
-SECURITY_MIDDLEWARE = (
+PRODUCTION_MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 )
 
 # set this to 60 seconds and then to 518400 when you can prove it works
@@ -38,7 +39,7 @@ SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
 # Make sure djangosecure.middleware.SecurityMiddleware is listed first
-MIDDLEWARE_CLASSES = SECURITY_MIDDLEWARE + MIDDLEWARE_CLASSES
+MIDDLEWARE_CLASSES = PRODUCTION_MIDDLEWARE + MIDDLEWARE_CLASSES
 
 # opbeat integration
 # See https://opbeat.com/languages/django/
@@ -71,7 +72,7 @@ INSTALLED_APPS += (
 
 # Static Assets
 # ------------------------
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # EMAIL
