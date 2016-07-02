@@ -24,9 +24,8 @@ django-enumfields==0.8.0
 # Images
 Pillow==3.3.0
 
-# For user registration, either via email or social
-# Well-built with regular release cycles!
-django-allauth==0.24.1
+# User registration, either via email or social
+django-allauth==0.25.2
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.1
