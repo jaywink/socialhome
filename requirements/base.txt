@@ -17,7 +17,7 @@ django-braces==1.9.0
 
 # Forms
 django-crispy-forms==1.6.0
-django-floppyforms==1.6.1
+django-floppyforms==1.6.2
 
 # Models
 django-model-utils==2.4
