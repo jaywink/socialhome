@@ -1,12 +1,5 @@
 @import "variables";
 
-.grid-sizer,
-.grid-item {
-  width: 46%;
-  padding: 1%;
-  margin: 1%;
-}
-
 .grid-item {
   background-color: #F1F1F1;
   border-radius: 6px;
@@ -22,10 +15,18 @@
 }
 
 // Responsive tweaks to grid sizes
-@media all and (min-width: $largeLower) {
+@media all and (min-width: $extraLargeLower) {
   .grid-sizer,
   .grid-item {
-    width: 32%;
+    width: 24%;
+    padding: 0.5%;
+    margin: 0.5%;
+  }
+}
+@media all and (max-width: $largeUpper) and (min-width: $largeLower) {
+  .grid-sizer,
+  .grid-item {
+    width: 32.1%;
     padding: 1%;
     margin: 0.5%;
   }
@@ -33,16 +34,16 @@
 @media all and (max-width: $mediumUpper) and (min-width: $mediumLower) {
   .grid-sizer,
   .grid-item {
-    width: 46%;
+    width: 48%;
     padding: 1%;
     margin: 1%;
   }
 }
-@media all and (max-width: $smallUpper) and (min-width: $smallLower) {
+@media all and (max-width: $smallUpper) {
   .grid-sizer,
   .grid-item {
     width: 100%;
-    padding: 1%;
+    padding: 2%;
     margin: 1% 0;
   }
 }
