@@ -65,7 +65,7 @@
       </nav>
     </div>
 
-    <div class="container">
+    <div class="{% block containertype %}container{% endblock %}">
 
       {% if messages %}
           {% for message in messages %}
