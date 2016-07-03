@@ -14,24 +14,14 @@
   }
 }
 
-// Responsive tweaks to grid sizes
-@media all and (min-width: $extraLargeLower) {
-  .grid-sizer,
-  .grid-item {
-    width: 24%;
-    padding: 0.5%;
-    margin: 0.5%;
-  }
+// Responsive grid sizes
+.grid-sizer,
+.grid-item {
+  width: 100%;
+  padding: 2%;
+  margin: 1% 0;
 }
-@media all and (max-width: $largeUpper) and (min-width: $largeLower) {
-  .grid-sizer,
-  .grid-item {
-    width: 32.1%;
-    padding: 1%;
-    margin: 0.5%;
-  }
-}
-@media all and (max-width: $mediumUpper) and (min-width: $mediumLower) {
+@media all and (min-width: $mediumDevice) {
   .grid-sizer,
   .grid-item {
     width: 48%;
@@ -39,11 +29,19 @@
     margin: 1%;
   }
 }
-@media all and (max-width: $smallUpper) {
+@media all and (min-width: $largeDevice) {
   .grid-sizer,
   .grid-item {
-    width: 100%;
-    padding: 2%;
-    margin: 1% 0;
+    width: 32.1%;
+    padding: 1%;
+    margin: 0.5%;
+  }
+}
+@media all and (min-width: $extraLargeDevice) {
+  .grid-sizer,
+  .grid-item {
+    width: 24%;
+    padding: 0.5%;
+    margin: 0.5%;
   }
 }
