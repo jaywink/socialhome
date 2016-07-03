@@ -25,12 +25,12 @@
       <nav class="navbar navbar-dark navbar-static-top bg-inverse">
         <div class="container">
           <a class="navbar-brand" href="/">Socialhome</a>
-          <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+          <button type="button" class="navbar-toggler hidden-md-up pull-xs-right pull-sm-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             &#9776;
           </button>
-
+          <div class="navbar-collapse-fix"></div>
           <!-- Collect the nav links, forms, and other content for toggling -->
-          <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1">
+          <div class="collapse navbar-toggleable-sm" id="bs-navbar-collapse-1">
             <ul class="nav navbar-nav">
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'home' %}">Home</a>
@@ -40,7 +40,7 @@
               </li>
             </ul>
 
-            <ul class="nav navbar-nav pull-xs-right">
+            <ul class="nav navbar-nav pull-xs-right pull-sm-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
                   <a class="nav-link" href="{% url "content:create" "profile" %}">{% trans "Create" %}</a>

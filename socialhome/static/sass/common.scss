@@ -26,8 +26,13 @@
     margin-left: 0;
   }
 
-  .nav.navbar-nav.pull-xs-right {
+  .nav.navbar-nav.pull-xs-right,
+  .nav.navbar-nav.pull-md-right {
     float: none !important;
+  }
+
+  .navbar-collapse-fix {
+    clear: both;
   }
 }
 
