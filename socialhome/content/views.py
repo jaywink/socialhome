@@ -35,6 +35,12 @@ class ContentCreateView(CreateView):
         )
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_form_kwargs(self):
+        """Add user to form kwargs."""
+        kwargs = super(ContentCreateView, self).get_form_kwargs()
+        kwargs.update({"user": self.request.user})
+        return kwargs
+
     def get_success_url(self):
         if self.kwargs.get("location") == "profile":
             return reverse("users:detail", kwargs={"username": self.request.user.username})
@@ -62,7 +68,10 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(ContentUpdateView, self).get_form_kwargs()
-        kwargs.update({"instance": self.object.content_object})
+        kwargs.update({
+            "instance": self.object.content_object,
+            "user": self.request.user,
+        })
         return kwargs
 
     def form_valid(self, form):

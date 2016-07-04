@@ -39,7 +39,7 @@ class TestContentCreateView(object):
 
     def test_form_valid(self, admin_client, rf):
         request, view = self._get_request_and_view(rf)
-        form = PostForm(data={"text": "barfoo", "public": True})
+        form = PostForm(data={"text": "barfoo", "public": True}, user=request.user)
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
@@ -82,7 +82,7 @@ class TestContentUpdateView(object):
 
     def test_form_valid(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
-        form = PostForm(data={"text": "barfoo", "public": True}, instance=content.content_object)
+        form = PostForm(data={"text": "barfoo", "public": True}, instance=content.content_object, user=request.user)
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
