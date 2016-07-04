@@ -39,7 +39,7 @@ class TestContentCreateView(object):
 
     def test_form_valid(self, admin_client, rf):
         request, view = self._get_request_and_view(rf)
-        form = PostForm(data={"text": "barfoo", "public": True})
+        form = PostForm(data={"text": "barfoo", "public": True}, user=request.user)
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
@@ -58,6 +58,14 @@ class TestContentCreateView(object):
     def test_create_view_renders(self, admin_client, rf):
         response = admin_client.get(reverse("content:create", kwargs={"location": "profile"}))
         assert response.status_code == 200
+
+    def test_untrusted_editor_text_is_cleaned(self, admin_client, rf):
+        request, view = self._get_request_and_view(rf)
+        request.user.trusted_editor = False
+        request.user.save()
+        form = PostForm(data={"text": "<script>console.log</script>", "public": True}, user=request.user)
+        form.full_clean()
+        assert form.cleaned_data["text"] == "&lt;script&gt;console.log&lt;/script&gt;"
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
@@ -82,7 +90,7 @@ class TestContentUpdateView(object):
 
     def test_form_valid(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
-        form = PostForm(data={"text": "barfoo", "public": True}, instance=content.content_object)
+        form = PostForm(data={"text": "barfoo", "public": True}, instance=content.content_object, user=request.user)
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
@@ -124,6 +132,17 @@ class TestContentUpdateView(object):
         content.refresh_from_db()
         assert content.content_object.text == "foobar"
         assert not content.content_object.public
+
+    def test_untrusted_editor_text_is_cleaned(self, admin_client, rf):
+        request, view, content = self._get_request_view_and_content(rf)
+        request.user.trusted_editor = False
+        request.user.save()
+        form = PostForm(
+            data={"text": "<script>console.log</script>", "public": True}, instance=content.content_object,
+            user=request.user
+        )
+        form.full_clean()
+        assert form.cleaned_data["text"] == "&lt;script&gt;console.log&lt;/script&gt;"
 
 
 @pytest.mark.usefixtures("admin_client", "rf")

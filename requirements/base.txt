@@ -54,3 +54,4 @@ git+https://github.com/jaywink/social-federation.git@master#egg=Social-Federatio
 
 # Content
 django-markdownx==1.6
+bleach==1.4.3
