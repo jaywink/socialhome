@@ -35,6 +35,11 @@ class User(AbstractUser):
     # Profile visibility
     visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.SELF)
 
+    # Trusted editor defines whether user is allowed some extra options, for example in content creation
+    # Users that are trusted might be able to inject harmful content into the system, for example
+    # with unlimited usage of HTML tags.
+    trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
+
     def __str__(self):
         return self.username
 
