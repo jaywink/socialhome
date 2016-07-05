@@ -48,12 +48,12 @@ class Content(models.Model):
 
     Actual content is linked by a GenericForeignKey. User and visibility is cached here for faster access.
     """
-    target = EnumIntegerField(ContentTarget)
+    target = EnumIntegerField(ContentTarget, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Content owner"))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
-    visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC)
+    visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     def __str__(self):
         return "%s (%s, %s, %s)" % (
