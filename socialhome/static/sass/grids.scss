@@ -45,3 +45,15 @@
     margin: 0.5%;
   }
 }
+
+.organize-content {
+  .card {
+    max-height: 100px;
+    overflow: hidden;
+
+    .fa-arrows-alt {
+      opacity: 0.6;
+      cursor: move;
+    }
+  }
+}

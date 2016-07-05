@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
@@ -45,7 +46,7 @@ class UserDetailView(AccessMixin, DetailView):
         elif self.request.user != self.target_user:
             # TODO: filter out also LIMITED until contacts implemented
             contents = contents.exclude(visibility__in=[Visibility.LIMITED, Visibility.SELF])
-        return contents
+        return contents.order_by("order")
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -64,6 +65,30 @@ class UserDetailView(AccessMixin, DetailView):
                     request.user == self.target_user:
                 return super(UserDetailView, self).dispatch(request, *args, **kwargs)
         return self.handle_no_permission()
+
+
+class OrganizeContentUserDetailView(UserDetailView):
+    template_name = "users/user_detail_organize.html"
+
+    def get_object(self):
+        # Only get the User record for the user making the request
+        return User.objects.get(username=self.request.user.username)
+
+    def post(self, request, *args, **kwargs):
+        """Save sort order."""
+        self._save_sort_order(request.POST.get("sort_order").split(","))
+        return redirect(self.get_success_url())
+
+    def _save_sort_order(self, card_ids):
+        """Update Content `order` values according to sort order."""
+        qs_ids = self._get_contents_queryset().values_list("id", flat=True)
+        for i in range(0, len(card_ids)):
+            # Only allow updating cards that are in our qs
+            if card_ids[i] in qs_ids:
+                Content.objects.filter(id=card_ids[i]).update(order=i)
+
+    def get_success_url(self):
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):

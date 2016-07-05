@@ -54,6 +54,8 @@ class Content(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+    # Order int to allow ordering content within some context
+    order = models.PositiveIntegerField(verbose_name=_("Order"), default=1, db_index=True)
 
     def __str__(self):
         return "%s (%s, %s, %s)" % (
