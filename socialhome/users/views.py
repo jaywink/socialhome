@@ -76,6 +76,7 @@ class OrganizeContentUserDetailView(UserDetailView):
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""
+        self.object = self.get_object()
         self._save_sort_order(request.POST.get("sort_order").split(","))
         return redirect(self.get_success_url())
 
