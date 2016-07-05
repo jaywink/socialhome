@@ -85,8 +85,9 @@ class OrganizeContentUserDetailView(UserDetailView):
         qs_ids = self._get_contents_queryset().values_list("id", flat=True)
         for i in range(0, len(card_ids)):
             # Only allow updating cards that are in our qs
-            if card_ids[i] in qs_ids:
-                Content.objects.filter(id=card_ids[i]).update(order=i)
+            id = int(card_ids[i])
+            if id in qs_ids:
+                Content.objects.filter(id=id).update(order=i)
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})

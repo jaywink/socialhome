@@ -173,7 +173,8 @@ class TestOrganizeContentUserDetailView(object):
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[0].id
-        view._save_sort_order([contents[0].id, contents[1].id, contents[2].id])
+        # Run id's via str() because request.POST gives them like that
+        view._save_sort_order([str(contents[0].id), str(contents[1].id), str(contents[2].id)])
         qs = view._get_contents_queryset()
         assert qs[0].id == contents[0].id
         assert qs[1].id == contents[1].id
