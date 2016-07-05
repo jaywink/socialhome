@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from test_plus.test import TestCase
 
@@ -7,7 +8,7 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.users.models import User
 from socialhome.users.tests.factories import UserFactory
-from socialhome.users.views import UserRedirectView, UserUpdateView, UserDetailView
+from socialhome.users.views import UserRedirectView, UserUpdateView, UserDetailView, OrganizeContentUserDetailView
 
 
 class BaseUserTestCase(TestCase):
@@ -71,9 +72,9 @@ class TestUserDetailView(object):
         contents = []
         if create_content:
             contents.extend([
-                ContentFactory(user=request.user, content_object__user=request.user),
-                ContentFactory(user=request.user, content_object__user=request.user),
-                ContentFactory(user=request.user, content_object__user=request.user),
+                ContentFactory(user=request.user, content_object__user=request.user, order=3),
+                ContentFactory(user=request.user, content_object__user=request.user, order=2),
+                ContentFactory(user=request.user, content_object__user=request.user, order=1),
             ])
         view = UserDetailView(request=request, kwargs={"username": request.user.username})
         view.object = request.user
@@ -84,9 +85,12 @@ class TestUserDetailView(object):
         request, view, contents = self._get_request_view_and_content(rf)
         context = view.get_context_data()
         assert len(context["contents"]) == 3
-        for i in range(3):
-            assert context["contents"][i]["content"] == contents[i].content_object.render()
-            assert context["contents"][i]["obj"] == contents[i]
+        context_content = {content["content"] for content in context["contents"]}
+        rendered = {content.content_object.render() for content in contents}
+        assert context_content == rendered
+        context_objs = {content["obj"] for content in context["contents"]}
+        objs = set(contents)
+        assert context_objs == objs
 
     def test_get_context_data_does_not_contain_content_for_other_users(self, admin_client, rf):
         request, view, contents = self._get_request_view_and_content(rf, create_content=False)
@@ -132,6 +136,56 @@ class TestUserDetailView(object):
         qs = view._get_contents_queryset()
         assert qs.count() == 4
         assert set(qs) == {public, site, selff, limited}
+
+    def test_contents_queryset_returns_content_in_correct_order(self, admin_client, rf):
+        request, view, contents = self._get_request_view_and_content(rf)
+        qs = view._get_contents_queryset()
+        assert qs[0].id == contents[2].id
+        assert qs[1].id == contents[1].id
+        assert qs[2].id == contents[0].id
+
+
+@pytest.mark.usefixtures("admin_client", "rf")
+class TestOrganizeContentUserDetailView(object):
+    def _get_request_view_and_content(self, rf, create_content=True):
+        request = rf.get("/")
+        request.user = UserFactory(visibility=Visibility.PUBLIC)
+        contents = []
+        if create_content:
+            contents.extend([
+                ContentFactory(user=request.user, content_object__user=request.user, order=3),
+                ContentFactory(user=request.user, content_object__user=request.user, order=2),
+                ContentFactory(user=request.user, content_object__user=request.user, order=1),
+            ])
+        view = OrganizeContentUserDetailView(request=request, kwargs={"username": request.user.username})
+        view.object = request.user
+        view.target_user = request.user
+        return request, view, contents
+
+    def test_view_renders(self, admin_client, rf):
+        request, view, contents = self._get_request_view_and_content(rf)
+        response = admin_client.get(reverse("users:detail-organize", kwargs={"username": request.user.username}))
+        assert response.status_code == 200
+
+    def test_save_sort_order_updates_order(self, admin_client, rf):
+        request, view, contents = self._get_request_view_and_content(rf)
+        qs = view._get_contents_queryset()
+        assert qs[0].id == contents[2].id
+        assert qs[1].id == contents[1].id
+        assert qs[2].id == contents[0].id
+        view._save_sort_order([contents[0].id, contents[1].id, contents[2].id])
+        qs = view._get_contents_queryset()
+        assert qs[0].id == contents[0].id
+        assert qs[1].id == contents[1].id
+        assert qs[2].id == contents[2].id
+
+    def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
+        request, view, contents = self._get_request_view_and_content(rf)
+        other_user = UserFactory()
+        other_content = ContentFactory(user=other_user, content_object__user=other_user, order=100)
+        view._save_sort_order([other_content.id])
+        other_content.refresh_from_db()
+        assert other_content.order == 100
 
 
 @pytest.mark.usefixtures("admin_user", "client")

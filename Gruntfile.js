@@ -89,6 +89,7 @@ module.exports = function (grunt) {
         src: [
           "<%= paths.bower %>/jquery/dist/jquery.min.js",
           "<%= paths.bower %>/tether/dist/js/tether.min.js",
+          "<%= paths.bower %>/jquery-ui/jquery-ui.min.js",
           "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
           "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
           "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
@@ -152,7 +153,7 @@ module.exports = function (grunt) {
       runDjango: {
         cmd: 'python <%= paths.manageScript %> runserver'
       },
-      
+
     }
   });
 
