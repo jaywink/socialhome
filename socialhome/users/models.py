@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -73,3 +74,10 @@ class User(AbstractUser):
             except IndexError:
                 return ""
         return ""
+
+    def save(self, *args, **kwargs):
+        """Make sure local user always has a key pair."""
+        if self.local and (not self.rsa_private_key or not self.rsa_public_key) and \
+                settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
+            self.generate_new_rsa_key()
+        return super(User, self).save(*args, **kwargs)

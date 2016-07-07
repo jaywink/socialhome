@@ -244,6 +244,10 @@ ADMIN_URL = r'^admin/'
 # SOCIALHOME
 # ------------------------------------------------------------------------------
 SOCIALHOME_DOMAIN = env("SOCIALHOME_DOMAIN", default='socialhome.local')
+# Whether to automatically generate an RSA key pair for local users on save
+# We need this setting so we can turn it off in tests that don't test this feature
+# Otherwise the whole test suite becomes slooooow.
+SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = True
 SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", True)
 # Username of profile living at root ie "/"
 # Instead of normal site landing page, this user profile will be shown.

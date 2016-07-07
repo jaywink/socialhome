@@ -65,4 +65,6 @@ CELERY_ALWAYS_EAGER = True
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
+# Disable generating RSA keys automatically, otherwise tests become slow
+SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
 SOCIALHOME_HTTPS = False
