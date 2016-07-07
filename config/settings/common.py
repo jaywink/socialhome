@@ -40,6 +40,7 @@ THIRD_PARTY_APPS = (
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
     "markdownx",
+    "django_extensions",  # Generic helpers for administration
 )
 
 # Apps specific for this project go here.
