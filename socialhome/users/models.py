@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import uuid
 
+from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
@@ -81,3 +82,8 @@ class User(AbstractUser):
                 settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             self.generate_new_rsa_key()
         return super(User, self).save(*args, **kwargs)
+
+    @property
+    def key(self):
+        """Required by Social-Federation."""
+        return RSA.importKey(self.rsa_private_key)

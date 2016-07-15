@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
@@ -8,10 +10,13 @@ from django.views.generic import View
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
+from federation.protocols.diaspora.protocol import Protocol
 
 from socialhome import __version__ as version
 from socialhome.federate.tasks import receive_public_task
 from socialhome.users.models import User
+
+logger = logging.getLogger("socialhome")
 
 
 def host_meta_view(request):
@@ -105,3 +110,19 @@ class ReceivePublicView(View):
             return HttpResponseBadRequest()
         receive_public_task.delay(payload)
         return HttpResponse(status=202)
+
+
+class ReceiveUserView(View):
+    """Diaspora /receive/users view."""
+    def post(self, request, *args, **kwargs):
+        """Reverse engineering - just save the content."""
+        payload = request.POST.get("xml")
+        if not payload:
+            return HttpResponseBadRequest()
+        guid = kwargs.get("guid")
+        user = User.objects.get(guid=guid)
+        protocol = Protocol()
+        sender, message = protocol.receive(payload, user=user, skip_author_verification=True)
+        logger.debug("ReceiveUserView - sender: %s" % sender)
+        logger.debug("ReceiveUserView - message: %s" % message)
+        return HttpResponse(status=404)
