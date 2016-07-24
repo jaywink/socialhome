@@ -157,8 +157,15 @@ LOGGING = {
             "formatter": "verbose",
             "maxBytes": 10485760,  # 10mb
             "backupCount": 10,
-
-        }
+        },
+        "federation_file": {
+            "filename": env("SOCIALHOME_LOGFILE_FEDERATION", default='/tmp/socialhome-federation.log'),
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "maxBytes": 10485760,  # 10mb
+            "backupCount": 10,
+        },
     },
     'loggers': {
         'django.request': {
@@ -175,7 +182,12 @@ LOGGING = {
             "level": "DEBUG",
             "handlers": ["application_file"],
             "propagate": True
-        }
+        },
+        "social-federation": {
+            "level": "DEBUG",
+            "handlers": ["federation_file"],
+            "propagate": False,
+        },
     }
 }
 
