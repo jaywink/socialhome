@@ -72,7 +72,10 @@ def hcard_view(request, guid):
         photo300=photo300,
         photo100=photo100,
         photo50=photo50,
-        searchable="true"  # TODO: allow user to set this
+        searchable="true" if user.public else "false",
+        guid=str(user.guid),
+        username=user.username,
+        public_key=user.rsa_public_key,
     )
     return HttpResponse(hcard)
 

@@ -50,7 +50,7 @@ celery==3.1.23
 django-extensions==1.6.7
 
 # Federation
-git+https://github.com/jaywink/social-federation.git@remote-profiles#egg=Social-Federation
+Social-Federation==0.4.0
 
 # Content
 django-markdownx==1.6

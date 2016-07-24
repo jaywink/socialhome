@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from federation.controllers import handle_receive
+from federation.inbound import handle_receive
 from federation.entities.diaspora.entities import DiasporaPost
 from federation.exceptions import NoSuitableProtocolFoundError
 
