@@ -3,7 +3,7 @@ import logging
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
+from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
 
@@ -13,7 +13,7 @@ from federation.hostmeta.generators import (
 from federation.protocols.diaspora.protocol import Protocol
 
 from socialhome import __version__ as version
-from socialhome.federate.tasks import receive_public_task
+from socialhome.federate.tasks import receive_task
 from socialhome.users.models import User
 
 logger = logging.getLogger("socialhome")
@@ -111,21 +111,16 @@ class ReceivePublicView(View):
         payload = request.POST.get("xml")
         if not payload:
             return HttpResponseBadRequest()
-        receive_public_task.delay(payload)
+        receive_task.delay(payload)
         return HttpResponse(status=202)
 
 
 class ReceiveUserView(View):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
-        """Reverse engineering - just save the content."""
         payload = request.POST.get("xml")
         if not payload:
             return HttpResponseBadRequest()
         guid = kwargs.get("guid")
-        user = User.objects.get(guid=guid)
-        protocol = Protocol()
-        sender, message = protocol.receive(payload, user=user, skip_author_verification=True)
-        logger.debug("ReceiveUserView - sender: %s" % sender)
-        logger.debug("ReceiveUserView - message: %s" % message)
-        return HttpResponse(status=404)
+        receive_task.delay(payload, guid=guid)
+        return HttpResponse(status=202)
