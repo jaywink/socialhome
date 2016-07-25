@@ -6,6 +6,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: 'user-{0}'.format(n))
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n))
     password = factory.PostGenerationMethodCall('set_password', 'password')
+    handle = factory.SelfAttribute("email")
 
     # Dummy strings as keys since generating these is expensive
     rsa_private_key = fuzzy.FuzzyText()

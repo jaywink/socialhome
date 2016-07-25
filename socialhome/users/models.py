@@ -7,6 +7,7 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -25,6 +26,9 @@ class User(AbstractUser):
 
     # Globally unique identifier
     guid = models.UUIDField(_("GUID"), default=uuid.uuid4, editable=False, unique=True)
+
+    # Globally unique handle in format username@domain.tld
+    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, validators=[validate_email])
 
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
@@ -77,10 +81,13 @@ class User(AbstractUser):
         return ""
 
     def save(self, *args, **kwargs):
-        """Make sure local user always has a key pair."""
-        if self.local and (not self.rsa_private_key or not self.rsa_public_key) and \
-                settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
-            self.generate_new_rsa_key()
+        """Make sure local user always has some necessary data."""
+        if self.local:
+            if (not self.rsa_private_key or not self.rsa_public_key) and \
+                    settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
+                self.generate_new_rsa_key()
+            if not self.handle:
+                self.handle = "%s@%s" % (self.username, settings.SOCIALHOME_DOMAIN)
         return super(User, self).save(*args, **kwargs)
 
     @property
