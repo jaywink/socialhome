@@ -10,11 +10,10 @@ from django.views.generic import View
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
-from federation.protocols.diaspora.protocol import Protocol
 
 from socialhome import __version__ as version
 from socialhome.federate.tasks import receive_task
-from socialhome.users.models import User
+from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
 
@@ -39,17 +38,14 @@ def webfinger_view(request):
         "diaspora",
         handle="{username}@{domain}".format(username=user.username, domain=settings.SOCIALHOME_DOMAIN),
         host=settings.SOCIALHOME_URL,
-        guid=str(user.guid),
-        public_key=user.rsa_public_key
+        guid=str(user.profile.guid),
+        public_key=user.profile.rsa_public_key
     )
     return HttpResponse(webfinger, content_type="application/xrd+xml")
 
 
-def get_photo_urls():
-    """Temporary function to return some pony urls which will not change.
-
-    Once User can have a profile photo and profile updates are sent out, use proper static images urls instead.
-    """
+def get_pony_urls():
+    """Function to return some pony urls which will not change."""
     base_url = "{url}{staticpath}images/pony[size].png".format(
         url=settings.SOCIALHOME_URL, staticpath=settings.STATIC_URL
     )
@@ -57,25 +53,32 @@ def get_photo_urls():
 
 
 def hcard_view(request, guid):
-    """Generate a hcard document."""
+    """Generate a hcard document.
+
+    For local users only.
+    """
     try:
-        user = get_object_or_404(User, guid=guid)
+        profile = get_object_or_404(Profile, guid=guid, user__isnull=False)
     except ValueError:
         raise Http404()
-    photo300, photo100, photo50 = get_photo_urls()
+    if profile.image_url_large and profile.image_url_medium and profile.image_url_small:
+        photo300, photo100, photo50 = profile.image_url_large, profile.image_url_medium, profile.image_url_small
+    else:
+        # Ponies are nice
+        photo300, photo100, photo50 = get_pony_urls()
     hcard = generate_hcard(
         "diaspora",
         hostname=settings.SOCIALHOME_URL,
-        fullname=user.name,
-        firstname=user.get_first_name(),
-        lastname=user.get_last_name(),
+        fullname=profile.name,
+        firstname=profile.get_first_name(),
+        lastname=profile.get_last_name(),
         photo300=photo300,
         photo100=photo100,
         photo50=photo50,
-        searchable="true" if user.public else "false",
-        guid=str(user.guid),
-        username=user.username,
-        public_key=user.rsa_public_key,
+        searchable="true" if profile.public else "false",
+        guid=profile.guid,
+        username=profile.nickname,
+        public_key=profile.rsa_public_key,
     )
     return HttpResponse(hcard)
 

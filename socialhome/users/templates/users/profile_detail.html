@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block title %}{{ object.username }}{% endblock %}
+{% block title %}{{ object.nickname }}{% endblock %}
 
 {% block containertype %}container-fluid{% endblock %}
 
@@ -11,18 +11,18 @@
             <div class="grid">
                 <div class="grid-sizer"></div>
                 <div class="grid-item">
-                    <h2>{{ object.username }}</h2>
+                    <h2>{{ object.nickname }}</h2>
                     {% if object.name %}
                         <p>{{ object.name }}</p>
                     {% endif %}
                 </div>
-                {% if object == request.user %}
+                {% if object == request.user.profile %}
                     <div class="grid-item">
                         <div class="row">
                             <div class="col-sm-12">
                                 <a class="btn btn-primary" href="{% url 'users:update' %}">My Info</a>
                                 <a class="btn btn-primary" href="{% url 'account_email' %}">E-Mail</a>
-                                <a class="btn btn-primary" href="{% url 'users:detail-organize' request.user.username %}">{% trans "Organize" %}</a>
+                                <a class="btn btn-primary" href="{% url 'users:detail-organize' %}">{% trans "Organize" %}</a>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                 {% for content in contents %}
                     <div class="grid-item">
                         <div class="grid-item-actions text-sm-right">
-                            {% if content.obj.user == request.user %}
+                            {% if content.obj.author == request.user.profile %}
                                 <a href="{% url "content:update" content.obj.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
                                 <a href="{% url "content:delete" content.obj.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
                             {% endif %}

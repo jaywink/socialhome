@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
-import uuid
-
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -12,10 +10,12 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils import generate_rsa_private_key
 
+# TODO: ensure Profile creation on user creation - where?
 
 @python_2_unicode_compatible
 class User(AbstractUser):
@@ -24,23 +24,6 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
 
-    # Globally unique identifier
-    guid = models.UUIDField(_("GUID"), default=uuid.uuid4, editable=False, unique=True)
-
-    # Globally unique handle in format username@domain.tld
-    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, validators=[validate_email])
-
-    # RSA key
-    rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
-    rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
-
-    # Local vs remote users
-    # Remote users cannot log in and don't have basic local user identity things like a private key
-    local = models.BooleanField(_("Local"), default=True, editable=False)
-
-    # Profile visibility
-    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.SELF)
-
     # Trusted editor defines whether user is allowed some extra options, for example in content creation
     # Users that are trusted might be able to inject harmful content into the system, for example
     # with unlimited usage of HTML tags.
@@ -48,18 +31,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-    def get_absolute_url(self):
-        return reverse('users:detail', kwargs={'username': self.username})
-
-    def generate_new_rsa_key(self):
-        """Generate a new RSA private key
-
-        Also cache the public key for faster retrieval into own field.
-        """
-        key = generate_rsa_private_key()
-        self.rsa_public_key = key.publickey().exportKey()
-        self.rsa_private_key = key.exportKey()
 
     def get_first_name(self):
         """Return User.first_name or part of User.name"""
@@ -80,15 +51,70 @@ class User(AbstractUser):
                 return ""
         return ""
 
+
+class Profile(models.Model):
+    """Profile data for local and remote users."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+
+    # Fields partly mirroring 'User' table since all our Profiles are not local
+    name = models.CharField(_("Name"), blank=True, max_length=255)
+    # TODO make uneditable
+    nickname = models.CharField(_("Nickname"),
+        max_length=64, unique=True, help_text=_("Usually username, for local users at least."),
+    )
+    email = models.EmailField(_("email address"), blank=True)
+
+    # GUID
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False)
+
+    # Globally unique handle in format username@domain.tld
+    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, validators=[validate_email])
+
+    # RSA key
+    rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
+    rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
+
+    # Profile visibility
+    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.SELF)
+
+    # Image urls
+    image_url_large = models.URLField(_("Image - large"), blank=True)
+    image_url_medium = models.URLField(_("Image - medium"), blank=True)
+    image_url_small = models.URLField(_("Image - small"), blank=True)
+
+    # Location
+    location = models.CharField(_("Location"), max_length=128, blank=True)
+
+    # NSFW status
+    nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
+
+    created = AutoCreatedField(_("Created"))
+    modified = AutoLastModifiedField(_("Modified"))
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.nickname)
+
+    def get_absolute_url(self):
+        return reverse("users:detail", kwargs={"nickname": self.nickname})
+
+    def generate_new_rsa_key(self):
+        """Generate a new RSA private key
+
+        Also cache the public key for faster retrieval into own field.
+        """
+        key = generate_rsa_private_key()
+        self.rsa_public_key = key.publickey().exportKey()
+        self.rsa_private_key = key.exportKey()
+
     def save(self, *args, **kwargs):
-        """Make sure local user always has some necessary data."""
-        if self.local:
+        """Make sure local profile always has some necessary data."""
+        if self.user:
             if (not self.rsa_private_key or not self.rsa_public_key) and \
                     settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
                 self.generate_new_rsa_key()
             if not self.handle:
-                self.handle = "%s@%s" % (self.username, settings.SOCIALHOME_DOMAIN)
-        return super(User, self).save(*args, **kwargs)
+                self.handle = "%s@%s" % (self.nickname, settings.SOCIALHOME_DOMAIN)
+        return super(Profile, self).save(*args, **kwargs)
 
     @property
     def key(self):
@@ -99,3 +125,22 @@ class User(AbstractUser):
     def public(self):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
+
+    def get_first_name(self):
+        """Return User.first_name or part of Profile.name"""
+        if self.user and self.user.first_name:
+            return self.user.first_name
+        elif self.name:
+            return self.name.split(" ")[0]
+        return ""
+
+    def get_last_name(self):
+        """Return User.last_name or part of Profile.name"""
+        if self.user and self.user.last_name:
+            return self.user.last_name
+        elif self.name:
+            try:
+                return self.name.split(" ", 1)[1]
+            except IndexError:
+                return ""
+        return ""

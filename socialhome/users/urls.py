@@ -17,18 +17,18 @@ urlpatterns = [
         name='redirect'
     ),
     url(
-        regex=r'^(?P<username>[\w.@+-]+)/$',
-        view=views.UserDetailView.as_view(),
+        regex=r'^(?P<nickname>[\w.@+-]+)/$',
+        view=views.ProfileDetailView.as_view(),
         name='detail'
     ),
     url(
-        regex=r'^(?P<username>[\w.@+-]+)/organize/$',
-        view=views.OrganizeContentUserDetailView.as_view(),
+        regex=r'^~organize/$',
+        view=views.OrganizeContentProfileDetailView.as_view(),
         name='detail-organize'
     ),
     url(
         regex=r'^~update/$',
-        view=views.UserUpdateView.as_view(),
+        view=views.ProfileUpdateView.as_view(),
         name='update'
     ),
 ]

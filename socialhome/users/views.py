@@ -10,17 +10,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from socialhome.content.enums import ContentTarget
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
-from .models import User
+from .models import User, Profile
 
 
-class UserDetailView(AccessMixin, DetailView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    slug_field = "username"
-    slug_url_kwarg = "username"
+class ProfileDetailView(AccessMixin, DetailView):
+    model = Profile
+    slug_field = "nickname"
+    slug_url_kwarg = "nickname"
 
     def get_context_data(self, **kwargs):
-        context = super(UserDetailView, self).get_context_data(**kwargs)
+        context = super(ProfileDetailView, self).get_context_data(**kwargs)
         context["contents"] = self._collect_contents()
         return context
 
@@ -40,10 +39,10 @@ class UserDetailView(AccessMixin, DetailView):
 
         Limit by content visibility.
         """
-        contents = Content.objects.filter(target=ContentTarget.PROFILE, user=self.object)
+        contents = Content.objects.filter(target=ContentTarget.PROFILE, author=self.object)
         if not self.request.user.is_authenticated():
             contents = contents.filter(visibility=Visibility.PUBLIC)
-        elif self.request.user != self.target_user:
+        elif self.request.user.profile != self.target_profile:
             # TODO: filter out also LIMITED until contacts implemented
             contents = contents.exclude(visibility__in=[Visibility.LIMITED, Visibility.SELF])
         return contents.order_by("order")
@@ -53,26 +52,31 @@ class UserDetailView(AccessMixin, DetailView):
 
         Redirect to login if not allowed to see profile.
         """
-        self.target_user = User.objects.get(username=self.kwargs.get("username"))
-        if self.target_user.visibility == Visibility.PUBLIC:
-            return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+        self.target_profile = Profile.objects.get(nickname=self.kwargs.get("nickname"))
+        if self.target_profile.visibility == Visibility.PUBLIC:
+            return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
         if request.user.is_authenticated():
-            if self.target_user.visibility == Visibility.SITE:
-                return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+            if self.target_profile.visibility == Visibility.SITE:
+                return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
             # TODO: handle Visibility.LIMITED once contacts are implemented
             # Currently falls back to lowest level, ie SELF
-            elif self.target_user.visibility in (Visibility.SELF, Visibility.LIMITED) and \
-                    request.user == self.target_user:
-                return super(UserDetailView, self).dispatch(request, *args, **kwargs)
+            elif self.target_profile.visibility in (Visibility.SELF, Visibility.LIMITED) and \
+                    request.user.profile == self.target_profile:
+                return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
         return self.handle_no_permission()
 
 
-class OrganizeContentUserDetailView(UserDetailView):
-    template_name = "users/user_detail_organize.html"
+class OrganizeContentProfileDetailView(ProfileDetailView):
+    template_name = "users/profile_detail_organize.html"
 
     def get_object(self):
-        # Only get the User record for the user making the request
-        return User.objects.get(username=self.request.user.username)
+        # Only get the Profile record for the user making the request
+        return Profile.objects.get(user=self.request.user)
+
+    def dispatch(self, request, *args, **kwargs):
+        """User current user."""
+        self.kwargs.update({"nickname": request.user.profile.nickname})
+        return super(OrganizeContentProfileDetailView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""
@@ -90,32 +94,25 @@ class OrganizeContentUserDetailView(UserDetailView):
                 Content.objects.filter(id=id).update(order=i)
 
     def get_success_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse("users:detail", kwargs={"nickname": self.object.nickname})
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse("users:detail",
-                       kwargs={"username": self.request.user.username})
+        return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
 
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
-
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     fields = ["name", "visibility"]
+    model = Profile
 
-    # we already imported User in the view code above, remember?
-    model = User
-
-    # send the user back to their own page after a successful update
     def get_success_url(self):
-        return reverse("users:detail",
-                       kwargs={"username": self.request.user.username})
+        return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
 
     def get_object(self):
-        # Only get the User record for the user making the request
-        return User.objects.get(username=self.request.user.username)
+        return Profile.objects.get(nickname=self.request.user.profile.nickname)
 
 
 class UserListView(LoginRequiredMixin, ListView):

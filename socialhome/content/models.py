@@ -12,7 +12,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
-from socialhome.users.models import User
+from socialhome.users.models import User, Profile
 
 
 class Post(models.Model):
@@ -20,7 +20,7 @@ class Post(models.Model):
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
     # and PostgreSQL is very picky with UUIDField.
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"))
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
     public = models.BooleanField(_("Public"), default=True)
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     # For example mobile, server or application name
@@ -33,10 +33,10 @@ class Post(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
-    def save(self, user=None, *args, **kwargs):
-        if not self.pk and user:
+    def save(self, author=None, *args, **kwargs):
+        if not self.pk and author:
             self.guid = uuid4()
-            self.user = user
+            self.author = author
         return super(Post, self).save(*args, **kwargs)
 
     def render(self):
@@ -46,10 +46,10 @@ class Post(models.Model):
 class Content(models.Model):
     """Model representing a piece of content.
 
-    Actual content is linked by a GenericForeignKey. User and visibility is cached here for faster access.
+    Actual content is linked by a GenericForeignKey. Author and visibility is cached here for faster access.
     """
     target = EnumIntegerField(ContentTarget, db_index=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Content owner"))
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")

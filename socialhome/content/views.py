@@ -9,7 +9,7 @@ from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
 from socialhome.content.forms import PostForm
 from socialhome.content.models import Content, Post
-from socialhome.users.views import UserDetailView
+from socialhome.users.views import ProfileDetailView
 
 
 class ContentCreateView(CreateView):
@@ -25,11 +25,11 @@ class ContentCreateView(CreateView):
 
     def form_valid(self, form):
         object = form.save(commit=False)
-        object.save(user=self.request.user)
+        object.save(author=self.request.user.profile)
         form.save_m2m()
         Content.objects.create(
             target=ContentTarget.PROFILE,
-            user=self.request.user,
+            author=self.request.user.profile,
             content_object=object,
             visibility=Visibility.PUBLIC  # No other visibility atm
         )
@@ -43,7 +43,7 @@ class ContentCreateView(CreateView):
 
     def get_success_url(self):
         if self.kwargs.get("location") == "profile":
-            return reverse("users:detail", kwargs={"username": self.request.user.username})
+            return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
         return reverse("home")
 
 
@@ -53,7 +53,7 @@ class UserOwnsContentMixin(UserPassesTestMixin):
     def test_func(self, user):
         """Ensure user owns content."""
         object = self.get_object()
-        return bool(object) and object.user == user
+        return bool(object) and object.author == user.profile
 
 
 class ContentUpdateView(UserOwnsContentMixin, UpdateView):
@@ -82,7 +82,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     def get_success_url(self):
         if self.object.target == ContentTarget.PROFILE:
-            return reverse("users:detail", kwargs={"username": self.request.user.username})
+            return reverse("users:detail", kwargs={"nickname": self.object.author.nickname})
         return reverse("home")
 
 
@@ -92,7 +92,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
     def get_success_url(self):
         if self.object.target == ContentTarget.PROFILE:
-            return reverse("users:detail", kwargs={"username": self.request.user.username})
+            return reverse("users:detail", kwargs={"nickname": self.object.author.nickname})
         return reverse("home")
 
     def get_context_data(self, **kwargs):
@@ -113,5 +113,5 @@ class HomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         """Redirect to user detail view if root page is a profile."""
         if settings.SOCIALHOME_ROOT_PROFILE:
-            return UserDetailView.as_view()(request, username=settings.SOCIALHOME_ROOT_PROFILE)
+            return ProfileDetailView.as_view()(request, nickname=settings.SOCIALHOME_ROOT_PROFILE)
         return super(HomeView, self).get(request, *args, **kwargs)
