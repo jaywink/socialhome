@@ -10,7 +10,7 @@ from socialhome.content.models import Post
 from socialhome.enums import Visibility
 from socialhome.federate.utils import safe_make_aware
 from socialhome.taskapp.celery import tasks
-from socialhome.users.models import User, Profile
+from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
 

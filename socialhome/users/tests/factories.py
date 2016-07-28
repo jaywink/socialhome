@@ -24,9 +24,3 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'users.Profile'
-
-
-def create_profile_with_user(username=None):
-    if username:
-        return ProfileFactory(nickname=username, user=UserFactory(username=username))
-    return ProfileFactory(user=UserFactory())

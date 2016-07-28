@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, absolute_import
 
 from Crypto.PublicKey import RSA
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -15,7 +14,6 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from socialhome.enums import Visibility
 from socialhome.federate.utils import generate_rsa_private_key
 
-# TODO: ensure Profile creation on user creation - where?
 
 @python_2_unicode_compatible
 class User(AbstractUser):
@@ -58,9 +56,9 @@ class Profile(models.Model):
 
     # Fields partly mirroring 'User' table since all our Profiles are not local
     name = models.CharField(_("Name"), blank=True, max_length=255)
-    # TODO make uneditable
     nickname = models.CharField(_("Nickname"),
         max_length=64, unique=True, help_text=_("Usually username, for local users at least."),
+        editable=False
     )
     email = models.EmailField(_("email address"), blank=True)
 
@@ -105,16 +103,6 @@ class Profile(models.Model):
         key = generate_rsa_private_key()
         self.rsa_public_key = key.publickey().exportKey()
         self.rsa_private_key = key.exportKey()
-
-    def save(self, *args, **kwargs):
-        """Make sure local profile always has some necessary data."""
-        if self.user:
-            if (not self.rsa_private_key or not self.rsa_public_key) and \
-                    settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
-                self.generate_new_rsa_key()
-            if not self.handle:
-                self.handle = "%s@%s" % (self.nickname, settings.SOCIALHOME_DOMAIN)
-        return super(Profile, self).save(*args, **kwargs)
 
     @property
     def key(self):

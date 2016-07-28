@@ -3,7 +3,7 @@ import logging
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
 

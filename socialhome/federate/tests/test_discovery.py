@@ -2,7 +2,8 @@
 import pytest
 from django.core.urlresolvers import reverse
 
-from socialhome.users.tests.factories import UserFactory, ProfileFactory, create_profile_with_user
+from socialhome.users.models import Profile
+from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("db", "client")
@@ -16,7 +17,8 @@ class TestFederationDiscovery(object):
         assert response.status_code == 404
 
     def test_webfinger_responds_200_on_known_user(self, client):
-        create_profile_with_user("foobar")
+        UserFactory(username="foobar")
+        Profile.objects.filter(nickname="foobar").update(rsa_public_key="fooobar")
         response = client.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
         assert response.status_code == 200
         response = client.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
@@ -27,8 +29,9 @@ class TestFederationDiscovery(object):
         assert response.status_code == 404
 
     def test_hcard_responds_on_200_on_known_user(self, client):
-        profile = create_profile_with_user("foobar")
-        response = client.get(reverse("federate:hcard", kwargs={"guid": str(profile.guid)}))
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(nickname="foobar").update(rsa_public_key="fooobar")
+        response = client.get(reverse("federate:hcard", kwargs={"guid": user.profile.guid}))
         assert response.status_code == 200
 
     def test_nodeinfo_wellknown_responds(self, client):
