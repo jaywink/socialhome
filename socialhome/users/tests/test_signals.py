@@ -11,7 +11,6 @@ class TestProfile(object):
         profile = user.profile
         assert profile.user == user
         assert profile.name == user.name
-        assert profile.nickname == user.username
         assert profile.email == user.email
         assert profile.rsa_private_key
         assert profile.rsa_public_key

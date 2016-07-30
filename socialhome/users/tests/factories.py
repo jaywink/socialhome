@@ -13,7 +13,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
-    nickname = factory.Sequence(lambda n: 'user-{0}'.format(n))
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n))
     handle = factory.SelfAttribute("email")
     guid = factory.Sequence(lambda n: 'guid-{0}'.format(n))

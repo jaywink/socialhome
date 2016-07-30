@@ -7,8 +7,8 @@ from socialhome.content.forms import PostForm
 from socialhome.content.models import Content, Post
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
-from socialhome.users.models import User, Profile
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.models import Profile
+from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("admin_client", "settings")
@@ -53,7 +53,7 @@ class TestContentCreateView(object):
 
     def test_get_success_url(self, admin_client, rf):
         request, view = self._get_request_and_view(rf)
-        assert view.get_success_url() == "/u/%s/" % request.user.profile.nickname
+        assert view.get_success_url() == "/u/%s/" % request.user.username
 
     def test_create_view_renders(self, admin_client, rf):
         response = admin_client.get(reverse("content:create", kwargs={"location": "profile"}))
@@ -104,10 +104,10 @@ class TestContentUpdateView(object):
 
     def test_get_success_url(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
-        assert view.get_success_url() == "/u/%s/" % request.user.profile.nickname
+        assert view.get_success_url() == "/u/%s/" % request.user.username
 
     def test_update_view_renders(self, admin_client, rf):
-        profile = Profile.objects.get(nickname="admin")
+        profile = Profile.objects.get(user__username="admin")
         content = ContentFactory(author=profile, content_object__author=profile)
         response = admin_client.get(reverse("content:update", kwargs={"pk": content.id}))
         assert response.status_code == 200
@@ -122,7 +122,7 @@ class TestContentUpdateView(object):
         assert response.status_code == 404
 
     def test_update_view_updates_content(self, admin_client, rf):
-        profile = Profile.objects.get(nickname="admin")
+        profile = Profile.objects.get(user__username="admin")
         content = ContentFactory(author=profile, content_object__author=profile)
         response = admin_client.post(reverse("content:update", kwargs={"pk": content.id}), {
             "text": "foobar",
@@ -157,16 +157,16 @@ class TestContentDeleteView(object):
 
     def test_get_success_url(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
-        assert view.get_success_url() == "/u/%s/" % request.user.profile.nickname
+        assert view.get_success_url() == "/u/%s/" % request.user.username
 
     def test_delete_view_renders(self, admin_client, rf):
-        profile = Profile.objects.get(nickname="admin")
+        profile = Profile.objects.get(user__username="admin")
         content = ContentFactory(author=profile, content_object__author=profile)
         response = admin_client.get(reverse("content:delete", kwargs={"pk": content.id}))
         assert response.status_code == 200
 
     def test_delete_deletes_content(self, admin_client, rf):
-        profile = Profile.objects.get(nickname="admin")
+        profile = Profile.objects.get(user__username="admin")
         content = ContentFactory(author=profile, content_object__author=profile)
         request = rf.post("/")
         request.user = profile.user

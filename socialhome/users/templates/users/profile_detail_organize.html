@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block title %}{{ object.nickname }} - {% trans "Organize content" %}{% endblock %}
+{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %} - {% trans "Organize content" %}{% endblock %}
 
 {% block containertype %}container{% endblock %}
 
 {% block content %}
     <h1>{% trans "Organize content" %}</h1>
-    <form method="post" action="{% url 'users:detail-organize' %}" id="organize-content-form">{% csrf_token %}
+    <form method="post" action="{% url 'users:profile-organize' %}" id="organize-content-form">{% csrf_token %}
         <input type="hidden" name="sort_order" value="">
         <div class="row">
             <div class="col-sm-12 organize-content">

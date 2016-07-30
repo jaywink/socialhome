@@ -18,7 +18,7 @@ class TestFederationDiscovery(object):
 
     def test_webfinger_responds_200_on_known_user(self, client):
         UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(rsa_public_key="fooobar")
+        Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
         response = client.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
         assert response.status_code == 200
         response = client.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
@@ -30,7 +30,7 @@ class TestFederationDiscovery(object):
 
     def test_hcard_responds_on_200_on_known_user(self, client):
         user = UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(rsa_public_key="fooobar")
+        Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
         response = client.get(reverse("federate:hcard", kwargs={"guid": user.profile.guid}))
         assert response.status_code == 200
 

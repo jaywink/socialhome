@@ -9,6 +9,7 @@ from socialhome.content.enums import ContentTarget
 from socialhome.enums import Visibility
 from socialhome.content.forms import PostForm
 from socialhome.content.models import Content, Post
+from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView
 
 
@@ -43,7 +44,7 @@ class ContentCreateView(CreateView):
 
     def get_success_url(self):
         if self.kwargs.get("location") == "profile":
-            return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
+            return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
 
 
@@ -82,7 +83,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     def get_success_url(self):
         if self.object.target == ContentTarget.PROFILE:
-            return reverse("users:detail", kwargs={"nickname": self.object.author.nickname})
+            return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
 
 
@@ -92,7 +93,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
     def get_success_url(self):
         if self.object.target == ContentTarget.PROFILE:
-            return reverse("users:detail", kwargs={"nickname": self.object.author.nickname})
+            return reverse("users:detail", kwargs={"username": self.request.user.username})
         return reverse("home")
 
     def get_context_data(self, **kwargs):
@@ -113,5 +114,6 @@ class HomeView(TemplateView):
     def get(self, request, *args, **kwargs):
         """Redirect to user detail view if root page is a profile."""
         if settings.SOCIALHOME_ROOT_PROFILE:
-            return ProfileDetailView.as_view()(request, nickname=settings.SOCIALHOME_ROOT_PROFILE)
+            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+            return ProfileDetailView.as_view()(request, guid=profile.guid)
         return super(HomeView, self).get(request, *args, **kwargs)

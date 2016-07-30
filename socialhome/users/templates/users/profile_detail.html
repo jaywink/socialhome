@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block title %}{{ object.nickname }}{% endblock %}
+{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %}{% endblock %}
 
 {% block containertype %}container-fluid{% endblock %}
 
@@ -11,18 +11,16 @@
             <div class="grid">
                 <div class="grid-sizer"></div>
                 <div class="grid-item">
-                    <h2>{{ object.nickname }}</h2>
-                    {% if object.name %}
-                        <p>{{ object.name }}</p>
-                    {% endif %}
+                    <h2>{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %}</h2>
+                    <p>{{ object.handle }}</p>
                 </div>
                 {% if object == request.user.profile %}
                     <div class="grid-item">
                         <div class="row">
                             <div class="col-sm-12">
-                                <a class="btn btn-primary" href="{% url 'users:update' %}">My Info</a>
+                                <a class="btn btn-primary" href="{% url 'users:profile-update' %}">My Info</a>
                                 <a class="btn btn-primary" href="{% url 'account_email' %}">E-Mail</a>
-                                <a class="btn btn-primary" href="{% url 'users:detail-organize' %}">{% trans "Organize" %}</a>
+                                <a class="btn btn-primary" href="{% url 'users:profile-organize' %}">{% trans "Organize" %}</a>
                             </div>
                         </div>
                     </div>

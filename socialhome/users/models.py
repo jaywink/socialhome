@@ -49,17 +49,16 @@ class User(AbstractUser):
                 return ""
         return ""
 
+    def get_absolute_url(self):
+        return reverse("users:detail", kwargs={"username": self.username})
+
 
 class Profile(models.Model):
     """Profile data for local and remote users."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
-    # Fields partly mirroring 'User' table since all our Profiles are not local
+    # Fields mirroring 'User' table since all our Profiles are not local
     name = models.CharField(_("Name"), blank=True, max_length=255)
-    nickname = models.CharField(_("Nickname"),
-        max_length=64, unique=True, help_text=_("Usually username, for local users at least."),
-        editable=False
-    )
     email = models.EmailField(_("email address"), blank=True)
 
     # GUID
@@ -90,10 +89,10 @@ class Profile(models.Model):
     modified = AutoLastModifiedField(_("Modified"))
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.nickname)
+        return "%s (%s)" % (self.name, self.handle)
 
     def get_absolute_url(self):
-        return reverse("users:detail", kwargs={"nickname": self.nickname})
+        return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
     def generate_new_rsa_key(self):
         """Generate a new RSA private key

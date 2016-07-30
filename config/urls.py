@@ -19,7 +19,7 @@ urlpatterns = [
     url(settings.ADMIN_URL, include(admin.site.urls)),
 
     # User management
-    url(r'^u/', include("socialhome.users.urls", namespace="users")),
+    url(r"", include("socialhome.users.urls", namespace="users")),
     url(r'^accounts/', include('allauth.urls')),
 
     # Markdownx

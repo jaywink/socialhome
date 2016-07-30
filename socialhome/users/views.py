@@ -13,10 +13,21 @@ from socialhome.enums import Visibility
 from .models import User, Profile
 
 
+class UserDetailView(DetailView):
+    model = User
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get(self, request, *args, **kwargs):
+        """Render ProfileDetailView for this user."""
+        profile = Profile.objects.get(user__username=kwargs.get("username"))
+        return ProfileDetailView.as_view()(request, guid=profile.guid)
+
+
 class ProfileDetailView(AccessMixin, DetailView):
     model = Profile
-    slug_field = "nickname"
-    slug_url_kwarg = "nickname"
+    slug_field = "guid"
+    slug_url_kwarg = "guid"
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
@@ -52,7 +63,7 @@ class ProfileDetailView(AccessMixin, DetailView):
 
         Redirect to login if not allowed to see profile.
         """
-        self.target_profile = Profile.objects.get(nickname=self.kwargs.get("nickname"))
+        self.target_profile = Profile.objects.get(guid=self.kwargs.get("guid"))
         if self.target_profile.visibility == Visibility.PUBLIC:
             return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
         if request.user.is_authenticated():
@@ -75,7 +86,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
 
     def dispatch(self, request, *args, **kwargs):
         """User current user."""
-        self.kwargs.update({"nickname": request.user.profile.nickname})
+        self.kwargs.update({"guid": request.user.profile.guid})
         return super(OrganizeContentProfileDetailView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -94,14 +105,14 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
                 Content.objects.filter(id=id).update(order=i)
 
     def get_success_url(self):
-        return reverse("users:detail", kwargs={"nickname": self.object.nickname})
+        return reverse("users:detail", kwargs={"username": self.object.user.username})
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -109,10 +120,10 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = Profile
 
     def get_success_url(self):
-        return reverse("users:detail", kwargs={"nickname": self.request.user.profile.nickname})
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
     def get_object(self):
-        return Profile.objects.get(nickname=self.request.user.profile.nickname)
+        return Profile.objects.get(guid=self.request.user.profile.guid)
 
 
 class UserListView(LoginRequiredMixin, ListView):

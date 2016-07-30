@@ -7,7 +7,7 @@ from test_plus.test import TestCase
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory
 from socialhome.users.views import UserRedirectView, ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView
 
 
@@ -79,7 +79,7 @@ class TestProfileDetailView(object):
                 ContentFactory(author=profile, content_object__author=profile, order=2),
                 ContentFactory(author=profile, content_object__author=profile, order=1),
             ])
-        view = ProfileDetailView(request=request, kwargs={"nickname": profile.nickname})
+        view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
         view.object = profile
         view.target_profile = profile
         return request, view, contents, profile
@@ -171,7 +171,7 @@ class TestOrganizeContentUserDetailView(object):
         return request, view, contents, profile
 
     def test_view_renders(self, admin_client, rf):
-        response = admin_client.get(reverse("users:detail-organize"))
+        response = admin_client.get(reverse("users:profile-organize"))
         assert response.status_code == 200
 
     def test_save_sort_order_updates_order(self, admin_client, rf):
@@ -199,60 +199,88 @@ class TestOrganizeContentUserDetailView(object):
 @pytest.mark.usefixtures("admin_user", "client")
 class TestProfileVisibilityForAnonymous(object):
     def test_visible_to_self_profile_requires_login_for_anonymous(self, admin_user, client):
-        Profile.objects.filter(nickname=admin_user.username).update(visibility=Visibility.SELF)
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SELF)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_limited_profile_requires_login_for_anonymous(self, admin_user, client):
-        Profile.objects.filter(nickname=admin_user.username).update(visibility=Visibility.LIMITED)
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.LIMITED)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_site_profile_requires_login_for_anonymous(self, admin_user, client):
-        Profile.objects.filter(nickname=admin_user.username).update(visibility=Visibility.SITE)
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SITE)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_public_profile_doesnt_require_login(self, admin_user, client):
-        Profile.objects.filter(nickname=admin_user.username).update(visibility=Visibility.PUBLIC)
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.PUBLIC)
         response = client.get("/u/admin/")
+        assert response.status_code == 200
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 200
 
 
 @pytest.mark.usefixtures("admin_client")
 class TestProfileVisibilityForLoggedInUsers(object):
     def test_visible_to_self_profile(self, admin_client):
-        Profile.objects.filter(nickname="admin").update(visibility=Visibility.SELF)
-        UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(visibility=Visibility.SELF)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.SELF)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.SELF)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 302
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_limited_profile(self, admin_client):
-        Profile.objects.filter(nickname="admin").update(visibility=Visibility.LIMITED)
-        UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(visibility=Visibility.LIMITED)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.LIMITED)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.LIMITED)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 302
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
+        assert response.status_code == 302
 
     def test_visible_to_site_profile(self, admin_client):
-        Profile.objects.filter(nickname="admin").update(visibility=Visibility.SITE)
-        UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(visibility=Visibility.SITE)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.SITE)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.SITE)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 200
 
     def test_visible_to_public_profile(self, admin_client):
-        Profile.objects.filter(nickname="admin").update(visibility=Visibility.PUBLIC)
-        UserFactory(username="foobar")
-        Profile.objects.filter(nickname="foobar").update(visibility=Visibility.PUBLIC)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.PUBLIC)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 200

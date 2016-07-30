@@ -50,7 +50,6 @@ def get_sender_profile(sender):
             logger.warning("Remote profile not found locally or remotely.")
             return
         sender_profile = Profile.objects.create(
-            nickname=remote_profile.handle.split("@")[0],
             name=remote_profile.name,
             guid=remote_profile.guid,
             handle=remote_profile.handle,

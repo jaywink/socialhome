@@ -16,7 +16,6 @@ def create_user_profile(sender, **kwargs):
         profile = Profile.objects.create(
             user=user,
             name=user.name,
-            nickname=user.username,
             email=user.email,
             handle="%s@%s" % (user.username, settings.SOCIALHOME_DOMAIN),
             guid=str(uuid4()),

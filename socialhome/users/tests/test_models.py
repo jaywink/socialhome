@@ -14,6 +14,9 @@ class TestUser(TestCase):
             "testuser"  # This is the default username for self.make_user()
         )
 
+    def test_get_absolute_url(self):
+        assert self.user.get_absolute_url() == "/u/testuser/"
+
 
 @pytest.mark.usefixtures("db")
 class TestProfile(object):
@@ -28,5 +31,5 @@ class TestProfile(object):
         assert profile.rsa_public_key != current_public_key
 
     def test_get_absolute_url(self, settings):
-        profile = ProfileFactory(nickname="testuser")
-        assert profile.get_absolute_url() == "/u/testuser/"
+        profile = ProfileFactory(guid="1234")
+        assert profile.get_absolute_url() == "/p/1234/"

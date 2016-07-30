@@ -77,7 +77,7 @@ def hcard_view(request, guid):
         photo50=photo50,
         searchable="true" if profile.public else "false",
         guid=profile.guid,
-        username=profile.nickname,
+        username=profile.user.username,
         public_key=profile.rsa_public_key,
     )
     return HttpResponse(hcard)
