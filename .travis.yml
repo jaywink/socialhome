@@ -8,7 +8,7 @@ services:
   - postgresql
 install:
   - pip install -U pip
-  - pip install -r requirements/test.txt
+  - pip install -U -r requirements/test.txt
   - pip freeze
 cache:
   directories:
