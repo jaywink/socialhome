@@ -40,7 +40,7 @@ django-autoslug==1.9.3
 pytz==2016.4
 
 # Redis support
-django-redis==4.4.3
+django-redis==4.4.4
 redis>=2.10.0
 
 # Tasks
