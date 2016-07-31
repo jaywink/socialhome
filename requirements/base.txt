@@ -5,7 +5,7 @@
 wheel==0.29.0
 
 # Django
-django==1.9.7
+django==1.9.8
 
 # Configuration
 django-environ==0.4.0
@@ -21,13 +21,13 @@ django-floppyforms==1.6.2
 
 # Models
 django-model-utils==2.5
-django-enumfields==0.8.1
+django-enumfields==0.8.2
 
 # Images
 Pillow==3.3.0
 
 # User registration, either via email or social
-django-allauth==0.25.2
+django-allauth==0.26.1
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.2
@@ -37,10 +37,10 @@ unicode-slugify==0.1.3
 django-autoslug==1.9.3
 
 # Time zones support
-pytz==2016.4
+pytz==2016.6.1
 
 # Redis support
-django-redis==4.4.3
+django-redis==4.4.4
 redis>=2.10.0
 
 # Tasks
