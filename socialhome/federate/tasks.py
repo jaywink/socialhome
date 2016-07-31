@@ -1,50 +1,77 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from federation.controllers import handle_receive
-from federation.entities.diaspora.entities import DiasporaPost
+from federation.entities import base
+from federation.fetchers import retrieve_remote_profile
+from federation.inbound import handle_receive
 from federation.exceptions import NoSuitableProtocolFoundError
 
 from socialhome.content.models import Post
+from socialhome.enums import Visibility
 from socialhome.federate.utils import safe_make_aware
 from socialhome.taskapp.celery import tasks
-from socialhome.users.models import User
+from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
 
 
 @tasks.task()
-def receive_public_task(payload):
-    """Process payload from /receive/public queue."""
+def receive_task(payload, guid=None):
+    """Process received payload."""
     # TODO: we're skipping author verification until fetching of remote profile public keys is implemented
+    profile = None
+    if guid:
+        try:
+            profile = Profile.objects.get(guid=guid, user__isnull=False)
+        except Profile.DoesNotExist:
+            logger.warning("No local profile found with guid")
+            return
     try:
-        sender, protocol_name, entities = handle_receive(payload, skip_author_verification=True)
+        sender, protocol_name, entities = handle_receive(payload, user=profile, skip_author_verification=True)
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
     except NoSuitableProtocolFoundError:
         logger.warning("No suitable protocol found for payload")
         return
-    if protocol_name != "diaspora":
-        logger.warning("Unsupported protocol: %s, sender: %s" % (protocol_name, sender))
-        return
     if not entities:
         logger.warning("No entities in payload")
         return
-    process_entities(entities)
+    sender_profile = get_sender_profile(sender)
+    if not sender_profile:
+        return
+    process_entities(entities, profile=sender_profile)
 
 
-def process_entities(entities):
+def get_sender_profile(sender):
+    try:
+        sender_profile = Profile.objects.get(handle=sender)
+    except Profile.DoesNotExist:
+        remote_profile = retrieve_remote_profile(sender)
+        if not remote_profile:
+            logger.warning("Remote profile not found locally or remotely.")
+            return
+        sender_profile = Profile.objects.create(
+            name=remote_profile.name,
+            guid=remote_profile.guid,
+            handle=remote_profile.handle,
+            visibility=Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
+            rsa_public_key=remote_profile.public_key,
+            image_url_large=remote_profile.image_urls["large"],
+            image_url_medium=remote_profile.image_urls["medium"],
+            image_url_small=remote_profile.image_urls["small"],
+            location=remote_profile.location,
+            email=remote_profile.email,
+        )
+    return sender_profile
+
+
+def process_entities(entities, profile):
     """Process a list of entities."""
-    user = None
     for entity in entities:
         logging.info("Entity: %s" % entity)
-        # We only care about Diaspora posts atm
-        if isinstance(entity, DiasporaPost):
-            if not user:
-                # TODO: Don't use a dummy user once we have remote profiles
-                user, created = User.objects.get_or_create(username="dummy")
+        if isinstance(entity, base.Post):
             try:
                 values = {
-                    "text": entity.raw_content, "user": user, "public": entity.public,
+                    "text": entity.raw_content, "author": profile, "public": entity.public,
                     "remote_created": safe_make_aware(entity.created_at, "UTC"),
                     "service_label": entity.provider_display_name or "",
                 }

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ user.username }}{% endblock %}
+{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %}{% endblock %}
 
 {% block content %}
     <h1>{{ user.username }}</h1>
-    <form class="form-horizontal" method="post" action="{% url 'users:update' %}">
+    <form class="form-horizontal" method="post" action="{% url 'users:profile-update' %}">
         {% csrf_token %}
         {{ form|crispy }}
         <div class="control-group">

@@ -4,7 +4,7 @@ import factory
 
 from socialhome.content.enums import ContentTarget
 from socialhome.content.models import Post, Content
-from socialhome.users.tests.factories import UserFactory
+from socialhome.users.tests.factories import ProfileFactory
 
 
 class PostFactory(factory.DjangoModelFactory):
@@ -13,7 +13,7 @@ class PostFactory(factory.DjangoModelFactory):
 
     text = fuzzy.FuzzyText()
     guid = fuzzy.FuzzyText()
-    user = factory.SubFactory(UserFactory)
+    author = factory.SubFactory(ProfileFactory)
 
 
 class ContentFactory(factory.DjangoModelFactory):
@@ -21,5 +21,5 @@ class ContentFactory(factory.DjangoModelFactory):
         model = Content
 
     target = ContentTarget.PROFILE
-    user = factory.SubFactory(UserFactory)
+    author = factory.SubFactory(ProfileFactory)
     content_object = factory.SubFactory(PostFactory)

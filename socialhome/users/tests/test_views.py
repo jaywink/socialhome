@@ -6,9 +6,10 @@ from test_plus.test import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.users.models import User
+from socialhome.users.models import User, Profile
 from socialhome.users.tests.factories import UserFactory
-from socialhome.users.views import UserRedirectView, UserUpdateView, UserDetailView, OrganizeContentUserDetailView
+from socialhome.users.views import UserRedirectView, ProfileUpdateView, ProfileDetailView,\
+    OrganizeContentProfileDetailView
 
 
 class BaseUserTestCase(TestCase):
@@ -35,12 +36,12 @@ class TestUserRedirectView(BaseUserTestCase):
         )
 
 
-class TestUserUpdateView(BaseUserTestCase):
+class TestProfileUpdateView(BaseUserTestCase):
     def setUp(self):
         # call BaseUserTestCase.setUp()
-        super(TestUserUpdateView, self).setUp()
+        super(TestProfileUpdateView, self).setUp()
         # Instantiate the view directly. Never do this outside a test!
-        self.view = UserUpdateView()
+        self.view = ProfileUpdateView()
         # Generate a fake request
         request = self.factory.get('/fake-url')
         # Attach the user to the request
@@ -60,29 +61,32 @@ class TestUserUpdateView(BaseUserTestCase):
         # Expect: self.user, as that is the request's user object
         self.assertEqual(
             self.view.get_object(),
-            self.user
+            self.user.profile
         )
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
-class TestUserDetailView(object):
+class TestProfileDetailView(object):
     def _get_request_view_and_content(self, rf, create_content=True):
         request = rf.get("/")
-        request.user = UserFactory(visibility=Visibility.PUBLIC)
+        request.user = UserFactory()
+        profile = request.user.profile
+        profile.visibility = Visibility.PUBLIC
+        profile.save()
         contents = []
         if create_content:
             contents.extend([
-                ContentFactory(user=request.user, content_object__user=request.user, order=3),
-                ContentFactory(user=request.user, content_object__user=request.user, order=2),
-                ContentFactory(user=request.user, content_object__user=request.user, order=1),
+                ContentFactory(author=profile, content_object__author=profile, order=3),
+                ContentFactory(author=profile, content_object__author=profile, order=2),
+                ContentFactory(author=profile, content_object__author=profile, order=1),
             ])
-        view = UserDetailView(request=request, kwargs={"username": request.user.username})
-        view.object = request.user
-        view.target_user = request.user
-        return request, view, contents
+        view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
+        view.object = profile
+        view.target_profile = profile
+        return request, view, contents, profile
 
     def test_get_context_data_contains_content_objects(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
+        request, view, contents, profile = self._get_request_view_and_content(rf)
         context = view.get_context_data()
         assert len(context["contents"]) == 3
         context_content = {content["content"] for content in context["contents"]}
@@ -93,52 +97,53 @@ class TestUserDetailView(object):
         assert context_objs == objs
 
     def test_get_context_data_does_not_contain_content_for_other_users(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf, create_content=False)
-        user = UserFactory(); ContentFactory(user=user, content_object__user=user)
-        user = UserFactory(); ContentFactory(user=user, content_object__user=user)
-        user = UserFactory(); ContentFactory(user=user, content_object__user=user)
+        request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
+        user = UserFactory()
+        ContentFactory(author=user.profile, content_object__author=user.profile)
+        user = UserFactory()
+        ContentFactory(author=user.profile, content_object__author=user.profile)
         context = view.get_context_data()
         assert len(context["contents"]) == 0
 
     def test_detail_view_renders(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
-        response = admin_client.get(request.user.get_absolute_url())
+        request, view, contents, profile = self._get_request_view_and_content(rf)
+        response = admin_client.get(profile.get_absolute_url())
         assert response.status_code == 200
 
     def test_contents_queryset_returns_public_only_for_unauthenticated(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf, create_content=False)
-        ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SITE)
-        ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SELF)
-        ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.LIMITED)
-        public = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.PUBLIC)
+        request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
+        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
+        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
+        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
+        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
         request.user = AnonymousUser()
         qs = view._get_contents_queryset()
         assert qs.count() == 1
         assert qs.first() == public
 
     def test_contents_queryset_returns_public_or_site_only_for_authenticated(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf, create_content=False)
-        site = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SITE)
-        ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SELF)
-        ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.LIMITED)
-        public = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.PUBLIC)
+        request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
+        site = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
+        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
+        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
+        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
         request.user = User.objects.get(username="admin")
         qs = view._get_contents_queryset()
         assert qs.count() == 2
         assert set(qs) == {public, site}
 
     def test_contents_queryset_returns_all_for_self(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf, create_content=False)
-        site = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SITE)
-        selff = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.SELF)
-        limited = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.LIMITED)
-        public = ContentFactory(user=request.user, content_object__user=request.user, visibility=Visibility.PUBLIC)
+        request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
+        site = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
+        selff = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
+        limited = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
+        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
         qs = view._get_contents_queryset()
         assert qs.count() == 4
         assert set(qs) == {public, site, selff, limited}
 
     def test_contents_queryset_returns_content_in_correct_order(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
+        request, view, contents, profile = self._get_request_view_and_content(rf)
         qs = view._get_contents_queryset()
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
@@ -149,26 +154,29 @@ class TestUserDetailView(object):
 class TestOrganizeContentUserDetailView(object):
     def _get_request_view_and_content(self, rf, create_content=True):
         request = rf.get("/")
-        request.user = UserFactory(visibility=Visibility.PUBLIC)
+        request.user = UserFactory()
+        profile = request.user.profile
+        profile.visibility = Visibility.PUBLIC
+        profile.save()
+
         contents = []
         if create_content:
             contents.extend([
-                ContentFactory(user=request.user, content_object__user=request.user, order=3),
-                ContentFactory(user=request.user, content_object__user=request.user, order=2),
-                ContentFactory(user=request.user, content_object__user=request.user, order=1),
+                ContentFactory(author=profile, content_object__author=profile, order=3),
+                ContentFactory(author=profile, content_object__author=profile, order=2),
+                ContentFactory(author=profile, content_object__author=profile, order=1),
             ])
-        view = OrganizeContentUserDetailView(request=request, kwargs={"username": request.user.username})
-        view.object = request.user
-        view.target_user = request.user
-        return request, view, contents
+        view = OrganizeContentProfileDetailView(request=request)
+        view.object = profile
+        view.target_profile = profile
+        return request, view, contents, profile
 
     def test_view_renders(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
-        response = admin_client.get(reverse("users:detail-organize", kwargs={"username": request.user.username}))
+        response = admin_client.get(reverse("users:profile-organize"))
         assert response.status_code == 200
 
     def test_save_sort_order_updates_order(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
+        request, view, contents, profile = self._get_request_view_and_content(rf)
         qs = view._get_contents_queryset()
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
@@ -181,71 +189,103 @@ class TestOrganizeContentUserDetailView(object):
         assert qs[2].id == contents[2].id
 
     def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
-        request, view, contents = self._get_request_view_and_content(rf)
+        request, view, contents, profile = self._get_request_view_and_content(rf)
         other_user = UserFactory()
-        other_content = ContentFactory(user=other_user, content_object__user=other_user, order=100)
+        other_content = ContentFactory(author=other_user.profile, content_object__author=other_user.profile, order=100)
         view._save_sort_order([other_content.id])
         other_content.refresh_from_db()
         assert other_content.order == 100
+
+    def test_get_success_url(self, admin_client, rf):
+        request, view, contents, profile = self._get_request_view_and_content(rf)
+        assert view.get_success_url() == "/u/%s/" % request.user.username
 
 
 @pytest.mark.usefixtures("admin_user", "client")
 class TestProfileVisibilityForAnonymous(object):
     def test_visible_to_self_profile_requires_login_for_anonymous(self, admin_user, client):
-        admin_user.visibility = Visibility.SELF
-        admin_user.save()
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SELF)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_limited_profile_requires_login_for_anonymous(self, admin_user, client):
-        admin_user.visibility = Visibility.LIMITED
-        admin_user.save()
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.LIMITED)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_site_profile_requires_login_for_anonymous(self, admin_user, client):
-        admin_user.visibility = Visibility.SITE
-        admin_user.save()
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SITE)
         response = client.get("/u/admin/")
+        assert response.status_code == 302
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 302
 
     def test_public_profile_doesnt_require_login(self, admin_user, client):
-        admin_user.visibility = Visibility.PUBLIC
-        admin_user.save()
+        Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.PUBLIC)
         response = client.get("/u/admin/")
+        assert response.status_code == 200
+        response = client.get("/p/%s/" % admin_user.profile.guid)
         assert response.status_code == 200
 
 
 @pytest.mark.usefixtures("admin_client")
 class TestProfileVisibilityForLoggedInUsers(object):
     def test_visible_to_self_profile(self, admin_client):
-        User.objects.filter(username="admin").update(visibility=Visibility.SELF)
-        UserFactory(username="foobar", visibility=Visibility.SELF)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.SELF)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.SELF)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 302
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 302
 
     def test_visible_to_limited_profile(self, admin_client):
-        User.objects.filter(username="admin").update(visibility=Visibility.LIMITED)
-        UserFactory(username="foobar", visibility=Visibility.LIMITED)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.LIMITED)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.LIMITED)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 302
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
+        assert response.status_code == 302
 
     def test_visible_to_site_profile(self, admin_client):
-        User.objects.filter(username="admin").update(visibility=Visibility.SITE)
-        UserFactory(username="foobar", visibility=Visibility.SITE)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.SITE)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.SITE)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 200
 
     def test_visible_to_public_profile(self, admin_client):
-        User.objects.filter(username="admin").update(visibility=Visibility.PUBLIC)
-        UserFactory(username="foobar", visibility=Visibility.PUBLIC)
+        admin = User.objects.get(username="admin")
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
+        user = UserFactory(username="foobar")
+        Profile.objects.filter(user__username="foobar").update(visibility=Visibility.PUBLIC)
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        assert response.status_code == 200
+        response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 200
