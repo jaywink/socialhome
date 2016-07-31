@@ -8,7 +8,8 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.tests.factories import UserFactory
-from socialhome.users.views import UserRedirectView, ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView
+from socialhome.users.views import UserRedirectView, ProfileUpdateView, ProfileDetailView,\
+    OrganizeContentProfileDetailView
 
 
 class BaseUserTestCase(TestCase):
@@ -194,6 +195,10 @@ class TestOrganizeContentUserDetailView(object):
         view._save_sort_order([other_content.id])
         other_content.refresh_from_db()
         assert other_content.order == 100
+
+    def test_get_success_url(self, admin_client, rf):
+        request, view, contents, profile = self._get_request_view_and_content(rf)
+        assert view.get_success_url() == "/u/%s/" % request.user.username
 
 
 @pytest.mark.usefixtures("admin_user", "client")

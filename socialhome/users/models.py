@@ -13,6 +13,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils import generate_rsa_private_key
+from socialhome.users.utils import get_pony_urls
 
 
 @python_2_unicode_compatible
@@ -131,3 +132,10 @@ class Profile(models.Model):
             except IndexError:
                 return ""
         return ""
+
+    def get_image_urls(self):
+        """Get profile image urls or ponies, if none."""
+        if self.image_url_large and self.image_url_medium and self.image_url_small:
+            return self.image_url_large, self.image_url_medium, self.image_url_small
+        # Ponies are nice
+        return get_pony_urls()

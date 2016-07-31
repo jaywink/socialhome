@@ -10,7 +10,6 @@ from django.views.generic import View
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
-
 from socialhome import __version__ as version
 from socialhome.federate.tasks import receive_task
 from socialhome.users.models import User, Profile
@@ -44,14 +43,6 @@ def webfinger_view(request):
     return HttpResponse(webfinger, content_type="application/xrd+xml")
 
 
-def get_pony_urls():
-    """Function to return some pony urls which will not change."""
-    base_url = "{url}{staticpath}images/pony[size].png".format(
-        url=settings.SOCIALHOME_URL, staticpath=settings.STATIC_URL
-    )
-    return base_url.replace("[size]", "300"), base_url.replace("[size]", "100"), base_url.replace("[size]", "50")
-
-
 def hcard_view(request, guid):
     """Generate a hcard document.
 
@@ -61,11 +52,7 @@ def hcard_view(request, guid):
         profile = get_object_or_404(Profile, guid=guid, user__isnull=False)
     except ValueError:
         raise Http404()
-    if profile.image_url_large and profile.image_url_medium and profile.image_url_small:
-        photo300, photo100, photo50 = profile.image_url_large, profile.image_url_medium, profile.image_url_small
-    else:
-        # Ponies are nice
-        photo300, photo100, photo50 = get_pony_urls()
+    photo300, photo100, photo50 = profile.get_image_urls()
     hcard = generate_hcard(
         "diaspora",
         hostname=settings.SOCIALHOME_URL,
