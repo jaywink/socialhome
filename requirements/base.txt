@@ -21,7 +21,7 @@ django-floppyforms==1.6.2
 
 # Models
 django-model-utils==2.5
-django-enumfields==0.8.1
+django-enumfields==0.8.2
 
 # Images
 Pillow==3.3.0
