@@ -1,21 +1,21 @@
 from django.forms import ModelForm
 from markdownx.widgets import MarkdownxWidget
 
-from socialhome.content.models import Post
+from socialhome.content.models import Content
 from socialhome.content.utils import safe_text_for_markdown_code
 
 
-class PostForm(ModelForm):
+class ContentForm(ModelForm):
     class Meta:
-        model = Post
-        fields = ["text", "public"]
+        model = Content
+        fields = ["text", "visibility", "pinned"]
         widgets = {
             "text": MarkdownxWidget()
         }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        super(PostForm, self).__init__(*args, **kwargs)
+        super(ContentForm, self).__init__(*args, **kwargs)
 
     def clean_text(self):
         """Sanitize text if user is untrusted."""

@@ -6,7 +6,7 @@ from federation.fetchers import retrieve_remote_profile
 from federation.inbound import handle_receive
 from federation.exceptions import NoSuitableProtocolFoundError
 
-from socialhome.content.models import Post
+from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.utils import safe_make_aware
 from socialhome.taskapp.celery import tasks
@@ -71,14 +71,15 @@ def process_entities(entities, profile):
         if isinstance(entity, base.Post):
             try:
                 values = {
-                    "text": entity.raw_content, "author": profile, "public": entity.public,
+                    "text": entity.raw_content, "author": profile,
+                    "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
                     "remote_created": safe_make_aware(entity.created_at, "UTC"),
                     "service_label": entity.provider_display_name or "",
                 }
-                post, created = Post.objects.update_or_create(guid=entity.guid, defaults=values)
+                content, created = Content.objects.update_or_create(guid=entity.guid, defaults=values)
                 if created:
-                    logger.info("Saved Post: %s" % post)
+                    logger.info("Saved Content: %s" % content)
                 else:
-                    logger.info("Updated Post: %s" % post)
-            except Exception:
-                logger.exception("Failed to handle %s: %s" % (entity.guid, entity.__name__))
+                    logger.info("Updated Content: %s" % content)
+            except Exception as ex:
+                logger.exception("Failed to handle %s: %s" % (entity.guid, ex))

@@ -43,7 +43,7 @@
             <ul class="nav navbar-nav pull-xs-right pull-sm-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url "content:create" "profile" %}">{% trans "Create" %}</a>
+                  <a class="nav-link" href="{% url "content:create" %}">{% trans "Create" %}</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>

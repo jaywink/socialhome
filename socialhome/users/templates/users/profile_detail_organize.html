@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-sm-12 organize-content">
                 {% for content in contents %}
-                    <div class="row" data-id="{{ content.obj.id }}">
+                    <div class="row" data-id="{{ content.id }}">
                         <div class="col-sm-12">
                             <div class="card card-block">
                                 <div class="row">
@@ -20,7 +20,7 @@
                                         <i class="fa fa-5x fa-arrows-alt"></i>
                                     </div>
                                     <div class="col-sm-10">
-                                        {{ content.content|safe }}
+                                        {{ content.rendered|safe }}
                                     </div>
                                 </div>
                             </div>
