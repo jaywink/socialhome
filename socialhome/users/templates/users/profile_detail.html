@@ -28,12 +28,12 @@
                 {% for content in contents %}
                     <div class="grid-item">
                         <div class="grid-item-actions text-sm-right">
-                            {% if content.obj.author == request.user.profile %}
-                                <a href="{% url "content:update" content.obj.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
-                                <a href="{% url "content:delete" content.obj.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
+                            {% if content.author == request.user.profile %}
+                                <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
+                                <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
                             {% endif %}
                         </div>
-                        {{ content.content|safe }}
+                        {{ content.rendered|safe }}
                     </div>
                 {% endfor %}
             </div>

@@ -5,8 +5,8 @@ import pytest
 from federation.entities import base
 from federation.tests.factories import entities
 
-from socialhome.content.models import Post
-from socialhome.content.tests.factories import PostFactory
+from socialhome.content.models import Content
+from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task, process_entities, get_sender_profile
 from socialhome.users.models import Profile
@@ -45,14 +45,14 @@ class TestProcessEntities(object):
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
         process_entities([entity], profile=ProfileFactory())
-        Post.objects.get(guid=entity.guid)
+        Content.objects.get(guid=entity.guid)
 
     def test_post_is_updated_from_entity(self):
         entity = entities.PostFactory()
-        PostFactory(guid=entity.guid)
+        ContentFactory(guid=entity.guid)
         process_entities([entity], profile=ProfileFactory())
-        post = Post.objects.get(guid=entity.guid)
-        assert post.text == entity.raw_content
+        content = Content.objects.get(guid=entity.guid)
+        assert content.text == entity.raw_content
 
 
 @pytest.mark.usefixtures("db")

@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
-from socialhome.content.enums import ContentTarget
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
-from .models import User, Profile
+from socialhome.users.models import User, Profile
 
 
 class UserDetailView(DetailView):
@@ -31,26 +28,15 @@ class ProfileDetailView(AccessMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        context["contents"] = self._collect_contents()
+        context["contents"] = self._get_contents_queryset()
         return context
-
-    def _collect_contents(self):
-        """Collect rendered content objects."""
-        contents_qs = self._get_contents_queryset()
-        contents = []
-        for content in contents_qs:
-            contents.append({
-                "content": content.content_object.render(),
-                "obj": content,
-            })
-        return contents
 
     def _get_contents_queryset(self):
         """Get queryset for content objects.
 
         Limit by content visibility.
         """
-        contents = Content.objects.filter(target=ContentTarget.PROFILE, author=self.object)
+        contents = Content.objects.filter(pinned=True, author=self.object)
         if not self.request.user.is_authenticated():
             contents = contents.filter(visibility=Visibility.PUBLIC)
         elif self.request.user.profile != self.target_profile:
@@ -80,7 +66,7 @@ class ProfileDetailView(AccessMixin, DetailView):
 class OrganizeContentProfileDetailView(ProfileDetailView):
     template_name = "users/profile_detail_organize.html"
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         # Only get the Profile record for the user making the request
         return Profile.objects.get(user=self.request.user)
 
@@ -105,7 +91,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
                 Content.objects.filter(id=id).update(order=i)
 
     def get_success_url(self):
-        return reverse("users:detail", kwargs={"username": self.object.user.username})
+        return reverse("home")
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
@@ -122,7 +108,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return Profile.objects.get(guid=self.request.user.profile.guid)
 
 

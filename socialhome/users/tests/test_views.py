@@ -76,9 +76,9 @@ class TestProfileDetailView(object):
         contents = []
         if create_content:
             contents.extend([
-                ContentFactory(author=profile, content_object__author=profile, order=3),
-                ContentFactory(author=profile, content_object__author=profile, order=2),
-                ContentFactory(author=profile, content_object__author=profile, order=1),
+                ContentFactory(author=profile, order=3, pinned=True),
+                ContentFactory(author=profile, order=2, pinned=True),
+                ContentFactory(author=profile, order=1, pinned=True),
             ])
         view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
         view.object = profile
@@ -88,20 +88,17 @@ class TestProfileDetailView(object):
     def test_get_context_data_contains_content_objects(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
         context = view.get_context_data()
-        assert len(context["contents"]) == 3
-        context_content = {content["content"] for content in context["contents"]}
-        rendered = {content.content_object.render() for content in contents}
-        assert context_content == rendered
-        context_objs = {content["obj"] for content in context["contents"]}
+        assert context["contents"].count() == 3
+        context_objs = {content for content in context["contents"]}
         objs = set(contents)
         assert context_objs == objs
 
     def test_get_context_data_does_not_contain_content_for_other_users(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
         user = UserFactory()
-        ContentFactory(author=user.profile, content_object__author=user.profile)
+        ContentFactory(author=user.profile, pinned=True)
         user = UserFactory()
-        ContentFactory(author=user.profile, content_object__author=user.profile)
+        ContentFactory(author=user.profile, pinned=True)
         context = view.get_context_data()
         assert len(context["contents"]) == 0
 
@@ -112,10 +109,10 @@ class TestProfileDetailView(object):
 
     def test_contents_queryset_returns_public_only_for_unauthenticated(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
-        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
-        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
-        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
-        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
+        ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
+        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
+        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
+        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
         request.user = AnonymousUser()
         qs = view._get_contents_queryset()
         assert qs.count() == 1
@@ -123,10 +120,10 @@ class TestProfileDetailView(object):
 
     def test_contents_queryset_returns_public_or_site_only_for_authenticated(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
-        site = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
-        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
-        ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
-        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
+        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
+        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
+        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
+        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
         request.user = User.objects.get(username="admin")
         qs = view._get_contents_queryset()
         assert qs.count() == 2
@@ -134,10 +131,10 @@ class TestProfileDetailView(object):
 
     def test_contents_queryset_returns_all_for_self(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
-        site = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SITE)
-        selff = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.SELF)
-        limited = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.LIMITED)
-        public = ContentFactory(author=profile, content_object__author=profile, visibility=Visibility.PUBLIC)
+        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
+        selff = ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
+        limited = ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
+        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
         qs = view._get_contents_queryset()
         assert qs.count() == 4
         assert set(qs) == {public, site, selff, limited}
@@ -162,9 +159,9 @@ class TestOrganizeContentUserDetailView(object):
         contents = []
         if create_content:
             contents.extend([
-                ContentFactory(author=profile, content_object__author=profile, order=3),
-                ContentFactory(author=profile, content_object__author=profile, order=2),
-                ContentFactory(author=profile, content_object__author=profile, order=1),
+                ContentFactory(author=profile, order=3, pinned=True),
+                ContentFactory(author=profile, order=2, pinned=True),
+                ContentFactory(author=profile, order=1, pinned=True),
             ])
         view = OrganizeContentProfileDetailView(request=request)
         view.object = profile
@@ -191,14 +188,14 @@ class TestOrganizeContentUserDetailView(object):
     def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
         other_user = UserFactory()
-        other_content = ContentFactory(author=other_user.profile, content_object__author=other_user.profile, order=100)
+        other_content = ContentFactory(author=other_user.profile, order=100, pinned=True)
         view._save_sort_order([other_content.id])
         other_content.refresh_from_db()
         assert other_content.order == 100
 
     def test_get_success_url(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
-        assert view.get_success_url() == "/u/%s/" % request.user.username
+        assert view.get_success_url() == "/"
 
 
 @pytest.mark.usefixtures("admin_user", "client")
