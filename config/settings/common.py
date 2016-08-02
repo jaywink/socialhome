@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount',  # registration
     "markdownx",
     "django_extensions",  # Generic helpers for administration
+    "channels",
 )
 
 # Apps specific for this project go here.
@@ -258,3 +259,24 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
+
+
+# REDIS
+REDIS_HOST=env("REDIS_HOST", default="localhost")
+REDIS_PORT=env("REDIS_PORT", default=6379)
+REDIS_DB=env("REDIS_DB", default=0)
+
+
+# Channel layer definitions
+# http://channels.readthedocs.org/en/latest/deploying.html#setting-up-a-channel-backend
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB)
+            ],
+        },
+        "ROUTING": "config.routing.channel_routing",
+    },
+}
