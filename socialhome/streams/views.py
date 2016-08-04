@@ -7,11 +7,9 @@ from socialhome.enums import Visibility
 class BaseStreamView(ListView):
     model = Content
     ordering = "-created"
-    paginate_by = 20
+    paginate_by = 30
 
 
 class PublicStreamView(BaseStreamView):
     template_name = "streams/public.html"
-
-    def get_queryset(self):
-        return Content.objects.filter(visibility=Visibility.PUBLIC)
+    queryset = Content.objects.filter(visibility=Visibility.PUBLIC)
