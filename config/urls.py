@@ -12,6 +12,10 @@ from socialhome.content.views import HomeView
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
+
+    # Streams
+    url(r"", include("socialhome.streams.urls", namespace="streams")),
+
     url(r'^$', HomeView.as_view(), name="home"),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name="about"),
 

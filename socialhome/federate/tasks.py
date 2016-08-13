@@ -7,6 +7,7 @@ from federation.inbound import handle_receive
 from federation.exceptions import NoSuitableProtocolFoundError
 
 from socialhome.content.models import Content
+from socialhome.content.utils import safe_text_for_markdown_code, safe_text
 from socialhome.enums import Visibility
 from socialhome.federate.utils import safe_make_aware
 from socialhome.taskapp.celery import tasks
@@ -50,15 +51,15 @@ def get_sender_profile(sender):
             logger.warning("Remote profile not found locally or remotely.")
             return
         sender_profile = Profile.objects.create(
-            name=remote_profile.name,
-            guid=remote_profile.guid,
+            name=safe_text(remote_profile.name),
+            guid=safe_text(remote_profile.guid),
             handle=remote_profile.handle,
             visibility=Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
-            rsa_public_key=remote_profile.public_key,
-            image_url_large=remote_profile.image_urls["large"],
-            image_url_medium=remote_profile.image_urls["medium"],
-            image_url_small=remote_profile.image_urls["small"],
-            location=remote_profile.location,
+            rsa_public_key=safe_text(remote_profile.public_key),
+            image_url_large=safe_text(remote_profile.image_urls["large"]),
+            image_url_medium=safe_text(remote_profile.image_urls["medium"]),
+            image_url_small=safe_text(remote_profile.image_urls["small"]),
+            location=safe_text(remote_profile.location),
             email=remote_profile.email,
         )
     return sender_profile
@@ -71,12 +72,12 @@ def process_entities(entities, profile):
         if isinstance(entity, base.Post):
             try:
                 values = {
-                    "text": entity.raw_content, "author": profile,
+                    "text": safe_text_for_markdown_code(entity.raw_content), "author": profile,
                     "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
                     "remote_created": safe_make_aware(entity.created_at, "UTC"),
-                    "service_label": entity.provider_display_name or "",
+                    "service_label": safe_text(entity.provider_display_name) or "",
                 }
-                content, created = Content.objects.update_or_create(guid=entity.guid, defaults=values)
+                content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
                 if created:
                     logger.info("Saved Content: %s" % content)
                 else:

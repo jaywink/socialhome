@@ -54,6 +54,17 @@ class TestProcessEntities(object):
         content = Content.objects.get(guid=entity.guid)
         assert content.text == entity.raw_content
 
+    def test_post_text_fields_are_cleaned(self):
+        entity = entities.PostFactory(
+            raw_content="<script>alert('yup');</script>",
+            provider_display_name="<script>alert('yup');</script>",
+            guid="<script>alert('yup');</script>"
+        )
+        process_entities([entity], profile=ProfileFactory())
+        content = Content.objects.get(guid="alert('yup');")
+        assert content.text == "&lt;script&gt;alert('yup');&lt;/script&gt;"
+        assert content.service_label == "alert('yup');"
+
 
 @pytest.mark.usefixtures("db")
 class TestGetSenderProfile(object):
@@ -81,3 +92,27 @@ class TestGetSenderProfile(object):
     def test_returns_none_if_no_remote_profile_found(self, mock_retrieve):
         mock_retrieve.return_value = None
         assert not get_sender_profile("foo@example.com")
+
+    @patch("socialhome.federate.tasks.retrieve_remote_profile")
+    def test_cleans_text_fields_in_profile(self, mock_retrieve):
+        # TODO: use ProfileFactory from Social-Federation once available
+        mock_retrieve.return_value = base.Profile(
+            name="<script>alert('yup');</script>", raw_content="<script>alert('yup');</script>",
+            public_key="<script>alert('yup');</script>",
+            handle="foo@example.com", guid="<script>alert('yup');</script>",
+            image_urls={
+                "small": "<script>alert('yup');</script>",
+                "medium": "<script>alert('yup');</script>",
+                "large": "<script>alert('yup');</script>",
+            },
+            location="<script>alert('yup');</script>",
+        )
+        sender_profile = get_sender_profile("foo@example.com")
+        assert isinstance(sender_profile, Profile)
+        assert sender_profile.name == "alert('yup');"
+        assert sender_profile.guid == "alert('yup');"
+        assert sender_profile.rsa_public_key == "alert('yup');"
+        assert sender_profile.image_url_small == "alert('yup');"
+        assert sender_profile.image_url_medium == "alert('yup');"
+        assert sender_profile.image_url_large == "alert('yup');"
+        assert sender_profile.location == "alert('yup');"

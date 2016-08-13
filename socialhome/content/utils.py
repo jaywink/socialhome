@@ -18,3 +18,8 @@ def safe_text_for_markdown_code(text):
     for counter, code in enumerate(safety, 1):
         text = text.replace("%%safe_text_for_markdown_code codes in safety %s%%" % counter, code, 1)
     return text
+
+
+def safe_text(text):
+    """Clean text, stripping all tags, attributes and styles."""
+    return bleach.clean(text, tags=[], attributes=[], styles=[], strip=True)

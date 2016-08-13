@@ -8,7 +8,7 @@ from django.db.migrations import RunPython
 
 def forward(apps, schema_editor):
     Content = apps.get_model("content", "Content")
-    Post = apps.get_model("content", "Content")
+    Post = apps.get_model("content", "Post")
     for content in Content.objects.all():
         post = Post.objects.get(id=content.object_id)
         post.order = content.order
