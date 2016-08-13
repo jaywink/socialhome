@@ -20,6 +20,7 @@
     "masonry": "~4.1.0",
     "imagesloaded": "~4.1.0",
     "fontawesome": "~4.6.3",
-    "jquery-ui": "jqueryui#^1.11.4"
+    "jquery-ui": "jqueryui#^1.11.4",
+    "reconnecting-websocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0"
   }
 }
