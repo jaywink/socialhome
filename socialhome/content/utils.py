@@ -21,4 +21,5 @@ def safe_text_for_markdown_code(text):
 
 
 def safe_text(text):
+    """Clean text, stripping all tags, attributes and styles."""
     return bleach.clean(text, tags=[], attributes=[], styles=[], strip=True)
