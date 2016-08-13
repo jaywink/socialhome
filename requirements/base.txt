@@ -8,7 +8,7 @@ wheel==0.29.0
 django==1.9.8
 
 # Channels
-channels==0.17.1
+channels==0.17.2
 asgi_redis==0.14.0
 
 # Configuration
