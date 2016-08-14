@@ -13,10 +13,25 @@ $(function () {
             console.log("Got message " + message.data);
             var data = JSON.parse(message.data);
             console.log(data);
-            if (data.event == "new" && availableContent.indexOf(data.id) == -1) {
+            if (data.event === "new" && availableContent.indexOf(data.id) === -1) {
                 availableContent.push(data.id);
                 $("#new-content-count").html(availableContent.length);
                 $("#new-content-container").show(100);
+            } else if (data.event === "content") {
+                var $grid = $('.grid'),
+                    $contents,
+                    ids = [];
+                _.each(data.contents, function(content) {
+                    var $elem = $('<div class="grid-item">' + content.rendered + '</div>');
+                    $contents = $contents ? $contents.add($elem) : $elem;
+                    ids.push(content.id);
+                });
+                availableContent = _.difference(availableContent, ids);
+                if (! availableContent.length) {
+                    $("#new-content-container").hide();
+                }
+                $("#new-content-count").html(availableContent.length);
+                $grid.prepend($contents).masonry("prepended", $contents);
             }
         };
 
@@ -29,6 +44,11 @@ $(function () {
             // Stream content refresh
             $("#new-content-load-link").click(function() {
                 console.log("Load new content");
+                var data = {
+                    "action": "load_content",
+                    "ids": availableContent
+                };
+                socket.send(JSON.stringify(data));
             });
         };
         socket.onclose = function () {

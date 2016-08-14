@@ -21,6 +21,7 @@
     "imagesloaded": "~4.1.0",
     "fontawesome": "~4.6.3",
     "jquery-ui": "jqueryui#^1.11.4",
-    "reconnecting-websocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0"
+    "reconnecting-websocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
+    "underscore": "^1.8.3"
   }
 }

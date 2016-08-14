@@ -92,6 +92,7 @@ module.exports = function (grunt) {
           "<%= paths.bower %>/jquery/dist/jquery.min.js",
           "<%= paths.bower %>/tether/dist/js/tether.min.js",
           "<%= paths.bower %>/jquery-ui/jquery-ui.min.js",
+          "<%= paths.bower %>/underscore/underscore-min.js",
           "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
           "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
           "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
