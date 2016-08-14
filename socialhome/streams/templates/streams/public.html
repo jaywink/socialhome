@@ -7,6 +7,13 @@
 
 {% block content %}
     <script>var socialhomeStream = "public";</script>
+    <div class="container">
+        <div id="new-content-container" class="hidden">
+            <a href="" id="new-content-load-link" onclick="return false;">
+                <span class="tag tag-pill tag-primary"><span id="new-content-count">0</span> {% trans "new posts available" %}</span>
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm-12">
             <div class="grid">

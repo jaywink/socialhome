@@ -5,4 +5,4 @@ class StreamConsumer(WebsocketConsumer):
     http_user = True
 
     def connection_groups(self, **kwargs):
-        return [kwargs.get("stream")]
+        return ["streams_%s" % kwargs.get("stream")]

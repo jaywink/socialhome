@@ -68,6 +68,7 @@ module.exports = function (grunt) {
               '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
               '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
               '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
+              '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
           },
       },
       dist: {
@@ -80,6 +81,7 @@ module.exports = function (grunt) {
               '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
               '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
               '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
+              '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
           },
       }
     },
@@ -107,6 +109,7 @@ module.exports = function (grunt) {
           "<%= paths.css %>/fontawesome.css",
           "<%= paths.css %>/common.css",
           "<%= paths.css %>/grids.css",
+          "<%= paths.css %>/streams.css",
         ],
         dest: "<%= paths.css %>/project.css",
         nonull: true,
