@@ -1,6 +1,6 @@
 @import "variables";
 
-.grid-item {
+.grid-item, .stamped {
   background-color: #F1F1F1;
   border-radius: 6px;
 
@@ -16,14 +16,14 @@
 
 // Responsive grid sizes
 .grid-sizer,
-.grid-item {
+.grid-item, .stamped {
   width: 100%;
   padding: 2%;
   margin: 1% 0;
 }
 @media all and (min-width: $mediumDevice) {
   .grid-sizer,
-  .grid-item {
+  .grid-item, .stamped {
     width: 48%;
     padding: 1%;
     margin: 1%;
@@ -31,7 +31,7 @@
 }
 @media all and (min-width: $largeDevice) {
   .grid-sizer,
-  .grid-item {
+  .grid-item, .stamped {
     width: 32.1%;
     padding: 1%;
     margin: 0.5%;
@@ -39,7 +39,7 @@
 }
 @media all and (min-width: $extraLargeDevice) {
   .grid-sizer,
-  .grid-item {
+  .grid-item, .stamped {
     width: 24%;
     padding: 0.5%;
     margin: 0.5%;
