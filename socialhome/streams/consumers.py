@@ -14,14 +14,17 @@ class StreamConsumer(WebsocketConsumer):
 
     def receive(self, text=None, bytes=None, **kwargs):
         data = json.loads(text)
-        print(data, kwargs, vars(self.message))
         action = data.get("action")
         if action and action == "load_content":
-            ids = data.get("ids")
-            if ids:
-                contents = Content.get_rendered_contents_for_user(ids, self.message.user)
-                payload = json.dumps({
-                    "event": "content",
-                    "contents": contents,
-                })
-                self.send(payload)
+            self.handle_load_content(data)
+
+    def handle_load_content(self, data):
+        """Send back the requested content."""
+        ids = data.get("ids")
+        if ids:
+            contents = Content.get_rendered_contents_for_user(ids, self.message.user)
+            payload = json.dumps({
+                "event": "content",
+                "contents": contents,
+            })
+            self.send(payload)
