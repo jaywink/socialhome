@@ -32,6 +32,10 @@ $(function () {
                 }
                 $("#new-content-count").html(availableContent.length);
                 $grid.prepend($contents).masonry("prepended", $contents);
+                // Layout Masonry after each image loads
+                $grid.imagesLoaded().progress(function() {
+                    $grid.masonry('layout');
+                });
             }
         };
 
