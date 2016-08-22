@@ -1,64 +1,104 @@
 $(function () {
-    if (typeof socialhomeStream !== "undefined") {
-        // Correctly decide between ws:// and wss://
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var ws_path = ws_scheme + '://' + window.location.host + "/ch/streams/" + socialhomeStream + "/";
-        console.log("Connecting to " + ws_path);
-        var socket = new ReconnectingWebSocket(ws_path);
-        var availableContent = [];
+    /*
+     * Handle stream updates
+     *
+     * Connect to backend via a websocket. Listen to new content for the current stream.
+     * Push new content to the view when user requests it.
+     *
+     */
+    var view = {
+        showNewLabel: function() {
+            $("#new-content-container").show(100);
+        },
 
-        // Handle incoming messages
-        socket.onmessage = function(message) {
-            // Decode the JSON
-            console.log("Got message " + message.data);
+        hideNewLabel: function() {
+            $("#new-content-container").hide();
+        },
+
+        updateNewLabelCount: function(count) {
+            $("#new-content-count").html(count);
+        },
+
+        createContentElem: function(content) {
+            return $('<div class="grid-item">' + content + '</div>');
+        },
+
+        addContentToGrid: function($contents) {
+            var $grid = $('.grid');
+            $grid.prepend($contents).masonry("prepended", $contents);
+            // Layout Masonry after each image loads
+            $grid.imagesLoaded().progress(function () {
+                $grid.masonry('layout');
+            });
+        }
+    };
+
+    var controller = {
+        availableContent: [],
+
+        init: function() {
+            this.socket = this.createConnection();
+            this.socket.onmessage = this.handleMessage;
+            this.socket.onopen = this.handleSocketOpen;
+            this.socket.onclose = this.handleSocketClose;
+        },
+
+        createConnection: function() {
+            // Correctly decide between ws:// and wss://
+            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws",
+                ws_path = ws_scheme + '://' + window.location.host + "/ch/streams/" + socialhomeStream + "/";
+            return new ReconnectingWebSocket(ws_path);
+        },
+
+        handleSocketOpen: function() {
+            if (controller.availableContent.length) {
+                view.showNewLabel();
+            }
+            // Stream content refresh
+            $("#new-content-load-link").click(controller.getContent);
+        },
+
+        handleSocketClose: function() {
+            $("#new-content-load-link").off("click");
+            view.hideNewLabel();
+        },
+
+        handleMessage: function(message) {
             var data = JSON.parse(message.data);
-            console.log(data);
-            if (data.event === "new" && availableContent.indexOf(data.id) === -1) {
-                availableContent.push(data.id);
-                $("#new-content-count").html(availableContent.length);
-                $("#new-content-container").show(100);
+            if (data.event === "new" && controller.availableContent.indexOf(data.id) === -1) {
+                controller.availableContent.push(data.id);
+                view.updateNewLabelCount(controller.availableContent.length);
+                view.showNewLabel();
+
             } else if (data.event === "content") {
-                var $grid = $('.grid'),
-                    $contents,
+                var $contents,
                     ids = [];
-                _.each(data.contents, function(content) {
-                    var $elem = $('<div class="grid-item">' + content.rendered + '</div>');
+
+                _.each(data.contents, function (content) {
+                    var $elem = view.createContentElem(content.rendered);
                     $contents = $contents ? $contents.add($elem) : $elem;
                     ids.push(content.id);
                 });
-                availableContent = _.difference(availableContent, ids);
-                if (! availableContent.length) {
-                    $("#new-content-container").hide();
-                }
-                $("#new-content-count").html(availableContent.length);
-                $grid.prepend($contents).masonry("prepended", $contents);
-                // Layout Masonry after each image loads
-                $grid.imagesLoaded().progress(function() {
-                    $grid.masonry('layout');
-                });
-            }
-        };
 
-        // Helpful debugging
-        socket.onopen = function () {
-            console.log("Connected to notification socket");
-            if (availableContent.length) {
-                $("#new-content-container").show(100);
+                controller.availableContent = _.difference(controller.availableContent, ids);
+                if (! controller.availableContent.length) {
+                    view.hideNewLabel();
+                }
+                view.updateNewLabelCount(controller.availableContent.length);
+                view.addContentToGrid($contents);
             }
-            // Stream content refresh
-            $("#new-content-load-link").click(function() {
-                console.log("Load new content");
-                var data = {
-                    "action": "load_content",
-                    "ids": availableContent
-                };
-                socket.send(JSON.stringify(data));
-            });
-        };
-        socket.onclose = function () {
-            console.log("Disconnected to notification socket");
-            $("#new-content-load-link").off("click");
-            $("#new-content-container").hide();
-        };
+        },
+
+        getContent: function() {
+            var data = {
+                "action": "load_content",
+                "ids": controller.availableContent
+            };
+            controller.socket.send(JSON.stringify(data));
+        }
+    };
+
+    if (typeof socialhomeStream !== "undefined") {
+        controller.init();
     }
 });
