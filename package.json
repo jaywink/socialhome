@@ -5,6 +5,7 @@
   "devDependencies": {
     "autoprefixer-core": "~5.2.1",
     "bower": "~1.7.9",
+    "chai": "^3.5.0",
     "connect-livereload": "~0.3.2",
     "cssnano": "~2.1.0",
     "grunt": "~0.4.5",
@@ -13,9 +14,11 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-watch": "~0.6.1",
+    "grunt-mocha": "^1.0.2",
     "grunt-postcss": "~0.5.5",
     "grunt-sass": "~1.0.0",
     "load-grunt-tasks": "~3.2.0",
+    "mocha": "^3.0.2",
     "pixrem": "~1.3.1",
     "time-grunt": "~1.2.1"
   },

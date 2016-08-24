@@ -70,14 +70,14 @@ mailhog
 # Socialhome environment file
 env.local
 
-# Compiled CSS
+# Collected statics
 socialhome/static/css/*.css
-
-# Compiled JS
 socialhome/static/js/project.js
+socialhome/static/fonts/
+staticfiles/
 
 # Bower
-/bower_components/
+bower_components/
 
-# Collected fonts
-socialhome/static/fonts/
+# Mocha test statics
+socialhome/static/mocha/

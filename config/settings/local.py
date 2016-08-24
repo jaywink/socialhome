@@ -56,6 +56,13 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
 # ------------------------------------------------------------------------------
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
+# Mocha JS testing
+# ------------------------------------------------------------------------------
+MOCHA_TESTS = env.bool('MOCHA_TESTS', default=False)
+if MOCHA_TESTS:
+    INSTALLED_APPS += ("mocha",)
+    MIDDLEWARE_CLASSES += ('whitenoise.middleware.WhiteNoiseMiddleware',)
+
 ########## CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
 CELERY_ALWAYS_EAGER = True

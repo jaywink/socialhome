@@ -1,0 +1,34 @@
+{% extends "mocha/base.html" %}
+{% load static %}
+
+
+{% block mocha_tests %}
+    <script src="{% static 'js/tests/test_streams.js' %}"></script>
+{% endblock %}
+
+
+{% block fixtures %}
+    <div class="container">
+        <div id="new-content-container" class="hidden">
+            <a href="" id="new-content-load-link" onclick="return false;">
+                <span class="tag tag-pill tag-primary"><span id="new-content-count">0</span> new posts available</span>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="grid">
+                <div class="grid-sizer"></div>
+                <div class="stamped">
+                    <h2>Stream</h2>
+                </div>
+                <div class="grid-item">
+                    <p>fewfewfewfwe</p>
+                </div>
+                <div class="grid-item">
+                    <p>fewfewfew</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -242,6 +242,11 @@ BROKER_URL = env("CELERY_BROKER_URL", default='django://')
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 
+# SITE CONFIGURATION
+# ------------------------------------------------------------------------------
+# Hosts/domain names that are valid for this site
+# See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['socialhome.local'])
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
@@ -281,3 +286,6 @@ CHANNEL_LAYERS = {
         "ROUTING": "config.routing.channel_routing",
     },
 }
+
+# Mocha JS tests - overrides in local.py
+MOCHA_TESTS = False

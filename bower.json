@@ -23,5 +23,9 @@
     "jquery-ui": "jqueryui#^1.11.4",
     "reconnecting-websocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "sinon": "http://sinonjs.org/releases/sinon-1.17.4.js",
+    "mock-socket": "^2.0.2"
   }
 }
