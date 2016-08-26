@@ -4,6 +4,8 @@
 
 A federated social home. Provides home page functionality and federates with other federated social networks using the Diaspora protocol.
 
+See an example site: https://jasonrobinson.me
+
 ## Status
 
 Alpha. Only limited functionality. Here be dragons.
