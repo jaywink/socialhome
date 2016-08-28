@@ -36,6 +36,11 @@
   }
 }
 
+// Dark navbar tuning
+.navbar-toggler {
+  color: #fff;
+}
+
 // Display django-debug-toolbar.
 // See https://github.com/django-debug-toolbar/django-debug-toolbar/issues/742
 // and https://github.com/pydanny/cookiecutter-django/issues/317
