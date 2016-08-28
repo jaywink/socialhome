@@ -30,7 +30,11 @@ $(function () {
             $grid.imagesLoaded().progress(function () {
                 $grid.masonry('layout');
             });
-        }
+        },
+
+        scrollToTop: function() {
+            window.scrollTo(0, 0);
+        },
     };
 
     var controller = {
@@ -95,6 +99,7 @@ $(function () {
                 "ids": controller.availableContent
             };
             controller.socket.send(JSON.stringify(data));
+            view.scrollToTop();
         }
     };
 
