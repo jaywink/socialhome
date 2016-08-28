@@ -20,8 +20,15 @@ before_script:
   - npm install
   - bower install
   - node_modules/.bin/grunt build
-script: py.test --cov=./
+  - python manage.py print_settings
+script:
+  - py.test --cov=./
+  - python manage.py migrate --noinput -v 0
+  - python manage.py collectstatic --noinput -v 0
+  - python manage.py runserver 8000 &
+  - sleep 5  # wait for server to start
+  - node_modules/.bin/grunt mocha
 after_success:
   - codecov
 env:
- - DATABASE_URL=postgres://postgres@127.0.0.1:5432/travis_ci_test DJANGO_SETTINGS_MODULE=config.settings.local DJANGO_ALLOWED_HOSTS=127.0.0.1 DJANGO_SECURE_SSL_REDIRECT=False SOCIALHOME_DOMAIN=127.0.0.1:8000 SOCIALHOME_HTTPS=False DJANGO_DEBUG=False DJANGO_DEBUG_TOOLBAR=False
+ - DATABASE_URL=postgres://postgres@127.0.0.1:5432/travis_ci_test DJANGO_SETTINGS_MODULE=config.settings.local DJANGO_ALLOWED_HOSTS=127.0.0.1 DJANGO_SECURE_SSL_REDIRECT=False SOCIALHOME_DOMAIN=127.0.0.1:8000 SOCIALHOME_HTTPS=False DJANGO_DEBUG=False DJANGO_DEBUG_TOOLBAR=False MOCHA_TESTS=True

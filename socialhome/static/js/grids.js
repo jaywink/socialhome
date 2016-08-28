@@ -5,6 +5,7 @@
             itemSelector: '.grid-item',
             columnWidth: '.grid-sizer',
             percentPosition: true,
+            stamp: ".stamped",
         });
         // Layout Masonry after each image loads
         $grid.imagesLoaded().progress(function() {

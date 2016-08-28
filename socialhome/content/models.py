@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
@@ -49,3 +50,26 @@ class Content(models.Model):
     @property
     def rendered(self):
         return self.render()
+
+    @staticmethod
+    def get_contents_for_user(ids, user):
+        contents = Content.objects.filter(id__in=ids)
+        if not user.is_authenticated():
+            contents = contents.filter(visibility=Visibility.PUBLIC)
+        else:
+            contents = contents.filter(
+                Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC])
+            )
+        return contents.order_by("created")
+
+    @staticmethod
+    def get_rendered_contents_for_user(ids, user):
+        contents = Content.get_contents_for_user(ids, user)
+        rendered = []
+        for content in contents:
+            rendered.append({
+                "id": content.id,
+                "author": content.author_id,
+                "rendered": content.rendered
+            })
+        return rendered

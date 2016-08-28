@@ -1,0 +1,33 @@
+@import "variables";
+
+/* New content container */
+#new-content-container {
+  position: fixed;
+  text-align: center;
+  z-index: 1000;
+  top: 37px;
+  left: 0;
+  right: 0;
+  font-size: 1.5em;
+}
+
+@media (min-width: $bsMediumDevice) {
+  #new-content-container {
+    font-size: 1.4em;
+    top: 38px;
+  }
+}
+
+@media (min-width: $bsLargeDevice) {
+  #new-content-container {
+    font-size: 1.2em;
+    top: 39px;
+  }
+}
+
+@media (min-width: $bsXLargeDevice) {
+  #new-content-container {
+    font-size: 1.0em;
+    top: 40px;
+  }
+}

@@ -22,7 +22,7 @@
   <body>
 
     <div class="m-b">
-      <nav class="navbar navbar-dark navbar-static-top bg-inverse">
+      <nav class="navbar navbar-dark navbar-fixed-top bg-inverse">
         <div class="container">
           <a class="navbar-brand" href="/">Socialhome</a>
           <button type="button" class="navbar-toggler hidden-md-up pull-xs-right pull-sm-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
@@ -66,7 +66,7 @@
       </nav>
     </div>
 
-    <div class="{% block containertype %}container{% endblock %}">
+    <div class="main-container {% block containertype %}container{% endblock %}">
 
       {% if messages %}
           {% for message in messages %}

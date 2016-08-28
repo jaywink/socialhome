@@ -1,182 +1,217 @@
 module.exports = function (grunt) {
 
-  var appConfig = grunt.file.readJSON('package.json');
+    var appConfig = grunt.file.readJSON('package.json');
 
-  // Load grunt tasks automatically
-  // see: https://github.com/sindresorhus/load-grunt-tasks
-  require('load-grunt-tasks')(grunt);
+    // Load grunt tasks automatically
+    // see: https://github.com/sindresorhus/load-grunt-tasks
+    require('load-grunt-tasks')(grunt);
 
-  // Time how long tasks take. Can help when optimizing build times
-  // see: https://npmjs.org/package/time-grunt
-  require('time-grunt')(grunt);
+    // Time how long tasks take. Can help when optimizing build times
+    // see: https://npmjs.org/package/time-grunt
+    require('time-grunt')(grunt);
 
-  var pathsConfig = function (appName) {
-    this.app = appName || appConfig.name;
+    var pathsConfig = function (appName) {
+        this.app = appName || appConfig.name;
 
-    return {
-      app: this.app,
-      templates: this.app + '/templates',
-      css: this.app + '/static/css',
-      sass: this.app + '/static/sass',
-      fonts: this.app + '/static/fonts',
-      images: this.app + '/static/images',
-      js: this.app + '/static/js',
-      manageScript: 'manage.py',
-      bower: "bower_components",
-    }
-  };
-
-  grunt.initConfig({
-
-    paths: pathsConfig(),
-    pkg: appConfig,
-
-    // see: https://github.com/gruntjs/grunt-contrib-watch
-    watch: {
-      gruntfile: {
-        files: ['Gruntfile.js']
-      },
-      sass: {
-        files: ['<%= paths.sass %>/**/*.{scss,sass}'],
-        tasks: ['sass:dev'],
-        options: {
-          atBegin: true
+        return {
+            app: this.app,
+            templates: this.app + '/templates',
+            css: this.app + '/static/css',
+            sass: this.app + '/static/sass',
+            fonts: this.app + '/static/fonts',
+            images: this.app + '/static/images',
+            js: this.app + '/static/js',
+            mocha: this.app + '/static/mocha',
+            manageScript: 'manage.py',
+            bower: "bower_components",
+            node: "node_modules",
         }
-      },
-      livereload: {
-        files: [
-          '<%= paths.js %>/**/*.js',
-          '<%= paths.sass %>/**/*.{scss,sass}',
-          '<%= paths.app %>/**/*.html'
-          ],
-        options: {
-          spawn: false,
-          livereload: true,
+    };
+
+    grunt.initConfig({
+
+        paths: pathsConfig(),
+        pkg: appConfig,
+
+        // see: https://github.com/gruntjs/grunt-contrib-watch
+        watch: {
+            gruntfile: {
+                files: ['Gruntfile.js']
+            },
+            sass: {
+                files: ['<%= paths.sass %>/**/*.{scss,sass}'],
+                tasks: ['sass:dev'],
+                options: {
+                    atBegin: true
+                }
+            },
+            livereload: {
+                files: [
+                    '<%= paths.js %>/**/*.js',
+                    '<%= paths.sass %>/**/*.{scss,sass}',
+                    '<%= paths.app %>/**/*.html'
+                ],
+                options: {
+                    spawn: false,
+                    livereload: true,
+                },
+            },
         },
-      },
-    },
 
-    // see: https://github.com/sindresorhus/grunt-sass
-    sass: {
-      dev: {
-          options: {
-              outputStyle: 'nested',
-              sourceMap: false,
-              precision: 10
-          },
-          files: {
-              '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
-              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
-              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
-          },
-      },
-      dist: {
-          options: {
-              outputStyle: 'compressed',
-              sourceMap: false,
-              precision: 10
-          },
-          files: {
-              '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
-              '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
-              '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
-          },
-      }
-    },
+        // see: https://github.com/sindresorhus/grunt-sass
+        sass: {
+            dev: {
+                options: {
+                    outputStyle: 'nested',
+                    sourceMap: false,
+                    precision: 10
+                },
+                files: {
+                    '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
+                    '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
+                    '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
+                    '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
+                },
+            },
+            dist: {
+                options: {
+                    outputStyle: 'compressed',
+                    sourceMap: false,
+                    precision: 10
+                },
+                files: {
+                    '<%= paths.css %>/fontawesome.css': '<%= paths.bower %>/fontawesome/scss/font-awesome.scss',
+                    '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
+                    '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
+                    '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
+                },
+            }
+        },
 
-    concat: {
-      js: {
-        src: [
-          "<%= paths.bower %>/jquery/dist/jquery.min.js",
-          "<%= paths.bower %>/tether/dist/js/tether.min.js",
-          "<%= paths.bower %>/jquery-ui/jquery-ui.min.js",
-          "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
-          "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
-          "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
-          "<%= paths.js %>/grids.js",
-        ],
-        dest: "<%= paths.js %>/project.js",
-        nonull: true,
-      },
-      css: {
-        src: [
-          "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
-          "<%= paths.bower %>/tether/dist/css/tether.min.css",
-          "<%= paths.css %>/fontawesome.css",
-          "<%= paths.css %>/common.css",
-          "<%= paths.css %>/grids.css",
-        ],
-        dest: "<%= paths.css %>/project.css",
-        nonull: true,
-      },
-    },
+        concat: {
+            js: {
+                src: [
+                    "<%= paths.bower %>/jquery/dist/jquery.min.js",
+                    "<%= paths.bower %>/tether/dist/js/tether.min.js",
+                    "<%= paths.bower %>/jquery-ui/jquery-ui.min.js",
+                    "<%= paths.bower %>/underscore/underscore-min.js",
+                    "<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js",
+                    "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
+                    "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
+                    "<%= paths.bower %>/reconnecting-websocket/reconnecting-websocket.min.js",
+                    "<%= paths.js %>/grids.js",
+                    "<%= paths.js %>/streams.js",
+                ],
+                dest: "<%= paths.js %>/project.js",
+                nonull: true,
+            },
+            css: {
+                src: [
+                    "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
+                    "<%= paths.bower %>/tether/dist/css/tether.min.css",
+                    "<%= paths.css %>/fontawesome.css",
+                    "<%= paths.css %>/common.css",
+                    "<%= paths.css %>/grids.css",
+                    "<%= paths.css %>/streams.css",
+                ],
+                dest: "<%= paths.css %>/project.css",
+                nonull: true,
+            },
+        },
 
-    //see https://github.com/nDmitry/grunt-postcss
-    postcss: {
-      options: {
-        map: true, // inline sourcemaps
+        //see https://github.com/nDmitry/grunt-postcss
+        postcss: {
+            options: {
+                map: true, // inline sourcemaps
 
-        processors: [
-          require('pixrem')(), // add fallbacks for rem units
-          require('autoprefixer-core')({browsers: [
-            'Android 2.3',
-            'Android >= 4',
-            'Chrome >= 20',
-            'Firefox >= 24',
-            'Explorer >= 8',
-            'iOS >= 6',
-            'Opera >= 12',
-            'Safari >= 6'
-          ]}), // add vendor prefixes
-          require('cssnano')() // minify the result
-        ]
-      },
-      dist: {
-        src: '<%= paths.css %>/*.css'
-      }
-    },
+                processors: [
+                    require('pixrem')(), // add fallbacks for rem units
+                    require('autoprefixer-core')({
+                        browsers: [
+                            'Android 2.3',
+                            'Android >= 4',
+                            'Chrome >= 20',
+                            'Firefox >= 24',
+                            'Explorer >= 8',
+                            'iOS >= 6',
+                            'Opera >= 12',
+                            'Safari >= 6'
+                        ]
+                    }), // add vendor prefixes
+                    require('cssnano')() // minify the result
+                ]
+            },
+            dist: {
+                src: '<%= paths.css %>/*.css'
+            }
+        },
 
-    copy: {
-      font_awesome: {
-        expand: true,
-        flatten: true,
-        src: ['<%= paths.bower %>/fontawesome/fonts/*'],
-        dest: '<%= paths.fonts %>'
-      }
-    },
+        copy: {
+            font_awesome: {
+                expand: true,
+                flatten: true,
+                src: ['<%= paths.bower %>/fontawesome/fonts/*'],
+                dest: '<%= paths.fonts %>'
+            },
+            mocha: {
+                expand: true,
+                flatten: true,
+                src: [
+                    "<%= paths.node %>/mocha/mocha.js",
+                    "<%= paths.node %>/mocha/mocha.css",
+                    "<%= paths.node %>/chai/chai.js",
+                    "<%= paths.bower %>/mock-socket/dist/mock-socket.js",
+                ],
+                dest: "<%= paths.mocha %>/",
+            },
+            sinon: {
+                src: "<%= paths.bower %>/sinon/index.js",
+                dest: "<%= paths.mocha %>/sinon.js",
+            },
+        },
 
-    // see: https://npmjs.org/package/grunt-bg-shell
-    bgShell: {
-      _defaults: {
-        bg: true
-      },
-      runDjango: {
-        cmd: 'python <%= paths.manageScript %> runserver'
-      },
+        // see: https://npmjs.org/package/grunt-bg-shell
+        bgShell: {
+            _defaults: {
+                bg: true
+            },
+            runDjango: {
+                cmd: 'python <%= paths.manageScript %> runserver'
+            },
+        },
+        mocha: {
+            'socialhome.streams': {
+                options: {
+                    urls: ['http://127.0.0.1:8000/mocha/streams/'],
+                    run: true,
+                    logErrors: true,
+                    reporter: "nyan",
+                }
+            },
+        },
+    });
 
-    }
-  });
+    grunt.registerTask('serve', [
+        'bgShell:runDjango',
+        'watch'
+    ]);
 
-  grunt.registerTask('serve', [
-    'bgShell:runDjango',
-    'watch'
-  ]);
+    grunt.registerTask('build', [
+        'sass:dist',
+        'postcss',
+        'concat',
+        'copy',
+    ]);
 
-  grunt.registerTask('build', [
-    'sass:dist',
-    'postcss',
-    'concat',
-    'copy',
-  ]);
+    grunt.registerTask('dev', [
+        'sass:dev',
+        'concat',
+        'copy',
+    ]);
 
-  grunt.registerTask('dev', [
-    'sass:dev',
-    'concat',
-    'copy',
-  ]);
+    grunt.registerTask('default', [
+        'dev'
+    ]);
 
-  grunt.registerTask('default', [
-    'dev'
-  ]);
-
+    grunt.loadNpmTasks('grunt-mocha');
 };

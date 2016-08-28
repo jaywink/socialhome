@@ -6,11 +6,19 @@
 {% block containertype %}container-fluid{% endblock %}
 
 {% block content %}
+    <script>var socialhomeStream = "public";</script>
+    <div class="container">
+        <div id="new-content-container" class="hidden">
+            <a href="" id="new-content-load-link" onclick="return false;">
+                <span class="tag tag-pill tag-primary"><span id="new-content-count">0</span> {% trans "new posts available" %}</span>
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm-12">
             <div class="grid">
                 <div class="grid-sizer"></div>
-                <div class="grid-item">
+                <div class="stamped">
                     <h2>{% trans "Public" %}</h2>
                     <p>{% trans "Contains public content from around the network." %}</p>
                 </div>
