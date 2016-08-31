@@ -85,6 +85,8 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     {% block javascript %}
+        <!-- JavaScript locales -->
+        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
         <!-- Compiled project JS -->
         <script src="{% static 'js/project.js' %}"></script>
     {% endblock javascript %}

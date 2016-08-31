@@ -24,8 +24,13 @@ $(function () {
         },
 
         addContentToGrid: function($contents) {
+            $('.grid').prepend($contents).masonry("prepended", $contents);
+            view.layoutMasonry();
+            view.addNSFWShield();
+        },
+
+        layoutMasonry: function() {
             var $grid = $('.grid');
-            $grid.prepend($contents).masonry("prepended", $contents);
             // Layout Masonry after each image loads
             $grid.imagesLoaded().progress(function () {
                 $grid.masonry('layout');
@@ -35,12 +40,52 @@ $(function () {
         scrollToTop: function() {
             window.scrollTo(0, 0);
         },
+
+        addNSFWShield: function() {
+            // Add a clickable card element above the hidden image to show it
+            $(".nsfw:not('.nsfw-shield-on')").each(function() {
+              $(this).addClass("nsfw-shield-on").before(
+                  $('<div class="card card-block text-xs-center nsfw-shield">' +
+                      '<p class="card-text">[' + gettext("show NSFW image") + ']</p></div>')
+              );
+            });
+            $(".nsfw-shield").off("click").click(view.showNSFWImage);
+        },
+
+        addNSFWShieldReturn: function() {
+            // Add a clickable text above the visible image to reactivate the shield again
+            $(".nsfw-shield-off:not('.nsfw-shield-off-active')").each(function() {
+                $(this).addClass("nsfw-shield-off-active").before(
+                    $('<div class="nsfw-shield-return">[' + gettext("hide NSFW image") + ']</div>')
+                )
+            });
+            $(".nsfw-shield-return").off("click").click(view.returnNSFWShield);
+        },
+
+        showNSFWImage: function(ev) {
+            // Make NSFW image visible
+            var $elem = $(ev.currentTarget);
+            $elem.hide().closest(".nsfw-shield").next().removeClass("nsfw nsfw-shield-on").addClass("nsfw-shield-off");
+            view.addNSFWShieldReturn();
+            view.layoutMasonry();
+            $elem.remove();
+        },
+
+        returnNSFWShield: function(ev) {
+            // Make NSFW image shielded again
+            var $elem = $(ev.currentTarget);
+            $elem.hide().next().addClass("nsfw").removeClass("nsfw-shield-off nsfw-shield-off-active");
+            view.addNSFWShield();
+            view.layoutMasonry();
+            $elem.remove();
+        },
     };
 
     var controller = {
         availableContent: [],
 
         init: function() {
+            view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
             this.socket.onopen = this.handleSocketOpen;

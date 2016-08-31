@@ -89,4 +89,29 @@ describe("Streams", function() {
             });
         });
     });
+
+    describe("nsfw", function() {
+        context("shield", function() {
+            it("activates", function() {
+                var $nsfw = $("#nsfw-content");
+                expect($nsfw.is(":visible")).to.be.false;
+                expect($nsfw.hasClass("nsfw-shield-on")).to.be.true;
+                var $card = $nsfw.prev();
+                expect($card.is(":visible")).to.be.true;
+            });
+
+            it("shows image on shield click and hides it on returned click", function() {
+                var $nsfw = $("#nsfw-content"),
+                    $card = $nsfw.prev();
+                $card.trigger("click");
+                expect($nsfw.is(":visible")).to.be.true;
+                expect($nsfw.hasClass("nsfw-shield-off")).to.be.true;
+                var $returner = $nsfw.prev();
+                expect($returner.is(":visible")).to.be.true;
+                $returner.trigger("click");
+                expect($nsfw.is(":visible")).to.be.false;
+                expect($nsfw.hasClass("nsfw-shield-on")).to.be.true;
+            });
+        });
+    });
 });

@@ -4,14 +4,17 @@ from uuid import uuid4
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from markdownx.utils import markdownify
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.content.utils import make_nsfw_safe
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
+from socialhome.utils import safe_clear_cached_property
 
 
 class Content(models.Model):
@@ -38,16 +41,31 @@ class Content(models.Model):
         )
 
     def save(self, author=None, *args, **kwargs):
-        if not self.pk and author:
+        if self.pk:
+            # Old instance, bust the cache
+            self.bust_cache()
+        elif author:
+            # New with author, set a GUID and author
             self.guid = uuid4()
             self.author = author
         return super(Content, self).save(*args, **kwargs)
 
-    def render(self):
-        return markdownify(self.text)
+    def bust_cache(self):
+        """Clear relevant caches for this instance."""
+        safe_clear_cached_property(self, "is_nsfw")
+        safe_clear_cached_property(self, "rendered")
 
-    # TODO: make cached_property
-    @property
+    @cached_property
+    def is_nsfw(self):
+        return self.text.lower().find("#nsfw") > -1
+
+    def render(self):
+        rendered = markdownify(self.text)
+        if self.is_nsfw:
+            rendered = make_nsfw_safe(rendered)
+        return rendered
+
+    @cached_property
     def rendered(self):
         return self.render()
 
