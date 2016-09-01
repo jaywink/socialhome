@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from unittest.mock import Mock, patch, call
+
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
@@ -44,9 +46,16 @@ class TestContentModel(TestCase):
             content.save()
 
     def test_renders(self):
-        content = Content.objects.create(text="# Foobar", guid="barfoo", author=ProfileFactory())
-        assert content.render() == "<h1>Foobar</h1>"
-        assert content.rendered == "<h1>Foobar</h1>"
+        content = Content.objects.create(text="# Foobar <img src='localhost'>", guid="barfoo", author=ProfileFactory())
+        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>")
+        self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>")
+
+    def test_renders_with_nsfw_shield(self):
+        content = Content.objects.create(
+            text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
+        )
+        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
+        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()
@@ -82,4 +91,16 @@ class TestContentModel(TestCase):
                 "author": self.site_content.author_id,
                 "rendered": "<p><em>Foobar</em></p>",
             }
+        ])
+
+    def test_busts_cache_on_save(self):
+        self.public_content.bust_cache = Mock()
+        self.public_content.save()
+        self.public_content.bust_cache.assert_called_once_with()
+
+    @patch("socialhome.content.models.safe_clear_cached_property")
+    def test_bust_cache_calls_safe_cache_clearer(self, mock_clear):
+        self.public_content.bust_cache()
+        self.assertEqual(mock_clear.call_args_list, [
+            call(self.public_content, "is_nsfw"), call(self.public_content, "rendered")
         ])

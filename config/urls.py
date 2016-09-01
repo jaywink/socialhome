@@ -7,8 +7,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from django.views.i18n import javascript_catalog
 
 from socialhome.content.views import HomeView
+
+
+js_translations = {
+    "packages": ("socialhome",),
+}
+
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
@@ -31,6 +38,9 @@ urlpatterns = [
 
     # Content
     url(r"^content/", include("socialhome.content.urls", namespace="content")),
+
+    # JavaScript translations
+    url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
