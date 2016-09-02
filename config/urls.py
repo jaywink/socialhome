@@ -26,9 +26,6 @@ urlpatterns = [
     url(r'^$', HomeView.as_view(), name="home"),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name="about"),
 
-    # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, include(admin.site.urls)),
-
     # User management
     url(r"", include("socialhome.users.urls", namespace="users")),
     url(r'^accounts/', include('allauth.urls')),
@@ -41,6 +38,9 @@ urlpatterns = [
 
     # JavaScript translations
     url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
+
+    # Comment this out to enable the admin site
+    # url(settings.ADMIN_URL, include(admin.site.urls)),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
