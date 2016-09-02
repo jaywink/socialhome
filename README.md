@@ -27,6 +27,37 @@ There is [an ansible role](https://github.com/jaywink/ansible-socialhome), if yo
 
 Running a development server however is easy. Just set up your virtualenv and create a settings file as below. Then use the built-in Django runserver command as usual.
 
+## Development
+
+### Installation
+
+Create a virtualenv and activate it. Ensure the following are installed:
+
+* Python system dependencies
+* NodeJS
+* PostgreSQL server
+* Redis
+
+Install requirements:
+
+    pip install -r requirements/local.txt
+    pip install -r requirements/test.txt
+    
+Do NPM, Bower
+
+    npm install
+    bower install
+    sudo npm -g install grunt
+    grunt dev
+    
+Create a database
+
+    sudo su - postgres
+    createuser -s -P socialhome  # give password 'socialhome'
+    createdb -O socialhome socialhome
+    exit
+    python manage.py migrate
+    
 ## Settings
 
 See: http://cookiecutter-django.readthedocs.org/en/latest/settings.html
@@ -35,8 +66,6 @@ A basic env file is provided, see `env.example`. Copy this to `env.local` and fi
 
     export `cat env.local`
 
-## Basic Commands
-
 ### Setting Up Your Users
 
 To create a *normal user account*, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
@@ -44,8 +73,6 @@ To create a *normal user account*, just go to Sign Up and fill out the form. Onc
 To create an *superuser account*, use this command::
 
     python manage.py createsuperuser
-
-## Development
 
 ### Running tests
 
