@@ -110,6 +110,12 @@ class Profile(models.Model):
         return RSA.importKey(self.rsa_private_key)
 
     @property
+    def private_key(self):
+        """Also required by Social-Federation."""
+        # TODO: make Social-Federation a bit saner here
+        return RSA.importKey(self.rsa_private_key)
+
+    @property
     def public(self):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC

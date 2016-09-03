@@ -59,6 +59,18 @@ class Content(models.Model):
     def is_nsfw(self):
         return self.text.lower().find("#nsfw") > -1
 
+    @property
+    def is_local(self):
+        if self.author.user:
+            return True
+        return False
+
+    @property
+    def effective_created(self):
+        if self.remote_created:
+            return self.remote_created
+        return self.created
+
     def render(self):
         rendered = markdownify(self.text)
         if self.is_nsfw:

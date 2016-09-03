@@ -104,3 +104,10 @@ class TestContentModel(TestCase):
         self.assertEqual(mock_clear.call_args_list, [
             call(self.public_content, "is_nsfw"), call(self.public_content, "rendered")
         ])
+
+    def test_is_local(self):
+        self.assertFalse(self.public_content.is_local)
+        user = self.make_user()
+        user.profile = self.public_content.author
+        user.save()
+        self.assertTrue(self.public_content.is_local)
