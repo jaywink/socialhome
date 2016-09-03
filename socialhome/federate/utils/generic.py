@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 import datetime
 
 import pytz
-
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings

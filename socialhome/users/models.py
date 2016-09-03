@@ -12,7 +12,7 @@ from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.enums import Visibility
-from socialhome.federate.utils import generate_rsa_private_key
+from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.utils import get_pony_urls
 
 
