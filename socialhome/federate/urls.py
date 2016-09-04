@@ -6,7 +6,7 @@ from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
 
 from socialhome.federate.views import (
     host_meta_view, webfinger_view, hcard_view, nodeinfo_well_known_view, nodeinfo_view, social_relay_view,
-    ReceivePublicView, ReceiveUserView)
+    ReceivePublicView, ReceiveUserView, content_xml_view)
 
 
 urlpatterns = [
@@ -25,4 +25,7 @@ urlpatterns = [
     url(r"^receive/public$", csrf_exempt(ReceivePublicView.as_view())),
     url(r"^receive/users/(?P<guid>[^/]+)/$", csrf_exempt(ReceiveUserView.as_view()), name="receive-user"),
     url(r"^receive/users/(?P<guid>[^/]+)$", csrf_exempt(ReceiveUserView.as_view())),
+
+    # Content
+    url(r"^p/(?P<guid>[^/]+).xml$", content_xml_view, name="content-xml"),
 ]
