@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import re
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
@@ -48,6 +50,7 @@ class Content(models.Model):
             # New with author, set a GUID and author
             self.guid = uuid4()
             self.author = author
+        self.fix_local_uploads()
         return super(Content, self).save(*args, **kwargs)
 
     def bust_cache(self):
@@ -103,3 +106,16 @@ class Content(models.Model):
                 "rendered": content.rendered
             })
         return rendered
+
+    def fix_local_uploads(self):
+        """Fix the markdown URL of local uploads.
+
+        Basically these need to be remote compatible. So make this:
+
+            ![](/media/markdownx/12345.jpg
+
+        to this:
+
+            ![](https://socialhome.domain/media/markdownx/12345.jpg
+        """
+        self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
