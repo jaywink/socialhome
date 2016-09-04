@@ -62,7 +62,7 @@ def send_content(content):
         # Just dump to the relay system for now
         # TODO: implement send_document helper in Social-Federation
         url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        logger.debug("Sending document to %s: %s", url, paylod)
+        logger.debug("Sending document to %s: %s", url, payload)
         try:
             response = requests.post(url, payload, headers={'user-agent': "socialhome/0.1"})
             logger.debug("Response: %s", response)
