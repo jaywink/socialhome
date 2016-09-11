@@ -266,6 +266,8 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
+# Relay to send public content to
+SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoast.net")
 
 
 # REDIS

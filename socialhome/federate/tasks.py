@@ -1,9 +1,15 @@
 import logging
 
+import requests
+from django.conf import settings
+
 from federation.exceptions import NoSuitableProtocolFoundError
 from federation.inbound import handle_receive
+from federation.outbound import handle_create_payload
+from federation.utils.network import send_document
 
-from socialhome.federate.utils.tasks import get_sender_profile, process_entities
+from socialhome.enums import Visibility
+from socialhome.federate.utils.tasks import get_sender_profile, process_entities, make_federable_entity
 from socialhome.taskapp.celery import tasks
 from socialhome.users.models import Profile
 
@@ -34,3 +40,23 @@ def receive_task(payload, guid=None):
     if not sender_profile:
         return
     process_entities(entities, profile=sender_profile)
+
+
+@tasks.task()
+def send_content(content):
+    """Handle sending a Content object out via the federation layer.
+
+    Currently we only deliver public content.
+    """
+    if not content.visibility == Visibility.PUBLIC:
+        return
+    entity = make_federable_entity(content)
+    if entity:
+        # TODO: Social-Federation should provide one method to send,
+        # which handles also payload creation and url calculation
+        payload = handle_create_payload(entity, content.author)
+        # Just dump to the relay system for now
+        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
+        send_document(url, payload)
+    else:
+        logger.warning("No entity for %s", content)

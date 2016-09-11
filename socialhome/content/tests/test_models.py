@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import datetime
 from unittest.mock import Mock, patch, call
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
+from django.utils.timezone import make_aware
 from test_plus import TestCase
 
 from socialhome.content.models import Content
@@ -25,6 +27,9 @@ class TestContentModel(TestCase):
         )
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.self_content = ContentFactory(visibility=Visibility.SELF)
+        cls.remote_content = ContentFactory(
+            visibility=Visibility.PUBLIC, remote_created=make_aware(datetime.datetime(2015, 1, 1))
+        )
         cls.ids = [
             cls.public_content.id, cls.site_content.id, cls.limited_content.id, cls.self_content.id
         ]
@@ -104,3 +109,30 @@ class TestContentModel(TestCase):
         self.assertEqual(mock_clear.call_args_list, [
             call(self.public_content, "is_nsfw"), call(self.public_content, "rendered")
         ])
+
+    def test_is_local(self):
+        self.assertFalse(self.public_content.is_local)
+        user = self.make_user()
+        user.profile = self.public_content.author
+        user.save()
+        self.assertTrue(self.public_content.is_local)
+
+    def test_save_calls_fix_local_uploads(self):
+        self.public_content.fix_local_uploads = Mock()
+        self.public_content.save()
+        self.public_content.fix_local_uploads.assert_called_once_with()
+
+    def test_fix_local_uploads(self):
+        self.public_content.text = "foobar ![](/media/markdownx/12345.jpg) barfoo"
+        self.public_content.save()
+        self.public_content.refresh_from_db()
+        self.assertEqual(
+            self.public_content.text,
+            "foobar ![](http://127.0.0.1:8000/media/markdownx/12345.jpg) barfoo"
+        )
+
+    def test_effective_created(self):
+        self.assertEqual(self.public_content.effective_created, self.public_content.created)
+        self.assertIsNone(self.public_content.remote_created)
+        self.assertEqual(self.remote_content.effective_created, self.remote_content.remote_created)
+        self.assertIsNotNone(self.remote_content.remote_created)

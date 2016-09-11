@@ -43,16 +43,17 @@ MIDDLEWARE_CLASSES = PRODUCTION_MIDDLEWARE + MIDDLEWARE_CLASSES
 
 # opbeat integration
 # See https://opbeat.com/languages/django/
-# TODO enable once in ansible role
-# INSTALLED_APPS += ('opbeat.contrib.django',)
-# OPBEAT = {
-#     'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
-#     'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
-#     'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
-# }
-# MIDDLEWARE_CLASSES = (
-#     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-# ) + MIDDLEWARE_CLASSES
+OPBEAT_ENABLE = env("DJANGO_OPBEAT_ENABLE", default=False)
+if OPBEAT_ENABLE:
+    INSTALLED_APPS += ('opbeat.contrib.django',)
+    OPBEAT = {
+        'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
+        'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
+        'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
+    }
+    MIDDLEWARE_CLASSES = (
+        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+    ) + MIDDLEWARE_CLASSES
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -113,11 +114,6 @@ CACHES = {
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -162,13 +158,13 @@ LOGGING = {
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['application_file'],
             'level': 'ERROR',
             'propagate': True
         },
         'django.security.DisallowedHost': {
             'level': 'ERROR',
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'application_file'],
             'propagate': True
         },
         "socialhome": {

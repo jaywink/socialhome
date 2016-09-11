@@ -58,3 +58,20 @@ def process_entities(entities, profile):
                     logger.info("Updated Content: %s" % content)
             except Exception as ex:
                 logger.exception("Failed to handle %s: %s" % (entity.guid, ex))
+
+
+def make_federable_entity(content):
+    """Make Content federable by converting it to a Social-Federation entity."""
+    logging.info("make_federable_entity - Content: %s" % content)
+    try:
+        return base.Post(
+            raw_content=content.text,
+            guid=str(content.guid),
+            handle=content.author.handle,
+            public=True,
+            provider_display_name="Socialhome",
+            created_at=content.effective_created,
+        )
+    except Exception as ex:
+        logger.exception("make_federable_entity - Failed to convert %s: %s" % (content.guid, ex))
+        return None
