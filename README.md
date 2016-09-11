@@ -31,26 +31,40 @@ Running a development server however is easy. Just set up your virtualenv and cr
 
 ### Installation
 
-Create a virtualenv and activate it. Ensure the following are installed:
+#### Create a virtualenv and activate it
+
+Python 3.4 and 3.5 are officially tested against. Ensure the following are installed:
 
 * Python system dependencies
 * NodeJS
 * PostgreSQL server
 * Redis
 
-Install requirements:
+The file `requirements.apt` contains other various dependencies. You can use the `install_os_dependencies.sh` script to help installing these.
+
+#### Install requirements:
 
     pip install -r requirements/local.txt
     pip install -r requirements/test.txt
     
-Do NPM, Bower
+#### Do NPM, Bower
 
     npm install
     bower install
     sudo npm -g install grunt
     grunt dev
     
-Create a database
+#### Configure
+
+Configuration is done via environment variables. For the meaning of them, look them up under files in `config/settings`. 
+
+    cp env.example env.local
+    
+Edit any values necessary. By default the `SECRET_KEY` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
+    
+#### Create a database
+
+If you changed the `DATABASE_URL` in the settings file, make sure to change the values in these commands accordingly. 
 
     sudo su - postgres
     createuser -s -P socialhome  # give password 'socialhome'
