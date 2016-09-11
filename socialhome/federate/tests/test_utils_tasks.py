@@ -1,6 +1,7 @@
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pytest
+from test_plus import TestCase
 
 from federation.entities import base
 from federation.tests.factories import entities
@@ -8,7 +9,7 @@ from federation.tests.factories import entities
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.utils.tasks import process_entities, get_sender_profile
+from socialhome.federate.utils.tasks import process_entities, get_sender_profile, make_federable_entity
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory
 
@@ -87,3 +88,21 @@ class TestGetSenderProfile(object):
         assert sender_profile.image_url_medium == "alert('yup');"
         assert sender_profile.image_url_large == "alert('yup');"
         assert sender_profile.location == "alert('yup');"
+
+
+@pytest.mark.usefixtures("db")
+class TestMakeFederableEntity(TestCase):
+    def test_returns_entity(self):
+        content = ContentFactory()
+        entity = make_federable_entity(content)
+        self.assertEqual(entity.raw_content, content.text)
+        self.assertEqual(entity.guid, content.guid)
+        self.assertEqual(entity.handle, content.author.handle)
+        self.assertEqual(entity.public, True)
+        self.assertEqual(entity.provider_display_name, "Socialhome")
+        self.assertEqual(entity.created_at, content.effective_created)
+
+    @patch("socialhome.federate.utils.tasks.base.Post", side_effect=Exception)
+    def test_returns_none_on_exception(self, mock_post):
+        entity = make_federable_entity(Mock())
+        self.assertIsNone(entity)
