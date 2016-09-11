@@ -3,7 +3,10 @@ from unittest.mock import patch
 
 import pytest
 from django.core.urlresolvers import reverse
+from test_plus import TestCase
 
+from socialhome.content.tests.factories import ContentFactory
+from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
@@ -75,3 +78,35 @@ class TestReceiveUser(object):
     def test_receive_user_returns_bad_request_if_no_payload(self, client):
         response = client.post(reverse("federate:receive-user", kwargs={"guid": "1234"}))
         assert response.status_code == 400
+
+
+@pytest.mark.usefixtures("db")
+class TestContentXMLView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestContentXMLView, cls).setUpTestData()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+
+    def setUp(self):
+        super(TestContentXMLView, self).setUp()
+
+    def test_non_public_content_returns_404(self):
+        response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.limited_content.guid}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_public_content_returns_success_code(self):
+        response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        self.assertEqual(response.status_code, 200)
+
+    @patch("socialhome.federate.views.make_federable_entity")
+    @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
+    def test_calls_make_federable_entity(self, mock_getter, mock_maker):
+        self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        mock_maker.assert_called_once_with(self.public_content)
+
+    @patch("socialhome.federate.views.make_federable_entity", return_value="entity")
+    @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
+    def test_calls_get_full_xml_representation(self, mock_getter, mock_maker):
+        self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        mock_getter.assert_called_once_with("entity")

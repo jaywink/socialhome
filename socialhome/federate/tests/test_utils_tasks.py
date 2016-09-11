@@ -47,8 +47,7 @@ class TestGetSenderProfile(object):
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_fetches_remote_profile_if_not_found(self, mock_retrieve):
-        # TODO: use ProfileFactory from Social-Federation once available
-        mock_retrieve.return_value = base.Profile(
+        mock_retrieve.return_value = entities.ProfileFactory(
             name="foobar", raw_content="barfoo", public_key="xyz",
             handle="foo@example.com", guid="123456"
         )
@@ -68,8 +67,7 @@ class TestGetSenderProfile(object):
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_cleans_text_fields_in_profile(self, mock_retrieve):
-        # TODO: use ProfileFactory from Social-Federation once available
-        mock_retrieve.return_value = base.Profile(
+        mock_retrieve.return_value = entities.ProfileFactory(
             name="<script>alert('yup');</script>", raw_content="<script>alert('yup');</script>",
             public_key="<script>alert('yup');</script>",
             handle="foo@example.com", guid="<script>alert('yup');</script>",

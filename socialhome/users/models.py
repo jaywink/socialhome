@@ -106,13 +106,18 @@ class Profile(models.Model):
 
     @property
     def key(self):
-        """Required by Social-Federation."""
-        return RSA.importKey(self.rsa_private_key)
+        """Required by Social-Federation.
+
+        Corresponds to public key.
+        """
+        return RSA.importKey(self.rsa_public_key)
 
     @property
     def private_key(self):
-        """Also required by Social-Federation."""
-        # TODO: make Social-Federation a bit saner here
+        """Required by Social-Federation.
+
+        Corresponds to private key.
+        """
         return RSA.importKey(self.rsa_private_key)
 
     @property

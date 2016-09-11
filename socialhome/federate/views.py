@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import logging
-from lxml import etree
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
+from lxml import etree
 
 from federation.entities.diaspora.mappers import get_outbound_entity
+from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
@@ -106,13 +107,9 @@ def content_xml_view(request, guid):
 
     Fetched by remote servers in certain situations.
     """
-    # TODO push as much as we can to Social-Federation
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     entity = make_federable_entity(content)
-    diaspora_entity = get_outbound_entity(entity)
-    xml = diaspora_entity.to_xml()
-    document = "<XML><post>%s</post></XML>" % etree.tostring(xml).decode("utf-8")
-    return HttpResponse(document, content_type="application/xml")
+    return HttpResponse(get_full_xml_representation(entity), content_type="application/xml")
 
 
 class ReceivePublicView(View):
