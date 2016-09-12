@@ -6,7 +6,7 @@
     "Jason Robinson <mail@jasonrobinson.me>"
   ],
   "description": "A federated social home",
-  "license": "MIT",
+  "license": "AGPLv3",
   "ignore": [
     "**/.*",
     "node_modules",

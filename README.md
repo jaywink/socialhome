@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Requirements Status](https://requires.io/github/jaywink/socialhome/requirements.svg?branch=master)](https://requires.io/github/jaywink/socialhome/requirements/?branch=master) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master)
+[![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Requirements Status](https://requires.io/github/jaywink/socialhome/requirements.svg?branch=master)](https://requires.io/github/jaywink/socialhome/requirements/?branch=master) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master) [![](https://img.shields.io/badge/license-AGPLv3-red.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
 # Socialhome
 
@@ -111,4 +111,6 @@ In addition to the web server HTTP traffic and the Celery workers, Socialhome us
 
 ## License
 
-MIT
+Except where otherwise noted the code is licensed as [AGPLv3](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)).
+
+Early work at and before commit [c36197491e996a599bd360e2b06853bbcb121c7a](https://github.com/jaywink/socialhome/commit/c36197491e996a599bd360e2b06853bbcb121c7a) was licensed as MIT.
