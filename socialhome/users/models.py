@@ -110,7 +110,7 @@ class Profile(models.Model):
 
         Corresponds to public key.
         """
-        return RSA.importKey(self.rsa_public_key)
+        return RSA.importKey(self.rsa_private_key)
 
     @property
     def private_key(self):
