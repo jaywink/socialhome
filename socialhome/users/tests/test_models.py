@@ -75,10 +75,10 @@ class TestProfile(object):
         assert str(profile) == "foo (foo@example.com)"
 
     @pytest.mark.usefixtures("settings")
-    def test_key(self, settings):
+    def test_private_key(self, settings):
         settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = True
         user = UserFactory()
-        assert user.profile.key
+        assert user.profile.private_key
 
     def test_get_first_name(self):
         user = UserFactory()
