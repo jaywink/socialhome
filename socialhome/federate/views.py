@@ -3,16 +3,15 @@ import logging
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.http.response import Http404, JsonResponse, HttpResponseBadRequest
+from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
-from lxml import etree
 
-from federation.entities.diaspora.mappers import get_outbound_entity
 from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
     SocialRelayWellKnown)
+from federation.protocols.diaspora.magic_envelope import MagicEnvelope
 
 from socialhome import __version__ as version
 from socialhome.content.models import Content
@@ -110,6 +109,34 @@ def content_xml_view(request, guid):
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     entity = make_federable_entity(content)
     return HttpResponse(get_full_xml_representation(entity), content_type="application/xml")
+
+
+def content_fetch_view(request, objtype, guid):
+    """Diaspora content fetch view.
+
+    Returns the signed payload for the public content. Non-public content will return 404.
+
+    If the content is not local, redirect to content author server.
+
+    Args:
+        objtype (str) - Diaspora content type. Currently if it is `status_message`, `post` or `reshare`,
+            we try to find `Content`.
+        guid (str) - The object guid to look for.
+    """
+    if objtype not in ["status_message", "post", "reshare"]:
+        raise Http404()
+    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
+    if not content.is_local:
+        url = "https://%s/fetch/%s/%s" % (
+            content.author.handle.split("@")[1], objtype, guid
+        )
+        return HttpResponseRedirect(url)
+    entity = make_federable_entity(content)
+    message = get_full_xml_representation(entity)
+    document = MagicEnvelope(
+        message=message, private_key=content.author.private_key, author_handle=content.author.handle
+    )
+    return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
 
 
 class ReceivePublicView(View):

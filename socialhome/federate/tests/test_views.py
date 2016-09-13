@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from django.core.urlresolvers import reverse
+from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
@@ -88,9 +89,6 @@ class TestContentXMLView(TestCase):
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
 
-    def setUp(self):
-        super(TestContentXMLView, self).setUp()
-
     def test_non_public_content_returns_404(self):
         response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.limited_content.guid}))
         self.assertEqual(response.status_code, 404)
@@ -110,3 +108,42 @@ class TestContentXMLView(TestCase):
     def test_calls_get_full_xml_representation(self, mock_getter, mock_maker):
         self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
         mock_getter.assert_called_once_with("entity")
+
+
+@pytest.mark.usefixtures("db")
+class TestContentFetchView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestContentFetchView, cls).setUpTestData()
+        author = UserFactory()
+        Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
+        cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)
+
+    def test_invalid_objtype_returns_404(self):
+        response = self.client.get(reverse("federate:content-fetch", kwargs={
+            "objtype": "foobar", "guid": self.public_content.guid
+        }))
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_public_content_returns_404(self):
+        response = self.client.get(reverse("federate:content-fetch", kwargs={
+            "objtype": "post", "guid": self.limited_content.guid
+        }))
+        self.assertEqual(response.status_code, 404)
+
+    def test_public_content_returns_success_code(self):
+        response = self.client.get(reverse("federate:content-fetch", kwargs={
+            "objtype": "post", "guid": self.public_content.guid
+        }))
+        self.assertEqual(response.status_code, 200)
+
+    def test_remote_content_redirects(self):
+        response = self.client.get(reverse("federate:content-fetch", kwargs={
+            "objtype": "post", "guid": self.remote_content.guid
+        }))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "https://%s/fetch/post/%s" %(
+            self.remote_content.author.handle.split("@")[1], self.remote_content.guid
+        ))

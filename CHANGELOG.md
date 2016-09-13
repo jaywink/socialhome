@@ -1,5 +1,8 @@
 ## [unreleased]
 
+### Added
+* Diaspora fetch entities view is now implemented as described in [the Diaspora protocol PR](https://github.com/diaspora/diaspora_federation/issues/31).
+
 ### License change
 
 As the project is still in early changes, decision have to be made about the long term license.
