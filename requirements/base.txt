@@ -24,7 +24,7 @@ django-crispy-forms==1.6.0
 django-floppyforms==1.7.0
 
 # Models
-django-model-utils==2.5
+django-model-utils==2.5.2
 django-enumfields==0.8.2
 
 # Images
