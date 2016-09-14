@@ -57,7 +57,7 @@ django-extensions==1.7.4
 Social-Federation==0.6.1
 
 # Content
-django-markdownx==1.6
+django-markdownx==1.6.3
 bleach==1.4.3
 beautifulsoup4==4.5.1
 lxml==3.6.1
