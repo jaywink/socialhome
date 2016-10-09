@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
-from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-
-from socialhome.content.models import Content
 from socialhome.enums import Visibility
+from socialhome.publisher.models import Content
 from socialhome.users.models import User, Profile
 
 

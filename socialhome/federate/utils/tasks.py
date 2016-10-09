@@ -3,10 +3,10 @@ import logging
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile
 
-from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown_code
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import safe_make_aware
+from socialhome.publisher.models import Content
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
