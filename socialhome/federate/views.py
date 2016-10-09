@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
-
 from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
@@ -14,10 +13,10 @@ from federation.hostmeta.generators import (
 from federation.protocols.diaspora.magic_envelope import MagicEnvelope
 
 from socialhome import __version__ as version
-from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task
 from socialhome.federate.utils.tasks import make_federable_entity
+from socialhome.publisher.models import Content
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")

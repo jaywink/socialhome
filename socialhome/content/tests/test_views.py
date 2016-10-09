@@ -1,11 +1,11 @@
 import pytest
 from django.core.urlresolvers import reverse
 
-from socialhome.enums import Visibility
-from socialhome.content.forms import ContentForm
-from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
+from socialhome.enums import Visibility
+from socialhome.publisher.forms import ContentForm
+from socialhome.publisher.models import Content
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 

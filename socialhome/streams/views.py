@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 
-from socialhome.content.models import Content
 from socialhome.enums import Visibility
+from socialhome.publisher.models import Content
 
 
 class BaseStreamView(ListView):

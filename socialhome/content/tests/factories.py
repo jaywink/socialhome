@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from factory import fuzzy
 import factory
+from factory import fuzzy
 
-from socialhome.content.models import Content
+from socialhome.publisher.models import Content
 from socialhome.users.tests.factories import ProfileFactory
 
 

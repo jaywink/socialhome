@@ -4,9 +4,9 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content
+from socialhome.publisher.models import Content
 from socialhome.streams.consumers import StreamConsumer
 
 logger = logging.getLogger("socialhome")

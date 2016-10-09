@@ -8,9 +8,9 @@ from django.db import IntegrityError, transaction
 from django.utils.timezone import make_aware
 from test_plus import TestCase
 
-from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
+from socialhome.publisher.models import Content
 from socialhome.users.tests.factories import ProfileFactory
 
 

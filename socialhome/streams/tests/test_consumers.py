@@ -5,8 +5,8 @@ import pytest
 from channels.tests import Client
 from django.test import SimpleTestCase, TestCase
 
-from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
+from socialhome.publisher.models import Content
 from socialhome.streams.consumers import StreamConsumer
 from socialhome.users.tests.factories import UserFactory
 

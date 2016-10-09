@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websockets import WebsocketConsumer
 
-from socialhome.content.models import Content
+from socialhome.publisher.models import Content
 
 
 class StreamConsumer(WebsocketConsumer):

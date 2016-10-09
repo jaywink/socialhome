@@ -1,8 +1,8 @@
 from django.forms import ModelForm
 from markdownx.widgets import MarkdownxWidget
 
-from socialhome.content.models import Content
 from socialhome.content.utils import safe_text_for_markdown_code
+from socialhome.publisher.models import Content
 
 
 class ContentForm(ModelForm):

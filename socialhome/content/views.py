@@ -5,8 +5,8 @@ from django.http import HttpResponseRedirect
 from django.http.response import Http404
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 
-from socialhome.content.forms import ContentForm
-from socialhome.content.models import Content
+from socialhome.publisher.forms import ContentForm
+from socialhome.publisher.models import Content
 from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView
 

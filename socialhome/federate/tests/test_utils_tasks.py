@@ -1,15 +1,13 @@
 from unittest.mock import patch, Mock
 
 import pytest
+from federation.tests.factories import entities
 from test_plus import TestCase
 
-from federation.entities import base
-from federation.tests.factories import entities
-
-from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import process_entities, get_sender_profile, make_federable_entity
+from socialhome.publisher.models import Content
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory
 
