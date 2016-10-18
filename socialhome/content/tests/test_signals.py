@@ -44,3 +44,28 @@ class TestFederateContent(TestCase):
         user = UserFactory()
         ContentFactory(author=user.profile)
         self.assertTrue(mock_logger.called)
+
+
+@pytest.mark.usefixtures("db")
+class TestFederateContentRetraction(TestCase):
+    @patch("socialhome.content.signals.send_content_retraction.delay")
+    def test_non_local_content_retraction_does_not_get_sent(self, mock_send):
+        content = ContentFactory()
+        content.delete()
+        mock_send.assert_not_called()
+
+    @patch("socialhome.content.signals.send_content_retraction.delay")
+    def test_local_content_retraction_gets_sent(self, mock_send):
+        user = UserFactory()
+        content = ContentFactory(author=user.profile)
+        self.assertTrue(content.is_local)
+        content.delete()
+        mock_send.assert_called_once_with(content, content.author_id)
+
+    @patch("socialhome.content.signals.send_content_retraction.delay", side_effect=Exception)
+    @patch("socialhome.content.signals.logger.exception")
+    def test_exception_calls_logger(self, mock_logger, mock_send):
+        user = UserFactory()
+        content = ContentFactory(author=user.profile)
+        content.delete()
+        self.assertTrue(mock_logger.called)

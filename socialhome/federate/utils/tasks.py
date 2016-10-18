@@ -53,11 +53,11 @@ def process_entities(entities, profile):
                 }
                 content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
                 if created:
-                    logger.info("Saved Content: %s" % content)
+                    logger.info("Saved Content: %s", content)
                 else:
-                    logger.info("Updated Content: %s" % content)
+                    logger.info("Updated Content: %s", content)
             except Exception as ex:
-                logger.exception("Failed to handle %s: %s" % (entity.guid, ex))
+                logger.exception("Failed to handle %s: %s", entity.guid, ex)
 
 
 def make_federable_entity(content):
@@ -73,5 +73,19 @@ def make_federable_entity(content):
             created_at=content.effective_created,
         )
     except Exception as ex:
-        logger.exception("make_federable_entity - Failed to convert %s: %s" % (content.guid, ex))
+        logger.exception("make_federable_entity - Failed to convert %s: %s", content.guid, ex)
+        return None
+
+
+def make_federable_retraction(content, author):
+    """Make Content retraction federable by converting it to a federation entity."""
+    logging.info("make_federable_retraction - Content: %s" % content)
+    try:
+        return base.Retraction(
+            entity_type="Post",  # Well, currently, at some point this could be something else
+            handle=author.handle,
+            target_guid=content.guid,
+        )
+    except Exception as ex:
+        logger.exception("make_federable_retraction - Failed to convert %s: %s", content.guid, ex)
         return None

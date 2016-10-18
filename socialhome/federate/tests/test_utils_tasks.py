@@ -3,13 +3,13 @@ from unittest.mock import patch, Mock
 import pytest
 from test_plus import TestCase
 
-from federation.entities import base
 from federation.tests.factories import entities
 
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.utils.tasks import process_entities, get_sender_profile, make_federable_entity
+from socialhome.federate.utils.tasks import process_entities, get_sender_profile, make_federable_entity, \
+    make_federable_retraction
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory
 
@@ -105,4 +105,19 @@ class TestMakeFederableEntity(TestCase):
     @patch("socialhome.federate.utils.tasks.base.Post", side_effect=Exception)
     def test_returns_none_on_exception(self, mock_post):
         entity = make_federable_entity(Mock())
+        self.assertIsNone(entity)
+
+
+@pytest.mark.usefixtures("db")
+class TestMakeFederableRetraction(TestCase):
+    def test_returns_entity(self):
+        content = ContentFactory()
+        entity = make_federable_retraction(content, content.author)
+        self.assertEqual(entity.entity_type, "Post")
+        self.assertEqual(entity.target_guid, content.guid)
+        self.assertEqual(entity.handle, content.author.handle)
+
+    @patch("socialhome.federate.utils.tasks.base.Retraction", side_effect=Exception)
+    def test_returns_none_on_exception(self, mock_post):
+        entity = make_federable_retraction(Mock(), Mock())
         self.assertIsNone(entity)
