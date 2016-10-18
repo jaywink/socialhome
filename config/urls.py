@@ -53,6 +53,11 @@ if settings.DEBUG:
         url(r'^404/$', default_views.page_not_found, kwargs={'exception': Exception("Page not Found")}),
         url(r'^500/$', default_views.server_error),
     ]
+    if settings.DEBUG_TOOLBAR_ENABLED:
+        import debug_toolbar
+        urlpatterns += [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ]
 
 if settings.MOCHA_TESTS:
     urlpatterns += [
