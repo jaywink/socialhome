@@ -61,7 +61,7 @@ def process_entities(entities, profile):
 
 
 def make_federable_entity(content):
-    """Make Content federable by converting it to a Social-Federation entity."""
+    """Make Content federable by converting it to a federation entity."""
     logging.info("make_federable_entity - Content: %s" % content)
     try:
         return base.Post(

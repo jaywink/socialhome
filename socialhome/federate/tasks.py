@@ -52,7 +52,7 @@ def send_content(content):
         return
     entity = make_federable_entity(content)
     if entity:
-        # TODO: Social-Federation should provide one method to send,
+        # TODO: federation should provide one method to send,
         # which handles also payload creation and url calculation
         payload = handle_create_payload(entity, content.author)
         # Just dump to the relay system for now

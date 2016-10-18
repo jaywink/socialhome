@@ -43,7 +43,7 @@ wget
 curl
 llvm
 
-##social-federation
+##federation
 libxml2-dev
 libxslt-dev
 lib32z1-dev

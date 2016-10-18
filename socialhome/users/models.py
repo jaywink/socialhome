@@ -106,7 +106,7 @@ class Profile(models.Model):
 
     @property
     def private_key(self):
-        """Required by Social-Federation.
+        """Required by federation.
 
         Corresponds to private key.
         """

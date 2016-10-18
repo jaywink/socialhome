@@ -172,7 +172,7 @@ LOGGING = {
             "handlers": ["application_file"],
             "propagate": True
         },
-        "social-federation": {
+        "federation": {
             "level": "DEBUG",
             "handlers": ["federation_file"],
             "propagate": False,
