@@ -62,6 +62,10 @@ Configuration is done via environment variables. For the meaning of them, look t
     
 Edit any values necessary. By default the `SECRET_KEY` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
     
+When running `manage.py` commands, these environment variables will be automatically loaded. For other usage (like `py.test`), load the environment in your shell with:
+
+    export `cat env.local`
+    
 #### Create a database
 
 If you changed the `DATABASE_URL` in the settings file, make sure to change the values in these commands accordingly. 
@@ -72,21 +76,25 @@ If you changed the `DATABASE_URL` in the settings file, make sure to change the 
     exit
     python manage.py migrate
     
-## Settings
+### Running the development server
 
-See: http://cookiecutter-django.readthedocs.org/en/latest/settings.html
+Just use the standard command:
 
-A basic env file is provided, see `env.example`. Copy this to `env.local` and fill with correct values. When running `manage.py` commands, these environment variables will be automatically loaded. For other usage (like `py.test`), load the environment in your shell with:
+    python manage.py runserver
+    
+Unfortunately `runserver_plus` cannot be used as it does not integrate with Django Channels.
+    
+### Creating a user
 
-    export `cat env.local`
-
-### Setting Up Your Users
-
-To create a *normal user account*, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
-
-To create an *superuser account*, use this command::
+To create an *superuser account*, use this command:
 
     python manage.py createsuperuser
+
+After this you need to log in once with the user via the user interface (which creates an email confirmation) and then run the following in the Django shell to confirm the email:
+
+    EmailAddress.objects.all().update(verified=True)
+    
+You should now be able to log in as the user `admin`.
 
 ### Running tests
 
