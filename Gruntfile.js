@@ -71,6 +71,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
                     '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
+                    '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss'
                 },
             },
             dist: {
@@ -84,6 +85,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
                     '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
+                    '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                 },
             }
         },
@@ -99,8 +101,10 @@ module.exports = function (grunt) {
                     "<%= paths.bower %>/masonry/dist/masonry.pkgd.min.js",
                     "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
                     "<%= paths.bower %>/reconnecting-websocket/reconnecting-websocket.min.js",
+                    "<%= paths.bower %>/bootstrap-markdown/js/bootstrap-markdown.js",
                     "<%= paths.js %>/grids.js",
                     "<%= paths.js %>/streams.js",
+                    "<%= paths.js %>/publisher.js",
                 ],
                 dest: "<%= paths.js %>/project.js",
                 nonull: true,
@@ -109,12 +113,15 @@ module.exports = function (grunt) {
                 src: [
                     "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
                     "<%= paths.bower %>/tether/dist/css/tether.min.css",
+                    "<%= paths.bower %>/bootstrap-markdown/css/bootstrap-markdown.min.css",
                     "<%= paths.css %>/fontawesome.css",
                     "<%= paths.css %>/common.css",
                     "<%= paths.css %>/grids.css",
                     "<%= paths.css %>/streams.css",
+                    "<%= paths.css %>/publisher.css",
                 ],
                 dest: "<%= paths.css %>/project.css",
+
                 nonull: true,
             },
         },
