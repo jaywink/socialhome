@@ -1,0 +1,26 @@
+@import "variables";
+
+@media(min-width: $bsMediumDevice){
+  .markdownx {
+    display: flex;
+    .preview-panel {
+      display: flex;
+      flex-flow: column;
+      .markdownx-preview {
+        flex-grow: 1;
+      }
+    }
+  }
+}
+
+.md-editor {
+  textarea {
+    background-color: #FFF;
+    padding: .5rem;
+    border-bottom: none;
+  }
+}
+
+.markdownx-preview {
+  min-height: 4rem
+}
