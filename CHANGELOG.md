@@ -2,6 +2,7 @@
 
 ### Added
 * Diaspora fetch entities view is now implemented as described in [the Diaspora protocol PR](https://github.com/diaspora/diaspora_federation/issues/31).
+* Content create/update editor now features a [bootstrap-markdown](http://www.codingdrama.com/bootstrap-markdown/) editor with fancy buttons. Thanks @christophehenry for the addition!
 
 ### License change
 
