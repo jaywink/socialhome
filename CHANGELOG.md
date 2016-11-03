@@ -4,6 +4,10 @@
 * Diaspora fetch entities view is now implemented as described in [the Diaspora protocol PR](https://github.com/diaspora/diaspora_federation/issues/31).
 * Content create/update editor now features a [bootstrap-markdown](http://www.codingdrama.com/bootstrap-markdown/) editor with fancy buttons. Thanks @christophehenry for the addition!
 
+### Development related notes
+
+* JavaScript unit tests are now executed using the command `grunt test`. This will launch a separate `runserver` on port 8181 and execute the tests against that. The separate `runserver` instance will be killed after the tests have been executed. Please note the configuration env variables must be exported out when running these tests as well.
+
 ### License change
 
 As the project is still in early changes, decision have to be made about the long term license.

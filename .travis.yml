@@ -25,9 +25,7 @@ script:
   - py.test --cov=./
   - python manage.py migrate --noinput -v 0
   - python manage.py collectstatic --noinput -v 0
-  - python manage.py runserver 8000 &
-  - sleep 5  # wait for server to start
-  - node_modules/.bin/grunt mocha
+  - node_modules/.bin/grunt test
 after_success:
   - codecov
 env:

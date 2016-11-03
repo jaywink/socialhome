@@ -98,9 +98,17 @@ You should now be able to log in as the user `admin`.
 
 ### Running tests
 
-Export your settings to the shell and then:
+Export your settings to the shell first.
+
+#### Python tests
 
     py.test
+    
+#### JavaScript tests
+
+This will launch a separate `runserver` on port 8181 and execute the tests against that. The separate `runserver` instance will be killed after the tests have been executed.
+
+    grunt test
 
 ## Celery
 

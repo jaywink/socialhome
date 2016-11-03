@@ -14,6 +14,7 @@
         mocha.setup('bdd');
         window.assert = chai.assert;
         window.expect = chai.expect;
+        var runserverPort = {{ settings.MOCHA_RUNSERVER_PORT }};
     </script>
 
     {% block core_libraries %}
