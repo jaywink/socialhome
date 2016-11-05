@@ -58,7 +58,7 @@ federation==0.8.1
 
 # Content
 django-markdownx==1.6.3
-bleach==1.4.3
+bleach==1.5.0
 beautifulsoup4==4.5.1
 lxml==3.6.4
 
