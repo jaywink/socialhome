@@ -54,7 +54,7 @@ celery==3.1.23
 django-extensions==1.7.4
 
 # Federation
-federation==0.8.1
+federation==0.8.2
 
 # Content
 django-markdownx==1.6.3
