@@ -5,33 +5,33 @@
 wheel==0.29.0
 
 # Django
-django==1.9.8
+django==1.10.3
 
 # Channels
-channels==0.17.2
-asgi_redis==0.14.1
+channels==0.17.3
+asgi_redis==1.0.0
 
 # Configuration
 django-environ==0.4.0
 django-secure==1.0.1
-whitenoise==3.2.1
+whitenoise==3.2.2
 
 # Permissions
-django-braces==1.9.0
+django-braces==1.10.0
 
 # Forms
 django-crispy-forms==1.6.0
 django-floppyforms==1.7.0
 
 # Models
-django-model-utils==2.5.2
+django-model-utils==2.6.0
 django-enumfields==0.8.2
 
 # Images
-Pillow==3.3.1
+Pillow==3.4.2
 
 # User registration, either via email or social
-django-allauth==0.27.0
+django-allauth==0.28.0
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.2
@@ -41,10 +41,10 @@ unicode-slugify==0.1.3
 django-autoslug==1.9.3
 
 # Time zones support
-pytz==2016.6.1
+pytz==2016.7
 
 # Redis support
-django-redis==4.4.4
+django-redis==4.6.0
 redis>=2.10.0
 
 # Tasks
@@ -54,11 +54,11 @@ celery==3.1.23
 django-extensions==1.7.4
 
 # Federation
-federation==0.8.1
+federation==0.8.2
 
 # Content
 django-markdownx==1.6.3
-bleach==1.4.3
+bleach==1.5.0
 beautifulsoup4==4.5.1
 lxml==3.6.4
 
