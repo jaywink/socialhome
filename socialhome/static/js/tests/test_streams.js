@@ -1,6 +1,6 @@
 describe("Streams", function() {
     before(function () {
-        window.mockServer = new window.MockServer('ws://127.0.0.1:8000/ch/streams/foobar/');
+        window.mockServer = new window.MockServer('ws://127.0.0.1:'+runserverPort+'/ch/streams/foobar/');
         window.WebSocket = window.MockWebSocket;
         window.mockServer.on('connection', function () {
             window.connectionSuccess = true;

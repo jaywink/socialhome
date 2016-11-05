@@ -64,6 +64,7 @@ MOCHA_TESTS = env.bool('MOCHA_TESTS', default=False)
 if MOCHA_TESTS:
     INSTALLED_APPS += ("mocha",)
     MIDDLEWARE_CLASSES += ('whitenoise.middleware.WhiteNoiseMiddleware',)
+    MOCHA_RUNSERVER_PORT = env.int("MOCHA_RUNSERVER_PORT", default=8000)
 
 ########## CELERY
 # In development, all tasks will be executed locally by blocking until the task returns

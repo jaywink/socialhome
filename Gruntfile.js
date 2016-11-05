@@ -180,16 +180,27 @@ module.exports = function (grunt) {
         // see: https://npmjs.org/package/grunt-bg-shell
         bgShell: {
             _defaults: {
-                bg: true
+                bg: true,
             },
             runDjango: {
-                cmd: 'python <%= paths.manageScript %> runserver'
+                cmd: 'python <%= paths.manageScript %> runserver',
+            },
+            runDjangoTest: {
+                cmd: 'MOCHA_RUNSERVER_PORT=8181 python <%= paths.manageScript %> runserver 8181',
+            },
+            killDjangoTest: {
+                cmd: 'kill `pgrep -f "runserver 8181"`',
+                bg: false,
+            },
+            sleep: {
+                cmd: 'sleep 10',
+                bg: false,
             },
         },
         mocha: {
             'socialhome.streams': {
                 options: {
-                    urls: ['http://127.0.0.1:8000/mocha/streams/'],
+                    urls: ['http://127.0.0.1:8181/mocha/streams/'],
                     run: true,
                     logErrors: true,
                     reporter: "nyan",
@@ -197,6 +208,29 @@ module.exports = function (grunt) {
             },
         },
     });
+
+    // Tip from http://stackoverflow.com/a/19673597/1489738
+    var previous_force_state = grunt.option("force");
+    grunt.registerTask("force", function(set) {
+        if (set === "on") {
+            grunt.option("force", true);
+        }
+        else if (set === "off") {
+            grunt.option("force", false);
+        }
+        else if (set === "restore") {
+            grunt.option("force", previous_force_state);
+        }
+    });
+
+    grunt.registerTask('test', [
+        'bgShell:runDjangoTest',
+        'bgShell:sleep',
+        'force:on',
+        'mocha',
+        'force:off',
+        'bgShell:killDjangoTest',
+    ]);
 
     grunt.registerTask('serve', [
         'bgShell:runDjango',
