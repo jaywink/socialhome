@@ -292,3 +292,73 @@ CHANNEL_LAYERS = {
 
 # Mocha JS tests - overrides in local.py
 MOCHA_TESTS = False
+
+
+# LOGGING CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        "application_file": {
+            "filename": env("SOCIALHOME_LOGFILE", default='/tmp/socialhome.log'),
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "maxBytes": 10485760,  # 10mb
+            "backupCount": 10,
+        },
+        "federation_file": {
+            "filename": env("SOCIALHOME_LOGFILE_FEDERATION", default='/tmp/socialhome-federation.log'),
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "maxBytes": 10485760,  # 10mb
+            "backupCount": 10,
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['application_file'],
+            'level': 'ERROR',
+            'propagate': True
+        },
+        'django.security.DisallowedHost': {
+            'level': 'ERROR',
+            'handlers': ['console', 'application_file'],
+            'propagate': True
+        },
+        "socialhome": {
+            "level": "DEBUG",
+            "handlers": ["application_file"],
+            "propagate": True
+        },
+        "federation": {
+            "level": "DEBUG",
+            "handlers": ["federation_file"],
+            "propagate": False,
+        },
+    }
+}

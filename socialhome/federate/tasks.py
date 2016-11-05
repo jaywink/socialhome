@@ -1,6 +1,5 @@
 import logging
 
-import requests
 from django.conf import settings
 
 from federation.exceptions import NoSuitableProtocolFoundError
@@ -9,7 +8,9 @@ from federation.outbound import handle_create_payload
 from federation.utils.network import send_document
 
 from socialhome.enums import Visibility
-from socialhome.federate.utils.tasks import get_sender_profile, process_entities, make_federable_entity
+from socialhome.federate.utils.tasks import (
+    get_sender_profile, process_entities, make_federable_entity, make_federable_retraction
+)
 from socialhome.taskapp.celery import tasks
 from socialhome.users.models import Profile
 
@@ -52,6 +53,9 @@ def send_content(content):
         return
     entity = make_federable_entity(content)
     if entity:
+        if settings.DEBUG:
+            # Don't send in development mode
+            return
         # TODO: federation should provide one method to send,
         # which handles also payload creation and url calculation
         payload = handle_create_payload(entity, content.author)
@@ -60,3 +64,26 @@ def send_content(content):
         send_document(url, payload)
     else:
         logger.warning("No entity for %s", content)
+
+
+@tasks.task()
+def send_content_retraction(content, author_id):
+    """Handle sending of retractions.
+
+    Currently only for public content.
+    """
+    if not content.visibility == Visibility.PUBLIC:
+        return
+    author = Profile.objects.get(id=author_id)
+    entity = make_federable_retraction(content, author)
+    if entity:
+        if settings.DEBUG:
+            # Don't send in development mode
+            return
+        payload = handle_create_payload(entity, author)
+        # Just dump to the relay system for now
+        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
+        send_document(url, payload)
+    else:
+        logger.warning("No retraction entity for %s", content)
+

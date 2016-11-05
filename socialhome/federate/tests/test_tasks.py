@@ -2,11 +2,12 @@ from unittest.mock import patch
 
 import pytest
 from django.conf import settings
+from django.test import override_settings
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import receive_task, send_content
+from socialhome.federate.tasks import receive_task, send_content, send_content_retraction
 from socialhome.users.tests.factories import ProfileFactory
 
 
@@ -45,9 +46,6 @@ class TestSendContent(TestCase):
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
 
-    def setUp(self):
-        super(TestSendContent, self).setUp()
-
     @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):
         send_content(self.limited_content)
@@ -74,3 +72,51 @@ class TestSendContent(TestCase):
     def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
         send_content(self.public_content)
         self.assertTrue(mock_logger.called)
+
+    @override_settings(DEBUG=True)
+    @patch("socialhome.federate.tasks.handle_create_payload")
+    def test_content_not_sent_in_debug_mode(self, mock_payload):
+        send_content(self.public_content)
+        mock_payload.assert_not_called()
+
+
+@pytest.mark.usefixtures("db")
+class TestSendContentRetraction(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestSendContentRetraction, cls).setUpTestData()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
+    def test_only_public_content_calls_make_federable_entity(self, mock_maker):
+        send_content_retraction(self.limited_content, self.limited_content.author_id)
+        mock_maker.assert_not_called()
+        send_content_retraction(self.public_content, self.public_content.author_id)
+        mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
+
+    @patch("socialhome.federate.tasks.handle_create_payload")
+    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
+    def test_handle_create_payload_is_called(self, mock_maker, mock_sender, mock_handler):
+        send_content_retraction(self.public_content, self.public_content.author_id)
+        mock_handler.assert_called_once_with("entity", self.public_content.author)
+
+    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
+    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    def test_send_document_is_called(self, mock_sender, mock_payloader):
+        send_content_retraction(self.public_content, self.public_content.author_id)
+        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
+        mock_sender.assert_called_once_with(url, "payload")
+
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
+    @patch("socialhome.federate.tasks.logger.warning")
+    def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
+        send_content_retraction(self.public_content, self.public_content.author_id)
+        self.assertTrue(mock_logger.called)
+
+    @override_settings(DEBUG=True)
+    @patch("socialhome.federate.tasks.handle_create_payload")
+    def test_content_not_sent_in_debug_mode(self, mock_payload):
+        send_content_retraction(self.public_content, self.public_content.author_id)
+        mock_payload.assert_not_called()
