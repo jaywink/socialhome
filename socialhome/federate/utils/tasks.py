@@ -43,21 +43,51 @@ def process_entities(entities, profile):
     """Process a list of entities."""
     for entity in entities:
         logging.info("Entity: %s" % entity)
-        if isinstance(entity, base.Post):
-            try:
-                values = {
-                    "text": safe_text_for_markdown_code(entity.raw_content), "author": profile,
-                    "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
-                    "remote_created": safe_make_aware(entity.created_at, "UTC"),
-                    "service_label": safe_text(entity.provider_display_name) or "",
-                }
-                content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
-                if created:
-                    logger.info("Saved Content: %s", content)
-                else:
-                    logger.info("Updated Content: %s", content)
-            except Exception as ex:
-                logger.exception("Failed to handle %s: %s", entity.guid, ex)
+        try:
+            if isinstance(entity, base.Post):
+                process_entity_post(entity, profile)
+            elif isinstance(entity, base.Retraction):
+                process_entity_retraction(entity, profile)
+        except Exception as ex:
+            logger.exception("Failed to handle %s: %s", entity.guid, ex)
+
+
+def process_entity_post(entity, profile):
+    """Process an entity of type Post."""
+    values = {
+        "text": safe_text_for_markdown_code(entity.raw_content), "author": profile,
+        "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
+        "remote_created": safe_make_aware(entity.created_at, "UTC"),
+        "service_label": safe_text(entity.provider_display_name) or "",
+    }
+    content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
+    if created:
+        logger.info("Saved Content: %s", content)
+    else:
+        logger.info("Updated Content: %s", content)
+
+
+def process_entity_retraction(entity, profile):
+    """Process an entity of type Retraction."""
+    entity_type = safe_text(entity.entity_type)
+    if entity_type != "Post":
+        logger.debug("Ignoring retraction of entity_type %s", entity_type)
+        return
+    target_guid = safe_text(entity.target_guid)
+    try:
+        content = Content.objects.get(guid=target_guid)
+    except Content.DoesNotExist:
+        logger.warning("Retracted content %s cannot be found", target_guid)
+        return
+    if content.is_local:
+        logger.warning("Local content %s cannot be retracted by a remote retraction!", content)
+        return
+    if content.author != profile:
+        logger.warning("Content %s is not owned by remote retraction profile %s", content, profile)
+        return
+    # Ok to process retraction
+    content.delete()
+    logger.info("Retraction done for content %s", content)
 
 
 def make_federable_entity(content):

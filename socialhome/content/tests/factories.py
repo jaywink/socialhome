@@ -1,15 +1,23 @@
-# -*- coding: utf-8 -*-
-from factory import fuzzy
-import factory
+from factory import (
+    SubFactory, fuzzy, DjangoModelFactory, post_generation
+)
 
 from socialhome.content.models import Content
-from socialhome.users.tests.factories import ProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
-class ContentFactory(factory.DjangoModelFactory):
+class ContentFactory(DjangoModelFactory):
     class Meta:
         model = Content
 
     text = fuzzy.FuzzyText()
     guid = fuzzy.FuzzyText()
-    author = factory.SubFactory(ProfileFactory)
+    author = SubFactory(ProfileFactory)
+
+
+class LocalContentFactory(ContentFactory):
+    @post_generation
+    def set_profile_with_user(self, create, extracted, **kwargs):
+        user = UserFactory()
+        self.author = user.profile
+        self.save()
