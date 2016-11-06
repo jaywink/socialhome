@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.utils import get_pony_urls
@@ -142,3 +143,19 @@ class Profile(models.Model):
             return self.image_url_large, self.image_url_medium, self.image_url_small
         # Ponies are nice
         return get_pony_urls()
+
+    @staticmethod
+    def from_remote_profile(remote_profile):
+        """Create a Profile from a remote Profile entity."""
+        return Profile.objects.create(
+            name=safe_text(remote_profile.name),
+            guid=safe_text(remote_profile.guid),
+            handle=remote_profile.handle,
+            visibility=Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
+            rsa_public_key=safe_text(remote_profile.public_key),
+            image_url_large=safe_text(remote_profile.image_urls["large"]),
+            image_url_medium=safe_text(remote_profile.image_urls["medium"]),
+            image_url_small=safe_text(remote_profile.image_urls["small"]),
+            location=safe_text(remote_profile.location),
+            email=remote_profile.email,
+        )

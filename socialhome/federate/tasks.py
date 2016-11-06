@@ -1,16 +1,15 @@
 import logging
 
 from django.conf import settings
-
-from federation.exceptions import NoSuitableProtocolFoundError
+from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError
 from federation.inbound import handle_receive
 from federation.outbound import handle_create_payload
 from federation.utils.network import send_document
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
-    get_sender_profile, process_entities, make_federable_entity, make_federable_retraction
-)
+    get_sender_profile, process_entities, make_federable_entity, make_federable_retraction,
+    sender_key_fetcher)
 from socialhome.taskapp.celery import tasks
 from socialhome.users.models import Profile
 
@@ -20,7 +19,6 @@ logger = logging.getLogger("socialhome")
 @tasks.task()
 def receive_task(payload, guid=None):
     """Process received payload."""
-    # TODO: we're skipping author verification until fetching of remote profile public keys is implemented
     profile = None
     if guid:
         try:
@@ -29,10 +27,16 @@ def receive_task(payload, guid=None):
             logger.warning("No local profile found with guid")
             return
     try:
-        sender, protocol_name, entities = handle_receive(payload, user=profile, skip_author_verification=True)
+        sender, protocol_name, entities = handle_receive(payload, user=profile, sender_key_fetcher=sender_key_fetcher)
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
     except NoSuitableProtocolFoundError:
         logger.warning("No suitable protocol found for payload")
+        return
+    except NoSenderKeyFoundError:
+        logger.warning("Could not find a public key for the sender - skipping payload")
+        return
+    except AssertionError:
+        logger.warning("Signature validation failed - skipping payload")
         return
     if not entities:
         logger.warning("No entities in payload")

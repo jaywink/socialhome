@@ -1,7 +1,6 @@
 from unittest.mock import patch, Mock
 
 import pytest
-from django.test import testcases
 from federation.entities.base import Retraction
 from federation.tests.factories import entities
 from test_plus import TestCase
@@ -11,15 +10,15 @@ from socialhome.content.tests.factories import ContentFactory, LocalContentFacto
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_entity, make_federable_retraction, process_entity_post,
-    process_entity_retraction)
+    process_entity_retraction, sender_key_fetcher)
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
-class ProcessEntitiesTestCase(testcases.TestCase):
+class TestProcessEntities(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(ProcessEntitiesTestCase, cls).setUpTestData()
+        super(TestProcessEntities, cls).setUpTestData()
         cls.profile = Mock()
         cls.post = entities.PostFactory()
         cls.retraction = Retraction(handle=cls.post.handle, target_guid=cls.post.guid, entity_type="Post")
@@ -68,11 +67,7 @@ class TestProcessEntityPost(object):
 
 
 @pytest.mark.usefixtures("db")
-class ProcessEntityRetractionTestCase(testcases.TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super(ProcessEntityRetractionTestCase, cls).setUpTestData()
-
+class TestProcessEntityRetraction(TestCase):
     @patch("socialhome.federate.utils.tasks.logger.debug")
     def test_non_post_entity_types_are_skipped(self, mock_logger):
         process_entity_retraction(Mock(entity_type="foo"), Mock())
@@ -189,3 +184,25 @@ class TestMakeFederableRetraction(TestCase):
     def test_returns_none_on_exception(self, mock_post):
         entity = make_federable_retraction(Mock(), Mock())
         self.assertIsNone(entity)
+
+
+@pytest.mark.usefixtures("db")
+class TestSenderKeyFetcher(TestCase):
+    def test_local_profile_public_key_is_returned(self):
+        user = UserFactory()
+        self.assertEqual(sender_key_fetcher(user.profile.handle), user.profile.rsa_public_key)
+
+    @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
+    @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
+    def test_remote_profile_public_key_is_returned(self, mock_from_remote, mock_retrieve):
+        remote_profile = Mock(public_key="foo")
+        mock_retrieve.return_value = remote_profile
+        self.assertEqual(sender_key_fetcher("bar"), "foo")
+        mock_retrieve.assert_called_once_with("bar")
+        mock_from_remote.assert_called_once_with(remote_profile)
+
+    @patch("socialhome.federate.utils.tasks.retrieve_remote_profile", return_value=None)
+    @patch("socialhome.federate.utils.tasks.logger.warning")
+    def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
+        self.assertEqual(sender_key_fetcher("bar"), None)
+        mock_logger.assert_called_once_with("Remote profile %s for sender key not found locally or remotely.", "bar")
