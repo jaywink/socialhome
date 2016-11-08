@@ -9,8 +9,7 @@ django==1.10.3
 
 # Channels
 channels==0.17.3
-# Version 1.0.0 is not compatible yet with Channels due to "receive_many" -> "receive" rename
-asgi_redis==0.14.1
+asgi_redis==1.0.0
 
 # Configuration
 django-environ==0.4.0
