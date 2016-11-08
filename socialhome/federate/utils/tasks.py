@@ -22,20 +22,9 @@ def get_sender_profile(sender):
     except Profile.DoesNotExist:
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
-            logger.warning("Remote profile not found locally or remotely.")
+            logger.warning("Remote profile %s not found locally or remotely.", sender)
             return
-        sender_profile = Profile.objects.create(
-            name=safe_text(remote_profile.name),
-            guid=safe_text(remote_profile.guid),
-            handle=remote_profile.handle,
-            visibility=Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
-            rsa_public_key=safe_text(remote_profile.public_key),
-            image_url_large=safe_text(remote_profile.image_urls["large"]),
-            image_url_medium=safe_text(remote_profile.image_urls["medium"]),
-            image_url_small=safe_text(remote_profile.image_urls["small"]),
-            location=safe_text(remote_profile.location),
-            email=remote_profile.email,
-        )
+        sender_profile = Profile.from_remote_profile(remote_profile)
     return sender_profile
 
 
@@ -119,3 +108,27 @@ def make_federable_retraction(content, author):
     except Exception as ex:
         logger.exception("make_federable_retraction - Failed to convert %s: %s", content.guid, ex)
         return None
+
+
+def sender_key_fetcher(handle):
+    """Return the RSA public key for a handle, if found.
+
+    Fetches the key first from a local Profile and if not found, looks for a remote Profile over the network.
+
+    :param handle: Handle of profile
+    :type handle: str
+    :returns: RSA public key or None
+    :rtype: str
+    """
+    try:
+        profile = Profile.objects.get(handle=handle, user__isnull=True)
+    except Profile.DoesNotExist:
+        remote_profile = retrieve_remote_profile(handle)
+        if not remote_profile:
+            logger.warning("Remote profile %s for sender key not found locally or remotely.", handle)
+            return None
+        # We might as well create the profile locally here since we'll need it again soon
+        Profile.from_remote_profile(remote_profile)
+        return remote_profile.public_key
+    else:
+        return profile.rsa_public_key
