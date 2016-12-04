@@ -51,7 +51,7 @@ redis>=2.10.0
 celery==3.1.23
 
 # Generic Django utils
-django-extensions==1.7.4
+django-extensions==1.7.5
 
 # Federation
 federation==0.8.2
