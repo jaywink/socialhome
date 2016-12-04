@@ -12,7 +12,7 @@ channels==0.17.3
 asgi_redis==1.0.0
 
 # Configuration
-django-environ==0.4.0
+django-environ==0.4.1
 django-secure==1.0.1
 whitenoise==3.2.2
 
