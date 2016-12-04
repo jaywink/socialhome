@@ -5,14 +5,14 @@
 wheel==0.29.0
 
 # Django
-django==1.10.3
+django==1.10.4
 
 # Channels
 channels==0.17.3
 asgi_redis==1.0.0
 
 # Configuration
-django-environ==0.4.0
+django-environ==0.4.1
 django-secure==1.0.1
 whitenoise==3.2.2
 
@@ -20,7 +20,7 @@ whitenoise==3.2.2
 django-braces==1.10.0
 
 # Forms
-django-crispy-forms==1.6.0
+django-crispy-forms==1.6.1
 django-floppyforms==1.7.0
 
 # Models
@@ -31,7 +31,7 @@ django-enumfields==0.8.2
 Pillow==3.4.2
 
 # User registration, either via email or social
-django-allauth==0.28.0
+django-allauth==0.29.0
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.2
@@ -51,7 +51,7 @@ redis>=2.10.0
 celery==3.1.23
 
 # Generic Django utils
-django-extensions==1.7.4
+django-extensions==1.7.5
 
 # Federation
 federation==0.8.2
