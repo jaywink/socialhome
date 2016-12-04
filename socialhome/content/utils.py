@@ -5,9 +5,13 @@ from bs4 import BeautifulSoup
 
 
 def safe_text_for_markdown_code(text):
-    """Clean the text using bleach but keep content within Markdown code sections ie ` or ``` combos."""
+    """Clean the text using bleach but keep content within Markdown code sections ie ` or ``` combos.
+
+    For single `, do not allow line breaks between the tag.
+    """
     # Regexp match all ` and ``` pairs
-    codes = re.findall(r"`(?!`).*`(?!`)", text, flags=re.DOTALL) + re.findall(r"```.*```", text, flags=re.DOTALL)
+    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
+            re.findall(r"```.*```", text, flags=re.DOTALL)
     # Store to safety, replacing with markers
     safety = []
     for counter, code in enumerate(codes, 1):

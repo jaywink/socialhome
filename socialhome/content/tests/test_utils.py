@@ -5,7 +5,8 @@ from socialhome.content.utils import safe_text_for_markdown_code, safe_text, mak
 PLAIN_TEXT = "abcdefg kissa kävelee"
 MARKDOWN_TEXT = "## header\n\nFoo Bar. *fooo*"
 SCRIPT_TEXT = "<script>console.log</script>"
-MARKDOWN_CODE_TEXT = "`<script>alert('yup');</script>`\n\n```\n<script>alert('yap');</script>\n```"
+MARKDOWN_CODE_TEXT = "`\n<script>alert('yup');</script>\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
+                     "<script>alert('yap');</script>\n```"
 HTML_TEXT = "<a href='foo'>bar</a><b>cee</b><em>daaa<div>faa</div>"
 
 
@@ -17,7 +18,9 @@ class TestSafeTextForMarkdownCode(object):
         assert safe_text_for_markdown_code(MARKDOWN_TEXT) == MARKDOWN_TEXT
 
     def test_text_with_markdown_code_survives(self):
-        assert safe_text_for_markdown_code(MARKDOWN_CODE_TEXT) == MARKDOWN_CODE_TEXT
+        assert safe_text_for_markdown_code(MARKDOWN_CODE_TEXT) == \
+               "`\n&lt;script&gt;alert('yup');&lt;/script&gt;\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
+               "<script>alert('yap');</script>\n```"
 
     def test_text_with_script_is_cleaned(self):
         assert safe_text_for_markdown_code(SCRIPT_TEXT) == "&lt;script&gt;console.log&lt;/script&gt;"
@@ -35,7 +38,8 @@ class TestSafeText(object):
         assert safe_text(MARKDOWN_TEXT) == MARKDOWN_TEXT
 
     def test_text_with_markdown_code_is_cleaned(self):
-        assert safe_text(MARKDOWN_CODE_TEXT) == "`alert('yup');`\n\n```\nalert('yap');\n```"
+        assert safe_text(MARKDOWN_CODE_TEXT) == "`\nalert('yup');\n`\n\n`alert('yup');`\n\n```\n" \
+                                                "alert('yap');\n```"
 
     def test_text_with_script_is_cleaned(self):
         assert safe_text(SCRIPT_TEXT) == "console.log"

@@ -270,14 +270,14 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
 # Relay to send public content to
 SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoast.net")
 
-
 # REDIS
+# -----
 REDIS_HOST=env("REDIS_HOST", default="localhost")
 REDIS_PORT=env("REDIS_PORT", default=6379)
 REDIS_DB=env("REDIS_DB", default=0)
 
-
-# Channel layer definitions
+# CHANNELS
+# --------
 # http://channels.readthedocs.org/en/latest/deploying.html#setting-up-a-channel-backend
 CHANNEL_LAYERS = {
     "default": {
@@ -291,9 +291,13 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Mocha JS tests - overrides in local.py
+# MOCHA
+# -----
 MOCHA_TESTS = False
 
+# MARKDOWN
+# --------
+MARKDOWNX_MARKDOWNIFY_FUNCTION = "CommonMark.commonmark"
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
