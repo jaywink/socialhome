@@ -17,8 +17,13 @@ cache:
     - node_modules/
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
+  # Install custom Node via nvm
+  - rm -rf ~/.nvm
+  - git clone https://github.com/creationix/nvm.git ~/.nvm
+  - (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
+  - source ~/.nvm/nvm.sh && nvm install 4
   - npm install
-  - bower install
+  - node_modules/.bin/bower install
   - node_modules/.bin/grunt build
   - python manage.py print_settings
 script:
