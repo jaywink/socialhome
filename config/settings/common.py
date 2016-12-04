@@ -78,6 +78,7 @@ MIGRATION_MODULES = {
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
+DEBUG_TOOLBAR_ENABLED = False
 
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
