@@ -71,7 +71,8 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/common.css': '<%= paths.sass %>/common.scss',
                     '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
-                    '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss'
+                    '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
+                    '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
                 },
             },
             dist: {
@@ -86,6 +87,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/grids.css': '<%= paths.sass %>/grids.scss',
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
                     '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
+                    '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
                 },
             }
         },
@@ -119,9 +121,9 @@ module.exports = function (grunt) {
                     "<%= paths.css %>/grids.css",
                     "<%= paths.css %>/streams.css",
                     "<%= paths.css %>/publisher.css",
+                    "<%= paths.css %>/content.css",
                 ],
                 dest: "<%= paths.css %>/project.css",
-
                 nonull: true,
             },
         },
@@ -130,7 +132,6 @@ module.exports = function (grunt) {
         postcss: {
             options: {
                 map: true, // inline sourcemaps
-
                 processors: [
                     require('pixrem')(), // add fallbacks for rem units
                     require('autoprefixer-core')({
