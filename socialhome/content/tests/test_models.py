@@ -52,15 +52,15 @@ class TestContentModel(TestCase):
 
     def test_renders(self):
         content = Content.objects.create(text="# Foobar <img src='localhost'>", guid="barfoo", author=ProfileFactory())
-        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>")
-        self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>")
+        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>\n")
+        self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>\n")
 
     def test_renders_with_nsfw_shield(self):
         content = Content.objects.create(
             text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
         )
-        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
-        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
+        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
+        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()
@@ -89,12 +89,12 @@ class TestContentModel(TestCase):
             {
                 "id": self.public_content.id,
                 "author": self.public_content.author_id,
-                "rendered": "<p><strong>Foobar</strong></p>",
+                "rendered": "<p><strong>Foobar</strong></p>\n",
             },
             {
                 "id": self.site_content.id,
                 "author": self.site_content.author_id,
-                "rendered": "<p><em>Foobar</em></p>",
+                "rendered": "<p><em>Foobar</em></p>\n",
             }
         ])
 

@@ -4,20 +4,31 @@ import bleach
 from bs4 import BeautifulSoup
 
 
-def safe_text_for_markdown_code(text):
-    """Clean the text using bleach but keep content within Markdown code sections ie ` or ``` combos."""
+def safe_text_for_markdown(text):
+    """Clean the text using bleach but keep certain Markdown sections.
+
+    Markdown code ie ` or ``` combos. For single `, do not allow line breaks between the tag.
+    Quotes ie '> ' which bleach would clean up.
+    """
     # Regexp match all ` and ``` pairs
-    codes = re.findall(r"`(?!`).*`(?!`)", text, flags=re.DOTALL) + re.findall(r"```.*```", text, flags=re.DOTALL)
+    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
+            re.findall(r"```.*```", text, flags=re.DOTALL)
     # Store to safety, replacing with markers
     safety = []
     for counter, code in enumerate(codes, 1):
         safety.append(code)
-        text = text.replace(code, "%%safe_text_for_markdown_code codes in safety %s%%" % counter, 1)
+        text = text.replace(code, "%%safe_text_for_markdown codes in safety %s%%" % counter, 1)
+    # Store quotes next
+    text = re.sub(r"(^> )", "%%safe_quote_in_start%%", text)
+    text = re.sub(r"(\n> )", "%%safe_quote_in_new_line%%", text, flags=re.DOTALL)
     # Nuke all html, scripts, etc
     text = bleach.clean(text)
+    # Return quotes
+    text = text.replace("%%safe_quote_in_start%%", "> ")
+    text = text.replace("%%safe_quote_in_new_line%%", "\n> ")
     # Return ` and ``` pairs from safety
     for counter, code in enumerate(safety, 1):
-        text = text.replace("%%safe_text_for_markdown_code codes in safety %s%%" % counter, code, 1)
+        text = text.replace("%%safe_text_for_markdown codes in safety %s%%" % counter, code, 1)
     return text
 
 

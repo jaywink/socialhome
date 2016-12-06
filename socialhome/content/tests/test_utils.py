@@ -1,30 +1,37 @@
 from unittest import TestCase
 
-from socialhome.content.utils import safe_text_for_markdown_code, safe_text, make_nsfw_safe
+from socialhome.content.utils import safe_text_for_markdown, safe_text, make_nsfw_safe
 
 PLAIN_TEXT = "abcdefg kissa kävelee"
 MARKDOWN_TEXT = "## header\n\nFoo Bar. *fooo*"
+MARKDOWN_QUOTES_TEXT = "> foo\n> bar > foo"
 SCRIPT_TEXT = "<script>console.log</script>"
-MARKDOWN_CODE_TEXT = "`<script>alert('yup');</script>`\n\n```\n<script>alert('yap');</script>\n```"
+MARKDOWN_CODE_TEXT = "`\n<script>alert('yup');</script>\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
+                     "<script>alert('yap');</script>\n```"
 HTML_TEXT = "<a href='foo'>bar</a><b>cee</b><em>daaa<div>faa</div>"
 
 
-class TestSafeTextForMarkdownCode(object):
+class TestSafeTextForMarkdown(object):
     def test_plain_text_survives(self):
-        assert safe_text_for_markdown_code(PLAIN_TEXT) == PLAIN_TEXT
+        assert safe_text_for_markdown(PLAIN_TEXT) == PLAIN_TEXT
 
     def test_text_with_markdown_survives(self):
-        assert safe_text_for_markdown_code(MARKDOWN_TEXT) == MARKDOWN_TEXT
+        assert safe_text_for_markdown(MARKDOWN_TEXT) == MARKDOWN_TEXT
 
     def test_text_with_markdown_code_survives(self):
-        assert safe_text_for_markdown_code(MARKDOWN_CODE_TEXT) == MARKDOWN_CODE_TEXT
+        assert safe_text_for_markdown(MARKDOWN_CODE_TEXT) == \
+               "`\n&lt;script&gt;alert('yup');&lt;/script&gt;\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
+               "<script>alert('yap');</script>\n```"
 
     def test_text_with_script_is_cleaned(self):
-        assert safe_text_for_markdown_code(SCRIPT_TEXT) == "&lt;script&gt;console.log&lt;/script&gt;"
+        assert safe_text_for_markdown(SCRIPT_TEXT) == "&lt;script&gt;console.log&lt;/script&gt;"
 
     def test_text_with_html_is_cleaned(self):
-        assert safe_text_for_markdown_code(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;faa&lt' \
+        assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;faa&lt' \
                                                          ';/div&gt;</em>'
+
+    def test_text_with_quotes_survives(self):
+        assert safe_text_for_markdown(MARKDOWN_QUOTES_TEXT) == "> foo\n> bar &gt; foo"
 
 
 class TestSafeText(object):
@@ -35,7 +42,8 @@ class TestSafeText(object):
         assert safe_text(MARKDOWN_TEXT) == MARKDOWN_TEXT
 
     def test_text_with_markdown_code_is_cleaned(self):
-        assert safe_text(MARKDOWN_CODE_TEXT) == "`alert('yup');`\n\n```\nalert('yap');\n```"
+        assert safe_text(MARKDOWN_CODE_TEXT) == "`\nalert('yup');\n`\n\n`alert('yup');`\n\n```\n" \
+                                                "alert('yap');\n```"
 
     def test_text_with_script_is_cleaned(self):
         assert safe_text(SCRIPT_TEXT) == "console.log"

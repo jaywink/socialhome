@@ -2,6 +2,7 @@
 import re
 from uuid import uuid4
 
+from CommonMark import commonmark
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -75,7 +76,7 @@ class Content(models.Model):
         return self.created
 
     def render(self):
-        rendered = markdownify(self.text)
+        rendered = commonmark(self.text)
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
         return rendered
