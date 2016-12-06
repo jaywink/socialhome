@@ -4,7 +4,7 @@ from federation.entities import base
 from federation.fetchers import retrieve_remote_profile
 
 from socialhome.content.models import Content
-from socialhome.content.utils import safe_text, safe_text_for_markdown_code
+from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import safe_make_aware
 from socialhome.users.models import Profile
@@ -44,7 +44,7 @@ def process_entities(entities, profile):
 def process_entity_post(entity, profile):
     """Process an entity of type Post."""
     values = {
-        "text": safe_text_for_markdown_code(entity.raw_content), "author": profile,
+        "text": safe_text_for_markdown(entity.raw_content), "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",

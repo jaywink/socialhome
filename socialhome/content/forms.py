@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from markdownx.widgets import MarkdownxWidget
 
 from socialhome.content.models import Content
-from socialhome.content.utils import safe_text_for_markdown_code
+from socialhome.content.utils import safe_text_for_markdown
 
 
 class ContentForm(ModelForm):
@@ -21,4 +21,4 @@ class ContentForm(ModelForm):
         """Sanitize text if user is untrusted."""
         if self.user.trusted_editor:
             return self.cleaned_data["text"]
-        return safe_text_for_markdown_code(self.cleaned_data["text"])
+        return safe_text_for_markdown(self.cleaned_data["text"])
