@@ -44,16 +44,41 @@ def process_entities(entities, profile):
 def process_entity_post(entity, profile):
     """Process an entity of type Post."""
     values = {
-        "text": safe_text_for_markdown(entity.raw_content), "author": profile,
+        "text": safe_text_for_markdown(entity.raw_content),
+        "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
+    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
     if created:
         logger.info("Saved Content: %s", content)
     else:
         logger.info("Updated Content: %s", content)
+
+
+def _embed_entity_images_to_post(children, text):
+    """Embed any entity `_children` of base.Image type to the text content as markdown.
+
+    Images are prefixed on top of the normal text content.
+
+    :param children: List of child entities
+    :param values: Text for creating the Post
+    :return: New text value to create the Post with
+    """
+    images = []
+    for child in children:
+        if isinstance(child, base.Image):
+            image_url = "%s%s" % (
+                safe_text(child.remote_path), safe_text(child.remote_name)
+            )
+            images.append("![](%s) " % image_url)
+    if images:
+        return "%s\n\n%s" % (
+            "".join(images), text
+        )
+    return text
 
 
 def process_entity_retraction(entity, profile):
