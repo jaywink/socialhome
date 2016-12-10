@@ -1,7 +1,7 @@
 from unittest.mock import patch, Mock
 
 import pytest
-from federation.entities.base import Retraction
+from federation.entities import base
 from federation.tests.factories import entities
 from test_plus import TestCase
 
@@ -21,7 +21,7 @@ class TestProcessEntities(TestCase):
         super(TestProcessEntities, cls).setUpTestData()
         cls.profile = Mock()
         cls.post = entities.PostFactory()
-        cls.retraction = Retraction(handle=cls.post.handle, target_guid=cls.post.guid, entity_type="Post")
+        cls.retraction = base.Retraction(handle=cls.post.handle, target_guid=cls.post.guid, entity_type="Post")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
     def test_process_entity_post_is_called(self, mock_process):
@@ -46,6 +46,17 @@ class TestProcessEntityPost(object):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory())
         Content.objects.get(guid=entity.guid)
+
+    def test_entity_images_are_prefixed_to_post_text(self):
+        entity = entities.PostFactory(
+            _children=[
+                base.Image(remote_path="foo", remote_name="bar"),
+                base.Image(remote_path="zoo", remote_name="dee"),
+            ],
+        )
+        process_entity_post(entity, ProfileFactory())
+        content = Content.objects.get(guid=entity.guid)
+        assert content.text.index("![](foobar) ![](zoodee) \n\n%s" % entity.raw_content) == 0
 
     def test_post_is_updated_from_entity(self):
         entity = entities.PostFactory()
