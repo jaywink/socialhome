@@ -7,9 +7,22 @@
             percentPosition: true,
             stamp: ".stamped",
         });
+
+        var layoutMasonry = function() {
+            // We're doing again an 'imagesLoaded' call here since some OEmbed's could have images which
+            // load a while, and we might be ending here from the Ajax success trigger
+            $grid.imagesLoaded().progress(function() {
+                $grid.masonry('layout');
+            });
+        };
+
         // Layout Masonry after each image loads
         $grid.imagesLoaded().progress(function() {
             $grid.masonry('layout');
+        });
+        // Layout Masonry also a little after each successful Ajax call
+        $(document).ajaxSuccess(function() {
+            setTimeout(layoutMasonry, 500);
         });
         // Make profile content organize cards sortable
         $(".organize-content").sortable({

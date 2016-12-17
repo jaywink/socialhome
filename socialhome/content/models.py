@@ -7,17 +7,39 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
+from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
-from markdownx.utils import markdownify
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.utils import make_nsfw_safe
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.utils import safe_clear_cached_property
+
+
+class OpenGraphCache(models.Model):
+    url = models.URLField(_("URL"), unique=True)
+    title = models.CharField(_("Title"), max_length=256, blank=True)
+    description = models.TextField(_("Description"), blank=True)
+    image = models.URLField(_("Image URL"), blank=True)
+    modified = AutoLastModifiedField(_("Modified"), db_index=True)
+
+    def __str__(self):
+        return "%s / %s" % (
+            self.url, truncate_letters(self.title, 30)
+        )
+
+
+class OEmbedCache(models.Model):
+    url = models.URLField(_("URL"), unique=True)
+    oembed = models.TextField(_("OEmbed HTML content"))
+    modified = AutoLastModifiedField(_("Modified"), db_index=True)
+
+    def __str__(self):
+        return self.url
 
 
 class Content(models.Model):
@@ -34,6 +56,15 @@ class Content(models.Model):
 
     # For example mobile, server or application name
     service_label = models.CharField(_("Service label"), blank=True, max_length=32)
+
+    # oEmbed or preview based on OG tags
+    oembed = models.ForeignKey(
+        OEmbedCache, verbose_name=_("OEmbed cache"), on_delete=models.SET_NULL, null=True
+    )
+    opengraph = models.ForeignKey(
+        OpenGraphCache, verbose_name=_("OpenGraph cache"), on_delete=models.SET_NULL, null=True
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -79,6 +110,15 @@ class Content(models.Model):
         rendered = commonmark(self.text)
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
+        if self.oembed:
+            rendered = "%s<br>%s" % (
+                rendered, self.oembed.oembed
+            )
+        if self.opengraph:
+            rendered = "%s%s" % (
+                rendered,
+                render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
+            )
         return rendered
 
     @cached_property
