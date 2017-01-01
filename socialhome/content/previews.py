@@ -40,6 +40,8 @@ def fetch_og_preview(content, urls):
         if OpenGraphCache.objects.filter(url=url, modified__gte=now() - datetime.timedelta(days=7)).exists():
             Content.objects.filter(id=content.id).update(opengraph=OpenGraphCache.objects.get(url=url))
             return True
+        # OpenGraph is kinda broken - make sure we destroy any old data before fetching
+        OpenGraph.__data__ = {}
         try:
             og = OpenGraph(url=url)
         except ConnectionError:
