@@ -52,9 +52,9 @@ class TestSafeText(object):
         assert safe_text(HTML_TEXT) == "barceedaaafaa"
 
 
-class MakeNSFWSafeTestCase(TestCase):
+class TestMakeNSFWSafe(TestCase):
     def setUp(self):
-        super(MakeNSFWSafeTestCase, self).setUp()
+        super(TestMakeNSFWSafe, self).setUp()
         self.nsfw_text = '<div>FooBar</div><div><img src="localhost"/></div><div>#nsfw</div>'
         self.nsfw_text_with_classes = '<div>FooBar</div><div><img class="foobar" src="localhost"/></div>' \
                                       '<div>#nsfw</div>'
@@ -82,10 +82,10 @@ class MakeNSFWSafeTestCase(TestCase):
         )
 
 
-class FindUrlsInTextTestCase(TestCase):
+class TestFindUrlsInText(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(FindUrlsInTextTestCase, cls).setUpTestData()
+        super(TestFindUrlsInText, cls).setUpTestData()
         cls.starts_with_url = "https://example.com/foobar"
         cls.http_starts_with_url = "http://example.com/foobar"
         cls.numbers = "http://foo123.633.com"
