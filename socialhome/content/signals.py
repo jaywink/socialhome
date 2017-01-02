@@ -51,4 +51,7 @@ def federate_content_retraction(sender, **kwargs):
 
 @receiver(post_save, sender=Content)
 def fetch_preview(instance, **kwargs):
-    fetch_content_preview(instance)
+    try:
+        fetch_content_preview(instance)
+    except Exception as ex:
+        logger.exception("Failed to fetch content preview for %s: %s", content, ex)
