@@ -7,6 +7,7 @@ django_coverage_plugin
 flake8
 django-test-plus
 factory_boy
+freezegun
 
 # pytest!
 pytest>=2.9.2
