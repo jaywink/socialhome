@@ -2,8 +2,10 @@ import datetime
 import os
 import re
 
+import requests
 from django.db import DataError
 from django.db import IntegrityError
+from django.db import transaction
 from django.utils.timezone import now
 from django_extensions.utils.text import truncate_letters
 from opengraph import OpenGraph
@@ -38,13 +40,14 @@ def fetch_og_preview(content, urls):
     for url in urls:
         # See first if recently cached already
         if OpenGraphCache.objects.filter(url=url, modified__gte=now() - datetime.timedelta(days=7)).exists():
-            Content.objects.filter(id=content.id).update(opengraph=OpenGraphCache.objects.get(url=url))
-            return True
+            opengraph = OpenGraphCache.objects.get(url=url)
+            Content.objects.filter(id=content.id).update(opengraph=opengraph)
+            return opengraph
         # OpenGraph is kinda broken - make sure we destroy any old data before fetching
         OpenGraph.__data__ = {}
         try:
             og = OpenGraph(url=url)
-        except ConnectionError:
+        except requests.exceptions.ConnectionError:
             continue
         if not og or (not "title" in og and not "site_name" in og and not "description" in og and not "image" in og):
             continue
@@ -53,20 +56,22 @@ def fetch_og_preview(content, urls):
             description = og.description if "description" in og else ""
             image = og.image if "image" in og else ""
             try:
-                opengraph = OpenGraphCache.objects.create(
-                    url=url,
-                    title=truncate_letters(safe_text(title), 250),
-                    description=safe_text(description),
-                    image=safe_text(image),
-                )
+                with transaction.atomic():
+                    opengraph = OpenGraphCache.objects.create(
+                        url=url,
+                        title=truncate_letters(safe_text(title), 250),
+                        description=safe_text(description),
+                        image=safe_text(image),
+                    )
             except DataError:
                 continue
         except IntegrityError:
             # Some other process got ahead of us
-            Content.objects.filter(id=content.id).update(opengraph=OpenGraphCache.objects.get(url=url))
-            return True
+            opengraph = OpenGraphCache.objects.get(url=url)
+            Content.objects.filter(id=content.id).update(opengraph=opengraph)
+            return opengraph
         Content.objects.filter(id=content.id).update(opengraph=opengraph)
-        return True
+        return opengraph
     return False
 
 

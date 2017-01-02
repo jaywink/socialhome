@@ -8,6 +8,7 @@ flake8
 django-test-plus
 factory_boy
 freezegun
+Faker
 
 # pytest!
 pytest>=2.9.2
