@@ -99,8 +99,9 @@ def fetch_oembed_preview(content, urls):
     for url in urls:
         # See first if recently cached already
         if OEmbedCache.objects.filter(url=url, modified__gte=now()-datetime.timedelta(days=7)).exists():
-            Content.objects.filter(id=content.id).update(oembed=OEmbedCache.objects.get(url=url))
-            return True
+            oembed = OEmbedCache.objects.get(url=url)
+            Content.objects.filter(id=content.id).update(oembed=oembed)
+            return oembed
         # Fetch oembed
         try:
             oembed = PyEmbed(discoverer=OEmbedDiscoverer()).embed(url)
@@ -115,8 +116,9 @@ def fetch_oembed_preview(content, urls):
             oembed = OEmbedCache.objects.create(url=url, oembed=oembed)
         except IntegrityError:
             # Some other process got ahead of us
-            Content.objects.filter(id=content.id).update(oembed=OEmbedCache.objects.get(url=url))
-            return True
+            oembed = OEmbedCache.objects.get(url=url)
+            Content.objects.filter(id=content.id).update(oembed=oembed)
+            return oembed
         Content.objects.filter(id=content.id).update(oembed=oembed)
-        return True
+        return oembed
     return False

@@ -7,10 +7,13 @@ from django.db import DataError
 from django.test import TestCase
 from freezegun import freeze_time
 from opengraph import OpenGraph
+from pyembed.core import PyEmbedError
+from pyembed.core.consumer import PyEmbedConsumerError
+from pyembed.core.discovery import PyEmbedDiscoveryError
 
 from socialhome.content.models import OpenGraphCache
-from socialhome.content.previews import fetch_content_preview, fetch_og_preview
-from socialhome.content.tests.factories import ContentFactory, OpenGraphCacheFactory
+from socialhome.content.previews import fetch_content_preview, fetch_og_preview, OEmbedDiscoverer, fetch_oembed_preview
+from socialhome.content.tests.factories import ContentFactory, OpenGraphCacheFactory, OEmbedCacheFactory
 
 
 class MockOpenGraph(dict):
@@ -26,9 +29,6 @@ class TestFetchOgPreview(TestCase):
         super(TestFetchOgPreview, cls).setUpTestData()
         cls.content = ContentFactory()
         cls.urls = ["https://example.com"]
-
-    def setUp(self):
-        super(TestFetchOgPreview, self).setUp()
 
     def test_if_cached_already_dont_fetch(self):
         opengraph = OpenGraphCacheFactory(url=self.urls[0])
@@ -123,3 +123,73 @@ class TestFetchContentPreview(TestCase):
     def test_fetch_og_preview_called(self, fetch_og, fetch_oembed, find_urls):
         fetch_content_preview(self.content)
         fetch_og.assert_called_once_with(self.content, ["example.com"])
+
+
+class TestOEmbedDiscoverer(object):
+    def test_oembed_discoverer_inits(self):
+        OEmbedDiscoverer()
+
+
+@pytest.mark.usefixtures("db")
+class TestFetchOEmbedPreview(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestFetchOEmbedPreview, cls).setUpTestData()
+        cls.content = ContentFactory()
+        cls.urls = ["https://example.com"]
+
+    def test_cache_not_updated_if_previous_found(self):
+        OEmbedCacheFactory(url=self.urls[0])
+        result = fetch_oembed_preview(self.content, self.urls)
+        self.content.refresh_from_db()
+        self.assertEqual(self.content.oembed, result)
+
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
+    def test_cache_updated_if_previous_found_older_than_7_days(self, embed):
+        with freeze_time(datetime.date.today() - datetime.timedelta(days=8)):
+            OEmbedCacheFactory(url=self.urls[0])
+        fetch_oembed_preview(self.content, self.urls)
+        embed.assert_called_once_with(self.urls[0])
+
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
+    def test_pyembed_called(self, embed):
+        fetch_oembed_preview(self.content, self.urls)
+        embed.assert_called_once_with(self.urls[0])
+
+    def test_pyembed_errors_swallowed(self):
+        for error in [PyEmbedError, PyEmbedDiscoveryError, PyEmbedConsumerError, ValueError]:
+            with patch("socialhome.content.previews.PyEmbed.embed", side_effect=error):
+                result = fetch_oembed_preview(self.content, self.urls)
+                self.assertFalse(result)
+
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
+    def test_empty_oembed_skipped(self, embed):
+        result = fetch_oembed_preview(self.content, self.urls)
+        embed.assert_called_once_with(self.urls[0])
+        self.assertFalse(result)
+
+    @pytest.mark.skip(reason="WIP")
+    @patch("socialhome.content.previews.PyEmbed.embed")
+    def test_oembed_width_corrected(self, embed):
+        for width in [
+                "foo width='50' bar"
+                'foo width="50" bar',
+                ]:
+            embed.return_value = width
+            result = fetch_oembed_preview(self.content, self.urls)
+            self.assertEqual(result.oembed, 'foo width="100%" bar')
+            result.delete()
+        for height in [
+                "foo height='50' bar"
+                'foo height="50" bar',
+                ]:
+            embed.return_value = height
+            result = fetch_oembed_preview(self.content, self.urls)
+            self.assertEqual(result.oembed, 'foo  bar')
+            result.delete()
+
+    def test_oembed_cache_created(self):
+        pass
+
+    def test_integrityerror_updates_with_found_cache(self):
+        pass
