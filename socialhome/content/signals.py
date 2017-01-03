@@ -54,4 +54,4 @@ def fetch_preview(instance, **kwargs):
     try:
         fetch_content_preview(instance)
     except Exception as ex:
-        logger.exception("Failed to fetch content preview for %s: %s", content, ex)
+        logger.exception("Failed to fetch content preview for %s: %s", instance, ex)

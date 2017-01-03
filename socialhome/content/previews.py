@@ -49,7 +49,7 @@ def fetch_og_preview(content, urls):
             og = OpenGraph(url=url)
         except requests.exceptions.ConnectionError:
             continue
-        if not og or (not "title" in og and not "site_name" in og and not "description" in og and not "image" in og):
+        if not og or ("title" not in og and "site_name" not in og and "description" not in og and "image" not in og):
             continue
         try:
             title = og.title if "title" in og else og.site_name if "site_name" in og else ""
