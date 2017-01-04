@@ -11,7 +11,7 @@ from pyembed.core import PyEmbedError
 from pyembed.core.consumer import PyEmbedConsumerError
 from pyembed.core.discovery import PyEmbedDiscoveryError
 
-from socialhome.content.models import OpenGraphCache
+from socialhome.content.models import OpenGraphCache, OEmbedCache
 from socialhome.content.previews import fetch_content_preview, fetch_og_preview, OEmbedDiscoverer, fetch_oembed_preview
 from socialhome.content.tests.factories import ContentFactory, OpenGraphCacheFactory, OEmbedCacheFactory
 
@@ -87,7 +87,7 @@ class TestFetchOgPreview(TestCase):
 
     @patch("socialhome.content.previews.OpenGraphCache.objects.filter", return_value=OpenGraphCache.objects.none())
     @patch("socialhome.content.previews.OpenGraph")
-    def test_opengraph_integrity_error_updates_with_existing_object(self, og, create):
+    def test_opengraph_integrity_error_updates_with_existing_object(self, og, filter):
         opengraph = OpenGraphCacheFactory(url=self.urls[0])
         og.return_value = MockOpenGraph({"title": "foo"})
         result = fetch_og_preview(self.content, self.urls)
@@ -168,28 +168,21 @@ class TestFetchOEmbedPreview(TestCase):
         embed.assert_called_once_with(self.urls[0])
         self.assertFalse(result)
 
-    @pytest.mark.skip(reason="WIP")
-    @patch("socialhome.content.previews.PyEmbed.embed")
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value='foo width="50" height="100" bar')
     def test_oembed_width_corrected(self, embed):
-        for width in [
-                "foo width='50' bar"
-                'foo width="50" bar',
-                ]:
-            embed.return_value = width
-            result = fetch_oembed_preview(self.content, self.urls)
-            self.assertEqual(result.oembed, 'foo width="100%" bar')
-            result.delete()
-        for height in [
-                "foo height='50' bar"
-                'foo height="50" bar',
-                ]:
-            embed.return_value = height
-            result = fetch_oembed_preview(self.content, self.urls)
-            self.assertEqual(result.oembed, 'foo  bar')
-            result.delete()
+        result = fetch_oembed_preview(self.content, self.urls)
+        self.assertEqual(result.oembed, 'foo width="100%"  bar')
 
-    def test_oembed_cache_created(self):
-        pass
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="foobar")
+    def test_oembed_cache_created(self, embed):
+        result = fetch_oembed_preview(self.content, self.urls)
+        self.assertEqual(result.oembed, "foobar")
+        self.content.refresh_from_db()
+        self.assertEqual(self.content.oembed, result)
 
-    def test_integrityerror_updates_with_found_cache(self):
-        pass
+    @patch("socialhome.content.previews.OEmbedCache.objects.filter", return_value=OEmbedCache.objects.none())
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="foobar")
+    def test_integrityerror_updates_with_found_cache(self, embed, filter):
+        oembed = OEmbedCacheFactory(url=self.urls[0])
+        result = fetch_oembed_preview(self.content, self.urls)
+        self.assertEqual(result, oembed)

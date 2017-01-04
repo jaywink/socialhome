@@ -113,7 +113,8 @@ def fetch_oembed_preview(content, urls):
         oembed = re.sub(r'width="[0-9]*"', 'width="100%"', oembed)
         oembed = re.sub(r'height="[0-9]*"', "", oembed)
         try:
-            oembed = OEmbedCache.objects.create(url=url, oembed=oembed)
+            with transaction.atomic():
+                oembed = OEmbedCache.objects.create(url=url, oembed=oembed)
         except IntegrityError:
             # Some other process got ahead of us
             oembed = OEmbedCache.objects.get(url=url)
