@@ -1,6 +1,6 @@
-from unittest import TestCase
+from django.test import TestCase
 
-from socialhome.content.utils import safe_text_for_markdown, safe_text, make_nsfw_safe
+from socialhome.content.utils import safe_text_for_markdown, safe_text, make_nsfw_safe, find_urls_in_text
 
 PLAIN_TEXT = "abcdefg kissa kävelee"
 MARKDOWN_TEXT = "## header\n\nFoo Bar. *fooo*"
@@ -52,9 +52,9 @@ class TestSafeText(object):
         assert safe_text(HTML_TEXT) == "barceedaaafaa"
 
 
-class MakeNSFWSafeTestCase(TestCase):
+class TestMakeNSFWSafe(TestCase):
     def setUp(self):
-        super(MakeNSFWSafeTestCase, self).setUp()
+        super(TestMakeNSFWSafe, self).setUp()
         self.nsfw_text = '<div>FooBar</div><div><img src="localhost"/></div><div>#nsfw</div>'
         self.nsfw_text_with_classes = '<div>FooBar</div><div><img class="foobar" src="localhost"/></div>' \
                                       '<div>#nsfw</div>'
@@ -80,3 +80,42 @@ class MakeNSFWSafeTestCase(TestCase):
             make_nsfw_safe(self.nsfw_text_many_classes),
             '<div>FooBar</div><div><img class="foo bar nsfw" src="localhost"/></div><div>#nsfw</div>'
         )
+
+
+class TestFindUrlsInText(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestFindUrlsInText, cls).setUpTestData()
+        cls.starts_with_url = "https://example.com/foobar"
+        cls.http_starts_with_url = "http://example.com/foobar"
+        cls.numbers = "http://foo123.633.com"
+        cls.special_chars = "https://example.com/~:[]@!$()*,;_%20+wat.wot?foo=bar&bar=foo#rokkenroll"
+        cls.urls_in_text = "fewfe https://example1.com grheiugheriu\nhttps://example2.com " \
+                           "fhuiwehfui https://example-3.com\nfwfefewjuio"
+        cls.href_and_markdown = "foo <a href='https://example.com'>bar</a> " \
+                                "<a href=\"https://example.com\">bar</a>" \
+                                "[waat](https://example.com)"
+
+    def test_starts_with_url(self):
+        urls = find_urls_in_text(self.starts_with_url)
+        self.assertEqual(urls, [self.starts_with_url])
+        urls = find_urls_in_text(self.http_starts_with_url)
+        self.assertEqual(urls, [self.http_starts_with_url])
+
+    def test_numbers(self):
+        urls = find_urls_in_text(self.numbers)
+        self.assertEqual(urls, [self.numbers])
+
+    def test_special_chars(self):
+        urls = find_urls_in_text(self.special_chars)
+        self.assertEqual(urls, [self.special_chars])
+
+    def test_urls_in_text(self):
+        urls = find_urls_in_text(self.urls_in_text)
+        self.assertEqual(urls, [
+            "https://example1.com", "https://example2.com", "https://example-3.com"
+        ])
+
+    def test_href_markdown_etc_skipped(self):
+        urls = find_urls_in_text(self.href_and_markdown)
+        self.assertEqual(urls, [])

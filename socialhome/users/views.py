@@ -42,7 +42,7 @@ class ProfileDetailView(AccessMixin, DetailView):
         elif self.request.user.profile != self.target_profile:
             # TODO: filter out also LIMITED until contacts implemented
             contents = contents.exclude(visibility__in=[Visibility.LIMITED, Visibility.SELF])
-        return contents.order_by("order")
+        return contents.order_by("order").select_related("oembed", "opengraph")
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.

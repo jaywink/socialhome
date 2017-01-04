@@ -6,3 +6,17 @@
     border-left: .25rem solid #eceeef;
   }
 }
+
+.opengraph-card {
+  cursor: pointer;
+  text-decoration: none;
+  color: #373a3c;
+
+  .card > .row {
+    padding: 10px;
+  }
+
+  img {
+    max-height: 60px;
+  }
+}

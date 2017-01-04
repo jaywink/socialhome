@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
 import datetime
 from unittest.mock import Mock, patch, call
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
+from django.template.loader import render_to_string
 from django.utils.timezone import make_aware
 from test_plus import TestCase
 
-from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.models import Content, OpenGraphCache, OEmbedCache
+from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
 from socialhome.enums import Visibility
 from socialhome.users.tests.factories import ProfileFactory
 
@@ -61,6 +61,21 @@ class TestContentModel(TestCase):
         )
         self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
         self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
+
+    def test_renders_with_oembed(self):
+        content = Content.objects.create(
+            text="foobar", guid="barfoo", author=ProfileFactory(),
+            oembed=OEmbedCacheFactory()
+        )
+        self.assertEqual(content.rendered, "<p>foobar</p>\n<br>%s" % content.oembed.oembed)
+
+    def test_renders_with_opengraphcache(self):
+        content = Content.objects.create(
+            text="foobar", guid="barfoo", author=ProfileFactory(),
+            opengraph=OpenGraphCacheFactory()
+        )
+        rendered_og = render_to_string("content/_og_preview.html", {"opengraph": content.opengraph})
+        self.assertEqual(content.rendered, "<p>foobar</p>\n%s" % rendered_og)
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()
@@ -136,3 +151,15 @@ class TestContentModel(TestCase):
         self.assertIsNone(self.public_content.remote_created)
         self.assertEqual(self.remote_content.effective_created, self.remote_content.remote_created)
         self.assertIsNotNone(self.remote_content.remote_created)
+
+
+class TestOpenGraphCache(TestCase):
+    def test_str(self):
+        ogc = OpenGraphCache(url="https://example.com", title="x"*200, description="bar", image="https://example.com")
+        self.assertEqual(str(ogc), "https://example.com / %s..." % ("x"*30))
+
+
+class TestOEmbedCache(TestCase):
+    def test_str(self):
+        oec = OEmbedCache(url="https://example.com", oembed="x"*200)
+        self.assertEqual(str(oec), "https://example.com")

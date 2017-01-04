@@ -1,0 +1,21 @@
+<a class="opengraph-card" href="{{ opengraph.url }}" target="_blank">
+    <div class="card">
+        <div class="row">
+            {% if opengraph.image %}
+                <div class="col-xs-3">
+                    <img class="card-img-top" src="{{ opengraph.image }}">
+                </div>
+            {% endif %}
+            <div class="{% if opengraph.image %}col-xs-9{% else %}col-xs-12{% endif %}">
+                <p class="card-text">
+                    {% if opengraph.title %}
+                        {{ opengraph.title }}
+                    {% endif %}
+                    {% if opengraph.description and opengraph.description != opengraph.title %}
+                        <br>{{ opengraph.description }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</a>

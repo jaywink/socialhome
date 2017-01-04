@@ -12,4 +12,4 @@ class BaseStreamView(ListView):
 
 class PublicStreamView(BaseStreamView):
     template_name = "streams/public.html"
-    queryset = Content.objects.filter(visibility=Visibility.PUBLIC)
+    queryset = Content.objects.filter(visibility=Visibility.PUBLIC).select_related("oembed", "opengraph")

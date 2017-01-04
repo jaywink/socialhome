@@ -4,9 +4,9 @@ from unittest.mock import Mock
 from socialhome.utils import safe_clear_cached_property
 
 
-class SafeClearCachedPropertyTestCase(TestCase):
+class TestSafeClearCachedProperty(TestCase):
     def setUp(self):
-        super(SafeClearCachedPropertyTestCase, self).setUp()
+        super(TestSafeClearCachedProperty, self).setUp()
         self.instance = Mock(foo="bar")
 
     def test_clears_attribute(self):

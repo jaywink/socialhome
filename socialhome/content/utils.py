@@ -54,3 +54,17 @@ def make_nsfw_safe(text):
     if result.startswith("<html><body>") and result.endswith("</body></html>"):
         result = result[len("<html><body>"):-len("</body></html>")]
     return result
+
+
+def find_urls_in_text(text):
+    """Find url's from text.
+
+    URL matching by design only picks up "orphan" urls which are not href attributes or markdown links.
+    There must be an empty space, line feed or text start before the url for a match to happen.
+
+    Note, this is not entirely accurate, we're just trying to match as many as we can, allowing possibly
+    a few false positives.
+    """
+    urls = re.findall(r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text) + \
+           re.findall(r'(?<=[ \n]{1})https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text)
+    return urls

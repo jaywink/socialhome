@@ -200,8 +200,8 @@ class TestMakeFederableRetraction(TestCase):
 @pytest.mark.usefixtures("db")
 class TestSenderKeyFetcher(TestCase):
     def test_local_profile_public_key_is_returned(self):
-        user = UserFactory()
-        self.assertEqual(sender_key_fetcher(user.profile.handle), user.profile.rsa_public_key)
+        profile = ProfileFactory()
+        self.assertEqual(sender_key_fetcher(profile.handle), profile.rsa_public_key)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")

@@ -69,3 +69,17 @@ class TestFederateContentRetraction(TestCase):
         content = ContentFactory(author=user.profile)
         content.delete()
         self.assertTrue(mock_logger.called)
+
+
+@pytest.mark.usefixtures("db")
+class TestFetchPreview(TestCase):
+    @patch("socialhome.content.signals.fetch_content_preview")
+    def test_fetch_content_preview_called(self, fetch):
+        content = ContentFactory()
+        fetch.assert_called_once_with(content)
+
+    @patch("socialhome.content.signals.fetch_content_preview", side_effect=Exception)
+    @patch("socialhome.content.signals.logger.exception")
+    def test_fetch_content_preview_called(self, logger, fetch):
+        ContentFactory()
+        self.assertTrue(logger.called)
