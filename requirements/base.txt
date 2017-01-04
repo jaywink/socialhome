@@ -28,7 +28,7 @@ django-model-utils==2.6.0
 django-enumfields==0.8.2
 
 # User registration, either via email or social
-django-allauth==0.29.0
+django-allauth==0.30.0
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.2
