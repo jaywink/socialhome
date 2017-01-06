@@ -107,7 +107,7 @@ class Content(models.Model):
         return self.created
 
     def render(self):
-        rendered = commonmark(self.text)
+        rendered = commonmark(self.text).strip()
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
         if self.oembed:
