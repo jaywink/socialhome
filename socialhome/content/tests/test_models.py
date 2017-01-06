@@ -52,22 +52,22 @@ class TestContentModel(TestCase):
 
     def test_renders(self):
         content = Content.objects.create(text="# Foobar <img src='localhost'>", guid="barfoo", author=ProfileFactory())
-        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>\n")
-        self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>\n")
+        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>")
+        self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>")
 
     def test_renders_with_nsfw_shield(self):
         content = Content.objects.create(
             text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
         )
-        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
-        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>\n')
+        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
+        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
 
     def test_renders_with_oembed(self):
         content = Content.objects.create(
             text="foobar", guid="barfoo", author=ProfileFactory(),
             oembed=OEmbedCacheFactory()
         )
-        self.assertEqual(content.rendered, "<p>foobar</p>\n<br>%s" % content.oembed.oembed)
+        self.assertEqual(content.rendered, "<p>foobar</p><br>%s" % content.oembed.oembed)
 
     def test_renders_with_opengraphcache(self):
         content = Content.objects.create(
@@ -75,7 +75,7 @@ class TestContentModel(TestCase):
             opengraph=OpenGraphCacheFactory()
         )
         rendered_og = render_to_string("content/_og_preview.html", {"opengraph": content.opengraph})
-        self.assertEqual(content.rendered, "<p>foobar</p>\n%s" % rendered_og)
+        self.assertEqual(content.rendered, "<p>foobar</p>%s" % rendered_og)
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()
@@ -104,12 +104,12 @@ class TestContentModel(TestCase):
             {
                 "id": self.public_content.id,
                 "author": self.public_content.author_id,
-                "rendered": "<p><strong>Foobar</strong></p>\n",
+                "rendered": "<p><strong>Foobar</strong></p>",
             },
             {
                 "id": self.site_content.id,
                 "author": self.site_content.author_id,
-                "rendered": "<p><em>Foobar</em></p>\n",
+                "rendered": "<p><em>Foobar</em></p>",
             }
         ])
 
