@@ -16,7 +16,7 @@
     "grunt-contrib-watch": "~1.0.0",
     "grunt-mocha": "^1.0.2",
     "grunt-postcss": "~0.8.0",
-    "grunt-sass": "~1.2.1",
+    "grunt-sass": "~2.0.0",
     "load-grunt-tasks": "~3.5.2",
     "mocha": "^3.0.2",
     "pixrem": "~3.0.2",
