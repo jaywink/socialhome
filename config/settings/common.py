@@ -235,11 +235,12 @@ AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
 # REDIS
 # -----
-REDIS_HOST=env("REDIS_HOST", default="localhost")
-REDIS_PORT=env("REDIS_PORT", default=6379)
-REDIS_DB=env("REDIS_DB", default=0)
+REDIS_HOST = env("REDIS_HOST", default="localhost")
+REDIS_PORT = env("REDIS_PORT", default=6379)
+REDIS_DB = env("REDIS_DB", default=0)
 
-########## CELERY
+# CELERY
+# ------
 INSTALLED_APPS += ('socialhome.taskapp.celery.CeleryConfig',)
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default='redis://%s:%s/%s' % (
     REDIS_HOST, REDIS_PORT, REDIS_DB
