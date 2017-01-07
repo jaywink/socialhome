@@ -23,8 +23,8 @@ class CeleryConfig(AppConfig):
     def ready(self):
         # Using a string here means the worker will not have to
         # pickle the object when using Windows.
-        tasks.config_from_object('django.conf:settings')
-        tasks.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
+        tasks.config_from_object('django.conf:settings', namespace='CELERY')
+        tasks.autodiscover_tasks()
 
         if hasattr(settings, 'OPBEAT'):
             from opbeat.contrib.django.models import client as opbeat_client
