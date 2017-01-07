@@ -233,13 +233,17 @@ LOGIN_URL = 'account_login'
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
+# REDIS
+# -----
+REDIS_HOST=env("REDIS_HOST", default="localhost")
+REDIS_PORT=env("REDIS_PORT", default=6379)
+REDIS_DB=env("REDIS_DB", default=0)
+
 ########## CELERY
 INSTALLED_APPS += ('socialhome.taskapp.celery.CeleryConfig',)
-# if you are not using the django database broker (e.g. rabbitmq, redis, memcached), you can remove the next line.
-INSTALLED_APPS += ('kombu.transport.django',)
-BROKER_URL = env("CELERY_BROKER_URL", default='django://')
-########## END CELERY
-
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default='redis://%s:%s/%s' % (
+    REDIS_HOST, REDIS_PORT, REDIS_DB
+))
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
@@ -269,12 +273,6 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
 )
 # Relay to send public content to
 SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoast.net")
-
-# REDIS
-# -----
-REDIS_HOST=env("REDIS_HOST", default="localhost")
-REDIS_PORT=env("REDIS_PORT", default=6379)
-REDIS_DB=env("REDIS_DB", default=0)
 
 # CHANNELS
 # --------
