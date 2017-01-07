@@ -56,15 +56,11 @@ The file `requirements.apt` contains other various dependencies. You can use the
     
 #### Configure
 
-Configuration is done via environment variables. For the meaning of them, look them up under files in `config/settings`. 
+Configuration is done via environment variables. For the meaning of them, look them up under files in `config/settings`. Values in `env_local` will be used automatically.
 
     cp env.example env.local
     
 Edit any values necessary. By default the `SECRET_KEY` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
-    
-When running `manage.py` commands, these environment variables will be automatically loaded. For other usage (like `py.test`), load the environment in your shell with:
-
-    export `cat env.local`
     
 #### Create a database
 
@@ -97,8 +93,6 @@ After this you need to log in once with the user via the user interface (which c
 You should now be able to log in as the user `admin`.
 
 ### Running tests
-
-Export your settings to the shell first.
 
 #### Python tests
 
