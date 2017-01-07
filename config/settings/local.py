@@ -65,10 +65,10 @@ if MOCHA_TESTS:
     MIDDLEWARE_CLASSES += ('whitenoise.middleware.WhiteNoiseMiddleware',)
     MOCHA_RUNSERVER_PORT = env.int("MOCHA_RUNSERVER_PORT", default=8000)
 
-########## CELERY
+# CELERY
+# ------
 # In development, all tasks will be executed locally by blocking until the task returns
-CELERY_ALWAYS_EAGER = True
-########## END CELERY
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Your local stuff: Below this line define 3rd party library settings
 
