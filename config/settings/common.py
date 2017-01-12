@@ -246,6 +246,10 @@ INSTALLED_APPS += ('socialhome.taskapp.celery.CeleryConfig',)
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default='redis://%s:%s/%s' % (
     REDIS_HOST, REDIS_PORT, REDIS_DB
 ))
+# Soft time out for all tasks
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+# Restart workers every X tasks
+CELERYD_MAX_TASKS_PER_CHILD = 1000
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
