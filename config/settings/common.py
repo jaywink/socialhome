@@ -247,9 +247,11 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL", default='redis://%s:%s/%s' % (
     REDIS_HOST, REDIS_PORT, REDIS_DB
 ))
 # Soft time out for all tasks
-CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERYD_TASK_SOFT_TIME_LIMIT = env("CELERYD_TASK_SOFT_TIME_LIMIT", default=60)
 # Restart workers every X tasks
-CELERYD_MAX_TASKS_PER_CHILD = 1000
+CELERYD_MAX_TASKS_PER_CHILD = env("CELERYD_MAX_TASKS_PER_CHILD", default=1000)
+# The number of concurrent worker processes/threads/green threads executing tasks.
+CELERYD_CONCURRENCY = env("CELERYD_CONCURRENCY", default=8)
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
