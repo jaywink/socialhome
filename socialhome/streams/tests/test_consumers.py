@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -27,14 +28,16 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "text": '{"action": "load_content", "ids": [%s]}' % self.content.id,
             },
         )
-        self.assertEqual(
-            self.client.receive(),
+        receive = self.client.receive()
+        text = json.loads(receive["text"])
+        self.assertEqual(text["event"], "content")
+        self.assertEqual(text["contents"], [
             {
-                'text': '{"event": "content", "contents": [{"id": %s, "author": %s, "rendered": "%s"}]}' % (
-                    self.content.id, self.content.author.id, self.content.rendered
-                )
+                "id": self.content.id,
+                "author": self.content.author.id,
+                "rendered": self.content.rendered,
             }
-        )
+        ])
 
 
 class TestStreamConsumerConnectionGroups(SimpleTestCase):
