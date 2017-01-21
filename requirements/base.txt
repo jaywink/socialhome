@@ -24,7 +24,7 @@ django-crispy-forms==1.6.1
 django-floppyforms==1.7.0
 
 # Models
-django-model-utils==2.6.0
+django-model-utils==2.6.1
 django-enumfields==0.8.2
 
 # User registration, either via email or social
