@@ -33,7 +33,7 @@ Running a development server however is easy. Just set up your virtualenv and cr
 
 #### Create a virtualenv and activate it
 
-Python 3.4 and 3.5 are officially tested against. Ensure the following are installed:
+Python 3.4, 3.5 and 3.6 are officially tested against. Ensure the following are installed:
 
 * Python system dependencies
 * NodeJS
@@ -56,7 +56,7 @@ The file `requirements.apt` contains other various dependencies. You can use the
     
 #### Configure
 
-Configuration is done via environment variables. For the meaning of them, look them up under files in `config/settings`. Values in `env_local` will be used automatically.
+Configuration is done via environment variables. For the meaning of them, look them up under files in `config/settings`. Values in `env.local` will be used automatically.
 
     cp env.example env.local
     
