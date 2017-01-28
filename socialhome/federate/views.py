@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import django_rq
 from django.conf import settings
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
@@ -145,7 +146,7 @@ class ReceivePublicView(View):
         payload = request.POST.get("xml")
         if not payload:
             return HttpResponseBadRequest()
-        receive_task.delay(payload)
+        django_rq.enqueue(receive_task, payload)
         return HttpResponse(status=202)
 
 
@@ -156,5 +157,5 @@ class ReceiveUserView(View):
         if not payload:
             return HttpResponseBadRequest()
         guid = kwargs.get("guid")
-        receive_task.delay(payload, guid=guid)
+        django_rq.enqueue(receive_task, payload, guid=guid)
         return HttpResponse(status=202)

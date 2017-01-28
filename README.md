@@ -104,18 +104,25 @@ This will launch a separate `runserver` on port 8181 and execute the tests again
 
     grunt test
 
-## Celery
+## Deployment
 
-This app comes with Celery.
+Some notes on deploying in production mode. A better guide will come later.
 
-To run a celery worker:
+### Circus
 
-    cd socialhome
-    celery -A socialhome.taskapp worker -l info
+To run background jobs in production, you can use the provided Circus configuration. Note, running this is only necessary in production mode when deploying to a server.
 
-Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
+If you have not installed the `requirements/production.txt` requirements, install Circus as follows:
 
-## Daphne/Websocket workers
+    pip install circus
+    
+Run Circus as follows, replacing the number of background task workers if necessary:
+
+    RQWORKER_NUM=5 circusd config/circus.ini
+    
+You can daemonize circus by passing an extra `--daemonize` flag.
+
+### Daphne/Websocket workers
 
 In addition to the web server HTTP traffic and the Celery workers, Socialhome uses the Daphne server and Django Channels workers to handle websocket traffic. In development environments you don't need to worry about this - runserver will handle these for you. In production, check Django Channels documentation or the [Ansible role](https://github.com/jaywink/ansible-socialhome) on examples about running Daphne and the workers, and how to expose Daphne via Apache/NGINX for example.
 

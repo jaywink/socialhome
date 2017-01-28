@@ -43,6 +43,7 @@ THIRD_PARTY_APPS = (
     "markdownx",
     "django_extensions",  # Generic helpers for administration
     "channels",
+    "django_rq",
 )
 
 # Apps specific for this project go here.
@@ -239,19 +240,20 @@ AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 REDIS_HOST = env("REDIS_HOST", default="localhost")
 REDIS_PORT = env("REDIS_PORT", default=6379)
 REDIS_DB = env("REDIS_DB", default=0)
+REDIS_PASSWORD = env("REDIS_PASSWORD", default="")
 
-# CELERY
-# ------
-INSTALLED_APPS += ('socialhome.taskapp.celery.CeleryConfig',)
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default='redis://%s:%s/%s' % (
-    REDIS_HOST, REDIS_PORT, REDIS_DB
-))
-# Soft time out for all tasks
-CELERYD_TASK_SOFT_TIME_LIMIT = env("CELERYD_TASK_SOFT_TIME_LIMIT", default=60)
-# Restart workers every X tasks
-CELERYD_MAX_TASKS_PER_CHILD = env("CELERYD_MAX_TASKS_PER_CHILD", default=1000)
-# The number of concurrent worker processes/threads/green threads executing tasks.
-CELERYD_CONCURRENCY = env("CELERYD_CONCURRENCY", default=8)
+# RQ
+# --
+RQ_QUEUES = {
+    'default': {
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'DB': REDIS_DB,
+        'PASSWORD': REDIS_PASSWORD,
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+RQ_SHOW_ADMIN_LINK = True
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'

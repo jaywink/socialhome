@@ -1,6 +1,7 @@
 import json
 import logging
 
+import django_rq
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
@@ -33,7 +34,7 @@ def federate_content(sender, **kwargs):
     content = kwargs.get("instance")
     if content.is_local:
         try:
-            send_content.delay(content)
+            django_rq.enqueue(send_content, content.id)
         except Exception as ex:
             logger.exception("Failed to federate_content %s: %s", content, ex)
 
@@ -44,7 +45,7 @@ def federate_content_retraction(sender, **kwargs):
     content = kwargs.get("instance")
     if content.is_local:
         try:
-            send_content_retraction.delay(content, content.author_id)
+            django_rq.enqueue(send_content_retraction, content.id, content.author_id)
         except Exception as ex:
             logger.exception("Failed to federate_content_retraction %s: %s", content, ex)
 
