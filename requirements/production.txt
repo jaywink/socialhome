@@ -13,3 +13,7 @@ django-storages-redux==1.3.2
 # Opbeat agent for performance monitoring
 # -----------------------------------------
 opbeat
+
+# Circus
+# ------
+circus==0.14.0
