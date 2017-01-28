@@ -111,6 +111,10 @@ CACHES = {
 }
 
 
+# RQ
+# --
+RQ_QUEUES["default"]["USE_REDIS_CACHE"] = "default"
+
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')
 

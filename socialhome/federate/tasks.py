@@ -5,18 +5,17 @@ from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFound
 from federation.inbound import handle_receive
 from federation.outbound import handle_create_payload
 from federation.utils.network import send_document
+from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
     get_sender_profile, process_entities, make_federable_entity, make_federable_retraction,
     sender_key_fetcher)
-from socialhome.taskapp.celery import tasks
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
 
 
-@tasks.task()
 def receive_task(payload, guid=None):
     """Process received payload."""
     profile = None
@@ -47,12 +46,16 @@ def receive_task(payload, guid=None):
     process_entities(entities, profile=sender_profile)
 
 
-@tasks.task()
-def send_content(content):
+def send_content(content_id):
     """Handle sending a Content object out via the federation layer.
 
     Currently we only deliver public content.
     """
+    try:
+        content = Content.objects.get(id=content_id)
+    except Content.DoesNotExist:
+        logger.warning("No content found with id %s", content_id)
+        return
     if not content.visibility == Visibility.PUBLIC:
         return
     entity = make_federable_entity(content)
@@ -70,12 +73,16 @@ def send_content(content):
         logger.warning("No entity for %s", content)
 
 
-@tasks.task()
-def send_content_retraction(content, author_id):
+def send_content_retraction(content_id, author_id):
     """Handle sending of retractions.
 
     Currently only for public content.
     """
+    try:
+        content = Content.objects.get(id=content_id)
+    except Content.DoesNotExist:
+        logger.warning("No content found with id %s", content_id)
+        return
     if not content.visibility == Visibility.PUBLIC:
         return
     author = Profile.objects.get(id=author_id)
