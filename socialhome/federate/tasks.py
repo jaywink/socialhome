@@ -97,4 +97,3 @@ def send_content_retraction(content_id, author_id):
         send_document(url, payload)
     else:
         logger.warning("No retraction entity for %s", content)
-
