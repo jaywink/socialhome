@@ -51,8 +51,9 @@ celery[redis]==4.0.2
 django-extensions==1.7.5
 
 # Federation
-#federation==0.9.1
-git+https://github.com/jaywink/federation.git@2a10cb9ffdc690b0712dd47fadf23938e7b07e9b#egg=federation==0.9.1.1
+federation==0.10.0
+# for quick overriding a commit version
+#git+https://github.com/jaywink/federation.git@xxxxxx#egg=federation==0.10.0
 
 # Content
 django-markdownx==1.7.2
