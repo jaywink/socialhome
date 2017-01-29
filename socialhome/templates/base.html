@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{% block title %}Socialhome{% endblock title %}</title>
+    <title>{% block title %}{{ request.site.name }}{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -22,7 +22,7 @@
   <body>
       <nav class="navbar navbar-dark navbar-fixed-top bg-inverse">
           <div class="container">
-              <a class="navbar-brand" href="/">Socialhome</a>
+              <a class="navbar-brand" href="/">{{ request.site.name }}</a>
 
               <button type="button" class="navbar-toggler hidden-md-up pull-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
                   &#9776;

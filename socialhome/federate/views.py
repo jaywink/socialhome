@@ -3,6 +3,7 @@ import logging
 
 import django_rq
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -85,13 +86,14 @@ def nodeinfo_well_known_view(request):
 
 def nodeinfo_view(request):
     """Generate a NodeInfo document."""
+    site = Site.objects.get_current()
     nodeinfo = NodeInfo(
         software={"name": "socialhome", "version": version},
         protocols={"inbound": ["diaspora"], "outbound": ["diaspora"]},
         services={"inbound": [], "outbound": []},
         open_registrations=settings.ACCOUNT_ALLOW_REGISTRATION,
         usage={"users": {}},
-        metadata={"nodeName": "Socialhome"}
+        metadata={"nodeName": site.name}
     )
     return JsonResponse(nodeinfo.doc)
 
