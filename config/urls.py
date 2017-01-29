@@ -39,11 +39,9 @@ urlpatterns = [
     # JavaScript translations
     url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
 
-    # RQ
+    # Admin pages
+    url(settings.ADMIN_URL, include(admin.site.urls)),
     url(r"^django-rq/", include("django_rq.urls")),
-
-    # Comment this out to enable the admin site
-    # url(settings.ADMIN_URL, include(admin.site.urls)),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
