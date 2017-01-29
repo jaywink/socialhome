@@ -110,7 +110,7 @@ Some notes on deploying in production mode. A better guide will come later.
 
 ### Circus
 
-To run background jobs in production, you can use the provided Circus configuration. Note, running this is only necessary in production mode when deploying to a server.
+To run background jobs in production, you can use or copy the provided Circus configuration. Note, running this is only necessary in production mode when deploying to a server.
 
 If you have not installed the `requirements/production.txt` requirements, install Circus as follows:
 
