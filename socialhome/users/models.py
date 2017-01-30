@@ -104,6 +104,7 @@ class Profile(models.Model):
         key = generate_rsa_private_key()
         self.rsa_public_key = key.publickey().exportKey()
         self.rsa_private_key = key.exportKey()
+        self.save(update_fields=("rsa_private_key", "rsa_public_key"))
 
     @property
     def private_key(self):
