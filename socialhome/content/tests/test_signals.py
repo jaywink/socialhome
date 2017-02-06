@@ -83,6 +83,22 @@ class TestFetchPreview(TestCase):
 
     @patch("socialhome.content.signals.fetch_content_preview", side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")
-    def test_fetch_content_preview_called(self, logger, fetch):
+    def test_fetch_content_preview_exception_logger_called(self, logger, fetch):
         ContentFactory()
+        self.assertTrue(logger.called)
+
+
+@pytest.mark.usefixtures("db")
+class TestExtractTags(TestCase):
+    def test_extract_content_called(self):
+        content = ContentFactory()
+        content.extract_tags = Mock()
+        content.save()
+        content.extract_tags.assert_called_once_with()
+
+    @patch("socialhome.content.signals.logger.exception")
+    def test_extract_content_exception_logger_called(self, logger):
+        content = ContentFactory()
+        content.extract_tags = Mock(side_effect=Exception)
+        content.save()
         self.assertTrue(logger.called)

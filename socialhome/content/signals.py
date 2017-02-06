@@ -56,3 +56,11 @@ def fetch_preview(instance, **kwargs):
         fetch_content_preview(instance)
     except Exception as ex:
         logger.exception("Failed to fetch content preview for %s: %s", instance, ex)
+
+
+@receiver(post_save, sender=Content)
+def extract_tags(instance, **kwargs):
+    try:
+        instance.extract_tags()
+    except Exception as ex:
+        logger.exception("Failed to extract tags for %s: %s", instance, ex)

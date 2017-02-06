@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.timezone import make_aware
 from test_plus import TestCase
 
-from socialhome.content.models import Content, OpenGraphCache, OEmbedCache
+from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
 from socialhome.enums import Visibility
 from socialhome.users.tests.factories import ProfileFactory
@@ -151,6 +151,47 @@ class TestContentModel(TestCase):
         self.assertIsNone(self.public_content.remote_created)
         self.assertEqual(self.remote_content.effective_created, self.remote_content.remote_created)
         self.assertIsNotNone(self.remote_content.remote_created)
+
+
+@pytest.mark.usefixtures("db")
+class TestContentExtractTags(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestContentExtractTags, cls).setUpTestData()
+        cls.content = ContentFactory(
+            text="**Foobar** #tag #othertag"
+        )
+
+    def test_factory_instance_has_tags(self):
+        self.assertTrue(Tag.objects.filter(name="tag").exists())
+        self.assertTrue(Tag.objects.filter(name="othertag").exists())
+        self.assertEquals(self.content.tags.count(), 2)
+        tags = set(self.content.tags.values_list("name", flat=True))
+        self.assertEqual(tags, {"tag", "othertag"})
+
+    def test_extract_tags_adds_new_tags(self):
+        self.content.text = "#post **Foobar** #tag #othertag #third\n#fourth"
+        self.content.save()
+        self.assertTrue(Tag.objects.filter(name="third").exists())
+        self.assertTrue(Tag.objects.filter(name="post").exists())
+        self.assertTrue(Tag.objects.filter(name="fourth").exists())
+        self.assertEquals(self.content.tags.count(), 5)
+        tags = set(self.content.tags.values_list("name", flat=True))
+        self.assertEqual(tags, {"tag", "othertag", "third", "post", "fourth"})
+
+    def test_extract_tags_removes_old_tags(self):
+        self.content.text = "**Foobar** #tag #third"
+        self.content.save()
+        self.assertEquals(self.content.tags.count(), 2)
+        tags = set(self.content.tags.values_list("name", flat=True))
+        self.assertEqual(tags, {"tag", "third"})
+
+
+@pytest.mark.usefixtures("db")
+class TestTagModel(TestCase):
+    def test_tag_instance_created(self):
+        Tag.objects.create(name="foobar")
+        self.assertTrue(Tag.objects.filter(name="foobar").exists())
 
 
 class TestOpenGraphCache(TestCase):
