@@ -42,6 +42,15 @@ class OEmbedCache(models.Model):
         return self.url
 
 
+class Tag(models.Model):
+    name = models.CharField(_("Name"), max_length=255, unique=True)
+    created = AutoCreatedField(_('Created'))
+    modified = AutoLastModifiedField(_('Modified'))
+
+    def __str__(self):
+        return "#%s" % self.name
+
+
 class Content(models.Model):
     text = models.TextField(_("Text"), blank=True)
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
@@ -65,6 +74,8 @@ class Content(models.Model):
         OpenGraphCache, verbose_name=_("OpenGraph cache"), on_delete=models.SET_NULL, null=True
     )
 
+    tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -84,6 +95,21 @@ class Content(models.Model):
             self.author = author
         self.fix_local_uploads()
         return super(Content, self).save(*args, **kwargs)
+
+    def extract_tags(self):
+        """Extract tags from the content."""
+        current = set(self.tags.values_list("name", flat=True))
+        tags = re.findall(r"#([a-zA-Z0-9-_]*)", self.text)
+        tags = set(tags)
+        if tags == current:
+            return
+        to_add = tags - current
+        tags_to_add = []
+        for tag_name in to_add:
+            tag, _created = Tag.objects.get_or_create(name=tag_name)
+            tags_to_add.append(tag)
+        final_tags = tags_to_add + list(Tag.objects.filter(name__in=tags & current))
+        self.tags.set(final_tags)
 
     def bust_cache(self):
         """Clear relevant caches for this instance."""
