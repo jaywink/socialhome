@@ -170,7 +170,7 @@ class TestContentExtractTags(TestCase):
         self.assertEqual(tags, {"tag", "othertag"})
 
     def test_extract_tags_adds_new_tags(self):
-        self.content.text = "#post **Foobar** #tag #othertag #third\n#fourth"
+        self.content.text = "#post **Foobar** #tag #OtherTag #third\n#fourth"
         self.content.save()
         self.assertTrue(Tag.objects.filter(name="third").exists())
         self.assertTrue(Tag.objects.filter(name="post").exists())
@@ -192,6 +192,12 @@ class TestTagModel(TestCase):
     def test_tag_instance_created(self):
         Tag.objects.create(name="foobar")
         self.assertTrue(Tag.objects.filter(name="foobar").exists())
+
+    def test_cleaned_name_filter(self):
+        Tag.objects.create(name="foobar")
+        self.assertTrue(Tag.objects.exists_by_cleaned_name(" FooBaR "))
+        tag = Tag.objects.get_by_cleaned_name(" FooBaR ")
+        self.assertEqual(tag.name, "foobar")
 
 
 class TestOpenGraphCache(TestCase):

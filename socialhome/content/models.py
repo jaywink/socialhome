@@ -42,13 +42,36 @@ class OEmbedCache(models.Model):
         return self.url
 
 
+class TagQuerySet(models.QuerySet):
+    def get_by_cleaned_name(self, name):
+        """Get by name after making sure it's lower case and trimmed."""
+        cleaned = name.strip().lower()
+        return self.get(name=cleaned)
+
+    def exists_by_cleaned_name(self, name):
+        """Exists filter by name after making sure it's lower case and trimmed."""
+        cleaned = name.strip().lower()
+        return self.filter(name=cleaned).exists()
+
+
 class Tag(models.Model):
     name = models.CharField(_("Name"), max_length=255, unique=True)
     created = AutoCreatedField(_('Created'))
     modified = AutoLastModifiedField(_('Modified'))
 
+    objects = TagQuerySet.as_manager()
+
     def __str__(self):
         return "#%s" % self.name
+
+    def save(self, *args, **kwargs):
+        """Ensure name is lower case and stripped.
+
+        Note this could lead to unique constraints when saving - make sure to also lower case and trim
+        the name when fetching tags, or use the given manager for that.
+        """
+        self.name = self.name.strip().lower()
+        super().save()
 
 
 class Content(models.Model):
@@ -100,7 +123,8 @@ class Content(models.Model):
         """Extract tags from the content."""
         current = set(self.tags.values_list("name", flat=True))
         tags = re.findall(r"#([a-zA-Z0-9-_]*)", self.text)
-        tags = set(tags)
+        # Fix the tags and make a set
+        tags = set([tag.strip().lower() for tag in tags])
         if tags == current:
             return
         to_add = tags - current
