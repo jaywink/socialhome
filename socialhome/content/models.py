@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 from uuid import uuid4
 
@@ -8,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
@@ -157,7 +157,8 @@ class Content(models.Model):
         return self.created
 
     def render(self):
-        rendered = commonmark(self.text).strip()
+        text = self.get_text_with_urlized_tags()
+        rendered = commonmark(text).strip()
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
         if self.oembed:
@@ -170,6 +171,13 @@ class Content(models.Model):
                 render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
             )
         return rendered
+
+    def get_text_with_urlized_tags(self):
+        """Return text with tags converted to Markdown urls."""
+        text= self.text
+        for tag in self.tags.values_list("name", flat=True):
+            text = text.replace("#%s" % tag, "[#%s](%s)" % (tag, reverse("streams:tags", kwargs={"name": tag})))
+        return text
 
     @cached_property
     def rendered(self):

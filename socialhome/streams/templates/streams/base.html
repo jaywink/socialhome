@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block containertype %}container-fluid{% endblock %}
+
+{% block content %}
+    <script>var socialhomeStream = "{{ stream_name }}";</script>
+    <div class="container">
+        <div id="new-content-container" class="hidden">
+            <a href="" id="new-content-load-link" onclick="return false;">
+                <span class="tag tag-pill tag-primary"><span id="new-content-count">0</span> {% trans "new posts available" %}</span>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="grid">
+                <div class="grid-sizer"></div>
+                <div class="stamped">
+                    {% block stream_description %}{% endblock %}
+                </div>
+                {% for content in content_list %}
+                    <div class="grid-item">
+                        <div class="grid-item-actions text-sm-right">
+                            {% if content.author == request.user.profile %}
+                                <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
+                                <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
+                            {% endif %}
+                        </div>
+                        {{ content.rendered|safe }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
