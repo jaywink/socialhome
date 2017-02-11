@@ -122,7 +122,7 @@ class Content(models.Model):
     def extract_tags(self):
         """Extract tags from the content."""
         current = set(self.tags.values_list("name", flat=True))
-        tags = re.findall(r"#([a-zA-Z0-9-_]*)", self.text)
+        tags = re.findall(r"#([a-zA-Z0-9-_]+)", self.text)
         # Fix the tags and make a set
         tags = set([tag.strip().lower() for tag in tags])
         if tags == current:
