@@ -25,10 +25,11 @@ class ProfileDetailView(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
+    template_name = "streams/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        context["contents"] = self._get_contents_queryset()
+        context["content_list"] = self._get_contents_queryset()
         return context
 
     def _get_contents_queryset(self):

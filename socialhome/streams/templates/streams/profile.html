@@ -1,0 +1,18 @@
+{% extends "streams/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
+
+{% block stream_description %}
+    <h2>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h2>
+{% endblock %}
+
+{% block stream_actions %}
+    {% if profile == request.user.profile %}
+        <div class="stamped">
+            <a class="btn btn-primary" href="{% url 'users:profile-update' %}">{% trans "Settings" %}</a>
+            <a class="btn btn-primary" href="{% url 'account_email' %}">{% trans "Email" %}</a>
+            <a class="btn btn-primary" href="{% url 'users:profile-organize' %}">{% trans "Organize profile content" %}</a>
+        </div>
+    {% endif %}
+{% endblock %}
