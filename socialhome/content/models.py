@@ -174,7 +174,7 @@ class Content(models.Model):
 
     def get_text_with_urlized_tags(self):
         """Return text with tags converted to Markdown urls."""
-        text= self.text
+        text = self.text
         for tag in self.tags.values_list("name", flat=True):
             text = text.replace("#%s" % tag, "[#%s](%s)" % (tag, reverse("streams:tags", kwargs={"name": tag})))
         return text
