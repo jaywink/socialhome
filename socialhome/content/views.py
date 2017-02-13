@@ -64,11 +64,6 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
     def get_success_url(self):
         return reverse("home")
 
-    def get_context_data(self, **kwargs):
-        context = super(ContentDeleteView, self).get_context_data(**kwargs)
-        context["content"] = self.object.render()
-        return context
-
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"

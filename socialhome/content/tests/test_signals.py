@@ -89,16 +89,16 @@ class TestFetchPreview(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestExtractTags(TestCase):
-    def test_extract_content_called(self):
+class TestRenderContent(TestCase):
+    def test_render_content_called(self):
         content = ContentFactory()
-        content.extract_tags = Mock()
+        content.render = Mock()
         content.save()
-        content.extract_tags.assert_called_once_with()
+        content.render.assert_called_once_with()
 
     @patch("socialhome.content.signals.logger.exception")
-    def test_extract_content_exception_logger_called(self, logger):
+    def test_render_content_exception_logger_called(self, logger):
         content = ContentFactory()
-        content.extract_tags = Mock(side_effect=Exception)
+        content.render = Mock(side_effect=Exception)
         content.save()
         self.assertTrue(logger.called)

@@ -52,15 +52,13 @@ class TestContentModel(TestCase):
 
     def test_renders(self):
         content = Content.objects.create(text="# Foobar <img src='localhost'>", guid="barfoo", author=ProfileFactory())
-        self.assertEqual(content.render(), "<h1>Foobar <img src='localhost'></h1>")
         self.assertEqual(content.rendered, "<h1>Foobar <img src='localhost'></h1>")
 
     def test_renders_with_nsfw_shield(self):
         content = Content.objects.create(
             text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
         )
-        self.assertEqual(content.render(), '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
-        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> #nsfw</p>')
+        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> <a href="/tags/nsfw/">#nsfw</a></p>')
 
     def test_renders_with_oembed(self):
         content = Content.objects.create(
@@ -76,6 +74,10 @@ class TestContentModel(TestCase):
         )
         rendered_og = render_to_string("content/_og_preview.html", {"opengraph": content.opengraph})
         self.assertEqual(content.rendered, "<p>foobar</p>%s" % rendered_og)
+
+    def test_renders_linkified_tags(self):
+        content = ContentFactory(text="#tag")
+        self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a></p>')
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()
@@ -122,7 +124,7 @@ class TestContentModel(TestCase):
     def test_bust_cache_calls_safe_cache_clearer(self, mock_clear):
         self.public_content.bust_cache()
         self.assertEqual(mock_clear.call_args_list, [
-            call(self.public_content, "is_nsfw"), call(self.public_content, "rendered")
+            call(self.public_content, "is_nsfw"),
         ])
 
     def test_is_local(self):
@@ -140,7 +142,6 @@ class TestContentModel(TestCase):
     def test_fix_local_uploads(self):
         self.public_content.text = "foobar ![](/media/markdownx/12345.jpg) barfoo"
         self.public_content.save()
-        self.public_content.refresh_from_db()
         self.assertEqual(
             self.public_content.text,
             "foobar ![](http://127.0.0.1:8000/media/markdownx/12345.jpg) barfoo"
@@ -154,13 +155,24 @@ class TestContentModel(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestContentExtractTags(TestCase):
+class TestContentSaveTags(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestContentExtractTags, cls).setUpTestData()
+        super(TestContentSaveTags, cls).setUpTestData()
         cls.content = ContentFactory(
             text="**Foobar** #tag #othertag"
         )
+        cls.text = ContentFactory(
+            text="#starting and #MixED with some #line\nendings also tags can\n#start on new line"
+        )
+        cls.invalid = ContentFactory(
+            text="#a!a #a#a #a$a #a%a #a^a #a&a #a*a #a+a #a.a #a,a #a@a #a£a #a/a #a(a #a)a #a=a #a?a #a`a #a'a #a\\a "
+                 "#a{a #a[a #a]a #a}a #a~a #a;a #a:a #a\"a #a’a #a”a"
+        )
+        cls.endings = ContentFactory(text="#parenthesis) #exp! #list]")
+        cls.prefixed = ContentFactory(text="(#foo [#bar")
+        cls.postfixed = ContentFactory(text="#foo) #bar] #hoo, #hee.")
+        cls.code = ContentFactory(text="foo\n```\n#code\n```\n#notcode\n\n    #alsocode\n")
 
     def test_factory_instance_has_tags(self):
         self.assertTrue(Tag.objects.filter(name="tag").exists())
@@ -185,6 +197,45 @@ class TestContentExtractTags(TestCase):
         self.assertEquals(self.content.tags.count(), 2)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "third"})
+
+    def test_all_tags_are_parsed_from_text(self):
+        tags = set(self.text.tags.values_list("name", flat=True))
+        self.assertEqual(
+            tags,
+            {"starting", "mixed", "line", "start"}
+        )
+
+    def test_invalid_text_returns_no_tags(self):
+        tags = set(self.invalid.tags.values_list("name", flat=True))
+        self.assertEqual(tags, set())
+
+    def test_endings_are_filtered_out(self):
+        tags = set(self.endings.tags.values_list("name", flat=True))
+        self.assertEqual(
+            tags,
+            {"parenthesis", "exp", "list"}
+        )
+
+    def test_prefixed_tags(self):
+        tags = set(self.prefixed.tags.values_list("name", flat=True))
+        self.assertEqual(
+            tags,
+            {"foo", "bar"}
+        )
+
+    def test_postfixed_tags(self):
+        tags = set(self.postfixed.tags.values_list("name", flat=True))
+        self.assertEqual(
+            tags,
+            {"foo", "bar", "hoo", "hee"}
+        )
+
+    def test_code_block_tags_ignored(self):
+        tags = set(self.code.tags.values_list("name", flat=True))
+        self.assertEqual(
+            tags,
+            {"notcode"}
+        )
 
 
 @pytest.mark.usefixtures("db")

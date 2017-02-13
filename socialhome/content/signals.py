@@ -59,8 +59,8 @@ def fetch_preview(instance, **kwargs):
 
 
 @receiver(post_save, sender=Content)
-def extract_tags(instance, **kwargs):
+def render_content(instance, **kwargs):
     try:
-        instance.extract_tags()
+        instance.render()
     except Exception as ex:
-        logger.exception("Failed to extract tags for %s: %s", instance, ex)
+        logger.exception("Failed to render text for %s: %s", instance, ex)

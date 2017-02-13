@@ -49,7 +49,6 @@ class TestProfile(object):
         current_public_key = profile.rsa_public_key
         profile.generate_new_rsa_key()
         profile.save()
-        profile.refresh_from_db()
         assert profile.rsa_private_key !=  current_rsa_key
         assert profile.rsa_public_key != current_public_key
 

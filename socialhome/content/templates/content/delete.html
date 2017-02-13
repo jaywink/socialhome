@@ -10,7 +10,7 @@
         {% trans "Confirm delete" %}
     </h1>
     <div>
-        {{ content|safe }}
+        {{ content.rendered|safe }}
     </div>
     <form method="post">
         {% csrf_token %}

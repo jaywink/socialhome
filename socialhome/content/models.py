@@ -14,7 +14,7 @@ from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
-from socialhome.content.utils import make_nsfw_safe
+from socialhome.content.utils import make_nsfw_safe, test_tag
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.utils import safe_clear_cached_property
@@ -76,6 +76,8 @@ class Tag(models.Model):
 
 class Content(models.Model):
     text = models.TextField(_("Text"), blank=True)
+    rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
+
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
@@ -119,12 +121,9 @@ class Content(models.Model):
         self.fix_local_uploads()
         return super(Content, self).save(*args, **kwargs)
 
-    def extract_tags(self):
+    def save_tags(self, tags):
         """Extract tags from the content."""
         current = set(self.tags.values_list("name", flat=True))
-        tags = re.findall(r"#([a-zA-Z0-9-_]+)", self.text)
-        # Fix the tags and make a set
-        tags = set([tag.strip().lower() for tag in tags])
         if tags == current:
             return
         to_add = tags - current
@@ -138,7 +137,6 @@ class Content(models.Model):
     def bust_cache(self):
         """Clear relevant caches for this instance."""
         safe_clear_cached_property(self, "is_nsfw")
-        safe_clear_cached_property(self, "rendered")
 
     @cached_property
     def is_nsfw(self):
@@ -157,7 +155,7 @@ class Content(models.Model):
         return self.created
 
     def render(self):
-        text = self.get_text_with_urlized_tags()
+        text = self.get_and_linkify_tags()
         rendered = commonmark(text).strip()
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
@@ -170,18 +168,51 @@ class Content(models.Model):
                 rendered,
                 render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
             )
-        return rendered
+        self.rendered = rendered
+        Content.objects.filter(id=self.id).update(rendered=rendered)
 
-    def get_text_with_urlized_tags(self):
-        """Return text with tags converted to Markdown urls."""
-        text = self.text
-        for tag in self.tags.values_list("name", flat=True):
-            text = text.replace("#%s" % tag, "[#%s](%s)" % (tag, reverse("streams:tags", kwargs={"name": tag})))
+    def get_and_linkify_tags(self):
+        """Find tags in text and convert them to Markdown links.
+
+        Save found tags to the content.
+        """
+        found_tags = set()
+        lines = self.text.splitlines(keepends=True)
+        final_words = []
+        code_block = False
+        # Check each line separately
+        for line in lines:
+            if line[0:3] == "```":
+                code_block = not code_block
+            if line.find("#") == -1 or line[0:4] == "    " or code_block:
+                # Just add the whole line
+                final_words.append(line)
+                continue
+            # Check each word separately
+            words = line.split(" ")
+            for word in words:
+                candidate = word.strip().strip("([]),.!?:")
+                if candidate.startswith("#"):
+                    candidate = candidate.strip("#").lower()
+                    if test_tag(candidate):
+                        # Tag
+                        found_tags.add(candidate)
+                        tag_word = word.replace(
+                            "#%s" % candidate,
+                            "[#%s](%s)" % (
+                                candidate,
+                                reverse("streams:tags", kwargs={"name": candidate.lower()})
+                            )
+                        )
+                        final_words.append(tag_word)
+                    else:
+                        # Not tag
+                        final_words.append(word)
+                else:
+                    final_words.append(word)
+        text = " ".join(final_words)
+        self.save_tags(found_tags)
         return text
-
-    @cached_property
-    def rendered(self):
-        return self.render()
 
     @staticmethod
     def get_contents_for_user(ids, user):

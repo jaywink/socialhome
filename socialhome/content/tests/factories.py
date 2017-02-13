@@ -1,8 +1,15 @@
 import factory
 from factory import fuzzy
 
-from socialhome.content.models import Content, OEmbedCache, OpenGraphCache
+from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
+
+
+class TagFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Tag
+
+    name = factory.Faker("user_name")
 
 
 class ContentFactory(factory.DjangoModelFactory):
