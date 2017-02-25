@@ -122,7 +122,7 @@ class Content(models.Model):
         return super(Content, self).save(*args, **kwargs)
 
     def save_tags(self, tags):
-        """Extract tags from the content."""
+        """Save given tag relations."""
         current = set(self.tags.values_list("name", flat=True))
         if tags == current:
             return
@@ -155,6 +155,7 @@ class Content(models.Model):
         return self.created
 
     def render(self):
+        """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
         rendered = commonmark(text).strip()
         if self.is_nsfw:

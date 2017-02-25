@@ -74,12 +74,7 @@ def find_urls_in_text(text):
 
 
 def test_tag(tag):
-    """Test and clean a given tag
-
-    A tag is invalid if it contains illegal characters, except if the illegal
-    character is at the end, in which case we just strip it. This allows for tags
-    ending in special characters like question marks still to be recognized.
-    """
+    """Test a word whether it could be accepted as a tag."""
     if not tag:
         return False
     for char in ILLEGAL_TAG_CHARS:
