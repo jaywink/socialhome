@@ -1,5 +1,5 @@
 [run]
 include = socialhome/*
-omit = *migrations*, *tests*
+omit = *migrations*, *tests*, *scripts*
 plugins =
     django_coverage_plugin
