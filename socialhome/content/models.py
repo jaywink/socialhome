@@ -57,7 +57,6 @@ class TagQuerySet(models.QuerySet):
 class Tag(models.Model):
     name = models.CharField(_("Name"), max_length=255, unique=True)
     created = AutoCreatedField(_('Created'))
-    modified = AutoLastModifiedField(_('Modified'))
 
     objects = TagQuerySet.as_manager()
 
