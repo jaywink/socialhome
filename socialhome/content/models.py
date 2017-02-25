@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 from django.template.loader import render_to_string
+from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -196,14 +197,19 @@ class Content(models.Model):
                     if test_tag(candidate):
                         # Tag
                         found_tags.add(candidate)
-                        tag_word = word.replace(
-                            "#%s" % candidate,
-                            "[#%s](%s)" % (
-                                candidate,
-                                reverse("streams:tags", kwargs={"name": candidate.lower()})
+                        try:
+                            tag_word = word.replace(
+                                "#%s" % candidate,
+                                "[#%s](%s)" % (
+                                    candidate,
+                                    reverse("streams:tags", kwargs={"name": candidate.lower()})
+                                )
                             )
-                        )
-                        final_words.append(tag_word)
+                            final_words.append(tag_word)
+                        except NoReverseMatch:
+                            # Don't linkify, seems we can't generate an url for it
+                            # TODO: throw to opbeat or just logger?
+                            final_words.append(word)
                     else:
                         # Not tag
                         final_words.append(word)
