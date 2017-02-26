@@ -4,7 +4,7 @@ import bleach
 from bs4 import BeautifulSoup
 
 
-ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—"
+ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
 
 
 def safe_text_for_markdown(text):

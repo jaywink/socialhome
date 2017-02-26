@@ -167,7 +167,7 @@ class TestContentSaveTags(TestCase):
         )
         cls.invalid = ContentFactory(
             text="#a!a #a#a #a$a #a%a #a^a #a&a #a*a #a+a #a.a #a,a #a@a #a£a #a/a #a(a #a)a #a=a #a?a #a`a #a'a #a\\a "
-                 "#a{a #a[a #a]a #a}a #a~a #a;a #a:a #a\"a #a’a #a”a"
+                 "#a{a #a[a #a]a #a}a #a~a #a;a #a:a #a\"a #a’a #a”a #\xa0cd"
         )
         cls.endings = ContentFactory(text="#parenthesis) #exp! #list]")
         cls.prefixed = ContentFactory(text="(#foo [#bar")
