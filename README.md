@@ -4,7 +4,7 @@
 
 A federated social home. Provides home page functionality and federates with other federated social networks using the Diaspora protocol.
 
-See an example site: https://jasonrobinson.me
+Official demo site: https://socialhome.network
 
 ## Status
 
@@ -14,7 +14,7 @@ Alpha. Only limited functionality. Here be dragons.
 
 ### Are there any public servers?
 
-Currently no, since the software is very alpha. Plan is to set up a public demo server soon.
+Yes, the official demo site is at https://socialhome.network. Feel free to play around, however note that the software is still in early stages and even though attempts will be made to keep the data while doing development, no guarantees can be made.
 
 ### How do I deploy it, can I just copy the files to a web server?
 
