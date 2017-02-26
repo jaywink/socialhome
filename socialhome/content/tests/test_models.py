@@ -76,8 +76,8 @@ class TestContentModel(TestCase):
         self.assertEqual(content.rendered, "<p>foobar</p>%s" % rendered_og)
 
     def test_renders_linkified_tags(self):
-        content = ContentFactory(text="#tag")
-        self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a></p>')
+        content = ContentFactory(text="#tag #MiXeD")
+        self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a> <a href="/tags/mixed/">#MiXeD</a></p>')
 
     def test_get_contents_for_unauthenticated_user(self):
         user = AnonymousUser()

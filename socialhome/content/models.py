@@ -194,10 +194,10 @@ class Content(models.Model):
             for word in words:
                 candidate = word.strip().strip("([]),.!?:")
                 if candidate.startswith("#"):
-                    candidate = candidate.strip("#").lower()
-                    if test_tag(candidate):
+                    candidate = candidate.strip("#")
+                    if test_tag(candidate.lower()):
                         # Tag
-                        found_tags.add(candidate)
+                        found_tags.add(candidate.lower())
                         try:
                             tag_word = word.replace(
                                 "#%s" % candidate,
