@@ -63,7 +63,7 @@ class TestFederateContentRetraction(TestCase):
         mock_send.reset_mock()
         content_id = content.id
         content.delete()
-        mock_send.assert_called_once_with(send_content_retraction, content_id, content.author_id)
+        mock_send.assert_called_once_with(send_content_retraction, content, content.author_id)
 
     @patch("socialhome.content.signals.django_rq.enqueue", side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")

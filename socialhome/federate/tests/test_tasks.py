@@ -90,33 +90,33 @@ class TestSendContentRetraction(TestCase):
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):
-        send_content_retraction(self.limited_content.id, self.limited_content.author_id)
+        send_content_retraction(self.limited_content, self.limited_content.author_id)
         mock_maker.assert_not_called()
-        send_content_retraction(self.public_content.id, self.public_content.author_id)
+        send_content_retraction(self.public_content, self.public_content.author_id)
         mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
 
     @patch("socialhome.federate.tasks.handle_create_payload")
     @patch("socialhome.federate.tasks.send_document", return_value=None)
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
     def test_handle_create_payload_is_called(self, mock_maker, mock_sender, mock_handler):
-        send_content_retraction(self.public_content.id, self.public_content.author_id)
+        send_content_retraction(self.public_content, self.public_content.author_id)
         mock_handler.assert_called_once_with("entity", self.public_content.author)
 
     @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
     @patch("socialhome.federate.tasks.send_document", return_value=None)
     def test_send_document_is_called(self, mock_sender, mock_payloader):
-        send_content_retraction(self.public_content.id, self.public_content.author_id)
+        send_content_retraction(self.public_content, self.public_content.author_id)
         url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
         mock_sender.assert_called_once_with(url, "payload")
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
     def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
-        send_content_retraction(self.public_content.id, self.public_content.author_id)
+        send_content_retraction(self.public_content, self.public_content.author_id)
         self.assertTrue(mock_logger.called)
 
     @override_settings(DEBUG=True)
     @patch("socialhome.federate.tasks.handle_create_payload")
     def test_content_not_sent_in_debug_mode(self, mock_payload):
-        send_content_retraction(self.public_content.id, self.public_content.author_id)
+        send_content_retraction(self.public_content, self.public_content.author_id)
         mock_payload.assert_not_called()
