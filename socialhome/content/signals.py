@@ -15,52 +15,56 @@ logger = logging.getLogger("socialhome")
 
 
 @receiver(post_save, sender=Content)
-def notify_listeners(sender, **kwargs):
+def content_post_save(instance, **kwargs):
+    fetch_preview(instance)
+    render_content(instance)
     if kwargs.get("created"):
-        content = kwargs.get("instance")
-        if content.visibility == Visibility.PUBLIC:
-            StreamConsumer.group_send("streams_public", json.dumps({
-                "event": "new",
-                "id": content.id,
-            }))
+        notify_listeners(instance)
+    if instance.is_local:
+        federate_content(instance)
 
 
-@receiver(post_save, sender=Content)
-def federate_content(sender, **kwargs):
+@receiver(post_delete, sender=Content)
+def federate_content_retraction(instance, **kwargs):
+    """Send out local content retractions to the federation layer."""
+    if instance.is_local:
+        try:
+            django_rq.enqueue(send_content_retraction, instance, instance.author_id)
+        except Exception as ex:
+            logger.exception("Failed to federate_content_retraction %s: %s", instance, ex)
+
+
+def fetch_preview(content):
+    try:
+        fetch_content_preview(content)
+    except Exception as ex:
+        logger.exception("Failed to fetch content preview for %s: %s", content, ex)
+
+
+def render_content(content):
+    content.refresh_from_db()
+    try:
+        content.render()
+    except Exception as ex:
+        logger.exception("Failed to render text for %s: %s", content, ex)
+
+
+def notify_listeners(content):
+    """Send out to listening consumers."""
+    # TODO: add sending for tags and pinned user profile content
+    if content.visibility == Visibility.PUBLIC:
+        StreamConsumer.group_send("streams_public", json.dumps({
+            "event": "new",
+            "id": content.id,
+        }))
+
+
+def federate_content(content):
     """Send out local content to the federation layer.
 
     Yes, edits also. The federation layer should decide whether these are really worth sending out.
     """
-    content = kwargs.get("instance")
-    if content.is_local:
-        try:
-            django_rq.enqueue(send_content, content.id)
-        except Exception as ex:
-            logger.exception("Failed to federate_content %s: %s", content, ex)
-
-
-@receiver(post_delete, sender=Content)
-def federate_content_retraction(sender, **kwargs):
-    """Send out local content retractions to the federation layer."""
-    content = kwargs.get("instance")
-    if content.is_local:
-        try:
-            django_rq.enqueue(send_content_retraction, content.id, content.author_id)
-        except Exception as ex:
-            logger.exception("Failed to federate_content_retraction %s: %s", content, ex)
-
-
-@receiver(post_save, sender=Content)
-def fetch_preview(instance, **kwargs):
     try:
-        fetch_content_preview(instance)
+        django_rq.enqueue(send_content, content.id)
     except Exception as ex:
-        logger.exception("Failed to fetch content preview for %s: %s", instance, ex)
-
-
-@receiver(post_save, sender=Content)
-def extract_tags(instance, **kwargs):
-    try:
-        instance.extract_tags()
-    except Exception as ex:
-        logger.exception("Failed to extract tags for %s: %s", instance, ex)
+        logger.exception("Failed to federate_content %s: %s", content, ex)

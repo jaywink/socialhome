@@ -4,6 +4,9 @@ import bleach
 from bs4 import BeautifulSoup
 
 
+ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
+
+
 def safe_text_for_markdown(text):
     """Clean the text using bleach but keep certain Markdown sections.
 
@@ -68,3 +71,13 @@ def find_urls_in_text(text):
     urls = re.findall(r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text) + \
            re.findall(r'(?<=[ \n]{1})https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text)
     return urls
+
+
+def test_tag(tag):
+    """Test a word whether it could be accepted as a tag."""
+    if not tag:
+        return False
+    for char in ILLEGAL_TAG_CHARS:
+        if char in tag:
+            return False
+    return True

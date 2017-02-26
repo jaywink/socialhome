@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
@@ -17,7 +17,7 @@ class UserDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         """Render ProfileDetailView for this user."""
-        profile = Profile.objects.get(user__username=kwargs.get("username"))
+        profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
         return ProfileDetailView.as_view()(request, guid=profile.guid)
 
 
@@ -25,10 +25,11 @@ class ProfileDetailView(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
+    template_name = "streams/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        context["contents"] = self._get_contents_queryset()
+        context["content_list"] = self._get_contents_queryset()
         return context
 
     def _get_contents_queryset(self):
@@ -60,6 +61,7 @@ class ProfileDetailView(AccessMixin, DetailView):
             elif self.target_profile.visibility in (Visibility.SELF, Visibility.LIMITED) and \
                     request.user.profile == self.target_profile:
                 return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
+            self.raise_exception = True
         return self.handle_no_permission()
 
 

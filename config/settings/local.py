@@ -13,7 +13,11 @@ from .common import *  # noqa
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool('DJANGO_DEBUG', default=True)
-TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
+if env.bool('CI', default=False):
+    # Required by django_coverage_plugin
+    TEMPLATES[0]['OPTIONS']['debug'] = True
+else:
+    TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------

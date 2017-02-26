@@ -73,16 +73,11 @@ def send_content(content_id):
         logger.warning("No entity for %s", content)
 
 
-def send_content_retraction(content_id, author_id):
+def send_content_retraction(content, author_id):
     """Handle sending of retractions.
 
     Currently only for public content.
     """
-    try:
-        content = Content.objects.get(id=content_id)
-    except Content.DoesNotExist:
-        logger.warning("No content found with id %s", content_id)
-        return
     if not content.visibility == Visibility.PUBLIC:
         return
     author = Profile.objects.get(id=author_id)

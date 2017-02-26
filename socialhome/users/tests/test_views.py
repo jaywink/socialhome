@@ -88,8 +88,8 @@ class TestProfileDetailView(object):
     def test_get_context_data_contains_content_objects(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
         context = view.get_context_data()
-        assert context["contents"].count() == 3
-        context_objs = {content for content in context["contents"]}
+        assert context["content_list"].count() == 3
+        context_objs = {content for content in context["content_list"]}
         objs = set(contents)
         assert context_objs == objs
 
@@ -100,7 +100,7 @@ class TestProfileDetailView(object):
         user = UserFactory()
         ContentFactory(author=user.profile, pinned=True)
         context = view.get_context_data()
-        assert len(context["contents"]) == 0
+        assert len(context["content_list"]) == 0
 
     def test_detail_view_renders(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
@@ -239,11 +239,11 @@ class TestProfileVisibilityForLoggedInUsers(object):
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
-        assert response.status_code == 302
+        assert response.status_code == 403
         response = admin_client.get("/p/%s/" % admin.profile.guid)
         assert response.status_code == 200
         response = admin_client.get("/p/%s/" % user.profile.guid)
-        assert response.status_code == 302
+        assert response.status_code == 403
 
     def test_visible_to_limited_profile(self, admin_client):
         admin = User.objects.get(username="admin")
@@ -253,11 +253,11 @@ class TestProfileVisibilityForLoggedInUsers(object):
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
-        assert response.status_code == 302
+        assert response.status_code == 403
         response = admin_client.get("/p/%s/" % admin.profile.guid)
         assert response.status_code == 200
         response = admin_client.get("/p/%s/" % user.profile.guid)
-        assert response.status_code == 302
+        assert response.status_code == 403
 
     def test_visible_to_site_profile(self, admin_client):
         admin = User.objects.get(username="admin")
