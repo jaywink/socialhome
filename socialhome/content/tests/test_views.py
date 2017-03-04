@@ -10,17 +10,29 @@ from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures("admin_client", "settings")
+@pytest.mark.usefixtures("db")
 class TestRootProfile(object):
-    def test_home_view_rendered_without_root_profile(self, admin_client, settings):
+    @pytest.mark.usefixtures("client", "settings")
+    def test_home_view_rendered_without_root_profile(self, client, settings):
         settings.SOCIALHOME_ROOT_PROFILE = None
-        response = admin_client.get("/")
+        response = client.get("/")
         assert response.templates[0].name == "pages/home.html"
 
-    def test_home_view_rendered_with_root_profile(self, admin_client, settings):
-        settings.SOCIALHOME_ROOT_PROFILE = "admin"
+    @pytest.mark.usefixtures("admin_client", "settings")
+    def test_logged_in_profile_view_rendered_without_root_profile(self, admin_client, settings):
+        settings.SOCIALHOME_ROOT_PROFILE = None
         response = admin_client.get("/")
         assert response.templates[0].name == "streams/profile.html"
+        assert response.context["profile"].user.username == "admin"
+
+    @pytest.mark.usefixtures("client", "admin_client", "settings")
+    def test_home_view_rendered_with_root_profile(self, client, admin_client, settings):
+        settings.SOCIALHOME_ROOT_PROFILE = "admin"
+        # Set admin profile visibility, otherwise it will just redirect to login
+        Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
+        response = client.get("/")
+        assert response.templates[0].name == "streams/profile.html"
+        assert response.context["profile"].user.username == "admin"
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
