@@ -69,7 +69,9 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
     def get(self, request, *args, **kwargs):
-        """Redirect to user detail view if root page is a profile."""
+        """Redirect to user detail view if root page is a profile or if the user is logged in"""
+        if request.user.is_authenticated:
+            return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
         if settings.SOCIALHOME_ROOT_PROFILE:
             profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
             return ProfileDetailView.as_view()(request, guid=profile.guid)
