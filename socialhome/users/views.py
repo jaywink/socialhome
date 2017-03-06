@@ -50,7 +50,7 @@ class ProfileDetailView(AccessMixin, DetailView):
 
         Redirect to login if not allowed to see profile.
         """
-        self.target_profile = Profile.objects.get(guid=self.kwargs.get("guid"))
+        self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
         if self.target_profile.visibility == Visibility.PUBLIC:
             return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
         if request.user.is_authenticated():
