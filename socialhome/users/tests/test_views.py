@@ -65,7 +65,7 @@ class TestProfileUpdateView(BaseUserTestCase):
         )
 
 
-@pytest.mark.usefixtures("admin_client", "rf")
+@pytest.mark.usefixtures("admin_client", "rf", "admin_user")
 class TestProfileDetailView(object):
     def _get_request_view_and_content(self, rf, create_content=True):
         request = rf.get("/")
@@ -106,6 +106,17 @@ class TestProfileDetailView(object):
         request, view, contents, profile = self._get_request_view_and_content(rf)
         response = admin_client.get(profile.get_absolute_url())
         assert response.status_code == 200
+
+    def test_detail_view_has_no_organize_content_button_if_no_content(self, admin_client, rf, admin_user):
+        request = rf.get("/")
+        request.user = admin_user
+        admin_profile = admin_user.profile
+        Profile.objects.filter(id=admin_profile.id).update(visibility=Visibility.PUBLIC)
+        response = admin_client.get(admin_profile.get_absolute_url())
+        assert str(response.content).find("Organize profile content") == -1
+        ContentFactory(author=admin_profile, pinned=True)
+        response = admin_client.get(admin_profile.get_absolute_url())
+        assert str(response.content).find("Organize profile content") > -1
 
     def test_contents_queryset_returns_public_only_for_unauthenticated(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf, create_content=False)
