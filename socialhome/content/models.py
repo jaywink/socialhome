@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from django.db.models.aggregates import Max
 
 from socialhome.content.utils import make_nsfw_safe, test_tag
 from socialhome.enums import Visibility
@@ -114,10 +115,17 @@ class Content(models.Model):
         if self.pk:
             # Old instance, bust the cache
             self.bust_cache()
-        elif author:
-            # New with author, set a GUID and author
-            self.guid = uuid4()
-            self.author = author
+        else:
+            if author:
+                # New with author, set a GUID and author
+                self.guid = uuid4()
+                self.author = author
+
+            if self.pinned:
+                max_order = Content.objects.filter(author=self.author).aggregate(Max("order"))["order__max"]
+                if max_order is not None:  # If max_order is None, there is likely to be no content yet
+                    self.order = max_order + 1
+
         self.fix_local_uploads()
         return super(Content, self).save(*args, **kwargs)
 

@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from test_plus.test import TestCase
 
+from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
@@ -80,6 +81,9 @@ class TestProfileDetailView(object):
                 ContentFactory(author=profile, order=2, pinned=True),
                 ContentFactory(author=profile, order=1, pinned=True),
             ])
+            Content.objects.filter(id=contents[0].id).update(order=3)
+            Content.objects.filter(id=contents[1].id).update(order=2)
+            Content.objects.filter(id=contents[2].id).update(order=1)
         view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
         view.object = profile
         view.target_profile = profile
@@ -174,6 +178,9 @@ class TestOrganizeContentUserDetailView(object):
                 ContentFactory(author=profile, order=2, pinned=True),
                 ContentFactory(author=profile, order=1, pinned=True),
             ])
+            Content.objects.filter(id=contents[0].id).update(order=3)
+            Content.objects.filter(id=contents[1].id).update(order=2)
+            Content.objects.filter(id=contents[2].id).update(order=1)
         view = OrganizeContentProfileDetailView(request=request)
         view.object = profile
         view.target_profile = profile
@@ -199,7 +206,8 @@ class TestOrganizeContentUserDetailView(object):
     def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
         request, view, contents, profile = self._get_request_view_and_content(rf)
         other_user = UserFactory()
-        other_content = ContentFactory(author=other_user.profile, order=100, pinned=True)
+        other_content = ContentFactory(author=other_user.profile, pinned=True)
+        Content.objects.filter(id=other_content.id).update(order=100)
         view._save_sort_order([other_content.id])
         other_content.refresh_from_db()
         assert other_content.order == 100
