@@ -12,7 +12,9 @@
         <div class="stamped">
             <a class="btn btn-primary" href="{% url 'users:profile-update' %}">{% trans "Settings" %}</a>
             <a class="btn btn-primary" href="{% url 'account_email' %}">{% trans "Email" %}</a>
-            <a class="btn btn-primary" href="{% url 'users:profile-organize' %}">{% trans "Organize profile content" %}</a>
+            {% if content_list %}
+                <a class="btn btn-primary" href="{% url 'users:profile-organize' %}">{% trans "Organize profile content" %}</a>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}
