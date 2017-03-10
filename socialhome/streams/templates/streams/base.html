@@ -24,13 +24,15 @@
                     <div class="gutter-sizer"></div>
                     {% for content in content_list %}
                         <div class="grid-item">
-                            <div class="grid-item-actions text-sm-right">
+                            {{ content.rendered|safe }}
+                            <div class="grid-item-bar">
+                                <span title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
                                 {% if content.author == request.user.profile %}
-                                    <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" aria-label="{% trans "Update" %}"></i></a>
-                                    <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" aria-label="{% trans "Delete" %}"></i></a>
+                                    &nbsp;
+                                    <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
+                                    <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
                                 {% endif %}
                             </div>
-                            {{ content.rendered|safe }}
                         </div>
                     {% endfor %}
                 </div>

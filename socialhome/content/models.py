@@ -1,6 +1,8 @@
+import datetime
 import re
 from uuid import uuid4
 
+import arrow
 from CommonMark import commonmark
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -161,6 +163,27 @@ class Content(models.Model):
         if self.remote_created:
             return self.remote_created
         return self.created
+
+    @property
+    def edited(self):
+        """Determine whether Content has been edited.
+
+        Because we do multiple saves in some cases on creation, for example for oEmbed or OpenGraph,
+        and a remote content could be delivered multiple times within a short time period, for example via
+        relay and original node, we allow 15 minutes before deciding that the content has been edited.
+
+        TODO: it would make sense to store an "edited" flag on the model itself.
+        """
+        return self.modified > self.created + datetime.timedelta(minutes=15)
+
+    @property
+    def humanized_timestamp(self):
+        """Human readable timestamp ie '2 hours ago'."""
+        return arrow.get(self.modified).humanize()
+
+    @property
+    def formatted_timestamp(self):
+        return arrow.get(self.modified).format()
 
     def render(self):
         """Pre-render text to Content.rendered."""
