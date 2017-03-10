@@ -16,11 +16,12 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="grid">
-                    <div class="grid-sizer"></div>
                     <div class="stamped">
                         {% block stream_description %}{% endblock %}
                     </div>
                     {% block stream_actions %}{% endblock %}
+                    <div class="grid-sizer"></div>
+                    <div class="gutter-sizer"></div>
                     {% for content in content_list %}
                         <div class="grid-item">
                             <div class="grid-item-actions text-sm-right">
