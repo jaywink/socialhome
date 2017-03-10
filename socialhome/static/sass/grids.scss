@@ -1,7 +1,8 @@
 @import "variables";
 
 .grid-item, .stamped {
-  background-color: #F1F1F1;
+  background-color: $light;
+  color: $dark;
 
   .grid-item-actions {
     font-size: small;
@@ -49,6 +50,7 @@
   .card {
     max-height: 100px;
     overflow: hidden;
+    color: $dark;
 
     .fa-arrows-alt {
       opacity: 0.6;
