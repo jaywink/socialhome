@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Dependency Status](https://gemnasium.com/badges/github.com/jaywink/socialhome.svg)](https://gemnasium.com/github.com/jaywink/socialhome) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master) [![](https://img.shields.io/badge/license-AGPLv3-red.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
+[![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Dependency Status](https://gemnasium.com/badges/github.com/jaywink/socialhome.svg)](https://gemnasium.com/github.com/jaywink/socialhome) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](http://webchat.freenode.net?channels=%23socialhome&uio=d4)
 
 # Socialhome
 
@@ -26,6 +26,10 @@ Unfortunately Socialhome is a bit more complex than that, being a Django project
 There is [an ansible role](https://github.com/jaywink/ansible-socialhome), if you are familiar with Ansible. But until something packaged is available like a Docker image, Socialhome will not be easy to deploy since it is a Django application that requires a full virtual server with root etc and system administration knowledge.
 
 Running a development server however is easy. Just set up your virtualenv and create a settings file as below. Then use the built-in Django runserver command as usual.
+
+### I have an idea or question - what to do?
+
+Either log an issue here on GitHub or jump on to [IRC FreeNode](http://webchat.freenode.net?channels=%23socialhome&uio=d4) and ask on **#socialhome**. Feedback, questions and ideas are always welcome!
 
 ## Development
 
