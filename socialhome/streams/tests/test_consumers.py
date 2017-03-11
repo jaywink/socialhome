@@ -36,6 +36,8 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "id": self.content.id,
                 "author": self.content.author.id,
                 "rendered": self.content.rendered,
+                "humanized_timestamp": self.content.humanized_timestamp,
+                "formatted_timestamp": self.content.formatted_timestamp,
             }
         ])
 

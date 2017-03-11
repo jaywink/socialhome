@@ -108,11 +108,15 @@ class TestContentModel(TestCase):
                 "id": self.public_content.id,
                 "author": self.public_content.author_id,
                 "rendered": "<p><strong>Foobar</strong></p>",
+                "humanized_timestamp": self.public_content.humanized_timestamp,
+                "formatted_timestamp": self.public_content.formatted_timestamp,
             },
             {
                 "id": self.site_content.id,
                 "author": self.site_content.author_id,
                 "rendered": "<p><em>Foobar</em></p>",
+                "humanized_timestamp": self.site_content.humanized_timestamp,
+                "formatted_timestamp": self.site_content.formatted_timestamp,
             }
         ])
 

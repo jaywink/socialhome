@@ -270,7 +270,9 @@ class Content(models.Model):
             rendered.append({
                 "id": content.id,
                 "author": content.author_id,
-                "rendered": content.rendered
+                "rendered": content.rendered,
+                "humanized_timestamp": content.humanized_timestamp,
+                "formatted_timestamp": content.formatted_timestamp,
             })
         return rendered
 
