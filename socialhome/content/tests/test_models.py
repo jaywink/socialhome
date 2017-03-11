@@ -153,6 +153,17 @@ class TestContentModel(TestCase):
         self.assertEqual(self.remote_content.effective_created, self.remote_content.remote_created)
         self.assertIsNotNone(self.remote_content.remote_created)
 
+    def test_content_saved_in_correct_order(self):
+        profile = ProfileFactory(guid="1234")
+        pinned_content_1 = Content(pinned=True, text="foobar")
+        pinned_content_2 = Content(pinned=True, text="foobar")
+        pinned_content_3 = Content(pinned=True, text="foobar")
+        pinned_content_1.save(author=profile)
+        pinned_content_2.save(author=profile)
+        pinned_content_3.save(author=profile)
+
+        assert [pinned_content_1.order, pinned_content_2.order, pinned_content_3.order] == [1, 2, 3]
+
 
 @pytest.mark.usefixtures("db")
 class TestContentSaveTags(TestCase):
