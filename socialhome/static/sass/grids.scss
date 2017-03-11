@@ -1,11 +1,11 @@
 @import "variables";
 
 .grid-item, .stamped {
-  background-color: #F1F1F1;
-  border-radius: 6px;
+  background-color: $light;
+  color: $dark;
 
-  .grid-item-actions {
-    font-size: small;
+  .grid-item-bar {
+    font-size: smaller;
     opacity: 0.5;
   }
 
@@ -14,42 +14,64 @@
   }
 }
 
+.stamped {
+  position: relative;
+  top: 10px;
+}
+@media all and (min-width: $mediumDevice) {
+  .stamped {
+    top: 11px;
+  }
+}
+@media all and (min-width: $largeDevice) {
+  .stamped {
+    top: 15px;
+  }
+}
+@media all and (min-width: $extraLargeDevice) {
+  .stamped {
+    top: 16px;
+  }
+}
+
 // Responsive grid sizes
 .grid-sizer,
 .grid-item, .stamped {
   width: 100%;
   padding: 2%;
-  margin: 1% 0;
+  margin-top: 1%;
 }
 @media all and (min-width: $mediumDevice) {
   .grid-sizer,
   .grid-item, .stamped {
-    width: 48%;
+    width: 49.5%;
     padding: 1%;
-    margin: 1%;
   }
 }
 @media all and (min-width: $largeDevice) {
   .grid-sizer,
   .grid-item, .stamped {
-    width: 32.1%;
+    width: 32.6%;
     padding: 1%;
-    margin: 0.5%;
   }
 }
 @media all and (min-width: $extraLargeDevice) {
   .grid-sizer,
   .grid-item, .stamped {
-    width: 24%;
+    width: 24.2%;
     padding: 0.5%;
-    margin: 0.5%;
   }
+}
+
+.gutter-sizer {
+  width: 1%;
 }
 
 .organize-content {
   .card {
     max-height: 100px;
     overflow: hidden;
+    color: $dark;
 
     .fa-arrows-alt {
       opacity: 0.6;

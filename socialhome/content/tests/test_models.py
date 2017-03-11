@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
 from django.utils.timezone import make_aware
+from freezegun import freeze_time
 from test_plus import TestCase
 
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
@@ -15,6 +16,7 @@ from socialhome.users.tests.factories import ProfileFactory
 
 
 @pytest.mark.usefixtures("db")
+@freeze_time("2017-03-11")
 class TestContentModel(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -107,11 +109,15 @@ class TestContentModel(TestCase):
                 "id": self.public_content.id,
                 "author": self.public_content.author_id,
                 "rendered": "<p><strong>Foobar</strong></p>",
+                "humanized_timestamp": self.public_content.humanized_timestamp,
+                "formatted_timestamp": self.public_content.formatted_timestamp,
             },
             {
                 "id": self.site_content.id,
                 "author": self.site_content.author_id,
                 "rendered": "<p><em>Foobar</em></p>",
+                "humanized_timestamp": self.site_content.humanized_timestamp,
+                "formatted_timestamp": self.site_content.formatted_timestamp,
             }
         ])
 
@@ -163,6 +169,19 @@ class TestContentModel(TestCase):
         pinned_content_3.save(author=profile)
 
         assert [pinned_content_1.order, pinned_content_2.order, pinned_content_3.order] == [1, 2, 3]
+
+    def test_edited_is_false_for_newly_created_content(self):
+        self.assertFalse(self.public_content.edited)
+
+    def test_edited_is_false_for_newly_created_content_within_15_minutes_grace_period(self):
+        with freeze_time(self.public_content.created + datetime.timedelta(minutes=14)):
+            self.public_content.save()
+            self.assertFalse(self.public_content.edited)
+
+    def test_edited_is_true_for_newly_created_content_after_15_minutes_grace_period(self):
+        with freeze_time(self.public_content.created + datetime.timedelta(minutes=16)):
+            self.public_content.save()
+            self.assertTrue(self.public_content.edited)
 
 
 @pytest.mark.usefixtures("db")

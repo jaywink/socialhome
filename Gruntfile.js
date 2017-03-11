@@ -40,7 +40,7 @@ module.exports = function (grunt) {
             },
             sass: {
                 files: ['<%= paths.sass %>/**/*.{scss,sass}'],
-                tasks: ['sass:dev'],
+                tasks: ['sass:dev', 'concat', 'copy'],
                 options: {
                     atBegin: true
                 }

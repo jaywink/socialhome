@@ -4,12 +4,14 @@ from unittest.mock import patch
 import pytest
 from channels.tests import ChannelTestCase, Client
 from django.test import SimpleTestCase
+from freezegun import freeze_time
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.streams.consumers import StreamConsumer
 
 
 @pytest.mark.usefixtures("db")
+@freeze_time("2017-03-11")
 class TestStreamConsumerReceive(ChannelTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -36,6 +38,8 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "id": self.content.id,
                 "author": self.content.author.id,
                 "rendered": self.content.rendered,
+                "humanized_timestamp": self.content.humanized_timestamp,
+                "formatted_timestamp": self.content.formatted_timestamp,
             }
         ])
 

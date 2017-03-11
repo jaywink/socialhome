@@ -39,7 +39,8 @@ html {
 }
 
 body {
-  background-color: black;
+  background-color: $darker;
+  color: $lightish;
 }
 
 // Generic utility classes
@@ -49,5 +50,5 @@ body {
 
 // Main container
 .main-container {
-  margin-top: 40px;
+  margin-top: 60px;
 }

@@ -73,12 +73,18 @@ describe("Streams", function() {
             });
 
             it("adds new content to grid on content message", function(done) {
-                window.mockServer.send(
-                    '{"event": "content", "contents": [{"id": 1, ' +
-                    '"rendered": "adds new content"}]}'
-                );
+                var message = {
+                    event: "content",
+                    contents: [{
+                        id: 1, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
+                        formatted_timestamp: "2017-01-02 10:11:12+00:00"
+                    }]
+                };
+                window.mockServer.send(JSON.stringify(message));
                 setTimeout(function () {
                     expect($(".grid-item:contains('adds new content')").length).to.eq(1);
+                    expect($(".grid-item-bar > span:contains('2 minutes ago')").length).to.eq(1);
+                    expect($(".grid-item-bar > span[title='2017-01-02 10:11:12+00:00']").length).to.eq(1);
                     done();
                 }, 500);
             });

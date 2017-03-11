@@ -20,7 +20,13 @@ $(function () {
         },
 
         createContentElem: function(content) {
-            return $('<div class="grid-item">' + content + '</div>');
+            return $(
+                '<div class="grid-item">' + content.rendered +
+                    '<div class="grid-item-bar">' +
+                        '<span title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
+                    '</div>' +
+                '</div>'
+            );
         },
 
         addContentToGrid: function($contents) {
@@ -124,7 +130,7 @@ $(function () {
                     ids = [];
 
                 _.each(data.contents, function (content) {
-                    var $elem = view.createContentElem(content.rendered);
+                    var $elem = view.createContentElem(content);
                     $contents = $contents ? $contents.add($elem) : $elem;
                     ids.push(content.id);
                 });
