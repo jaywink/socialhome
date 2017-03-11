@@ -16,6 +16,7 @@ from socialhome.users.tests.factories import ProfileFactory
 
 
 @pytest.mark.usefixtures("db")
+@freeze_time("2017-03-11")
 class TestContentModel(TestCase):
     @classmethod
     def setUpTestData(cls):
