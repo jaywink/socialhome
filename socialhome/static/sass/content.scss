@@ -12,8 +12,13 @@
   text-decoration: none;
   color: #373a3c;
 
-  .card > .row {
+  .card {
     padding: 10px;
+
+    .opengraph-card-image {
+      float: left;
+      margin-right: 10px;
+    }
   }
 
   img {
