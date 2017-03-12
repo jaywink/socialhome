@@ -39,7 +39,10 @@ module.exports = function (grunt) {
                 files: ['Gruntfile.js']
             },
             sass: {
-                files: ['<%= paths.sass %>/**/*.{scss,sass}'],
+                files: [
+                    '<%= paths.sass %>/**/*.{scss,sass}',
+                    '<%= paths.js %>/**/*.js',
+                ],
                 tasks: ['sass:dev', 'concat', 'copy'],
                 options: {
                     atBegin: true

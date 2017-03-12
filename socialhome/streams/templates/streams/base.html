@@ -26,7 +26,7 @@
                         <div class="grid-item">
                             {{ content.rendered|safe }}
                             <div class="grid-item-bar">
-                                <span title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
+                                <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
                                 {% if content.author == request.user.profile %}
                                     &nbsp;
                                     <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
@@ -40,3 +40,23 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block modal %}
+    <div class="modal" id="content-modal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="" id="content-modal-profile-pic">
+                    <h5 id="content-modal-title" class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans "Close" %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="content-modal-body" class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

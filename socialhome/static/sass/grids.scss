@@ -3,10 +3,16 @@
 .grid-item, .stamped {
   background-color: $light;
   color: $dark;
+  overflow-wrap: break-word;
 
   .grid-item-bar {
     font-size: smaller;
     opacity: 0.5;
+
+    .grid-item-open-action {
+      text-decoration: none;
+      cursor: pointer;
+    }
   }
 
   img {

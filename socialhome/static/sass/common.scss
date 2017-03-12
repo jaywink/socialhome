@@ -52,3 +52,17 @@ body {
 .main-container {
   margin-top: 60px;
 }
+
+// Modals have a light background
+.modal {
+  color: $dark;
+
+  .modal-content {
+    border-radius: unset;
+  }
+}
+
+// Lose the rounding on buttons
+.btn {
+  border-radius: unset;
+}

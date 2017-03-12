@@ -20,3 +20,21 @@
     max-height: 60px;
   }
 }
+
+#content-modal {
+  overflow-wrap: break-word;
+
+  img {
+    max-width: 100%;
+
+    #content-modal-profile-pic {
+      max-width: 50px;
+      max-height: 50px;
+    }
+  }
+
+  #content-modal-title {
+    display: inline;
+    padding-left: 20px;
+  }
+}

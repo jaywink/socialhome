@@ -288,3 +288,13 @@ class Content(models.Model):
             ![](https://socialhome.domain/media/markdownx/12345.jpg
         """
         self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
+
+    @property
+    def dict_for_view(self):
+        return {
+            "id": self.id,
+            "rendered": self.rendered,
+            "author_name": self.author.name,
+            "author_handle": self.author.handle,
+            "author_image": self.author.image_url_small,
+        }

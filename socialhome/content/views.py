@@ -1,9 +1,9 @@
-from braces.views import UserPassesTestMixin
+from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
-from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, DetailView
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
@@ -63,6 +63,14 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("home")
+
+
+class ContentView(AjaxResponseMixin, JSONResponseMixin, DetailView):
+    model = Content
+
+    def get_ajax(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return self.render_json_response(self.object.dict_for_view)
 
 
 class HomeView(TemplateView):
