@@ -69,6 +69,7 @@ lxml==3.7.2
 pyembed==1.3.3
 python-opengraph==0.0.2
 arrow==0.10.0
+django-settings-export==1.1.0
 
 # IPython for administration
 ipython
