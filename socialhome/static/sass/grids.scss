@@ -3,7 +3,7 @@
 .grid-item, .stamped {
   background-color: $light;
   color: $dark;
-  overflow-wrap: break-word;
+  overflow: hidden;
 
   .grid-item-bar {
     font-size: smaller;
