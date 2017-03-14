@@ -23,7 +23,7 @@ $(function () {
             return $(
                 '<div class="grid-item">' + content.rendered +
                     '<div class="grid-item-bar">' +
-                        '<span title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
+                        '<span class="grid-item-open-action" data-content-id="' + content.id + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
                     '</div>' +
                 '</div>'
             );
@@ -85,12 +85,40 @@ $(function () {
             view.layoutMasonry();
             $elem.remove();
         },
+
+        showContentModal: function() {
+            $('#content-modal').modal('show');
+            // Close modal on esc key
+            $(document).keypress(function (e) {
+                if (e.keyCode == 27) {
+                    $('#content-modal').modal('hide');
+                }
+            });
+        },
+
+        cleanContentModal: function() {
+            $('#content-modal-title, #content-modal-body').html("");
+            $("#content-modal-profile-pic").attr("src", "");
+        },
+
+        loadContentModal: function(contentId) {
+            var content = $.getJSON(
+                "/content/" + contentId,
+                function(data) {
+                    $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
+                    $("#content-modal-body").html(data.rendered);
+                    $("#content-modal-profile-pic").attr("src", data.author_image);
+                    view.addNSFWShield();
+                }
+            );
+        },
     };
 
     var controller = {
         availableContent: [],
 
         init: function() {
+            this.addContentListeners();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
@@ -141,6 +169,7 @@ $(function () {
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
                 view.addContentToGrid($contents);
+                controller.addContentListeners();
             }
         },
 
@@ -151,7 +180,18 @@ $(function () {
             };
             controller.socket.send(JSON.stringify(data));
             view.scrollToTop();
-        }
+        },
+
+        loadContentModal: function(ev) {
+            var contentId = $(ev.currentTarget).data("content-id");
+            view.cleanContentModal();
+            view.showContentModal();
+            view.loadContentModal(contentId);
+        },
+
+        addContentListeners: function() {
+            $(".grid-item-open-action").off("click").click(this.loadContentModal);
+        },
     };
 
     if (typeof socialhomeStream !== "undefined") {

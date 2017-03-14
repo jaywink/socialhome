@@ -183,6 +183,15 @@ class TestContentModel(TestCase):
             self.public_content.save()
             self.assertTrue(self.public_content.edited)
 
+    def test_dict_for_view(self):
+        self.assertEqual(self.public_content.dict_for_view, {
+            "id": self.public_content.id,
+            "rendered": self.public_content.rendered,
+            "author_name": self.public_content.author.name,
+            "author_handle": self.public_content.author.handle,
+            "author_image": self.public_content.author.image_url_small,
+        })
+
 
 @pytest.mark.usefixtures("db")
 class TestContentSaveTags(TestCase):

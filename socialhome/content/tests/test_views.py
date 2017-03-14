@@ -1,5 +1,9 @@
+import json
+
 import pytest
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.client import Client
 
 from socialhome.enums import Visibility
 from socialhome.content.forms import ContentForm
@@ -174,3 +178,20 @@ class TestContentDeleteView(object):
         content = ContentFactory(author=user.profile)
         response = admin_client.post(reverse("content:delete", kwargs={"pk": content.id}))
         assert response.status_code == 404
+
+
+class TestContentView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.content = ContentFactory()
+        cls.client = Client()
+
+    def test_content_view_render_json_result(self):
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode("utf-8"))
+        self.assertEqual(self.content.dict_for_view, data)
