@@ -120,4 +120,40 @@ describe("Streams", function() {
             });
         });
     });
+
+    describe("modal", function() {
+        before(function() {
+            server = sinon.fakeServer.create();
+            var data = {
+                id: 1, rendered: "foobar", author_name: "sinon", author_handle: "mocha@stream_test",
+                author_image: "https://localhost/sinon.jpg",
+            };
+            server.respondWith(
+                "GET",
+                "/content/1",
+                [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
+            );
+        });
+
+        context("click on timestamp", function() {
+            it("opens up modal", function() {
+                var $modal = $(".modal-content");
+                expect($modal.is(":visible")).to.be.false;
+                $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
+                    done();
+                });
+                server.respond();
+                expect($modal.is(":visible")).to.be.true;
+                expect($("#content-modal-title:contains('sinon')").length).to.eq(1);
+                expect($("#content-modal-title:contains('mocha@stream_test')").length).to.eq(1);
+                expect($("#content-modal-body:contains('foobar')").length).to.eq(1);
+                expect($("#content-modal-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
+            });
+        });
+
+        after(function() {
+            server.restore();
+            $("#content-modal").modal("hide");
+        });
+    });
 });

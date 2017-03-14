@@ -107,7 +107,7 @@ $(function () {
                 function(data) {
                     $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
                     $("#content-modal-body").html(data.rendered);
-                    $("#content-modal-profile-pic").attr("src", data.author_image)
+                    $("#content-modal-profile-pic").attr("src", data.author_image);
                     view.addNSFWShield();
                 }
             );
