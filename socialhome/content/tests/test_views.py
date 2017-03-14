@@ -193,5 +193,5 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode("utf-8"))
         self.assertEqual(self.content.dict_for_view, data)
