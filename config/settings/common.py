@@ -226,6 +226,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 ACCOUNT_ADAPTER = 'socialhome.users.adapters.AccountAdapter'
+ACCOUNT_PRESERVE_USERNAME_CASING = False
 SOCIALACCOUNT_ADAPTER = 'socialhome.users.adapters.SocialAccountAdapter'
 
 # Custom user app defaults
