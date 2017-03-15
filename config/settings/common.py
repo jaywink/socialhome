@@ -164,10 +164,15 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'django_settings_export.settings_export',
                 # Your stuff: custom template context processors go here
             ],
         },
     },
+]
+
+SETTINGS_EXPORT = [
+    'ACCOUNT_ALLOW_REGISTRATION',
 ]
 
 # See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
