@@ -187,9 +187,18 @@ class TestContentView(TestCase):
         cls.content = ContentFactory()
         cls.client = Client()
 
-    def test_content_view_render_json_result(self):
+    def test_content_view_renders_json_result(self):
         response = self.client.get(
             reverse("content:view", kwargs={"pk": self.content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode("utf-8"))
+        self.assertEqual(self.content.dict_for_view, data)
+
+    def test_content_view_by_guid_renders_json_result(self):
+        response = self.client.get(
+            reverse("content:view-by-guid", kwargs={"guid": self.content.guid}),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)

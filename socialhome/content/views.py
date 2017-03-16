@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, DetailView
 
 from socialhome.content.forms import ContentForm
@@ -67,6 +68,12 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
 class ContentView(AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
+
+    def get_object(self, queryset=None):
+        guid = self.kwargs.get("guid")
+        if guid:
+            return get_object_or_404(Content, guid=guid)
+        return super().get_object(queryset=queryset)
 
     def get_ajax(self, request, *args, **kwargs):
         self.object = self.get_object()
