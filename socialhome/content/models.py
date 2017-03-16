@@ -292,7 +292,7 @@ class Content(models.Model):
     @property
     def dict_for_view(self):
         return {
-            "id": self.id,
+            "guid": self.guid,
             "rendered": self.rendered,
             "author_name": self.author.name,
             "author_handle": self.author.handle,

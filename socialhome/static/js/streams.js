@@ -23,7 +23,7 @@ $(function () {
             return $(
                 '<div class="grid-item">' + content.rendered +
                     '<div class="grid-item-bar">' +
-                        '<span class="grid-item-open-action" data-content-id="' + content.id + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
+                        '<span class="grid-item-open-action" data-content-guid="' + content.guid + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
                     '</div>' +
                 '</div>'
             );
@@ -101,9 +101,9 @@ $(function () {
             $("#content-modal-profile-pic").attr("src", "");
         },
 
-        loadContentModal: function(contentId) {
+        loadContentModal: function(contentGuid) {
             var content = $.getJSON(
-                "/content/" + contentId,
+                "/content/" + contentGuid,
                 function(data) {
                     $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
                     $("#content-modal-body").html(data.rendered);
@@ -183,10 +183,10 @@ $(function () {
         },
 
         loadContentModal: function(ev) {
-            var contentId = $(ev.currentTarget).data("content-id");
+            var contentGuid = $(ev.currentTarget).data("content-guid");
             view.cleanContentModal();
             view.showContentModal();
-            view.loadContentModal(contentId);
+            view.loadContentModal(contentGuid);
         },
 
         addContentListeners: function() {

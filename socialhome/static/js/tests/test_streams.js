@@ -125,12 +125,12 @@ describe("Streams", function() {
         before(function() {
             server = sinon.fakeServer.create();
             var data = {
-                id: 1, rendered: "foobar", author_name: "sinon", author_handle: "mocha@stream_test",
+                guid: "1234", rendered: "foobar", author_name: "sinon", author_handle: "mocha@stream_test",
                 author_image: "https://localhost/sinon.jpg",
             };
             server.respondWith(
                 "GET",
-                "/content/1",
+                "/content/1234",
                 [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
             );
         });
@@ -139,7 +139,7 @@ describe("Streams", function() {
             it("opens up modal", function() {
                 var $modal = $(".modal-content");
                 expect($modal.is(":visible")).to.be.false;
-                $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
+                $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
                     done();
                 });
                 server.respond();
