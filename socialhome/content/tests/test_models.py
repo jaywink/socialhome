@@ -185,7 +185,7 @@ class TestContentModel(TestCase):
 
     def test_dict_for_view(self):
         self.assertEqual(self.public_content.dict_for_view, {
-            "id": self.public_content.id,
+            "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
