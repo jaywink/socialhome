@@ -8,7 +8,7 @@ from django.test.client import Client
 from socialhome.enums import Visibility
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
@@ -184,7 +184,8 @@ class TestContentView(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.content = ContentFactory()
+        cls.content = LocalContentFactory(visibility=Visibility.PUBLIC)
+        cls.private_content = LocalContentFactory(visibility=Visibility.LIMITED)
         cls.client = Client()
 
     def test_content_view_renders_json_result(self):
@@ -204,3 +205,17 @@ class TestContentView(TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode("utf-8"))
         self.assertEqual(self.content.dict_for_view, data)
+
+    def test_content_view_returns_404_for_private_content_except_if_owned(self):
+        self.client.force_login(self.content.author.user)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.private_content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.private_content.author.user)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.private_content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)

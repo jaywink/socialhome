@@ -8,6 +8,7 @@ from django.views.generic import CreateView, UpdateView, TemplateView, DeleteVie
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
+from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView
 
@@ -38,7 +39,23 @@ class UserOwnsContentMixin(UserPassesTestMixin):
     def test_func(self, user):
         """Ensure user owns content."""
         object = self.get_object()
-        return bool(object) and object.author == user.profile
+        return (
+            bool(object) and hasattr(user, "profile") and object.author == user.profile
+        )
+
+
+class PublicOrOwnedByUserContentMixin(UserPassesTestMixin):
+    raise_exception = Http404
+
+    def test_func(self, user):
+        """Ensure content is public or user owns it."""
+        object = self.get_object()
+        return (
+            bool(object) and (
+                object.visibility == Visibility.PUBLIC or
+                (hasattr(user, "profile")  and object.author == user.profile)
+            )
+        )
 
 
 class ContentUpdateView(UserOwnsContentMixin, UpdateView):
@@ -66,7 +83,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-class ContentView(AjaxResponseMixin, JSONResponseMixin, DetailView):
+class ContentView(PublicOrOwnedByUserContentMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
 
     def get_object(self, queryset=None):
