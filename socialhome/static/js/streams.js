@@ -87,7 +87,11 @@ $(function () {
         },
 
         showContentModal: function() {
-            $('#content-modal').modal('show');
+            $('#content-modal').modal('show').on('hide.bs.modal', function (e) {
+                // Push navigation back one level when hiding the modal
+                history.back();
+                $('#content-modal').off("hide.bs.modal");
+            });
             // Close modal on esc key
             $(document).keypress(function (e) {
                 if (e.keyCode == 27) {
@@ -105,6 +109,9 @@ $(function () {
             var content = $.getJSON(
                 "/content/" + contentGuid,
                 function(data) {
+                    // Change URL to the content URL
+                    window.history.pushState({content: data.guid}, data.guid, "/content/" + data.guid);
+                    // Add content to the modal
                     $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
                     $("#content-modal-body").html(data.rendered);
                     $("#content-modal-profile-pic").attr("src", data.author_image);
