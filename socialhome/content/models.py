@@ -185,6 +185,10 @@ class Content(models.Model):
     def formatted_timestamp(self):
         return arrow.get(self.modified).format()
 
+    @property
+    def short_text(self):
+        return truncate_letters(self.text, 50)
+
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()

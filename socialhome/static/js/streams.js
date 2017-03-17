@@ -88,9 +88,8 @@ $(function () {
 
         showContentModal: function() {
             $('#content-modal').modal('show').on('hide.bs.modal', function (e) {
-                // Push navigation back one level when hiding the modal
-                history.back();
                 $('#content-modal').off("hide.bs.modal");
+                history.back();
             });
             // Close modal on esc key
             $(document).keypress(function (ev) {
@@ -105,8 +104,8 @@ $(function () {
         },
 
         cleanContentModal: function() {
-            $('#content-modal-title, #content-modal-body').html("");
-            $("#content-modal-profile-pic").attr("src", "");
+            $('#content-title, #content-body').html("");
+            $("#content-profile-pic").attr("src", "");
         },
 
         loadContentModal: function(contentGuid) {
@@ -116,9 +115,9 @@ $(function () {
                     // Change URL to the content URL
                     window.history.pushState({content: data.guid}, data.guid, "/content/" + data.guid);
                     // Add content to the modal
-                    $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
-                    $("#content-modal-body").html(data.rendered);
-                    $("#content-modal-profile-pic").attr("src", data.author_image);
+                    $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
+                    $("#content-body").html(data.rendered);
+                    $("#content-profile-pic").attr("src", data.author_image);
                     view.addNSFWShield();
                 }
             );
@@ -137,6 +136,7 @@ $(function () {
             this.socket.onclose = this.handleSocketClose;
             // Hide content modal on back navigation
             window.onpopstate = function(ev) {
+                $('#content-modal').off("hide.bs.modal");
                 view.hideContentModal();
             };
         },

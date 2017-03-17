@@ -85,6 +85,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
 class ContentView(PublicOrOwnedByUserContentMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
+    template_name = "content/detail.html"
 
     def get_object(self, queryset=None):
         guid = self.kwargs.get("guid")
