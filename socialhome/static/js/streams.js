@@ -93,11 +93,15 @@ $(function () {
                 $('#content-modal').off("hide.bs.modal");
             });
             // Close modal on esc key
-            $(document).keypress(function (e) {
-                if (e.keyCode == 27) {
-                    $('#content-modal').modal('hide');
+            $(document).keypress(function (ev) {
+                if (ev.keyCode == 27) {
+                    view.hideContentModal();
                 }
             });
+        },
+
+        hideContentModal: function() {
+            $('#content-modal').modal('hide');
         },
 
         cleanContentModal: function() {
@@ -131,6 +135,10 @@ $(function () {
             this.socket.onmessage = this.handleMessage;
             this.socket.onopen = this.handleSocketOpen;
             this.socket.onclose = this.handleSocketClose;
+            // Hide content modal on back navigation
+            window.onpopstate = function(ev) {
+                view.hideContentModal();
+            };
         },
 
         createConnection: function() {
