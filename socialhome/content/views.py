@@ -106,6 +106,6 @@ class HomeView(TemplateView):
         if request.user.is_authenticated:
             return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
         if settings.SOCIALHOME_ROOT_PROFILE:
-            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+            profile = get_object_or_404(Profile, user__username=settings.SOCIALHOME_ROOT_PROFILE)
             return ProfileDetailView.as_view()(request, guid=profile.guid)
         return super(HomeView, self).get(request, *args, **kwargs)

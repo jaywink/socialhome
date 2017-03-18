@@ -15,13 +15,5 @@
 
 {% block content %}
     <script>var socialhomeStream = "content-{{ content.guid }}";</script>
-    <div id="content-detail">
-        <div id="content-header">
-            <img src="{{ content.author.image_url_small }}" id="content-profile-pic">
-            <h5 id="content-title">{{ content.author.name }} &lt;{{ content.author.handle }}&gt;</h5>
-            <span class="pull-right" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
-        </div>
-        <div id="content-body">{{ content.rendered|safe }}</div>
-        {#<div id="content-footer"></div>#}
-    </div>
+    {% include "content/_content_detail.html" with modal=False content=content %}
 {% endblock %}

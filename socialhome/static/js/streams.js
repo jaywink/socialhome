@@ -106,6 +106,7 @@ $(function () {
         cleanContentModal: function() {
             $('#content-title, #content-body').html("");
             $("#content-profile-pic").attr("src", "");
+            $("#content-timestamp").attr("title", "").html("");
         },
 
         loadContentModal: function(contentGuid) {
@@ -118,6 +119,7 @@ $(function () {
                     $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
                     $("#content-body").html(data.rendered);
                     $("#content-profile-pic").attr("src", data.author_image);
+                    $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
                     view.addNSFWShield();
                 }
             );

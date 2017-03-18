@@ -273,6 +273,7 @@ class Content(models.Model):
         for content in contents:
             rendered.append({
                 "id": content.id,
+                "guid": content.guid,
                 "author": content.author_id,
                 "rendered": content.rendered,
                 "humanized_timestamp": content.humanized_timestamp,
@@ -295,10 +296,13 @@ class Content(models.Model):
 
     @property
     def dict_for_view(self):
+        humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         return {
             "guid": self.guid,
             "rendered": self.rendered,
             "author_name": self.author.name,
             "author_handle": self.author.handle,
             "author_image": self.author.image_url_small,
+            "humanized_timestamp": humanized_timestamp,
+            "formatted_timestamp": self.formatted_timestamp,
         }

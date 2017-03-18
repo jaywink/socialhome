@@ -36,6 +36,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         self.assertEqual(text["contents"], [
             {
                 "id": self.content.id,
+                "guid": self.content.guid,
                 "author": self.content.author.id,
                 "rendered": self.content.rendered,
                 "humanized_timestamp": self.content.humanized_timestamp,

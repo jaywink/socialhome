@@ -107,6 +107,7 @@ class TestContentModel(TestCase):
         self.assertEqual(contents, [
             {
                 "id": self.public_content.id,
+                "guid": self.public_content.guid,
                 "author": self.public_content.author_id,
                 "rendered": "<p><strong>Foobar</strong></p>",
                 "humanized_timestamp": self.public_content.humanized_timestamp,
@@ -114,6 +115,7 @@ class TestContentModel(TestCase):
             },
             {
                 "id": self.site_content.id,
+                "guid": self.site_content.guid,
                 "author": self.site_content.author_id,
                 "rendered": "<p><em>Foobar</em></p>",
                 "humanized_timestamp": self.site_content.humanized_timestamp,
@@ -190,6 +192,8 @@ class TestContentModel(TestCase):
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.image_url_small,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "formatted_timestamp": self.public_content.formatted_timestamp,
         })
 
 

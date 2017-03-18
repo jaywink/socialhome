@@ -28,8 +28,9 @@ a.opengraph-card {
   }
 }
 
-#content-modal, #content-detail {
+#content-modal {
   overflow-wrap: break-word;
+  color: $dark;
 
   img {
     max-width: 100%;
@@ -48,25 +49,10 @@ a.opengraph-card {
     display: inline;
     padding-left: 20px;
   }
-}
 
-// Modal type styling for content-detail
-#content-detail {
-  background-color: $white;
-  color: $dark;
-
-  #content-header {
+  .content-bar {
+    font-size: smaller;
+    opacity: 0.5;
     padding: 15px;
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-  #content-body {
-    padding: 15px;
-  }
-
-  #content-footer {
-    padding: 15px;
-    text-align: right;
-    border-top: 1px solid #e5e5e5;
   }
 }
