@@ -294,8 +294,7 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
 
-    @property
-    def dict_for_view(self):
+    def dict_for_view(self, request):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         return {
             "guid": self.guid,
@@ -305,4 +304,5 @@ class Content(models.Model):
             "author_image": self.author.image_url_small,
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
+            "is_author": bool(request.user.is_authenticated and self.author == request.user.profile),
         }

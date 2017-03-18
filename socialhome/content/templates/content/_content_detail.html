@@ -17,6 +17,11 @@
             </div>
             <div class="content-bar">
                 <span id="content-timestamp" title="{% if content %}{{ content.formatted_timestamp }}{% endif %}">{% if content %}{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}{% endif %}</span>
+                <span id="content-bar-actions" class="{% if not content or content.author != request.user.profile %}hidden{% endif %}">
+                    &nbsp;
+                    <a href="{% if content %}{% url "content:update" content.id %}{% endif %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
+                    <a href="{% if content %}{% url "content:delete" content.id %}{% endif %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
+                </span>
             </div>
             {% if modal %}
                 <div class="modal-footer">

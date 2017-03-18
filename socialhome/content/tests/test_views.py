@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock
 
 import pytest
 from django.core.urlresolvers import reverse
@@ -195,7 +196,7 @@ class TestContentView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(self.content.dict_for_view, data)
+        self.assertEqual(self.content.dict_for_view(Mock()), data)
 
     def test_content_view_by_guid_renders_json_result(self):
         response = self.client.get(
@@ -204,7 +205,7 @@ class TestContentView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(self.content.dict_for_view, data)
+        self.assertEqual(self.content.dict_for_view(Mock()), data)
 
     def test_content_view_returns_404_for_private_content_except_if_owned(self):
         self.client.force_login(self.content.author.user)

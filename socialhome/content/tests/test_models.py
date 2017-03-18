@@ -186,7 +186,7 @@ class TestContentModel(TestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_dict_for_view(self):
-        self.assertEqual(self.public_content.dict_for_view, {
+        self.assertEqual(self.public_content.dict_for_view(Mock()), {
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
@@ -194,6 +194,25 @@ class TestContentModel(TestCase):
             "author_image": self.public_content.author.image_url_small,
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
+            "is_author": False,
+        })
+
+    def test_dict_for_view_for_author(self):
+        request = Mock(
+            user=Mock(
+                is_authenticated=True,
+                profile=self.public_content.author,
+            )
+        )
+        self.assertEqual(self.public_content.dict_for_view(request), {
+            "guid": self.public_content.guid,
+            "rendered": self.public_content.rendered,
+            "author_name": self.public_content.author.name,
+            "author_handle": self.public_content.author.handle,
+            "author_image": self.public_content.author.image_url_small,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "formatted_timestamp": self.public_content.formatted_timestamp,
+            "is_author": True,
         })
 
 
