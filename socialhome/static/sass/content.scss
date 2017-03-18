@@ -34,6 +34,11 @@ a.opengraph-card {
   img {
     max-width: 100%;
   }
+
+  .modal-content {
+    border-radius: unset;
+  }
+
   #content-profile-pic {
     max-width: 50px;
     max-height: 50px;
