@@ -3,6 +3,14 @@
 
 {% block containertype %}container-fluid{% endblock %}
 
+{% block ogtags %}
+    <meta property="og:title" content="{% block stream_title %}{% endblock %} - {{ request.site.name }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://{{ request.site.domain }}{{ request.path }}" />
+    {# TODO fix logo #}
+    <meta property="og:image" content="https://socialhome.network/media/markdownx/74b37fa1-88d0-4e29-9fdc-8d07ba216f63.png" />
+{% endblock %}
+
 {% block content %}
     <script>var socialhomeStream = "{{ stream_name }}";</script>
     <div class="streams-container">
