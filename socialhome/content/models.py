@@ -258,7 +258,7 @@ class Content(models.Model):
     @staticmethod
     def get_contents_for_user(ids, user):
         contents = Content.objects.filter(id__in=ids)
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             contents = contents.filter(visibility=Visibility.PUBLIC)
         else:
             contents = contents.filter(

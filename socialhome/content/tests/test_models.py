@@ -220,7 +220,7 @@ class TestContentSaveTags(TestCase):
     def test_factory_instance_has_tags(self):
         self.assertTrue(Tag.objects.filter(name="tag").exists())
         self.assertTrue(Tag.objects.filter(name="othertag").exists())
-        self.assertEquals(self.content.tags.count(), 2)
+        self.assertEqual(self.content.tags.count(), 2)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "othertag"})
 
@@ -230,14 +230,14 @@ class TestContentSaveTags(TestCase):
         self.assertTrue(Tag.objects.filter(name="third").exists())
         self.assertTrue(Tag.objects.filter(name="post").exists())
         self.assertTrue(Tag.objects.filter(name="fourth").exists())
-        self.assertEquals(self.content.tags.count(), 5)
+        self.assertEqual(self.content.tags.count(), 5)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "othertag", "third", "post", "fourth"})
 
     def test_extract_tags_removes_old_tags(self):
         self.content.text = "**Foobar** #tag #third"
         self.content.save()
-        self.assertEquals(self.content.tags.count(), 2)
+        self.assertEqual(self.content.tags.count(), 2)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "third"})
 

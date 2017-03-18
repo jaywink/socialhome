@@ -38,7 +38,7 @@ class ProfileDetailView(AccessMixin, DetailView):
         Limit by content visibility.
         """
         contents = Content.objects.filter(pinned=True, author=self.object)
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             contents = contents.filter(visibility=Visibility.PUBLIC)
         elif self.request.user.profile != self.target_profile:
             # TODO: filter out also LIMITED until contacts implemented
@@ -53,7 +53,7 @@ class ProfileDetailView(AccessMixin, DetailView):
         self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
         if self.target_profile.visibility == Visibility.PUBLIC:
             return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             if self.target_profile.visibility == Visibility.SITE:
                 return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
             # TODO: handle Visibility.LIMITED once contacts are implemented
