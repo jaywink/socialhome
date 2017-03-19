@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
@@ -189,6 +190,10 @@ class Content(models.Model):
     def short_text(self):
         return truncate_letters(self.text, 50)
 
+    @property
+    def slug(self):
+        return slugify(self.short_text)
+
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
@@ -297,6 +302,7 @@ class Content(models.Model):
     def dict_for_view(self, request):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         return {
+            "id": self.id,
             "guid": self.guid,
             "rendered": self.rendered,
             "author_name": self.author.name,
@@ -305,4 +311,5 @@ class Content(models.Model):
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
             "is_author": bool(request.user.is_authenticated and self.author == request.user.profile),
+            "slug": self.slug,
         }

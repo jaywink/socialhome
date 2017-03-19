@@ -112,10 +112,12 @@ $(function () {
 
         loadContentModal: function(contentGuid) {
             var content = $.getJSON(
-                "/content/" + contentGuid,
+                "/content/" + contentGuid + "/",
                 function(data) {
                     // Change URL to the content URL
-                    window.history.pushState({content: data.guid}, data.guid, "/content/" + data.guid);
+                    window.history.pushState(
+                        {content: data.guid}, data.guid, "/content/" + data.id + "/" + data.slug + "/"
+                    );
                     // Add content to the modal
                     $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
                     $("#content-body").html(data.rendered);
