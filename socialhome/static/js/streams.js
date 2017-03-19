@@ -130,7 +130,7 @@ $(function () {
                 function(data) {
                     // Change URL to the content URL
                     var url = "/content/" + data.id + "/";
-                    if (data.slug !== "/") {
+                    if (data.slug !== "") {
                         url = url + data.slug + "/"
                     }
                     window.history.pushState(
