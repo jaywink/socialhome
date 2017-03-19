@@ -42,13 +42,21 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <img src="" id="content-modal-profile-pic">
-                    <h5 id="content-modal-title" class="modal-title"></h5>
+                    <img src="" id="content-profile-pic">
+                    <h5 id="content-title" class="modal-title"></h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
-                <div id="content-modal-body" class="modal-body"></div>
+                <div id="content-body" class="modal-body"></div>
+                <div class="content-bar">
+                    <span id="content-timestamp" title=""></span>
+                    <span id="content-bar-actions" class="hidden">
+                        &nbsp;
+                        <a id="content-update-link" href=""><i class="fa fa-pencil" title="Update" aria-label="Update"></i></a>
+                        <a id="content-delete-link" href=""><i class="fa fa-remove" title="Delete" aria-label="Delete"></i></a>
+                    </span>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>

@@ -53,7 +53,7 @@ class PublicOrOwnedByUserContentMixin(UserPassesTestMixin):
         return (
             bool(object) and (
                 object.visibility == Visibility.PUBLIC or
-                (hasattr(user, "profile")  and object.author == user.profile)
+                (hasattr(user, "profile") and object.author == user.profile)
             )
         )
 
