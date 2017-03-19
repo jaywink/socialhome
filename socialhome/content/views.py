@@ -49,11 +49,11 @@ class PublicOrOwnedByUserContentMixin(UserPassesTestMixin):
 
     def test_func(self, user):
         """Ensure content is public or user owns it."""
-        object = self.get_object()
+        obj = self.get_object()
         return (
-            bool(object) and (
-                object.visibility == Visibility.PUBLIC or
-                (hasattr(user, "profile") and object.author == user.profile)
+            bool(obj) and (
+                obj.visibility == Visibility.PUBLIC or
+                (hasattr(user, "profile") and obj.author == user.profile)
             )
         )
 
