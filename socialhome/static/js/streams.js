@@ -111,24 +111,32 @@ $(function () {
             $("#content-update-link, #content-delete-link").attr("href", "");
         },
 
+        setContentModalData: function(data) {
+            // Add content to the modal
+            $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
+            $("#content-body").html(data.rendered);
+            $("#content-profile-pic").attr("src", data.author_image);
+            $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
+            if (data.is_author) {
+                $("#content-bar-actions").removeClass("hidden");
+                $("#content-update-link").attr("href", data.update_url);
+                $("#content-delete-link").attr("href", data.delete_url);
+            }
+        },
+
         loadContentModal: function(contentGuid) {
-            var content = $.getJSON(
+            $.getJSON(
                 "/content/" + contentGuid + "/",
                 function(data) {
                     // Change URL to the content URL
-                    window.history.pushState(
-                        {content: data.guid}, data.guid, "/content/" + data.id + "/" + data.slug + "/"
-                    );
-                    // Add content to the modal
-                    $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
-                    $("#content-body").html(data.rendered);
-                    $("#content-profile-pic").attr("src", data.author_image);
-                    $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
-                    if (data.is_author) {
-                        $("#content-bar-actions").removeClass("hidden");
-                        $("#content-update-link").attr("href", data.update_url);
-                        $("#content-delete-link").attr("href", data.delete_url);
+                    var url = "/content/" + data.id + "/";
+                    if (data.slug !== "/") {
+                        url = url + data.slug + "/"
                     }
+                    window.history.pushState(
+                        {content: data.guid}, data.guid, url
+                    );
+                    view.setContentModalData(data);
                     view.addNSFWShield();
                 }
             );
