@@ -52,10 +52,25 @@ body {
 .main-container {
   margin-top: 60px;
 }
+@media all and (max-width: $mediumDevice) {
+  .main-container {
+    width: 100%;
+    max-width: unset;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 
 // Modals
 .modal {
   color: $dark;
+}
+@media all and (max-width: $mediumDevice) {
+  .modal-lg {
+    width: 100%;
+    max-width: unset;
+    margin: 0;
+  }
 }
 
 // Lose the rounding on buttons

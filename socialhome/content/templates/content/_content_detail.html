@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="{% if modal %}modal{% endif %}" id="content-modal">
+<div class="{% if modal %}modal{% else %}content-detail{% endif %}" id="content-modal">
     {% if modal %}<div class="modal-dialog modal-lg" role="document">{% endif %}
         <div class="modal-content">
             <div class="modal-header">
