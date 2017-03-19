@@ -108,6 +108,7 @@ $(function () {
             $("#content-profile-pic").attr("src", "");
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
+            $("#content-update-link, #content-delete-link").attr("href", "");
         },
 
         loadContentModal: function(contentGuid) {
@@ -125,6 +126,8 @@ $(function () {
                     $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
                     if (data.is_author) {
                         $("#content-bar-actions").removeClass("hidden");
+                        $("#content-update-link").attr("href", data.update_url);
+                        $("#content-delete-link").attr("href", data.delete_url);
                     }
                     view.addNSFWShield();
                 }

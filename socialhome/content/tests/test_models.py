@@ -5,6 +5,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.timezone import make_aware
 from freezegun import freeze_time
 from test_plus import TestCase
@@ -187,6 +188,7 @@ class TestContentModel(TestCase):
 
     def test_dict_for_view(self):
         self.assertEqual(self.public_content.dict_for_view(Mock()), {
+            "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
@@ -195,6 +197,9 @@ class TestContentModel(TestCase):
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": False,
+            "slug": self.public_content.slug,
+            "update_url": "",
+            "delete_url": "",
         })
 
     def test_dict_for_view_for_author(self):
@@ -205,6 +210,7 @@ class TestContentModel(TestCase):
             )
         )
         self.assertEqual(self.public_content.dict_for_view(request), {
+            "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
@@ -213,6 +219,9 @@ class TestContentModel(TestCase):
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": True,
+            "slug": self.public_content.slug,
+            "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
+            "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
         })
 
 

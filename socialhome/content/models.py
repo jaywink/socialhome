@@ -301,6 +301,7 @@ class Content(models.Model):
 
     def dict_for_view(self, request):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
+        is_author = bool(request.user.is_authenticated and self.author == request.user.profile)
         return {
             "id": self.id,
             "guid": self.guid,
@@ -310,6 +311,8 @@ class Content(models.Model):
             "author_image": self.author.image_url_small,
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
-            "is_author": bool(request.user.is_authenticated and self.author == request.user.profile),
+            "is_author": is_author,
             "slug": self.slug,
+            "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
+            "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
         }
