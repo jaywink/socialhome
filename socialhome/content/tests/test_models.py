@@ -5,7 +5,10 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.text import slugify
 from django.utils.timezone import make_aware
+from django_extensions.utils.text import truncate_letters
 from freezegun import freeze_time
 from test_plus import TestCase
 
@@ -20,7 +23,7 @@ from socialhome.users.tests.factories import ProfileFactory
 class TestContentModel(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestContentModel, cls).setUpTestData()
+        super().setUpTestData()
         cls.public_content = ContentFactory(
             visibility=Visibility.PUBLIC, text="**Foobar**"
         )
@@ -38,6 +41,10 @@ class TestContentModel(TestCase):
         cls.set = {
             cls.public_content, cls.site_content, cls.limited_content, cls.self_content
         }
+
+    def setUp(self):
+        super().setUp()
+        self.public_content.refresh_from_db()
 
     def test_create(self):
         Content.objects.create(text="foobar", guid="barfoo", author=ProfileFactory())
@@ -107,6 +114,7 @@ class TestContentModel(TestCase):
         self.assertEqual(contents, [
             {
                 "id": self.public_content.id,
+                "guid": self.public_content.guid,
                 "author": self.public_content.author_id,
                 "rendered": "<p><strong>Foobar</strong></p>",
                 "humanized_timestamp": self.public_content.humanized_timestamp,
@@ -114,6 +122,7 @@ class TestContentModel(TestCase):
             },
             {
                 "id": self.site_content.id,
+                "guid": self.site_content.guid,
                 "author": self.site_content.author_id,
                 "rendered": "<p><em>Foobar</em></p>",
                 "humanized_timestamp": self.site_content.humanized_timestamp,
@@ -184,13 +193,66 @@ class TestContentModel(TestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_dict_for_view(self):
-        self.assertEqual(self.public_content.dict_for_view, {
+        self.assertEqual(self.public_content.dict_for_view(Mock()), {
             "id": self.public_content.id,
+            "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.image_url_small,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "formatted_timestamp": self.public_content.formatted_timestamp,
+            "is_author": False,
+            "slug": self.public_content.slug,
+            "update_url": "",
+            "delete_url": "",
         })
+
+    def test_dict_for_view_for_author(self):
+        request = Mock(
+            user=Mock(
+                is_authenticated=True,
+                profile=self.public_content.author,
+            )
+        )
+        self.assertEqual(self.public_content.dict_for_view(request), {
+            "id": self.public_content.id,
+            "guid": self.public_content.guid,
+            "rendered": self.public_content.rendered,
+            "author_name": self.public_content.author.name,
+            "author_handle": self.public_content.author.handle,
+            "author_image": self.public_content.author.image_url_small,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "formatted_timestamp": self.public_content.formatted_timestamp,
+            "is_author": True,
+            "slug": self.public_content.slug,
+            "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
+            "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
+        })
+
+    def test_dict_for_view_edited_post(self):
+        with freeze_time(self.public_content.created + datetime.timedelta(minutes=16)):
+            self.public_content.save()
+            self.assertEqual(self.public_content.dict_for_view(Mock()), {
+                "id": self.public_content.id,
+                "guid": self.public_content.guid,
+                "rendered": self.public_content.rendered,
+                "author_name": self.public_content.author.name,
+                "author_handle": self.public_content.author.handle,
+                "author_image": self.public_content.author.image_url_small,
+                "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
+                "formatted_timestamp": self.public_content.formatted_timestamp,
+                "is_author": False,
+                "slug": self.public_content.slug,
+                "update_url": "",
+                "delete_url": "",
+            })
+
+    def test_short_text(self):
+        self.assertEqual(self.public_content.short_text, truncate_letters(self.public_content.text, 50))
+
+    def test_slug(self):
+        self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
 
 
 @pytest.mark.usefixtures("db")
@@ -216,7 +278,7 @@ class TestContentSaveTags(TestCase):
     def test_factory_instance_has_tags(self):
         self.assertTrue(Tag.objects.filter(name="tag").exists())
         self.assertTrue(Tag.objects.filter(name="othertag").exists())
-        self.assertEquals(self.content.tags.count(), 2)
+        self.assertEqual(self.content.tags.count(), 2)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "othertag"})
 
@@ -226,14 +288,14 @@ class TestContentSaveTags(TestCase):
         self.assertTrue(Tag.objects.filter(name="third").exists())
         self.assertTrue(Tag.objects.filter(name="post").exists())
         self.assertTrue(Tag.objects.filter(name="fourth").exists())
-        self.assertEquals(self.content.tags.count(), 5)
+        self.assertEqual(self.content.tags.count(), 5)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "othertag", "third", "post", "fourth"})
 
     def test_extract_tags_removes_old_tags(self):
         self.content.text = "**Foobar** #tag #third"
         self.content.save()
-        self.assertEquals(self.content.tags.count(), 2)
+        self.assertEqual(self.content.tags.count(), 2)
         tags = set(self.content.tags.values_list("name", flat=True))
         self.assertEqual(tags, {"tag", "third"})
 

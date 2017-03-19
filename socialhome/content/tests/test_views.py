@@ -1,4 +1,5 @@
 import json
+from unittest.mock import Mock, patch
 
 import pytest
 from django.core.urlresolvers import reverse
@@ -8,8 +9,9 @@ from django.test.client import Client
 from socialhome.enums import Visibility
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
-from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
+from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView, \
+    PublicOrOwnedByUserContentMixin
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
@@ -184,14 +186,149 @@ class TestContentView(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.content = ContentFactory()
+        cls.content = LocalContentFactory(visibility=Visibility.PUBLIC)
+        cls.private_content = LocalContentFactory(visibility=Visibility.LIMITED)
         cls.client = Client()
 
-    def test_content_view_render_json_result(self):
+    def test_content_view_renders_json_result(self):
         response = self.client.get(
             reverse("content:view", kwargs={"pk": self.content.id}),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(self.content.dict_for_view, data)
+        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+
+    def test_content_view_by_guid_renders_json_result(self):
+        response = self.client.get(
+            reverse("content:view-by-guid", kwargs={"guid": self.content.guid}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+
+    def test_content_view_by_slug_renders_json_result(self):
+        response = self.client.get(
+            reverse("content:view-by-slug", kwargs={"pk": self.content.id, "slug": self.content.slug}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+
+    def test_content_view_returns_404_for_private_content_except_if_owned(self):
+        self.client.force_login(self.content.author.user)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.private_content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 404)
+        self.client.force_login(self.private_content.author.user)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.private_content.id}),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_content_view_renders(self):
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.content.id})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_content_view_renders_by_guid(self):
+        response = self.client.get(
+            reverse("content:view-by-guid", kwargs={"guid": self.content.guid}),
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_content_view_renders_by_slug(self):
+        response = self.client.get(
+            reverse("content:view-by-slug", kwargs={"pk": self.content.id, "slug": self.content.slug})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_content_view_content(self):
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.content.id})
+        )
+        self.assertNotContains(response, "modal-dialog modal-lg")
+        self.assertContains(response, self.content.author.image_url_small)
+        self.assertContains(response, self.content.author.name)
+        self.assertContains(response, self.content.author.handle)
+        self.assertNotContains(response, 'data-dismiss="modal"')
+        self.assertContains(response, self.content.rendered)
+        self.assertContains(response, self.content.humanized_timestamp)
+        self.assertContains(response, self.content.formatted_timestamp)
+        self.assertContains(response, '<span id="content-bar-actions" class="hidden"')
+        self.assertNotContains(response, "modal-footer")
+        self.assertContains(response, 'var socialhomeStream = "content-%s' % self.content.guid)
+
+    def test_content_view_content_as_author(self):
+        self.client.force_login(self.content.author.user)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": self.content.id})
+        )
+        self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
+
+
+class MockPublicOrOwnedProtectedView(PublicOrOwnedByUserContentMixin):
+    mock_object = None
+    author = "profile"
+
+    def __init__(self, visibility):
+        self.mock_object = Mock(
+            visibility=visibility,
+            author=self.author
+        )
+
+    def get_object(self):
+        return self.mock_object
+
+
+class PublicOrOwnedByUserContentMixin(TestCase):
+    def test_public_content_is_true(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.PUBLIC)
+        self.assertTrue(view.test_func(Mock(profile=Mock())))
+
+    def test_limited_content_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.LIMITED)
+        self.assertFalse(view.test_func(Mock(profile=Mock())))
+
+    def test_site_content_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SITE)
+        self.assertFalse(view.test_func(Mock(profile=Mock())))
+
+    def test_self_content_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SELF)
+        self.assertFalse(view.test_func(Mock(profile=Mock())))
+
+    def test_public_content_no_profile_is_true(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.PUBLIC)
+        self.assertTrue(view.test_func(Mock()))
+
+    def test_limited_content_no_profile_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.LIMITED)
+        self.assertFalse(view.test_func(Mock()))
+
+    def test_site_content_no_profile_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SITE)
+        self.assertFalse(view.test_func(Mock()))
+
+    def test_self_content_no_profile_is_false(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SELF)
+        self.assertFalse(view.test_func(Mock()))
+
+    def test_public_content_is_true_if_owned(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.PUBLIC)
+        self.assertTrue(view.test_func(Mock(profile=view.author)))
+
+    def test_limited_content_is_true_if_owned(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.LIMITED)
+        self.assertTrue(view.test_func(Mock(profile=view.author)))
+
+    def test_site_content_is_true_if_owned(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SITE)
+        self.assertTrue(view.test_func(Mock(profile=view.author)))
+
+    def test_self_content_is_true_if_owned(self):
+        view = MockPublicOrOwnedProtectedView(Visibility.SELF)
+        self.assertTrue(view.test_func(Mock(profile=view.author)))

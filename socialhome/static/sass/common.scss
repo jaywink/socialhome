@@ -52,13 +52,24 @@ body {
 .main-container {
   margin-top: 60px;
 }
+@media all and (max-width: $mediumDevice) {
+  .main-container {
+    width: 100%;
+    max-width: unset;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 
-// Modals have a light background
+// Modals
 .modal {
   color: $dark;
-
-  .modal-content {
-    border-radius: unset;
+}
+@media all and (max-width: $mediumDevice) {
+  .modal-lg {
+    width: 100%;
+    max-width: unset;
+    margin: 0;
   }
 }
 

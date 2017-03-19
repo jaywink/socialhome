@@ -125,35 +125,100 @@ describe("Streams", function() {
         before(function() {
             server = sinon.fakeServer.create();
             var data = {
-                id: 1, rendered: "foobar", author_name: "sinon", author_handle: "mocha@stream_test",
-                author_image: "https://localhost/sinon.jpg",
+                id: 1, guid: "1234", rendered: "foobar barfoo", author_name: "sinon", author_handle: "mocha@stream_test",
+                author_image: "https://localhost/sinon.jpg", slug: "foobar-barfoo",
+                formatted_timestamp: "2017-03-14 22:04:00+00:00", humanized_timestamp: "2 hours ago",
+                is_author: false, update_url: "", delete_url: "",
             };
             server.respondWith(
                 "GET",
-                "/content/1",
+                "/content/1234/",
                 [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
             );
         });
 
-        context("click on timestamp", function() {
-            it("opens up modal", function() {
+        it("click on timestamp opens up modal", function() {
+            var $modal = $(".modal-content");
+            expect($modal.is(":visible")).to.be.false;
+            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+                done();
+            });
+            server.respond();
+            expect($modal.is(":visible")).to.be.true;
+            expect($("#content-title:contains('sinon')").length).to.eq(1);
+            expect($("#content-title:contains('mocha@stream_test')").length).to.eq(1);
+            expect($("#content-body:contains('foobar barfoo')").length).to.eq(1);
+            expect($("#content-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
+            expect($("#content-timestamp[title='2017-03-14 22:04:00+00:00']").length).to.eq(1);
+            expect($("#content-timestamp:contains('2 hours ago')").length).to.eq(1);
+            expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
+            expect($("#content-update-link").attr("href")).to.eq("");
+            expect($("#content-delete-link").attr("href")).to.eq("");
+        });
+
+        context("as author", function() {
+            before(function() {
+                server = sinon.fakeServer.create();
+                var data = {
+                    id: 1, guid: "1234", rendered: "foobar barfoo", author_name: "sinon", author_handle: "mocha@stream_test",
+                    author_image: "https://localhost/sinon.jpg", slug: "foobar-barfoo",
+                    formatted_timestamp: "2017-03-14 22:04:00+00:00", humanized_timestamp: "2 hours ago",
+                    is_author: true, update_url: "http://127.0.0.1:" + runserverPort + "/content/1/~update/",
+                    delete_url: "http://127.0.0.1:" + runserverPort + "/content/1/~delete/",
+                };
+                server.respondWith(
+                    "GET",
+                    "/content/1234/",
+                    [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
+                );
+            });
+
+            it("click on timestamp opens up modal", function() {
                 var $modal = $(".modal-content");
                 expect($modal.is(":visible")).to.be.false;
-                $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
+                $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
                     done();
                 });
                 server.respond();
-                expect($modal.is(":visible")).to.be.true;
-                expect($("#content-modal-title:contains('sinon')").length).to.eq(1);
-                expect($("#content-modal-title:contains('mocha@stream_test')").length).to.eq(1);
-                expect($("#content-modal-body:contains('foobar')").length).to.eq(1);
-                expect($("#content-modal-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
+                expect($("#content-bar-actions").hasClass("hidden")).to.be.false;
+                expect($("#content-update-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~update/");
+                expect($("#content-delete-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~delete/");
             });
+
+            after(function() {
+                server.restore();
+            });
+        });
+
+        it("changes url to content and then back on hiding modal", function() {
+            var currentUrl = window.location.href;
+            expect(currentUrl).to.not.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
+            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+                done();
+            });
+            server.respond();
+            expect(window.location.href).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
+            $("#content-modal").modal("hide");
+            expect(window.location.href).to.eq(currentUrl);
+        });
+
+        it("hides modal on back navigation", function() {
+            var $modal = $(".modal-content");
+            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+                done();
+            });
+            server.respond();
+            expect($modal.is(":visible")).to.be.true;
+            history.back();
+            expect($modal.is(":visible")).to.be.false;
+        });
+
+        afterEach(function() {
+            $("#content-modal").modal("hide");
         });
 
         after(function() {
             server.restore();
-            $("#content-modal").modal("hide");
         });
     });
 });

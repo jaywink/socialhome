@@ -74,6 +74,7 @@ env.local
 socialhome/static/css/*.css
 socialhome/static/js/project.js
 socialhome/static/fonts/
+!/socialhome/static/fonts/.gitkeep
 staticfiles/
 
 # Bower

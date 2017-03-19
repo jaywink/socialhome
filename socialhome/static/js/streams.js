@@ -23,7 +23,7 @@ $(function () {
             return $(
                 '<div class="grid-item">' + content.rendered +
                     '<div class="grid-item-bar">' +
-                        '<span class="grid-item-open-action" data-content-id="' + content.id + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
+                        '<span class="grid-item-open-action" data-content-guid="' + content.guid + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
                     '</div>' +
                 '</div>'
             );
@@ -87,27 +87,56 @@ $(function () {
         },
 
         showContentModal: function() {
-            $('#content-modal').modal('show');
+            $('#content-modal').modal('show').on('hide.bs.modal', function (e) {
+                $('#content-modal').off("hide.bs.modal");
+                history.back();
+            });
             // Close modal on esc key
-            $(document).keypress(function (e) {
-                if (e.keyCode == 27) {
-                    $('#content-modal').modal('hide');
+            $(document).keypress(function (ev) {
+                if (ev.keyCode == 27) {
+                    view.hideContentModal();
                 }
             });
         },
 
-        cleanContentModal: function() {
-            $('#content-modal-title, #content-modal-body').html("");
-            $("#content-modal-profile-pic").attr("src", "");
+        hideContentModal: function() {
+            $('#content-modal').modal('hide');
         },
 
-        loadContentModal: function(contentId) {
-            var content = $.getJSON(
-                "/content/" + contentId,
+        cleanContentModal: function() {
+            $('#content-title, #content-body').html("");
+            $("#content-profile-pic").attr("src", "");
+            $("#content-timestamp").attr("title", "").html("");
+            $("#content-bar-actions").addClass("hidden");
+            $("#content-update-link, #content-delete-link").attr("href", "");
+        },
+
+        setContentModalData: function(data) {
+            // Add content to the modal
+            $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
+            $("#content-body").html(data.rendered);
+            $("#content-profile-pic").attr("src", data.author_image);
+            $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
+            if (data.is_author) {
+                $("#content-bar-actions").removeClass("hidden");
+                $("#content-update-link").attr("href", data.update_url);
+                $("#content-delete-link").attr("href", data.delete_url);
+            }
+        },
+
+        loadContentModal: function(contentGuid) {
+            $.getJSON(
+                "/content/" + contentGuid + "/",
                 function(data) {
-                    $("#content-modal-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
-                    $("#content-modal-body").html(data.rendered);
-                    $("#content-modal-profile-pic").attr("src", data.author_image);
+                    // Change URL to the content URL
+                    var url = "/content/" + data.id + "/";
+                    if (data.slug !== "") {
+                        url = url + data.slug + "/"
+                    }
+                    window.history.pushState(
+                        {content: data.guid}, data.guid, url
+                    );
+                    view.setContentModalData(data);
                     view.addNSFWShield();
                 }
             );
@@ -124,6 +153,11 @@ $(function () {
             this.socket.onmessage = this.handleMessage;
             this.socket.onopen = this.handleSocketOpen;
             this.socket.onclose = this.handleSocketClose;
+            // Hide content modal on back navigation
+            window.onpopstate = function(ev) {
+                $('#content-modal').off("hide.bs.modal");
+                view.hideContentModal();
+            };
         },
 
         createConnection: function() {
@@ -183,10 +217,10 @@ $(function () {
         },
 
         loadContentModal: function(ev) {
-            var contentId = $(ev.currentTarget).data("content-id");
+            var contentGuid = $(ev.currentTarget).data("content-guid");
             view.cleanContentModal();
             view.showContentModal();
-            view.loadContentModal(contentId);
+            view.loadContentModal(contentGuid);
         },
 
         addContentListeners: function() {

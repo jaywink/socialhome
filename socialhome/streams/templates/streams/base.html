@@ -3,6 +3,14 @@
 
 {% block containertype %}container-fluid{% endblock %}
 
+{% block ogtags %}
+    <meta property="og:title" content="{% block stream_title %}{% endblock %} - {{ request.site.name }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://{{ request.site.domain }}{{ request.path }}" />
+    {# TODO fix logo #}
+    <meta property="og:image" content="https://socialhome.network/media/markdownx/74b37fa1-88d0-4e29-9fdc-8d07ba216f63.png" />
+{% endblock %}
+
 {% block content %}
     <script>var socialhomeStream = "{{ stream_name }}";</script>
     <div class="streams-container">
@@ -26,7 +34,7 @@
                         <div class="grid-item">
                             {{ content.rendered|safe }}
                             <div class="grid-item-bar">
-                                <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
+                                <span class="grid-item-open-action" data-content-guid="{{ content.guid }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
                                 {% if content.author == request.user.profile %}
                                     &nbsp;
                                     <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
@@ -42,21 +50,5 @@
 {% endblock content %}
 
 {% block modal %}
-    <div class="modal" id="content-modal">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <img src="" id="content-modal-profile-pic">
-                    <h5 id="content-modal-title" class="modal-title"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans "Close" %}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="content-modal-body" class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "content/_content_detail.html" with modal=True content=None %}
 {% endblock %}

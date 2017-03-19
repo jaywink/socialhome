@@ -9,6 +9,16 @@
     font-size: smaller;
     opacity: 0.5;
 
+    @media all and (max-width: $largeDevice) {
+      font-size: small;
+    }
+    @media all and (max-width: $mediumDevice) {
+      font-size: medium;
+    }
+    @media all and (max-width: $bsSmallDevice) {
+      font-size: large;
+    }
+
     .grid-item-open-action {
       text-decoration: none;
       cursor: pointer;

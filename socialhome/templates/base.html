@@ -4,6 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>{% block title %}{{ request.site.name }}{% endblock title %}</title>
+    {% block ogtags %}
+        <meta property="og:title" content="{{ request.site.name }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://{{ request.site.domain }}" />
+        {# TODO fix logo #}
+        <meta property="og:image" content="https://socialhome.network/media/markdownx/74b37fa1-88d0-4e29-9fdc-8d07ba216f63.png" />
+    {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">

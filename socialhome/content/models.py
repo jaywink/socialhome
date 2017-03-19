@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
@@ -185,6 +186,14 @@ class Content(models.Model):
     def formatted_timestamp(self):
         return arrow.get(self.modified).format()
 
+    @property
+    def short_text(self):
+        return truncate_letters(self.text, 50)
+
+    @property
+    def slug(self):
+        return slugify(self.short_text)
+
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
@@ -254,7 +263,7 @@ class Content(models.Model):
     @staticmethod
     def get_contents_for_user(ids, user):
         contents = Content.objects.filter(id__in=ids)
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             contents = contents.filter(visibility=Visibility.PUBLIC)
         else:
             contents = contents.filter(
@@ -269,6 +278,7 @@ class Content(models.Model):
         for content in contents:
             rendered.append({
                 "id": content.id,
+                "guid": content.guid,
                 "author": content.author_id,
                 "rendered": content.rendered,
                 "humanized_timestamp": content.humanized_timestamp,
@@ -289,12 +299,20 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
 
-    @property
-    def dict_for_view(self):
+    def dict_for_view(self, request):
+        humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
+        is_author = bool(request.user.is_authenticated and self.author == request.user.profile)
         return {
             "id": self.id,
+            "guid": self.guid,
             "rendered": self.rendered,
             "author_name": self.author.name,
             "author_handle": self.author.handle,
             "author_image": self.author.image_url_small,
+            "humanized_timestamp": humanized_timestamp,
+            "formatted_timestamp": self.formatted_timestamp,
+            "is_author": is_author,
+            "slug": self.slug,
+            "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
+            "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
         }

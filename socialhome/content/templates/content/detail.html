@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {{ content.short_text }}
+{% endblock %}
+
+{% block ogtags %}
+    <meta property="og:title" content="{{ content.short_text }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://{{ request.site.domain }}{{ request.path }}" />
+    {# TODO find an image from content #}
+    <meta property="og:image" content="https://socialhome.network/media/markdownx/74b37fa1-88d0-4e29-9fdc-8d07ba216f63.png" />
+{% endblock %}
+
+{% block content %}
+    <script>var socialhomeStream = "content-{{ content.guid }}";</script>
+    {% include "content/_content_detail.html" with modal=False content=content %}
+{% endblock %}

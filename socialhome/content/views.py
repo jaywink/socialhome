@@ -3,10 +3,12 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, DetailView
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
+from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView
 
@@ -37,7 +39,23 @@ class UserOwnsContentMixin(UserPassesTestMixin):
     def test_func(self, user):
         """Ensure user owns content."""
         object = self.get_object()
-        return bool(object) and object.author == user.profile
+        return (
+            bool(object) and hasattr(user, "profile") and object.author == user.profile
+        )
+
+
+class PublicOrOwnedByUserContentMixin(UserPassesTestMixin):
+    raise_exception = Http404
+
+    def test_func(self, user):
+        """Ensure content is public or user owns it."""
+        obj = self.get_object()
+        return (
+            bool(obj) and (
+                obj.visibility == Visibility.PUBLIC or
+                (hasattr(user, "profile") and obj.author == user.profile)
+            )
+        )
 
 
 class ContentUpdateView(UserOwnsContentMixin, UpdateView):
@@ -65,12 +83,19 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-class ContentView(AjaxResponseMixin, JSONResponseMixin, DetailView):
+class ContentView(PublicOrOwnedByUserContentMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
+    template_name = "content/detail.html"
+
+    def get_object(self, queryset=None):
+        guid = self.kwargs.get("guid")
+        if guid:
+            return get_object_or_404(Content, guid=guid)
+        return super().get_object(queryset=queryset)
 
     def get_ajax(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return self.render_json_response(self.object.dict_for_view)
+        return self.render_json_response(self.object.dict_for_view(request))
 
 
 class HomeView(TemplateView):
@@ -81,6 +106,6 @@ class HomeView(TemplateView):
         if request.user.is_authenticated:
             return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
         if settings.SOCIALHOME_ROOT_PROFILE:
-            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+            profile = get_object_or_404(Profile, user__username=settings.SOCIALHOME_ROOT_PROFILE)
             return ProfileDetailView.as_view()(request, guid=profile.guid)
         return super(HomeView, self).get(request, *args, **kwargs)

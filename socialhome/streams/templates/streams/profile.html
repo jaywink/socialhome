@@ -7,6 +7,8 @@
     <h2>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h2>
 {% endblock %}
 
+{% block stream_title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
+
 {% block stream_actions %}
     {% if profile == request.user.profile %}
         <div class="stamped">
