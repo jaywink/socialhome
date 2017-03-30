@@ -7,6 +7,8 @@
             gutter: '.gutter-sizer',
             percentPosition: true,
             stamp: ".stamped",
+            transitionDuration: 0,
+            stagger: 0,
         });
 
         // Layout Masonry after each image loads

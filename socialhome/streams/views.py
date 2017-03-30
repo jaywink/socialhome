@@ -28,7 +28,7 @@ class TagStreamView(BaseStreamView):
     queryset = Content.objects.filter(visibility=Visibility.PUBLIC).select_related("oembed", "opengraph")
 
     def dispatch(self, request, *args, **kwargs):
-        self.stream_name = "tags/%s" % kwargs.get("name")
+        self.stream_name = "tags__%s" % kwargs.get("name")
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):

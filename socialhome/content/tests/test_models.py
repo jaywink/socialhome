@@ -88,29 +88,29 @@ class TestContentModel(TestCase):
         content = ContentFactory(text="#tag #MiXeD")
         self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a> <a href="/tags/mixed/">#MiXeD</a></p>')
 
-    def test_get_contents_for_unauthenticated_user(self):
+    def test_filter_for_unauthenticated_user(self):
         user = AnonymousUser()
-        contents = Content.get_contents_for_user(self.ids, user)
+        qs = Content.objects.filter(id__in=self.ids)
+        contents = Content.filter_for_user(qs, user)
         self.assertEqual(set(contents), {self.public_content})
 
-    def test_get_contents_for_self(self):
+    def test_filter_for_self(self):
         user = self.make_user()
         user.profile = self.self_content.author
         user.save()
-        contents = Content.get_contents_for_user(self.ids, user)
+        qs = Content.objects.filter(id__in=self.ids)
+        contents = Content.filter_for_user(qs, user)
         self.assertEqual(set(contents), self.set - {self.limited_content})
 
-    def test_get_contents_for_authenticated_other_user(self):
+    def test_filter_for_other_user(self):
         user = self.make_user()
-        contents = Content.get_contents_for_user(self.ids, user)
+        qs = Content.objects.filter(id__in=self.ids)
+        contents = Content.filter_for_user(qs, user)
         self.assertEqual(set(contents), self.set - {self.self_content, self.limited_content})
 
     def test_get_rendered_contents_for_user(self):
-        user = self.make_user()
-        contents = Content.get_rendered_contents_for_user(
-            [self.public_content.id, self.site_content.id],
-            user
-        )
+        qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
+        contents = Content.get_rendered_contents(qs)
         self.assertEqual(contents, [
             {
                 "id": self.public_content.id,

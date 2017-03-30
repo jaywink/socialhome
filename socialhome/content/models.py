@@ -261,21 +261,19 @@ class Content(models.Model):
         return text
 
     @staticmethod
-    def get_contents_for_user(ids, user):
-        contents = Content.objects.filter(id__in=ids)
+    def filter_for_user(qs, user):
         if not user.is_authenticated:
-            contents = contents.filter(visibility=Visibility.PUBLIC)
+            contents = qs.filter(visibility=Visibility.PUBLIC)
         else:
-            contents = contents.filter(
+            contents = qs.filter(
                 Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC])
             )
-        return contents.order_by("created")
+        return contents
 
     @staticmethod
-    def get_rendered_contents_for_user(ids, user):
-        contents = Content.get_contents_for_user(ids, user)
+    def get_rendered_contents(qs):
         rendered = []
-        for content in contents:
+        for content in qs:
             rendered.append({
                 "id": content.id,
                 "guid": content.guid,
