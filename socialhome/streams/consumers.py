@@ -41,7 +41,7 @@ class StreamConsumer(WebsocketConsumer):
         if not last_id:
             return
         qs = Content.objects.filter(id__lt=last_id)
-        qs = Content.filter_for_user(qs, self.message.user).order_by("-created")[:30]
+        qs = Content.filter_for_user(qs, self.message.user).order_by("-created")[:10]
         contents = Content.get_rendered_contents(qs)
         payload = self.make_payload(contents, "appended")
         self.send(payload)

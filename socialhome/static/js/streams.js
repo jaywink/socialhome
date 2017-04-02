@@ -33,9 +33,9 @@ $(function () {
 
         addContentToGrid: function($contents, placement) {
             if (placement === "appended") {
-                $('.grid').append($contents).masonry(placement, $contents);
+                $('.grid').append($contents).masonry(placement, $contents, true);
             } else {
-                $('.grid').prepend($contents).masonry(placement, $contents);
+                $('.grid').prepend($contents).masonry(placement, $contents, true);
             }
             view.layoutMasonry();
             view.addNSFWShield();
@@ -43,9 +43,14 @@ $(function () {
 
         layoutMasonry: function() {
             var $grid = $('.grid');
-            // Layout Masonry after all images have loaded (for performance on infinite scrolling)
-            $grid.imagesLoaded().always(function () {
-                $grid.masonry('layout');
+            $grid.imagesLoaded().progress(function (instance) {
+                // Layout after every 5th image has loaded or at the end
+                // Just a small performance tweak to not layout too often which becomes a problem
+                // when loading infinitescroll items
+                if (instance.progressedCount === instance.images.length ||
+                        instance.progressedCount % 5 === 0) {
+                    $grid.masonry('layout');
+                }
             });
         },
 
@@ -225,7 +230,7 @@ $(function () {
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
                 if (ids.length && data.placement === "appended") {
-                    setTimeout(controller.addLoadMoreTrigger, 1000);
+                    setTimeout(controller.addLoadMoreTrigger, 500);
                 }
             }
         },
