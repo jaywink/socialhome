@@ -22,26 +22,35 @@ class StreamConsumer(WebsocketConsumer):
         elif action == "load_more":
             self.handle_load_more(data)
 
+    def _get_stream_qs(self):
+        """Using the stream info, get correct queryset to use for content."""
+        stream_info = self.kwargs.get("stream").split("__")
+        if stream_info[0] == "public":
+            return Content.objects.public()
+        elif stream_info[0] == "tags":
+            return Content.objects.tags(stream_info[1], self.message.user)
+        elif stream_info[0] == "profile":
+            return Content.objects.profile(stream_info[1], self.message.user)
+        return Content.objects.none()
+
     def handle_load_content(self, data):
         """Send back the requested content."""
-        # TODO handle load according to stream qs - not public
         ids = data.get("ids")
         if not ids:
             return
-        qs = Content.objects.filter(id__in=ids)
-        qs = Content.filter_for_user(qs, self.message.user).order_by("-created")
+        qs = self._get_stream_qs()
+        qs = qs.filter(id__in=ids)
         contents = Content.get_rendered_contents(qs)
         payload = self.make_payload(contents, "prepended")
         self.send(payload)
 
     def handle_load_more(self, data):
         """Load more content to the stream."""
-        # TODO handle load according to stream qs - not public
         last_id = data.get("last_id")
         if not last_id:
             return
-        qs = Content.objects.filter(id__lt=last_id)
-        qs = Content.filter_for_user(qs, self.message.user).order_by("-created")[:10]
+        qs = self._get_stream_qs()
+        qs = qs.filter(id__lt=last_id)[:20]
         contents = Content.get_rendered_contents(qs)
         payload = self.make_payload(contents, "appended")
         self.send(payload)

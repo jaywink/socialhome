@@ -184,6 +184,7 @@ class TestOrganizeContentUserDetailView(object):
         view = OrganizeContentProfileDetailView(request=request)
         view.object = profile
         view.target_profile = profile
+        view.kwargs = {"guid": profile.guid}
         return request, view, contents, profile
 
     def test_view_renders(self, admin_client, rf):

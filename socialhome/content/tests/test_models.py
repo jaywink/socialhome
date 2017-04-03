@@ -2,7 +2,6 @@ import datetime
 from unittest.mock import Mock, patch, call
 
 import pytest
-from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -87,26 +86,6 @@ class TestContentModel(TestCase):
     def test_renders_linkified_tags(self):
         content = ContentFactory(text="#tag #MiXeD")
         self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a> <a href="/tags/mixed/">#MiXeD</a></p>')
-
-    def test_filter_for_unauthenticated_user(self):
-        user = AnonymousUser()
-        qs = Content.objects.filter(id__in=self.ids)
-        contents = Content.filter_for_user(qs, user)
-        self.assertEqual(set(contents), {self.public_content})
-
-    def test_filter_for_self(self):
-        user = self.make_user()
-        user.profile = self.self_content.author
-        user.save()
-        qs = Content.objects.filter(id__in=self.ids)
-        contents = Content.filter_for_user(qs, user)
-        self.assertEqual(set(contents), self.set - {self.limited_content})
-
-    def test_filter_for_other_user(self):
-        user = self.make_user()
-        qs = Content.objects.filter(id__in=self.ids)
-        contents = Content.filter_for_user(qs, user)
-        self.assertEqual(set(contents), self.set - {self.self_content, self.limited_content})
 
     def test_get_rendered_contents_for_user(self):
         qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])

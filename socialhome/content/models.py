@@ -5,7 +5,6 @@ from uuid import uuid4
 import arrow
 from CommonMark import commonmark
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -21,7 +20,7 @@ from django.db.models.aggregates import Max
 
 from socialhome.content.utils import make_nsfw_safe, test_tag
 from socialhome.enums import Visibility
-from socialhome.users.models import User, Profile
+from socialhome.users.models import Profile
 from socialhome.utils import safe_clear_cached_property
 
 
@@ -78,6 +77,42 @@ class Tag(models.Model):
         super().save()
 
 
+class ContentQuerySet(models.QuerySet):
+    def _select_related(self):
+        return self.select_related("oembed", "opengraph")
+
+    def visible_for_user(self, user):
+        """Filter by visibility to given user."""
+        if not user.is_authenticated:
+            return self.filter(visibility=Visibility.PUBLIC)
+        # TODO: handle also LIMITED when contacts implemented
+        return self.filter(Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]))
+
+    def public(self):
+        return self._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")
+
+    def tags(self, tag, user):
+        try:
+            tag = Tag.objects.get_by_cleaned_name(tag)
+        except Tag.DoesNotExist:
+            return Content.objects.none()
+        return self._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
+
+    def profile(self, guid, user):
+        """Filter for a user profile.
+
+        Ensures if the profile is not visible to the user, no content will be returned.
+        """
+        try:
+            profile = Profile.objects.get(guid=guid)
+        except Profile.DoesNotExist:
+            return Content.objects.none()
+        if not profile.visible_to_user(user):
+            return Content.objects.none()
+        qs = self._select_related().visible_for_user(user).filter(pinned=True, author=profile)
+        return qs.order_by("order")
+
+
 class Content(models.Model):
     text = models.TextField(_("Text"), blank=True)
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
@@ -108,6 +143,8 @@ class Content(models.Model):
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
+
+    objects = ContentQuerySet.as_manager()
 
     def __str__(self):
         return "{text} ({guid})".format(
@@ -259,16 +296,6 @@ class Content(models.Model):
         text = " ".join(final_words)
         self.save_tags(found_tags)
         return text
-
-    @staticmethod
-    def filter_for_user(qs, user):
-        if not user.is_authenticated:
-            contents = qs.filter(visibility=Visibility.PUBLIC)
-        else:
-            contents = qs.filter(
-                Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC])
-            )
-        return contents
 
     @staticmethod
     def get_rendered_contents(qs):
