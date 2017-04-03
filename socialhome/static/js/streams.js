@@ -237,13 +237,13 @@ $(function () {
 
         addLoadMoreTrigger: function() {
             controller.loadMoreTracker = appear({
-              elements: function elements(){
-                return $(".grid .grid-item:nth-last-child(5)");
-              },
-              appear: function appear(el) {
-                controller.loadMoreContent();
-              },
-              bounds: 200,
+                elements: function elements(){
+                    return $(".grid .grid-item:nth-last-child(5)");
+                },
+                appear: function appear(el) {
+                    controller.loadMoreContent();
+                },
+                debounce: 200,
             });
         },
 
