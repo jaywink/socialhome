@@ -251,7 +251,7 @@ class TestContentView(TestCase):
             reverse("content:view", kwargs={"pk": self.content.id})
         )
         self.assertNotContains(response, "modal-dialog modal-lg")
-        self.assertContains(response, self.content.author.image_url_small)
+        self.assertContains(response, self.content.author.safer_image_url_small)
         self.assertContains(response, self.content.author.name)
         self.assertContains(response, self.content.author.handle)
         self.assertNotContains(response, 'data-dismiss="modal"')

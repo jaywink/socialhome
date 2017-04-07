@@ -1,6 +1,7 @@
 import pytest
 from test_plus.test import TestCase
 
+from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 from socialhome.users.utils import get_pony_urls
 
@@ -102,3 +103,9 @@ class TestProfile(object):
         assert profile.get_last_name() == ""
         profile.name = ""
         assert profile.get_last_name() == ""
+
+    def test_safer_image_url_small(self):
+        profile = ProfileFactory.build(image_url_small="/foobar", handle="foo@localhost")
+        assert profile.safer_image_url_small == "https://localhost/foobar"
+        profile.image_url_small = "https://example.com/foobar"
+        assert profile.safer_image_url_small == "https://example.com/foobar"
