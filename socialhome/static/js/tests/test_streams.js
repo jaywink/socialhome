@@ -77,7 +77,8 @@ describe("Streams", function() {
                     event: "content",
                     contents: [{
                         id: 1, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
-                        formatted_timestamp: "2017-01-02 10:11:12+00:00"
+                        formatted_timestamp: "2017-01-02 10:11:12+00:00",
+                        author_image: "http://localhost/foobar.png", author_name: "Some Author",
                     }]
                 };
                 window.mockServer.send(JSON.stringify(message));
@@ -85,6 +86,8 @@ describe("Streams", function() {
                     expect($(".grid-item:contains('adds new content')").length).to.eq(1);
                     expect($(".grid-item-bar > span:contains('2 minutes ago')").length).to.eq(1);
                     expect($(".grid-item-bar > span[title='2017-01-02 10:11:12+00:00']").length).to.eq(1);
+                    expect($(".grid-item-author-bar-pic[src='http://localhost/foobar.png']").length).to.eq(1);
+                    expect($(".grid-item-author-bar:contains('Some Author')").length).to.eq(1);
                     done();
                 }, 500);
             });

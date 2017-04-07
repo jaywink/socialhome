@@ -25,6 +25,16 @@
     }
   }
 
+  .grid-item-author-bar {
+    margin-top: 9px;
+
+    .grid-item-author-bar-pic {
+      max-width: 24px;
+      max-height: 24px;
+      margin-right: 5px;
+    }
+  }
+
   img {
     max-width: 100%;
   }

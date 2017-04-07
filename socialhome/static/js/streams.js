@@ -22,13 +22,18 @@ $(function () {
         },
 
         createContentElem: function(content) {
-            return $(
-                '<div class="grid-item" data-content-id="' + content.id + '">' + content.rendered +
-                    '<div class="grid-item-bar">' +
-                        '<span class="grid-item-open-action" data-content-guid="' + content.guid + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
-                    '</div>' +
-                '</div>'
-            );
+            var elem = '<div class="grid-item" data-content-id="' + content.id + '">' + content.rendered +
+                '<div class="grid-item-bar">' +
+                '<span class="grid-item-open-action" data-content-guid="' + content.guid +
+                '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
+                '</div>';
+            if (socialhomeStream.indexOf("profile__") !== 0) {
+                elem = elem + '<div class="grid-item-author-bar">' +
+                    '<img src="' + content.author_image + '" class="grid-item-author-bar-pic"> ' + content.author_name +
+                    '</div>';
+            }
+            elem = elem + '</div>';
+            return $(elem);
         },
 
         addContentToGrid: function($contents, placement) {

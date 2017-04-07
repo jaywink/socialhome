@@ -114,6 +114,18 @@ class Profile(models.Model):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
 
+    @property
+    def safer_image_url_small(self):
+        """Return a most likely more working image_url_small for the profile.
+        
+        Some urls are proven to be relative to host instead of absolute urls.
+        """
+        if self.image_url_small.startswith("/"):
+            return "https://%s%s" % (
+                self.handle.split("@")[1], self.image_url_small,
+            )
+        return self.image_url_small
+
     def visible_to_user(self, user):
         """Check whether the given user should be able to see this profile."""
         if self.visibility == Visibility.PUBLIC:

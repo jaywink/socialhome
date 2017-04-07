@@ -24,7 +24,7 @@ class TestContentModel(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.public_content = ContentFactory(
-            visibility=Visibility.PUBLIC, text="**Foobar**"
+            visibility=Visibility.PUBLIC, text="**Foobar**", author__name="Author Name"
         )
         cls.site_content = ContentFactory(
             visibility=Visibility.SITE, text="_Foobar_"
@@ -95,6 +95,8 @@ class TestContentModel(TestCase):
                 "id": self.public_content.id,
                 "guid": self.public_content.guid,
                 "author": self.public_content.author_id,
+                "author_image": self.public_content.author.safer_image_url_small,
+                "author_name": self.public_content.author.name,
                 "rendered": "<p><strong>Foobar</strong></p>",
                 "humanized_timestamp": self.public_content.humanized_timestamp,
                 "formatted_timestamp": self.public_content.formatted_timestamp,
@@ -103,6 +105,8 @@ class TestContentModel(TestCase):
                 "id": self.site_content.id,
                 "guid": self.site_content.guid,
                 "author": self.site_content.author_id,
+                "author_image": self.site_content.author.safer_image_url_small,
+                "author_name": self.site_content.author.handle,
                 "rendered": "<p><em>Foobar</em></p>",
                 "humanized_timestamp": self.site_content.humanized_timestamp,
                 "formatted_timestamp": self.site_content.formatted_timestamp,
@@ -178,7 +182,7 @@ class TestContentModel(TestCase):
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
-            "author_image": self.public_content.author.image_url_small,
+            "author_image": self.public_content.author.safer_image_url_small,
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": False,
@@ -200,7 +204,7 @@ class TestContentModel(TestCase):
             "rendered": self.public_content.rendered,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
-            "author_image": self.public_content.author.image_url_small,
+            "author_image": self.public_content.author.safer_image_url_small,
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": True,
@@ -218,7 +222,7 @@ class TestContentModel(TestCase):
                 "rendered": self.public_content.rendered,
                 "author_name": self.public_content.author.name,
                 "author_handle": self.public_content.author.handle,
-                "author_image": self.public_content.author.image_url_small,
+                "author_image": self.public_content.author.safer_image_url_small,
                 "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
                 "formatted_timestamp": self.public_content.formatted_timestamp,
                 "is_author": False,
