@@ -137,25 +137,6 @@ describe("Streams", function() {
             );
         });
 
-        it("click on timestamp opens up modal", function() {
-            var $modal = $(".modal-content");
-            expect($modal.is(":visible")).to.be.false;
-            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
-                done();
-            });
-            server.respond();
-            expect($modal.is(":visible")).to.be.true;
-            expect($("#content-title:contains('sinon')").length).to.eq(1);
-            expect($("#content-title:contains('mocha@stream_test')").length).to.eq(1);
-            expect($("#content-body:contains('foobar barfoo')").length).to.eq(1);
-            expect($("#content-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
-            expect($("#content-timestamp[title='2017-03-14 22:04:00+00:00']").length).to.eq(1);
-            expect($("#content-timestamp:contains('2 hours ago')").length).to.eq(1);
-            expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
-            expect($("#content-update-link").attr("href")).to.eq("");
-            expect($("#content-delete-link").attr("href")).to.eq("");
-        });
-
         context("as author", function() {
             before(function() {
                 server = sinon.fakeServer.create();
@@ -199,7 +180,9 @@ describe("Streams", function() {
             server.respond();
             expect(window.location.href).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
             $("#content-modal").modal("hide");
-            expect(window.location.href).to.eq(currentUrl);
+            setTimeout(function() {
+                expect(window.location.href).to.eq(currentUrl);
+            }, 100);
         });
 
         it("hides modal on back navigation", function() {
@@ -210,11 +193,33 @@ describe("Streams", function() {
             server.respond();
             expect($modal.is(":visible")).to.be.true;
             history.back();
-            expect($modal.is(":visible")).to.be.false;
+            setTimeout(function() {
+                expect($modal.is(":visible")).to.be.false;
+            }, 100);
         });
 
-        afterEach(function() {
+        it("click on timestamp opens up modal", function() {
+            var $modal = $(".modal-content");
+            expect($modal.is(":visible")).to.be.false;
+            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+                done();
+            });
+            server.respond();
+            expect($modal.is(":visible")).to.be.true;
+            expect($("#content-title:contains('sinon')").length).to.eq(1);
+            expect($("#content-title:contains('mocha@stream_test')").length).to.eq(1);
+            expect($("#content-body:contains('foobar barfoo')").length).to.eq(1);
+            expect($("#content-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
+            expect($("#content-timestamp[title='2017-03-14 22:04:00+00:00']").length).to.eq(1);
+            expect($("#content-timestamp:contains('2 hours ago')").length).to.eq(1);
+            expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
+            expect($("#content-update-link").attr("href")).to.eq("");
+            expect($("#content-delete-link").attr("href")).to.eq("");
+        });
+
+        afterEach(function(done) {
             $("#content-modal").modal("hide");
+            done();
         });
 
         after(function() {

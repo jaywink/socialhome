@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
@@ -6,7 +5,6 @@ from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.models import Content
-from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 
 
@@ -30,20 +28,11 @@ class ProfileDetailView(AccessMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
         context["content_list"] = self._get_contents_queryset()
+        context["stream_name"] = "profile__%s" % self.kwargs.get("guid")
         return context
 
     def _get_contents_queryset(self):
-        """Get queryset for content objects.
-
-        Limit by content visibility.
-        """
-        contents = Content.objects.filter(pinned=True, author=self.object)
-        if not self.request.user.is_authenticated:
-            contents = contents.filter(visibility=Visibility.PUBLIC)
-        elif self.request.user.profile != self.target_profile:
-            # TODO: filter out also LIMITED until contacts implemented
-            contents = contents.exclude(visibility__in=[Visibility.LIMITED, Visibility.SELF])
-        return contents.order_by("order").select_related("oembed", "opengraph")
+        return Content.objects.profile(self.kwargs.get("guid"), self.request.user)
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -51,16 +40,9 @@ class ProfileDetailView(AccessMixin, DetailView):
         Redirect to login if not allowed to see profile.
         """
         self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
-        if self.target_profile.visibility == Visibility.PUBLIC:
+        if self.target_profile.visible_to_user(self.request.user):
             return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
-            if self.target_profile.visibility == Visibility.SITE:
-                return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
-            # TODO: handle Visibility.LIMITED once contacts are implemented
-            # Currently falls back to lowest level, ie SELF
-            elif self.target_profile.visibility in (Visibility.SELF, Visibility.LIMITED) and \
-                    request.user.profile == self.target_profile:
-                return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
             self.raise_exception = True
         return self.handle_no_permission()
 

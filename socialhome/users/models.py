@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
 from Crypto.PublicKey import RSA
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
@@ -17,7 +13,6 @@ from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.utils import get_pony_urls
 
 
-@python_2_unicode_compatible
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns
@@ -118,6 +113,16 @@ class Profile(models.Model):
     def public(self):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
+
+    def visible_to_user(self, user):
+        """Check whether the given user should be able to see this profile."""
+        if self.visibility == Visibility.PUBLIC:
+            return True
+        elif user.is_authenticated:
+            if self.visibility == Visibility.SITE or user.profile == self:
+                return True
+        # TODO: handle Visibility.LIMITED once contacts are implemented
+        return False
 
     def get_first_name(self):
         """Return User.first_name or part of Profile.name"""

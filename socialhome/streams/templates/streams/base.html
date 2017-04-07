@@ -31,7 +31,7 @@
                     <div class="grid-sizer"></div>
                     <div class="gutter-sizer"></div>
                     {% for content in content_list %}
-                        <div class="grid-item">
+                        <div class="grid-item" data-content-id="{{ content.id }}">
                             {{ content.rendered|safe }}
                             <div class="grid-item-bar">
                                 <span class="grid-item-open-action" data-content-guid="{{ content.guid }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>

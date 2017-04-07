@@ -8,12 +8,8 @@ wheel==0.29.0
 django==1.10.5
 
 # Channels
-channels==1.0.2
-asgi_redis==1.0.0
-# Lock Twisted, 17.1.0 broke websockets with constant disconnect/reconnect and console errors like
-# Error: The connection to <websocket> was interrupted while the page was loading.
-# TODO: monitor Twisted and Channels changelogs to free this version lock
-Twisted==16.6.0
+channels==1.1.2
+asgi_redis==1.2.1
 
 # Configuration
 django-environ==0.4.1

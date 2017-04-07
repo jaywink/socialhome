@@ -7,6 +7,8 @@ $(function () {
      *
      */
     var view = {
+        contentIds: [],
+
         showNewLabel: function() {
             $("#new-content-container").show(100);
         },
@@ -21,7 +23,7 @@ $(function () {
 
         createContentElem: function(content) {
             return $(
-                '<div class="grid-item">' + content.rendered +
+                '<div class="grid-item" data-content-id="' + content.id + '">' + content.rendered +
                     '<div class="grid-item-bar">' +
                         '<span class="grid-item-open-action" data-content-guid="' + content.guid + '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
                     '</div>' +
@@ -29,17 +31,26 @@ $(function () {
             );
         },
 
-        addContentToGrid: function($contents) {
-            $('.grid').prepend($contents).masonry("prepended", $contents);
+        addContentToGrid: function($contents, placement) {
+            if (placement === "appended") {
+                $('.grid').append($contents).masonry(placement, $contents, true);
+            } else {
+                $('.grid').prepend($contents).masonry(placement, $contents, true);
+            }
             view.layoutMasonry();
             view.addNSFWShield();
         },
 
         layoutMasonry: function() {
             var $grid = $('.grid');
-            // Layout Masonry after each image loads
-            $grid.imagesLoaded().progress(function () {
-                $grid.masonry('layout');
+            $grid.imagesLoaded().progress(function (instance) {
+                // Layout after every 5th image has loaded or at the end
+                // Just a small performance tweak to not layout too often which becomes a problem
+                // when loading infinitescroll items
+                if (instance.progressedCount === instance.images.length ||
+                        instance.progressedCount % 5 === 0) {
+                    $grid.masonry('layout');
+                }
             });
         },
 
@@ -93,7 +104,7 @@ $(function () {
             });
             // Close modal on esc key
             $(document).keypress(function (ev) {
-                if (ev.keyCode == 27) {
+                if (ev.keyCode === 27) {
                     view.hideContentModal();
                 }
             });
@@ -141,12 +152,24 @@ $(function () {
                 }
             );
         },
+
+        initContentIds: function() {
+            $(".grid-item").each(function() {
+                view.contentIds.push($(this).data("content-id"));
+            });
+        },
+
+        getSmallestContentId: function() {
+            return Math.min.apply(Math, view.contentIds);
+        },
     };
 
     var controller = {
         availableContent: [],
+        loadMoreTracker: undefined,
 
         init: function() {
+            view.initContentIds();
             this.addContentListeners();
             view.addNSFWShield();
             this.socket = this.createConnection();
@@ -173,6 +196,7 @@ $(function () {
             }
             // Stream content refresh
             $("#new-content-load-link").click(controller.getContent);
+            controller.addLoadMoreTrigger();
         },
 
         handleSocketClose: function() {
@@ -202,9 +226,25 @@ $(function () {
                     view.hideNewLabel();
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
-                view.addContentToGrid($contents);
+                view.addContentToGrid($contents, data.placement);
+                view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
+                if (ids.length && data.placement === "appended") {
+                    setTimeout(controller.addLoadMoreTrigger, 500);
+                }
             }
+        },
+
+        addLoadMoreTrigger: function() {
+            controller.loadMoreTracker = appear({
+                elements: function elements(){
+                    return $(".grid .grid-item:nth-last-child(5)");
+                },
+                appear: function appear(el) {
+                    controller.loadMoreContent();
+                },
+                debounce: 200,
+            });
         },
 
         getContent: function() {
@@ -214,6 +254,21 @@ $(function () {
             };
             controller.socket.send(JSON.stringify(data));
             view.scrollToTop();
+        },
+
+        loadMoreContent: function() {
+            if (controller.loadMoreTracker !== undefined) {
+                controller.loadMoreTracker.destroy();
+            }
+            var data = {
+                action: "load_more",
+                last_id: view.getSmallestContentId(),
+            };
+            try {
+                controller.socket.send(JSON.stringify(data));
+            } catch(e) {
+                console.log(e);
+            }
         },
 
         loadContentModal: function(ev) {

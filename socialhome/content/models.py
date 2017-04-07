@@ -5,9 +5,8 @@ from uuid import uuid4
 import arrow
 from CommonMark import commonmark
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Q
+from django.db.models.aggregates import Max
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
@@ -17,11 +16,11 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
-from django.db.models.aggregates import Max
 
+from socialhome.content.querysets import TagQuerySet, ContentQuerySet
 from socialhome.content.utils import make_nsfw_safe, test_tag
 from socialhome.enums import Visibility
-from socialhome.users.models import User, Profile
+from socialhome.users.models import Profile
 from socialhome.utils import safe_clear_cached_property
 
 
@@ -45,18 +44,6 @@ class OEmbedCache(models.Model):
 
     def __str__(self):
         return self.url
-
-
-class TagQuerySet(models.QuerySet):
-    def get_by_cleaned_name(self, name):
-        """Get by name after making sure it's lower case and trimmed."""
-        cleaned = name.strip().lower()
-        return self.get(name=cleaned)
-
-    def exists_by_cleaned_name(self, name):
-        """Exists filter by name after making sure it's lower case and trimmed."""
-        cleaned = name.strip().lower()
-        return self.filter(name=cleaned).exists()
 
 
 class Tag(models.Model):
@@ -108,6 +95,8 @@ class Content(models.Model):
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
+
+    objects = ContentQuerySet.as_manager()
 
     def __str__(self):
         return "{text} ({guid})".format(
@@ -261,21 +250,9 @@ class Content(models.Model):
         return text
 
     @staticmethod
-    def get_contents_for_user(ids, user):
-        contents = Content.objects.filter(id__in=ids)
-        if not user.is_authenticated:
-            contents = contents.filter(visibility=Visibility.PUBLIC)
-        else:
-            contents = contents.filter(
-                Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC])
-            )
-        return contents.order_by("created")
-
-    @staticmethod
-    def get_rendered_contents_for_user(ids, user):
-        contents = Content.get_contents_for_user(ids, user)
+    def get_rendered_contents(qs):
         rendered = []
-        for content in contents:
+        for content in qs:
             rendered.append({
                 "id": content.id,
                 "guid": content.guid,

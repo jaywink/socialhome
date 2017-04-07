@@ -1,7 +1,6 @@
 from django.views.generic import ListView
 
-from socialhome.content.models import Content, Tag
-from socialhome.enums import Visibility
+from socialhome.content.models import Content
 
 
 class BaseStreamView(ListView):
@@ -18,27 +17,20 @@ class BaseStreamView(ListView):
 
 class PublicStreamView(BaseStreamView):
     template_name = "streams/public.html"
-    queryset = Content.objects.filter(visibility=Visibility.PUBLIC).select_related("oembed", "opengraph")
+    queryset = Content.objects.public()
     stream_name = "public"
 
 
 class TagStreamView(BaseStreamView):
     template_name = "streams/tag.html"
-    # TODO: support non-public content via visibility checks
-    queryset = Content.objects.filter(visibility=Visibility.PUBLIC).select_related("oembed", "opengraph")
 
     def dispatch(self, request, *args, **kwargs):
-        self.stream_name = "tags/%s" % kwargs.get("name")
+        self.stream_name = "tags__%s" % kwargs.get("name")
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         """Restrict to a tag."""
-        try:
-            tag = Tag.objects.get_by_cleaned_name(self.kwargs.get("name"))
-        except Tag.DoesNotExist:
-            return Content.objects.none()
-        qs = super().get_queryset()
-        return qs.filter(tags=tag)
+        return Content.objects.tags(self.kwargs.get("name"), self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
