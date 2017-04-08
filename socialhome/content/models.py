@@ -92,6 +92,10 @@ class Content(models.Model):
 
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
 
+    parent = models.ForeignKey(
+        "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -114,7 +118,7 @@ class Content(models.Model):
                 self.author = author
 
             if self.pinned:
-                max_order = Content.objects.filter(author=self.author).aggregate(Max("order"))["order__max"]
+                max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet
                     self.order = max_order + 1
 
@@ -262,6 +266,7 @@ class Content(models.Model):
                 "rendered": content.rendered,
                 "humanized_timestamp": content.humanized_timestamp,
                 "formatted_timestamp": content.formatted_timestamp,
+                "child_count": content.children.count(),
             })
         return rendered
 
@@ -290,6 +295,7 @@ class Content(models.Model):
             "author_image": self.author.safer_image_url_small,
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
+            "child_count": self.children.count(),
             "is_author": is_author,
             "slug": self.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",

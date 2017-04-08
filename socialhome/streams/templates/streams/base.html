@@ -33,19 +33,29 @@
                     {% for content in content_list %}
                         <div class="grid-item" data-content-id="{{ content.id }}">
                             {{ content.rendered|safe }}
-                            <div class="grid-item-bar">
-                                <span class="grid-item-open-action" data-content-guid="{{ content.guid }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
-                                {% if content.author == request.user.profile %}
-                                    &nbsp;
-                                    <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
-                                    <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
-                                {% endif %}
-                            </div>
                             {% if "profile__" not in stream_name %}
                                 <div class="grid-item-author-bar">
                                     <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
                                 </div>
                             {% endif %}
+                            <div class="grid-item-bar">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <span class="grid-item-open-action" data-content-guid="{{ content.guid }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
+                                        {% if content.author == request.user.profile %}
+                                            &nbsp;
+                                            <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
+                                            <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-xs-6 text-xs-right grid-item-reactions">
+                                        <div class="item-reaction">
+                                            <a href="#"><i class="fa fa-envelope" title="{% trans "Comments" %}" aria-label="{% trans "Comments" %}"></i></a>
+                                            <span class="item-reaction-counter">{{ content.children.count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>

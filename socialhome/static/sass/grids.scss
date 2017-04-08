@@ -23,10 +23,18 @@
       text-decoration: none;
       cursor: pointer;
     }
+
+    .item-reaction {
+      display: inline-block;
+      border: 1px solid #03adae;
+      border-radius: 3px;
+      padding: 0 3px;
+      cursor: pointer;
+    }
   }
 
   .grid-item-author-bar {
-    margin-top: 9px;
+    margin-bottom: 3px;
 
     .grid-item-author-bar-pic {
       max-width: 24px;
