@@ -25,6 +25,7 @@ $(function () {
             var data = {
                 content: content,
                 stream: socialhomeStream.split("__")[0],
+                objType: (content.parent) ? "comment" : "post",
             };
             var elem = Content.template(data);
             return $(elem);
@@ -170,6 +171,7 @@ $(function () {
         init: function() {
             view.initContentIds();
             this.addContentListeners();
+            this.addCommentTriggers();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
@@ -228,6 +230,7 @@ $(function () {
                 view.addContentToGrid($contents, data.placement);
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
+                controller.addCommentTriggers();
                 if (ids.length && data.placement === "appended") {
                     setTimeout(controller.addLoadMoreTrigger, 500);
                 }
@@ -277,8 +280,18 @@ $(function () {
             view.loadContentModal(contentGuid);
         },
 
+        openComments: function(ev) {
+            var contentGuid = $(ev.currentTarget).data("content-guid");
+            console.log(contentGuid);
+            // load via websocket or ajax?
+        },
+
         addContentListeners: function() {
             $(".grid-item-open-action").off("click").click(this.loadContentModal);
+        },
+
+        addCommentTriggers: function() {
+            $(".item-open-comments-action").off("click").click(this.openComments);
         },
     };
 
