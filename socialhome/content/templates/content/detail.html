@@ -14,6 +14,6 @@
 {% endblock %}
 
 {% block content %}
-    <script>var socialhomeStream = "content-{{ content.guid }}";</script>
+    <script>var socialhomeStream = "content__{{ content.guid }}";</script>
     {% include "content/_content_detail.html" with modal=False content=content %}
 {% endblock %}

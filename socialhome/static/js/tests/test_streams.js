@@ -160,7 +160,7 @@ describe("Streams", function() {
             it("click on timestamp opens up modal", function() {
                 var $modal = $(".modal-content");
                 expect($modal.is(":visible")).to.be.false;
-                $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+                $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
                     done();
                 });
                 server.respond();
@@ -177,7 +177,7 @@ describe("Streams", function() {
         it("changes url to content and then back on hiding modal", function() {
             var currentUrl = window.location.href;
             expect(currentUrl).to.not.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
-            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+            $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
                 done();
             });
             server.respond();
@@ -190,7 +190,7 @@ describe("Streams", function() {
 
         it("hides modal on back navigation", function() {
             var $modal = $(".modal-content");
-            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+            $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
                 done();
             });
             server.respond();
@@ -204,7 +204,7 @@ describe("Streams", function() {
         it("click on timestamp opens up modal", function() {
             var $modal = $(".modal-content");
             expect($modal.is(":visible")).to.be.false;
-            $(".grid-item-open-action[data-content-guid=1234]").trigger("click", function(done) {
+            $(".grid-item-open-action[data-content-id=1]").trigger("click", function(done) {
                 done();
             });
             server.respond();

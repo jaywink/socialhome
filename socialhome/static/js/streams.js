@@ -37,7 +37,11 @@ $(function () {
             } else if (placement === "prepended") {
                 $('.grid').prepend($contents).masonry(placement, $contents, true);
             } else if (placement === "children") {
-                $(".grid-item[data-content-id='" + parent_id + "']").append($contents);
+                if ($("#content-modal:visible").length) {
+                    $("#content-modal-comments").html($contents);
+                } else {
+                    $(".grid-item[data-content-id='" + parent_id + "']").append($contents);
+                }
             }
             view.layoutMasonry();
             view.addNSFWShield();
@@ -122,6 +126,7 @@ $(function () {
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
             $("#content-update-link, #content-delete-link").attr("href", "");
+            // TODO: clear reaction related
         },
 
         setContentModalData: function(data) {
@@ -135,6 +140,7 @@ $(function () {
                 $("#content-update-link").attr("href", data.update_url);
                 $("#content-delete-link").attr("href", data.delete_url);
             }
+            // TODO: set reaction related
         },
 
         loadContentModal: function(contentGuid) {
@@ -200,6 +206,11 @@ $(function () {
             // Stream content refresh
             $("#new-content-load-link").click(controller.getContent);
             controller.addLoadMoreTrigger();
+            // Comments if single content view
+            if (socialhomeStream.split("__")[0] === "content") {
+                var contentId = $("#content-body").data("content-id");
+                controller.loadComments(contentId);
+            }
         },
 
         handleSocketClose: function() {
@@ -276,21 +287,29 @@ $(function () {
         },
 
         loadContentModal: function(ev) {
-            var contentGuid = $(ev.currentTarget).data("content-guid");
+            var contentId = $(ev.currentTarget).data("content-id");
+            $("#content-modal").on("shown.bs.modal", function() {
+                controller.loadComments(contentId);
+                $("#content-modal").off("shown.bs.modal");
+            });
             view.cleanContentModal();
             view.showContentModal();
-            view.loadContentModal(contentGuid);
+            view.loadContentModal(contentId);
         },
 
         openComments: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
+            controller.loadComments(contentId);
+            $(ev.currentTarget).removeClass("item-open-comments-action").off("click");
+        },
+
+        loadComments: function(contentId) {
             var data = {
                 action: "load_children",
                 content_id: contentId,
             };
             try {
                 controller.socket.send(JSON.stringify(data));
-                $(ev.currentTarget).removeClass("item-open-comments-action").off("click");
             } catch(e) {
                 console.log(e);
             }

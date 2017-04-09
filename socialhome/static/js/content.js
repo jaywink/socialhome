@@ -11,7 +11,7 @@
         '<div class="grid-item-bar">' +
             '<div class="row">' +
                 '<div class="col-xs-6">' +
-                    '<span class="grid-item-open-action" data-content-guid="<%= content.guid %>" ' +
+                    '<span class="grid-item-open-action" data-content-id="<%= content.id %>" ' +
                         'title="<%= content.formatted_timestamp %>"><%= content.humanized_timestamp %>' +
                     '</span>' +
                 '</div>' +
