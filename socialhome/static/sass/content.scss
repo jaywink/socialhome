@@ -57,7 +57,7 @@ a.opengraph-card {
   .content-bar {
     font-size: smaller;
     opacity: 0.5;
-    padding: 15px;
+    padding: 0 15px 15px;
 
     @media all and (max-width: $largeDevice) {
       font-size: small;
@@ -75,11 +75,29 @@ a.opengraph-card {
   }
 }
 
-.comment {
-  padding-left: 15px;
+.content-actions {
+  padding-top: 10px;
+
+  a {
+    width: 100%;
+  }
+}
+
+.comments-container {
+  padding: 0 15px;
+
   font-size: 0.95em;
 
   img {
     max-width: 100%;
   }
+}
+
+#content-modal-comments {
+  padding: 0 30px;
+}
+
+.comment {
+  border-top: solid 1px $darkopacity;
+  margin-top: 7px;
 }

@@ -33,10 +33,10 @@
                     </div>
                 </div>
             </div>
-            <div id="content-modal-comments" class="comment"></div>
-            {% if modal %}
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
+            <div id="content-modal-comments" class="comments-container"></div>
+            {% if request.user.is_authenticated %}
+                <div class="content-actions">
+                    <a class="btn btn-secondary" id="content-reply-url" href="{% if content %}{% url "content:reply" pk=content.id %}{% endif %}">{% trans "Reply" %}</a>
                 </div>
             {% endif %}
         </div>

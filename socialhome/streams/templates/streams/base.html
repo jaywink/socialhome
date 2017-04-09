@@ -58,6 +58,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="comments-container" data-content-id="{{ content.id }}"></div>
+                            {% if request.user.is_authenticated %}
+                                <div class="content-actions hidden" data-content-id="{{ content.id }}">
+                                    <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

@@ -289,7 +289,21 @@ class Content(models.Model):
             "child_count": self.children.count(),
             "parent": self.parent_id if self.parent else "",
             "is_author": is_author,
+            "is_authenticated": bool(user.is_authenticated),
             "slug": self.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
+            "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
         }
+
+    def visible_for_user(self, user):
+        """Check if visible to given user.
+        
+        Mirrors logic in `ContentQuerySet.visible_for_user`.
+        """
+        # TODO: handle also LIMITED when contacts implemented
+        if self.visibility == Visibility.PUBLIC:
+            return True
+        if user.is_authenticated and (self.author == user.profile or self.visibility == Visibility.SITE):
+            return True
+        return False

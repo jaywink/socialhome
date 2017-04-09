@@ -33,6 +33,24 @@ class ContentCreateView(CreateView):
         return reverse("home")
 
 
+class ContentReplyView(ContentCreateView):
+    def dispatch(self, request, *args, **kwargs):
+        content_id = kwargs.get("pk")
+        self.parent = get_object_or_404(Content, id=content_id)
+        if not self.parent.visible_for_user(request.user):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        object = form.save(commit=False)
+        object.parent = self.parent
+        object.save(author=self.request.user.profile)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse("content:view-by-slug", kwargs={"pk": self.parent.id, "slug": self.parent.slug})
+
+
 class UserOwnsContentMixin(UserPassesTestMixin):
     raise_exception = Http404
 

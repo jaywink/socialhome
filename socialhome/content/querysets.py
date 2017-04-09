@@ -58,4 +58,4 @@ class ContentQuerySet(models.QuerySet):
         return qs.order_by("order")
 
     def children(self, parent_id, user):
-        return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("-created")
+        return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("created")
