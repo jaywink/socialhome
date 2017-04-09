@@ -297,9 +297,9 @@ class Content(models.Model):
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
             "child_count": self.children.count(),
+            "parent": self.parent_id if self.parent else "",
             "is_author": is_author,
             "slug": self.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
-            "parent": self.parent_id if self.parent else "",
         }

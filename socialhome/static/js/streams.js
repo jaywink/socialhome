@@ -126,7 +126,7 @@ $(function () {
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
             $("#content-update-link, #content-delete-link").attr("href", "");
-            // TODO: clear reaction related
+            $("#comment-content-count").html("");
         },
 
         setContentModalData: function(data) {
@@ -140,7 +140,9 @@ $(function () {
                 $("#content-update-link").attr("href", data.update_url);
                 $("#content-delete-link").attr("href", data.delete_url);
             }
-            // TODO: set reaction related
+            if (! data.parent) {
+                $("#comment-content-count").html(data.child_count);
+            }
         },
 
         loadContentModal: function(contentGuid) {

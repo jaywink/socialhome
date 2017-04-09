@@ -19,7 +19,7 @@
                     '<% if (!content.parent) { %>' +
                         '<div class="item-reaction">' +
                             '<span class="item-open-comments-action" data-content-id="<%= content.id %>">' +
-                                '<i class="fa fa-envelope"></i>' +
+                                '<i class="fa fa-envelope" title="' + gettext("Comments") +'" aria-label="' + gettext("Comments") +'"></i>' +
                             '</span>&nbsp;' +
                             '<span class="item-reaction-counter"><%= content.child_count %></span>' +
                         '</div>' +
