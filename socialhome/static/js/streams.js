@@ -104,7 +104,7 @@ $(function () {
         },
 
         showContentModal: function() {
-            $('#content-modal').modal('show').on('hide.bs.modal', function (e) {
+            $('#content-modal').modal('show').on('hide.bs.modal', function () {
                 $('#content-modal').off("hide.bs.modal");
                 history.back();
             });
@@ -186,7 +186,7 @@ $(function () {
             this.socket.onopen = this.handleSocketOpen;
             this.socket.onclose = this.handleSocketClose;
             // Hide content modal on back navigation
-            window.onpopstate = function(ev) {
+            window.onpopstate = function() {
                 $('#content-modal').off("hide.bs.modal");
                 view.hideContentModal();
             };
@@ -194,7 +194,7 @@ $(function () {
 
         createConnection: function() {
             // Correctly decide between ws:// and wss://
-            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws",
+            var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws",
                 ws_path = ws_scheme + '://' + window.location.host + "/ch/streams/" + socialhomeStream + "/";
             return new ReconnectingWebSocket(ws_path);
         },
@@ -226,7 +226,7 @@ $(function () {
                 view.showNewLabel();
 
             } else if (data.event === "content") {
-                var $contents,
+                var $contents = undefined,
                     ids = [];
 
                 _.each(data.contents, function (content) {
@@ -252,10 +252,10 @@ $(function () {
 
         addLoadMoreTrigger: function() {
             controller.loadMoreTracker = appear({
-                elements: function elements(){
+                elements: function () {
                     return $(".grid .grid-item:nth-last-child(5)");
                 },
-                appear: function appear(el) {
+                appear: function () {
                     controller.loadMoreContent();
                 },
                 debounce: 200,
