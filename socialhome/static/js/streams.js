@@ -126,7 +126,7 @@ $(function () {
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
             $("#content-update-link, #content-delete-link").attr("href", "");
-            $("#comment-content-count").html("");
+            $("#content-comment-count").html("");
         },
 
         setContentModalData: function(data) {
@@ -141,7 +141,7 @@ $(function () {
                 $("#content-delete-link").attr("href", data.delete_url);
             }
             if (! data.parent) {
-                $("#comment-content-count").html(data.child_count);
+                $("#content-comment-count").html(data.child_count);
             }
         },
 

@@ -42,7 +42,7 @@ class StreamConsumer(WebsocketConsumer):
             return
         qs = self._get_stream_qs()
         qs = qs.filter(id__in=ids)
-        contents = Content.get_rendered_contents(qs)
+        contents = Content.get_rendered_contents(qs, self.message.user)
         payload = self.make_payload(contents, "prepended")
         self.send_payload(payload)
 
@@ -53,7 +53,7 @@ class StreamConsumer(WebsocketConsumer):
             return
         qs = self._get_stream_qs()
         qs = qs.filter(id__lt=last_id)[:20]
-        contents = Content.get_rendered_contents(qs)
+        contents = Content.get_rendered_contents(qs, self.message.user)
         payload = self.make_payload(contents, "appended")
         self.send_payload(payload)
 
@@ -63,7 +63,7 @@ class StreamConsumer(WebsocketConsumer):
             return
         # TODO: get recursively
         qs = Content.objects.children(content_id, self.message.user)
-        contents = Content.get_rendered_contents(qs)
+        contents = Content.get_rendered_contents(qs, self.message.user)
         payload = self.make_payload(contents, "children")
         payload["parent_id"] = content_id
         self.send_payload(payload)

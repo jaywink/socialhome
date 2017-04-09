@@ -95,7 +95,7 @@ class ContentView(PublicOrOwnedByUserContentMixin, AjaxResponseMixin, JSONRespon
 
     def get_ajax(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return self.render_json_response(self.object.dict_for_view(request))
+        return self.render_json_response(self.object.dict_for_view(request.user))
 
 
 class HomeView(TemplateView):

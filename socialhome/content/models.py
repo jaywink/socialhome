@@ -254,21 +254,10 @@ class Content(models.Model):
         return text
 
     @staticmethod
-    def get_rendered_contents(qs):
+    def get_rendered_contents(qs, user):
         rendered = []
         for content in qs:
-            rendered.append({
-                "id": content.id,
-                "guid": content.guid,
-                "author": content.author_id,
-                "author_image": content.author.safer_image_url_small,
-                "author_name": content.author.name or content.author.handle,
-                "rendered": content.rendered,
-                "humanized_timestamp": content.humanized_timestamp,
-                "formatted_timestamp": content.formatted_timestamp,
-                "child_count": content.children.count(),
-                "parent": content.parent_id if content.parent else "",
-            })
+            rendered.append(content.dict_for_view(user))
         return rendered
 
     def fix_local_uploads(self):
@@ -284,13 +273,14 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
 
-    def dict_for_view(self, request):
+    def dict_for_view(self, user):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
-        is_author = bool(request.user.is_authenticated and self.author == request.user.profile)
+        is_author = bool(user.is_authenticated and self.author == user.profile)
         return {
             "id": self.id,
             "guid": self.guid,
             "rendered": self.rendered,
+            "author": self.author_id,
             "author_name": self.author.name or self.author.handle,
             "author_handle": self.author.handle,
             "author_image": self.author.safer_image_url_small,
