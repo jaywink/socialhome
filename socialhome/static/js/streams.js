@@ -31,11 +31,13 @@ $(function () {
             return $(elem);
         },
 
-        addContentToGrid: function($contents, placement) {
+        addContentToGrid: function($contents, placement, parent_id) {
             if (placement === "appended") {
                 $('.grid').append($contents).masonry(placement, $contents, true);
-            } else {
+            } else if (placement === "prepended") {
                 $('.grid').prepend($contents).masonry(placement, $contents, true);
+            } else if (placement === "children") {
+                $(".grid-item[data-content-id='" + parent_id + "']").append($contents);
             }
             view.layoutMasonry();
             view.addNSFWShield();
@@ -227,7 +229,7 @@ $(function () {
                     view.hideNewLabel();
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
-                view.addContentToGrid($contents, data.placement);
+                view.addContentToGrid($contents, data.placement, data.parent_id);
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
                 controller.addCommentTriggers();
@@ -281,9 +283,17 @@ $(function () {
         },
 
         openComments: function(ev) {
-            var contentGuid = $(ev.currentTarget).data("content-guid");
-            console.log(contentGuid);
-            // load via websocket or ajax?
+            var contentId = $(ev.currentTarget).data("content-id");
+            var data = {
+                action: "load_children",
+                content_id: contentId,
+            };
+            try {
+                controller.socket.send(JSON.stringify(data));
+                $(ev.currentTarget).removeClass("item-open-comments-action").off("click");
+            } catch(e) {
+                console.log(e);
+            }
         },
 
         addContentListeners: function() {

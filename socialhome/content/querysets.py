@@ -56,3 +56,6 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         qs = self.top_level()._select_related().visible_for_user(user).filter(pinned=True, author=profile)
         return qs.order_by("order")
+
+    def children(self, parent_id, user):
+        return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("-created")

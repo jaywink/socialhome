@@ -21,6 +21,8 @@ class StreamConsumer(WebsocketConsumer):
             self.handle_load_content(data)
         elif action == "load_more":
             self.handle_load_more(data)
+        elif action == "load_children":
+            self.handle_load_children(data)
 
     def _get_stream_qs(self):
         """Using the stream info, get correct queryset to use for content."""
@@ -42,7 +44,7 @@ class StreamConsumer(WebsocketConsumer):
         qs = qs.filter(id__in=ids)
         contents = Content.get_rendered_contents(qs)
         payload = self.make_payload(contents, "prepended")
-        self.send(payload)
+        self.send_payload(payload)
 
     def handle_load_more(self, data):
         """Load more content to the stream."""
@@ -53,13 +55,26 @@ class StreamConsumer(WebsocketConsumer):
         qs = qs.filter(id__lt=last_id)[:20]
         contents = Content.get_rendered_contents(qs)
         payload = self.make_payload(contents, "appended")
-        self.send(payload)
+        self.send_payload(payload)
+
+    def handle_load_children(self, data):
+        content_id = data.get("content_id")
+        if not content_id:
+            return
+        # TODO: get recursively
+        qs = Content.objects.children(content_id, self.message.user)
+        contents = Content.get_rendered_contents(qs)
+        payload = self.make_payload(contents, "children")
+        payload["parent_id"] = content_id
+        self.send_payload(payload)
+
+    def send_payload(self, payload):
+        self.send(json.dumps(payload))
 
     @staticmethod
     def make_payload(contents, placement):
-        payload = json.dumps({
+        return {
             "event": "content",
             "contents": contents,
             "placement": placement,
-        })
-        return payload
+        }
