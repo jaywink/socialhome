@@ -196,7 +196,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
 
     def test_content_view_by_guid_renders_json_result(self):
         response = self.client.get(
@@ -204,7 +204,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
 
     def test_content_view_by_slug_renders_json_result(self):
         response = self.client.get(
@@ -212,7 +212,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock()), response.json())
+        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
 
     def test_content_view_returns_404_for_private_content_except_if_owned(self):
         self.client.force_login(self.content.author.user)
@@ -260,7 +260,7 @@ class TestContentView(TestCase):
         self.assertContains(response, self.content.formatted_timestamp)
         self.assertContains(response, '<span id="content-bar-actions" class="hidden"')
         self.assertNotContains(response, "modal-footer")
-        self.assertContains(response, 'var socialhomeStream = "content-%s' % self.content.guid)
+        self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.guid)
 
     def test_content_view_content_as_author(self):
         self.client.force_login(self.content.author.user)

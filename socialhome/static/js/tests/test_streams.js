@@ -79,13 +79,15 @@ describe("Streams", function() {
                         id: 1, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
                         formatted_timestamp: "2017-01-02 10:11:12+00:00",
                         author_image: "http://localhost/foobar.png", author_name: "Some Author",
-                    }]
+                        parent_id: "",
+                    }],
+                    placement: "prepended",
                 };
                 window.mockServer.send(JSON.stringify(message));
                 setTimeout(function () {
                     expect($(".grid-item:contains('adds new content')").length).to.eq(1);
-                    expect($(".grid-item-bar > span:contains('2 minutes ago')").length).to.eq(1);
-                    expect($(".grid-item-bar > span[title='2017-01-02 10:11:12+00:00']").length).to.eq(1);
+                    expect($(".grid-item-bar span:contains('2 minutes ago')").length).to.eq(1);
+                    expect($(".grid-item-bar span[title='2017-01-02 10:11:12+00:00']").length).to.eq(1);
                     expect($(".grid-item-author-bar-pic[src='http://localhost/foobar.png']").length).to.eq(1);
                     expect($(".grid-item-author-bar:contains('Some Author')").length).to.eq(1);
                     done();
@@ -164,9 +166,11 @@ describe("Streams", function() {
                     done();
                 });
                 server.respond();
-                expect($("#content-bar-actions").hasClass("hidden")).to.be.false;
-                expect($("#content-update-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~update/");
-                expect($("#content-delete-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~delete/");
+                setTimeout(function() {
+                    expect($("#content-bar-actions").hasClass("hidden")).to.be.false;
+                    expect($("#content-update-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~update/");
+                    expect($("#content-delete-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~delete/");
+                }, 100);
             });
 
             after(function() {
@@ -181,10 +185,12 @@ describe("Streams", function() {
                 done();
             });
             server.respond();
-            expect(window.location.href).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
-            $("#content-modal").modal("hide");
             setTimeout(function() {
-                expect(window.location.href).to.eq(currentUrl);
+                expect(window.location.href).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/foobar-barfoo/");
+                $("#content-modal").modal("hide");
+                setTimeout(function() {
+                    expect(window.location.href).to.eq(currentUrl);
+                }, 100);
             }, 100);
         });
 
@@ -208,16 +214,18 @@ describe("Streams", function() {
                 done();
             });
             server.respond();
-            expect($modal.is(":visible")).to.be.true;
-            expect($("#content-title:contains('sinon')").length).to.eq(1);
-            expect($("#content-title:contains('mocha@stream_test')").length).to.eq(1);
-            expect($("#content-body:contains('foobar barfoo')").length).to.eq(1);
-            expect($("#content-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
-            expect($("#content-timestamp[title='2017-03-14 22:04:00+00:00']").length).to.eq(1);
-            expect($("#content-timestamp:contains('2 hours ago')").length).to.eq(1);
-            expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
-            expect($("#content-update-link").attr("href")).to.eq("");
-            expect($("#content-delete-link").attr("href")).to.eq("");
+            setTimeout(function() {
+                expect($modal.is(":visible")).to.be.true;
+                expect($("#content-title:contains('sinon')").length).to.eq(1);
+                expect($("#content-title:contains('mocha@stream_test')").length).to.eq(1);
+                expect($("#content-body:contains('foobar barfoo')").length).to.eq(1);
+                expect($("#content-profile-pic[src='https://localhost/sinon.jpg']").length).to.eq(1);
+                expect($("#content-timestamp[title='2017-03-14 22:04:00+00:00']").length).to.eq(1);
+                expect($("#content-timestamp:contains('2 hours ago')").length).to.eq(1);
+                expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
+                expect($("#content-update-link").attr("href")).to.eq("");
+                expect($("#content-delete-link").attr("href")).to.eq("");
+            }, 100);
         });
 
         afterEach(function(done) {

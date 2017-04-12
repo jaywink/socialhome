@@ -89,7 +89,7 @@ class TestContentModel(TestCase):
 
     def test_get_rendered_contents_for_user(self):
         qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
-        contents = Content.get_rendered_contents(qs)
+        contents = Content.get_rendered_contents(qs, Mock(is_authenticated=True))
         self.assertEqual(contents, [
             {
                 "id": self.public_content.id,
@@ -100,6 +100,15 @@ class TestContentModel(TestCase):
                 "rendered": "<p><strong>Foobar</strong></p>",
                 "humanized_timestamp": self.public_content.humanized_timestamp,
                 "formatted_timestamp": self.public_content.formatted_timestamp,
+                "author_handle": self.public_content.author.handle,
+                "is_author": False,
+                "slug": self.public_content.slug,
+                "update_url": "",
+                "delete_url": "",
+                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+                "child_count": 0,
+                "is_authenticated": True,
+                "parent": "",
             },
             {
                 "id": self.site_content.id,
@@ -110,6 +119,15 @@ class TestContentModel(TestCase):
                 "rendered": "<p><em>Foobar</em></p>",
                 "humanized_timestamp": self.site_content.humanized_timestamp,
                 "formatted_timestamp": self.site_content.formatted_timestamp,
+                "author_handle": self.site_content.author.handle,
+                "is_author": False,
+                "slug": self.site_content.slug,
+                "update_url": "",
+                "delete_url": "",
+                "reply_url": reverse("content:reply", kwargs={"pk": self.site_content.id}),
+                "child_count": 0,
+                "is_authenticated": True,
+                "parent": "",
             }
         ])
 
@@ -180,6 +198,7 @@ class TestContentModel(TestCase):
             "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
+            "author": self.public_content.author_id,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.safer_image_url_small,
@@ -189,19 +208,22 @@ class TestContentModel(TestCase):
             "slug": self.public_content.slug,
             "update_url": "",
             "delete_url": "",
+            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+            "child_count": 0,
+            "is_authenticated": True,
+            "parent": "",
         })
 
     def test_dict_for_view_for_author(self):
-        request = Mock(
-            user=Mock(
-                is_authenticated=True,
-                profile=self.public_content.author,
-            )
+        user = Mock(
+            is_authenticated=True,
+            profile=self.public_content.author,
         )
-        self.assertEqual(self.public_content.dict_for_view(request), {
+        self.assertEqual(self.public_content.dict_for_view(user), {
             "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
+            "author": self.public_content.author_id,
             "author_name": self.public_content.author.name,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.safer_image_url_small,
@@ -211,6 +233,10 @@ class TestContentModel(TestCase):
             "slug": self.public_content.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
             "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
+            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+            "child_count": 0,
+            "is_authenticated": True,
+            "parent": "",
         })
 
     def test_dict_for_view_edited_post(self):
@@ -220,6 +246,7 @@ class TestContentModel(TestCase):
                 "id": self.public_content.id,
                 "guid": self.public_content.guid,
                 "rendered": self.public_content.rendered,
+                "author": self.public_content.author_id,
                 "author_name": self.public_content.author.name,
                 "author_handle": self.public_content.author.handle,
                 "author_image": self.public_content.author.safer_image_url_small,
@@ -229,6 +256,10 @@ class TestContentModel(TestCase):
                 "slug": self.public_content.slug,
                 "update_url": "",
                 "delete_url": "",
+                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+                "child_count": 0,
+                "is_authenticated": True,
+                "parent": "",
             })
 
     def test_short_text(self):

@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 from channels.tests import ChannelTestCase, Client
 from django.test import SimpleTestCase
+from django.urls import reverse
 from freezegun import freeze_time
 
 from socialhome.content.models import Content
@@ -46,6 +47,15 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "rendered": self.content.rendered,
                 "humanized_timestamp": self.content.humanized_timestamp,
                 "formatted_timestamp": self.content.formatted_timestamp,
+                "author_handle": self.content.author.handle,
+                "is_author": False,
+                "slug": self.content.slug,
+                "update_url": "",
+                "delete_url": "",
+                "reply_url": "",
+                "child_count": 0,
+                "is_authenticated": False,
+                "parent": "",
             }
         ])
 
@@ -71,6 +81,15 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "rendered": self.content.rendered,
                 "humanized_timestamp": self.content.humanized_timestamp,
                 "formatted_timestamp": self.content.formatted_timestamp,
+                "author_handle": self.content.author.handle,
+                "is_author": False,
+                "slug": self.content.slug,
+                "update_url": "",
+                "delete_url": "",
+                "reply_url": "",
+                "child_count": 0,
+                "is_authenticated": False,
+                "parent": "",
             }
         ])
 
