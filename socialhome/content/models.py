@@ -298,7 +298,7 @@ class Content(models.Model):
 
     def visible_for_user(self, user):
         """Check if visible to given user.
-        
+
         Mirrors logic in `ContentQuerySet.visible_for_user`.
         """
         # TODO: handle also LIMITED when contacts implemented
