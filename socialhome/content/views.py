@@ -56,8 +56,6 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
     def dispatch(self, request, *args, **kwargs):
         content_id = kwargs.get("pk")
         self.parent = get_object_or_404(Content, id=content_id)
-        if not self.parent.visible_for_user(request.user):
-            raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
