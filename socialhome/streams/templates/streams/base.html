@@ -49,12 +49,14 @@
                                         {% endif %}
                                     </div>
                                     <div class="col-xs-6 text-xs-right grid-item-reactions">
-                                        <div class="item-reaction">
-                                            <span class="item-open-comments-action" data-content-id="{{ content.id }}">
-                                                <i class="fa fa-envelope" title="{% trans "Comments" %}" aria-label="{% trans "Comments" %}"></i>
-                                            </span>
-                                            <span class="item-reaction-counter">{{ content.children.count }}</span>
-                                        </div>
+                                        {% if request.user.is_authenticated or content.children.count %}
+                                            <div class="item-reaction">
+                                                <span class="item-open-comments-action" data-content-id="{{ content.id }}">
+                                                    <i class="fa fa-envelope" title="{% trans "Comments" %}" aria-label="{% trans "Comments" %}"></i>
+                                                </span>
+                                                <span class="item-reaction-counter">{{ content.children.count }}</span>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

@@ -24,7 +24,7 @@
                         '<% } %>' +
                     '</div>' +
                     '<div class="col-xs-6 text-xs-right grid-item-reactions">' +
-                        '<% if (!content.parent) { %>' +
+                        '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
                             '<div class="item-reaction">' +
                                 '<span class="item-open-comments-action" data-content-id="<%= content.id %>">' +
                                     '<i class="fa fa-envelope" title="' + gettext("Comments") +'" aria-label="' + gettext("Comments") +'"></i>' +
