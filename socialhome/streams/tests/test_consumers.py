@@ -20,6 +20,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         super(TestStreamConsumerReceive, cls).setUpTestData()
         cls.content = ContentFactory()
         cls.content2 = ContentFactory()
+        cls.child_content = ContentFactory(parent=cls.content)
 
     def setUp(self):
         super(TestStreamConsumerReceive, self).setUp()
@@ -53,7 +54,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "update_url": "",
                 "delete_url": "",
                 "reply_url": "",
-                "child_count": 0,
+                "child_count": 1,
                 "is_authenticated": False,
                 "parent": "",
             }
@@ -87,9 +88,44 @@ class TestStreamConsumerReceive(ChannelTestCase):
                 "update_url": "",
                 "delete_url": "",
                 "reply_url": "",
-                "child_count": 0,
+                "child_count": 1,
                 "is_authenticated": False,
                 "parent": "",
+            }
+        ])
+
+    def test_receive_load_children_sends_reply_content(self):
+        self.client.send_and_consume(
+            "websocket.receive",
+            {
+                "path": "/ch/streams/public/",
+                "text": '{"action": "load_children", "content_id": %s}' % self.content.id,
+            },
+        )
+        receive = self.client.receive()
+        text = json.loads(receive["text"])
+        self.assertEqual(text["event"], "content")
+        self.assertEqual(text["placement"], "children")
+        self.assertEqual(text["parent_id"], self.content.id)
+        self.assertEqual(text["contents"], [
+            {
+                "id": self.child_content.id,
+                "guid": self.child_content.guid,
+                "author": self.child_content.author.id,
+                "author_image": self.child_content.author.safer_image_url_small,
+                "author_name": self.child_content.author.handle,
+                "rendered": self.child_content.rendered,
+                "humanized_timestamp": self.child_content.humanized_timestamp,
+                "formatted_timestamp": self.child_content.formatted_timestamp,
+                "author_handle": self.child_content.author.handle,
+                "is_author": False,
+                "slug": self.child_content.slug,
+                "update_url": "",
+                "delete_url": "",
+                "reply_url": "",
+                "child_count": 0,
+                "is_authenticated": False,
+                "parent": self.content.id,
             }
         ])
 
