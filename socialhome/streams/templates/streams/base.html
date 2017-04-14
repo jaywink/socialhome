@@ -51,8 +51,8 @@
                                     <div class="col-xs-6 text-xs-right grid-item-reactions">
                                         {% if request.user.is_authenticated or content.children.count %}
                                             <div class="item-reaction">
-                                                <span class="item-open-comments-action" data-content-id="{{ content.id }}">
-                                                    <i class="fa fa-envelope" title="{% trans "Comments" %}" aria-label="{% trans "Comments" %}"></i>
+                                                <span class="item-open-replies-action" data-content-id="{{ content.id }}">
+                                                    <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
                                                 </span>
                                                 <span class="item-reaction-counter">{{ content.children.count }}</span>
                                             </div>
@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="comments-container" data-content-id="{{ content.id }}"></div>
+                            <div class="replies-container" data-content-id="{{ content.id }}"></div>
                             {% if request.user.is_authenticated %}
                                 <div class="content-actions hidden" data-content-id="{{ content.id }}">
                                     <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>

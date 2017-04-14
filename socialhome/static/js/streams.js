@@ -38,9 +38,9 @@ $(function () {
                 $('.grid').prepend($contents).masonry(placement, $contents, true);
             } else if (placement === "children") {
                 if ($("#content-modal:visible").length) {
-                    $("#content-modal-comments").html($contents);
+                    $("#content-modal-replies").html($contents);
                 } else {
-                    $(".comments-container[data-content-id='" + parent_id + "']").html($contents);
+                    $(".replies-container[data-content-id='" + parent_id + "']").html($contents);
                 }
             }
             view.layoutMasonry();
@@ -127,7 +127,7 @@ $(function () {
             $("#content-bar-actions").addClass("hidden");
             $("#content-update-link, #content-delete-link, #content-reply-url").attr("href", "");
             $("#content-comment-count").html("");
-            $("#content-modal-comments").html("");
+            $("#content-modal-replies").html("");
         },
 
         setContentModalData: function(data) {
@@ -210,10 +210,10 @@ $(function () {
             // Stream content refresh
             $("#new-content-load-link").click(controller.getContent);
             controller.addLoadMoreTrigger();
-            // Comments if single content view
+            // Replies if single content view
             if (socialhomeStream.split("__")[0] === "content") {
                 var contentId = $("#content-body").data("content-id");
-                controller.loadComments(contentId);
+                controller.loadReplies(contentId);
             }
         },
 
@@ -293,7 +293,7 @@ $(function () {
         loadContentModal: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
             $("#content-modal").on("shown.bs.modal", function() {
-                controller.loadComments(contentId);
+                controller.loadReplies(contentId);
                 $("#content-modal").off("shown.bs.modal");
             });
             view.cleanContentModal();
@@ -301,14 +301,14 @@ $(function () {
             view.loadContentModal(contentId);
         },
 
-        openComments: function(ev) {
+        openReplies: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
-            controller.loadComments(contentId);
+            controller.loadReplies(contentId);
             $(".content-actions[data-content-id='" + contentId + "']").removeClass("hidden");
-            $(ev.currentTarget).removeClass("item-open-comments-action").off("click");
+            $(ev.currentTarget).removeClass("item-open-replies-action").off("click", controller.openReplies);
         },
 
-        loadComments: function(contentId) {
+        loadReplies: function(contentId) {
             var data = {
                 action: "load_children",
                 content_id: contentId,
@@ -325,7 +325,7 @@ $(function () {
         },
 
         addCommentTriggers: function() {
-            $(".item-open-comments-action").off("click", controller.openComments).click(controller.openComments);
+            $(".item-open-replies-action").off("click", controller.openReplies).click(controller.openReplies);
         },
     };
 

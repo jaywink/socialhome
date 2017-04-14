@@ -26,8 +26,8 @@
                     '<div class="col-xs-6 text-xs-right grid-item-reactions">' +
                         '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
                             '<div class="item-reaction">' +
-                                '<span class="item-open-comments-action" data-content-id="<%= content.id %>">' +
-                                    '<i class="fa fa-envelope" title="' + gettext("Comments") +'" aria-label="' + gettext("Comments") +'"></i>' +
+                                '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
+                                    '<i class="fa fa-envelope" title="' + gettext("Replies") +'" aria-label="' + gettext("Replies") +'"></i>' +
                                 '</span>&nbsp;' +
                                 '<span class="item-reaction-counter"><%= content.child_count %></span>' +
                             '</div>' +
