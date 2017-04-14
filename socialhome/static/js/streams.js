@@ -247,7 +247,7 @@ $(function () {
                 view.addContentToGrid($contents, data.placement, data.parent_id);
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
-                controller.addCommentTriggers();
+                setTimeout(controller.addCommentTriggers, 500);
                 if (ids.length && data.placement === "appended") {
                     setTimeout(controller.addLoadMoreTrigger, 500);
                 }
@@ -321,11 +321,11 @@ $(function () {
         },
 
         addContentListeners: function() {
-            $(".grid-item-open-action").off("click").click(this.loadContentModal);
+            $(".grid-item-open-action").off("click", controller.loadContentModal).click(controller.loadContentModal);
         },
 
         addCommentTriggers: function() {
-            $(".item-open-comments-action").off("click").click(this.openComments);
+            $(".item-open-comments-action").off("click", controller.openComments).click(controller.openComments);
         },
     };
 
