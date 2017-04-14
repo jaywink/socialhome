@@ -1,4 +1,4 @@
-from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin
+from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -8,12 +8,31 @@ from django.views.generic import CreateView, UpdateView, TemplateView, DeleteVie
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView
 
 
-class ContentCreateView(CreateView):
+class ContentVisibleForUserMixin(UserPassesTestMixin):
+    def test_func(self, user):
+        """Ensure user owns content."""
+        object = self.get_object()
+        return (
+            bool(object) and object.visible_for_user(user)
+        )
+
+
+class UserOwnsContentMixin(UserPassesTestMixin):
+    raise_exception = Http404
+
+    def test_func(self, user):
+        """Ensure user owns content."""
+        object = self.get_object()
+        return (
+            bool(object) and hasattr(user, "profile") and object.author == user.profile
+        )
+
+
+class ContentCreateView(LoginRequiredMixin, CreateView):
     model = Content
     form_class = ContentForm
     template_name = "content/edit.html"
@@ -33,7 +52,7 @@ class ContentCreateView(CreateView):
         return reverse("home")
 
 
-class ContentReplyView(ContentCreateView):
+class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
     def dispatch(self, request, *args, **kwargs):
         content_id = kwargs.get("pk")
         self.parent = get_object_or_404(Content, id=content_id)
@@ -49,31 +68,6 @@ class ContentReplyView(ContentCreateView):
 
     def get_success_url(self):
         return reverse("content:view-by-slug", kwargs={"pk": self.parent.id, "slug": self.parent.slug})
-
-
-class UserOwnsContentMixin(UserPassesTestMixin):
-    raise_exception = Http404
-
-    def test_func(self, user):
-        """Ensure user owns content."""
-        object = self.get_object()
-        return (
-            bool(object) and hasattr(user, "profile") and object.author == user.profile
-        )
-
-
-class PublicOrOwnedByUserContentMixin(UserPassesTestMixin):
-    raise_exception = Http404
-
-    def test_func(self, user):
-        """Ensure content is public or user owns it."""
-        obj = self.get_object()
-        return (
-            bool(obj) and (
-                obj.visibility == Visibility.PUBLIC or
-                (hasattr(user, "profile") and obj.author == user.profile)
-            )
-        )
 
 
 class ContentUpdateView(UserOwnsContentMixin, UpdateView):
@@ -101,7 +95,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-class ContentView(PublicOrOwnedByUserContentMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
+class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
     template_name = "content/detail.html"
 
