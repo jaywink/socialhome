@@ -1,9 +1,9 @@
 (function($){
     window.Content = {};
     var contentTemplate =
-        '<div class="<% if (content.parent) { %>comment<% } else { %>grid-item<% } %>" ' +
+        '<div class="<% if (content.parent) { %>reply<% } else { %>grid-item<% } %>" ' +
                 'data-content-id="<%= content.id %>">' +
-        '   <%= content.rendered %>' +
+            '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
                 '<div class="grid-item-author-bar">' +
                     '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +

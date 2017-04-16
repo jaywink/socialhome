@@ -25,7 +25,7 @@ $(function () {
             var data = {
                 content: content,
                 stream: socialhomeStream.split("__")[0],
-                objType: (content.parent) ? "comment" : "post",
+                objType: (content.parent) ? "reply" : "post",
             };
             var elem = Content.template(data);
             return $(elem);
@@ -126,7 +126,7 @@ $(function () {
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
             $("#content-update-link, #content-delete-link, #content-reply-url").attr("href", "");
-            $("#content-comment-count").html("");
+            $("#content-reply-count").html("");
             $("#content-modal-replies").html("");
         },
 
@@ -142,7 +142,7 @@ $(function () {
                 $("#content-delete-link").attr("href", data.delete_url);
             }
             if (! data.parent) {
-                $("#content-comment-count").html(data.child_count);
+                $("#content-reply-count").html(data.child_count);
                 $("#content-reply-url").attr("href", data.reply_url);
             }
         },
@@ -183,7 +183,7 @@ $(function () {
         init: function() {
             view.initContentIds();
             this.addContentListeners();
-            this.addCommentTriggers();
+            this.addReplyTriggers();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
@@ -247,7 +247,7 @@ $(function () {
                 view.addContentToGrid($contents, data.placement, data.parent_id);
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
-                setTimeout(controller.addCommentTriggers, 500);
+                setTimeout(controller.addReplyTriggers, 500);
                 if (ids.length && data.placement === "appended") {
                     setTimeout(controller.addLoadMoreTrigger, 500);
                 }
@@ -324,7 +324,7 @@ $(function () {
             $(".grid-item-open-action").off("click", controller.loadContentModal).click(controller.loadContentModal);
         },
 
-        addCommentTriggers: function() {
+        addReplyTriggers: function() {
             $(".item-open-replies-action").off("click", controller.openReplies).click(controller.openReplies);
         },
     };
