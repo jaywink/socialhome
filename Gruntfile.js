@@ -212,6 +212,14 @@ module.exports = function (grunt) {
                     reporter: "nyan",
                 }
             },
+            'socialhome.content': {
+                options: {
+                    urls: ['http://127.0.0.1:8181/mocha/content/'],
+                    run: true,
+                    logErrors: true,
+                    reporter: "nyan",
+                }
+            },
         },
     });
 
