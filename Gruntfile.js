@@ -196,10 +196,9 @@ module.exports = function (grunt) {
             },
             killDjangoTest: {
                 cmd: 'kill `pgrep -f "runserver 8181"`',
-                bg: false,
             },
             sleep: {
-                cmd: 'sleep 10',
+                cmd: 'sleep 5',
                 bg: false,
             },
         },
@@ -209,6 +208,7 @@ module.exports = function (grunt) {
                     urls: ['http://127.0.0.1:8181/mocha/streams/'],
                     run: true,
                     logErrors: true,
+                    log: true,
                     reporter: "nyan",
                 }
             },
@@ -217,6 +217,7 @@ module.exports = function (grunt) {
                     urls: ['http://127.0.0.1:8181/mocha/content/'],
                     run: true,
                     logErrors: true,
+                    log: true,
                     reporter: "nyan",
                 }
             },
