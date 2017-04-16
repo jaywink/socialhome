@@ -147,9 +147,9 @@ $(function () {
             }
         },
 
-        loadContentModal: function(contentGuid) {
+        loadContentModal: function(contentId) {
             $.getJSON(
-                "/content/" + contentGuid + "/",
+                "/content/" + contentId + "/",
                 function(data) {
                     // Change URL to the content URL
                     var url = "/content/" + data.id + "/";
@@ -157,7 +157,7 @@ $(function () {
                         url = url + data.slug + "/"
                     }
                     window.history.pushState(
-                        {content: data.guid}, data.guid, url
+                        {content: data.id}, data.id, url
                     );
                     view.setContentModalData(data);
                     view.addNSFWShield();
