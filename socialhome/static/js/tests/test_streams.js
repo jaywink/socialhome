@@ -67,7 +67,7 @@ describe("Streams", function() {
 
         context("receiving", function() {
             it("shows new content label on new message", function(done) {
-                window.mockServer.send('{"event": "new", "id": 1}');
+                window.mockServer.send('{"event": "new", "id": 4}');
                 expect($("#new-content-container:visible").length).to.eq(1);
                 done();
             });
@@ -76,7 +76,7 @@ describe("Streams", function() {
                 var message = {
                     event: "content",
                     contents: [{
-                        id: 1, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
+                        id: 4, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
                         formatted_timestamp: "2017-01-02 10:11:12+00:00",
                         author_image: "http://localhost/foobar.png", author_name: "Some Author",
                         parent_id: "",
@@ -185,6 +185,7 @@ describe("Streams", function() {
                 is_author: false,
                 update_url: "",
                 delete_url: "",
+                child_count: 1,
             };
             this.server.respondWith(
                 "GET",
@@ -238,12 +239,69 @@ describe("Streams", function() {
             expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
             expect($("#content-update-link").attr("href")).to.eq("");
             expect($("#content-delete-link").attr("href")).to.eq("");
+            expect($("#content-reply-count:contains('1')").length).to.eq(1);
+            $("#content-modal").modal("hide");
+            done();
+        });
+
+        it("adds replies to reply container in modal", function(done) {
+            serverResponse.call(this);
+            $(".grid-item-open-action[data-content-id=1]").trigger("click");
+            this.server.respond();
+            var message = {
+                event: "content",
+                contents: [{
+                    id: 3, rendered: "new reply", humanized_timestamp: "2 minutes ago",
+                    formatted_timestamp: "2017-01-02 10:11:12+00:00",
+                    author_image: "http://localhost/foobar.png", author_name: "Some Author",
+                    parent: "1",
+                }],
+                placement: "children",
+                parent_id: 1,
+            };
+            window.mockServer.send(JSON.stringify(message));
+            $container = $("#content-modal-replies");
+            expect($container.is(":visible")).to.be.true;
+            expect($container.find(".reply").length).to.be.eql(1);
+            expect($container.find(".reply:contains('new reply')").length).to.be.eql(1);
             $("#content-modal").modal("hide");
             done();
         });
 
         after(function() {
             this.server.restore();
+        });
+    });
+
+    describe("replies", function() {
+        it("adds replies to reply container in stream", function(done) {
+            var message = {
+                event: "content",
+                contents: [{
+                    id: 3, rendered: "new reply", humanized_timestamp: "2 minutes ago",
+                    formatted_timestamp: "2017-01-02 10:11:12+00:00",
+                    author_image: "http://localhost/foobar.png", author_name: "Some Author",
+                    parent: "1",
+                }],
+                placement: "children",
+                parent_id: 1,
+            };
+            window.mockServer.send(JSON.stringify(message));
+            $container = $(".replies-container[data-content-id='1']");
+            expect($container.is(":visible")).to.be.true;
+            expect($container.find(".reply").length).to.be.eql(1);
+            expect($container.find(".reply:contains('new reply')").length).to.be.eql(1);
+            done();
+        });
+
+        it("triggers load message on click open replies", function(done) {
+            $(".item-open-replies-action[data-content-id='1']").trigger("click");
+            expect(window.mockMessage).to.eq('{"action":"load_children","content_id":1}');
+            done();
+        });
+
+        after(function() {
+            window.mockMessage = undefined;
         });
     });
 });
