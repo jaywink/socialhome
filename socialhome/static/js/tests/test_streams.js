@@ -10,6 +10,10 @@ describe("Streams", function() {
         });
     });
 
+    beforeEach(function() {
+        console.log("TEST START: " + this.currentTest.title + " --- URL IS " + window.location.href);
+    });
+
     describe("websocket", function() {
         context("on stream page", function () {
             before(function () {
@@ -161,8 +165,8 @@ describe("Streams", function() {
             expect($("#content-bar-actions").hasClass("hidden")).to.be.false;
             expect($("#content-update-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~update/");
             expect($("#content-delete-link").attr("href")).to.eq("http://127.0.0.1:" + runserverPort + "/content/1/~delete/");
+            $("#content-modal").modal("hide");
             setTimeout(function () {
-                $("#content-modal").modal("hide");
                 done();
             }, 100);
         });
@@ -234,11 +238,6 @@ describe("Streams", function() {
             expect($("#content-bar-actions").hasClass("hidden")).to.be.true;
             expect($("#content-update-link").attr("href")).to.eq("");
             expect($("#content-delete-link").attr("href")).to.eq("");
-            $("#content-modal").modal("hide");
-            done();
-        });
-
-        afterEach(function(done) {
             $("#content-modal").modal("hide");
             done();
         });

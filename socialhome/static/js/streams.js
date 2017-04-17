@@ -117,7 +117,10 @@ $(function () {
         },
 
         hideContentModal: function() {
-            $('#content-modal').modal('hide');
+            var $contentModal = $('#content-modal');
+            $contentModal.off("hide.bs.modal");
+            history.back();
+            $contentModal.modal('hide');
         },
 
         cleanContentModal: function() {
