@@ -22,23 +22,55 @@
                     <h2>Stream</h2>
                 </div>
                 <div class="grid-sizer"></div>
-                <div class="grid-item">
+                <div class="grid-item" data-content-id="1">
                     <p>Foo Bar</p>
-                    <div class="grid-item-bar">
-                        <span class="grid-item-open-action" data-content-guid="1234" title="2017-03-14 22:04:00+00:00">2 hours ago</span>
-                    </div>
                     <div class="grid-item-author-bar">
                         <img src="{% static "images/pony100.png" %}" class="grid-item-author-bar-pic"> Dummy Author
+                    </div>
+                    <div class="grid-item-bar">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <span class="grid-item-open-action" data-content-id="1" title="2017-03-14 22:04:00+00:00">2 hours ago</span>
+                            </div>
+                             <div class="col-xs-6 text-xs-right grid-item-reactions">
+                                <div class="item-reaction">
+                                    <span class="item-open-replies-action" data-content-id="1">
+                                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
+                                    </span>
+                                    <span class="item-reaction-counter">1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="replies-container" data-content-id="1"></div>
+                    <div class="content-actions hidden" data-content-id="1">
+                        <a class="btn btn-secondary" href="">Reply</a>
                     </div>
                 </div>
-                <div class="grid-item">
-                    <p>#nsfw</p>
+                <div class="grid-item" data-content-id="2">
+                    <p>#nsfw<</p>
                     <p><img id="nsfw-content" class="nsfw" src="{% static "images/pony100.png" %}"></p>
-                    <div class="grid-item-bar">
-                        <span class="grid-item-open-action" data-content-guid="2345" title="2017-03-14 21:04:00+00:00">3 hours ago (edited)</span>
-                    </div>
                     <div class="grid-item-author-bar">
                         <img src="{% static "images/pony100.png" %}" class="grid-item-author-bar-pic"> Dummy Author
+                    </div>
+                    <div class="grid-item-bar">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <span class="grid-item-open-action" data-content-id="2" title="2017-03-14 21:04:00+00:00">3 hours ago (edited)</span>
+                            </div>
+                             <div class="col-xs-6 text-xs-right grid-item-reactions">
+                                <div class="item-reaction">
+                                    <span class="item-open-replies-action" data-content-id="1">
+                                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
+                                    </span>
+                                    <span class="item-reaction-counter">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="replies-container" data-content-id="2"></div>
+                    <div class="content-actions hidden" data-content-id="2">
+                        <a class="btn btn-secondary" href="">Reply</a>
                     </div>
                 </div>
             </div>
@@ -56,15 +88,26 @@
                 </div>
                 <div id="content-body" class="modal-body"></div>
                 <div class="content-bar">
-                    <span id="content-timestamp" title=""></span>
-                    <span id="content-bar-actions" class="hidden">
-                        &nbsp;
-                        <a id="content-update-link" href=""><i class="fa fa-pencil" title="Update" aria-label="Update"></i></a>
-                        <a id="content-delete-link" href=""><i class="fa fa-remove" title="Delete" aria-label="Delete"></i></a>
-                    </span>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <span id="content-timestamp" title=""></span>
+                            <span id="content-bar-actions" class="hidden">
+                                &nbsp;
+                                <a id="content-update-link" href=""><i class="fa fa-pencil" title="Update" aria-label="Update"></i></a>
+                                <a id="content-delete-link" href=""><i class="fa fa-remove" title="Delete" aria-label="Delete"></i></a>
+                            </span>
+                        </div>
+                        <div class="col-xs-6 text-xs-right grid-item-reactions">
+                            <div class="item-reaction">
+                                <span><i class="fa fa-envelope"></i></span>&nbsp;
+                                <span class="item-reaction-counter" id="content-reply-count"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div id="content-modal-replies" class="replies-container"></div>
+                <div class="content-actions">
+                    <a class="btn btn-secondary" id="content-reply-url" href="">Reply</a>
                 </div>
             </div>
         </div>

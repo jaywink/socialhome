@@ -33,6 +33,12 @@ class TestFederateContent(TestCase):
         mock_send.assert_not_called()
 
     @patch("socialhome.content.signals.django_rq.enqueue")
+    def test_content_with_parent_does_not_get_sent(self, mock_send):
+        user = UserFactory()
+        ContentFactory(author=user.profile, parent=ContentFactory())
+        mock_send.assert_not_called()
+
+    @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_gets_sent(self, mock_send):
         user = UserFactory()
         content = ContentFactory(author=user.profile)

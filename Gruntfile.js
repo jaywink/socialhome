@@ -108,6 +108,7 @@ module.exports = function (grunt) {
                     "<%= paths.bower %>/reconnecting-websocket/reconnecting-websocket.min.js",
                     "<%= paths.bower %>/bootstrap-markdown/js/bootstrap-markdown.js",
                     "<%= paths.js %>/vendor/appear.min.js",
+                    "<%= paths.js %>/content.js",
                     "<%= paths.js %>/grids.js",
                     "<%= paths.js %>/streams.js",
                     "<%= paths.js %>/publisher.js",
@@ -195,10 +196,9 @@ module.exports = function (grunt) {
             },
             killDjangoTest: {
                 cmd: 'kill `pgrep -f "runserver 8181"`',
-                bg: false,
             },
             sleep: {
-                cmd: 'sleep 10',
+                cmd: 'sleep 5',
                 bg: false,
             },
         },
@@ -208,6 +208,16 @@ module.exports = function (grunt) {
                     urls: ['http://127.0.0.1:8181/mocha/streams/'],
                     run: true,
                     logErrors: true,
+                    log: true,
+                    reporter: "nyan",
+                }
+            },
+            'socialhome.content': {
+                options: {
+                    urls: ['http://127.0.0.1:8181/mocha/content/'],
+                    run: true,
+                    logErrors: true,
+                    log: true,
                     reporter: "nyan",
                 }
             },

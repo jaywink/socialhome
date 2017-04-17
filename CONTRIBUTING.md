@@ -35,6 +35,30 @@ will not be merged because it doesn't fit into the grand plan.
 The best way to ask questions or suggest your implementation detail is on the GitHub issue itself OR on
 [IRC FreeNode](http://webchat.freenode.net?channels=%23socialhome&uio=d4) channel #socialhome.
 
+### Feature notes
+
+Some notes regarding features to take into account when writing code.
+
+#### Streams
+
+Everything is (supposed to be at least) a stream in Socialhome. The main streams are user profiles and the public stream, but basically each single content view is also a stream. Opening a reply in an individual window would also create a stream for that reply content.
+ 
+A stream should automatically subscribe the user using websockets and handle any incoming messages from the server (in `socialhome/static/js/streams.js`), notifying the user of new content and adding it to the page on request (without a page load). 
+ 
+This basic design should be kept in mind when touching stream related code.
+
+##### Stream templates
+
+Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code. Different from this is the single content view which is rendered with a slightly different template.
+
+There are three locations to modify when changing how content is rendered in streams or single content views:
+
+1. `socialhome/streams/templates/streams/base.html` - This renders the initial stream as a basic Django template on page load.
+1. `socialhome/static/js/content.js` - This is the main JavaScript template which is used to insert content into the stream. This is used for both top level content and replies in content streams.
+1. `socialhome/content/templates/content/_content_detail.html` - This template is used to render the single content view either directly or as a pop-up modal (with data filled by JS).
+
+All these three templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
+
 ## Tests
 
 As a general rule all code must have unit tests. For bug fixes provide a test that ensures the bug will not be back

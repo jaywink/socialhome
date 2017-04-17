@@ -57,7 +57,7 @@ a.opengraph-card {
   .content-bar {
     font-size: smaller;
     opacity: 0.5;
-    padding: 15px;
+    padding: 0 15px 15px;
 
     @media all and (max-width: $largeDevice) {
       font-size: small;
@@ -69,4 +69,35 @@ a.opengraph-card {
       font-size: large;
     }
   }
+
+  .item-reaction {
+    cursor: unset;
+  }
+}
+
+.content-actions {
+  padding-top: 10px;
+
+  a {
+    width: 100%;
+  }
+}
+
+.replies-container {
+  padding: 0 15px;
+
+  font-size: 0.95em;
+
+  img {
+    max-width: 100%;
+  }
+}
+
+#content-modal-replies {
+  padding: 0 30px;
+}
+
+.reply {
+  border-top: solid 1px $darkopacity;
+  margin-top: 7px;
 }

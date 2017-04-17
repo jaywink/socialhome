@@ -92,6 +92,10 @@ class Content(models.Model):
 
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
 
+    parent = models.ForeignKey(
+        "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -114,7 +118,7 @@ class Content(models.Model):
                 self.author = author
 
             if self.pinned:
-                max_order = Content.objects.filter(author=self.author).aggregate(Max("order"))["order__max"]
+                max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet
                     self.order = max_order + 1
 
@@ -250,19 +254,10 @@ class Content(models.Model):
         return text
 
     @staticmethod
-    def get_rendered_contents(qs):
+    def get_rendered_contents(qs, user):
         rendered = []
         for content in qs:
-            rendered.append({
-                "id": content.id,
-                "guid": content.guid,
-                "author": content.author_id,
-                "author_image": content.author.safer_image_url_small,
-                "author_name": content.author.name or content.author.handle,
-                "rendered": content.rendered,
-                "humanized_timestamp": content.humanized_timestamp,
-                "formatted_timestamp": content.formatted_timestamp,
-            })
+            rendered.append(content.dict_for_view(user))
         return rendered
 
     def fix_local_uploads(self):
@@ -278,20 +273,37 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
 
-    def dict_for_view(self, request):
+    def dict_for_view(self, user):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
-        is_author = bool(request.user.is_authenticated and self.author == request.user.profile)
+        is_author = bool(user.is_authenticated and self.author == user.profile)
         return {
             "id": self.id,
             "guid": self.guid,
             "rendered": self.rendered,
+            "author": self.author_id,
             "author_name": self.author.name or self.author.handle,
             "author_handle": self.author.handle,
             "author_image": self.author.safer_image_url_small,
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
+            "child_count": self.children.count(),
+            "parent": self.parent_id if self.parent else "",
             "is_author": is_author,
+            "is_authenticated": bool(user.is_authenticated),
             "slug": self.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
+            "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
         }
+
+    def visible_for_user(self, user):
+        """Check if visible to given user.
+
+        Mirrors logic in `ContentQuerySet.visible_for_user`.
+        """
+        # TODO: handle also LIMITED when contacts implemented
+        if self.visibility == Visibility.PUBLIC:
+            return True
+        if user.is_authenticated and (self.author == user.profile or self.visibility == Visibility.SITE):
+            return True
+        return False

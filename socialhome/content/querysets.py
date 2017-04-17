@@ -21,6 +21,9 @@ class ContentQuerySet(models.QuerySet):
     def _select_related(self):
         return self.select_related("oembed", "opengraph")
 
+    def top_level(self):
+        return self.filter(parent=None)
+
     def visible_for_user(self, user):
         """Filter by visibility to given user."""
         if not user.is_authenticated:
@@ -29,7 +32,7 @@ class ContentQuerySet(models.QuerySet):
         return self.filter(Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]))
 
     def public(self):
-        return self._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")
+        return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")
 
     def tags(self, tag, user):
         from socialhome.content.models import Tag, Content
@@ -37,7 +40,7 @@ class ContentQuerySet(models.QuerySet):
             tag = Tag.objects.get_by_cleaned_name(tag)
         except Tag.DoesNotExist:
             return Content.objects.none()
-        return self._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
+        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
 
     def profile(self, guid, user):
         """Filter for a user profile.
@@ -51,5 +54,8 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         if not profile.visible_to_user(user):
             return Content.objects.none()
-        qs = self._select_related().visible_for_user(user).filter(pinned=True, author=profile)
+        qs = self.top_level()._select_related().visible_for_user(user).filter(pinned=True, author=profile)
         return qs.order_by("order")
+
+    def children(self, parent_id, user):
+        return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("created")

@@ -22,25 +22,26 @@ $(function () {
         },
 
         createContentElem: function(content) {
-            var elem = '<div class="grid-item" data-content-id="' + content.id + '">' + content.rendered +
-                '<div class="grid-item-bar">' +
-                '<span class="grid-item-open-action" data-content-guid="' + content.guid +
-                '" title="'+ content.formatted_timestamp + '">' + content.humanized_timestamp + '</span>' +
-                '</div>';
-            if (socialhomeStream.indexOf("profile__") !== 0) {
-                elem = elem + '<div class="grid-item-author-bar">' +
-                    '<img src="' + content.author_image + '" class="grid-item-author-bar-pic"> ' + content.author_name +
-                    '</div>';
-            }
-            elem = elem + '</div>';
+            var data = {
+                content: content,
+                stream: socialhomeStream.split("__")[0],
+                objType: (content.parent) ? "reply" : "post",
+            };
+            var elem = Content.template(data);
             return $(elem);
         },
 
-        addContentToGrid: function($contents, placement) {
+        addContentToGrid: function($contents, placement, parent_id) {
             if (placement === "appended") {
                 $('.grid').append($contents).masonry(placement, $contents, true);
-            } else {
+            } else if (placement === "prepended") {
                 $('.grid').prepend($contents).masonry(placement, $contents, true);
+            } else if (placement === "children") {
+                if ($("#content-modal:visible").length) {
+                    $("#content-modal-replies").html($contents);
+                } else {
+                    $(".replies-container[data-content-id='" + parent_id + "']").html($contents);
+                }
             }
             view.layoutMasonry();
             view.addNSFWShield();
@@ -103,7 +104,7 @@ $(function () {
         },
 
         showContentModal: function() {
-            $('#content-modal').modal('show').on('hide.bs.modal', function (e) {
+            $('#content-modal').modal('show').on('hide.bs.modal', function () {
                 $('#content-modal').off("hide.bs.modal");
                 history.back();
             });
@@ -116,7 +117,10 @@ $(function () {
         },
 
         hideContentModal: function() {
-            $('#content-modal').modal('hide');
+            var $contentModal = $('#content-modal');
+            $contentModal.off("hide.bs.modal");
+            history.back();
+            $contentModal.modal('hide');
         },
 
         cleanContentModal: function() {
@@ -124,7 +128,9 @@ $(function () {
             $("#content-profile-pic").attr("src", "");
             $("#content-timestamp").attr("title", "").html("");
             $("#content-bar-actions").addClass("hidden");
-            $("#content-update-link, #content-delete-link").attr("href", "");
+            $("#content-update-link, #content-delete-link, #content-reply-url").attr("href", "");
+            $("#content-reply-count").html("");
+            $("#content-modal-replies").html("");
         },
 
         setContentModalData: function(data) {
@@ -138,11 +144,15 @@ $(function () {
                 $("#content-update-link").attr("href", data.update_url);
                 $("#content-delete-link").attr("href", data.delete_url);
             }
+            if (! data.parent) {
+                $("#content-reply-count").html(data.child_count);
+                $("#content-reply-url").attr("href", data.reply_url);
+            }
         },
 
-        loadContentModal: function(contentGuid) {
+        loadContentModal: function(contentId) {
             $.getJSON(
-                "/content/" + contentGuid + "/",
+                "/content/" + contentId + "/",
                 function(data) {
                     // Change URL to the content URL
                     var url = "/content/" + data.id + "/";
@@ -150,7 +160,7 @@ $(function () {
                         url = url + data.slug + "/"
                     }
                     window.history.pushState(
-                        {content: data.guid}, data.guid, url
+                        {content: data.id}, data.id, url
                     );
                     view.setContentModalData(data);
                     view.addNSFWShield();
@@ -176,13 +186,14 @@ $(function () {
         init: function() {
             view.initContentIds();
             this.addContentListeners();
+            this.addReplyTriggers();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
             this.socket.onopen = this.handleSocketOpen;
             this.socket.onclose = this.handleSocketClose;
             // Hide content modal on back navigation
-            window.onpopstate = function(ev) {
+            window.onpopstate = function() {
                 $('#content-modal').off("hide.bs.modal");
                 view.hideContentModal();
             };
@@ -190,7 +201,7 @@ $(function () {
 
         createConnection: function() {
             // Correctly decide between ws:// and wss://
-            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws",
+            var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws",
                 ws_path = ws_scheme + '://' + window.location.host + "/ch/streams/" + socialhomeStream + "/";
             return new ReconnectingWebSocket(ws_path);
         },
@@ -202,6 +213,11 @@ $(function () {
             // Stream content refresh
             $("#new-content-load-link").click(controller.getContent);
             controller.addLoadMoreTrigger();
+            // Replies if single content view
+            if (socialhomeStream.split("__")[0] === "content") {
+                var contentId = $("#content-body").data("content-id");
+                controller.loadReplies(contentId);
+            }
         },
 
         handleSocketClose: function() {
@@ -217,7 +233,7 @@ $(function () {
                 view.showNewLabel();
 
             } else if (data.event === "content") {
-                var $contents,
+                var $contents = undefined,
                     ids = [];
 
                 _.each(data.contents, function (content) {
@@ -231,9 +247,10 @@ $(function () {
                     view.hideNewLabel();
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
-                view.addContentToGrid($contents, data.placement);
+                view.addContentToGrid($contents, data.placement, data.parent_id);
                 view.contentIds = _.union(view.contentIds, ids);
                 controller.addContentListeners();
+                setTimeout(controller.addReplyTriggers, 500);
                 if (ids.length && data.placement === "appended") {
                     setTimeout(controller.addLoadMoreTrigger, 500);
                 }
@@ -242,10 +259,10 @@ $(function () {
 
         addLoadMoreTrigger: function() {
             controller.loadMoreTracker = appear({
-                elements: function elements(){
+                elements: function () {
                     return $(".grid .grid-item:nth-last-child(5)");
                 },
-                appear: function appear(el) {
+                appear: function () {
                     controller.loadMoreContent();
                 },
                 debounce: 200,
@@ -277,14 +294,41 @@ $(function () {
         },
 
         loadContentModal: function(ev) {
-            var contentGuid = $(ev.currentTarget).data("content-guid");
+            var contentId = $(ev.currentTarget).data("content-id");
+            $("#content-modal").on("shown.bs.modal", function() {
+                controller.loadReplies(contentId);
+                $("#content-modal").off("shown.bs.modal");
+            });
             view.cleanContentModal();
             view.showContentModal();
-            view.loadContentModal(contentGuid);
+            view.loadContentModal(contentId);
+        },
+
+        openReplies: function(ev) {
+            var contentId = $(ev.currentTarget).data("content-id");
+            controller.loadReplies(contentId);
+            $(".content-actions[data-content-id='" + contentId + "']").removeClass("hidden");
+            $(ev.currentTarget).removeClass("item-open-replies-action").off("click", controller.openReplies);
+        },
+
+        loadReplies: function(contentId) {
+            var data = {
+                action: "load_children",
+                content_id: contentId,
+            };
+            try {
+                controller.socket.send(JSON.stringify(data));
+            } catch(e) {
+                console.log(e);
+            }
         },
 
         addContentListeners: function() {
-            $(".grid-item-open-action").off("click").click(this.loadContentModal);
+            $(".grid-item-open-action").off("click", controller.loadContentModal).click(controller.loadContentModal);
+        },
+
+        addReplyTriggers: function() {
+            $(".item-open-replies-action").off("click", controller.openReplies).click(controller.openReplies);
         },
     };
 
