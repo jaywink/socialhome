@@ -63,7 +63,7 @@ def process_entity_post(entity, profile):
 def process_entity_comment(entity, profile):
     """Process an entity of type Comment."""
     try:
-        parent = Content.objects.get(entity.target_guid)
+        parent = Content.objects.get(guid=entity.target_guid)
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)
         return
