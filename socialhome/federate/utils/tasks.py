@@ -37,6 +37,8 @@ def process_entities(entities, profile):
                 process_entity_post(entity, profile)
             elif isinstance(entity, base.Retraction):
                 process_entity_retraction(entity, profile)
+            elif isinstance(entity, base.Comment):
+                process_entity_comment(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
 
@@ -56,6 +58,28 @@ def process_entity_post(entity, profile):
         logger.info("Saved Content: %s", content)
     else:
         logger.info("Updated Content: %s", content)
+
+
+def process_entity_comment(entity, profile):
+    """Process an entity of type Comment."""
+    try:
+        parent = Content.objects.get(entity.target_guid)
+    except Content.DoesNotExist:
+        logger.warning("No target found for comment: %s", entity)
+        return
+    values = {
+        "text": safe_text_for_markdown(entity.raw_content),
+        "author": profile,
+        "visibility": parent.visibility,
+        "remote_created": safe_make_aware(entity.created_at, "UTC"),
+        "parent": parent,
+    }
+    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
+    content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
+    if created:
+        logger.info("Saved Content from comment entity: %s", content)
+    else:
+        logger.info("Updated Content from comment entity: %s", content)
 
 
 def _embed_entity_images_to_post(children, text):
