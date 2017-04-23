@@ -40,7 +40,7 @@
                             {% endif %}
                             <div class="grid-item-bar">
                                 <div class="row">
-                                    <div class="col-xs-6">
+                                    <div class="col-xs-7">
                                         <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
                                         {% if content.author == request.user.profile %}
                                             &nbsp;
@@ -48,7 +48,7 @@
                                             <a href="{% url "content:delete" content.id %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
                                         {% endif %}
                                     </div>
-                                    <div class="col-xs-6 text-xs-right grid-item-reactions">
+                                    <div class="col-xs-5 text-xs-right grid-item-reactions">
                                         {% if request.user.is_authenticated or content.children.count %}
                                             <div class="item-reaction">
                                                 <span class="item-open-replies-action" data-content-id="{{ content.id }}">

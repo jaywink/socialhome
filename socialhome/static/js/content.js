@@ -11,7 +11,7 @@
             '<% } %>' +
             '<div class="grid-item-bar">' +
                 '<div class="row">' +
-                    '<div class="col-xs-6">' +
+                    '<div class="col-xs-7">' +
                         '<span class="grid-item-open-action" data-content-id="<%= content.id %>" ' +
                             'title="<%= content.formatted_timestamp %>"><%= content.humanized_timestamp %>' +
                         '</span>' +
@@ -23,7 +23,7 @@
                             '</span>' +
                         '<% } %>' +
                     '</div>' +
-                    '<div class="col-xs-6 text-xs-right grid-item-reactions">' +
+                    '<div class="col-xs-5 text-xs-right grid-item-reactions">' +
                         '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
                             '<div class="item-reaction">' +
                                 '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
