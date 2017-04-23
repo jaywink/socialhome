@@ -53,8 +53,8 @@ def render_content(content):
 
 def notify_listeners(content):
     """Send out to listening consumers."""
-    # TODO: add sending for tags and pinned user profile content
-    if content.visibility == Visibility.PUBLIC:
+    # TODO: add sending for tags, content and user profile streams
+    if content.visibility == Visibility.PUBLIC and not content.parent:
         StreamConsumer.group_send("streams_public", json.dumps({
             "event": "new",
             "id": content.id,
