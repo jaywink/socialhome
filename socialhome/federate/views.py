@@ -126,7 +126,7 @@ def content_fetch_view(request, objtype, guid):
             we try to find `Content`.
         guid (str) - The object guid to look for.
     """
-    if objtype not in ["status_message", "post", "reshare"]:
+    if objtype not in ["status_message", "post", "reshare", "comment"]:
         raise Http404()
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     if not content.is_local:
