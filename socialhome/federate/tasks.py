@@ -121,7 +121,7 @@ def send_content_retraction(content, author_id):
 
 def forward_relayable(entity, parent_id):
     """Handle forwarding of a relayable object.
-    
+
     Currently only for public content.
     """
     try:
