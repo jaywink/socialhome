@@ -3,17 +3,19 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.test import override_settings
+from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import receive_task, send_content, send_content_retraction
-from socialhome.users.tests.factories import ProfileFactory
+from socialhome.federate.tasks import receive_task, send_content, send_content_retraction, send_reply
+from socialhome.users.models import Profile
+from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
 @pytest.mark.usefixtures("db")
 @patch("socialhome.federate.tasks.process_entities")
-class TestReceiveTask(object):
+class TestReceiveTask():
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
     @patch("socialhome.federate.tasks.get_sender_profile")
     def test_receive_task_runs(self, mock_get_sender, mock_handle_receive, mock_process_entities):
@@ -42,7 +44,7 @@ class TestReceiveTask(object):
 class TestSendContent(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestSendContent, cls).setUpTestData()
+        super().setUpTestData()
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
 
@@ -84,7 +86,7 @@ class TestSendContent(TestCase):
 class TestSendContentRetraction(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestSendContentRetraction, cls).setUpTestData()
+        super().setUpTestData()
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
 
@@ -120,3 +122,19 @@ class TestSendContentRetraction(TestCase):
     def test_content_not_sent_in_debug_mode(self, mock_payload):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_payload.assert_not_called()
+
+
+@pytest.mark.usefixtures("db")
+class TestSendReply(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        author = UserFactory()
+        Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.reply = ContentFactory(parent=cls.public_content, author=author.profile)
+
+    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    def test_send_reply(self, mock_sender):
+        send_reply(self.reply.id)
+        assert mock_sender.called == 1
