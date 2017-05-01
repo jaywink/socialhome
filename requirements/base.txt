@@ -54,7 +54,7 @@ django-extensions==1.7.5
 # Federation
 #federation==0.10.0
 # for quick overriding a commit version
-git+https://github.com/jaywink/federation.git@7ccc070711893cfafa93cec06a8da3211039e7b8#egg=federation==0.10.1
+git+https://github.com/jaywink/federation.git@999c27cd5cb90e3ab9f843789933c5a88f96764b#egg=federation==0.10.1
 
 # Content
 django-markdownx==1.7.2

@@ -1,5 +1,6 @@
 import logging
 
+import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile
 
@@ -80,6 +81,10 @@ def process_entity_comment(entity, profile):
         logger.info("Saved Content from comment entity: %s", content)
     else:
         logger.info("Updated Content from comment entity: %s", content)
+    if parent.is_local:
+        # We should relay this to participants we know of
+        from socialhome.federate.tasks import forward_relayable
+        django_rq.enqueue(forward_relayable, entity, parent.id)
 
 
 def _embed_entity_images_to_post(children, text):

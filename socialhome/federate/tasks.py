@@ -92,3 +92,23 @@ def send_content_retraction(content, author_id):
         send_document(url, payload)
     else:
         logger.warning("No retraction entity for %s", content)
+
+
+def forward_relayable(entity, parent_id):
+    """Handle forwarding of a relayable object.
+    
+    Currently only for public content.
+    """
+    try:
+        parent = Content.objects.get(id=parent_id, visibility=Visibility.PUBLIC)
+    except Content.DoesNotExist:
+        logger.warning("No public content found with id %s", parent_id)
+        return
+    if settings.DEBUG:
+        # Don't send in development mode
+        return
+    entity.sign_with_parent(parent.author.private_key)
+    payload = handle_create_payload(entity, parent.author)
+    # Just dump to the relay system for now
+    url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
+    send_document(url, payload)
