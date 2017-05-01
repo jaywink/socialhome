@@ -133,9 +133,7 @@ def process_entity_retraction(entity, profile):
     logger.info("Retraction done for content %s", content)
 
 
-def make_federable_entity(content):
-    """Make Content federable by converting it to a federation entity."""
-    logging.info("make_federable_entity - Content: %s" % content)
+def _make_post(content):
     try:
         return base.Post(
             raw_content=content.text,
@@ -146,8 +144,30 @@ def make_federable_entity(content):
             created_at=content.effective_created,
         )
     except Exception as ex:
-        logger.exception("make_federable_entity - Failed to convert %s: %s", content.guid, ex)
+        logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
         return None
+
+
+def _make_comment(content):
+    try:
+        return base.Comment(
+            raw_content=content.text,
+            guid=str(content.guid),
+            target_guid=str(content.parent.guid),
+            handle=content.author.handle,
+            created_at=content.effective_created,
+        )
+    except Exception as ex:
+        logger.exception("_make_comment - Failed to convert %s: %s", content.guid, ex)
+        return None
+
+
+def make_federable_entity(content):
+    """Make Content federable by converting it to a federation entity."""
+    logging.info("make_federable_entity - Content: %s" % content)
+    if content.parent:
+        return _make_comment(content)
+    return _make_post(content)
 
 
 def make_federable_retraction(content, author):

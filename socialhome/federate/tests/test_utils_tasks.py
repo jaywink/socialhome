@@ -178,7 +178,9 @@ class TestMakeFederableEntity(TestCase):
 
     @patch("socialhome.federate.utils.tasks.base.Post", side_effect=Exception)
     def test_returns_none_on_exception(self, mock_post):
-        entity = make_federable_entity(Mock())
+        mock_post = Mock()
+        mock_post.parent = False
+        entity = make_federable_entity(mock_post)
         self.assertIsNone(entity)
 
 

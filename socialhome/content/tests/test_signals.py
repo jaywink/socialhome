@@ -5,7 +5,7 @@ import pytest
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.federate.tasks import send_content, send_content_retraction
+from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
 from socialhome.users.tests.factories import UserFactory
 
 
@@ -33,10 +33,11 @@ class TestFederateContent(TestCase):
         mock_send.assert_not_called()
 
     @patch("socialhome.content.signals.django_rq.enqueue")
-    def test_content_with_parent_does_not_get_sent(self, mock_send):
+    def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
-        ContentFactory(author=user.profile, parent=ContentFactory())
-        mock_send.assert_not_called()
+        content = ContentFactory(author=user.profile, parent=ContentFactory())
+        self.assertTrue(content.is_local)
+        mock_send.assert_called_once_with(send_reply, content.id)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_gets_sent(self, mock_send):

@@ -73,6 +73,31 @@ def send_content(content_id):
         logger.warning("No entity for %s", content)
 
 
+def send_reply(content_id):
+    """Handle sending a Content object that is a reply out via the federation layer.
+
+    Currently we only deliver public content.
+    """
+    try:
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC)
+    except Content.DoesNotExist:
+        logger.warning("No content found with id %s", content_id)
+        return
+    entity = make_federable_entity(content)
+    if entity:
+        if settings.DEBUG:
+            # Don't send in development mode
+            return
+        # TODO: federation should provide one method to send,
+        # which handles also payload creation and url calculation
+        payload = handle_create_payload(entity, content.author)
+        # Just dump to the relay system for now
+        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
+        send_document(url, payload)
+    else:
+        logger.warning("No entity for %s", content)
+
+
 def send_content_retraction(content, author_id):
     """Handle sending of retractions.
 
