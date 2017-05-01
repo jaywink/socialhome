@@ -110,8 +110,11 @@ def content_xml_view(request, guid):
     Fetched by remote servers in certain situations.
     """
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
+    if not content.is_local:
+        raise Http404()
     entity = make_federable_entity(content)
-    return HttpResponse(get_full_xml_representation(entity), content_type="application/xml")
+    xml = get_full_xml_representation(entity, content.author.private_key)
+    return HttpResponse(xml, content_type="application/xml")
 
 
 def content_fetch_view(request, objtype, guid):
@@ -135,7 +138,7 @@ def content_fetch_view(request, objtype, guid):
         )
         return HttpResponseRedirect(url)
     entity = make_federable_entity(content)
-    message = get_full_xml_representation(entity)
+    message = get_full_xml_representation(entity, content.author.private_key)
     document = MagicEnvelope(
         message=message, private_key=content.author.private_key, author_handle=content.author.handle
     )

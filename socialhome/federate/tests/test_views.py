@@ -87,7 +87,11 @@ class TestContentXMLView(TestCase):
     def setUpTestData(cls):
         super(TestContentXMLView, cls).setUpTestData()
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        author = UserFactory()
+        author.profile.rsa_private_key = get_dummy_private_key().exportKey()
+        author.profile.save()
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
+        cls.profile = author.profile
 
     def test_non_public_content_returns_404(self):
         response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.limited_content.guid}))
@@ -107,7 +111,7 @@ class TestContentXMLView(TestCase):
     @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
     def test_calls_get_full_xml_representation(self, mock_getter, mock_maker):
         self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
-        mock_getter.assert_called_once_with("entity")
+        mock_getter.assert_called_once_with("entity", self.profile.private_key)
 
 
 @pytest.mark.usefixtures("db")

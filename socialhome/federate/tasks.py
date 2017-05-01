@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError
+from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
 from federation.outbound import handle_create_payload
 from federation.utils.network import send_document
@@ -34,7 +34,7 @@ def receive_task(payload, guid=None):
     except NoSenderKeyFoundError:
         logger.warning("Could not find a public key for the sender - skipping payload")
         return
-    except AssertionError:
+    except SignatureVerificationError:
         logger.warning("Signature validation failed - skipping payload")
         return
     if not entities:
