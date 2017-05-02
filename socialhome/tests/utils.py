@@ -14,3 +14,8 @@ def disable_requests(monkeypatch):
             pass
 
     monkeypatch.setattr("requests.get", Mock(return_value=MockResponse))
+
+
+def disable_mailer(monkeypatch):
+    """Mock away mail sending."""
+    monkeypatch.setattr("django.core.mail.send_mail", Mock())

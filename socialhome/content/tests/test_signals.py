@@ -35,7 +35,9 @@ class TestFederateContent(TestCase):
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
-        content = ContentFactory(author=user.profile, parent=ContentFactory())
+        parent = ContentFactory(author=user.profile)
+        mock_send.reset_mock()
+        content = ContentFactory(author=user.profile, parent=parent)
         self.assertTrue(content.is_local)
         mock_send.assert_called_once_with(send_reply, content.id)
 
