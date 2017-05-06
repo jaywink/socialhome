@@ -12,31 +12,33 @@ from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_entity, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher)
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import ProfileFactory
 
 
 class TestProcessEntities(TestCase):
     @classmethod
     def setUpTestData(cls):
         super(TestProcessEntities, cls).setUpTestData()
-        cls.profile = Mock()
         cls.post = entities.PostFactory()
-        cls.retraction = base.Retraction(handle=cls.post.handle, target_guid=cls.post.guid, entity_type="Post")
+        cls.retraction = base.Retraction()
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
-    def test_process_entity_post_is_called(self, mock_process):
-        process_entities([self.post], profile=self.profile)
-        mock_process.assert_called_once_with(self.post, self.profile)
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_post_is_called(self, mock_sender, mock_process):
+        process_entities([self.post])
+        mock_process.assert_called_once_with(self.post, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_retraction")
-    def test_process_entity_retraction_is_called(self, mock_process):
-        process_entities([self.retraction], profile=self.profile)
-        mock_process.assert_called_once_with(self.retraction, self.profile)
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_retraction_is_called(self, mock_sender, mock_process):
+        process_entities([self.retraction])
+        mock_process.assert_called_once_with(self.retraction, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
-    def test_logger_is_called_on_process_exception(self, mock_process, mock_logger):
-        process_entities([self.post], profile=self.profile)
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_logger_is_called_on_process_exception(self, mock_sender, mock_process, mock_logger):
+        process_entities([self.post])
         self.assertEqual(mock_logger.called, 1)
 
 

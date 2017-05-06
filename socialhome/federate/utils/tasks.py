@@ -29,10 +29,14 @@ def get_sender_profile(sender):
     return sender_profile
 
 
-def process_entities(entities, profile):
+def process_entities(entities):
     """Process a list of entities."""
     for entity in entities:
         logging.info("Entity: %s" % entity)
+        profile = get_sender_profile(entity.handle)
+        if not profile:
+            logger.warning("No sender profile for entity %s, skipping" % entity)
+            continue
         try:
             if isinstance(entity, base.Post):
                 process_entity_post(entity, profile)

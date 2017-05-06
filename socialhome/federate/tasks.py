@@ -9,8 +9,8 @@ from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
-    get_sender_profile, process_entities, make_federable_entity, make_federable_retraction,
-    sender_key_fetcher)
+    process_entities, make_federable_entity, make_federable_retraction, sender_key_fetcher
+)
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
@@ -40,10 +40,7 @@ def receive_task(payload, guid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    sender_profile = get_sender_profile(sender)
-    if not sender_profile:
-        return
-    process_entities(entities, profile=sender_profile)
+    process_entities(entities)
 
 
 def send_content(content_id):

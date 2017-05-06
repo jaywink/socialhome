@@ -17,25 +17,12 @@ from socialhome.users.tests.factories import ProfileFactory, UserFactory
 @patch("socialhome.federate.tasks.process_entities")
 class TestReceiveTask():
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
-    @patch("socialhome.federate.tasks.get_sender_profile")
-    def test_receive_task_runs(self, mock_get_sender, mock_handle_receive, mock_process_entities):
-        profile = ProfileFactory()
-        mock_get_sender.return_value = profile
+    def test_receive_task_runs(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar")
-        mock_process_entities.assert_called_with(["entity"], profile=profile)
-
-    @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
-    @patch("socialhome.federate.tasks.get_sender_profile")
-    def test_receive_task_returns_none_on_no_sender_profile(self, mock_get_sender, mock_handle_receive,
-                                                            mock_process_entities):
-        mock_get_sender.return_value = None
-        assert receive_task("foobar") is None
-        mock_process_entities.assert_not_called()
+        mock_process_entities.assert_called_with(["entity"])
 
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", []))
-    @patch("socialhome.federate.tasks.get_sender_profile")
-    def test_receive_task_returns_none_on_no_entities(self, mock_get_sender, mock_handle_receive,
-                                                      mock_process_entities):
+    def test_receive_task_returns_none_on_no_entities(self, mock_handle_receive, mock_process_entities):
         assert receive_task("foobar") is None
         mock_process_entities.assert_not_called()
 
