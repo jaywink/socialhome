@@ -3,8 +3,7 @@ import logging
 from django.conf import settings
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
-from federation.outbound import handle_create_payload
-from federation.utils.network import send_document
+from federation.outbound import handle_send
 from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
@@ -60,14 +59,24 @@ def send_content(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        # TODO: federation should provide one method to send,
-        # which handles also payload creation and url calculation
-        payload = handle_create_payload(entity, content.author)
-        # Just dump to the relay system for now
-        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        send_document(url, payload)
+        recipients = [
+            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
+        ]
+        handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
+
+
+def _get_remote_participants_for_parent(parent, exclude=None):
+    """Get remote participants for a parent."""
+    participants = []
+    if not parent.is_local:
+        participants.append((parent.author.handle, None))
+    replies = Content.objects.filter(parent_id=parent.id, visibility=Visibility.PUBLIC)
+    for reply in replies:
+        if not reply.is_local and reply.author.handle != exclude:
+            participants.append((reply.author.handle, None))
+    return participants
 
 
 def send_reply(content_id):
@@ -76,7 +85,7 @@ def send_reply(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, parent_id__isnull=False)
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
@@ -85,12 +94,11 @@ def send_reply(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        # TODO: federation should provide one method to send,
-        # which handles also payload creation and url calculation
-        payload = handle_create_payload(entity, content.author)
-        # Just dump to the relay system for now
-        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        send_document(url, payload)
+        recipients = [
+            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
+        ]
+        recipients.extend(_get_remote_participants_for_parent(content.parent))
+        handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
 
@@ -108,10 +116,10 @@ def send_content_retraction(content, author_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        payload = handle_create_payload(entity, author)
-        # Just dump to the relay system for now
-        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        send_document(url, payload)
+        recipients = [
+            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
+        ]
+        handle_send(entity, author, recipients)
     else:
         logger.warning("No retraction entity for %s", content)
 
@@ -130,7 +138,8 @@ def forward_relayable(entity, parent_id):
         # Don't send in development mode
         return
     entity.sign_with_parent(parent.author.private_key)
-    payload = handle_create_payload(entity, parent.author)
-    # Just dump to the relay system for now
-    url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-    send_document(url, payload)
+    recipients = [
+        (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
+    ]
+    recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
+    handle_send(entity, parent.author, recipients)
