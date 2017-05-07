@@ -1,4 +1,4 @@
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, call
 
 import pytest
 from federation.entities import base
@@ -8,18 +8,21 @@ from test_plus import TestCase
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.enums import Visibility
+from socialhome.federate.tasks import forward_relayable
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_entity, make_federable_retraction, process_entity_post,
-    process_entity_retraction, sender_key_fetcher)
+    process_entity_retraction, sender_key_fetcher, process_entity_comment)
+from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
 class TestProcessEntities(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestProcessEntities, cls).setUpTestData()
+        super().setUpTestData()
         cls.post = entities.PostFactory()
+        cls.comment = base.Comment()
         cls.retraction = base.Retraction()
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
@@ -34,6 +37,12 @@ class TestProcessEntities(TestCase):
         process_entities([self.retraction])
         mock_process.assert_called_once_with(self.retraction, "profile")
 
+    @patch("socialhome.federate.utils.tasks.process_entity_comment")
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_comment_is_called(self, mock_sender, mock_process):
+        process_entities([self.comment])
+        mock_process.assert_called_once_with(self.comment, "profile")
+
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -43,7 +52,7 @@ class TestProcessEntities(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestProcessEntityPost(object):
+class TestProcessEntityPost():
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory())
@@ -77,6 +86,64 @@ class TestProcessEntityPost(object):
         content = Content.objects.get(guid="alert('yup');")
         assert content.text == "&lt;script&gt;alert('yup');&lt;/script&gt;"
         assert content.service_label == "alert('yup');"
+
+
+@pytest.mark.usefixtures("db")
+class TestProcessEntityComment(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.content = ContentFactory()
+
+    def setUp(self):
+        super().setUp()
+        self.comment = base.Comment(target_guid=self.content.guid, raw_content="foobar")
+
+    def test_reply_is_created_from_entity(self):
+        process_entity_comment(self.comment, ProfileFactory())
+        Content.objects.get(guid=self.comment.guid, parent=self.content)
+
+    def test_entity_images_are_prefixed_to_post_text(self):
+        self.comment._children = [
+            base.Image(remote_path="foo", remote_name="bar"),
+            base.Image(remote_path="zoo", remote_name="dee"),
+        ]
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        self.assertEqual(content.text.index("![](foobar) ![](zoodee) \n\n%s" % self.comment.raw_content), 0)
+
+    def test_reply_is_updated_from_entity(self):
+        ContentFactory(guid=self.comment.guid)
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        self.assertEqual(content.text, self.comment.raw_content)
+
+    def test_reply_text_fields_are_cleaned(self):
+        self.comment.raw_content = "<script>alert('yup');</script>"
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        self.assertEqual(content.text, "&lt;script&gt;alert('yup');&lt;/script&gt;")
+
+    @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
+    def test_does_not_forwards_relayable_if_not_local_content(self, mock_rq):
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        mock_rq.assert_called_once_with(send_reply_notifications, content.id)
+
+    @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
+    def test_forwards_relayable_if_local_content(self, mock_rq):
+        user = UserFactory()
+        self.content.author = user.profile
+        self.content.save()
+        self.content.refresh_from_db()
+        mock_rq.reset_mock()
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        call_args = [
+            call(send_reply_notifications, content.id),
+            call(forward_relayable, self.comment, self.content.id),
+        ]
+        self.assertEqual(mock_rq.call_args_list, call_args)
 
 
 @pytest.mark.usefixtures("db")
@@ -117,7 +184,7 @@ class TestProcessEntityRetraction(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestGetSenderProfile(object):
+class TestGetSenderProfile():
     def test_returns_existing_profile(self):
         profile = ProfileFactory(handle="foo@example.com")
         assert get_sender_profile("foo@example.com") == profile

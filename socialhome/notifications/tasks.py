@@ -12,7 +12,7 @@ logger = logging.getLogger("socialhome")
 
 def send_reply_notifications(content_id):
     """Super simple reply notification to content local participants.
-    
+
     Until proper notifications is supported, just pop out an email.
     """
     if settings.DEBUG:

@@ -1,15 +1,17 @@
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pytest
+from django.conf import settings
 from django.test import override_settings
+from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import receive_task, send_content, send_content_retraction, send_reply
+from socialhome.federate.tasks import receive_task, send_content, send_content_retraction, send_reply, forward_relayable
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import UserFactory
+from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
 @pytest.mark.usefixtures("db")
@@ -104,9 +106,33 @@ class TestSendReply(TestCase):
         author = UserFactory()
         Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.remote_reply = ContentFactory(parent=cls.public_content, author=ProfileFactory())
         cls.reply = ContentFactory(parent=cls.public_content, author=author.profile)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_send_reply(self, mock_sender):
         send_reply(self.reply.id)
         assert mock_sender.called == 1
+
+
+@pytest.mark.django_db
+class TestForwardRelayable(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        author = UserFactory()
+        author.profile.rsa_private_key = get_dummy_private_key().exportKey()
+        author.profile.save()
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
+        cls.remote_reply = ContentFactory(parent=cls.public_content, author=ProfileFactory())
+        cls.reply = ContentFactory(parent=cls.public_content)
+
+    @patch("socialhome.federate.tasks.handle_send", return_value=None)
+    def test_foo(self, mock_send):
+        entity = Comment(handle=self.reply.author.handle)
+        entity.sign_with_parent = Mock()
+        forward_relayable(entity, self.public_content.id)
+        mock_send.assert_called_once_with(entity, self.public_content.author, [
+            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
+            (self.remote_reply.author.handle, None),
+        ])
