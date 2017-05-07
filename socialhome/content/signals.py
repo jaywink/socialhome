@@ -9,7 +9,7 @@ from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
-from socialhome.notifications.tasks import send_reply_notification
+from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.streams.consumers import StreamConsumer
 
 logger = logging.getLogger("socialhome")
@@ -21,11 +21,10 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     if kwargs.get("created"):
         notify_listeners(instance)
-    # TODO federate replies also when that is available in federation layer
     if instance.is_local:
         federate_content(instance)
-    if instance.parent and instance.parent.author != instance.author:
-        django_rq.enqueue(send_reply_notification, instance.parent_id)
+    if instance.parent:
+        django_rq.enqueue(send_reply_notifications, instance.id)
 
 
 @receiver(post_delete, sender=Content)
