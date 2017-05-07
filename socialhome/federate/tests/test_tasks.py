@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-from django.conf import settings
 from django.test import override_settings
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
@@ -10,7 +9,7 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task, send_content, send_content_retraction, send_reply
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("db")
@@ -42,19 +41,11 @@ class TestSendContent(TestCase):
         send_content(self.public_content.id)
         mock_maker.assert_called_once_with(self.public_content)
 
-    @patch("socialhome.federate.tasks.handle_create_payload")
-    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
-    def test_handle_create_payload_is_called(self, mock_maker, mock_sender, mock_handler):
+    def test_handle_send_is_called(self, mock_maker, mock_send):
         send_content(self.public_content.id)
-        mock_handler.assert_called_once_with("entity", self.public_content.author)
-
-    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
-    @patch("socialhome.federate.tasks.send_document", return_value=None)
-    def test_send_document_is_called(self, mock_sender, mock_payloader):
-        send_content(self.public_content.id)
-        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        mock_sender.assert_called_once_with(url, "payload")
+        mock_send.assert_called_once_with("entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')])
 
     @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -63,10 +54,10 @@ class TestSendContent(TestCase):
         self.assertTrue(mock_logger.called)
 
     @override_settings(DEBUG=True)
-    @patch("socialhome.federate.tasks.handle_create_payload")
-    def test_content_not_sent_in_debug_mode(self, mock_payload):
+    @patch("socialhome.federate.tasks.handle_send")
+    def test_content_not_sent_in_debug_mode(self, mock_send):
         send_content(self.public_content.id)
-        mock_payload.assert_not_called()
+        mock_send.assert_not_called()
 
 
 @pytest.mark.usefixtures("db")
@@ -84,19 +75,13 @@ class TestSendContentRetraction(TestCase):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
 
-    @patch("socialhome.federate.tasks.handle_create_payload")
-    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
-    def test_handle_create_payload_is_called(self, mock_maker, mock_sender, mock_handler):
+    def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
         send_content_retraction(self.public_content, self.public_content.author_id)
-        mock_handler.assert_called_once_with("entity", self.public_content.author)
-
-    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
-    @patch("socialhome.federate.tasks.send_document", return_value=None)
-    def test_send_document_is_called(self, mock_sender, mock_payloader):
-        send_content_retraction(self.public_content, self.public_content.author_id)
-        url = "https://%s/receive/public" % settings.SOCIALHOME_RELAY_DOMAIN
-        mock_sender.assert_called_once_with(url, "payload")
+        mock_sender.assert_called_once_with(
+            "entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')]
+        )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -105,10 +90,10 @@ class TestSendContentRetraction(TestCase):
         self.assertTrue(mock_logger.called)
 
     @override_settings(DEBUG=True)
-    @patch("socialhome.federate.tasks.handle_create_payload")
-    def test_content_not_sent_in_debug_mode(self, mock_payload):
+    @patch("socialhome.federate.tasks.handle_send")
+    def test_content_not_sent_in_debug_mode(self, mock_send):
         send_content_retraction(self.public_content, self.public_content.author_id)
-        mock_payload.assert_not_called()
+        mock_send.assert_not_called()
 
 
 @pytest.mark.usefixtures("db")
@@ -121,7 +106,7 @@ class TestSendReply(TestCase):
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
         cls.reply = ContentFactory(parent=cls.public_content, author=author.profile)
 
-    @patch("socialhome.federate.tasks.send_document", return_value=None)
+    @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_send_reply(self, mock_sender):
         send_reply(self.reply.id)
         assert mock_sender.called == 1
