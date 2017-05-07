@@ -35,6 +35,12 @@
                     '</div>' +
                 '</div>' +
             '</div>' +
+            '<div class="replies-container" data-content-id="<%= content.id %>"></div>' +
+            '<% if (content.is_authenticated) { %>' +
+                '<div class="content-actions hidden" data-content-id="<%= content.id %>">' +
+                    '<a class="btn btn-secondary" href="<%= content.reply_url %>" aria-label="' + gettext("Reply") + '">' + gettext("Reply") +'</a>' +
+                '</div>' +
+            '<% } %>' +
         '</div>';
     window.Content.template = _.template(contentTemplate);
 })(jQuery);
