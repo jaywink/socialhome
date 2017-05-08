@@ -1,11 +1,12 @@
 import json
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, call
 
 import pytest
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.federate.tasks import send_content, send_content_retraction
+from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
+from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.users.tests.factories import UserFactory
 
 
@@ -33,10 +34,17 @@ class TestFederateContent(TestCase):
         mock_send.assert_not_called()
 
     @patch("socialhome.content.signals.django_rq.enqueue")
-    def test_content_with_parent_does_not_get_sent(self, mock_send):
+    def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
-        ContentFactory(author=user.profile, parent=ContentFactory())
-        mock_send.assert_not_called()
+        parent = ContentFactory(author=user.profile)
+        mock_send.reset_mock()
+        content = ContentFactory(author=user.profile, parent=parent)
+        self.assertTrue(content.is_local)
+        call_args = [
+            call(send_reply, content.id),
+            call(send_reply_notifications, content.id)
+        ]
+        assert mock_send.call_args_list == call_args
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_gets_sent(self, mock_send):

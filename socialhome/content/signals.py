@@ -8,7 +8,8 @@ from django.dispatch import receiver
 from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import send_content, send_content_retraction
+from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
+from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.streams.consumers import StreamConsumer
 
 logger = logging.getLogger("socialhome")
@@ -20,9 +21,10 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     if kwargs.get("created"):
         notify_listeners(instance)
-    # TODO federate replies also when that is available in federation layer
-    if instance.is_local and not instance.parent:
+    if instance.is_local:
         federate_content(instance)
+    if instance.parent:
+        django_rq.enqueue(send_reply_notifications, instance.id)
 
 
 @receiver(post_delete, sender=Content)
@@ -53,8 +55,8 @@ def render_content(content):
 
 def notify_listeners(content):
     """Send out to listening consumers."""
-    # TODO: add sending for tags and pinned user profile content
-    if content.visibility == Visibility.PUBLIC:
+    # TODO: add sending for tags, content and user profile streams
+    if content.visibility == Visibility.PUBLIC and not content.parent:
         StreamConsumer.group_send("streams_public", json.dumps({
             "event": "new",
             "id": content.id,
@@ -67,6 +69,9 @@ def federate_content(content):
     Yes, edits also. The federation layer should decide whether these are really worth sending out.
     """
     try:
-        django_rq.enqueue(send_content, content.id)
+        if content.parent:
+            django_rq.enqueue(send_reply, content.id)
+        else:
+            django_rq.enqueue(send_content, content.id)
     except Exception as ex:
         logger.exception("Failed to federate_content %s: %s", content, ex)

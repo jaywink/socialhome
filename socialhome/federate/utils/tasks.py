@@ -1,5 +1,6 @@
 import logging
 
+import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile
 
@@ -28,15 +29,21 @@ def get_sender_profile(sender):
     return sender_profile
 
 
-def process_entities(entities, profile):
+def process_entities(entities):
     """Process a list of entities."""
     for entity in entities:
         logging.info("Entity: %s" % entity)
+        profile = get_sender_profile(entity.handle)
+        if not profile:
+            logger.warning("No sender profile for entity %s, skipping" % entity)
+            continue
         try:
             if isinstance(entity, base.Post):
                 process_entity_post(entity, profile)
             elif isinstance(entity, base.Retraction):
                 process_entity_retraction(entity, profile)
+            elif isinstance(entity, base.Comment):
+                process_entity_comment(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
 
@@ -56,6 +63,32 @@ def process_entity_post(entity, profile):
         logger.info("Saved Content: %s", content)
     else:
         logger.info("Updated Content: %s", content)
+
+
+def process_entity_comment(entity, profile):
+    """Process an entity of type Comment."""
+    try:
+        parent = Content.objects.get(guid=entity.target_guid)
+    except Content.DoesNotExist:
+        logger.warning("No target found for comment: %s", entity)
+        return
+    values = {
+        "text": safe_text_for_markdown(entity.raw_content),
+        "author": profile,
+        "visibility": parent.visibility,
+        "remote_created": safe_make_aware(entity.created_at, "UTC"),
+        "parent": parent,
+    }
+    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
+    content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
+    if created:
+        logger.info("Saved Content from comment entity: %s", content)
+    else:
+        logger.info("Updated Content from comment entity: %s", content)
+    if parent.is_local:
+        # We should relay this to participants we know of
+        from socialhome.federate.tasks import forward_relayable
+        django_rq.enqueue(forward_relayable, entity, parent.id)
 
 
 def _embed_entity_images_to_post(children, text):
@@ -104,9 +137,7 @@ def process_entity_retraction(entity, profile):
     logger.info("Retraction done for content %s", content)
 
 
-def make_federable_entity(content):
-    """Make Content federable by converting it to a federation entity."""
-    logging.info("make_federable_entity - Content: %s" % content)
+def _make_post(content):
     try:
         return base.Post(
             raw_content=content.text,
@@ -117,8 +148,30 @@ def make_federable_entity(content):
             created_at=content.effective_created,
         )
     except Exception as ex:
-        logger.exception("make_federable_entity - Failed to convert %s: %s", content.guid, ex)
+        logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
         return None
+
+
+def _make_comment(content):
+    try:
+        return base.Comment(
+            raw_content=content.text,
+            guid=str(content.guid),
+            target_guid=str(content.parent.guid),
+            handle=content.author.handle,
+            created_at=content.effective_created,
+        )
+    except Exception as ex:
+        logger.exception("_make_comment - Failed to convert %s: %s", content.guid, ex)
+        return None
+
+
+def make_federable_entity(content):
+    """Make Content federable by converting it to a federation entity."""
+    logging.info("make_federable_entity - Content: %s" % content)
+    if content.parent:
+        return _make_comment(content)
+    return _make_post(content)
 
 
 def make_federable_retraction(content, author):

@@ -31,7 +31,7 @@ $(function () {
             return $(elem);
         },
 
-        addContentToGrid: function($contents, placement, parent_id) {
+        addContentToGrid: function($contents, placement, parent_id, done) {
             if (placement === "appended") {
                 $('.grid').append($contents).masonry(placement, $contents, true);
             } else if (placement === "prepended") {
@@ -45,6 +45,7 @@ $(function () {
             }
             view.layoutMasonry();
             view.addNSFWShield();
+            done();
         },
 
         layoutMasonry: function() {
@@ -244,13 +245,14 @@ $(function () {
                     view.hideNewLabel();
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
-                view.addContentToGrid($contents, data.placement, data.parent_id);
+                view.addContentToGrid($contents, data.placement, data.parent_id, function() {
+                    controller.addContentListeners();
+                    controller.addReplyTriggers();
+                    if (ids.length && data.placement === "appended") {
+                        controller.addLoadMoreTrigger();
+                    }
+                });
                 view.contentIds = _.union(view.contentIds, ids);
-                controller.addContentListeners();
-                setTimeout(controller.addReplyTriggers, 500);
-                if (ids.length && data.placement === "appended") {
-                    setTimeout(controller.addLoadMoreTrigger, 500);
-                }
             }
         },
 
