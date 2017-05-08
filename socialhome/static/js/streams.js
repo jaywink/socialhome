@@ -204,6 +204,10 @@ $(function () {
             return new ReconnectingWebSocket(ws_path);
         },
 
+        isContentDetail: function() {
+            return socialhomeStream.split("__")[0] === "content";
+        },
+
         handleSocketOpen: function() {
             if (controller.availableContent.length) {
                 view.showNewLabel();
@@ -212,7 +216,7 @@ $(function () {
             $("#new-content-load-link").click(controller.getContent);
             controller.addLoadMoreTrigger();
             // Replies if single content view
-            if (socialhomeStream.split("__")[0] === "content") {
+            if (controller.isContentDetail()) {
                 var contentId = $("#content-body").data("content-id");
                 controller.loadReplies(contentId);
             }
@@ -246,10 +250,12 @@ $(function () {
                 }
                 view.updateNewLabelCount(controller.availableContent.length);
                 view.addContentToGrid($contents, data.placement, data.parent_id, function() {
-                    controller.addContentListeners();
-                    controller.addReplyTriggers();
-                    if (ids.length && data.placement === "appended") {
-                        controller.addLoadMoreTrigger();
+                    if (!controller.isContentDetail()) {
+                        controller.addContentListeners();
+                        controller.addReplyTriggers();
+                        if (ids.length && data.placement === "appended") {
+                            controller.addLoadMoreTrigger();
+                        }
                     }
                 });
                 view.contentIds = _.union(view.contentIds, ids);
