@@ -1,7 +1,6 @@
 import pytest
 from test_plus.test import TestCase
 
-from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 from socialhome.users.utils import get_pony_urls
 
@@ -43,7 +42,7 @@ class TestUser(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestProfile(object):
+class TestProfile():
     def test_generate_new_rsa_key(self):
         profile = ProfileFactory()
         current_rsa_key = profile.rsa_private_key
