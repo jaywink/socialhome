@@ -8,7 +8,7 @@ from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import safe_make_aware
-from socialhome.users.models import Profile
+from socialhome.users.models import Profile, User
 
 logger = logging.getLogger("socialhome")
 
@@ -44,8 +44,41 @@ def process_entities(entities):
                 process_entity_retraction(entity, profile)
             elif isinstance(entity, base.Comment):
                 process_entity_comment(entity, profile)
+            elif isinstance(entity, base.Relationship):
+                process_entity_relationship(entity, profile)
+            elif isinstance(entity, base.Follow):
+                process_entity_follow(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
+
+
+def process_entity_follow(entity, profile):
+    """Process entity of type Follow."""
+    try:
+        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
+        return
+    if entity.following:
+        user.followers.add(profile)
+        logger.info("Added follower %s to user %s", profile, user)
+    else:
+        user.followers.remove(profile)
+        logger.info("Removed follower %s from user %s", profile, user)
+
+
+def process_entity_relationship(entity, profile):
+    """Process entity of type Relationship."""
+    if not entity.relationship == "following":
+        logger.debug("Ignoring relationship of type %s", entity.relationship)
+        return
+    try:
+        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
+        return
+    user.followers.add(profile)
+    logger.info("Added follower %s to user %s", profile, user)
 
 
 def process_entity_post(entity, profile):
