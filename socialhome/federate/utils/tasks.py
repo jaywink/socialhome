@@ -147,13 +147,8 @@ def _embed_entity_images_to_post(children, text):
     return text
 
 
-def process_entity_retraction(entity, profile):
-    """Process an entity of type Retraction."""
-    entity_type = safe_text(entity.entity_type)
-    if entity_type != "Post":
-        logger.debug("Ignoring retraction of entity_type %s", entity_type)
-        return
-    target_guid = safe_text(entity.target_guid)
+def _retract_content(target_guid, profile):
+    """Retract a Content."""
     try:
         content = Content.objects.get(guid=target_guid)
     except Content.DoesNotExist:
@@ -168,6 +163,31 @@ def process_entity_retraction(entity, profile):
     # Ok to process retraction
     content.delete()
     logger.info("Retraction done for content %s", content)
+
+
+def _retract_relationship(target_guid, profile):
+    """Retract a (legacy) relationship."""
+    try:
+        user = User.objects.get(profile__guid=target_guid)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for relationship retraction", target_guid)
+        return
+    user.followers.remove(profile)
+    logger.info("Removed follower %s from user %s", profile, user)
+
+
+def process_entity_retraction(entity, profile):
+    """Process an entity of type Retraction."""
+    entity_type = safe_text(entity.entity_type)
+    if entity_type == "Post":
+        target_guid = safe_text(entity.target_guid)
+        _retract_content(target_guid, profile)
+    elif entity_type == "Profile":
+        # This is legacy stuff and means basically retract sharing/following
+        target_guid = safe_text(entity._receiving_guid)
+        _retract_relationship(target_guid, profile)
+    else:
+        logger.debug("Ignoring retraction of entity_type %s", entity_type)
 
 
 def _make_post(content):
