@@ -41,8 +41,8 @@ class TestFederateContent(TestCase):
         content = ContentFactory(author=user.profile, parent=parent)
         self.assertTrue(content.is_local)
         call_args = [
+            call(send_reply_notifications, content.id),
             call(send_reply, content.id),
-            call(send_reply_notifications, content.id)
         ]
         assert mock_send.call_args_list == call_args
 

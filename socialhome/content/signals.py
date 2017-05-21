@@ -21,10 +21,10 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     if kwargs.get("created"):
         notify_listeners(instance)
+        if instance.parent:
+            django_rq.enqueue(send_reply_notifications, instance.id)
     if instance.is_local:
         federate_content(instance)
-    if instance.parent:
-        django_rq.enqueue(send_reply_notifications, instance.id)
 
 
 @receiver(post_delete, sender=Content)
