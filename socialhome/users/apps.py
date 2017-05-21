@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.apps import AppConfig
 
 
@@ -8,4 +7,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         """Import our signals."""
-        from socialhome.users.signals import create_user_profile
+        from socialhome.users.signals import create_user_profile, send_follow_notification
