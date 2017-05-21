@@ -33,8 +33,9 @@ class TestSendContent(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        author = UserFactory()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
     @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):
@@ -67,8 +68,9 @@ class TestSendContentRetraction(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        author = UserFactory()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):

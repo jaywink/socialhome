@@ -48,11 +48,11 @@ def send_content(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC)
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
-    if not content.visibility == Visibility.PUBLIC:
+    if not content.is_local:
         return
     entity = make_federable_entity(content)
     if entity:
@@ -62,6 +62,7 @@ def send_content(content_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
+        recipients.extend(_get_remote_followers(content.author.user))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -79,6 +80,15 @@ def _get_remote_participants_for_parent(parent, exclude=None):
     return participants
 
 
+def _get_remote_followers(user, exclude=None):
+    """Get remote followers for a user."""
+    followers = []
+    for follower in user.followers.filter(user__isnull=True):
+        if follower.handle != exclude:
+            followers.append((follower.handle, None))
+    return followers
+
+
 def send_reply(content_id):
     """Handle sending a Content object that is a reply out via the federation layer.
 
@@ -89,6 +99,8 @@ def send_reply(content_id):
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
+    if not content.is_local:
+        return
     entity = make_federable_entity(content)
     if entity:
         if settings.DEBUG:
@@ -98,6 +110,7 @@ def send_reply(content_id):
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
         recipients.extend(_get_remote_participants_for_parent(content.parent))
+        recipients.extend(_get_remote_followers(content.author.user))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -108,7 +121,7 @@ def send_content_retraction(content, author_id):
 
     Currently only for public content.
     """
-    if not content.visibility == Visibility.PUBLIC:
+    if not content.visibility == Visibility.PUBLIC or not content.is_local:
         return
     author = Profile.objects.get(id=author_id)
     entity = make_federable_retraction(content, author)
@@ -119,6 +132,7 @@ def send_content_retraction(content, author_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
+        recipients.extend(_get_remote_followers(author.user))
         handle_send(entity, author, recipients)
     else:
         logger.warning("No retraction entity for %s", content)
@@ -142,4 +156,5 @@ def forward_relayable(entity, parent_id):
         (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
     ]
     recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
+    recipients.extend(_get_remote_followers(parent.author.user, exclude=entity.handle))
     handle_send(entity, parent.author, recipients)
