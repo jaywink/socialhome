@@ -212,7 +212,7 @@ def make_federable_retraction(content, author):
     logging.info("make_federable_retraction - Content: %s" % content)
     try:
         return base.Retraction(
-            entity_type="Post",  # Well, currently, at some point this could be something else
+            entity_type="Comment" if content.parent else "Post",
             handle=author.handle,
             target_guid=content.guid,
         )

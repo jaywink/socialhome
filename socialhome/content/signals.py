@@ -30,8 +30,7 @@ def content_post_save(instance, **kwargs):
 @receiver(post_delete, sender=Content)
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
-    # TODO federate replies also when that is available in federation layer
-    if instance.is_local and not instance.parent:
+    if instance.is_local:
         try:
             django_rq.enqueue(send_content_retraction, instance, instance.author_id)
         except Exception as ex:
