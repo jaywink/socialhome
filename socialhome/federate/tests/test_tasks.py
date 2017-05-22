@@ -9,7 +9,10 @@ from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import receive_task, send_content, send_content_retraction, send_reply, forward_relayable
+from socialhome.federate.tasks import (
+    receive_task, send_content, send_content_retraction, send_reply,
+    forward_relayable, _get_remote_followers,
+)
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -28,13 +31,13 @@ class TestReceiveTask():
         mock_process_entities.assert_not_called()
 
 
-@pytest.mark.usefixtures("db")
 class TestSendContent(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        author = UserFactory()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
     @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):
@@ -62,13 +65,13 @@ class TestSendContent(TestCase):
         mock_send.assert_not_called()
 
 
-@pytest.mark.usefixtures("db")
 class TestSendContentRetraction(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        author = UserFactory()
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
+        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
     def test_only_public_content_calls_make_federable_entity(self, mock_maker):
@@ -98,7 +101,6 @@ class TestSendContentRetraction(TestCase):
         mock_send.assert_not_called()
 
 
-@pytest.mark.usefixtures("db")
 class TestSendReply(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -115,7 +117,6 @@ class TestSendReply(TestCase):
         assert mock_sender.called == 1
 
 
-@pytest.mark.django_db
 class TestForwardRelayable(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -136,3 +137,35 @@ class TestForwardRelayable(TestCase):
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
             (self.remote_reply.author.handle, None),
         ])
+
+
+class TestGetRemoveFollowers(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.local_follower_user = UserFactory()
+        cls.remote_follower = ProfileFactory()
+        cls.remote_follower2 = ProfileFactory()
+        cls.user.followers.add(
+            cls.local_follower_user.profile, cls.remote_follower, cls.remote_follower2,
+        )
+
+    def test_all_remote_returned(self):
+        followers = set(_get_remote_followers(self.user))
+        self.assertEqual(
+            followers,
+            {
+                (self.remote_follower.handle, None),
+                (self.remote_follower2.handle, None),
+            }
+        )
+
+    def test_exclude_is_excluded(self):
+        followers = set(_get_remote_followers(self.user, exclude=self.remote_follower.handle))
+        self.assertEqual(
+            followers,
+            {
+                (self.remote_follower2.handle, None),
+            }
+        )

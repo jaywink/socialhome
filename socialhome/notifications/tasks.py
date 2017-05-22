@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 
 from socialhome.content.models import Content
-from socialhome.users.models import User
+from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
 
@@ -41,5 +41,28 @@ def send_reply_notifications(content_id):
         "There is a new reply to content you have participated in, see it here: %s" % parent_url,
         settings.DEFAULT_FROM_EMAIL,
         participants,
+        fail_silently=False,
+    )
+
+
+def send_follow_notification(follower_id, user_id):
+    """Super simple you've been followed notification to a user."""
+    if settings.DEBUG:
+        return
+    try:
+        user = User.objects.get(id=user_id, is_active=True)
+    except User.DoesNotExist:
+        logger.warning("No active user %s found for follow notification", user_id)
+        return
+    try:
+        follower = Profile.objects.get(id=follower_id)
+    except Profile.DoesNotExist:
+        logger.warning("No follower profile %s found for follow notifications", follower_id)
+        return
+    send_mail(
+        "%sNew follower" % settings.EMAIL_SUBJECT_PREFIX,
+        "You have a new follower: %s" % follower.handle,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
         fail_silently=False,
     )

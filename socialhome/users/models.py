@@ -5,7 +5,7 @@ from django.core.validators import validate_email
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
-from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from model_utils.models import TimeStampedModel
 
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
@@ -23,6 +23,10 @@ class User(AbstractUser):
     # Users that are trusted might be able to inject harmful content into the system, for example
     # with unlimited usage of HTML tags.
     trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
+
+    # Relationships
+    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following")
+    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers")
 
     def __str__(self):
         return self.username
@@ -50,7 +54,7 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
 
-class Profile(models.Model):
+class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
@@ -81,9 +85,6 @@ class Profile(models.Model):
 
     # NSFW status
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
-
-    created = AutoCreatedField(_("Created"))
-    modified = AutoLastModifiedField(_("Modified"))
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.handle)

@@ -11,7 +11,9 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import forward_relayable
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_entity, make_federable_retraction, process_entity_post,
-    process_entity_retraction, sender_key_fetcher, process_entity_comment)
+    process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
+    process_entity_relationship,
+)
 from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
@@ -24,6 +26,8 @@ class TestProcessEntities(TestCase):
         cls.post = entities.PostFactory()
         cls.comment = base.Comment()
         cls.retraction = base.Retraction()
+        cls.relationship = base.Relationship()
+        cls.follow = base.Follow()
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -42,6 +46,18 @@ class TestProcessEntities(TestCase):
     def test_process_entity_comment_is_called(self, mock_sender, mock_process):
         process_entities([self.comment])
         mock_process.assert_called_once_with(self.comment, "profile")
+
+    @patch("socialhome.federate.utils.tasks.process_entity_relationship")
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_comment_is_called(self, mock_sender, mock_process):
+        process_entities([self.relationship])
+        mock_process.assert_called_once_with(self.relationship, "profile")
+
+    @patch("socialhome.federate.utils.tasks.process_entity_follow")
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_comment_is_called(self, mock_sender, mock_process):
+        process_entities([self.follow])
+        mock_process.assert_called_once_with(self.follow, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
@@ -88,7 +104,6 @@ class TestProcessEntityPost():
         assert content.service_label == "alert('yup');"
 
 
-@pytest.mark.usefixtures("db")
 class TestProcessEntityComment(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -146,8 +161,20 @@ class TestProcessEntityComment(TestCase):
         self.assertEqual(mock_rq.call_args_list, call_args)
 
 
-@pytest.mark.usefixtures("db")
 class TestProcessEntityRetraction(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.content = ContentFactory()
+        cls.local_content = LocalContentFactory()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
+
+    def setUp(self):
+        super().setUp()
+        self.content.refresh_from_db()
+
     @patch("socialhome.federate.utils.tasks.logger.debug")
     def test_non_post_entity_types_are_skipped(self, mock_logger):
         process_entity_retraction(Mock(entity_type="foo"), Mock())
@@ -160,27 +187,75 @@ class TestProcessEntityRetraction(TestCase):
 
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_does_nothing_if_content_is_not_local(self, mock_logger):
-        content = LocalContentFactory()
-        process_entity_retraction(Mock(entity_type="Post", target_guid=content.guid), Mock())
-        mock_logger.assert_called_with("Local content %s cannot be retracted by a remote retraction!", content)
+        process_entity_retraction(Mock(entity_type="Post", target_guid=self.local_content.guid), Mock())
+        mock_logger.assert_called_with(
+            "Local content %s cannot be retracted by a remote retraction!", self.local_content
+        )
 
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_does_nothing_if_content_author_is_not_same_as_remote_profile(self, mock_logger):
-        content = ContentFactory()
         remote_profile = Mock()
-        process_entity_retraction(Mock(entity_type="Post", target_guid=content.guid), remote_profile)
+        process_entity_retraction(Mock(entity_type="Post", target_guid=self.content.guid), remote_profile)
         mock_logger.assert_called_with(
-            "Content %s is not owned by remote retraction profile %s", content, remote_profile
+            "Content %s is not owned by remote retraction profile %s", self.content, remote_profile
         )
 
     def test_deletes_content(self):
-        content = ContentFactory()
         process_entity_retraction(
-            Mock(entity_type="Post", target_guid=content.guid, handle=content.author.handle),
-            content.author
+            Mock(entity_type="Post", target_guid=self.content.guid, handle=self.content.author.handle),
+            self.content.author
         )
         with self.assertRaises(Content.DoesNotExist):
-            Content.objects.get(id=content.id)
+            Content.objects.get(id=self.content.id)
+
+    def test_removes_follower(self):
+        self.user.followers.add(self.remote_profile)
+        process_entity_retraction(
+            base.Retraction(entity_type="Profile", _receiving_guid=self.profile.guid),
+            self.remote_profile,
+        )
+        self.assertEqual(self.user.followers.count(), 0)
+
+
+class TestProcessEntityFollow(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
+
+    def test_follower_added_on_following_true(self):
+        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
+        self.assertEqual(self.user.followers.count(), 1)
+        self.assertEqual(self.user.followers.first().handle, self.remote_profile.handle)
+
+    def test_follower_removed_on_following_false(self):
+        self.user.followers.add(self.remote_profile)
+        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=False), self.remote_profile)
+        self.assertEqual(self.user.followers.count(), 0)
+
+
+class TestProcessEntityRelationship(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
+
+    def test_follower_added_on_following(self):
+        process_entity_relationship(base.Relationship(
+            target_handle=self.profile.handle, relationship="following"), self.remote_profile
+        )
+        self.assertEqual(self.user.followers.count(), 1)
+        self.assertEqual(self.user.followers.first().handle, self.remote_profile.handle)
+
+    def test_follower_not_added_on_not_following(self):
+        process_entity_relationship(base.Relationship(
+            target_handle=self.profile.handle, relationship="sharing"), self.remote_profile
+        )
+        self.assertEqual(self.user.followers.count(), 0)
 
 
 @pytest.mark.usefixtures("db")
@@ -233,7 +308,6 @@ class TestGetSenderProfile():
         assert sender_profile.location == "alert('yup');"
 
 
-@pytest.mark.usefixtures("db")
 class TestMakeFederableEntity(TestCase):
     def test_returns_entity(self):
         content = ContentFactory()
@@ -253,7 +327,6 @@ class TestMakeFederableEntity(TestCase):
         self.assertIsNone(entity)
 
 
-@pytest.mark.usefixtures("db")
 class TestMakeFederableRetraction(TestCase):
     def test_returns_entity(self):
         content = ContentFactory()
@@ -268,7 +341,6 @@ class TestMakeFederableRetraction(TestCase):
         self.assertIsNone(entity)
 
 
-@pytest.mark.usefixtures("db")
 class TestSenderKeyFetcher(TestCase):
     def test_local_profile_public_key_is_returned(self):
         profile = ProfileFactory()

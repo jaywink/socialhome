@@ -5,8 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.notifications.tasks import send_reply_notifications
-from socialhome.users.tests.factories import UserFactory
+from socialhome.notifications.tasks import send_reply_notifications, send_follow_notification
+from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
 class TestSendReplyNotification(TestCase):
@@ -34,5 +34,24 @@ class TestSendReplyNotification(TestCase):
             "There is a new reply to content you have participated in, see it here: %s" % self.content_url,
             settings.DEFAULT_FROM_EMAIL,
             self.participant_emails,
+            fail_silently=False,
+        )
+
+
+class TestSendFollowNotification(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = ProfileFactory()
+
+    @patch("socialhome.notifications.tasks.send_mail")
+    def test_calls_send_email(self, mock_send):
+        send_follow_notification(self.profile.id, self.user.id)
+        mock_send.assert_called_once_with(
+            "[Django] New follower",
+            "You have a new follower: %s" % self.profile.handle,
+            settings.DEFAULT_FROM_EMAIL,
+            [self.user.email],
             fail_silently=False,
         )

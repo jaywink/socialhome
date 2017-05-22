@@ -1,10 +1,14 @@
-# -*- coding: utf-8 -*-
+from unittest.mock import patch
+
 import pytest
-from socialhome.users.tests.factories import UserFactory
+from django.test import TestCase
+
+from socialhome.notifications.tasks import send_follow_notification
+from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-@pytest.mark.usefixtures("db", "settings")
-class TestProfile(object):
+@pytest.mark.django_db
+class TestProfile():
     def test_signal_creates_a_profile(self, settings):
         settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = True
         user = UserFactory()
@@ -16,3 +20,16 @@ class TestProfile(object):
         assert profile.rsa_public_key
         assert profile.handle == "%s@%s" %(user.username, settings.SOCIALHOME_DOMAIN)
         assert profile.guid
+
+
+class TestUserFollowersChange(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = ProfileFactory()
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_adding_follower_sends_a_notification(self, mock_enqueue):
+        self.user.followers.add(self.profile)
+        mock_enqueue.assert_called_once_with(send_follow_notification, self.profile.id, self.user.id)

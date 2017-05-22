@@ -8,7 +8,7 @@ from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import safe_make_aware
-from socialhome.users.models import Profile
+from socialhome.users.models import Profile, User
 
 logger = logging.getLogger("socialhome")
 
@@ -44,8 +44,41 @@ def process_entities(entities):
                 process_entity_retraction(entity, profile)
             elif isinstance(entity, base.Comment):
                 process_entity_comment(entity, profile)
+            elif isinstance(entity, base.Relationship):
+                process_entity_relationship(entity, profile)
+            elif isinstance(entity, base.Follow):
+                process_entity_follow(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
+
+
+def process_entity_follow(entity, profile):
+    """Process entity of type Follow."""
+    try:
+        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
+        return
+    if entity.following:
+        user.followers.add(profile)
+        logger.info("Added follower %s to user %s", profile, user)
+    else:
+        user.followers.remove(profile)
+        logger.info("Removed follower %s from user %s", profile, user)
+
+
+def process_entity_relationship(entity, profile):
+    """Process entity of type Relationship."""
+    if not entity.relationship == "following":
+        logger.debug("Ignoring relationship of type %s", entity.relationship)
+        return
+    try:
+        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
+        return
+    user.followers.add(profile)
+    logger.info("Added follower %s to user %s", profile, user)
 
 
 def process_entity_post(entity, profile):
@@ -114,13 +147,8 @@ def _embed_entity_images_to_post(children, text):
     return text
 
 
-def process_entity_retraction(entity, profile):
-    """Process an entity of type Retraction."""
-    entity_type = safe_text(entity.entity_type)
-    if entity_type != "Post":
-        logger.debug("Ignoring retraction of entity_type %s", entity_type)
-        return
-    target_guid = safe_text(entity.target_guid)
+def _retract_content(target_guid, profile):
+    """Retract a Content."""
     try:
         content = Content.objects.get(guid=target_guid)
     except Content.DoesNotExist:
@@ -135,6 +163,31 @@ def process_entity_retraction(entity, profile):
     # Ok to process retraction
     content.delete()
     logger.info("Retraction done for content %s", content)
+
+
+def _retract_relationship(target_guid, profile):
+    """Retract a (legacy) relationship."""
+    try:
+        user = User.objects.get(profile__guid=target_guid)
+    except User.DoesNotExist:
+        logging.warning("Could not find local user %s for relationship retraction", target_guid)
+        return
+    user.followers.remove(profile)
+    logger.info("Removed follower %s from user %s", profile, user)
+
+
+def process_entity_retraction(entity, profile):
+    """Process an entity of type Retraction."""
+    entity_type = safe_text(entity.entity_type)
+    if entity_type == "Post":
+        target_guid = safe_text(entity.target_guid)
+        _retract_content(target_guid, profile)
+    elif entity_type == "Profile":
+        # This is legacy stuff and means basically retract sharing/following
+        target_guid = safe_text(entity._receiving_guid)
+        _retract_relationship(target_guid, profile)
+    else:
+        logger.debug("Ignoring retraction of entity_type %s", entity_type)
 
 
 def _make_post(content):
@@ -179,7 +232,7 @@ def make_federable_retraction(content, author):
     logging.info("make_federable_retraction - Content: %s" % content)
     try:
         return base.Retraction(
-            entity_type="Post",  # Well, currently, at some point this could be something else
+            entity_type="Comment" if content.parent else "Post",
             handle=author.handle,
             target_guid=content.guid,
         )
