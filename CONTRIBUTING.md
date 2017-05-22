@@ -64,6 +64,14 @@ All these three templates must be checked when any content rendering related twe
 As a general rule all code must have unit tests. For bug fixes provide a test that ensures the bug will not be back
 and for features always add a good enough coverage. PR's without sufficient test coverage will not be merged.
 
+### Testing tools
+
+We use `py.test` as test runner but most of the tests are Django `TestCase` based test classes. Some old tests are pure py.test function based tests. All new tests are preferred to be Django TestCase based tests.
+
+Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
+
+We also have some `Mocha` based JavaScript tests. Any new JS code that affects for example streams functionality should have at least basic tests written.
+
 ## Code style
 
 As a general rule, for Python code follow PEP8, except with a 120 character line length. We provide an
