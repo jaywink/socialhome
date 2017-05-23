@@ -14,7 +14,6 @@ from socialhome.federate.utils.tasks import (
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_relationship,
 )
-from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
@@ -68,7 +67,7 @@ class TestProcessEntities(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestProcessEntityPost():
+class TestProcessEntityPost:
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory())
@@ -143,7 +142,7 @@ class TestProcessEntityComment(TestCase):
     def test_does_not_forwards_relayable_if_not_local_content(self, mock_rq):
         process_entity_comment(self.comment, ProfileFactory())
         content = Content.objects.get(guid=self.comment.guid, parent=self.content)
-        mock_rq.assert_called_once_with(send_reply_notifications, content.id)
+        self.assertFalse(mock_rq.called)
 
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
     def test_forwards_relayable_if_local_content(self, mock_rq):
@@ -155,7 +154,6 @@ class TestProcessEntityComment(TestCase):
         process_entity_comment(self.comment, ProfileFactory())
         content = Content.objects.get(guid=self.comment.guid, parent=self.content)
         call_args = [
-            call(send_reply_notifications, content.id),
             call(forward_relayable, self.comment, self.content.id),
         ]
         self.assertEqual(mock_rq.call_args_list, call_args)
@@ -259,7 +257,7 @@ class TestProcessEntityRelationship(TestCase):
 
 
 @pytest.mark.usefixtures("db")
-class TestGetSenderProfile():
+class TestGetSenderProfile:
     def test_returns_existing_profile(self):
         profile = ProfileFactory(handle="foo@example.com")
         assert get_sender_profile("foo@example.com") == profile
