@@ -1,7 +1,7 @@
 import json
 from unittest.mock import patch, Mock, call
 
-import pytest
+from django.test import TransactionTestCase
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
@@ -10,7 +10,6 @@ from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.users.tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures("db")
 class TestNotifyListeners(TestCase):
     @patch("socialhome.content.signals.StreamConsumer")
     def test_content_save_calls_streamconsumer_group_send(self, mock_consumer):
@@ -26,8 +25,7 @@ class TestNotifyListeners(TestCase):
         self.assertFalse(mock_consumer.group_send.called)
 
 
-@pytest.mark.usefixtures("db")
-class TestFederateContent(TestCase):
+class TestFederateContent(TransactionTestCase):
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_non_local_content_does_not_get_sent(self, mock_send):
         ContentFactory()
@@ -61,7 +59,6 @@ class TestFederateContent(TestCase):
         self.assertTrue(mock_logger.called)
 
 
-@pytest.mark.usefixtures("db")
 class TestFederateContentRetraction(TestCase):
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_non_local_content_retraction_does_not_get_sent(self, mock_send):
@@ -88,7 +85,6 @@ class TestFederateContentRetraction(TestCase):
         self.assertTrue(mock_logger.called)
 
 
-@pytest.mark.usefixtures("db")
 class TestFetchPreview(TestCase):
     @patch("socialhome.content.signals.fetch_content_preview")
     def test_fetch_content_preview_called(self, fetch):
@@ -102,7 +98,6 @@ class TestFetchPreview(TestCase):
         self.assertTrue(logger.called)
 
 
-@pytest.mark.usefixtures("db")
 class TestRenderContent(TestCase):
     def test_render_content_called(self):
         content = ContentFactory()

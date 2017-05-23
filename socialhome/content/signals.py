@@ -2,6 +2,7 @@ import json
 import logging
 
 import django_rq
+from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
@@ -22,9 +23,9 @@ def content_post_save(instance, **kwargs):
     if kwargs.get("created"):
         notify_listeners(instance)
         if instance.parent:
-            django_rq.enqueue(send_reply_notifications, instance.id)
+            transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
     if instance.is_local:
-        federate_content(instance)
+        transaction.on_commit(lambda: federate_content(instance))
 
 
 @receiver(post_delete, sender=Content)

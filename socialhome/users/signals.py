@@ -2,6 +2,7 @@ from uuid import uuid4
 
 import django_rq
 from django.conf import settings
+from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
@@ -29,5 +30,7 @@ def create_user_profile(sender, **kwargs):
 def user_followers_change(sender, instance, action, **kwargs):
     """Deliver notification on new followers."""
     if action == "post_add":
-        for id in kwargs.get("pk_set"):
-            django_rq.enqueue(send_follow_notification, id, instance.id)
+        def on_commit():
+            for id in kwargs.get("pk_set"):
+                django_rq.enqueue(send_follow_notification, id, instance.id)
+        transaction.on_commit(on_commit)
