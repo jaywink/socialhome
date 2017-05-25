@@ -1,12 +1,14 @@
 [![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![Stories in Ready](https://badge.waffle.io/jaywink/socialhome.png?label=ready&title=Ready)](https://waffle.io/jaywink/socialhome) [![Dependency Status](https://gemnasium.com/badges/github.com/jaywink/socialhome.svg)](https://gemnasium.com/github.com/jaywink/socialhome) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![Code Health](https://landscape.io/github/jaywink/socialhome/master/landscape.svg?style=flat)](https://landscape.io/github/jaywink/socialhome/master) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
-[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](http://webchat.freenode.net?channels=%23socialhome&uio=d4) [![Chat on Gitter](https://badges.gitter.im/socialhome/Lobby.svg)](https://gitter.im/socialhome/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](http://webchat.freenode.net?channels=%23socialhome&uio=d4) [![Chat on Gitter](https://badges.gitter.im/socialhome/Lobby.svg)](https://gitter.im/socialhome/Lobby)
 
 # Socialhome
 
 A federated social home. Provides home page functionality and federates with other federated social networks using the Diaspora protocol.
 
 Official demo site: https://socialhome.network
+
+[![](https://socialhome.network/media/markdownx/244f2aad-1b30-4400-8b93-04672beed2cc.png)](https://socialhome.network)
 
 ## Status
 
@@ -31,7 +33,11 @@ Running a development server however is easy. Just set up your virtualenv and cr
 
 ### I have an idea or question - what to do?
 
-Either log an issue here on GitHub or jump on to [IRC FreeNode](http://webchat.freenode.net?channels=%23socialhome&uio=d4) and ask on **#socialhome**. Feedback, questions and ideas are always welcome!
+Feedback, questions and ideas are always welcome! You can use the following channels:
+
+* Log an issue here on [GitHub](https://github.com/jaywink/socialhome/issues)
+* [IRC FreeNode](http://webchat.freenode.net?channels=%23socialhome&uio=d4) channel **#socialhome**
+* [Gitter chat](https://gitter.im/socialhome/Lobby)
 
 ## Development
 
