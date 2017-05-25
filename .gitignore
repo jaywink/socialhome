@@ -82,3 +82,6 @@ bower_components/
 
 # Mocha test statics
 socialhome/static/mocha/
+
+# DOcs
+/docs/_build/

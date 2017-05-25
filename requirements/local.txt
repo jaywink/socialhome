@@ -1,6 +1,9 @@
 # Local development dependencies go here
 -r base.txt
 Sphinx
+sphinx-autobuild
+# Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet
+git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
 Werkzeug
 
 # django-debug-toolbar that works with Django 1.5+
