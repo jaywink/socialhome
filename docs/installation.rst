@@ -10,7 +10,8 @@ The following guides are available:
 Ubuntu
 ------
 
- * :ref:`installation-ubuntu`
+ * Manual installation :ref:`installation-ubuntu` (14.04)
+ * `Ansible role <https://github.com/jaywink/ansible-socialhome>`_ (14.04)
 
 Other platforms
 ---------------
