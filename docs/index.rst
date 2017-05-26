@@ -19,6 +19,8 @@ Joining
 
 Yes! The official server is open for registrations. `Sign up <https://socialhome.network/accounts/signup/>`_ and play around!
 
+Please see the :ref:`community` pages for how to interact with the community.
+
 Installation
 ------------
 
