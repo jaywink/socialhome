@@ -1,0 +1,140 @@
+.. _development:
+
+Development
+===========
+
+Socialhome is missing features and needs a lot of polish on the UI side. If you are familiar with Django (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
+
+For guidelines how to contribute, please first read our `contributing document <https://github.com/jaywink/socialhome/blob/master/CONTRIBUTING.md>`_.
+
+* `Source code repo <https://github.com/jaywink/socialhome>`_
+* `Issue tracker <https://github.com/jaywink/socialhome/issues>`_
+* `Kanban board <https://waffle.io/jaywink/socialhome>`_
+
+Environment setup
+-----------------
+
+Instructions are for Ubuntu 16.04+. Please contribute via PR's if you notice anything missing or want to contribute instructions for another platform.
+
+Python Virtualenv
+.................
+
+Python 3.4, 3.5 and 3.6 are officially tested against. Ensure the following are installed:
+
+* Python system dependencies
+* NodeJS
+* PostgreSQL server
+* Redis
+
+The file ``requirements.apt`` contains other various dependencies. You can use the ``install_os_dependencies.sh`` script to help installing these.
+
+Install requirements
+....................
+
+::
+
+    pip install -r requirements/local.txt
+    pip install -r requirements/test.txt
+
+Do NPM, Bower
+.............
+
+::
+
+    npm install
+    bower install
+    sudo npm -g install grunt
+    grunt dev
+
+Configure
+.........
+
+Configuration is done via environment variables. For the meaning of them, look them up under files in ``config/settings``. Values in ``env.local`` will be used automatically.
+
+::
+
+    cp env.example env.local
+
+Edit any values necessary. By default the ``SECRET_KEY`` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
+
+Create a database
+.................
+
+If you changed the ``DATABASE_URL`` in the settings file, make sure to change the values in these commands accordingly.
+
+::
+
+    sudo su - postgres
+    createuser -s -P socialhome  # give password 'socialhome'
+    createdb -O socialhome socialhome
+    exit
+    python manage.py migrate
+
+Running the development server
+..............................
+
+Just use the standard command:
+
+::
+
+    python manage.py runserver
+
+Unfortunately ``runserver_plus`` cannot be used as it does not integrate with Django Channels.
+
+Creating a user
+...............
+
+To create an *superuser account*, use this command:
+
+::
+
+    python manage.py createsuperuser
+
+After this you need to log in once with the user via the user interface (which creates an email confirmation) and then run the following in the Django shell to confirm the email:
+
+::
+
+    EmailAddress.objects.all().update(verified=True)
+
+You should now be able to log in as the user ``admin``.
+
+Running tests
+-------------
+
+Python tests
+............
+
+::
+
+    py.test
+
+JavaScript tests
+................
+
+This will launch a separate ``runserver`` on port 8181 and execute the tests against that. The separate ``runserver`` instance will be killed after the tests have been executed.
+
+::
+
+    grunt test
+
+Building local documentation
+----------------------------
+
+::
+
+   cd docs
+   make html
+
+Doing a release
+---------------
+
+* Bump version number in two places:
+    * ``socialhome/__init__.py``
+    * ``docs/conf.py``
+
+Contact for help
+----------------
+
+Easiest via FreeNode IRC, channel #socialhome (`webchat here <http://webchat.freenode.net?channels=%23socialhome&uio=d4>`_) or `Gitter chat <https://gitter.im/socialhome/Lobby>`_
+
+You can also ask questions or give feedback via issues.
