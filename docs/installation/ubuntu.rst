@@ -276,7 +276,7 @@ You must change or add the following values:
 
     DATABASE_URL=postgres://socialhome:DATABASEPASSWORDHERE@127.0.0.1:5432/socialhome
     DJANGO_SECRET_KEY=
-    DJANGO_ALLOWED_HOSTS=.yourdomain.tld
+    DJANGO_ALLOWED_HOSTS=yourdomain.tld
     DJANGO_SECURE_SSL_REDIRECT=True
     DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
     SOCIALHOME_DOMAIN=yourdomain.tld
@@ -291,6 +291,11 @@ Make the env file a bit less readable.
 ::
 
     chmod 0600 env.local
+
+Configure email sending
+.......................
+
+Note, email *is* required for signing up. Users will **not** be able to sign up if the instance does not have working email sending. See :ref:`email-config` on how to configure email sending.
 
 Run migrations
 ..............
@@ -308,6 +313,16 @@ Install statics
     node_modules/.bin/bower install
     node_modules/.bin/grunt build
     python manage.py collectstatic
+
+Set the correct domain name in Django
+.....................................
+
+Load up the Django shell with ``python manage.py shell_plus`` and then execute the following, replacing "yourdomain.tld" with your domain and "Socialhome" as the name of your site, assuming you want the name changed:
+
+::
+
+    Site.objects.filter(id=1).update(domain="yourdomain.tld", name="Socialhome")
+    exit
 
 Set up Circus
 .............
@@ -346,8 +361,12 @@ Start Circus. It will automatically start on system boot.
     sudo service socialhome start
 
 Done!
------
+.....
 
 That wasn't so hard was it?
 
 Navigate to the domain you chose to install Socialhome on and hopefully you will see a landing page. Signups will be open. Unless you want to keep it that way, after creating your own account, you should close the signups to avoid random people signing up to your instance. See configuration tips at :ref:`running`.
+
+If you didn't configure emails, you cannot complete your user account registration without the email confirmation link. See :ref:`shell-email-confirm`.
+
+If you want to set your initially created user as admin, see :ref:`admin-user`.
