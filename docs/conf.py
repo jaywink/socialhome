@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from recommonmark.parser import CommonMarkParser
-
 __version__ = "0.1.0"
 
 # Federation documentation build configuration file, created by
@@ -42,16 +40,11 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# Add Markdown support
-source_parsers = {
-    '.md': CommonMarkParser,
-}
-
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 
 # The encoding of source files.
 #
