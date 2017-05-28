@@ -6,7 +6,9 @@
             '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
                 '<div class="grid-item-author-bar">' +
-                    '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
+                    '<div class="author-popover" data-container="body" data-toggle="popover" data-placement="right" data-author-guid="<%= content.author_guid %>">' +
+                        '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
+                    '</div>' +
                 '</div>' +
             '<% } %>' +
             '<div class="grid-item-bar">' +

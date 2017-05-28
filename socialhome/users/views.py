@@ -19,10 +19,29 @@ class UserDetailView(DetailView):
         return ProfileDetailView.as_view()(request, guid=profile.guid)
 
 
-class ProfileDetailView(AccessMixin, DetailView):
+class ProfileViewMixin(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Handle profile visibility checks.
+
+        Redirect to login if not allowed to see profile.
+        """
+        self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
+        if self.target_profile.visible_to_user(self.request.user):
+            return super().dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            self.raise_exception = True
+        return self.handle_no_permission()
+
+
+class ProfileBoxView(ProfileViewMixin):
+    template_name = "users/profile_box.html"
+
+
+class ProfileDetailView(ProfileViewMixin):
     template_name = "streams/profile.html"
 
     def get_context_data(self, **kwargs):
@@ -33,18 +52,6 @@ class ProfileDetailView(AccessMixin, DetailView):
 
     def _get_contents_queryset(self):
         return Content.objects.profile(self.kwargs.get("guid"), self.request.user)
-
-    def dispatch(self, request, *args, **kwargs):
-        """Handle profile visibility checks.
-
-        Redirect to login if not allowed to see profile.
-        """
-        self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
-        if self.target_profile.visible_to_user(self.request.user):
-            return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            self.raise_exception = True
-        return self.handle_no_permission()
 
 
 class OrganizeContentProfileDetailView(ProfileDetailView):

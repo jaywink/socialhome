@@ -56,6 +56,16 @@ class TestProfile():
         profile = ProfileFactory(guid="1234")
         assert profile.get_absolute_url() == "/p/1234/"
 
+    def test_home_url(self):
+        profile = ProfileFactory(guid="1234")
+        assert profile.home_url == profile.remote_url
+        user = UserFactory()
+        assert user.profile.home_url == user.profile.get_absolute_url()
+
+    def test_remote_url(self):
+        profile = ProfileFactory(guid="1234")
+        assert profile.remote_url == "https://example.com/people/1234"
+
     def test_get_image_urls_returns_ponies(self):
         profile = ProfileFactory(guid="1234")
         ponies = get_pony_urls()
@@ -108,3 +118,9 @@ class TestProfile():
         assert profile.safer_image_url_small == "https://localhost/foobar"
         profile.image_url_small = "https://example.com/foobar"
         assert profile.safer_image_url_small == "https://example.com/foobar"
+
+    def test_safer_image_url_medium(self):
+        profile = ProfileFactory.build(image_url_medium="/foobar", handle="foo@localhost")
+        assert profile.safer_image_url_medium == "https://localhost/foobar"
+        profile.image_url_medium = "https://example.com/foobar"
+        assert profile.safer_image_url_medium == "https://example.com/foobar"

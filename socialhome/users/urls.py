@@ -1,39 +1,41 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from django.conf.urls import url
 
 from . import views
 
 urlpatterns = [
     url(
-        regex=r'^u/$',
+        regex=r"^u/$",
         view=views.UserListView.as_view(),
-        name='list'
+        name="list"
     ),
     url(
-        regex=r'^u/~redirect/$',
+        regex=r"^u/~redirect/$",
         view=views.UserRedirectView.as_view(),
-        name='redirect'
+        name="redirect"
     ),
     url(
-        regex=r'^u/(?P<username>[\w.@+-]+)/$',
+        regex=r"^u/(?P<username>[\w.@+-]+)/$",
         view=views.UserDetailView.as_view(),
-        name='detail'
+        name="detail"
     ),
     url(
-        regex=r'^p/~organize/$',
+        regex=r"^p/~organize/$",
         view=views.OrganizeContentProfileDetailView.as_view(),
-        name='profile-organize'
+        name="profile-organize"
     ),
     url(
-        regex=r'^p/~update/$',
+        regex=r"^p/~update/$",
         view=views.ProfileUpdateView.as_view(),
-        name='profile-update'
+        name="profile-update"
     ),
     url(
-        regex=r'^p/(?P<guid>[^/]+)/$',
+        regex=r"^p/(?P<guid>[^/]+)/box/$",
+        view=views.ProfileBoxView.as_view(),
+        name="profile-box"
+    ),
+    url(
+        regex=r"^p/(?P<guid>[^/]+)/$",
         view=views.ProfileDetailView.as_view(),
-        name='profile-detail'
+        name="profile-detail"
     ),
 ]
