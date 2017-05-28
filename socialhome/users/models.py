@@ -92,6 +92,17 @@ class Profile(TimeStampedModel):
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
+    @property
+    def home_url(self):
+        if not self.user:
+            # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
+            return self.remote_url
+        return self.get_absolute_url()
+
+    @property
+    def remote_url(self):
+        return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
+
     def generate_new_rsa_key(self):
         """Generate a new RSA private key
 
@@ -118,7 +129,7 @@ class Profile(TimeStampedModel):
     @property
     def safer_image_url_small(self):
         """Return a most likely more working image_url_small for the profile.
-        
+
         Some urls are proven to be relative to host instead of absolute urls.
         """
         if self.image_url_small.startswith("/"):
@@ -126,6 +137,18 @@ class Profile(TimeStampedModel):
                 self.handle.split("@")[1], self.image_url_small,
             )
         return self.image_url_small
+
+    @property
+    def safer_image_url_medium(self):
+        """Return a most likely more working image_url_medium for the profile.
+
+        Some urls are proven to be relative to host instead of absolute urls.
+        """
+        if self.image_url_medium.startswith("/"):
+            return "https://%s%s" % (
+                self.handle.split("@")[1], self.image_url_medium,
+            )
+        return self.image_url_medium
 
     def visible_to_user(self, user):
         """Check whether the given user should be able to see this profile."""

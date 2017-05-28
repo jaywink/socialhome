@@ -281,6 +281,7 @@ class Content(models.Model):
             "guid": self.guid,
             "rendered": self.rendered,
             "author": self.author_id,
+            "author_guid": self.author.guid,
             "author_name": self.author.name or self.author.handle,
             "author_handle": self.author.handle,
             "author_image": self.author.safer_image_url_small,

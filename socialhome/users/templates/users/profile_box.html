@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="profile-box">
+    <img src="{{ profile.safer_image_url_medium }}" class="profile-box-author-pic">
+    <h6>
+        {{ profile.name }}
+    </h6>
+    <p>{{ profile.handle }}</p>
+    <a href="{{ profile.get_absolute_url }}">{% trans "Profile" %}</a>
+    {% if not profile.user %}
+        - <a href="{{ profile.home_url }}">{% trans "Home" %}</a>
+    {% endif %}
+    </div>
+</div>

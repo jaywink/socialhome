@@ -137,6 +137,8 @@ $(function () {
             $("#content-body").html(data.rendered);
             $("#content-profile-pic").attr("src", data.author_image);
             $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
+            $(".modal-header .author-popover-active").attr("data-author-guid", data.author_guid)
+                .data("author-guid", data.author_guid);
             if (data.is_author) {
                 $("#content-bar-actions").removeClass("hidden");
                 $("#content-update-link").attr("href", data.update_url);
@@ -185,6 +187,7 @@ $(function () {
             view.initContentIds();
             this.addContentListeners();
             this.addReplyTriggers();
+            this.initAuthorPopovers();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
@@ -253,6 +256,7 @@ $(function () {
                     if (!controller.isContentDetail()) {
                         controller.addContentListeners();
                         controller.addReplyTriggers();
+                        controller.initAuthorPopovers();
                         if (ids.length && data.placement === "appended") {
                             controller.addLoadMoreTrigger();
                         }
@@ -334,6 +338,34 @@ $(function () {
 
         addReplyTriggers: function() {
             $(".item-open-replies-action").off("click", controller.openReplies).click(controller.openReplies);
+        },
+
+        closeAuthorInfo: function() {
+            // Ensure author info popovers are closed
+            $(".author-popover-active").popover("hide");
+            $(document).off("click", controller.closeAuthorInfo);
+        },
+
+        loadAuthorInfo: function() {
+            // Load content to author info popover
+            var $this = $(this);
+            var $authorGuid = $this.data("author-guid");
+            var $selector = ".author-popover-active[data-author-guid='"+ $authorGuid +"']";
+            $($selector).on("shown.bs.popover", function() {
+                $("#profile-box-" + $(this).data("author-guid")).load("/p/" + $authorGuid + "/box/");
+                $($selector).off("shown.bs.popover");
+                $(document).click(controller.closeAuthorInfo);
+            });
+            return '<div id="profile-box-' + $authorGuid + '"><i class="fa fa-spinner fa-spin"></i></div>';
+        },
+
+        initAuthorPopovers: function() {
+            // Initialize author info popovers once
+            $(".author-popover").removeClass("author-popover").addClass("author-popover-active").popover({
+                content: controller.loadAuthorInfo,
+                html: true,
+            });
+
         },
     };
 
