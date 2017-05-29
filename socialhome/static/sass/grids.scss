@@ -48,11 +48,6 @@
   }
 }
 
-.author-popover-active {
-  display: inline;
-  cursor: pointer;
-}
-
 .stamped {
   position: relative;
   top: 10px;
@@ -119,21 +114,11 @@
   }
 }
 
+.profile-box-trigger {
+  cursor: pointer;
+}
+
 .profile-box {
-  color: $dark;
-
-  .profile-box-author-pic {
-    max-width: 100px;
-    max-height: 100px;
-    margin-right: 5px;
-    margin-bottom: 10px;
-  }
-}
-
-.popover:before {
-  border-style: unset !important;
-}
-
-.popover:after {
-  left: unset !important;
+  margin-left: 29px;
+  padding-top: 0;
 }

@@ -138,18 +138,6 @@ class Profile(TimeStampedModel):
             )
         return self.image_url_small
 
-    @property
-    def safer_image_url_medium(self):
-        """Return a most likely more working image_url_medium for the profile.
-
-        Some urls are proven to be relative to host instead of absolute urls.
-        """
-        if self.image_url_medium.startswith("/"):
-            return "https://%s%s" % (
-                self.handle.split("@")[1], self.image_url_medium,
-            )
-        return self.image_url_medium
-
     def visible_to_user(self, user):
         """Check whether the given user should be able to see this profile."""
         if self.visibility == Visibility.PUBLIC:

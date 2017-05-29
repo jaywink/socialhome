@@ -35,8 +35,15 @@
                             {{ content.rendered|safe }}
                             {% if "profile__" not in stream_name %}
                                 <div class="grid-item-author-bar">
-                                    <div class="author-popover" data-container="body" data-toggle="popover" data-placement="right" data-author-guid="{{ content.author.guid }}">
+                                    <div class="profile-box-trigger">
                                         <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
+                                    </div>
+                                    <div class="profile-box hidden">
+                                        {{ content.author.handle }}
+                                        <a href="{{ content.author.get_absolute_url }}" class="btn btn-default" title="{% trans "Profile" %}" aria-label="{% trans "Profile" %}"><i class="fa fa-user"></i></a>
+                                        {% if not content.author.user %}
+                                            <a href="{{ content.author.home_url }}" class="btn btn-default" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}

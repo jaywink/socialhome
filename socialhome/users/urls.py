@@ -29,11 +29,6 @@ urlpatterns = [
         name="profile-update"
     ),
     url(
-        regex=r"^p/(?P<guid>[^/]+)/box/$",
-        view=views.ProfileBoxView.as_view(),
-        name="profile-box"
-    ),
-    url(
         regex=r"^p/(?P<guid>[^/]+)/$",
         view=views.ProfileDetailView.as_view(),
         name="profile-detail"

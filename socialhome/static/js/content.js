@@ -6,8 +6,15 @@
             '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
                 '<div class="grid-item-author-bar">' +
-                    '<div class="author-popover" data-container="body" data-toggle="popover" data-placement="right" data-author-guid="<%= content.author_guid %>">' +
+                    '<div class="profile-box-trigger"' +
                         '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
+                    '</div>' +
+                    '<div class="profile-box hidden">' +
+                        '<%= content.author_handle %>' +
+                        '<a href="<%= content.author_profile_url %>" class="btn btn-default" title="' + gettext("Profile") + '" aria-label="' + gettext("Profile") + '"><i class="fa fa-user"></i></a>' +
+                        '<% if (! content.author_is_local) { %>' +
+                            '<a href="<%= content.author_home_url %>" class="btn btn-default" title="' + gettext("Home") + '" aria-label="' + gettext("Home") + '"><i class="fa fa-home"></i></a>' +
+                        '<% } %>' +
                     '</div>' +
                 '</div>' +
             '<% } %>' +
