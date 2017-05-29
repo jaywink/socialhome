@@ -4,15 +4,19 @@
     {% if modal %}<div class="modal-dialog modal-lg" role="document">{% endif %}
         <div class="modal-content">
             <div class="modal-header">
-                <div class="author-popover" data-container="body" data-toggle="popover" data-placement="bottom" data-author-guid="{% if content %}{{ content.author.guid }}{% endif %}">
-                    <img src="{% if content %}{{ content.author.image_url_small }}{% endif %}" id="content-profile-pic">
-                    <h5 id="content-title" class="modal-title">{% if content %}{{ content.author.name }} &lt;{{ content.author.handle }}&gt;{% endif %}</h5>
-                </div>
                 {% if modal %}
                     <button type="button" class="close" data-dismiss="modal" aria-label="{% trans "Close" %}">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 {% endif %}
+                <img src="{% if content %}{{ content.author.image_url_small }}{% endif %}" id="content-profile-pic">
+                <h5 id="content-title" class="modal-title">{% if content %}{{ content.author.name }} &lt;{{ content.author.handle }}&gt;{% endif %}</h5>
+                <div>
+                    <a href="{% if content %}{{ content.author.get_absolute_url }}{% endif %}" class="btn btn-default" title="{% trans "Profile" %}" aria-label="{% trans "Profile" %}"><i class="fa fa-user"></i></a>
+                    {% if content and not content.author.user %}
+                        <a href="{{ content.author.home_url }}" class="btn btn-default" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+                    {% endif %}
+                </div>
             </div>
             <div id="content-body" class="modal-body" {% if content %}data-content-id="{{ content.id }}"{% endif %}>
                 {% if content %}{{ content.rendered|safe }}{% endif %}

@@ -118,9 +118,3 @@ class TestProfile():
         assert profile.safer_image_url_small == "https://localhost/foobar"
         profile.image_url_small = "https://example.com/foobar"
         assert profile.safer_image_url_small == "https://example.com/foobar"
-
-    def test_safer_image_url_medium(self):
-        profile = ProfileFactory.build(image_url_medium="/foobar", handle="foo@localhost")
-        assert profile.safer_image_url_medium == "https://localhost/foobar"
-        profile.image_url_medium = "https://example.com/foobar"
-        assert profile.safer_image_url_medium == "https://example.com/foobar"

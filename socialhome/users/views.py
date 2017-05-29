@@ -37,10 +37,6 @@ class ProfileViewMixin(AccessMixin, DetailView):
         return self.handle_no_permission()
 
 
-class ProfileBoxView(ProfileViewMixin):
-    template_name = "users/profile_box.html"
-
-
 class ProfileDetailView(ProfileViewMixin):
     template_name = "streams/profile.html"
 
