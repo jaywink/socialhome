@@ -69,3 +69,6 @@ django-settings-export==1.2.1
 
 # IPython for administration
 ipython
+
+# API
+djangorestframework==3.6.3

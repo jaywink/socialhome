@@ -43,6 +43,8 @@ THIRD_PARTY_APPS = (
     "django_extensions",  # Generic helpers for administration
     "channels",
     "django_rq",
+    "rest_framework",
+    "rest_framework.authtoken",
 )
 
 # Apps specific for this project go here.
@@ -378,4 +380,13 @@ LOGGING = {
             "propagate": False,
         },
     }
+}
+
+# REST FRAMEWORK
+# --------------
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    )
 }

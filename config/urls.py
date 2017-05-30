@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
 from django.views.i18n import javascript_catalog
+from rest_framework.routers import DefaultRouter
 
 from socialhome.content.views import HomeView
 
@@ -13,6 +14,8 @@ js_translations = {
     "packages": ("socialhome",),
 }
 
+# API routes
+router = DefaultRouter()
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
@@ -39,6 +42,10 @@ urlpatterns = [
     # Admin pages
     url(settings.ADMIN_URL, include(admin.site.urls)),
     url(r"^django-rq/", include("django_rq.urls")),
+
+    # API
+    url(r"^api/", include(router.urls, namespace="api")),
+    url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
