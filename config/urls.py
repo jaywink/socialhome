@@ -8,7 +8,7 @@ from django.views.i18n import javascript_catalog
 from rest_framework.routers import DefaultRouter
 
 from socialhome.content.views import HomeView
-
+from socialhome.users.viewsets import UserViewSet
 
 js_translations = {
     "packages": ("socialhome",),
@@ -16,6 +16,7 @@ js_translations = {
 
 # API routes
 router = DefaultRouter()
+router.register(r"users", UserViewSet)
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),

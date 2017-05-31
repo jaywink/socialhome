@@ -10,6 +10,7 @@ from model_utils.models import TimeStampedModel
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import generate_rsa_private_key
+from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls
 
 
@@ -85,6 +86,8 @@ class Profile(TimeStampedModel):
 
     # NSFW status
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
+
+    objects = ProfileQuerySet.as_manager()
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.handle)
