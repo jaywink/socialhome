@@ -51,4 +51,5 @@ Table of contents
 
    installation
    running
+   api
    development
