@@ -23,7 +23,7 @@ class UserViewSet(ReadOnlyModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
 
-    @detail_route(methods=["post"], permission_classes=[IsSelf])
+    @detail_route(methods=["post"], permission_classes=[IsAuthenticated, IsSelf])
     def add_follower(self, request, pk=None):
         guid = request.data.get("guid")
         try:
@@ -36,7 +36,7 @@ class UserViewSet(ReadOnlyModelViewSet):
         user.following.add(profile)
         return Response({"status": "Follower added."})
 
-    @detail_route(methods=["post"], permission_classes=[IsSelf])
+    @detail_route(methods=["post"], permission_classes=[IsAuthenticated, IsSelf])
     def remove_follower(self, request, pk=None):
         guid = request.data.get("guid")
         try:
