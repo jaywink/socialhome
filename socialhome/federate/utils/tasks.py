@@ -60,11 +60,11 @@ def process_entity_follow(entity, profile):
         logging.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
         return
     if entity.following:
-        user.followers.add(profile)
-        logger.info("Added follower %s to user %s", profile, user)
+        profile.following.add(user.profile)
+        logger.info("Profile %s now follows user %s", profile, user)
     else:
-        user.followers.remove(profile)
-        logger.info("Removed follower %s from user %s", profile, user)
+        profile.following.remove(user.profile)
+        logger.info("Profile %s has unfollowed user %s", profile, user)
 
 
 def process_entity_relationship(entity, profile):
@@ -77,8 +77,8 @@ def process_entity_relationship(entity, profile):
     except User.DoesNotExist:
         logging.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
         return
-    user.followers.add(profile)
-    logger.info("Added follower %s to user %s", profile, user)
+    profile.following.add(user.profile)
+    logger.info("Profile %s now follows user %s", profile, user)
 
 
 def process_entity_post(entity, profile):
@@ -172,8 +172,8 @@ def _retract_relationship(target_guid, profile):
     except User.DoesNotExist:
         logging.warning("Could not find local user %s for relationship retraction", target_guid)
         return
-    user.followers.remove(profile)
-    logger.info("Removed follower %s from user %s", profile, user)
+    profile.following.remove(user.profile)
+    logger.info("Profile %s has unfollowed user %s", profile, user)
 
 
 def process_entity_retraction(entity, profile):

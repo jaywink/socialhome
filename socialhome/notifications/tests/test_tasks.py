@@ -47,7 +47,7 @@ class TestSendFollowNotification(TestCase):
 
     @patch("socialhome.notifications.tasks.send_mail")
     def test_calls_send_email(self, mock_send):
-        send_follow_notification(self.profile.id, self.user.id)
+        send_follow_notification(self.profile.id, self.user.profile.id)
         mock_send.assert_called_once_with(
             "[Django] New follower",
             "You have a new follower: %s" % self.profile.handle,

@@ -22,7 +22,7 @@ class TestProfile:
         assert profile.guid
 
 
-class TestUserFollowersChange(TransactionTestCase):
+class TestProfileFollowingChange(TransactionTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -30,5 +30,5 @@ class TestUserFollowersChange(TransactionTestCase):
 
     @patch("socialhome.users.signals.django_rq.enqueue")
     def test_adding_follower_sends_a_notification(self, mock_enqueue):
-        self.user.followers.add(self.profile)
-        mock_enqueue.assert_called_once_with(send_follow_notification, self.profile.id, self.user.id)
+        self.profile.following.add(self.user.profile)
+        mock_enqueue.assert_called_once_with(send_follow_notification, self.profile.id, self.user.profile.id)

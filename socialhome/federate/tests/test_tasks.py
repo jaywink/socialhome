@@ -145,14 +145,14 @@ class TestGetRemoveFollowers(TestCase):
         super().setUpTestData()
         cls.user = UserFactory()
         cls.local_follower_user = UserFactory()
+        cls.local_follower_user.profile.following.add(cls.user.profile)
         cls.remote_follower = ProfileFactory()
+        cls.remote_follower.following.add(cls.user.profile)
         cls.remote_follower2 = ProfileFactory()
-        cls.user.followers.add(
-            cls.local_follower_user.profile, cls.remote_follower, cls.remote_follower2,
-        )
+        cls.remote_follower2.following.add(cls.user.profile)
 
     def test_all_remote_returned(self):
-        followers = set(_get_remote_followers(self.user))
+        followers = set(_get_remote_followers(self.user.profile))
         self.assertEqual(
             followers,
             {
@@ -162,7 +162,7 @@ class TestGetRemoveFollowers(TestCase):
         )
 
     def test_exclude_is_excluded(self):
-        followers = set(_get_remote_followers(self.user, exclude=self.remote_follower.handle))
+        followers = set(_get_remote_followers(self.user.profile, exclude=self.remote_follower.handle))
         self.assertEqual(
             followers,
             {

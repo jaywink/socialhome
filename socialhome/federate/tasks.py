@@ -62,7 +62,7 @@ def send_content(content_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
-        recipients.extend(_get_remote_followers(content.author.user))
+        recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -80,10 +80,10 @@ def _get_remote_participants_for_parent(parent, exclude=None):
     return participants
 
 
-def _get_remote_followers(user, exclude=None):
-    """Get remote followers for a user."""
+def _get_remote_followers(profile, exclude=None):
+    """Get remote followers for a profile."""
     followers = []
-    for follower in user.followers.filter(user__isnull=True):
+    for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if follower.handle != exclude:
             followers.append((follower.handle, None))
     return followers
@@ -110,7 +110,7 @@ def send_reply(content_id):
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
         recipients.extend(_get_remote_participants_for_parent(content.parent))
-        recipients.extend(_get_remote_followers(content.author.user))
+        recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -132,7 +132,7 @@ def send_content_retraction(content, author_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
-        recipients.extend(_get_remote_followers(author.user))
+        recipients.extend(_get_remote_followers(author))
         handle_send(entity, author, recipients)
     else:
         logger.warning("No retraction entity for %s", content)
@@ -156,5 +156,5 @@ def forward_relayable(entity, parent_id):
         (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
     ]
     recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
-    recipients.extend(_get_remote_followers(parent.author.user, exclude=entity.handle))
+    recipients.extend(_get_remote_followers(parent.author, exclude=entity.handle))
     handle_send(entity, parent.author, recipients)
