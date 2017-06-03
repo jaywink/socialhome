@@ -129,6 +129,14 @@ class Profile(TimeStampedModel):
         return RSA.importKey(self.rsa_private_key)
 
     @property
+    def key(self):
+        """Required by federation.
+
+        Corresponds to public key.
+        """
+        return self.rsa_public_key
+
+    @property
     def public(self):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
