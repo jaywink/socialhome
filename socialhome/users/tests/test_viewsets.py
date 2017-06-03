@@ -23,13 +23,13 @@ class TestUserViewSet(APITestCase):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["username"], self.user.username)
+        self.assertEqual(len(response.data.get("results")), 1)
+        self.assertEqual(response.data.get("results")[0]["username"], self.user.username)
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data.get("results")), 2)
 
     def test_user_get(self):
         # Not authenticated
@@ -68,20 +68,20 @@ class TestProfileViewSet(APITestCase):
         # Not authenticated
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["handle"], self.profile.handle)
+        self.assertEqual(len(response.data.get("results")), 1)
+        self.assertEqual(response.data.get("results")[0]["handle"], self.profile.handle)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
-        for data in response.data:
+        self.assertEqual(len(response.data.get("results")), 2)
+        for data in response.data.get("results"):
             self.assertTrue(data["handle"] in [self.profile.handle, self.site_profile.handle])
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 4)
+        self.assertEqual(len(response.data.get("results")), 4)
 
     def test_profile_get(self):
         # Not authenticated
