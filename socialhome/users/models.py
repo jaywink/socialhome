@@ -26,8 +26,9 @@ class User(AbstractUser):
     trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
 
     # Relationships
-    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following")
-    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers")
+    # TODO remove in favour of Profile.following
+    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following_set")
+    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers_set")
 
     def __str__(self):
         return self.username
@@ -86,6 +87,9 @@ class Profile(TimeStampedModel):
 
     # NSFW status
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
+
+    # Following
+    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers")
 
     objects = ProfileQuerySet.as_manager()
 
