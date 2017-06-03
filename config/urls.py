@@ -9,7 +9,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from socialhome.content.views import HomeView
-from socialhome.users.viewsets import UserViewSet
+from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 js_translations = {
     "packages": ("socialhome",),
@@ -17,6 +17,7 @@ js_translations = {
 
 # API routes
 router = DefaultRouter()
+router.register(r"profiles", ProfileViewSet)
 router.register(r"users", UserViewSet)
 
 urlpatterns = [
