@@ -44,6 +44,10 @@
                                         {% if not content.author.user %}
                                             <a href="{{ content.author.home_url }}" class="btn btn-default" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
                                         {% endif %}
+                                        {% if request.user.is_authenticated and content.author != request.user.profile %}
+                                            <button class="follower-button btn btn-default {% if not content.author.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ content.author.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                                            <button class="follower-button btn btn-default {% if content.author.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ content.author.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}

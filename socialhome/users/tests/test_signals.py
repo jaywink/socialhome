@@ -3,7 +3,7 @@ from unittest.mock import patch, call
 import pytest
 from django.test import TransactionTestCase
 
-from socialhome.federate.tasks import send_follow
+from socialhome.federate.tasks import send_follow_change
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -43,6 +43,18 @@ class TestProfileFollowingChange(TransactionTestCase):
             mock_enqueue.call_args_list,
             [
                 call(send_follow_notification, self.profile2.id, self.profile.id),
-                call(send_follow, self.profile2.id, self.profile.id),
+                call(send_follow_change, self.profile2.id, self.profile.id, True),
+            ]
+        )
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_removing_remote_follower_triggers_federation_event(self, mock_enqueue):
+        self.profile2.following.add(self.profile)
+        mock_enqueue.reset_mock()
+        self.profile2.following.remove(self.profile)
+        self.assertEqual(
+            mock_enqueue.call_args_list,
+            [
+                call(send_follow_change, self.profile2.id, self.profile.id, False),
             ]
         )

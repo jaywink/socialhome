@@ -163,7 +163,7 @@ def forward_relayable(entity, parent_id):
     handle_send(entity, parent.author, recipients)
 
 
-def send_follow(profile_id, followed_id):
+def send_follow_change(profile_id, followed_id, follow):
     """Handle sending of a local follow of a remote profile."""
     try:
         profile = Profile.objects.get(id=profile_id, user__isnull=False)
@@ -178,7 +178,7 @@ def send_follow(profile_id, followed_id):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle)
+    entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle, following=follow)
     # TODO: add high level method support to federation for private payload delivery
     payload = handle_create_payload(entity, profile, to_user=remote_profile)
     url = "https://%s/receive/users/%s" % (

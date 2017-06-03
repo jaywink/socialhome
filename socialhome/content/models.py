@@ -276,6 +276,7 @@ class Content(models.Model):
     def dict_for_view(self, user):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         is_author = bool(user.is_authenticated and self.author == user.profile)
+        is_following_author = bool(user.is_authenticated and self.author_id in user.profile.following_ids)
         return {
             "id": self.id,
             "guid": self.guid,
@@ -293,11 +294,13 @@ class Content(models.Model):
             "child_count": self.children.count(),
             "parent": self.parent_id if self.parent else "",
             "is_author": is_author,
+            "is_following_author": is_following_author,
             "is_authenticated": bool(user.is_authenticated),
             "slug": self.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
             "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
+            "user_id": user.profile.id,
         }
 
     def visible_for_user(self, user):
