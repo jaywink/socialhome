@@ -207,12 +207,12 @@ class TestProcessEntityRetraction(TestCase):
             Content.objects.get(id=self.content.id)
 
     def test_removes_follower(self):
-        self.user.followers.add(self.remote_profile)
+        self.remote_profile.following.add(self.profile)
         process_entity_retraction(
             base.Retraction(entity_type="Profile", _receiving_guid=self.profile.guid),
             self.remote_profile,
         )
-        self.assertEqual(self.user.followers.count(), 0)
+        self.assertEqual(self.remote_profile.following.count(), 0)
 
 
 class TestProcessEntityFollow(TestCase):
@@ -225,13 +225,13 @@ class TestProcessEntityFollow(TestCase):
 
     def test_follower_added_on_following_true(self):
         process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
-        self.assertEqual(self.user.followers.count(), 1)
-        self.assertEqual(self.user.followers.first().handle, self.remote_profile.handle)
+        self.assertEqual(self.remote_profile.following.count(), 1)
+        self.assertEqual(self.remote_profile.following.first().handle, self.profile.handle)
 
     def test_follower_removed_on_following_false(self):
-        self.user.followers.add(self.remote_profile)
+        self.remote_profile.following.add(self.profile)
         process_entity_follow(base.Follow(target_handle=self.profile.handle, following=False), self.remote_profile)
-        self.assertEqual(self.user.followers.count(), 0)
+        self.assertEqual(self.remote_profile.following.count(), 0)
 
 
 class TestProcessEntityRelationship(TestCase):
@@ -246,14 +246,14 @@ class TestProcessEntityRelationship(TestCase):
         process_entity_relationship(base.Relationship(
             target_handle=self.profile.handle, relationship="following"), self.remote_profile
         )
-        self.assertEqual(self.user.followers.count(), 1)
-        self.assertEqual(self.user.followers.first().handle, self.remote_profile.handle)
+        self.assertEqual(self.remote_profile.following.count(), 1)
+        self.assertEqual(self.remote_profile.following.first().handle, self.profile.handle)
 
     def test_follower_not_added_on_not_following(self):
         process_entity_relationship(base.Relationship(
             target_handle=self.profile.handle, relationship="sharing"), self.remote_profile
         )
-        self.assertEqual(self.user.followers.count(), 0)
+        self.assertEqual(self.remote_profile.following.count(), 0)
 
 
 @pytest.mark.usefixtures("db")

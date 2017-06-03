@@ -45,14 +45,14 @@ def send_reply_notifications(content_id):
     )
 
 
-def send_follow_notification(follower_id, user_id):
+def send_follow_notification(follower_id, followed_id):
     """Super simple you've been followed notification to a user."""
     if settings.DEBUG:
         return
     try:
-        user = User.objects.get(id=user_id, is_active=True)
+        user = User.objects.get(profile__id=followed_id, is_active=True)
     except User.DoesNotExist:
-        logger.warning("No active user %s found for follow notification", user_id)
+        logger.warning("No active user with profile %s found for follow notification", followed_id)
         return
     try:
         follower = Profile.objects.get(id=follower_id)

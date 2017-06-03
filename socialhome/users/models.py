@@ -10,6 +10,7 @@ from model_utils.models import TimeStampedModel
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import generate_rsa_private_key
+from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls
 
 
@@ -25,8 +26,9 @@ class User(AbstractUser):
     trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
 
     # Relationships
-    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following")
-    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers")
+    # TODO remove in favour of Profile.following
+    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following_set")
+    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers_set")
 
     def __str__(self):
         return self.username
@@ -86,6 +88,11 @@ class Profile(TimeStampedModel):
     # NSFW status
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
 
+    # Following
+    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers")
+
+    objects = ProfileQuerySet.as_manager()
+
     def __str__(self):
         return "%s (%s)" % (self.name, self.handle)
 
@@ -120,6 +127,14 @@ class Profile(TimeStampedModel):
         Corresponds to private key.
         """
         return RSA.importKey(self.rsa_private_key)
+
+    @property
+    def key(self):
+        """Required by federation.
+
+        Corresponds to public key.
+        """
+        return RSA.importKey(self.rsa_public_key)
 
     @property
     def public(self):

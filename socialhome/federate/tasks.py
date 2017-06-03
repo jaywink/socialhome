@@ -1,9 +1,12 @@
 import logging
 
 from django.conf import settings
+from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
-from federation.outbound import handle_send
+from federation.outbound import handle_send, handle_create_payload
+from federation.utils.network import send_document
+
 from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
@@ -62,7 +65,7 @@ def send_content(content_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
-        recipients.extend(_get_remote_followers(content.author.user))
+        recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -80,10 +83,10 @@ def _get_remote_participants_for_parent(parent, exclude=None):
     return participants
 
 
-def _get_remote_followers(user, exclude=None):
-    """Get remote followers for a user."""
+def _get_remote_followers(profile, exclude=None):
+    """Get remote followers for a profile."""
     followers = []
-    for follower in user.followers.filter(user__isnull=True):
+    for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if follower.handle != exclude:
             followers.append((follower.handle, None))
     return followers
@@ -110,7 +113,7 @@ def send_reply(content_id):
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
         recipients.extend(_get_remote_participants_for_parent(content.parent))
-        recipients.extend(_get_remote_followers(content.author.user))
+        recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("No entity for %s", content)
@@ -132,7 +135,7 @@ def send_content_retraction(content, author_id):
         recipients = [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
         ]
-        recipients.extend(_get_remote_followers(author.user))
+        recipients.extend(_get_remote_followers(author))
         handle_send(entity, author, recipients)
     else:
         logger.warning("No retraction entity for %s", content)
@@ -156,5 +159,29 @@ def forward_relayable(entity, parent_id):
         (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
     ]
     recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
-    recipients.extend(_get_remote_followers(parent.author.user, exclude=entity.handle))
+    recipients.extend(_get_remote_followers(parent.author, exclude=entity.handle))
     handle_send(entity, parent.author, recipients)
+
+
+def send_follow(profile_id, followed_id):
+    """Handle sending of a local follow of a remote profile."""
+    try:
+        profile = Profile.objects.get(id=profile_id, user__isnull=False)
+    except Profile.DoesNotExist:
+        logger.warning("No local profile %s found to send follow with", profile_id)
+        return
+    try:
+        remote_profile = Profile.objects.get(id=followed_id, user__isnull=True)
+    except Profile.DoesNotExist:
+        logger.warning("No remote profile %s found to send follow for", followed_id)
+        return
+    if settings.DEBUG:
+        # Don't send in development mode
+        return
+    entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle)
+    # TODO: add high level method support to federation for private payload delivery
+    payload = handle_create_payload(entity, profile, to_user=remote_profile)
+    url = "https://%s/receive/users/%s" % (
+        remote_profile.handle.split("@")[1], remote_profile.guid,
+    )
+    send_document(url, payload)

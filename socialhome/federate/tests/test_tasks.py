@@ -12,7 +12,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
     forward_relayable, _get_remote_followers,
-)
+    send_follow)
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -129,7 +129,7 @@ class TestForwardRelayable(TestCase):
         cls.reply = ContentFactory(parent=cls.public_content)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
-    def test_foo(self, mock_send):
+    def test_forward_relayable(self, mock_send):
         entity = Comment(handle=self.reply.author.handle)
         entity.sign_with_parent = Mock()
         forward_relayable(entity, self.public_content.id)
@@ -145,14 +145,14 @@ class TestGetRemoveFollowers(TestCase):
         super().setUpTestData()
         cls.user = UserFactory()
         cls.local_follower_user = UserFactory()
+        cls.local_follower_user.profile.following.add(cls.user.profile)
         cls.remote_follower = ProfileFactory()
+        cls.remote_follower.following.add(cls.user.profile)
         cls.remote_follower2 = ProfileFactory()
-        cls.user.followers.add(
-            cls.local_follower_user.profile, cls.remote_follower, cls.remote_follower2,
-        )
+        cls.remote_follower2.following.add(cls.user.profile)
 
     def test_all_remote_returned(self):
-        followers = set(_get_remote_followers(self.user))
+        followers = set(_get_remote_followers(self.user.profile))
         self.assertEqual(
             followers,
             {
@@ -162,10 +162,28 @@ class TestGetRemoveFollowers(TestCase):
         )
 
     def test_exclude_is_excluded(self):
-        followers = set(_get_remote_followers(self.user, exclude=self.remote_follower.handle))
+        followers = set(_get_remote_followers(self.user.profile, exclude=self.remote_follower.handle))
         self.assertEqual(
             followers,
             {
                 (self.remote_follower2.handle, None),
             }
+        )
+
+
+class TestSendFollow(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
+
+    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
+    @patch("socialhome.federate.tasks.send_document")
+    def test_send_follow(self, mock_send, mock_payload):
+        send_follow(self.profile.id, self.remote_profile.id)
+        mock_send.assert_called_once_with(
+            "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
+            "payload",
         )

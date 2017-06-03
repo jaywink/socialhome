@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
+from socialhome.federate.tasks import send_follow
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.users.models import User, Profile
 
@@ -26,11 +27,15 @@ def create_user_profile(sender, **kwargs):
             profile.generate_new_rsa_key()
 
 
-@receiver(m2m_changed, sender=User.followers.through)
-def user_followers_change(sender, instance, action, **kwargs):
+@receiver(m2m_changed, sender=Profile.following.through)
+def profile_following_change(sender, instance, action, **kwargs):
     """Deliver notification on new followers."""
     if action == "post_add":
         def on_commit():
             for id in kwargs.get("pk_set"):
-                django_rq.enqueue(send_follow_notification, id, instance.id)
+                django_rq.enqueue(send_follow_notification, instance.id, id)
+                # Send out on the federation layer if local follower, remote followed
+                if Profile.objects.filter(id=id, user__isnull=True).exists() and instance.user:
+                    django_rq.enqueue(send_follow, instance.id, id)
+
         transaction.on_commit(on_commit)
