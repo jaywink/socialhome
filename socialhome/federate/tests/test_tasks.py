@@ -184,6 +184,6 @@ class TestSendFollow(TestCase):
     def test_send_follow(self, mock_send, mock_payload):
         send_follow(self.profile.id, self.remote_profile.id)
         mock_send.assert_called_once_with(
-            "https://%s/receive/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
+            "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
             "payload",
         )

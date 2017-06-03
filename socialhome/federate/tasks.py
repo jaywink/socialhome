@@ -181,7 +181,7 @@ def send_follow(profile_id, followed_id):
     entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle)
     # TODO: add high level method support to federation for private payload delivery
     payload = handle_create_payload(entity, profile, to_user=remote_profile)
-    url = "https://%s/receive/%s" % (
+    url = "https://%s/receive/users/%s" % (
         remote_profile.handle.split("@")[1], remote_profile.guid,
     )
     send_document(url, payload)
