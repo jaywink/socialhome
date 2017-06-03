@@ -134,7 +134,7 @@ class Profile(TimeStampedModel):
 
         Corresponds to public key.
         """
-        return self.rsa_public_key
+        return RSA.importKey(self.rsa_public_key)
 
     @property
     def public(self):
