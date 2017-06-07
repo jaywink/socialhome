@@ -59,6 +59,7 @@ def send_follow_notification(follower_id, followed_id):
     except Profile.DoesNotExist:
         logger.warning("No follower profile %s found for follow notifications", follower_id)
         return
+    logger.info("send_follow_notification - Sending mail to %s", user.email)
     send_mail(
         "%sNew follower" % settings.EMAIL_SUBJECT_PREFIX,
         "You have a new follower: %s" % follower.handle,
