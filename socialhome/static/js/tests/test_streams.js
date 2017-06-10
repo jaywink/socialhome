@@ -79,7 +79,7 @@ describe("Streams", function() {
                         id: 4, rendered: "adds new content", humanized_timestamp: "2 minutes ago",
                         formatted_timestamp: "2017-01-02 10:11:12+00:00",
                         author_image: "http://localhost/foobar.png", author_name: "Some Author",
-                        parent_id: "",
+                        parent_id: "", profile_id: "",
                     }],
                     placement: "prepended",
                 };
@@ -281,7 +281,7 @@ describe("Streams", function() {
                     id: 3, rendered: "new reply", humanized_timestamp: "2 minutes ago",
                     formatted_timestamp: "2017-01-02 10:11:12+00:00",
                     author_image: "http://localhost/foobar.png", author_name: "Some Author",
-                    parent: "1",
+                    parent: "1", profile_id: "2"
                 }],
                 placement: "children",
                 parent_id: 1,

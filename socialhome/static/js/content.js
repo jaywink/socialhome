@@ -6,7 +6,7 @@
             '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
                 '<div class="grid-item-author-bar">' +
-                    '<div class="profile-box-trigger"' +
+                    '<div class="profile-box-trigger">' +
                         '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
                     '</div>' +
                     '<div class="profile-box hidden">' +
