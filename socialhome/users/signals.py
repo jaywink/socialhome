@@ -8,7 +8,6 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 from socialhome.federate.tasks import send_follow_change
-from socialhome.notifications.tasks import send_follow_notification
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -30,23 +29,23 @@ def create_user_profile(sender, **kwargs):
             profile.generate_new_rsa_key()
 
 
-@receiver(m2m_changed, sender=Profile.following.through)
-def profile_following_change(sender, instance, action, **kwargs):
-    """Deliver notification on new followers."""
-    if action in ["post_add", "post_remove"]:
-        logger.debug("profile_following_change - Got %s from %s for %s - waiting for commit", action, sender, instance)
-        def on_commit():
-            logger.debug("profile_following_change - Commit happened!")
-            logger.debug("profile_following_change - pk_set %s", kwargs.get("pk_set"))
-            for id in kwargs.get("pk_set"):
-                if action == "post_add":
-                    logger.debug("profile_following_change - Enqueue follow notification with %s and %s",
-                                 instance.id, id)
-                    django_rq.enqueue(send_follow_notification, instance.id, id)
-                # Send out on the federation layer if local follower, remote followed/unfollowed
-                if Profile.objects.filter(id=id, user__isnull=True).exists() and instance.user:
-                    django_rq.enqueue(
-                        send_follow_change, instance.id, id, True if action == "post_add" else False
-                    )
+def on_commit_profile_following_change(action, pks, instance):
+    logger.debug("on_commit_profile_following_change - Commit happened!")
+    logger.debug("on_commit_profile_following_change - pk_set %s", pks)
+    for id in pks:
+        # Send out on the federation layer if local follower, remote followed/unfollowed
+        if Profile.objects.filter(id=id, user__isnull=True).exists() and instance.user:
+            django_rq.enqueue(
+                send_follow_change, instance.id, id, True if action == "post_add" else False
+            )
 
-        transaction.on_commit(on_commit)
+
+@receiver(m2m_changed, sender=Profile.following.through)
+def profile_following_change(sender, instance, action, pk_set, **kwargs):
+    """Deliver notification on new followers."""
+    logger.debug("profile_following_change - sender %s, instance %s, action %s, pk_set %s, kwargs: %s",
+                 sender, instance, action, pk_set, kwargs)
+    if action in ["post_add", "post_remove"]:
+        logger.debug("profile_following_change - Got %s from %s for %s", action, sender, instance)
+        logger.debug("profile_following_change - pk_set %s", pk_set)
+        transaction.on_commit(lambda: on_commit_profile_following_change(action, pk_set, instance))

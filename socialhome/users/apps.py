@@ -7,4 +7,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         """Import our signals."""
-        from socialhome.users.signals import create_user_profile, send_follow_notification
+        from socialhome.users.signals import create_user_profile, profile_following_change

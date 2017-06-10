@@ -54,6 +54,7 @@ def process_entities(entities):
 
 def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
+    from socialhome.notifications.tasks import send_follow_notification
     try:
         user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
     except User.DoesNotExist:
@@ -61,6 +62,7 @@ def process_entity_follow(entity, profile):
         return
     if entity.following:
         profile.following.add(user.profile)
+        django_rq.enqueue(send_follow_notification, profile.id, user.profile.id)
         logger.info("Profile %s now follows user %s", profile, user)
     else:
         profile.following.remove(user.profile)
@@ -69,6 +71,7 @@ def process_entity_follow(entity, profile):
 
 def process_entity_relationship(entity, profile):
     """Process entity of type Relationship."""
+    from socialhome.notifications.tasks import send_follow_notification
     if not entity.relationship == "following":
         logger.debug("Ignoring relationship of type %s", entity.relationship)
         return
@@ -78,6 +81,7 @@ def process_entity_relationship(entity, profile):
         logging.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
         return
     profile.following.add(user.profile)
+    django_rq.enqueue(send_follow_notification, profile.id, user.profile.id)
     logger.info("Profile %s now follows user %s", profile, user)
 
 
