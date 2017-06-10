@@ -277,6 +277,7 @@ class Content(models.Model):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         is_author = bool(user.is_authenticated and self.author == user.profile)
         is_following_author = bool(user.is_authenticated and self.author_id in user.profile.following_ids)
+        profile_id = user.profile.id if getattr(user, "profile", None) else ""
         return {
             "id": self.id,
             "guid": self.guid,
@@ -300,7 +301,7 @@ class Content(models.Model):
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
             "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
-            "user_id": user.profile.id,
+            "profile_id": profile_id,
         }
 
     def visible_for_user(self, user):

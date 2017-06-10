@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 from channels.tests import ChannelTestCase, Client
+from django.contrib.auth.models import AnonymousUser
 from django.test import SimpleTestCase
-from django.urls import reverse
 from freezegun import freeze_time
 
 from socialhome.content.models import Content
@@ -15,6 +15,8 @@ from socialhome.streams.consumers import StreamConsumer
 @pytest.mark.usefixtures("db")
 @freeze_time("2017-03-11")
 class TestStreamConsumerReceive(ChannelTestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         super(TestStreamConsumerReceive, cls).setUpTestData()
@@ -38,31 +40,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         text = json.loads(receive["text"])
         self.assertEqual(text["event"], "content")
         self.assertEqual(text["placement"], "prepended")
-        self.assertEqual(text["contents"], [
-            {
-                "id": self.content.id,
-                "guid": self.content.guid,
-                "author": self.content.author.id,
-                "author_guid": self.content.author.guid,
-                "author_image": self.content.author.safer_image_url_small,
-                "author_name": self.content.author.handle,
-                "author_profile_url": self.content.author.get_absolute_url(),
-                "author_home_url": self.content.author.home_url,
-                "author_is_local": bool(self.content.author.user),
-                "rendered": self.content.rendered,
-                "humanized_timestamp": self.content.humanized_timestamp,
-                "formatted_timestamp": self.content.formatted_timestamp,
-                "author_handle": self.content.author.handle,
-                "is_author": False,
-                "slug": self.content.slug,
-                "update_url": "",
-                "delete_url": "",
-                "reply_url": "",
-                "child_count": 1,
-                "is_authenticated": False,
-                "parent": "",
-            }
-        ])
+        self.assertEqual(text["contents"], [self.content.dict_for_view(AnonymousUser())])
 
     def test_receive_load_more_sends_more_content(self):
         self.client.send_and_consume(
@@ -76,31 +54,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         text = json.loads(receive["text"])
         self.assertEqual(text["event"], "content")
         self.assertEqual(text["placement"], "appended")
-        self.assertEqual(text["contents"], [
-            {
-                "id": self.content.id,
-                "guid": self.content.guid,
-                "author": self.content.author.id,
-                "author_guid": self.content.author.guid,
-                "author_image": self.content.author.safer_image_url_small,
-                "author_name": self.content.author.handle,
-                "author_profile_url": self.content.author.get_absolute_url(),
-                "author_home_url": self.content.author.home_url,
-                "author_is_local": bool(self.content.author.user),
-                "rendered": self.content.rendered,
-                "humanized_timestamp": self.content.humanized_timestamp,
-                "formatted_timestamp": self.content.formatted_timestamp,
-                "author_handle": self.content.author.handle,
-                "is_author": False,
-                "slug": self.content.slug,
-                "update_url": "",
-                "delete_url": "",
-                "reply_url": "",
-                "child_count": 1,
-                "is_authenticated": False,
-                "parent": "",
-            }
-        ])
+        self.assertEqual(text["contents"], [self.content.dict_for_view(AnonymousUser())])
 
     def test_receive_load_children_sends_reply_content(self):
         self.client.send_and_consume(
@@ -115,31 +69,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         self.assertEqual(text["event"], "content")
         self.assertEqual(text["placement"], "children")
         self.assertEqual(text["parent_id"], self.content.id)
-        self.assertEqual(text["contents"], [
-            {
-                "id": self.child_content.id,
-                "guid": self.child_content.guid,
-                "author": self.child_content.author.id,
-                "author_guid": self.child_content.author.guid,
-                "author_image": self.child_content.author.safer_image_url_small,
-                "author_name": self.child_content.author.handle,
-                "author_profile_url": self.child_content.author.get_absolute_url(),
-                "author_home_url": self.child_content.author.home_url,
-                "author_is_local": bool(self.child_content.author.user),
-                "rendered": self.child_content.rendered,
-                "humanized_timestamp": self.child_content.humanized_timestamp,
-                "formatted_timestamp": self.child_content.formatted_timestamp,
-                "author_handle": self.child_content.author.handle,
-                "is_author": False,
-                "slug": self.child_content.slug,
-                "update_url": "",
-                "delete_url": "",
-                "reply_url": "",
-                "child_count": 0,
-                "is_authenticated": False,
-                "parent": self.content.id,
-            }
-        ])
+        self.assertEqual(text["contents"], [self.child_content.dict_for_view(AnonymousUser())])
 
     @patch("socialhome.streams.consumers.Content.objects.public", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.tags", return_value=Content.objects.none())

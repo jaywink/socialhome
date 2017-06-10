@@ -16,8 +16,8 @@
                             '<a href="<%= content.author_home_url %>" class="btn btn-default" title="' + gettext("Home") + '" aria-label="' + gettext("Home") + '"><i class="fa fa-home"></i></a>' +
                         '<% } %>' +
                         '<% if (content.is_authenticated && ! content.is_author) { %>' +
-                            '<button class="follower-button btn btn-default <% if (! content.is_following_author) { %>hidden<% } %>" data-action="remove_follower" data-profileid="<%= content.user_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Unfollow") + '" aria-label="' + gettext("Unfollow") + '"><i class="fa fa-minus"></i></button>' +
-                            '<button class="follower-button btn btn-default <% if (content.is_following_author) { %>hidden<% } %>" data-action="add_follower" data-profileid="<%= content.user_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Follow") + '" aria-label="' + gettext("Follow") + '"><i class="fa fa-plus"></i></button>' +
+                            '<button class="follower-button btn btn-default <% if (! content.is_following_author) { %>hidden<% } %>" data-action="remove_follower" data-profileid="<%= content.profile_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Unfollow") + '" aria-label="' + gettext("Unfollow") + '"><i class="fa fa-minus"></i></button>' +
+                            '<button class="follower-button btn btn-default <% if (content.is_following_author) { %>hidden<% } %>" data-action="add_follower" data-profileid="<%= content.profile_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Follow") + '" aria-label="' + gettext("Follow") + '"><i class="fa fa-plus"></i></button>' +
                         '<% } %>' +
                     '</div>' +
                 '</div>' +
