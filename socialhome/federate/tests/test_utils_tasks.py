@@ -14,6 +14,7 @@ from socialhome.federate.utils.tasks import (
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_relationship,
 )
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
@@ -66,8 +67,12 @@ class TestProcessEntities(TestCase):
         self.assertEqual(mock_logger.called, 1)
 
 
-@pytest.mark.usefixtures("db")
-class TestProcessEntityPost:
+class TestProcessEntityPost(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.local_content = LocalContentFactory()
+
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory())
@@ -102,8 +107,14 @@ class TestProcessEntityPost:
         assert content.text == "&lt;script&gt;alert('yup');&lt;/script&gt;"
         assert content.service_label == "alert('yup');"
 
+    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None))
+    def test_local_content_is_skipped(self, mock_update):
+        entity = entities.PostFactory(guid=self.local_content.guid)
+        process_entity_post(entity, ProfileFactory())
+        self.assertFalse(mock_update.called)
 
-class TestProcessEntityComment(TestCase):
+
+class TestProcessEntityComment(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -141,7 +152,7 @@ class TestProcessEntityComment(TestCase):
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
     def test_does_not_forwards_relayable_if_not_local_content(self, mock_rq):
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        Content.objects.get(guid=self.comment.guid, parent=self.content)
         self.assertFalse(mock_rq.called)
 
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
@@ -152,11 +163,18 @@ class TestProcessEntityComment(TestCase):
         self.content.refresh_from_db()
         mock_rq.reset_mock()
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        Content.objects.get(guid=self.comment.guid, parent=self.content)
         call_args = [
             call(forward_relayable, self.comment, self.content.id),
         ]
         self.assertEqual(mock_rq.call_args_list, call_args)
+
+    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None))
+    def test_local_reply_is_skipped(self, mock_update):
+        user = UserFactory()
+        ContentFactory(guid=self.comment.guid, author=user.profile)
+        process_entity_comment(self.comment, ProfileFactory())
+        self.assertFalse(mock_update.called)
 
 
 class TestProcessEntityRetraction(TestCase):

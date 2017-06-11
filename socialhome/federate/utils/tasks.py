@@ -87,6 +87,10 @@ def process_entity_relationship(entity, profile):
 
 def process_entity_post(entity, profile):
     """Process an entity of type Post."""
+    guid = safe_text(entity.guid)
+    if Content.objects.filter(guid=guid, author__user__isnull=False).exists():
+        logger.warning("Remote sent content with guid %s is local! Skipping.", guid)
+        return
     values = {
         "text": safe_text_for_markdown(entity.raw_content),
         "author": profile,
@@ -95,7 +99,7 @@ def process_entity_post(entity, profile):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
-    content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
+    content, created = Content.objects.update_or_create(guid=guid, defaults=values)
     if created:
         logger.info("Saved Content: %s", content)
     else:
@@ -104,6 +108,10 @@ def process_entity_post(entity, profile):
 
 def process_entity_comment(entity, profile):
     """Process an entity of type Comment."""
+    guid = safe_text(entity.guid)
+    if Content.objects.filter(guid=guid, author__user__isnull=False).exists():
+        logger.warning("Remote sent comment with guid %s is local! Skipping.", guid)
+        return
     try:
         parent = Content.objects.get(guid=entity.target_guid)
     except Content.DoesNotExist:
@@ -117,7 +125,7 @@ def process_entity_comment(entity, profile):
         "parent": parent,
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
-    content, created = Content.objects.update_or_create(guid=safe_text(entity.guid), defaults=values)
+    content, created = Content.objects.update_or_create(guid=guid, defaults=values)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
     else:
