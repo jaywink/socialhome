@@ -14,6 +14,7 @@ from socialhome.federate.utils.tasks import (
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_relationship,
 )
+from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
@@ -251,6 +252,11 @@ class TestProcessEntityFollow(TestCase):
         process_entity_follow(base.Follow(target_handle=self.profile.handle, following=False), self.remote_profile)
         self.assertEqual(self.remote_profile.following.count(), 0)
 
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_follower_added_sends_a_notification(self, mock_enqueue):
+        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
+        mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
+
 
 class TestProcessEntityRelationship(TestCase):
     @classmethod
@@ -272,6 +278,13 @@ class TestProcessEntityRelationship(TestCase):
             target_handle=self.profile.handle, relationship="sharing"), self.remote_profile
         )
         self.assertEqual(self.remote_profile.following.count(), 0)
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_follower_added_sends_a_notification(self, mock_enqueue):
+        process_entity_relationship(base.Relationship(
+            target_handle=self.profile.handle, relationship="following"), self.remote_profile
+        )
+        mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
 
 
 @pytest.mark.usefixtures("db")
