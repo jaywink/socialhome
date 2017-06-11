@@ -1,6 +1,16 @@
 from unittest.mock import Mock
 
+from test_plus import TestCase
 
+import socialhome.tests.environment  # Set some environment tweaks
+
+
+class SocialhomeTestCase(TestCase):
+    maxDiff = None
+
+
+# py.test monkeypatches while we still have two kinds of tests
+# Remove these once all our tests are either `SocialhomeTestCase` or another test class
 def disable_requests(monkeypatch):
     """Mock away request.get and requests.post."""
     monkeypatch.setattr("requests.post", Mock())
