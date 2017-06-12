@@ -6,15 +6,21 @@
             '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
                 '<div class="grid-item-author-bar">' +
-                    '<div class="profile-box-trigger"' +
+                    '<div class="profile-box-trigger">' +
                         '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
                     '</div>' +
                     '<div class="profile-box hidden">' +
                         '<%= content.author_handle %>' +
-                        '<a href="<%= content.author_profile_url %>" class="btn btn-default" title="' + gettext("Profile") + '" aria-label="' + gettext("Profile") + '"><i class="fa fa-user"></i></a>' +
-                        '<% if (! content.author_is_local) { %>' +
-                            '<a href="<%= content.author_home_url %>" class="btn btn-default" title="' + gettext("Home") + '" aria-label="' + gettext("Home") + '"><i class="fa fa-home"></i></a>' +
-                        '<% } %>' +
+                        '<div class="pull-right">' +
+                            '<a href="<%= content.author_profile_url %>" class="btn btn-secondary" title="' + gettext("Profile") + '" aria-label="' + gettext("Profile") + '"><i class="fa fa-user"></i></a>' +
+                            '<% if (! content.author_is_local) { %>' +
+                                '<a href="<%= content.author_home_url %>" class="btn btn-secondary" title="' + gettext("Home") + '" aria-label="' + gettext("Home") + '"><i class="fa fa-home"></i></a>' +
+                            '<% } %>' +
+                            '<% if (content.is_authenticated && ! content.is_author) { %>' +
+                                '<button class="follower-button btn btn-secondary <% if (! content.is_following_author) { %>hidden<% } %>" data-action="remove_follower" data-profileid="<%= content.profile_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Unfollow") + '" aria-label="' + gettext("Unfollow") + '"><i class="fa fa-minus"></i></button>' +
+                                '<button class="follower-button btn btn-secondary <% if (content.is_following_author) { %>hidden<% } %>" data-action="add_follower" data-profileid="<%= content.profile_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Follow") + '" aria-label="' + gettext("Follow") + '"><i class="fa fa-plus"></i></button>' +
+                            '<% } %>' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
             '<% } %>' +

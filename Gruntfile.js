@@ -107,6 +107,7 @@ module.exports = function (grunt) {
                     "<%= paths.bower %>/imagesloaded/imagesloaded.pkgd.min.js",
                     "<%= paths.bower %>/reconnecting-websocket/reconnecting-websocket.min.js",
                     "<%= paths.bower %>/bootstrap-markdown/js/bootstrap-markdown.js",
+                    "<%= paths.bower %>/js-cookie/src/js.cookie.js",
                     "<%= paths.js %>/vendor/appear.min.js",
                     "<%= paths.js %>/content.js",
                     "<%= paths.js %>/grids.js",

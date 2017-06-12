@@ -28,9 +28,9 @@ class ProfileViewSet(ModelViewSet):
     def add_follower(self, request, pk=None):
         guid = request.data.get("guid")
         try:
-            target_profile = Profile.objects.visible_for_user(request.user).get(guid=guid)
+            target_profile = Profile.objects.get(guid=guid)
         except Profile.DoesNotExist:
-            raise PermissionDenied("Profile given either does not exist or is not visible.")
+            raise PermissionDenied("Profile given does not exist.")
         profile = self.get_object()
         if profile.guid == guid:
             raise ValidationError("Cannot follow self!")

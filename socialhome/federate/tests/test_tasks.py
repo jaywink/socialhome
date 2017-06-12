@@ -12,7 +12,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
     forward_relayable, _get_remote_followers,
-    send_follow)
+    send_follow_change)
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -181,8 +181,8 @@ class TestSendFollow(TestCase):
 
     @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
     @patch("socialhome.federate.tasks.send_document")
-    def test_send_follow(self, mock_send, mock_payload):
-        send_follow(self.profile.id, self.remote_profile.id)
+    def test_send_follow_change(self, mock_send, mock_payload):
+        send_follow_change(self.profile.id, self.remote_profile.id, True)
         mock_send.assert_called_once_with(
             "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
             "payload",

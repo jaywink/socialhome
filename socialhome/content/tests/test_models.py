@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import Mock, patch, call
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -14,7 +15,8 @@ from test_plus import TestCase
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
 from socialhome.enums import Visibility
-from socialhome.users.tests.factories import ProfileFactory
+from socialhome.users.models import Profile
+from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
 @pytest.mark.usefixtures("db")
@@ -23,8 +25,11 @@ class TestContentModel(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.user = UserFactory()
+        cls.user2 = AnonymousUser()
+        cls.profile = cls.user.profile
         cls.public_content = ContentFactory(
-            visibility=Visibility.PUBLIC, text="**Foobar**", author__name="Author Name"
+            visibility=Visibility.PUBLIC, text="**Foobar**", author=cls.profile,
         )
         cls.site_content = ContentFactory(
             visibility=Visibility.SITE, text="_Foobar_"
@@ -43,7 +48,9 @@ class TestContentModel(TestCase):
 
     def setUp(self):
         super().setUp()
+        self.maxDiff = None
         self.public_content.refresh_from_db()
+        self.site_content.refresh_from_db()
 
     def test_create(self):
         Content.objects.create(text="foobar", guid="barfoo", author=ProfileFactory())
@@ -89,7 +96,7 @@ class TestContentModel(TestCase):
 
     def test_get_rendered_contents_for_user(self):
         qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
-        contents = Content.get_rendered_contents(qs, Mock(is_authenticated=True))
+        contents = Content.get_rendered_contents(qs, self.user2)
         self.assertEqual(contents, [
             {
                 "id": self.public_content.id,
@@ -97,7 +104,7 @@ class TestContentModel(TestCase):
                 "author": self.public_content.author_id,
                 "author_guid": self.public_content.author.guid,
                 "author_image": self.public_content.author.safer_image_url_small,
-                "author_name": self.public_content.author.name,
+                "author_name": self.public_content.author.handle,
                 "author_profile_url": self.public_content.author.get_absolute_url(),
                 "author_home_url": self.public_content.author.home_url,
                 "author_is_local": bool(self.public_content.author.user),
@@ -106,13 +113,15 @@ class TestContentModel(TestCase):
                 "formatted_timestamp": self.public_content.formatted_timestamp,
                 "author_handle": self.public_content.author.handle,
                 "is_author": False,
+                "is_following_author": False,
                 "slug": self.public_content.slug,
                 "update_url": "",
                 "delete_url": "",
-                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+                "reply_url": "",
                 "child_count": 0,
-                "is_authenticated": True,
+                "is_authenticated": False,
                 "parent": "",
+                "profile_id": "",
             },
             {
                 "id": self.site_content.id,
@@ -129,13 +138,15 @@ class TestContentModel(TestCase):
                 "formatted_timestamp": self.site_content.formatted_timestamp,
                 "author_handle": self.site_content.author.handle,
                 "is_author": False,
+                "is_following_author": False,
                 "slug": self.site_content.slug,
                 "update_url": "",
                 "delete_url": "",
-                "reply_url": reverse("content:reply", kwargs={"pk": self.site_content.id}),
+                "reply_url": "",
                 "child_count": 0,
-                "is_authenticated": True,
+                "is_authenticated": False,
                 "parent": "",
+                "profile_id": "",
             }
         ])
 
@@ -152,11 +163,10 @@ class TestContentModel(TestCase):
         ])
 
     def test_is_local(self):
-        self.assertFalse(self.public_content.is_local)
-        user = self.make_user()
-        user.profile = self.public_content.author
-        user.save()
-        self.assertTrue(self.public_content.is_local)
+        self.assertFalse(self.site_content.is_local)
+        self.site_content.author = self.profile
+        self.site_content.save()
+        self.assertTrue(self.site_content.is_local)
 
     def test_save_calls_fix_local_uploads(self):
         self.public_content.fix_local_uploads = Mock()
@@ -202,13 +212,13 @@ class TestContentModel(TestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_dict_for_view(self):
-        self.assertEqual(self.public_content.dict_for_view(Mock()), {
+        self.assertEqual(self.public_content.dict_for_view(self.user2), {
             "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author": self.public_content.author_id,
             "author_guid": self.public_content.author.guid,
-            "author_name": self.public_content.author.name,
+            "author_name": self.public_content.author.handle,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.safer_image_url_small,
             "author_profile_url": self.public_content.author.get_absolute_url(),
@@ -217,27 +227,26 @@ class TestContentModel(TestCase):
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": False,
+            "is_following_author": False,
             "slug": self.public_content.slug,
             "update_url": "",
             "delete_url": "",
-            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+            "reply_url": "",
             "child_count": 0,
-            "is_authenticated": True,
+            "is_authenticated": False,
             "parent": "",
+            "profile_id": "",
         })
 
     def test_dict_for_view_for_author(self):
-        user = Mock(
-            is_authenticated=True,
-            profile=self.public_content.author,
-        )
-        self.assertEqual(self.public_content.dict_for_view(user), {
+        Profile.objects.filter(id=self.profile.id).update(name="Foo Bar")
+        self.assertEqual(self.public_content.dict_for_view(self.user), {
             "id": self.public_content.id,
             "guid": self.public_content.guid,
             "rendered": self.public_content.rendered,
             "author": self.public_content.author_id,
             "author_guid": self.public_content.author.guid,
-            "author_name": self.public_content.author.name,
+            "author_name": self.public_content.author.handle,
             "author_handle": self.public_content.author.handle,
             "author_image": self.public_content.author.safer_image_url_small,
             "author_profile_url": self.public_content.author.get_absolute_url(),
@@ -246,6 +255,7 @@ class TestContentModel(TestCase):
             "humanized_timestamp": self.public_content.humanized_timestamp,
             "formatted_timestamp": self.public_content.formatted_timestamp,
             "is_author": True,
+            "is_following_author": False,
             "slug": self.public_content.slug,
             "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
             "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
@@ -253,18 +263,19 @@ class TestContentModel(TestCase):
             "child_count": 0,
             "is_authenticated": True,
             "parent": "",
+            "profile_id": self.public_content.author.id,
         })
 
     def test_dict_for_view_edited_post(self):
         with freeze_time(self.public_content.created + datetime.timedelta(minutes=16)):
             self.public_content.save()
-            self.assertEqual(self.public_content.dict_for_view(Mock()), {
+            self.assertEqual(self.public_content.dict_for_view(self.user), {
                 "id": self.public_content.id,
                 "guid": self.public_content.guid,
                 "rendered": self.public_content.rendered,
                 "author": self.public_content.author_id,
                 "author_guid": self.public_content.author.guid,
-                "author_name": self.public_content.author.name,
+                "author_name": self.public_content.author.handle,
                 "author_handle": self.public_content.author.handle,
                 "author_image": self.public_content.author.safer_image_url_small,
                 "author_profile_url": self.public_content.author.get_absolute_url(),
@@ -272,14 +283,16 @@ class TestContentModel(TestCase):
                 "author_is_local": bool(self.public_content.author.user),
                 "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
                 "formatted_timestamp": self.public_content.formatted_timestamp,
-                "is_author": False,
+                "is_author": True,
+                "is_following_author": False,
                 "slug": self.public_content.slug,
-                "update_url": "",
-                "delete_url": "",
+                "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
+                "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
                 "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
                 "child_count": 0,
                 "is_authenticated": True,
                 "parent": "",
+                "profile_id": self.public_content.author.id,
             })
 
     def test_short_text(self):

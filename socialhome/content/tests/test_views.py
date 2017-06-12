@@ -1,6 +1,5 @@
-from unittest.mock import Mock
-
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
@@ -15,7 +14,7 @@ from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("db")
-class TestRootProfile(object):
+class TestRootProfile:
     @pytest.mark.usefixtures("client", "settings")
     def test_home_view_rendered_without_root_profile(self, client, settings):
         settings.SOCIALHOME_ROOT_PROFILE = None
@@ -40,7 +39,7 @@ class TestRootProfile(object):
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
-class TestContentCreateView(object):
+class TestContentCreateView:
     def _get_request_and_view(self, rf):
         request = rf.get("/")
         request.user = UserFactory()
@@ -75,7 +74,7 @@ class TestContentCreateView(object):
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
-class TestContentUpdateView(object):
+class TestContentUpdateView:
     def _get_request_view_and_content(self, rf):
         request = rf.get("/")
         request.user = UserFactory()
@@ -145,7 +144,7 @@ class TestContentUpdateView(object):
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
-class TestContentDeleteView(object):
+class TestContentDeleteView:
     def _get_request_view_and_content(self, rf):
         request = rf.get("/")
         request.user = UserFactory()
@@ -181,6 +180,8 @@ class TestContentDeleteView(object):
 
 
 class TestContentView(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -194,7 +195,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
+        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
 
     def test_content_view_by_guid_renders_json_result(self):
         response = self.client.get(
@@ -202,7 +203,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
+        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
 
     def test_content_view_by_slug_renders_json_result(self):
         response = self.client.get(
@@ -210,7 +211,7 @@ class TestContentView(TestCase):
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(Mock(is_authenticated=False)), response.json())
+        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
 
     def test_content_view_redirects_to_login_for_private_content_except_if_owned(self):
         self.client.force_login(self.content.author.user)
@@ -268,7 +269,6 @@ class TestContentView(TestCase):
         self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
 
 
-@pytest.mark.usefixtures("db")
 class TestContentReplyView(TestCase):
     @classmethod
     def setUpTestData(cls):

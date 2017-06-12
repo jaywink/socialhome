@@ -186,6 +186,7 @@ $(function () {
             this.addContentListeners();
             this.addReplyTriggers();
             this.initProfileBoxTriggers();
+            this.addFollowUnfollowTriggers();
             view.addNSFWShield();
             this.socket = this.createConnection();
             this.socket.onmessage = this.handleMessage;
@@ -254,11 +255,12 @@ $(function () {
                     if (!controller.isContentDetail()) {
                         controller.addContentListeners();
                         controller.addReplyTriggers();
-                        controller.initProfileBoxTriggers();
                         if (ids.length && data.placement === "appended") {
                             controller.addLoadMoreTrigger();
                         }
                     }
+                    controller.initProfileBoxTriggers();
+                    controller.addFollowUnfollowTriggers();
                 });
                 view.contentIds = _.union(view.contentIds, ids);
             }
@@ -344,6 +346,23 @@ $(function () {
                 $(ev.currentTarget).next().toggleClass("hidden");
                 $('.grid').masonry("layout");
             });
+        },
+
+        followUnfollow: function(ev) {
+            var $elem = $(ev.currentTarget);
+            var targetGuid = $elem.data("target");
+            $.post({
+                url: "/api/profiles/" +$elem.data("profileid") + "/" + $elem.data("action") + "/",
+                data: { guid: targetGuid },
+                success: function () {
+                    $(".follower-button[data-target='" + targetGuid + "']").toggleClass("hidden");
+                },
+                headers: { "X-CSRFToken": Cookies.get('csrftoken') },
+            });
+        },
+
+        addFollowUnfollowTriggers: function() {
+            $(".follower-button").off("click", controller.followUnfollow).click(controller.followUnfollow);
         },
     };
 

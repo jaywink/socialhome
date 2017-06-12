@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from model_utils.models import TimeStampedModel
@@ -120,7 +121,7 @@ class Profile(TimeStampedModel):
         self.rsa_private_key = key.exportKey()
         self.save(update_fields=("rsa_private_key", "rsa_public_key"))
 
-    @property
+    @cached_property
     def private_key(self):
         """Required by federation.
 
@@ -128,7 +129,7 @@ class Profile(TimeStampedModel):
         """
         return RSA.importKey(self.rsa_private_key)
 
-    @property
+    @cached_property
     def key(self):
         """Required by federation.
 
@@ -152,6 +153,10 @@ class Profile(TimeStampedModel):
                 self.handle.split("@")[1], self.image_url_small,
             )
         return self.image_url_small
+
+    @cached_property
+    def following_ids(self):
+        return self.following.values_list("id", flat=True)
 
     def visible_to_user(self, user):
         """Check whether the given user should be able to see this profile."""
@@ -192,15 +197,18 @@ class Profile(TimeStampedModel):
     @staticmethod
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
-        return Profile.objects.create(
-            name=safe_text(remote_profile.name),
+        profile, _created = Profile.objects.update_or_create(
             guid=safe_text(remote_profile.guid),
-            handle=remote_profile.handle,
-            visibility=Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
-            rsa_public_key=safe_text(remote_profile.public_key),
-            image_url_large=safe_text(remote_profile.image_urls["large"]),
-            image_url_medium=safe_text(remote_profile.image_urls["medium"]),
-            image_url_small=safe_text(remote_profile.image_urls["small"]),
-            location=safe_text(remote_profile.location),
-            email=remote_profile.email,
+            handle=safe_text(remote_profile.handle),
+            defaults={
+                "name": safe_text(remote_profile.name),
+                "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
+                "rsa_public_key": safe_text(remote_profile.public_key),
+                "image_url_large": safe_text(remote_profile.image_urls["large"]),
+                "image_url_medium": safe_text(remote_profile.image_urls["medium"]),
+                "image_url_small": safe_text(remote_profile.image_urls["small"]),
+                "location": safe_text(remote_profile.location),
+                "email": safe_text(remote_profile.email),
+            },
         )
+        return profile
