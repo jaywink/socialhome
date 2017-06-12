@@ -9,6 +9,7 @@ from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
@@ -179,9 +180,7 @@ class TestContentDeleteView:
         assert response.status_code == 404
 
 
-class TestContentView(TestCase):
-    maxDiff = None
-
+class TestContentView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -267,6 +266,13 @@ class TestContentView(TestCase):
             reverse("content:view", kwargs={"pk": self.content.id})
         )
         self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
+
+    def test_content_view_guid_quoting(self):
+        content = ContentFactory(guid="foo@bar", visibility=Visibility.PUBLIC)
+        response = self.client.get(
+            reverse("content:view", kwargs={"pk": content.id})
+        )
+        self.assertEqual(response.context["stream_name"], "foo%40bar")
 
 
 class TestContentReplyView(TestCase):

@@ -108,3 +108,4 @@ class TestStreamConsumerConnectionGroups(SimpleTestCase):
     def test_connection_groups(self, mock_consumer):
         consumer = StreamConsumer()
         self.assertEqual(consumer.connection_groups(stream="foobar"), ["streams_foobar"])
+        self.assertEqual(consumer.connection_groups(stream="foo%40bar"), ["streams_foo@bar"])

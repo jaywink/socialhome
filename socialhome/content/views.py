@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+
 from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -106,6 +108,11 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
     def get_ajax(self, request, *args, **kwargs):
         self.object = self.get_object()
         return self.render_json_response(self.object.dict_for_view(request.user))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["stream_name"] = quote_plus(self.object.guid)
+        return context
 
 
 class HomeView(TemplateView):
