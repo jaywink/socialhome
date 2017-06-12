@@ -255,12 +255,12 @@ $(function () {
                     if (!controller.isContentDetail()) {
                         controller.addContentListeners();
                         controller.addReplyTriggers();
-                        controller.initProfileBoxTriggers();
-                        controller.addFollowUnfollowTriggers();
                         if (ids.length && data.placement === "appended") {
                             controller.addLoadMoreTrigger();
                         }
                     }
+                    controller.initProfileBoxTriggers();
+                    controller.addFollowUnfollowTriggers();
                 });
                 view.contentIds = _.union(view.contentIds, ids);
             }
