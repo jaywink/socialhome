@@ -74,7 +74,8 @@ class TestStreamConsumerReceive(ChannelTestCase):
     @patch("socialhome.streams.consumers.Content.objects.public", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.tags", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.profile", return_value=Content.objects.none())
-    def test_get_stream_qs_per_stream(self, mock_profile, mock_tags, mock_public):
+    @patch("socialhome.streams.consumers.Content.objects.profile_pinned", return_value=Content.objects.none())
+    def test_get_stream_qs_per_stream(self, mock_pinned, mock_profile, mock_tags, mock_public):
         self.client.send_and_consume(
             "websocket.receive",
             {
@@ -96,6 +97,15 @@ class TestStreamConsumerReceive(ChannelTestCase):
             "websocket.receive",
             {
                 "path": "/ch/streams/profile__1234/",
+                "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
+            },
+        )
+        self.assertEqual(mock_pinned.call_count, 1)
+        self.assertEqual(mock_pinned.call_args[0][0], "1234")
+        self.client.send_and_consume(
+            "websocket.receive",
+            {
+                "path": "/ch/streams/profile_all__1234/",
                 "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
             },
         )

@@ -19,6 +19,14 @@ class UserDetailView(DetailView):
         return ProfileDetailView.as_view()(request, guid=profile.guid)
 
 
+class UserAllContentView(UserDetailView):
+    def get(self, request, *args, **kwargs):
+        """Render ProfileDetailView for this user."""
+        profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
+        return ProfileAllContentView.as_view()(request, guid=profile.guid)
+
+
+
 class ProfileViewMixin(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
@@ -41,9 +49,22 @@ class ProfileDetailView(ProfileViewMixin):
     template_name = "streams/profile.html"
 
     def get_context_data(self, **kwargs):
-        context = super(ProfileDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["content_list"] = self._get_contents_queryset()
         context["stream_name"] = "profile__%s" % self.kwargs.get("guid")
+        return context
+
+    def _get_contents_queryset(self):
+        return Content.objects.profile_pinned(self.kwargs.get("guid"), self.request.user)
+
+
+class ProfileAllContentView(ProfileViewMixin):
+    template_name = "streams/profile_all.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["content_list"] = self._get_contents_queryset()
+        context["stream_name"] = "profile_all__%s" % self.kwargs.get("guid")
         return context
 
     def _get_contents_queryset(self):
@@ -60,7 +81,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
     def dispatch(self, request, *args, **kwargs):
         """User current user."""
         self.kwargs.update({"guid": request.user.profile.guid})
-        return super(OrganizeContentProfileDetailView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""

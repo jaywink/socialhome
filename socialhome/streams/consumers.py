@@ -33,6 +33,8 @@ class StreamConsumer(WebsocketConsumer):
         elif stream_info[0] == "tags":
             return Content.objects.tags(stream_info[1], self.message.user)
         elif stream_info[0] == "profile":
+            return Content.objects.profile_pinned(stream_info[1], self.message.user)
+        elif stream_info[0] == "profile_all":
             return Content.objects.profile(stream_info[1], self.message.user)
         return Content.objects.none()
 

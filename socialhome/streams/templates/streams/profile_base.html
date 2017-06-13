@@ -1,0 +1,14 @@
+{% extends "streams/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
+
+{% block stream_description %}
+    <h2>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h2>
+{% endblock %}
+
+{% block stream_title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
+
+{% block stream_actions %}
+    {% include "streams/includes/_profile_stream_actions.html" %}
+{% endblock %}

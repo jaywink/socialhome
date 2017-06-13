@@ -14,6 +14,11 @@ urlpatterns = [
         name="redirect"
     ),
     url(
+        regex=r"^u/(?P<username>[\w.@+-]+)/all/$",
+        view=views.UserAllContentView.as_view(),
+        name="all-content"
+    ),
+    url(
         regex=r"^u/(?P<username>[\w.@+-]+)/$",
         view=views.UserDetailView.as_view(),
         name="detail"
@@ -27,6 +32,11 @@ urlpatterns = [
         regex=r"^p/~update/$",
         view=views.ProfileUpdateView.as_view(),
         name="profile-update"
+    ),
+    url(
+        regex=r"^p/(?P<guid>[^/]+)/all/$",
+        view=views.ProfileAllContentView.as_view(),
+        name="profile-all-content"
     ),
     url(
         regex=r"^p/(?P<guid>[^/]+)/$",
