@@ -63,3 +63,28 @@
 .profile-stream-stamped-header {
   padding-left: 20px;
 }
+
+.stamped-profile-info {
+  word-break: break-all;
+}
+
+@media all and (max-width: $largeDevice) {
+  .stamped-profile-info {
+    h1 {
+      font-size: 1.75rem;
+    }
+    h3 {
+      font-size: 1.4rem;
+    }
+  }
+}
+@media all and (max-width: $mediumDevice) {
+  .stamped-profile-info {
+    h1 {
+      font-size: 1.5rem;
+    }
+    h3 {
+      font-size: 1.25rem;
+    }
+  }
+}

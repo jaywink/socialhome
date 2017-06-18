@@ -25,7 +25,7 @@
             <img class="profile-stream-stamped-image" src="{{ profile.safer_image_url_large }}">
         {% endif %}
     </div>
-    <div class="d-inline-block ml-3 align-center">
+    <div class="d-inline-block ml-3 align-center stamped-profile-info">
         <h1>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h1>
         <h3><cite title="{% trans "User handle on The Federation" %}">{{ profile.handle }}</cite></h3>
     </div>
