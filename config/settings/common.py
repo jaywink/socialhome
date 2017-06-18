@@ -49,7 +49,8 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    "socialhome.users",  # custom users app
+    "socialhome",
+    "socialhome.users",
     "socialhome.federate",
     "socialhome.content",
     "socialhome.streams",

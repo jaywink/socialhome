@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load string_utils %}
 
 {% block containertype %}container-fluid{% endblock %}
 
@@ -30,7 +31,7 @@
             {% for content in content_list %}
                 <div class="grid-item" data-content-id="{{ content.id }}">
                     {{ content.rendered|safe }}
-                    {% if "profile__" not in stream_name %}
+                    {% if not stream_name|startswith:"profile_" %}
                         <div class="grid-item-author-bar mt-1">
                             <div class="profile-box-trigger">
                                 <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
