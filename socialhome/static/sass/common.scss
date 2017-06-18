@@ -27,6 +27,7 @@
     a:active {
       background-color: unset;
     }
+    border-radius: unset;
   }
 }
 
@@ -94,8 +95,7 @@ body {
   }
 }
 
-// Lose the rounding on buttons
-.btn {
+// Lose the rounding on various things
+.btn, .card {
   border-radius: unset;
 }
-
