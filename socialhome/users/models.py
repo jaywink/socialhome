@@ -154,6 +154,15 @@ class Profile(TimeStampedModel):
             )
         return self.image_url_small
 
+    @property
+    def safer_image_url_large(self):
+        # TODO unify this and the small version to one helper
+        if self.image_url_large.startswith("/"):
+            return "https://%s%s" % (
+                self.handle.split("@")[1], self.image_url_large,
+            )
+        return self.image_url_large
+
     @cached_property
     def following_ids(self):
         return self.following.values_list("id", flat=True)

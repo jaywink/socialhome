@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import Client
 
 from socialhome.enums import Visibility
@@ -11,30 +11,32 @@ from socialhome.content.tests.factories import ContentFactory, LocalContentFacto
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import UserFactory
+from socialhome.users.tests.factories import UserFactory, AdminUserFactory
 
 
-@pytest.mark.usefixtures("db")
-class TestRootProfile:
-    @pytest.mark.usefixtures("client", "settings")
-    def test_home_view_rendered_without_root_profile(self, client, settings):
-        settings.SOCIALHOME_ROOT_PROFILE = None
-        response = client.get("/")
+class TestRootProfile(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.admin_user = AdminUserFactory(username="admin")
+
+    def test_home_view_rendered_without_root_profile(self):
+        response = self.client.get("/")
         assert response.templates[0].name == "pages/home.html"
 
-    @pytest.mark.usefixtures("admin_client", "settings")
-    def test_logged_in_profile_view_rendered_without_root_profile(self, admin_client, settings):
-        settings.SOCIALHOME_ROOT_PROFILE = None
-        response = admin_client.get("/")
+    def test_logged_in_profile_view_rendered_without_root_profile(self):
+        with self.login(username=self.user.username):
+            response = self.client.get("/")
         assert response.templates[0].name == "streams/profile.html"
         assert response.context["profile"].user.username == "admin"
 
-    @pytest.mark.usefixtures("client", "admin_client", "settings")
-    def test_home_view_rendered_with_root_profile(self, client, admin_client, settings):
-        settings.SOCIALHOME_ROOT_PROFILE = "admin"
+    @override_settings(SOCIALHOME_ROOT_PROFILE="admin")
+    def test_home_view_rendered_with_root_profile(self):
         # Set admin profile visibility, otherwise it will just redirect to login
         Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
-        response = client.get("/")
+        with self.login(username=self.admin_user.username):
+            response = self.client.get("/")
         assert response.templates[0].name == "streams/profile.html"
         assert response.context["profile"].user.username == "admin"
 

@@ -31,6 +31,7 @@ class ProfileViewMixin(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
+    template_name = "streams/profile.html"
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -46,12 +47,19 @@ class ProfileViewMixin(AccessMixin, DetailView):
 
 
 class ProfileDetailView(ProfileViewMixin):
-    template_name = "streams/profile.html"
+    def dispatch(self, request, *args, **kwargs):
+        """Ensure we have pinned content. If not, render all content instead."""
+        self.content_list = self._get_contents_queryset()
+        if not self.content_list.exists():
+            return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["content_list"] = self._get_contents_queryset()
+        context["content_list"] = self.content_list
+        context["pinned_content_exists"] = True
         context["stream_name"] = "profile__%s" % self.kwargs.get("guid")
+        context["profile_stream_type"] = "pinned"
         return context
 
     def _get_contents_queryset(self):
@@ -59,12 +67,16 @@ class ProfileDetailView(ProfileViewMixin):
 
 
 class ProfileAllContentView(ProfileViewMixin):
-    template_name = "streams/profile_all.html"
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["content_list"] = self._get_contents_queryset()
+        qs = self._get_contents_queryset()
+        context["content_list"] = qs[:30]
+        if self.object.user:
+            context["pinned_content_exists"] = qs.filter(pinned=True).exists()
+        else:
+            context["pinned_content_exists"] = False
         context["stream_name"] = "profile_all__%s" % self.kwargs.get("guid")
+        context["profile_stream_type"] = "all_content"
         return context
 
     def _get_contents_queryset(self):

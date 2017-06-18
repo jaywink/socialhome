@@ -1,7 +1,0 @@
-{% extends "streams/profile_base.html" %}
-{% load i18n %}
-
-{% block stream_description %}
-    <h2>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h2>
-    <a class="btn btn-success" href="{% url "users:profile-detail" guid=profile.guid %}">{% trans "View pinned content" %}</a>
-{% endblock %}
