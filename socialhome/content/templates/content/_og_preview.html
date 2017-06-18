@@ -1,20 +1,22 @@
 <a class="opengraph-card" href="{{ opengraph.url }}" target="_blank">
     <div class="card">
-        {% if opengraph.image %}
-            <div class="opengraph-card-image">
-                <img src="{{ opengraph.image }}">
+        <div class="card-block">
+            {% if opengraph.image %}
+                <div class="opengraph-card-image">
+                    <img src="{{ opengraph.image }}">
+                </div>
+            {% endif %}
+            <div class="opengraph-card-text">
+                <p class="card-text">
+                    {% if opengraph.title %}
+                        {{ opengraph.title }}
+                    {% endif %}
+                    {% if opengraph.description and opengraph.description != opengraph.title %}
+                        <br>{{ opengraph.description }}
+                    {% endif %}
+                </p>
             </div>
-        {% endif %}
-        <div class="opengraph-card-text">
-            <p class="card-text">
-                {% if opengraph.title %}
-                    {{ opengraph.title }}
-                {% endif %}
-                {% if opengraph.description and opengraph.description != opengraph.title %}
-                    <br>{{ opengraph.description }}
-                {% endif %}
-            </p>
+            <div class="clearfix"></div>
         </div>
-        <div class="clearfix"></div>
     </div>
 </a>
