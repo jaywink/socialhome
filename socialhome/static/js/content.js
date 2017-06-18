@@ -5,7 +5,7 @@
                 'data-content-id="<%= content.id %>">' +
             '<%= content.rendered %>' +
             '<% if (content.parent || stream !== "profile") { %>' +
-                '<div class="grid-item-author-bar">' +
+                '<div class="grid-item-author-bar mt-1">' +
                     '<div class="profile-box-trigger">' +
                         '<img src="<%= content.author_image %>" class="grid-item-author-bar-pic"> <%= content.author_name %>' +
                     '</div>' +
@@ -26,7 +26,7 @@
             '<% } %>' +
             '<div class="grid-item-bar">' +
                 '<div class="row">' +
-                    '<div class="col-xs-7">' +
+                    '<div class="col-7">' +
                         '<span class="grid-item-open-action" data-content-id="<%= content.id %>" ' +
                             'title="<%= content.formatted_timestamp %>"><%= content.humanized_timestamp %>' +
                         '</span>' +
@@ -38,7 +38,7 @@
                             '</span>' +
                         '<% } %>' +
                     '</div>' +
-                    '<div class="col-xs-5 text-xs-right grid-item-reactions">' +
+                    '<div class="col-5 text-right grid-item-reactions mt-1">' +
                         '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
                             '<div class="item-reaction">' +
                                 '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +

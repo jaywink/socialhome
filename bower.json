@@ -15,7 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "v4.0.0-alpha.5",
+    "bootstrap": "v4.0.0-alpha.6",
     "tether": "~1.4.0",
     "masonry": "~4.1.0",
     "imagesloaded": "~4.1.0",
@@ -31,6 +31,6 @@
     "mock-socket": "^2.0.2"
   },
   "resolutions": {
-    "bootstrap": "v4.0.0-alpha.5"
+    "bootstrap": "v4.0.0-alpha.6"
   }
 }
