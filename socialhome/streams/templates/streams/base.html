@@ -47,6 +47,7 @@
                                         <button class="follower-button btn btn-secondary {% if content.author.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ content.author.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
                                     {% endif %}
                                 </div>
+                                <div class="clearfix"></div>
                             </div>
                         </div>
                     {% endif %}

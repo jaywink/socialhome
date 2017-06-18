@@ -21,6 +21,7 @@
                                 '<button class="follower-button btn btn-secondary <% if (content.is_following_author) { %>hidden<% } %>" data-action="add_follower" data-profileid="<%= content.profile_id %>" data-target="<%= content.author_guid %>" title="' + gettext("Follow") + '" aria-label="' + gettext("Follow") + '"><i class="fa fa-plus"></i></button>' +
                             '<% } %>' +
                         '</div>' +
+                        '<div class="clearfix"></div>' +
                     '</div>' +
                 '</div>' +
             '<% } %>' +
