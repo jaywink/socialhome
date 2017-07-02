@@ -15,6 +15,8 @@ class AdminUserFactory(UserFactory):
     is_superuser = True
     is_staff = True
 
+    username = "admin"
+
 
 class ProfileFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
