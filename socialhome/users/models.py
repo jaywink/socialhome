@@ -142,26 +142,29 @@ class Profile(TimeStampedModel):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
 
-    @property
-    def safer_image_url_small(self):
-        """Return a most likely more working image_url_small for the profile.
+    def safer_image_url(self, size):
+        """Return a most likely more working image url for the profile.
 
         Some urls are proven to be relative to host instead of absolute urls.
         """
-        if self.image_url_small.startswith("/"):
+        attr = "image_url_%s" % size
+        if getattr(self, attr).startswith("/"):
             return "https://%s%s" % (
-                self.handle.split("@")[1], self.image_url_small,
+                self.handle.split("@")[1], getattr(self, attr),
             )
-        return self.image_url_small
+        return getattr(self, attr)
+
+    @property
+    def safer_image_url_small(self):
+        return self.safer_image_url("small")
+
+    @property
+    def safer_image_url_medium(self):
+        return self.safer_image_url("medium")
 
     @property
     def safer_image_url_large(self):
-        # TODO unify this and the small version to one helper
-        if self.image_url_large.startswith("/"):
-            return "https://%s%s" % (
-                self.handle.split("@")[1], self.image_url_large,
-            )
-        return self.image_url_large
+        return self.safer_image_url("large")
 
     @cached_property
     def following_ids(self):
