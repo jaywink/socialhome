@@ -6,7 +6,7 @@
 {% endblock %}{% endblock %}
 
 {% block stream_stamped %}
-    {% if profile == request.user.profile %}
+    {% if request.user.is_authenticated and profile == request.user.profile %}
         <div class="dropdown pull-right">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="profileMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-cog"></i>
@@ -18,6 +18,16 @@
                     <a class="dropdown-item" href="{% url "users:profile-organize" %}" title="{% trans "Organize profile content" %}" aria-label="{% trans "Organize profile content" %}"><i class="fa fa-arrows-v"></i> {% trans "Organize profile content" %}</a>
                 {% endif %}
             </div>
+        </div>
+    {% else %}
+        <div class="pull-right">
+            {% if not profile.user %}
+                <a href="{{ profile.home_url }}" class="btn btn-secondary" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+                <button class="follower-button btn btn-secondary {% if not profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                <button class="follower-button btn btn-secondary {% if profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
+            {% endif %}
         </div>
     {% endif %}
     <div class="d-inline-block">
