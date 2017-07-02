@@ -9,10 +9,10 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
-from socialhome.users.tests.factories import UserFactory, AdminUserFactory
+from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
 from socialhome.users.views import (
-    UserRedirectView, ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView
-)
+    UserRedirectView, ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView,
+    ProfileAllContentView)
 
 
 class BaseUserTestCase(TestCase):
@@ -318,3 +318,45 @@ class TestProfileVisibilityForLoggedInUsers:
         assert response.status_code == 200
         response = admin_client.get("/p/%s/" % user.profile.guid)
         assert response.status_code == 200
+
+
+class TestUserAllContentView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        Profile.objects.filter(user__username=cls.user.username).update(visibility=Visibility.PUBLIC)
+
+    def test_all_content_view_renders_right_view(self):
+        response = self.get("users:all-content", username=self.user.username)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context_data.get("view").__class__, ProfileAllContentView)
+        self.assertEqual(response.context_data.get("object"), self.user.profile)
+
+
+class TestProfileAllContentView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        Profile.objects.filter(user__username=cls.user.username).update(visibility=Visibility.PUBLIC)
+        cls.user_content = ContentFactory(author=cls.user.profile, visibility=Visibility.PUBLIC)
+        cls.profile = ProfileFactory(visibility=Visibility.PUBLIC)
+        cls.profile_content = ContentFactory(author=cls.profile, visibility=Visibility.PUBLIC)
+
+    def test_renders_for_user(self):
+        response = self.get("users:profile-all-content", guid=self.user.profile.guid)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context_data.get("pinned_content_exists"))
+        ContentFactory(author=self.user.profile, pinned=True, visibility=Visibility.PUBLIC)
+        response = self.get("users:profile-all-content", guid=self.user.profile.guid)
+        self.assertTrue(response.context_data.get("pinned_content_exists"))
+        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.user.profile.guid)
+        self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
+
+    def test_renders_for_remote_profile(self):
+        response = self.get("users:profile-all-content", guid=self.profile.guid)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context_data.get("pinned_content_exists"))
+        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.profile.guid)
+        self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")

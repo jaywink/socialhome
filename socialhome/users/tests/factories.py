@@ -27,5 +27,10 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     rsa_private_key = fuzzy.FuzzyText()
     rsa_public_key = fuzzy.FuzzyText()
 
+    # Dummy image urls
+    image_url_small = "https://127.0.0.1:8000/foo/small.png"
+    image_url_medium = "https://127.0.0.1:8000/foo/medium.png"
+    image_url_large = "/foo/large.png"
+
     class Meta:
         model = "users.Profile"

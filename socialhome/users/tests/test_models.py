@@ -67,7 +67,7 @@ class TestProfile():
         assert profile.remote_url == "https://example.com/people/1234"
 
     def test_get_image_urls_returns_ponies(self):
-        profile = ProfileFactory(guid="1234")
+        profile = ProfileFactory(guid="1234", image_url_small="", image_url_medium="", image_url_large="")
         ponies = get_pony_urls()
         urls = profile.get_image_urls()
         assert urls == ponies
