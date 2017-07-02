@@ -54,8 +54,12 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         if not profile.visible_to_user(user):
             return Content.objects.none()
-        qs = self.top_level()._select_related().visible_for_user(user).filter(pinned=True, author=profile)
-        return qs.order_by("order")
+        qs = self.top_level()._select_related().visible_for_user(user).filter(author=profile)
+        return qs.order_by("-created")
+
+    def profile_pinned(self, guid, user):
+        """Get profile content user has chosen to pin on profile."""
+        return self.profile(guid, user).filter(pinned=True).order_by("order")
 
     def children(self, parent_id, user):
         return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("created")

@@ -69,7 +69,7 @@ $(function () {
             // Add a clickable card element above the hidden image to show it
             $(".nsfw:not('.nsfw-shield-on')").each(function() {
               $(this).addClass("nsfw-shield-on").before(
-                  $('<div class="card card-block text-xs-center nsfw-shield">' +
+                  $('<div class="card card-block text-center nsfw-shield">' +
                       '<p class="card-text">[' + gettext("show NSFW image") + ']</p></div>')
               );
             });

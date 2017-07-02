@@ -14,10 +14,32 @@
   color: $red;
 }
 
-// This is a fix for the bootstrap4 alpha release
-@media (max-width: 47.9em) {
-  .navbar-collapse-fix {
-    clear: both;
+// Navbar
+.navbar {
+  #{$a-tags} {
+    color: $white;
+  }
+
+  .dropdown-menu {
+    #{$a-tags} {
+      color: $dark;
+    }
+    a:active {
+      background-color: unset;
+    }
+    border-radius: unset;
+  }
+}
+
+.nav-item.show {
+  .dropdown-menu {
+    display: inline-block;
+  }
+}
+
+@media all and (max-width: $mediumDevice) {
+  .navbar-container {
+    width: 100%;
   }
 }
 
@@ -50,7 +72,7 @@ body {
 
 // Main container
 .main-container {
-  margin-top: 60px;
+  margin-top: 55px;
 }
 @media all and (max-width: $mediumDevice) {
   .main-container {
@@ -73,7 +95,7 @@ body {
   }
 }
 
-// Lose the rounding on buttons
-.btn {
+// Lose the rounding on various things
+.btn, .card {
   border-radius: unset;
 }

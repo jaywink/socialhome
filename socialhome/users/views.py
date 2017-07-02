@@ -19,10 +19,20 @@ class UserDetailView(DetailView):
         return ProfileDetailView.as_view()(request, guid=profile.guid)
 
 
+class UserAllContentView(UserDetailView):
+    def get(self, request, *args, **kwargs):
+        """Render ProfileDetailView for this user."""
+        profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
+        return ProfileAllContentView.as_view()(request, guid=profile.guid)
+
+
 class ProfileViewMixin(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
+    template_name = "streams/profile.html"
+    target_profile = None
+    content_list = None
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -38,12 +48,36 @@ class ProfileViewMixin(AccessMixin, DetailView):
 
 
 class ProfileDetailView(ProfileViewMixin):
-    template_name = "streams/profile.html"
+    def dispatch(self, request, *args, **kwargs):
+        """Ensure we have pinned content. If not, render all content instead."""
+        self.content_list = self._get_contents_queryset()
+        if not self.content_list.exists():
+            return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        context["content_list"] = self._get_contents_queryset()
+        context = super().get_context_data(**kwargs)
+        context["content_list"] = self.content_list
+        context["pinned_content_exists"] = True
         context["stream_name"] = "profile__%s" % self.kwargs.get("guid")
+        context["profile_stream_type"] = "pinned"
+        return context
+
+    def _get_contents_queryset(self):
+        return Content.objects.profile_pinned(self.kwargs.get("guid"), self.request.user)
+
+
+class ProfileAllContentView(ProfileViewMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs = self._get_contents_queryset()
+        context["content_list"] = qs[:30]
+        if self.object.user:
+            context["pinned_content_exists"] = qs.filter(pinned=True).exists()
+        else:
+            context["pinned_content_exists"] = False
+        context["stream_name"] = "profile_all__%s" % self.kwargs.get("guid")
+        context["profile_stream_type"] = "all_content"
         return context
 
     def _get_contents_queryset(self):
@@ -60,7 +94,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
     def dispatch(self, request, *args, **kwargs):
         """User current user."""
         self.kwargs.update({"guid": request.user.profile.guid})
-        return super(OrganizeContentProfileDetailView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""
@@ -73,9 +107,9 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
         qs_ids = self._get_contents_queryset().values_list("id", flat=True)
         for i in range(0, len(card_ids)):
             # Only allow updating cards that are in our qs
-            id = int(card_ids[i])
-            if id in qs_ids:
-                Content.objects.filter(id=id).update(order=i)
+            card_id = int(card_ids[i])
+            if card_id in qs_ids:
+                Content.objects.filter(id=card_id).update(order=i)
 
     def get_success_url(self):
         return reverse("home")

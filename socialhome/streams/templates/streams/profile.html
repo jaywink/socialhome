@@ -1,22 +1,49 @@
 {% extends "streams/base.html" %}
 {% load i18n %}
 
-{% block title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
+{% block title %}{% block stream_title %}
+    {% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}
+{% endblock %}{% endblock %}
 
-{% block stream_description %}
-    <h2>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h2>
-{% endblock %}
-
-{% block stream_title %}{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}{% endblock %}
-
-{% block stream_actions %}
-    {% if profile == request.user.profile %}
-        <div class="stamped">
-            <a class="btn btn-primary" href="{% url 'users:profile-update' %}">{% trans "Settings" %}</a>
-            <a class="btn btn-primary" href="{% url 'account_email' %}">{% trans "Email" %}</a>
-            {% if content_list %}
-                <a class="btn btn-primary" href="{% url 'users:profile-organize' %}">{% trans "Organize profile content" %}</a>
+{% block stream_stamped %}
+    {% if request.user.is_authenticated and profile == request.user.profile %}
+        <div class="dropdown pull-right">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="profileMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-cog"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenuButton">
+                <a class="dropdown-item" href="{% url "users:profile-update" %}" title="{% trans "Settings" %}" aria-label="{% trans "Settings" %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
+                <a class="dropdown-item" href="{% url "account_email" %}" title="{% trans "Email" %}" aria-label="{% trans "Email" %}"><i class="fa fa-envelope"></i> {% trans "Email" %}</a>
+                {% if content_list %}
+                    <a class="dropdown-item" href="{% url "users:profile-organize" %}" title="{% trans "Organize profile content" %}" aria-label="{% trans "Organize profile content" %}"><i class="fa fa-arrows-v"></i> {% trans "Organize profile content" %}</a>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="pull-right">
+            {% if not profile.user %}
+                <a href="{{ profile.home_url }}" class="btn btn-secondary" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+                <button class="follower-button btn btn-secondary {% if not profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                <button class="follower-button btn btn-secondary {% if profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
             {% endif %}
         </div>
     {% endif %}
+    <div class="d-inline-block">
+        {% if profile.safer_image_url_large %}
+            <img class="profile-stream-stamped-image" src="{{ profile.safer_image_url_large }}">
+        {% endif %}
+    </div>
+    <div class="d-inline-block ml-3 align-center stamped-profile-info">
+        <h1>{% if profile.name %}{{ profile.name }}{% else %}{{ profile.guid }}{% endif %}</h1>
+        <h3><cite title="{% trans "User handle on The Federation" %}">{{ profile.handle }}</cite></h3>
+    </div>
+    <div class="text-center">
+        {% if pinned_content_exists %}
+            <a class="btn btn-{% if profile_stream_type == "pinned" %}primary{% else %}secondary{% endif %}" href="{% url "users:profile-detail" guid=profile.guid %}">{% trans "Pinned content" %}</a>
+        {% endif %}
+        <a class="btn btn-{% if profile_stream_type == "all_content" %}primary{% else %}secondary{% endif %}" href="{% url "users:profile-all-content" guid=profile.guid %}">{% trans "All content" %}</a>
+    </div>
+    <div class="clearfix"></div>
 {% endblock %}

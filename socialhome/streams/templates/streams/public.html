@@ -1,11 +1,11 @@
 {% extends "streams/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Public" %}{% endblock %}
+{% block title %}{% block stream_title %}
+    {% trans "Public" %}
+{% endblock %}{% endblock %}
 
-{% block stream_description %}
+{% block stream_stamped %}
     <h2>{% trans "Public" %}</h2>
     <p>{% trans "Contains public content from around the network." %}</p>
 {% endblock %}
-
-{% block stream_title %}{% trans "Public" %}{% endblock %}

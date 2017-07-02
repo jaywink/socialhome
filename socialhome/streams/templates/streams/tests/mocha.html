@@ -11,7 +11,7 @@
     <div class="container">
         <div id="new-content-container" class="hidden">
             <a href="" id="new-content-load-link" onclick="return false;">
-                <span class="tag tag-pill tag-primary"><span id="new-content-count">0</span> new posts available</span>
+                <span class="badge badge-pill badge-primary"><span id="new-content-count">0</span> new posts available</span>
             </a>
         </div>
     </div>
@@ -24,17 +24,17 @@
                 <div class="grid-sizer"></div>
                 <div class="grid-item" data-content-id="1">
                     <p>Foo Bar</p>
-                    <div class="grid-item-author-bar">
+                    <div class="grid-item-author-bar mt-1">
                         <div class="profile-box-trigger">
                             <img src="{% static "images/pony100.png" %}" class="grid-item-author-bar-pic"> Dummy Author
                         </div>
                     </div>
                     <div class="grid-item-bar">
                         <div class="row">
-                            <div class="col-xs-6">
+                            <div class="col-9">
                                 <span class="grid-item-open-action" data-content-id="1" title="2017-03-14 22:04:00+00:00">2 hours ago</span>
                             </div>
-                             <div class="col-xs-6 text-xs-right grid-item-reactions">
+                             <div class="col-3 text-right grid-item-reactions mt-1">
                                 <div class="item-reaction">
                                     <span class="item-open-replies-action" data-content-id="1">
                                         <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
@@ -52,17 +52,17 @@
                 <div class="grid-item" data-content-id="2">
                     <p>#nsfw<</p>
                     <p><img id="nsfw-content" class="nsfw" src="{% static "images/pony100.png" %}"></p>
-                    <div class="grid-item-author-bar">
+                    <div class="grid-item-author-bar mt-1">
                         <div class="profile-box-trigger">
                             <img src="{% static "images/pony100.png" %}" class="grid-item-author-bar-pic"> Dummy Author
                         </div>
                     </div>
                     <div class="grid-item-bar">
                         <div class="row">
-                            <div class="col-xs-6">
+                            <div class="col-9">
                                 <span class="grid-item-open-action" data-content-id="2" title="2017-03-14 21:04:00+00:00">3 hours ago (edited)</span>
                             </div>
-                             <div class="col-xs-6 text-xs-right grid-item-reactions">
+                             <div class="col-3 text-right grid-item-reactions mt-1">
                                 <div class="item-reaction">
                                     <span class="item-open-replies-action" data-content-id="1">
                                         <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
@@ -93,7 +93,7 @@
                 <div id="content-body" class="modal-body"></div>
                 <div class="content-bar">
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-6">
                             <span id="content-timestamp" title=""></span>
                             <span id="content-bar-actions" class="hidden">
                                 &nbsp;
@@ -101,7 +101,7 @@
                                 <a id="content-delete-link" href=""><i class="fa fa-remove" title="Delete" aria-label="Delete"></i></a>
                             </span>
                         </div>
-                        <div class="col-xs-6 text-xs-right grid-item-reactions">
+                        <div class="col-6 text-right grid-item-reactions mt-1">
                             <div class="item-reaction">
                                 <span><i class="fa fa-envelope"></i></span>&nbsp;
                                 <span class="item-reaction-counter" id="content-reply-count"></span>

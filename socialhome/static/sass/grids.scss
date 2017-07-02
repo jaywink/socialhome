@@ -1,6 +1,6 @@
 @import "variables";
 
-.grid-item, .stamped {
+.grid-item {
   background-color: $light;
   color: $dark;
   overflow: hidden;
@@ -48,51 +48,57 @@
   }
 }
 
-.stamped {
-  position: relative;
-  top: 10px;
-}
-@media all and (min-width: $mediumDevice) {
-  .stamped {
-    top: 11px;
-  }
-}
-@media all and (min-width: $largeDevice) {
-  .stamped {
-    top: 15px;
-  }
-}
-@media all and (min-width: $extraLargeDevice) {
-  .stamped {
-    top: 16px;
-  }
-}
-
 // Responsive grid sizes
 .grid-sizer,
-.grid-item, .stamped {
+.grid-item {
   width: 100%;
   padding: 2%;
-  margin-top: 1%;
+  margin-top: 10px;
 }
 @media all and (min-width: $mediumDevice) {
   .grid-sizer,
-  .grid-item, .stamped {
+  .grid-item {
     width: 49.5%;
     padding: 1%;
   }
 }
 @media all and (min-width: $largeDevice) {
   .grid-sizer,
-  .grid-item, .stamped {
+  .grid-item {
     width: 32.6%;
     padding: 1%;
   }
 }
 @media all and (min-width: $extraLargeDevice) {
   .grid-sizer,
-  .grid-item, .stamped {
+  .grid-item {
     width: 24.2%;
+    padding: 0.5%;
+  }
+}
+
+// Stamped element centered on top
+.stamped {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 10px;
+  padding: 2%;
+  overflow: visible;
+  background-color: $light;
+  color: $dark;
+}
+@media all and (min-width: $largeDevice) {
+  .stamped {
+    left: 0;
+    width: 66.2%;
+    padding: 1%;
+  }
+}
+@media all and (min-width: $extraLargeDevice) {
+  .stamped {
+    left: 25.2%;
+    width: 49.4%;
     padding: 0.5%;
   }
 }
