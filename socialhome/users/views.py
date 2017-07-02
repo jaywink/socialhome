@@ -26,12 +26,13 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, guid=profile.guid)
 
 
-
 class ProfileViewMixin(AccessMixin, DetailView):
     model = Profile
     slug_field = "guid"
     slug_url_kwarg = "guid"
     template_name = "streams/profile.html"
+    target_profile = None
+    content_list = None
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -106,9 +107,9 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
         qs_ids = self._get_contents_queryset().values_list("id", flat=True)
         for i in range(0, len(card_ids)):
             # Only allow updating cards that are in our qs
-            id = int(card_ids[i])
-            if id in qs_ids:
-                Content.objects.filter(id=id).update(order=i)
+            card_id = int(card_ids[i])
+            if card_id in qs_ids:
+                Content.objects.filter(id=card_id).update(order=i)
 
     def get_success_url(self):
         return reverse("home")

@@ -19,7 +19,7 @@ class TestRootProfile(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
-        cls.admin_user = AdminUserFactory(username="admin")
+        cls.admin_user = AdminUserFactory()
 
     @override_settings(SOCIALHOME_ROOT_PROFILE=None)
     def test_home_view_rendered_without_root_profile(self):
