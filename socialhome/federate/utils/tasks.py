@@ -16,10 +16,10 @@ logger = logging.getLogger("socialhome")
 def get_sender_profile(sender):
     """Get or create sender profile.
 
-    Fetch it from federation layer if necessary.
+    Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
     try:
-        sender_profile = Profile.objects.get(handle=sender)
+        sender_profile = Profile.objects.exclude(rsa_public_key="").get(handle=sender)
     except Profile.DoesNotExist:
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
