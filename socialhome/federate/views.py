@@ -157,7 +157,12 @@ class ReceivePublicView(View):
 class ReceiveUserView(View):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
-        payload = request.POST.get("xml")
+        if request.content_type == "application/json":
+            # New style
+            payload = request.body
+        else:
+            # Legacy
+            payload = request.POST.get("xml")
         if not payload:
             return HttpResponseBadRequest()
         guid = kwargs.get("guid")
