@@ -72,8 +72,15 @@ class TestReceivePublic(object):
 
 @pytest.mark.usefixtures("db", "client")
 class TestReceiveUser(object):
-    def test_receive_user_responds(self, client):
+    def test_receive_user_responds_for_xml_payload(self, client):
         response = client.post(reverse("federate:receive-user", kwargs={"guid": "1234"}), {"xml": "foo"})
+        assert response.status_code == 202
+
+    def test_receive_user_responds_for_json_payload(self, client):
+        response = client.post(
+            reverse("federate:receive-user", kwargs={"guid": "1234"}), data='{"foo": "bar"}',
+            content_type="application/json",
+        )
         assert response.status_code == 202
 
     def test_receive_user_returns_bad_request_if_no_payload(self, client):
