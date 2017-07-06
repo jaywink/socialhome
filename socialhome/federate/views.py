@@ -59,16 +59,15 @@ def hcard_view(request, guid):
         profile = get_object_or_404(Profile, guid=guid, user__isnull=False)
     except ValueError:
         raise Http404()
-    photo300, photo100, photo50 = profile.get_image_urls()
     hcard = generate_hcard(
         "diaspora",
         hostname=settings.SOCIALHOME_URL,
         fullname=profile.name,
         firstname=profile.get_first_name(),
         lastname=profile.get_last_name(),
-        photo300=photo300,
-        photo100=photo100,
-        photo50=photo50,
+        photo300=profile.safer_image_url_large,
+        photo100=profile.safer_image_url_medium,
+        photo50=profile.safer_image_url_small,
         searchable="true" if profile.public else "false",
         guid=profile.guid,
         username=profile.user.username,

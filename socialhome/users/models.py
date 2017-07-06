@@ -208,13 +208,6 @@ class Profile(TimeStampedModel):
                 return ""
         return ""
 
-    def get_image_urls(self):
-        """Get profile image urls or ponies, if none."""
-        if self.image_url_large and self.image_url_medium and self.image_url_small:
-            return self.image_url_large, self.image_url_medium, self.image_url_small
-        # Ponies are nice
-        return get_pony_urls()
-
     @staticmethod
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
