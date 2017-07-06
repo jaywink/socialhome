@@ -90,7 +90,7 @@ class Profile(TimeStampedModel):
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
 
     # Following
-    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers")
+    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
 
     objects = ProfileQuerySet.as_manager()
 
