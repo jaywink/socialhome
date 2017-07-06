@@ -21,6 +21,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.self_tags_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, text="#foobar")
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
+        cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
 
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
@@ -43,6 +44,12 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_tags_content, self.site_tags_content})
         contents = set(Content.objects.tags("foobar", self.self_content.author.user))
         self.assertEqual(contents, {self.public_tags_content, self.site_tags_content, self.self_tags_content})
+
+    def test_followed(self):
+        contents = set(Content.objects.followed(self.other_user))
+        self.assertEqual(contents, {self.public_content})
+        contents = set(Content.objects.followed(self.self_user))
+        self.assertEqual(contents, set())
 
     def _set_profiles_public(self):
         Profile.objects.filter(id=self.public_content.author_id).update(visibility=Visibility.PUBLIC)

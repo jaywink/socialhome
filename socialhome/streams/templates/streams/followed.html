@@ -1,0 +1,11 @@
+{% extends "streams/base.html" %}
+{% load i18n %}
+
+{% block title %}{% block stream_title %}
+    {% trans "Followed" %}
+{% endblock %}{% endblock %}
+
+{% block stream_stamped %}
+    <h2>{% trans "Followed" %}</h2>
+    <p>{% trans "Content from followed users." %}</p>
+{% endblock %}

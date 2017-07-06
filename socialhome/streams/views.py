@@ -1,3 +1,4 @@
+from braces.views import LoginRequiredMixin
 from django.views.generic import ListView
 
 from socialhome.content.models import Content
@@ -36,3 +37,14 @@ class TagStreamView(BaseStreamView):
         context = super().get_context_data(**kwargs)
         context["tag_name"] = self.kwargs.get("name")
         return context
+
+
+class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
+    template_name = "streams/followed.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.stream_name = "followed__%s" % request.user.username
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Content.objects.followed(self.request.user)

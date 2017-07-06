@@ -30,6 +30,8 @@ class StreamConsumer(WebsocketConsumer):
         stream_info = self.kwargs.get("stream").split("__")
         if stream_info[0] == "public":
             return Content.objects.public()
+        elif stream_info[0] == "followed":
+            return Content.objects.followed(self.message.user)
         elif stream_info[0] == "tags":
             return Content.objects.tags(stream_info[1], self.message.user)
         elif stream_info[0] == "profile":

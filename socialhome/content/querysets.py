@@ -42,6 +42,11 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         return self.top_level()._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
 
+    def followed(self, user):
+        qs = self.top_level()._select_related().visible_for_user(user)
+        qs = qs.filter(author_id__in=user.profile.following.values_list("id", flat=True))
+        return qs.order_by("-created")
+
     def profile(self, guid, user):
         """Filter for a user profile.
 
