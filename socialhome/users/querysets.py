@@ -11,3 +11,7 @@ class ProfileQuerySet(QuerySet):
             return self
         # TODO: handle also LIMITED when contacts implemented
         return self.filter(Q(id=user.profile.id) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]))
+
+    def followers(self, profile):
+        """Return followers of a Profile."""
+        return self.filter(following=profile)

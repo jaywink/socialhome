@@ -1,6 +1,7 @@
-import pytest
+from django.test import override_settings
 from test_plus.test import TestCase
 
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 from socialhome.users.utils import get_pony_urls
 
@@ -41,8 +42,7 @@ class TestUser(TestCase):
         assert self.user.get_last_name() == ""
 
 
-@pytest.mark.usefixtures("db")
-class TestProfile():
+class TestProfile(SocialhomeTestCase):
     def test_generate_new_rsa_key(self):
         profile = ProfileFactory()
         current_rsa_key = profile.rsa_private_key
@@ -66,26 +66,18 @@ class TestProfile():
         profile = ProfileFactory(guid="1234")
         assert profile.remote_url == "https://example.com/people/1234"
 
-    def test_get_image_urls_returns_ponies(self):
+    def test_profile_image_urls_default_to_ponies(self):
         profile = ProfileFactory(guid="1234", image_url_small="", image_url_medium="", image_url_large="")
         ponies = get_pony_urls()
-        urls = profile.get_image_urls()
-        assert urls == ponies
-
-    def test_get_image_urls_returns_urls(self):
-        profile = ProfileFactory(
-            guid="1234", image_url_large="large", image_url_medium="medium", image_url_small="small"
-        )
-        urls = profile.get_image_urls()
-        assert urls == ("large", "medium", "small")
+        urls = [profile.image_url_large, profile.image_url_medium, profile.image_url_small]
+        self.assertEqual(urls, ponies)
 
     def test___str__(self):
         profile = ProfileFactory(name="foo", handle="foo@example.com")
         assert str(profile) == "foo (foo@example.com)"
 
-    @pytest.mark.usefixtures("settings")
-    def test_key_properties(self, settings):
-        settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = True
+    @override_settings(SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE=True)
+    def test_key_properties(self):
         user = UserFactory()
         assert user.profile.private_key
         assert user.profile.key

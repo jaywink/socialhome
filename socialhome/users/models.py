@@ -90,7 +90,7 @@ class Profile(TimeStampedModel):
     nsfw = models.BooleanField(_("NSFW"), default=False, help_text=_("Should users content be considered NSFW?"))
 
     # Following
-    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers")
+    following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
 
     objects = ProfileQuerySet.as_manager()
 
@@ -99,6 +99,15 @@ class Profile(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
+
+    def save(self, *args, **kwargs):
+        """Set default pony images if image urls are empty."""
+        if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
+            ponies = get_pony_urls()
+            for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
+                if not getattr(self, attr, None):
+                    setattr(self, attr, ponies[idx])
+        super().save(*args, **kwargs)
 
     @property
     def home_url(self):
@@ -198,13 +207,6 @@ class Profile(TimeStampedModel):
             except IndexError:
                 return ""
         return ""
-
-    def get_image_urls(self):
-        """Get profile image urls or ponies, if none."""
-        if self.image_url_large and self.image_url_medium and self.image_url_small:
-            return self.image_url_large, self.image_url_medium, self.image_url_small
-        # Ponies are nice
-        return get_pony_urls()
 
     @staticmethod
     def from_remote_profile(remote_profile):

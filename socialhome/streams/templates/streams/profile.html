@@ -6,30 +6,46 @@
 {% endblock %}{% endblock %}
 
 {% block stream_stamped %}
-    {% if request.user.is_authenticated and profile == request.user.profile %}
-        <div class="dropdown pull-right">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="profileMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-cog"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenuButton">
-                <a class="dropdown-item" href="{% url "users:profile-update" %}" title="{% trans "Settings" %}" aria-label="{% trans "Settings" %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
-                <a class="dropdown-item" href="{% url "account_email" %}" title="{% trans "Email" %}" aria-label="{% trans "Email" %}"><i class="fa fa-envelope"></i> {% trans "Email" %}</a>
-                {% if content_list %}
-                    <a class="dropdown-item" href="{% url "users:profile-organize" %}" title="{% trans "Organize profile content" %}" aria-label="{% trans "Organize profile content" %}"><i class="fa fa-arrows-v"></i> {% trans "Organize profile content" %}</a>
+    <div class="pull-right">
+        {% if request.user.is_authenticated and profile == request.user.profile %}
+            <div class="dropdown text-right">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="profileMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-cog"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenuButton">
+                    <a class="dropdown-item" href="{% url "users:profile-update" %}" title="{% trans "Settings" %}" aria-label="{% trans "Settings" %}"><i class="fa fa-cog"></i> {% trans "Settings" %}</a>
+                    <a class="dropdown-item" href="{% url "account_email" %}" title="{% trans "Email" %}" aria-label="{% trans "Email" %}"><i class="fa fa-envelope"></i> {% trans "Email" %}</a>
+                    {% if content_list %}
+                        <a class="dropdown-item" href="{% url "users:profile-organize" %}" title="{% trans "Organize profile content" %}" aria-label="{% trans "Organize profile content" %}"><i class="fa fa-arrows-v"></i> {% trans "Organize profile content" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mt-1">
+                <a class="btn btn-secondary" href="#" title="{% trans "Following" %}" aria-label="{% trans "Following" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> {{ profile.following.count }}</a>
+            </div>
+            <div class="mt-1">
+                <a class="btn btn-secondary" href="#" title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-left"></i> {{ followers_count }}</a>
+            </div>
+        {% else %}
+            <div class="text-right">
+                {% if not profile.user %}
+                    <a href="{{ profile.home_url }}" class="btn btn-secondary" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                    <button class="follower-button btn btn-secondary {% if not profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                    <button class="follower-button btn btn-secondary {% if profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
                 {% endif %}
             </div>
-        </div>
-    {% else %}
-        <div class="pull-right">
-            {% if not profile.user %}
-                <a href="{{ profile.home_url }}" class="btn btn-secondary" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
+            {% if profile.user %}
+                <div class="mt-1 text-right">
+                    <span title="{% trans "Following" %}" aria-label="{% trans "Following" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> {{ profile.following.count }}</span>
+                </div>
+                <div class="mt-1">
+                    <span title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-left"></i> {{ followers_count }}</span>
+                </div>
             {% endif %}
-            {% if request.user.is_authenticated %}
-                <button class="follower-button btn btn-secondary {% if not profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
-                <button class="follower-button btn btn-secondary {% if profile.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ profile.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
-            {% endif %}
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
     <div class="d-inline-block">
         {% if profile.safer_image_url_large %}
             <img class="profile-stream-stamped-image" src="{{ profile.safer_image_url_large }}">
