@@ -1,46 +1,17 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.test.client import Client
 
-from socialhome.enums import Visibility
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
+from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import UserFactory, AdminUserFactory
-
-
-class TestRootProfile(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.user = UserFactory()
-        cls.admin_user = AdminUserFactory()
-
-    @override_settings(SOCIALHOME_ROOT_PROFILE=None)
-    def test_home_view_rendered_without_root_profile(self):
-        response = self.client.get("/")
-        assert response.templates[0].name == "pages/home.html"
-
-    @override_settings(SOCIALHOME_ROOT_PROFILE=None)
-    def test_logged_in_profile_view_rendered_without_root_profile(self):
-        with self.login(username=self.user.username):
-            response = self.client.get("/")
-        assert response.templates[0].name == "streams/profile.html"
-        assert response.context["profile"].user.username == self.user.username
-
-    @override_settings(SOCIALHOME_ROOT_PROFILE="admin")
-    def test_home_view_rendered_with_root_profile(self):
-        # Set admin profile visibility, otherwise it will just redirect to login
-        Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
-        with self.login(username=self.admin_user.username):
-            response = self.client.get("/")
-        assert response.templates[0].name == "streams/profile.html"
-        assert response.context["profile"].user.username == "admin"
+from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("admin_client", "rf")

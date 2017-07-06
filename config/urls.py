@@ -8,7 +8,7 @@ from django.views.i18n import javascript_catalog
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from socialhome.content.views import HomeView
+from socialhome.views import HomeView
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 js_translations = {

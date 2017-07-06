@@ -1,17 +1,14 @@
 from urllib.parse import quote_plus
 
 from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.users.models import Profile
-from socialhome.users.views import ProfileDetailView
 
 
 class ContentVisibleForUserMixin(UserPassesTestMixin):
@@ -113,16 +110,3 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
         context = super().get_context_data(**kwargs)
         context["stream_name"] = quote_plus(self.object.guid)
         return context
-
-
-class HomeView(TemplateView):
-    template_name = "pages/home.html"
-
-    def get(self, request, *args, **kwargs):
-        """Redirect to user detail view if root page is a profile or if the user is logged in"""
-        if request.user.is_authenticated:
-            return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
-        if settings.SOCIALHOME_ROOT_PROFILE:
-            profile = get_object_or_404(Profile, user__username=settings.SOCIALHOME_ROOT_PROFILE)
-            return ProfileDetailView.as_view()(request, guid=profile.guid)
-        return super(HomeView, self).get(request, *args, **kwargs)
