@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Preferences" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Preferences" %}</h1>
+    <form action="" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Back to profile" %}</a>
+        <input type="submit" class="btn btn-primary" value="{% trans "Submit" %}" />
+    </form>
+{% endblock %}

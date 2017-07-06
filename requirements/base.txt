@@ -72,3 +72,6 @@ ipython
 
 # API
 djangorestframework==3.6.3
+
+# User settings
+django-dynamic-preferences==1.2

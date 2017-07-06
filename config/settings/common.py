@@ -23,31 +23,28 @@ env.read_env("env.local")
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
-    # Default Django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Admin
     "django.contrib.admin",
 )
 THIRD_PARTY_APPS = (
-    "crispy_forms",  # Form layouts
-    "allauth",  # registration
-    "allauth.account",  # registration
-    "allauth.socialaccount",  # registration
+    "crispy_forms",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "markdownx",
-    "django_extensions",  # Generic helpers for administration
+    "django_extensions",
     "channels",
     "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
+    "dynamic_preferences",
+    "dynamic_preferences.users.apps.UserPreferencesConfig",
 )
-
-# Apps specific for this project go here.
 LOCAL_APPS = (
     "socialhome",
     "socialhome.users",
@@ -56,7 +53,6 @@ LOCAL_APPS = (
     "socialhome.streams",
 )
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
@@ -165,6 +161,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
+                "dynamic_preferences.processors.global_preferences",
             ],
         },
     },
@@ -400,4 +397,17 @@ REST_FRAMEWORK = {
         "user": "30/minute",
     },
     "DEFAULT_VERSION": "0.1",
+}
+
+# DYNAMIC PREFERENCES
+# -------------------
+DYNAMIC_PREFERENCES = {
+    # The python module in which registered preferences will be searched within each app
+    "REGISTRY_MODULE": "preferences",
+
+    # Use this to disable caching of preference. This can be useful to debug things
+    "ENABLE_CACHE": True,
+
+    # Use this to disable checking preferences names. This can be useful to debug things
+    "VALIDATE_NAMES": True,
 }
