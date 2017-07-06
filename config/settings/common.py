@@ -161,7 +161,6 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
-                "dynamic_preferences.processors.global_preferences",
             ],
         },
     },
