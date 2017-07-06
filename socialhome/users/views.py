@@ -46,6 +46,11 @@ class ProfileViewMixin(AccessMixin, DetailView):
             self.raise_exception = True
         return self.handle_no_permission()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["followers_count"] = Profile.objects.followers(self.object).count()
+        return context
+
 
 class ProfileDetailView(ProfileViewMixin):
     def dispatch(self, request, *args, **kwargs):
