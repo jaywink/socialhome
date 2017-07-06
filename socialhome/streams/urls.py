@@ -1,8 +1,9 @@
 from django.conf.urls import url
 
-from socialhome.streams.views import PublicStreamView, TagStreamView
+from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView
 
 urlpatterns = [
+    url(r"^followed/$", FollowedStreamView.as_view(), name="followed"),
     url(r"^public/$", PublicStreamView.as_view(), name="public"),
     url(r"^tags/(?P<name>[\w-]+)/$", TagStreamView.as_view(), name="tags"),
 ]

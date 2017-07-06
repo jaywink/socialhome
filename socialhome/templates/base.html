@@ -38,6 +38,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" id="navbar-streams" href="#">{% trans "Streams" %}</a>
                         <div class="dropdown-menu" aria-labelledby="navbar-streams">
+                            <a class="dropdown-item" href="{% url 'streams:followed' %}">{% trans "Followed" %}</a>
                             <a class="dropdown-item" href="{% url 'streams:public' %}">{% trans "Public" %}</a>
                         </div>
                     </li>
