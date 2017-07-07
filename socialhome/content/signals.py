@@ -12,6 +12,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
 from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.streams.consumers import StreamConsumer
+from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
 
@@ -55,12 +56,24 @@ def render_content(content):
 
 def notify_listeners(content):
     """Send out to listening consumers."""
-    # TODO: add sending for tags, content and user profile streams
-    if content.visibility == Visibility.PUBLIC and not content.parent:
-        StreamConsumer.group_send("streams_public", json.dumps({
-            "event": "new",
-            "id": content.id,
-        }))
+    data = json.dumps({"event": "new", "id": content.id})
+    if content.parent:
+        # Content comments
+        StreamConsumer.group_send("streams_content__%s" % content.parent.guid, data)
+    else:
+        # Public stream
+        if content.visibility == Visibility.PUBLIC:
+            StreamConsumer.group_send("streams_public", data)
+        # Tag streams
+        for tag in content.tags.values_list("name", flat=True):
+            StreamConsumer.group_send("streams_tags__%s" % tag, data)
+        # Profile streams
+        StreamConsumer.group_send("streams_profile__%s" % content.author.guid, data)
+        StreamConsumer.group_send("streams_profile_all__%s" % content.author.guid, data)
+        # Followed stream
+        followed_qs = Profile.objects.followers(content.author).filter(user__isnull=False)
+        for username in followed_qs.values_list("user__username", flat=True):
+            StreamConsumer.group_send("streams_followed__%s" % username, data)
 
 
 def federate_content(content):

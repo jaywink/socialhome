@@ -5,19 +5,60 @@ from django.test import TransactionTestCase
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
+from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
 from socialhome.notifications.tasks import send_reply_notifications
-from socialhome.users.tests.factories import UserFactory
+from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-class TestNotifyListeners(TestCase):
+class TestNotifyListeners(SocialhomeTestCase):
     @patch("socialhome.content.signals.StreamConsumer")
     def test_content_save_calls_streamconsumer_group_send(self, mock_consumer):
         mock_consumer.group_send = Mock()
+        # Public post no tags or followers
         content = ContentFactory()
-        mock_consumer.group_send.assert_called_once_with(
-            "streams_public", json.dumps({"event": "new", "id": content.id})
-        )
+        data = json.dumps({"event": "new", "id": content.id})
+        calls = [
+            call("streams_public", data),
+            call("streams_profile__%s" % content.author.guid, data),
+            call("streams_profile_all__%s" % content.author.guid, data),
+        ]
+        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
+        mock_consumer.group_send.reset_mock()
+        # Private post with tags
+        content = ContentFactory(visibility=Visibility.LIMITED, text="#foobar #barfoo")
+        data = json.dumps({"event": "new", "id": content.id})
+        calls = [
+            call("streams_tags__foobar", data),
+            call("streams_tags__barfoo", data),
+            call("streams_profile__%s" % content.author.guid, data),
+            call("streams_profile_all__%s" % content.author.guid, data),
+        ]
+        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
+        mock_consumer.group_send.reset_mock()
+        # Public post with followers
+        follower = UserFactory()
+        follower2 = UserFactory()
+        profile = ProfileFactory()
+        follower.profile.following.add(content.author)
+        follower2.profile.following.add(content.author)
+        profile.following.add(content.author)
+        content = ContentFactory(author=content.author)
+        data = json.dumps({"event": "new", "id": content.id})
+        calls = [
+            call("streams_public", data),
+            call("streams_profile__%s" % content.author.guid, data),
+            call("streams_profile_all__%s" % content.author.guid, data),
+            call("streams_followed__%s" % follower.username, data),
+            call("streams_followed__%s" % follower2.username, data),
+        ]
+        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
+        mock_consumer.group_send.reset_mock()
+        # Replies
+        reply = ContentFactory(parent=content)
+        data = json.dumps({"event": "new", "id": reply.id})
+        mock_consumer.group_send.assert_called_once_with("streams_content__%s" % content.guid, data)
         mock_consumer.group_send.reset_mock()
         # Update shouldn't cause a group send
         content.text = "foo"
