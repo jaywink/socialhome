@@ -16,6 +16,6 @@ class LandingPage(ChoicePreference):
         ("followed", _("Followed stream")),
         ("public", _("Public stream")),
     ]
-    default = "profile"
+    default = "followed"
     verbose_name = _("Landing page")
     help_text = _("Choose which page you want to see as the landing page.")
