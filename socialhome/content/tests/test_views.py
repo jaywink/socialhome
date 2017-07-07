@@ -233,7 +233,7 @@ class TestContentView(SocialhomeTestCase):
         self.assertContains(response, self.content.formatted_timestamp)
         self.assertContains(response, '<span id="content-bar-actions" class="hidden"')
         self.assertNotContains(response, "modal-footer")
-        self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.guid)
+        self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.channel_group_name)
 
     def test_content_view_content_as_author(self):
         self.client.force_login(self.content.author.user)
@@ -241,13 +241,6 @@ class TestContentView(SocialhomeTestCase):
             reverse("content:view", kwargs={"pk": self.content.id})
         )
         self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
-
-    def test_content_view_guid_quoting(self):
-        content = ContentFactory(guid="foo@bar", visibility=Visibility.PUBLIC)
-        response = self.client.get(
-            reverse("content:view", kwargs={"pk": content.id})
-        )
-        self.assertEqual(response.context["stream_name"], "foo%40bar")
 
 
 class TestContentReplyView(TestCase):

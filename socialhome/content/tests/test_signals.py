@@ -58,7 +58,7 @@ class TestNotifyListeners(SocialhomeTestCase):
         # Replies
         reply = ContentFactory(parent=content)
         data = json.dumps({"event": "new", "id": reply.id})
-        mock_consumer.group_send.assert_called_once_with("streams_content__%s" % content.guid, data)
+        mock_consumer.group_send.assert_called_once_with("streams_content__%s" % content.channel_group_name, data)
         mock_consumer.group_send.reset_mock()
         # Update shouldn't cause a group send
         content.text = "foo"

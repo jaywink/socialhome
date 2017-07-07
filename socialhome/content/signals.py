@@ -59,7 +59,7 @@ def notify_listeners(content):
     data = json.dumps({"event": "new", "id": content.id})
     if content.parent:
         # Content comments
-        StreamConsumer.group_send("streams_content__%s" % content.parent.guid, data)
+        StreamConsumer.group_send("streams_content__%s" % content.parent.channel_group_name, data)
     else:
         # Public stream
         if content.visibility == Visibility.PUBLIC:

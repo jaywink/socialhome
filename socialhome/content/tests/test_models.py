@@ -327,6 +327,17 @@ class TestContentModel(TestCase):
         self.assertTrue(self.self_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
         self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
 
+    def test_channel_group_name(self):
+        self.assertEquals(
+            self.public_content.channel_group_name, "%s%s" % (self.public_content.id, slugify(self.public_content.guid))
+        )
+        long_non_ascii_guid_content = ContentFactory(guid="ä"*150)
+        self.assertEquals(
+            long_non_ascii_guid_content.channel_group_name, "%s%s" % (
+                long_non_ascii_guid_content.id, "a"*(80-len(str(long_non_ascii_guid_content.id)))
+            )
+        )
+
 
 @pytest.mark.usefixtures("db")
 class TestContentSaveTags(TestCase):
