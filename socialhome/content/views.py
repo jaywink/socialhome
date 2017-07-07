@@ -1,5 +1,3 @@
-from urllib.parse import quote_plus
-
 from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -108,5 +106,5 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["stream_name"] = quote_plus(self.object.guid)
+        context["stream_name"] = "content__%s" % self.object.channel_group_name
         return context

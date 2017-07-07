@@ -1,5 +1,4 @@
 import json
-from urllib.parse import unquote_plus
 
 from channels.generic.websockets import WebsocketConsumer
 
@@ -11,7 +10,7 @@ class StreamConsumer(WebsocketConsumer):
     channel_session_user = True
 
     def connection_groups(self, **kwargs):
-        return ["streams_%s" % unquote_plus(kwargs.get("stream"))]
+        return ["streams_%s" % kwargs.get("stream")]
 
     def receive(self, text=None, bytes=None, **kwargs):
         data = json.loads(text)

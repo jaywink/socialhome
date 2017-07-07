@@ -187,6 +187,15 @@ class Content(models.Model):
     def slug(self):
         return slugify(self.short_text)
 
+    @property
+    def channel_group_name(self):
+        """Make a safe Channel group name.
+
+        ASCII or hyphens or periods only.
+        Prefix with ID as we have to cut long guids due to asgi library group name restriction.
+        """
+        return ("%s%s" % (self.id, slugify(self.guid)))[:80]
+
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
