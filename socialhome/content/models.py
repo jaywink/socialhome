@@ -64,6 +64,15 @@ class Tag(models.Model):
         self.name = self.name.strip().lower()
         super().save()
 
+    @property
+    def channel_group_name(self):
+        """Make a safe Channel group name.
+
+        ASCII or hyphens or periods only.
+        Prefix with ID as we have to slugify the name and cut long guids due to asgi library group name restriction.
+        """
+        return ("%s_%s" % (self.id, slugify(self.name)))[:80]
+
 
 class Content(models.Model):
     text = models.TextField(_("Text"), blank=True)

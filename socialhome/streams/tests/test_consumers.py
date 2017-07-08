@@ -8,7 +8,7 @@ from django.test import SimpleTestCase
 from freezegun import freeze_time
 
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.streams.consumers import StreamConsumer
 
 
@@ -23,6 +23,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
         cls.content = ContentFactory()
         cls.content2 = ContentFactory()
         cls.child_content = ContentFactory(parent=cls.content)
+        cls.tag = TagFactory()
 
     def setUp(self):
         super(TestStreamConsumerReceive, self).setUp()
@@ -88,12 +89,12 @@ class TestStreamConsumerReceive(ChannelTestCase):
         self.client.send_and_consume(
             "websocket.receive",
             {
-                "path": "/ch/streams/tags__foobar/",
+                "path": "/ch/streams/tags__%s_%s/" % (self.tag.id, self.tag.name),
                 "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
             },
         )
         self.assertEqual(mock_tags.call_count, 1)
-        self.assertEqual(mock_tags.call_args[0][0], "foobar")
+        self.assertEqual(mock_tags.call_args[0][0], self.tag)
         self.client.send_and_consume(
             "websocket.receive",
             {

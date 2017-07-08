@@ -1,7 +1,6 @@
 import datetime
 from unittest.mock import Mock, patch, call
 
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
@@ -10,7 +9,6 @@ from django.utils.text import slugify
 from django.utils.timezone import make_aware
 from django_extensions.utils.text import truncate_letters
 from freezegun import freeze_time
-from test_plus import TestCase
 
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
@@ -350,8 +348,7 @@ class TestContentRendered(SocialhomeTestCase):
         )
 
 
-@pytest.mark.usefixtures("db")
-class TestContentSaveTags(TestCase):
+class TestContentSaveTags(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super(TestContentSaveTags, cls).setUpTestData()
@@ -434,26 +431,33 @@ class TestContentSaveTags(TestCase):
         )
 
 
-@pytest.mark.usefixtures("db")
-class TestTagModel(TestCase):
+class TestTagModel(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.tag = Tag.objects.create(name="foobar")
+        cls.tag2 = Tag.objects.create(name="f"*150)
+
     def test_tag_instance_created(self):
-        Tag.objects.create(name="foobar")
         self.assertTrue(Tag.objects.filter(name="foobar").exists())
 
     def test_cleaned_name_filter(self):
-        Tag.objects.create(name="foobar")
         self.assertTrue(Tag.objects.exists_by_cleaned_name(" FooBaR "))
         tag = Tag.objects.get_by_cleaned_name(" FooBaR ")
         self.assertEqual(tag.name, "foobar")
 
+    def test_channel_group_name(self):
+        self.assertEqual(self.tag.channel_group_name, "%s_%s" % (self.tag.id, self.tag.name))
+        self.assertEqual(self.tag2.channel_group_name, ("%s_%s" % (self.tag2.id, self.tag2.name))[:80])
 
-class TestOpenGraphCache(TestCase):
+
+class TestOpenGraphCache(SocialhomeTestCase):
     def test_str(self):
         ogc = OpenGraphCache(url="https://example.com", title="x"*200, description="bar", image="https://example.com")
         self.assertEqual(str(ogc), "https://example.com / %s..." % ("x"*30))
 
 
-class TestOEmbedCache(TestCase):
+class TestOEmbedCache(SocialhomeTestCase):
     def test_str(self):
         oec = OEmbedCache(url="https://example.com", oembed="x"*200)
         self.assertEqual(str(oec), "https://example.com")

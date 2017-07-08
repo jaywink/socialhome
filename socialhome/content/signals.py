@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
@@ -65,8 +65,8 @@ def notify_listeners(content):
         if content.visibility == Visibility.PUBLIC:
             StreamConsumer.group_send("streams_public", data)
         # Tag streams
-        for tag in content.tags.values_list("name", flat=True):
-            StreamConsumer.group_send("streams_tags__%s" % tag, data)
+        for tag in content.tags.all():
+            StreamConsumer.group_send("streams_tags__%s" % tag.channel_group_name, data)
         # Profile streams
         StreamConsumer.group_send("streams_profile__%s" % content.author.guid, data)
         StreamConsumer.group_send("streams_profile_all__%s" % content.author.guid, data)

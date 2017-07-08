@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock, call
 from django.test import TransactionTestCase
 from test_plus import TestCase
 
+from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
@@ -30,8 +31,8 @@ class TestNotifyListeners(SocialhomeTestCase):
         content = ContentFactory(visibility=Visibility.LIMITED, text="#foobar #barfoo")
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
-            call("streams_tags__foobar", data),
-            call("streams_tags__barfoo", data),
+            call("streams_tags__%s_foobar" % Tag.objects.get(name="foobar").id, data),
+            call("streams_tags__%s_barfoo" % Tag.objects.get(name="barfoo").id, data),
             call("streams_profile__%s" % content.author.guid, data),
             call("streams_profile_all__%s" % content.author.guid, data),
         ]

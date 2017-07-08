@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websockets import WebsocketConsumer
 
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 
 
 class StreamConsumer(WebsocketConsumer):
@@ -32,7 +32,9 @@ class StreamConsumer(WebsocketConsumer):
         elif stream_info[0] == "followed":
             return Content.objects.followed(self.message.user)
         elif stream_info[0] == "tags":
-            return Content.objects.tags(stream_info[1], self.message.user)
+            tag_id = stream_info[1].split("_")[0]
+            tag = Tag.objects.get(id=tag_id)
+            return Content.objects.tags(tag, self.message.user)
         elif stream_info[0] == "profile":
             return Content.objects.profile_pinned(stream_info[1], self.message.user)
         elif stream_info[0] == "profile_all":

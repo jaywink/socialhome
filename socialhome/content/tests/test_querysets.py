@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
@@ -14,6 +14,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         super().setUpTestData()
         cls.public_content = ContentFactory(pinned=True)
         cls.public_tags_content = ContentFactory(text="#foobar")
+        cls.tag = Tag.objects.get(name="foobar")
         cls.site_content = ContentFactory(visibility=Visibility.SITE, pinned=True)
         cls.site_tags_content = ContentFactory(visibility=Visibility.SITE, text="#foobar")
         cls.self_user = UserFactory()
@@ -37,12 +38,20 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.public())
         self.assertEqual(contents, {self.public_content, self.public_tags_content})
 
-    def test_tags(self):
-        contents = set(Content.objects.tags("foobar", self.anonymous_user))
+    def test_tags_by_name(self):
+        contents = set(Content.objects.tags_by_name("foobar", self.anonymous_user))
         self.assertEqual(contents, {self.public_tags_content})
-        contents = set(Content.objects.tags("foobar", self.other_user))
+        contents = set(Content.objects.tags_by_name("foobar", self.other_user))
         self.assertEqual(contents, {self.public_tags_content, self.site_tags_content})
-        contents = set(Content.objects.tags("foobar", self.self_content.author.user))
+        contents = set(Content.objects.tags_by_name("foobar", self.self_content.author.user))
+        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content, self.self_tags_content})
+
+    def test_tags(self):
+        contents = set(Content.objects.tags(self.tag, self.anonymous_user))
+        self.assertEqual(contents, {self.public_tags_content})
+        contents = set(Content.objects.tags(self.tag, self.other_user))
+        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content})
+        contents = set(Content.objects.tags(self.tag, self.self_content.author.user))
         self.assertEqual(contents, {self.public_tags_content, self.site_tags_content, self.self_tags_content})
 
     def test_followed(self):

@@ -35,12 +35,15 @@ class ContentQuerySet(models.QuerySet):
         return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")
 
     def tags(self, tag, user):
+        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
+
+    def tags_by_name(self, tag, user):
         from socialhome.content.models import Tag, Content
         try:
             tag = Tag.objects.get_by_cleaned_name(tag)
         except Tag.DoesNotExist:
             return Content.objects.none()
-        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
+        return self.tags(tag, user)
 
     def followed(self, user):
         qs = self.top_level()._select_related().visible_for_user(user)
