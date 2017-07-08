@@ -338,12 +338,12 @@ class TestContentRendered(SocialhomeTestCase):
         self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a> <a href="/tags/mixed/">#MiXeD</a></p>')
 
     def test_renders_linkified_textual_links(self):
-        content = ContentFactory(text="foo https://https.local http://http.local ` http://codetag.local `\n"
-                                      "```\nhttp://codesection.local\n```")
+        content = ContentFactory(text="[foo](http://http.local) https://https.local http://http.local ` "
+                                      "http://codetag.local `\n```\nhttp://codesection.local\n```")
         self.assertEqual(
             content.rendered,
-            '<p>foo <a href="https://https.local" target="_blank" rel="noopener">https://https.local</a> '
-            '<a href="http://http.local" target="_blank" rel="noopener">http://http.local</a> '
+            '<p><a href="http://http.local">foo</a> <a href="https://https.local" target="_blank" rel="noopener">'
+            'https://https.local</a> <a href="http://http.local" target="_blank" rel="noopener">http://http.local</a> '
             '<code>http://codetag.local</code></p>\n<pre><code>http://codesection.local\n</code></pre>'
         )
 

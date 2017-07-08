@@ -69,14 +69,26 @@ def make_nsfw_safe(text):
     return result
 
 
+def linkify_re_match(match):
+    return '<a href="{url}" target="_blank" rel="noopener">{url}</a>'.format(url=match.group())
+
+
 def linkify_text_urls(text):
     """Find textual lonely urls in the text and make them proper HTML links."""
     urls = find_urls_in_text(text)
     if not urls:
         return text
     code_blocks, text = code_blocks_add_markers(text)
-    for url in urls:
-        text = text.replace(url, '<a href="{url}" target="_blank" rel="noopener">{url}</a>'.format(url=url))
+    text = re.sub(
+        r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*',
+        linkify_re_match,
+        text,
+    )
+    text = re.sub(
+        r'(?<=[ \n]{1})https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*',
+        linkify_re_match,
+        text,
+    )
     text = code_blocks_restore(code_blocks, text)
     return text
 
