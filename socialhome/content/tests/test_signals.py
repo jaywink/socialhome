@@ -22,8 +22,8 @@ class TestNotifyListeners(SocialhomeTestCase):
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
             call("streams_public", data),
-            call("streams_profile__%s" % content.author.guid, data),
-            call("streams_profile_all__%s" % content.author.guid, data),
+            call("streams_profile__%s" % content.author.id, data),
+            call("streams_profile_all__%s" % content.author.id, data),
         ]
         mock_consumer.group_send.assert_has_calls(calls, any_order=True)
         mock_consumer.group_send.reset_mock()
@@ -33,8 +33,8 @@ class TestNotifyListeners(SocialhomeTestCase):
         calls = [
             call("streams_tags__%s_foobar" % Tag.objects.get(name="foobar").id, data),
             call("streams_tags__%s_barfoo" % Tag.objects.get(name="barfoo").id, data),
-            call("streams_profile__%s" % content.author.guid, data),
-            call("streams_profile_all__%s" % content.author.guid, data),
+            call("streams_profile__%s" % content.author.id, data),
+            call("streams_profile_all__%s" % content.author.id, data),
         ]
         mock_consumer.group_send.assert_has_calls(calls, any_order=True)
         mock_consumer.group_send.reset_mock()
@@ -49,8 +49,8 @@ class TestNotifyListeners(SocialhomeTestCase):
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
             call("streams_public", data),
-            call("streams_profile__%s" % content.author.guid, data),
-            call("streams_profile_all__%s" % content.author.guid, data),
+            call("streams_profile__%s" % content.author.id, data),
+            call("streams_profile_all__%s" % content.author.id, data),
             call("streams_followed__%s" % follower.username, data),
             call("streams_followed__%s" % follower2.username, data),
         ]

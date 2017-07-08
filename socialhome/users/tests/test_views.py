@@ -351,12 +351,12 @@ class TestProfileAllContentView(SocialhomeTestCase):
         ContentFactory(author=self.user.profile, pinned=True, visibility=Visibility.PUBLIC)
         response = self.get("users:profile-all-content", guid=self.user.profile.guid)
         self.assertTrue(response.context_data.get("pinned_content_exists"))
-        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.user.profile.guid)
+        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.user.profile.id)
         self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
 
     def test_renders_for_remote_profile(self):
         response = self.get("users:profile-all-content", guid=self.profile.guid)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context_data.get("pinned_content_exists"))
-        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.profile.guid)
+        self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.profile.id)
         self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")

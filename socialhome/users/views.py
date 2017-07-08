@@ -64,7 +64,7 @@ class ProfileDetailView(ProfileViewMixin):
         context = super().get_context_data(**kwargs)
         context["content_list"] = self.content_list
         context["pinned_content_exists"] = True
-        context["stream_name"] = "profile__%s" % self.kwargs.get("guid")
+        context["stream_name"] = "profile__%s" % self.object.id
         context["profile_stream_type"] = "pinned"
         return context
 
@@ -81,7 +81,7 @@ class ProfileAllContentView(ProfileViewMixin):
             context["pinned_content_exists"] = qs.filter(pinned=True).exists()
         else:
             context["pinned_content_exists"] = False
-        context["stream_name"] = "profile_all__%s" % self.kwargs.get("guid")
+        context["stream_name"] = "profile_all__%s" % self.object.id
         context["profile_stream_type"] = "all_content"
         return context
 

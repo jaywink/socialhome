@@ -68,8 +68,8 @@ def notify_listeners(content):
         for tag in content.tags.all():
             StreamConsumer.group_send("streams_tags__%s" % tag.channel_group_name, data)
         # Profile streams
-        StreamConsumer.group_send("streams_profile__%s" % content.author.guid, data)
-        StreamConsumer.group_send("streams_profile_all__%s" % content.author.guid, data)
+        StreamConsumer.group_send("streams_profile__%s" % content.author.id, data)
+        StreamConsumer.group_send("streams_profile_all__%s" % content.author.id, data)
         # Followed stream
         followed_qs = Profile.objects.followers(content.author).filter(user__isnull=False)
         for username in followed_qs.values_list("user__username", flat=True):
