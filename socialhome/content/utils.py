@@ -13,14 +13,7 @@ def safe_text_for_markdown(text):
     Markdown code ie ` or ``` combos. For single `, do not allow line breaks between the tag.
     Quotes ie '> ' which bleach would clean up.
     """
-    # Regexp match all ` and ``` pairs
-    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
-            re.findall(r"```.*```", text, flags=re.DOTALL)
-    # Store to safety, replacing with markers
-    safety = []
-    for counter, code in enumerate(codes, 1):
-        safety.append(code)
-        text = text.replace(code, "%%safe_text_for_markdown codes in safety %s%%" % counter, 1)
+    code_blocks, text = code_blocks_add_markers(text)
     # Store quotes next
     text = re.sub(r"(^> )", "%%safe_quote_in_start%%", text)
     text = re.sub(r"(\n> )", "%%safe_quote_in_new_line%%", text, flags=re.DOTALL)
@@ -29,8 +22,25 @@ def safe_text_for_markdown(text):
     # Return quotes
     text = text.replace("%%safe_quote_in_start%%", "> ")
     text = text.replace("%%safe_quote_in_new_line%%", "\n> ")
+    text = code_blocks_restore(code_blocks, text)
+    return text
+
+
+def code_blocks_add_markers(text):
+    # Regexp match all ` and ``` pairs
+    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
+            re.findall(r"```.*```", text, flags=re.DOTALL)
+    # Store to safety, replacing with markers
+    safety = []
+    for counter, code in enumerate(codes, 1):
+        safety.append(code)
+        text = text.replace(code, "%%safe_text_for_markdown codes in safety %s%%" % counter, 1)
+    return safety, text
+
+
+def code_blocks_restore(code_blocks, text):
     # Return ` and ``` pairs from safety
-    for counter, code in enumerate(safety, 1):
+    for counter, code in enumerate(code_blocks, 1):
         text = text.replace("%%safe_text_for_markdown codes in safety %s%%" % counter, code, 1)
     return text
 
@@ -57,6 +67,18 @@ def make_nsfw_safe(text):
     if result.startswith("<html><body>") and result.endswith("</body></html>"):
         result = result[len("<html><body>"):-len("</body></html>")]
     return result
+
+
+def linkify_text_urls(text):
+    """Find textual lonely urls in the text and make them proper HTML links."""
+    urls = find_urls_in_text(text)
+    if not urls:
+        return text
+    code_blocks, text = code_blocks_add_markers(text)
+    for url in urls:
+        text = text.replace(url, '<a href="{url}" target="_blank" rel="noopener">{url}</a>'.format(url=url))
+    text = code_blocks_restore(code_blocks, text)
+    return text
 
 
 def find_urls_in_text(text):
