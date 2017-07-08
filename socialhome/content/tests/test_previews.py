@@ -1,10 +1,8 @@
 import datetime
 from unittest.mock import patch
 
-import pytest
 import requests
 from django.db import DataError
-from django.test import TestCase
 from freezegun import freeze_time
 from opengraph import OpenGraph
 from pyembed.core import PyEmbedError
@@ -14,6 +12,7 @@ from pyembed.core.discovery import PyEmbedDiscoveryError
 from socialhome.content.models import OpenGraphCache, OEmbedCache
 from socialhome.content.previews import fetch_content_preview, fetch_og_preview, OEmbedDiscoverer, fetch_oembed_preview
 from socialhome.content.tests.factories import ContentFactory, OpenGraphCacheFactory, OEmbedCacheFactory
+from socialhome.tests.utils import SocialhomeTestCase
 
 
 class MockOpenGraph(dict):
@@ -21,13 +20,17 @@ class MockOpenGraph(dict):
     def title(self):
         return self.__getitem__("title")
 
+    @property
+    def image(self):
+        return self.__getitem__("image")
 
-@pytest.mark.usefixtures("db")
-class TestFetchOgPreview(TestCase):
+
+class TestFetchOgPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super(TestFetchOgPreview, cls).setUpTestData()
         cls.content = ContentFactory()
+        cls.nsfw_content = ContentFactory(text="foo #nsfw")
         cls.urls = ["https://example.com"]
 
     def test_if_cached_already_dont_fetch(self):
@@ -78,6 +81,15 @@ class TestFetchOgPreview(TestCase):
         self.assertEqual(opengraph.image, "")
         self.assertEqual(opengraph.url, self.urls[0])
 
+    @patch("socialhome.content.previews.OpenGraph")
+    def test_opengraph_cache_created_without_image_for_nsfw_content(self, og):
+        og.return_value = MockOpenGraph({"title": "foo", "image": "https://domain.tld/pic.png"})
+        opengraph = fetch_og_preview(self.nsfw_content, self.urls)
+        self.assertEqual(opengraph.title, "foo")
+        self.assertEqual(opengraph.description, "")
+        self.assertEqual(opengraph.image, "")
+        self.assertEqual(opengraph.url, self.urls[0])
+
     @patch("socialhome.content.previews.OpenGraphCache.objects.create", side_effect=DataError)
     @patch("socialhome.content.previews.OpenGraph")
     def test_opengraph_data_error_is_passed(self, og, create):
@@ -94,7 +106,7 @@ class TestFetchOgPreview(TestCase):
         self.assertEqual(opengraph, result)
 
 
-class TestFetchContentPreview(TestCase):
+class TestFetchContentPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super(TestFetchContentPreview, cls).setUpTestData()
@@ -125,13 +137,12 @@ class TestFetchContentPreview(TestCase):
         fetch_og.assert_called_once_with(self.content, ["example.com"])
 
 
-class TestOEmbedDiscoverer(object):
+class TestOEmbedDiscoverer:
     def test_oembed_discoverer_inits(self):
         OEmbedDiscoverer()
 
 
-@pytest.mark.usefixtures("db")
-class TestFetchOEmbedPreview(TestCase):
+class TestFetchOEmbedPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super(TestFetchOEmbedPreview, cls).setUpTestData()
