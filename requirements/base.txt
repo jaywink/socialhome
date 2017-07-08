@@ -45,7 +45,7 @@ django-redis==4.8.0
 redis>=2.10.0
 
 # Tasks
-rq==0.7.1
+rq==0.8.0
 django-rq==0.9.5
 
 # Generic Django utils
