@@ -75,3 +75,6 @@ djangorestframework==3.6.3
 
 # User settings
 django-dynamic-preferences==1.2
+
+# UI elements
+django-tables2==1.10.0

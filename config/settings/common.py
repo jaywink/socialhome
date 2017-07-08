@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
     "rest_framework.authtoken",
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
+    "django_tables2",
 )
 LOCAL_APPS = (
     "socialhome",
