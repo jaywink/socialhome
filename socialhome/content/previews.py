@@ -54,7 +54,7 @@ def fetch_og_preview(content, urls):
         try:
             title = og.title if "title" in og else og.site_name if "site_name" in og else ""
             description = og.description if "description" in og else ""
-            image = og.image if "image" in og else ""
+            image = og.image if "image" in og and not content.is_nsfw else ""
             try:
                 with transaction.atomic():
                     opengraph = OpenGraphCache.objects.create(
