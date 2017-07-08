@@ -43,4 +43,9 @@ urlpatterns = [
         view=views.ProfileDetailView.as_view(),
         name="profile-detail"
     ),
+    url(
+        regex=r"^contacts/$",
+        view=views.ContactsFollowedView.as_view(),
+        name="contacts-followed"
+    ),
 ]

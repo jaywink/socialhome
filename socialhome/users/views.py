@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.models import Content
 from socialhome.users.models import User, Profile
+from socialhome.users.tables import FollowedTable
 
 
 class UserDetailView(DetailView):
@@ -143,3 +144,18 @@ class UserListView(LoginRequiredMixin, ListView):
     # These next two lines tell the view to index lookups by username
     slug_field = "username"
     slug_url_kwarg = "username"
+
+
+class ContactsFollowedView(LoginRequiredMixin, DetailView):
+    model = Profile
+    template_name = "users/contacts_followed.html"
+
+    def get_object(self, queryset=None):
+        return Profile.objects.get(guid=self.request.user.profile.guid)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table = FollowedTable(self.object.following.all(), template="users/_followed_table.html")
+        table.paginate(page=self.request.GET.get('page', 1), per_page=25)
+        context["followed_table"] = table
+        return context
