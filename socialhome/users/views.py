@@ -158,7 +158,7 @@ class ContactsFollowedView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table = FollowedTable(self.object.following.all(), template="users/_followed_table.html")
-        table.paginate(page=self.request.GET.get('page', 1), per_page=25)
+        table = FollowedTable(self.object.following.all(), order_by=self.request.GET.get("sort"))
+        table.paginate(page=self.request.GET.get("page", 1), per_page=25)
         context["followed_table"] = table
         return context

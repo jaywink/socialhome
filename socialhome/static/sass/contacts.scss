@@ -1,0 +1,17 @@
+@import "variables";
+
+.contacts-table {
+  #{$a-tags} {
+    color: $white;
+    text-decoration: unset;
+  }
+}
+
+.profile-picture {
+  max-width: 48px;
+  max-height: 48px;
+}
+
+.follower-button {
+  cursor: pointer;
+}
