@@ -1,3 +1,4 @@
+from braces.views import StaffuserRequiredMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
@@ -139,11 +140,13 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return Profile.objects.get(guid=self.request.user.profile.guid)
 
 
-class UserListView(LoginRequiredMixin, ListView):
+class UserListView(StaffuserRequiredMixin, ListView):
     model = User
     # These next two lines tell the view to index lookups by username
     slug_field = "username"
     slug_url_kwarg = "username"
+    redirect_unauthenticated_users = True
+    raise_exception = True
 
 
 class ContactsFollowedView(LoginRequiredMixin, DetailView):
