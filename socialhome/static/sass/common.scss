@@ -40,6 +40,10 @@
 @media all and (max-width: $mediumDevice) {
   .navbar-container {
     width: 100%;
+
+    #search-form {
+      display: block;
+    }
   }
 }
 

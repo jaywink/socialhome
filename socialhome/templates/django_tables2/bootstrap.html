@@ -5,7 +5,7 @@
 {% block table-wrapper %}
     <div class="table-container">
         {% block table %}
-            <table {% if table.attrs %} {{ table.attrs.as_html }}{% else %}class="contacts-table table table-inverse table-striped table-hover"{% endif %}>
+            <table {% if table.attrs %} {{ table.attrs.as_html }}{% else %}class="table table-inverse table-striped table-hover"{% endif %}>
                 {% block table.thead %}
                     {% if table.show_header %}
                         <thead class="thead-inverse">

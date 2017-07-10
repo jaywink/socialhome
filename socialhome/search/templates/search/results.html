@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{% trans "Search" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Search" %}</h1>
+    <br>
+
+    <h3>{% trans "Profile results" %}</h3>
+    {% render_table profile_table %}
+{% endblock %}

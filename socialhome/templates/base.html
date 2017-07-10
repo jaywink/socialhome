@@ -58,15 +58,23 @@
                             <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
                         </li>
                     {% else %}
-                    {% if settings.ACCOUNT_ALLOW_REGISTRATION %}
-                        <li class="nav-item">
-                            <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-                        </li>
+                        {% if settings.ACCOUNT_ALLOW_REGISTRATION %}
+                            <li class="nav-item">
+                                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+                            </li>
                         {% endif %}
                         <li class="nav-item">
                             <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Log In" %}</a>
                         </li>
                     {% endif %}
+                    <form id="search-form" class="form-inline ml-2" method="get" action="{% url "search:search" %}">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control" type="text" name="q" placeholder="{% trans "Search" %}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-secondary" type="submit" aria-label="{% trans "Search" %}" title="{% trans "Search" %}"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>
                 </ul>
             </div>
         </div>
