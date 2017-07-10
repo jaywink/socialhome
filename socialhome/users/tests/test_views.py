@@ -8,6 +8,7 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
+from socialhome.users.tables import FollowedTable
 from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
 from socialhome.users.views import (
     ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView, ProfileAllContentView)
@@ -336,3 +337,27 @@ class TestProfileAllContentView(SocialhomeTestCase):
         self.assertFalse(response.context_data.get("pinned_content_exists"))
         self.assertEqual(response.context_data.get("stream_name"), "profile_all__%s" % self.profile.id)
         self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
+
+
+class TestContactsFollowedView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = ProfileFactory()
+        cls.user.profile.following.add(cls.profile)
+
+    def test_login_required(self):
+        # Not logged in, redirects to login
+        self.get("users:contacts-followed")
+        self.response_302()
+        # Logged in
+        with self.login(self.user):
+            self.get("users:contacts-followed")
+        self.response_200()
+
+    def test_contains_table_object(self):
+        with self.login(self.user):
+            self.get("users:contacts-followed")
+        self.assertTrue(isinstance(self.context["followed_table"], FollowedTable))
+        self.assertContext("profile", self.user.profile)
