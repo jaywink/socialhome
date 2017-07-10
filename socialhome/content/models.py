@@ -208,8 +208,8 @@ class Content(models.Model):
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
-        text = linkify_text_urls(text)
         rendered = commonmark(text).strip()
+        rendered = linkify_text_urls(rendered)
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
         if self.oembed:

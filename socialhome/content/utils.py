@@ -26,10 +26,19 @@ def safe_text_for_markdown(text):
     return text
 
 
-def code_blocks_add_markers(text):
-    # Regexp match all ` and ``` pairs
-    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
-            re.findall(r"```.*```", text, flags=re.DOTALL)
+def code_blocks_add_markers(text, style="markdown"):
+    """Store code block contents to safety.
+
+    :param text: Text to process
+    :param style: Either 'markdown' or 'html'
+    :returns: tuple (list of extracted code block texts, processed text without code block contents)
+    """
+    if style == "markdown":
+        # Regexp match all ` and ``` pairs
+        codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
+                re.findall(r"```.*```", text, flags=re.DOTALL)
+    else:
+        codes = re.findall(r"<code>.*</code>", text, flags=re.DOTALL)
     # Store to safety, replacing with markers
     safety = []
     for counter, code in enumerate(codes, 1):
@@ -78,7 +87,7 @@ def linkify_text_urls(text):
     urls = find_urls_in_text(text)
     if not urls:
         return text
-    code_blocks, text = code_blocks_add_markers(text)
+    code_blocks, text = code_blocks_add_markers(text, style="html")
     text = re.sub(
         r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*',
         linkify_re_match,
