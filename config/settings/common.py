@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
     "rest_framework.authtoken",
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
+    "django_tables2",
 )
 LOCAL_APPS = (
     "socialhome",
@@ -226,7 +227,7 @@ SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
 
 # Select the correct user model
 AUTH_USER_MODEL = "users.User"
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "home"
 LOGIN_URL = "account_login"
 
 # SLUGLIFIER

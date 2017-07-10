@@ -76,6 +76,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
                     '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
+                    '<%= paths.css %>/contacts.css': '<%= paths.sass %>/contacts.scss',
                 },
             },
             dist: {
@@ -91,6 +92,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/streams.css': '<%= paths.sass %>/streams.scss',
                     '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
+                    '<%= paths.css %>/contacts.css': '<%= paths.sass %>/contacts.scss',
                 },
             }
         },
@@ -109,6 +111,7 @@ module.exports = function (grunt) {
                     "<%= paths.bower %>/bootstrap-markdown/js/bootstrap-markdown.js",
                     "<%= paths.bower %>/js-cookie/src/js.cookie.js",
                     "<%= paths.js %>/vendor/appear.min.js",
+                    "<%= paths.js %>/contacts.js",
                     "<%= paths.js %>/content.js",
                     "<%= paths.js %>/grids.js",
                     "<%= paths.js %>/streams.js",
@@ -128,6 +131,7 @@ module.exports = function (grunt) {
                     "<%= paths.css %>/streams.css",
                     "<%= paths.css %>/publisher.css",
                     "<%= paths.css %>/content.css",
+                    "<%= paths.css %>/contacts.css",
                 ],
                 dest: "<%= paths.css %>/project.css",
                 nonull: true,

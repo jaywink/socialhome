@@ -1,11 +1,13 @@
+from braces.views import StaffuserRequiredMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import DetailView, ListView, RedirectView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.models import Content
 from socialhome.users.models import User, Profile
+from socialhome.users.tables import FollowedTable
 
 
 class UserDetailView(DetailView):
@@ -120,13 +122,6 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
         return reverse("home")
 
 
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
-
-    def get_redirect_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
-
-
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     fields = ["name", "visibility"]
     model = Profile
@@ -138,8 +133,25 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return Profile.objects.get(guid=self.request.user.profile.guid)
 
 
-class UserListView(LoginRequiredMixin, ListView):
+class UserListView(StaffuserRequiredMixin, ListView):
     model = User
     # These next two lines tell the view to index lookups by username
     slug_field = "username"
     slug_url_kwarg = "username"
+    redirect_unauthenticated_users = True
+    raise_exception = True
+
+
+class ContactsFollowedView(LoginRequiredMixin, DetailView):
+    model = Profile
+    template_name = "users/contacts_followed.html"
+
+    def get_object(self, queryset=None):
+        return Profile.objects.get(guid=self.request.user.profile.guid)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table = FollowedTable(self.object.following.all(), order_by=self.request.GET.get("sort"))
+        table.paginate(page=self.request.GET.get("page", 1), per_page=25)
+        context["followed_table"] = table
+        return context

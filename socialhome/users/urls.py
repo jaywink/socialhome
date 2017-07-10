@@ -9,11 +9,6 @@ urlpatterns = [
         name="list"
     ),
     url(
-        regex=r"^u/~redirect/$",
-        view=views.UserRedirectView.as_view(),
-        name="redirect"
-    ),
-    url(
         regex=r"^u/(?P<username>[\w.@+-]+)/all/$",
         view=views.UserAllContentView.as_view(),
         name="all-content"
@@ -42,5 +37,10 @@ urlpatterns = [
         regex=r"^p/(?P<guid>[^/]+)/$",
         view=views.ProfileDetailView.as_view(),
         name="profile-detail"
+    ),
+    url(
+        regex=r"^contacts/$",
+        view=views.ContactsFollowedView.as_view(),
+        name="contacts-followed"
     ),
 ]
