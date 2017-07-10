@@ -1,7 +1,7 @@
 from braces.views import StaffuserRequiredMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import DetailView, ListView, RedirectView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
@@ -120,13 +120,6 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
 
     def get_success_url(self):
         return reverse("home")
-
-
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
-
-    def get_redirect_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):

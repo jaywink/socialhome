@@ -2,7 +2,6 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
-from test_plus.test import TestCase
 
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
@@ -11,38 +10,15 @@ from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
 from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
 from socialhome.users.views import (
-    UserRedirectView, ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView,
-    ProfileAllContentView)
+    ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView, ProfileAllContentView)
 
 
-class BaseUserTestCase(TestCase):
-    def setUp(self):
-        self.user = self.make_user()
-        self.factory = RequestFactory()
-
-
-class TestUserRedirectView(BaseUserTestCase):
-    def test_get_redirect_url(self):
-        # Instantiate the view directly. Never do this outside a test!
-        view = UserRedirectView()
-        # Generate a fake request
-        request = self.factory.get('/fake-url')
-        # Attach the user to the request
-        request.user = self.user
-        # Attach the request to the view
-        view.request = request
-        # Expect: '/users/testuser/', as that is the default username for
-        #   self.make_user()
-        self.assertEqual(
-            view.get_redirect_url(),
-            '/u/testuser/'
-        )
-
-
-class TestProfileUpdateView(BaseUserTestCase):
+class TestProfileUpdateView(SocialhomeTestCase):
     def setUp(self):
         # call BaseUserTestCase.setUp()
         super(TestProfileUpdateView, self).setUp()
+        self.user = self.make_user()
+        self.factory = RequestFactory()
         # Instantiate the view directly. Never do this outside a test!
         self.view = ProfileUpdateView()
         # Generate a fake request
