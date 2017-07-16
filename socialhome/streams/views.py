@@ -10,11 +10,19 @@ class BaseStreamView(ListView):
     ordering = "-created"
     paginate_by = 30
     stream_name = ""
+    vue = False
+
+    def dispatch(self, request, *args, **kwargs):
+        self.vue = bool(request.GET.get("vue", False))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["stream_name"] = self.stream_name
         return context
+
+    def get_template_names(self):
+        return ["streams/vue.html"] if self.vue else super().get_template_names()
 
 
 class PublicStreamView(BaseStreamView):
