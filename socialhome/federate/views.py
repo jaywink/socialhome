@@ -143,27 +143,29 @@ def content_fetch_view(request, objtype, guid):
     return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
 
 
-class ReceivePublicView(View):
+class DiasporaReceiveViewMixin(View):
+    @staticmethod
+    def get_payload_from_request(request):
+        """Get the payload from request, trying legacy first."""
+        body = request.body
+        if request.POST.get("xml"):
+            return request.POST.get("xml")
+        else:
+            return body
+
+
+class ReceivePublicView(DiasporaReceiveViewMixin):
     """Diaspora /receive/public view."""
     def post(self, request, *args, **kwargs):
-        payload = request.POST.get("xml")
-        if not payload:
-            return HttpResponseBadRequest()
+        payload = self.get_payload_from_request(request)
         django_rq.enqueue(receive_task, payload)
         return HttpResponse(status=202)
 
 
-class ReceiveUserView(View):
+class ReceiveUserView(DiasporaReceiveViewMixin):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
-        if request.content_type == "application/json":
-            # New style
-            payload = request.body
-        else:
-            # Legacy
-            payload = request.POST.get("xml")
-        if not payload:
-            return HttpResponseBadRequest()
+        payload = self.get_payload_from_request(request)
         guid = kwargs.get("guid")
         django_rq.enqueue(receive_task, payload, guid=guid)
         return HttpResponse(status=202)
