@@ -4,9 +4,10 @@ import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from django.http.response import Http404, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.http.response import Http404, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
+from dynamic_preferences.registries import global_preferences_registry
 
 from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
@@ -143,27 +144,33 @@ def content_fetch_view(request, objtype, guid):
     return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
 
 
-class ReceivePublicView(View):
+class DiasporaReceiveViewMixin(View):
+    @staticmethod
+    def get_payload_from_request(request):
+        """Get the payload from request, trying legacy first."""
+        preferences = global_preferences_registry.manager()
+        body = request.body
+        if request.POST.get("xml"):
+            payload = request.POST.get("xml")
+        else:
+            payload = body
+        if preferences["admin__log_all_receive_payloads"]:
+            logger.debug("get_payload_from_request - Payload: %s", payload)
+        return payload
+
+
+class ReceivePublicView(DiasporaReceiveViewMixin):
     """Diaspora /receive/public view."""
     def post(self, request, *args, **kwargs):
-        payload = request.POST.get("xml")
-        if not payload:
-            return HttpResponseBadRequest()
+        payload = self.get_payload_from_request(request)
         django_rq.enqueue(receive_task, payload)
         return HttpResponse(status=202)
 
 
-class ReceiveUserView(View):
+class ReceiveUserView(DiasporaReceiveViewMixin):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
-        if request.content_type == "application/json":
-            # New style
-            payload = request.body
-        else:
-            # Legacy
-            payload = request.POST.get("xml")
-        if not payload:
-            return HttpResponseBadRequest()
+        payload = self.get_payload_from_request(request)
         guid = kwargs.get("guid")
         django_rq.enqueue(receive_task, payload, guid=guid)
         return HttpResponse(status=202)

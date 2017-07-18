@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pytest
 from django.core.urlresolvers import reverse
 from federation.tests.fixtures.keys import get_dummy_private_key
-from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
+from socialhome.federate.views import DiasporaReceiveViewMixin
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
 
 @pytest.mark.usefixtures("db", "client")
-class TestFederationDiscovery(object):
+class TestFederationDiscovery:
     def test_host_meta_responds(self, client):
         response = client.get(reverse("federate:host-meta"))
         assert response.status_code == 200
@@ -59,19 +59,29 @@ class TestFederationDiscovery(object):
         assert response.status_code == 200
 
 
+class TestDiasporaReceiveViewMixin(SocialhomeTestCase):
+    def test_returns_legacy_xml_payload(self):
+        self.assertEqual(
+            DiasporaReceiveViewMixin.get_payload_from_request(Mock(body="foobar", POST={"xml": "barfoo"})),
+            "barfoo",
+        )
+
+    def test_returns_other_payload(self):
+        self.assertEqual(
+            DiasporaReceiveViewMixin.get_payload_from_request(Mock(body="foobar", POST={})),
+            "foobar",
+        )
+
+
 @pytest.mark.usefixtures("db", "client")
-class TestReceivePublic(object):
+class TestReceivePublic:
     def test_receive_public_responds(self, client):
         response = client.post(reverse("federate:receive-public"), {"xml": "foo"})
         assert response.status_code == 202
 
-    def test_receive_public_returns_bad_request_if_no_payload(self, client):
-        response = client.post(reverse("federate:receive-public"))
-        assert response.status_code == 400
-
 
 @pytest.mark.usefixtures("db", "client")
-class TestReceiveUser(object):
+class TestReceiveUser:
     def test_receive_user_responds_for_xml_payload(self, client):
         response = client.post(reverse("federate:receive-user", kwargs={"guid": "1234"}), {"xml": "foo"})
         assert response.status_code == 202
@@ -83,16 +93,11 @@ class TestReceiveUser(object):
         )
         assert response.status_code == 202
 
-    def test_receive_user_returns_bad_request_if_no_payload(self, client):
-        response = client.post(reverse("federate:receive-user", kwargs={"guid": "1234"}))
-        assert response.status_code == 400
 
-
-@pytest.mark.usefixtures("db")
-class TestContentXMLView(TestCase):
+class TestContentXMLView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestContentXMLView, cls).setUpTestData()
+        super().setUpTestData()
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         author = UserFactory()
         author.profile.rsa_private_key = get_dummy_private_key().exportKey()
@@ -121,11 +126,10 @@ class TestContentXMLView(TestCase):
         mock_getter.assert_called_once_with("entity", self.profile.private_key)
 
 
-@pytest.mark.usefixtures("db")
-class TestContentFetchView(TestCase):
+class TestContentFetchView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestContentFetchView, cls).setUpTestData()
+        super().setUpTestData()
         author = UserFactory()
         Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
