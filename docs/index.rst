@@ -52,4 +52,6 @@ Table of contents
    installation
    running
    api
+   community
    development
+   contributing

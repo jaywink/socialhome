@@ -5,7 +5,7 @@ Development
 
 Socialhome is missing features and needs a lot of polish on the UI side. If you are familiar with Django (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
 
-For guidelines how to contribute, please first read our `contributing document <https://github.com/jaywink/socialhome/blob/master/CONTRIBUTING.md>`_.
+For guidelines how to contribute, please first read the :ref:`contributing` guide.
 
 * `Source code repo <https://github.com/jaywink/socialhome>`_
 * `Issue tracker <https://github.com/jaywink/socialhome/issues>`_
