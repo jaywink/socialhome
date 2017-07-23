@@ -23,6 +23,8 @@ on what to do, check out the issues listed there. Some issues are
 `labeled as newcomer <https://github.com/jaywink/socialhome/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer>`_.
 These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
 
+See also our :ref:`roadmap` for high level plans.
+
 Logging issues
 --------------
 
@@ -48,6 +50,8 @@ Some notes regarding features to take into account when writing code.
 
 Streams
 :::::::
+
+*NOTE! See also our* :ref:`roadmap` *for high level plans regarding a streams rewrite. This section talks mostly about the current streams.*
 
 Everything is (supposed to be at least) a stream in Socialhome. The main streams are user profiles, followed and the public stream, but basically each single content view is also a stream. Opening a reply in an individual window would also create a stream for that reply content.
 

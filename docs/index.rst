@@ -54,4 +54,5 @@ Table of contents
    api
    community
    development
+   roadmap
    contributing
