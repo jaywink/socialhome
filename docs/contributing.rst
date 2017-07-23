@@ -18,7 +18,7 @@ The best contributions come from real personal need.
 Finding things to do
 --------------------
 
-We have an `issue tracker <https://github.com/jaywink/socialhome/issues>`_) on GitHub. If you don't already have an idea
+We have an `issue tracker <https://github.com/jaywink/socialhome/issues>`_ on GitHub. If you don't already have an idea
 on what to do, check out the issues listed there. Some issues are
 `labeled as newcomer <https://github.com/jaywink/socialhome/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer>`_.
 These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
