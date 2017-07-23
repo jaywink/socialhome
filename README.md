@@ -13,6 +13,8 @@ Please check the official site for more information about features. Naturally, t
 
 Official site: [https://socialhome.network](https://socialhome.network).
 
+Documentation: http://socialhome.readthedocs.io/
+
 Joining
 -------
 
