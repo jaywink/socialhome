@@ -1,9 +1,14 @@
 {
   "name": "socialhome",
   "version": "0.1.0",
-  "dependencies": {},
+  "scripts": {
+    "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch"
+  },
   "devDependencies": {
     "autoprefixer-core": "~6.0.1",
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-es2017": "^6.24.1",
     "bower": "~1.8.0",
     "chai": "^3.5.0",
     "connect-livereload": "~0.6.0",
@@ -20,7 +25,8 @@
     "load-grunt-tasks": "~3.5.2",
     "mocha": "^3.0.2",
     "pixrem": "~3.0.2",
-    "time-grunt": "~1.4.0"
+    "time-grunt": "~1.4.0",
+    "webpack": "^3.2.0"
   },
   "engines": {
     "node": ">=0.8.0"
