@@ -6,5 +6,5 @@ class UsersConfig(AppConfig):
     verbose_name = "Users"
 
     def ready(self):
-        """Import our signals."""
+        # Import our signals
         from socialhome.users.signals import create_user_profile, profile_following_change

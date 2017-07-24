@@ -101,7 +101,10 @@ class Profile(TimeStampedModel):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
     def save(self, *args, **kwargs):
-        """Set default pony images if image urls are empty."""
+        # Protect against empty guids which the search indexing would crash on
+        if not self.guid:
+            raise ValueError("Profile must have a guid!")
+        # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):

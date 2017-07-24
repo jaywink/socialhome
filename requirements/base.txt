@@ -78,3 +78,7 @@ django-dynamic-preferences==1.2
 
 # UI elements
 django-tables2==1.10.0
+
+# Search
+django-haystack==2.6.1
+whoosh==2.7.4

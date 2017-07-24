@@ -1,8 +1,7 @@
 from django.conf.urls import url
 
-from socialhome.search.views import SearchView
-
+from socialhome.search.views import GlobalSearchView
 
 urlpatterns = [
-    url(r"", SearchView.as_view(), name="search"),
+    url(r"", GlobalSearchView.as_view(), name="global"),
 ]
