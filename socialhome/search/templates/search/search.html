@@ -9,7 +9,10 @@
     <h1>{% trans "Search" %}</h1>
 
     <form method="get" action=".">
-        {{ form|crispy }}
+        <div class="form-group">
+            <input type="text" class="form-control" value="{{ request.GET.q }}" title="{% trans "Search term" %}"
+                   placeholder="{% trans "Type a search term" %}" autofocus name="q" id="search-input">
+        </div>
         <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
     </form>
 
