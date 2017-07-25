@@ -5,6 +5,8 @@ from socialhome.users.models import Profile
 
 
 class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
+    text = indexes.EdgeNgramField(document=True, use_template=True)
+
     class Meta:
         model = Profile
         fields = ("name", "handle")
