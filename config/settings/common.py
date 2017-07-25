@@ -423,3 +423,4 @@ HAYSTACK_CONNECTIONS = {
         "PATH": str(ROOT_DIR("var", "whoosh")),
     },
 }
+HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
