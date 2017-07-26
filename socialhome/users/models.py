@@ -183,13 +183,16 @@ class Profile(TimeStampedModel):
         return self.following.values_list("id", flat=True)
 
     def visible_to_user(self, user):
-        """Check whether the given user should be able to see this profile."""
+        """Check whether the given user should be able to see this profile.
+
+        User not logged in: see on PUBLIC
+        User logged in: see own or LIMITED + SITE
+        """
         if self.visibility == Visibility.PUBLIC:
             return True
         elif user.is_authenticated:
-            if self.visibility == Visibility.SITE or user.profile == self:
+            if self.visibility != Visibility.SELF or user.profile == self:
                 return True
-        # TODO: handle Visibility.LIMITED once contacts are implemented
         return False
 
     def get_first_name(self):

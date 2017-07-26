@@ -262,11 +262,11 @@ class TestProfileVisibilityForLoggedInUsers:
         response = admin_client.get("/u/admin/")
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
-        assert response.status_code == 403
+        assert response.status_code == 200
         response = admin_client.get("/p/%s/" % admin.profile.guid)
         assert response.status_code == 200
         response = admin_client.get("/p/%s/" % user.profile.guid)
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_visible_to_site_profile(self, admin_client):
         admin = User.objects.get(username="admin")

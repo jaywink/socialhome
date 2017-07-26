@@ -17,7 +17,7 @@ class IntegerEnumField(indexes.IntegerField):
 
 class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
-    visibility = IntegerEnumField(model_attr="visibility")
+    profile_visibility = IntegerEnumField(model_attr="visibility")
 
     class Meta:
         model = Profile
