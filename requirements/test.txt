@@ -14,5 +14,6 @@ Faker
 pytest>=2.9.2
 pytest-cov
 pytest-django
+pytest-env
 pytest-sugar
 pytest-warnings

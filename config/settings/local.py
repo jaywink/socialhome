@@ -2,6 +2,7 @@
 """
 Local settings for development environments
 """
+import sys
 
 from .common import *  # noqa
 
@@ -85,3 +86,16 @@ RQ_QUEUES["default"]["ASYNC"] = False
 # Disable generating RSA keys automatically, otherwise tests become slow
 SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
 SOCIALHOME_HTTPS = False
+
+# HAYSTACK
+# --------
+# Use a separate index if testing
+if env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in sys.argv:
+    if not os.path.isdir("/tmp/socialhome-haystack-test-index"):
+        os.mkdir("/tmp/socialhome-haystack-test-index")
+    HAYSTACK_CONNECTIONS = {
+        "default": {
+            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+            "PATH": "/tmp/socialhome-haystack-test-index",
+        },
+    }
