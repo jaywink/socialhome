@@ -4,8 +4,20 @@ from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 
 
+class IntegerEnumField(indexes.IntegerField):
+    def convert(self, value):
+        """Override to get the number from the Enum, if we're passed an Enum."""
+        if value is None:
+            return None
+        try:
+            return value.value
+        except AttributeError:
+            return value
+
+
 class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
+    visibility = IntegerEnumField(model_attr="visibility")
 
     class Meta:
         model = Profile
