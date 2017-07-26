@@ -81,7 +81,7 @@ and for features always add a good enough coverage. PR's without sufficient test
 Testing tools
 .............
 
-We use ``py.test`` as test runner but the tests themselves are Django ``TestCase`` based test classes. We have our own base class called ``SocialhomeTestCase`` which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these.
+We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own base class called ``SocialhomeTestCase`` which should be used as a base for all Django tests. Alternatively, to test Django class based views, you can use our ``SocialhomeCBVTestCase``. Both these base classes inherit from the powerful `django-test-plus <http://django-test-plus.readthedocs.io>`_ test classes. Some old tests are pure py.test function based tests, feel free to convert these.
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
 

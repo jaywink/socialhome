@@ -26,3 +26,7 @@ class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.exclude(visibility=Visibility.SELF)
+
+    def should_update(self, instance, **kwargs):
+        """Ensure we don't update SELF profiles to the index."""
+        return instance.visibility != Visibility.SELF

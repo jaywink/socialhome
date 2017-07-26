@@ -13,7 +13,10 @@ class GlobalSearchView(SearchView):
         We exclude SELF profiles too, though they should never even be indexed.
         """
         queryset = super().get_queryset()
-        # Profile modifications
+        return self.filter_queryset(queryset)
+
+    def filter_queryset(self, queryset):
+        """Do some of our own filtering on the queryset before returning."""
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(handle=self.request.user.profile.handle)
             if self.request.user.is_staff:

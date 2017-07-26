@@ -1,11 +1,16 @@
 from unittest.mock import Mock
 
 from test_plus import TestCase
+from test_plus.test import CBVTestCase
 
 import socialhome.tests.environment  # Set some environment tweaks
 
 
 class SocialhomeTestCase(TestCase):
+    maxDiff = None
+
+
+class SocialhomeCBVTestCase(CBVTestCase):
     maxDiff = None
 
 
