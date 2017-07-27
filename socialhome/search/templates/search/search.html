@@ -52,10 +52,10 @@
         </div>
 
         {% if page_obj.has_previous or page_obj.has_next %}
-            <div>
-                {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}">{% endif %}&laquo; {% trans "Previous" %}{% if page_obj.has_previous %}</a>{% endif %}
+            <div class="text-center">
+                {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}" class="btn btn-secondary">&laquo; {% trans "Previous" %}</a>{% endif %}
                 |
-                {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}">{% endif %}{% trans "Next" %} &raquo;{% if page_obj.has_next %}</a>{% endif %}
+                {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}" class="btn btn-secondary">{% trans "Next" %} &raquo;</a>{% endif %}
             </div>
         {% endif %}
     {% else %}
