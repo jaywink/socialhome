@@ -314,6 +314,8 @@ Install statics
     node_modules/.bin/grunt build
     python manage.py collectstatic
 
+.. include:: ../includes/search_index.rst
+
 Set the correct domain name in Django
 .....................................
 
