@@ -8,7 +8,10 @@ from django.db.migrations import RunPython
 
 
 def forward(apps, schema_editor):
-    call_command("runscript", "0016_populate_content_rendered")
+    # Removed as it's causing exceptions and is not needed except for old nodes
+    # which should have updated by now
+    # call_command("runscript", "0016_populate_content_rendered")
+    pass
 
 
 class Migration(migrations.Migration):
@@ -18,5 +21,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        RunPython(forward, RunPython.noop),
+        RunPython(RunPython.noop, RunPython.noop),
     ]
