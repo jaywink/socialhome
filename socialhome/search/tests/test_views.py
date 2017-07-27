@@ -64,4 +64,4 @@ class TestGlobalSearchView(SocialhomeTestCase):
     def test_returns_a_result(self):
         self.get("%s?q=%s" % (reverse("search:global"), "foobar"))
         self.assertResponseContains(self.public_profile.name, html=False)
-        self.assertResponseContains(self.public_profile.handle, html=False)
+        self.assertResponseContains(self.public_profile.username_part, html=False)

@@ -182,6 +182,10 @@ class Profile(TimeStampedModel):
     def following_ids(self):
         return self.following.values_list("id", flat=True)
 
+    @property
+    def username_part(self):
+        return self.handle.split("@")[0]
+
     def visible_to_user(self, user):
         """Check whether the given user should be able to see this profile.
 
