@@ -56,3 +56,4 @@ Table of contents
    development
    roadmap
    contributing
+   changelog
