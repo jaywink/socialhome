@@ -1,6 +1,11 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from haystack.generic_views import SearchView
 
+from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
+from socialhome.users.models import Profile
+from socialhome.users.views import ProfileDetailView
 
 
 class GlobalSearchView(SearchView):
@@ -14,6 +19,22 @@ class GlobalSearchView(SearchView):
         """
         queryset = super().get_queryset()
         return self.filter_queryset(queryset)
+
+    def get(self, request, *args, **kwargs):
+        """See if we have a direct match. If so redirect, if not, search."""
+        try:
+            q = safe_text(request.GET.get("q"))
+            validate_email(q)
+        except ValidationError:
+            pass
+        else:
+            try:
+                profile = Profile.objects.visible_for_user(request.user).get(handle=q)
+            except Profile.DoesNotExist:
+                pass
+            else:
+                return ProfileDetailView.as_view()(request, guid=profile.guid)
+        return super().get(request, *args, **kwargs)
 
     def filter_queryset(self, queryset):
         """Do some of our own filtering on the queryset before returning."""

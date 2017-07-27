@@ -7,6 +7,7 @@ from socialhome.enums import Visibility
 from socialhome.search.views import GlobalSearchView
 from socialhome.tests.utils import SocialhomeCBVTestCase, SocialhomeTestCase
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.views import ProfileAllContentView
 
 
 class TestGlobalSearchViewQuerySet(SocialhomeCBVTestCase):
@@ -60,8 +61,16 @@ class TestGlobalSearchView(SocialhomeTestCase):
     def test_view_renders(self):
         self.get("search:global")
         self.response_200()
+        self.assertResponseContains("Search", html=False)
 
     def test_returns_a_result(self):
         self.get("%s?q=%s" % (reverse("search:global"), "foobar"))
+        self.assertResponseContains("Results", html=False)
         self.assertResponseContains(self.public_profile.name, html=False)
         self.assertResponseContains(self.public_profile.username_part, html=False)
+
+    def test_direct_profile_match_goes_to_profile_view(self):
+        self.get("%s?q=%s" % (reverse("search:global"), self.public_profile.handle))
+        self.assertResponseNotContains("Results", html=False)
+        self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
+        self.assertEqual(self.context["object"], self.public_profile)
