@@ -17,7 +17,7 @@ class FollowedTable(Table):
 
     class Meta:
         model = Profile
-        fields = tuple()
+        fields = ()
         order_by = ("name", "handle")
-        template = "users/_followed_table.html"
+        template = "django_tables2/bootstrap.html"
         sequence = ("picture", "name", "handle")

@@ -1,18 +1,18 @@
-.. _roadmap:
-
-Roadmap
-=======
-
-Here we try to detail some future higher level plans for Socialhome.
+.. _architecture:
 
 Architecture
-------------
+============
 
-Our current and future (dotted lines) architecture looks something like this:
+Some details on the architecture and future high level plans for Socialhome.
+
+Component map
+-------------
+
+Our current and future (dotted lines) components look something like this:
 
 .. image:: _static/architecture.png
 
-At the lowest level we have the database (**PostgreSQL**) and **Redis** based cache / queue storage. To these we want to add some search index for full text search, possibly **Elasticsearch**.
+At the lowest level we have the database (**PostgreSQL**) and **Redis** based cache / queue storage. Search is currently powered by **Django-Haystack + Whoosh**.
 
 On top of this we have the background jobs, which are powered by **RQ**.
 
@@ -21,6 +21,9 @@ In the middle sits **Django**.
 To provide data for the frontend we have 3 solutions - **WebSockets** (powered by **Channels**), a **REST API** powered by **Django REST framework** and **Django** template engine itself.
 
 For the frontend, we will have 3 solutions. Currently everything is **Django templates**. We will want to keep some of the pages as Django templates. For the streams (and possibly other pages), we want to create a **Vue.js** app. Additionally, **mobile apps** would be provided.
+
+Component and feature notes
+---------------------------
 
 Vue.js app(s)
 .............
@@ -81,3 +84,56 @@ Tracking issue
 ::::::::::::::
 
 The Vue.js streams rewrite is tracked `in this issue <https://github.com/jaywink/socialhome/issues/202>`_.
+
+Search
+......
+
+Search is currently powered by `django-haystack <http://django-haystack.readthedocs.io>`_ as the framework and `Whoosh <https://whoosh.readthedocs.io>`_ as the engine. Whoosh is a pure Python backend with a file based search index. As performance requirements increase (for example full text content search), we should offer the option to use `Elasticsearch <https://www.elastic.co/products/elasticsearch>`_ as an optional search backend. Django-haystack supports both backends with just configuration changes. Whoosh should still be the default since it doesn't require extra installations like Elasticsearch does.
+
+The global search works as follows, in this order:
+
+- Search by profile handle:
+
+  - If direct match found -> render profile
+  - If remote match found -> fetch and render profile
+
+- Search all indexes for any matches
+
+Indexes
+:::::::
+
+Currently a search index only exists only for profile objects. The plan is to add the following search indexes:
+
+* Tags
+* Content
+
+UI
+::
+
+Profiles and tags can be easily listed in a list or table structure. Content would make sense to be rendered in a normal grid. This would make the search results page just another (dynamic) stream. See below mockup.
+
+.. image:: _static/search_results.png
+
+Streams
+.......
+
+There are many streams in Socialhome. The main streams are user profiles, followed and the public stream, but basically each single content view is also a stream. Opening a reply in an individual window would also create a stream for that reply content. Additionally, we want users to be able to create custom streams according to rules. For example, a stream could be "followed profiles + tag #foobar + tag #barfoo".
+
+A stream should automatically subscribe the user using websockets and handle any incoming messages from the server (currently in ``socialhome/static/js/streams.js``), notifying the user of new content and adding it to the page on request (without a page load).
+
+This basic design should be kept in mind when touching stream related code.
+
+Stream templates
+::::::::::::::::
+
+Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code. Different from this is the single content view which is rendered with a slightly different template.
+
+There are three locations to modify when changing how content is rendered in streams or single content views:
+
+* ``socialhome/streams/templates/streams/base.html`` - This renders the initial stream as a basic Django template on page load.
+* ``socialhome/static/js/content.js`` - This is the main JavaScript template which is used to insert content into the stream. This is used for both top level content and replies in content streams.
+* ``socialhome/content/templates/content/_content_detail.html`` - This template is used to render the single content view.
+
+All these three templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
+
+NOTE! The Vue.js streams rewrite will change templates mentioned here but shouldn't change the actual way streams work.

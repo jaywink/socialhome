@@ -77,6 +77,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
                     '<%= paths.css %>/contacts.css': '<%= paths.sass %>/contacts.scss',
+                    '<%= paths.css %>/search.css': '<%= paths.sass %>/search.scss',
                 },
             },
             dist: {
@@ -93,6 +94,7 @@ module.exports = function (grunt) {
                     '<%= paths.css %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.css %>/content.css': '<%= paths.sass %>/content.scss',
                     '<%= paths.css %>/contacts.css': '<%= paths.sass %>/contacts.scss',
+                    '<%= paths.css %>/search.css': '<%= paths.sass %>/search.scss',
                 },
             }
         },
@@ -116,6 +118,7 @@ module.exports = function (grunt) {
                     "<%= paths.js %>/grids.js",
                     "<%= paths.js %>/streams.js",
                     "<%= paths.js %>/publisher.js",
+                    "<%= paths.js %>/search.js",
                 ],
                 dest: "<%= paths.js %>/project.js",
                 nonull: true,
@@ -132,6 +135,7 @@ module.exports = function (grunt) {
                     "<%= paths.css %>/publisher.css",
                     "<%= paths.css %>/content.css",
                     "<%= paths.css %>/contacts.css",
+                    "<%= paths.css %>/search.css",
                 ],
                 dest: "<%= paths.css %>/project.css",
                 nonull: true,

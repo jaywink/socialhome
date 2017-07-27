@@ -1,0 +1,13 @@
+@import "variables";
+
+.search-results {
+  li {
+    list-style: none;
+    border-top: 1px solid $dark;
+  }
+
+  #{$a-tags} {
+    color: unset;
+    text-decoration: unset;
+  }
+}

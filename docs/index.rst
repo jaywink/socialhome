@@ -54,6 +54,6 @@ Table of contents
    api
    community
    development
-   roadmap
+   architecture
    contributing
    changelog

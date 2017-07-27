@@ -101,7 +101,10 @@ class Profile(TimeStampedModel):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
     def save(self, *args, **kwargs):
-        """Set default pony images if image urls are empty."""
+        # Protect against empty guids which the search indexing would crash on
+        if not self.guid:
+            raise ValueError("Profile must have a guid!")
+        # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
@@ -179,14 +182,21 @@ class Profile(TimeStampedModel):
     def following_ids(self):
         return self.following.values_list("id", flat=True)
 
+    @property
+    def username_part(self):
+        return self.handle.split("@")[0]
+
     def visible_to_user(self, user):
-        """Check whether the given user should be able to see this profile."""
+        """Check whether the given user should be able to see this profile.
+
+        User not logged in: see on PUBLIC
+        User logged in: see own or LIMITED + SITE
+        """
         if self.visibility == Visibility.PUBLIC:
             return True
         elif user.is_authenticated:
-            if self.visibility == Visibility.SITE or user.profile == self:
+            if self.visibility != Visibility.SELF or user.profile == self:
                 return True
-        # TODO: handle Visibility.LIMITED once contacts are implemented
         return False
 
     def get_first_name(self):

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from datetime import datetime
 
 import environ
+import os
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("socialhome")
@@ -45,6 +46,7 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "django_tables2",
+    "haystack",
 )
 LOCAL_APPS = (
     "socialhome",
@@ -52,6 +54,7 @@ LOCAL_APPS = (
     "socialhome.federate",
     "socialhome.content",
     "socialhome.streams",
+    "socialhome.search",
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -411,3 +414,13 @@ DYNAMIC_PREFERENCES = {
     # Use this to disable checking preferences names. This can be useful to debug things
     "VALIDATE_NAMES": True,
 }
+
+# HAYSTACK
+# ------
+HAYSTACK_CONNECTIONS = {
+    "default": {
+        "ENGINE": "haystack.backends.whoosh_backend.WhooshEngine",
+        "PATH": str(ROOT_DIR("var", "whoosh")),
+    },
+}
+HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"

@@ -111,3 +111,7 @@ class TestProfile(SocialhomeTestCase):
         assert profile.safer_image_url_small == "https://localhost/foobar"
         profile.image_url_small = "https://example.com/foobar"
         assert profile.safer_image_url_small == "https://example.com/foobar"
+
+    def test_empty_guid(self):
+        with self.assertRaises(ValueError):
+            ProfileFactory(guid="")

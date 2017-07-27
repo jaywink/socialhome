@@ -23,7 +23,7 @@ on what to do, check out the issues listed there. Some issues are
 `labeled as newcomer <https://github.com/jaywink/socialhome/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer>`_.
 These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
 
-See also our :ref:`roadmap` for high level plans.
+See also our :ref:`architecture` for high level plans.
 
 Logging issues
 --------------
@@ -43,35 +43,6 @@ will not be merged because it doesn't fit into the grand plan.
 
 Please don't be afraid to get in touch, see channels in the :ref:`community` pages.
 
-Feature notes
-.............
-
-Some notes regarding features to take into account when writing code.
-
-Streams
-:::::::
-
-*NOTE! See also our* :ref:`roadmap` *for high level plans regarding a streams rewrite. This section talks mostly about the current streams.*
-
-Everything is (supposed to be at least) a stream in Socialhome. The main streams are user profiles, followed and the public stream, but basically each single content view is also a stream. Opening a reply in an individual window would also create a stream for that reply content.
-
-A stream should automatically subscribe the user using websockets and handle any incoming messages from the server (in ``socialhome/static/js/streams.js``), notifying the user of new content and adding it to the page on request (without a page load).
-
-This basic design should be kept in mind when touching stream related code.
-
-Stream templates
-++++++++++++++++
-
-Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code. Different from this is the single content view which is rendered with a slightly different template.
-
-There are three locations to modify when changing how content is rendered in streams or single content views:
-
-* ``socialhome/streams/templates/streams/base.html`` - This renders the initial stream as a basic Django template on page load.
-* ``socialhome/static/js/content.js`` - This is the main JavaScript template which is used to insert content into the stream. This is used for both top level content and replies in content streams.
-* ``socialhome/content/templates/content/_content_detail.html`` - This template is used to render the single content view either directly or as a pop-up modal (with data filled by JS).
-
-All these three templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
-
 Tests
 -----
 
@@ -81,7 +52,7 @@ and for features always add a good enough coverage. PR's without sufficient test
 Testing tools
 .............
 
-We use ``py.test`` as test runner but the tests themselves are Django ``TestCase`` based test classes. We have our own base class called ``SocialhomeTestCase`` which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these.
+We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own base class called ``SocialhomeTestCase`` which should be used as a base for all Django tests. Alternatively, to test Django class based views, you can use our ``SocialhomeCBVTestCase``. Both these base classes inherit from the powerful `django-test-plus <http://django-test-plus.readthedocs.io>`_ test classes. Some old tests are pure py.test function based tests, feel free to convert these.
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
 
