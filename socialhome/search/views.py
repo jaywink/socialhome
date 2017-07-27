@@ -1,5 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.shortcuts import redirect
+from django.urls import reverse
+from federation.fetchers import retrieve_remote_profile
 from haystack.generic_views import SearchView
 
 from socialhome.content.utils import safe_text
@@ -21,19 +24,26 @@ class GlobalSearchView(SearchView):
         return self.filter_queryset(queryset)
 
     def get(self, request, *args, **kwargs):
-        """See if we have a direct match. If so redirect, if not, search."""
+        """See if we have a direct match. If so redirect, if not, search.
+
+        Try fetching a remote profile if the search term is a handle.
+        """
         try:
             q = safe_text(request.GET.get("q"))
             validate_email(q)
         except ValidationError:
             pass
         else:
+            profile = None
             try:
                 profile = Profile.objects.visible_for_user(request.user).get(handle=q)
             except Profile.DoesNotExist:
-                pass
-            else:
-                return ProfileDetailView.as_view()(request, guid=profile.guid)
+                # Try a remote search
+                remote_profile = retrieve_remote_profile(q)
+                if remote_profile:
+                    profile = Profile.from_remote_profile(remote_profile)
+            if profile:
+                return redirect(reverse("users:profile-detail", kwargs={"guid": profile.guid}))
         return super().get(request, *args, **kwargs)
 
     def filter_queryset(self, queryset):
