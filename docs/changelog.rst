@@ -17,6 +17,11 @@ Added
 
 * When searching for profiles based on handle, fetch profile from remote if it isn't found locally (`#163 <https://github.com/jaywink/socialhome/issues/163>`_)
 
+Fixed
+.....
+
+* Make reply notifications to local users not send one single email with all local participants, but one email per participant. Previous implementation would have leaked emails of participants to other participants.
+
 0.1.0 (2017-07-27)
 ------------------
 

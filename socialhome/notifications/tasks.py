@@ -36,13 +36,14 @@ def send_reply_notifications(content_id):
         settings.SOCIALHOME_URL,
         reverse("content:view-by-slug", kwargs={"pk": parent.id, "slug": parent.slug}),
     )
-    send_mail(
-        "%sNew reply to content you have participated in" % settings.EMAIL_SUBJECT_PREFIX,
-        "There is a new reply to content you have participated in, see it here: %s" % parent_url,
-        settings.DEFAULT_FROM_EMAIL,
-        participants,
-        fail_silently=False,
-    )
+    for participant in participants:
+        send_mail(
+            "%sNew reply to content you have participated in" % settings.EMAIL_SUBJECT_PREFIX,
+            "There is a new reply to content you have participated in, see it here: %s" % parent_url,
+            settings.DEFAULT_FROM_EMAIL,
+            [participant],
+            fail_silently=False,
+        )
 
 
 def send_follow_notification(follower_id, followed_id):
