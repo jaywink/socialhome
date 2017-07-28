@@ -24,18 +24,21 @@ class TestSendReplyNotification(TestCase):
         cls.content_url = "http://127.0.0.1:8000%s" % reverse(
             "content:view-by-slug", kwargs={"pk": cls.content.id, "slug": cls.content.slug}
         )
-        cls.participant_emails = {user.email, replying_user.email}
+        cls.participant_emails = [user.email, replying_user.email]
 
     @patch("socialhome.notifications.tasks.send_mail")
     def test_calls_send_email(self, mock_send):
         send_reply_notifications(self.reply2.id)
-        mock_send.assert_called_once_with(
-            "[Django] New reply to content you have participated in",
-            "There is a new reply to content you have participated in, see it here: %s" % self.content_url,
-            settings.DEFAULT_FROM_EMAIL,
-            self.participant_emails,
-            fail_silently=False,
-        )
+        self.assertEqual(mock_send.call_count, 2)
+        for cal in mock_send.call_args_list:
+            args, kwargs = cal
+            self.assertEqual(args[0], "[Django] New reply to content you have participated in")
+            self.assertEqual(args[1], "There is a new reply to content you have participated in, see it here: %s" %
+                             self.content_url,)
+            self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
+            self.assertTrue(args[3][0] in self.participant_emails)
+            self.assertEqual(len(args[3]), 1)
+            self.assertFalse(kwargs.get("fail_silently"))
 
 
 class TestSendFollowNotification(TestCase):
