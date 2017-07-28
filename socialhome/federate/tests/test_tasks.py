@@ -1,4 +1,4 @@
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 import pytest
 from django.conf import settings
@@ -13,6 +13,7 @@ from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
     forward_relayable, _get_remote_followers,
     send_follow_change)
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -101,20 +102,35 @@ class TestSendContentRetraction(TestCase):
         mock_send.assert_not_called()
 
 
-class TestSendReply(TestCase):
+class TestSendReply(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         author = UserFactory()
         Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.public_content = ContentFactory(author=author.profile, visibility=Visibility.PUBLIC)
+        cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)
         cls.remote_reply = ContentFactory(parent=cls.public_content, author=ProfileFactory())
         cls.reply = ContentFactory(parent=cls.public_content, author=author.profile)
+        cls.reply2 = ContentFactory(parent=cls.remote_content, author=author.profile)
 
-    @patch("socialhome.federate.tasks.handle_send", return_value=None)
-    def test_send_reply(self, mock_sender):
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.forward_relayable")
+    @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
+    def test_send_reply_relaying_via_local_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply.id)
-        assert mock_sender.called == 1
+        mock_forward.assert_called_once_with("entity", self.public_content.id)
+        assert mock_sender.called == 0
+
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.forward_relayable")
+    @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
+    def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
+        send_reply(self.reply2.id)
+        mock_sender.assert_called_once_with("entity", self.reply2.author, [
+            (self.remote_content.author.handle, None),
+        ])
+        assert mock_forward.called == 0
 
 
 class TestForwardRelayable(TestCase):
@@ -130,13 +146,12 @@ class TestForwardRelayable(TestCase):
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_forward_relayable(self, mock_send):
-        entity = Comment(handle=self.reply.author.handle)
-        entity.sign_with_parent = Mock()
+        entity = Comment(handle=self.reply.author.handle, guid=self.reply.guid)
         forward_relayable(entity, self.public_content.id)
-        mock_send.assert_called_once_with(entity, self.public_content.author, [
+        mock_send.assert_called_once_with(entity, self.reply.author, [
             (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
             (self.remote_reply.author.handle, None),
-        ])
+        ], parent_user=self.public_content.author)
 
 
 class TestGetRemoveFollowers(TestCase):

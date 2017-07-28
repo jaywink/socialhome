@@ -105,18 +105,20 @@ def send_reply(content_id):
     if not content.is_local:
         return
     entity = make_federable_entity(content)
-    if entity:
-        if settings.DEBUG:
-            # Don't send in development mode
-            return
-        recipients = [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-        ]
-        recipients.extend(_get_remote_participants_for_parent(content.parent))
-        recipients.extend(_get_remote_followers(content.author))
-        handle_send(entity, content.author, recipients)
-    else:
+    if not entity:
         logger.warning("No entity for %s", content)
+    if settings.DEBUG:
+        # Don't send in development mode
+        return
+    # Send directly (remote parent) or as a relayable (local parent)
+    if content.parent.is_local:
+        forward_relayable(entity, content.parent.id)
+    else:
+        # We only need to send to the original author
+        recipients = [
+            (content.parent.author.handle, None),
+        ]
+        handle_send(entity, content.author, recipients)
 
 
 def send_content_retraction(content, author_id):
@@ -151,16 +153,20 @@ def forward_relayable(entity, parent_id):
     except Content.DoesNotExist:
         logger.warning("No public content found with id %s", parent_id)
         return
+    try:
+        content = Content.objects.get(guid=entity.guid, visibility=Visibility.PUBLIC)
+    except Content.DoesNotExist:
+        logger.warning("No content found with guid %s", entity.guid)
+        return
     if settings.DEBUG:
         # Don't send in development mode
         return
-    entity.sign_with_parent(parent.author.private_key)
     recipients = [
         (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
     ]
     recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
     recipients.extend(_get_remote_followers(parent.author, exclude=entity.handle))
-    handle_send(entity, parent.author, recipients)
+    handle_send(entity, content.author, recipients, parent_user=parent.author)
 
 
 def send_follow_change(profile_id, followed_id, follow):

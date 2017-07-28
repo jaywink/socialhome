@@ -21,6 +21,10 @@ Fixed
 .....
 
 * Make reply notifications to local users not send one single email with all local participants, but one email per participant. Previous implementation would have leaked emails of participants to other participants.
+* Correctly send replies to remotes (`#210 <https://github.com/jaywink/socialhome/issues/210>`_)
+
+  If parent content is local, send via the relayable forwarding mechanism. This ensures parent author signs the content. If parent author is remote, send just to the remote author. The remote author should then relay it.
+
 
 0.1.0 (2017-07-27)
 ------------------
