@@ -139,7 +139,8 @@ class Profile(TimeStampedModel):
 
         Corresponds to private key.
         """
-        return RSA.importKey(self.rsa_private_key)
+        if self.rsa_private_key:
+            return RSA.importKey(self.rsa_private_key)
 
     @cached_property
     def key(self):
@@ -147,7 +148,8 @@ class Profile(TimeStampedModel):
 
         Corresponds to public key.
         """
-        return RSA.importKey(self.rsa_public_key)
+        if self.rsa_public_key:
+            return RSA.importKey(self.rsa_public_key)
 
     @property
     def public(self):
