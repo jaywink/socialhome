@@ -38,7 +38,7 @@ class StreamConsumer(WebsocketConsumer):
         elif stream_info[0] == "profile":
             return Content.objects.profile_pinned(stream_info[1], self.message.user)
         elif stream_info[0] == "profile_all":
-            return Content.objects.profile(stream_info[1], self.message.user)
+            return Content.objects.profile_by_id(stream_info[1], self.message.user)
         return Content.objects.none()
 
     def handle_load_content(self, data):

@@ -74,7 +74,7 @@ class TestStreamConsumerReceive(ChannelTestCase):
 
     @patch("socialhome.streams.consumers.Content.objects.public", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.tags", return_value=Content.objects.none())
-    @patch("socialhome.streams.consumers.Content.objects.profile", return_value=Content.objects.none())
+    @patch("socialhome.streams.consumers.Content.objects.profile_by_id", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.profile_pinned", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.followed", return_value=Content.objects.none())
     def test_get_stream_qs_per_stream(self, mock_followed, mock_pinned, mock_profile, mock_tags, mock_public):
