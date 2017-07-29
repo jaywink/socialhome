@@ -4,6 +4,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_MET
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
+from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer
 
@@ -22,7 +23,11 @@ class ProfileViewSet(ModelViewSet):
     permission_classes = (IsOwnProfileOrReadOnly,)
 
     def get_queryset(self):
-        return Profile.objects.visible_for_user(self.request.user)
+        qs = Profile.objects.visible_for_user(self.request.user)
+        if self.action == "list" and not self.request.user.is_staff:
+            # Filter out also LIMITED profiles since those don't want to be "searched"
+            qs = qs.exclude(visibility=Visibility.LIMITED)
+        return qs
 
     @detail_route(methods=["post"])
     def add_follower(self, request, pk=None):
