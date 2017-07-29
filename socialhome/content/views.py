@@ -33,6 +33,7 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
     model = Content
     form_class = ContentForm
     template_name = "content/edit.html"
+    is_reply = False
 
     def form_valid(self, form):
         object = form.save(commit=False)
@@ -48,8 +49,15 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse("home")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_reply"] = self.is_reply
+        return context
+
 
 class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
+    is_reply = True
+
     def dispatch(self, request, *args, **kwargs):
         content_id = kwargs.get("pk")
         self.parent = get_object_or_404(Content, id=content_id)
@@ -80,6 +88,11 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("home")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_reply"] = True if self.object.parent else False
+        return context
 
 
 class ContentDeleteView(UserOwnsContentMixin, DeleteView):

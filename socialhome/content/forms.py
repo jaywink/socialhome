@@ -16,6 +16,8 @@ class ContentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super(ContentForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs = {"class": "form-control"}
 
     def clean_text(self):
         """Sanitize text if user is untrusted."""

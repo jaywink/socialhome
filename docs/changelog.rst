@@ -17,6 +17,11 @@ Added
 
 * When searching for profiles based on handle, fetch profile from remote if it isn't found locally (`#163 <https://github.com/jaywink/socialhome/issues/163>`_)
 
+Changed
+.......
+
+* Improved content/reply create/edit form. Replies don't contain visibility or pinned form elements any more. Added also some help texts regarding drag'n'drop image embed, visibility and content pinning.
+
 Fixed
 .....
 

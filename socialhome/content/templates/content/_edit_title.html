@@ -1,0 +1,13 @@
+{% load i18n %}
+
+{% if is_reply %}
+    {% if object %}
+        {% trans "Update reply" %}
+    {% else %}
+        {% trans "Reply" %}
+    {% endif %}
+{% elif object %}
+    {% trans "Update" %}
+{% else %}
+    {% trans "Create" %}
+{% endif %}
