@@ -24,7 +24,7 @@ Fixed
 * Correctly send replies to remotes (`#210 <https://github.com/jaywink/socialhome/issues/210>`_)
 
   If parent content is local, send via the relayable forwarding mechanism. This ensures parent author signs the content. If parent author is remote, send just to the remote author. The remote author should then relay it.
-
+* Ensure calling ``Profile.private_key`` or ``Profile.key`` don't crash if the profile doesn't have keys. Now the properties just return ``None``.
 
 0.1.0 (2017-07-27)
 ------------------
