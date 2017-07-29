@@ -69,5 +69,13 @@ class ContentQuerySet(models.QuerySet):
         """Get profile content user has chosen to pin on profile."""
         return self.profile(guid, user).filter(pinned=True).order_by("order")
 
+    def profile_by_id(self, id, user):
+        """Filter for a user profile by ID.
+
+        Ensures if the profile is not visible to the user, no content will be returned.
+        """
+        profile = Profile.objects.only("guid").get(id=id)
+        return self.profile(profile.guid, user)
+
     def children(self, parent_id, user):
         return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("created")
