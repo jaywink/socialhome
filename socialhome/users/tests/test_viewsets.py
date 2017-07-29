@@ -58,10 +58,10 @@ class TestProfileViewSet(APITestCase):
         cls.profile = cls.user.profile
         cls.staff_user = UserFactory(is_staff=True)
         cls.staff_profile = cls.staff_user.profile
-        cls.site_profile = ProfileFactory()
-        cls.self_profile = ProfileFactory()
+        cls.site_profile = ProfileFactory(visibility=Visibility.SITE)
+        cls.self_profile = ProfileFactory(visibility=Visibility.SELF)
+        cls.limited_profile = ProfileFactory(visibility=Visibility.LIMITED)
         Profile.objects.filter(id=cls.profile.id).update(visibility=Visibility.PUBLIC)
-        Profile.objects.filter(id=cls.site_profile.id).update(visibility=Visibility.SITE)
 
     def test_profile_list(self):
         url = reverse("api:profile-list")
@@ -81,7 +81,7 @@ class TestProfileViewSet(APITestCase):
         self.client.login(username=self.staff_user.username, password="password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 4)
+        self.assertEqual(len(response.data.get("results")), 5)
 
     def test_profile_get(self):
         # Not authenticated
