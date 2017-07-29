@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
@@ -303,7 +304,7 @@ class Content(models.Model):
             "rendered": self.rendered,
             "author": self.author_id,
             "author_guid": self.author.guid,
-            "author_name": self.author.name or self.author.handle,
+            "author_name": escape(self.author.name) or self.author.handle,
             "author_handle": self.author.handle,
             "author_image": self.author.safer_image_url_small,
             "author_profile_url": self.author.get_absolute_url(),

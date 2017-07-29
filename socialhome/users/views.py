@@ -6,6 +6,7 @@ from django.views.generic import DetailView, ListView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.models import Content
+from socialhome.users.forms import ProfileForm
 from socialhome.users.models import User, Profile
 from socialhome.users.tables import FollowedTable
 
@@ -123,7 +124,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    fields = ["name", "visibility"]
+    form_class = ProfileForm
     model = Profile
 
     def get_success_url(self):
