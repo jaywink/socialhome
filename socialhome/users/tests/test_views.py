@@ -16,17 +16,13 @@ from socialhome.users.views import (
 
 class TestProfileUpdateView(SocialhomeTestCase):
     def setUp(self):
-        # call BaseUserTestCase.setUp()
-        super(TestProfileUpdateView, self).setUp()
+        super().setUp()
         self.user = self.make_user()
+        self.profile = self.user.profile
         self.factory = RequestFactory()
-        # Instantiate the view directly. Never do this outside a test!
         self.view = ProfileUpdateView()
-        # Generate a fake request
         request = self.factory.get('/fake-url')
-        # Attach the user to the request
         request.user = self.user
-        # Attach the request to the view
         self.view.request = request
 
     def test_get_success_url(self):
@@ -43,6 +39,21 @@ class TestProfileUpdateView(SocialhomeTestCase):
             self.view.get_object(),
             self.user.profile
         )
+
+    def test_updates_name(self):
+        with self.login(self.user):
+            self.post("users:profile-update", data={
+                "name": "updated name", "visibility": self.profile.visibility.value
+            })
+            self.response_302()
+            self.profile.refresh_from_db()
+            self.assertEqual(self.profile.name, "updated name")
+            # Try a bad name
+            self.post("users:profile-update", data={
+                "name": '<script>alert("such hack");</script>', "visibility": self.profile.visibility.value
+            })
+            self.profile.refresh_from_db()
+            self.assertEqual(self.profile.name, 'alert("such hack");')
 
 
 class TestProfileDetailView(SocialhomeTestCase):

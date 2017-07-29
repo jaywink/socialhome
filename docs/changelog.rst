@@ -6,6 +6,13 @@ Changelog
 [unreleased]
 ------------
 
+Security
+........
+
+* Fix XSS vulnerability in profile edit. Unsanitized profile field input was allowed and one place showed a field without escaping it. The fields are now sanitized and escaping has been ensured.
+
+  The problem concerned only local users and not remote profile fields which were correctly sanitized already.
+
 Added
 .....
 
