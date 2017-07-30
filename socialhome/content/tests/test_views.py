@@ -243,20 +243,16 @@ class TestContentView(SocialhomeTestCase):
         self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
 
 
-class TestContentReplyView(TestCase):
+class TestContentReplyView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         user = UserFactory()
         cls.content = ContentFactory(author=user.profile)
 
-    def setUp(self):
-        super().setUp()
-        self.client = Client()
-
     def test_view_renders(self):
-        self.client.force_login(self.content.author.user)
-        response = self.client.get(reverse("content:reply", kwargs={"pk": self.content.id}))
+        with self.login(self.content.author.user):
+            response = self.client.get(reverse("content:reply", kwargs={"pk": self.content.id}))
         self.assertEqual(response.status_code, 200)
 
     def test_redirects_to_login_if_not_logged_in(self):
@@ -264,11 +260,10 @@ class TestContentReplyView(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_form_valid(self):
-        self.client.force_login(self.content.author.user)
-        response = self.client.post(
-            reverse("content:reply", kwargs={"pk": self.content.id}),
-            {"text": "foobar", "visibility": 0, "pinned": False}
-        )
+        with self.login(self.content.author.user):
+            response = self.client.post(
+                reverse("content:reply", kwargs={"pk": self.content.id}), {"text": "foobar"},
+            )
         self.assertEqual(response.status_code, 302)
         self.content.refresh_from_db()
         self.assertEqual(self.content.children.count(), 1)

@@ -118,6 +118,10 @@ class Content(models.Model):
         )
 
     def save(self, author=None, *args, **kwargs):
+        if self.parent:
+            # Ensure replies have sane values
+            self.visibility = self.parent.visibility
+            self.pinned = False
         if self.pk:
             # Old instance, bust the cache
             self.bust_cache()
@@ -133,7 +137,7 @@ class Content(models.Model):
                     self.order = max_order + 1
 
         self.fix_local_uploads()
-        return super(Content, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def save_tags(self, tags):
         """Save given tag relations."""

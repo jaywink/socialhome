@@ -43,7 +43,7 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
     def get_form_kwargs(self):
         """Add user to form kwargs."""
         kwargs = super(ContentCreateView, self).get_form_kwargs()
-        kwargs.update({"user": self.request.user})
+        kwargs.update({"user": self.request.user, "is_reply": self.is_reply})
         return kwargs
 
     def get_success_url(self):
@@ -83,6 +83,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
         kwargs.update({
             "instance": self.object,
             "user": self.request.user,
+            "is_reply": self.is_reply,
         })
         return kwargs
 
@@ -91,8 +92,12 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["is_reply"] = True if self.object.parent else False
+        context["is_reply"] = self.is_reply
         return context
+
+    @property
+    def is_reply(self):
+        return True if self.object.parent else False
 
 
 class ContentDeleteView(UserOwnsContentMixin, DeleteView):
