@@ -124,16 +124,29 @@ Building local documentation
 
 ::
 
-   cd docs
-   make html
+    cd docs
+    make html
 
 Doing a release
 ---------------
 
-* Bump version number in three places:
-    * ``socialhome/__init__.py``
-    * ``docs/conf.py``
-    * ``docs/changelog.rst``
+Bump version number in three places:
+
+* ``socialhome/__init__.py``
+* ``docs/conf.py``
+* ``docs/changelog.rst``
+
+To generate a markdown version of the release changelog, first install ``Pandoc``:
+
+::
+
+    sudo apt install pandoc
+
+Then execute the following and copy the markdown version for pasting to GitHub releases or a Socialhome post:
+
+::
+
+    pandoc --from rst --to markdown_github docs/changelog.rst | less
 
 Contact for help
 ----------------
