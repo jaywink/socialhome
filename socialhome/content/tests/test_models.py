@@ -306,6 +306,12 @@ class TestContentModel(SocialhomeTestCase):
             )
         )
 
+    def test_reply_gets_parent_values(self):
+        # Try with other values
+        reply = ContentFactory(parent=self.public_content, visibility=Visibility.SELF, pinned=True)
+        self.assertEqual(reply.visibility, Visibility.PUBLIC)
+        self.assertFalse(reply.pinned)
+
 
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):

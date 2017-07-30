@@ -15,7 +15,11 @@ class ContentForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        is_reply = kwargs.pop("is_reply", False)
         super(ContentForm, self).__init__(*args, **kwargs)
+        if is_reply:
+            self.fields.pop("visibility")
+            self.fields.pop("pinned")
         for field in self.fields:
             self.fields[field].widget.attrs = {"class": "form-control"}
 

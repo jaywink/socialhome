@@ -3,6 +3,14 @@
 Changelog
 =========
 
+[unreleased]
+------------
+
+Fixed
+.....
+
+* Fix reply form regression introduced in v0.2.0. (`#217 <https://github.com/jaywink/socialhome/issues/217>`_)
+
 0.2.0 (2017-07-30)
 ------------------
 
