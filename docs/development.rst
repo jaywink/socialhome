@@ -130,9 +130,10 @@ Building local documentation
 Doing a release
 ---------------
 
-* Bump version number in two places:
+* Bump version number in three places:
     * ``socialhome/__init__.py``
     * ``docs/conf.py``
+    * ``docs/changelog.rst``
 
 Contact for help
 ----------------
