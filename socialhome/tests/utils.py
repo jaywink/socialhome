@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+from rest_framework.test import APITestCase
 from test_plus import TestCase
 from test_plus.test import CBVTestCase
 
@@ -11,6 +12,10 @@ class SocialhomeTestCase(TestCase):
 
 
 class SocialhomeCBVTestCase(CBVTestCase):
+    maxDiff = None
+
+
+class SocialhomeAPITestCase(APITestCase):
     maxDiff = None
 
 

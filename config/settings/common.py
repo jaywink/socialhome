@@ -399,6 +399,7 @@ REST_FRAMEWORK = {
         "anon": "30/minute",
         "user": "30/minute",
         "image_upload": "50/day",
+        "content_create": "100/day",
     },
     "DEFAULT_VERSION": "0.1",
 }
