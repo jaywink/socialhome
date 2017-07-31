@@ -117,7 +117,7 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
-    def save(self, author=None, *args, **kwargs):
+    def save(self, *args, **kwargs):
         if self.parent:
             # Ensure replies have sane values
             self.visibility = self.parent.visibility
@@ -126,11 +126,8 @@ class Content(models.Model):
             # Old instance, bust the cache
             self.bust_cache()
         else:
-            if author:
-                # New with author, set a GUID and author
+            if not self.guid:
                 self.guid = uuid4()
-                self.author = author
-
             if self.pinned:
                 max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet
