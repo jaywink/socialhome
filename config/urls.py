@@ -9,7 +9,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from socialhome.content.viewsets import ContentViewSet, ImageUploadView
-from socialhome.views import HomeView
+from socialhome.views import HomeView, MarkdownXImageUploadView
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 js_translations = {
@@ -36,6 +36,8 @@ urlpatterns = [
     url(r"^accounts/", include("allauth.urls")),
 
     # Markdownx
+    # Use our own upload view based on the MarkdownX view
+    url(r"^markdownx/upload/$", MarkdownXImageUploadView.as_view(), name="markdownx_upload"),
     url(r"^markdownx/", include("markdownx.urls")),
 
     # Content

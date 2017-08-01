@@ -1,7 +1,10 @@
+from braces.views import LoginRequiredMixin
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
+from markdownx.views import ImageUploadView
 
+from socialhome.forms import MarkdownXImageForm
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
 from socialhome.users.models import Profile
 from socialhome.users.views import ProfileDetailView, ProfileAllContentView
@@ -29,3 +32,13 @@ class HomeView(TemplateView):
             profile = get_object_or_404(Profile, user__username=settings.SOCIALHOME_ROOT_PROFILE)
             return ProfileDetailView.as_view()(request, guid=profile.guid)
         return super(HomeView, self).get(request, *args, **kwargs)
+
+
+class MarkdownXImageUploadView(LoginRequiredMixin, ImageUploadView):
+    form_class = MarkdownXImageForm
+    raise_exception = True
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({"user": self.request.user})
+        return kwargs
