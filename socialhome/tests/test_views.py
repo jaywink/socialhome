@@ -1,12 +1,13 @@
-from django.test import override_settings
+from django.test import override_settings, RequestFactory
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
-from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.tests.utils import SocialhomeTestCase, SocialhomeCBVTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, AdminUserFactory
 from socialhome.users.views import ProfileDetailView, ProfileAllContentView
+from socialhome.views import MarkdownXImageUploadView
 
 
 class TestBaseView(SocialhomeTestCase):
@@ -84,3 +85,33 @@ class TestHomeViewLandingPagePreference(SocialhomeTestCase):
         with self.login(self.user):
             self.get("home")
         self.assertEqual(self.context["view"].__class__, ProfileDetailView)
+
+
+class TestMarkdownXImageUploadViewMethods(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_form_kwargs_has_user(self):
+        request = RequestFactory().get("/")
+        request.user = self.user
+        view = self.get_instance(MarkdownXImageUploadView, request=request)
+        kwargs = view.get_form_kwargs()
+        self.assertEqual(kwargs.get("user"), self.user)
+
+
+class TestMarkdownXImageUploadView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_login_required(self):
+        self.post("markdownx_upload")
+        self.response_403()
+        with self.login(self.user):
+            # Well umm, markdownx upload seems to crash on invalid image payload ¯\_(ツ)_/¯
+            # We really just want to test that a logged in user goes past the "login required" check
+            with self.assertRaises(AttributeError):
+                self.post("markdownx_upload")

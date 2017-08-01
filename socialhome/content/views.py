@@ -37,7 +37,8 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         object = form.save(commit=False)
-        object.save(author=self.request.user.profile)
+        object.author = self.request.user.profile
+        object.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form_kwargs(self):
@@ -66,7 +67,8 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
     def form_valid(self, form):
         object = form.save(commit=False)
         object.parent = self.parent
-        object.save(author=self.request.user.profile)
+        object.author = self.request.user.profile
+        object.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

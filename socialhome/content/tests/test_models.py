@@ -2,7 +2,6 @@ import datetime
 from unittest.mock import Mock, patch, call
 
 from django.contrib.auth.models import AnonymousUser
-from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.text import slugify
@@ -50,17 +49,8 @@ class TestContentModel(SocialhomeTestCase):
         self.site_content.refresh_from_db()
 
     def test_create(self):
-        Content.objects.create(text="foobar", guid="barfoo", author=ProfileFactory())
-
-    def test_gets_guid_on_save_with_user(self):
-        content = Content(text="foobar")
-        content.save(author=ProfileFactory())
+        content = Content.objects.create(text="foobar", author=ProfileFactory())
         assert content.guid
-
-    def test_raises_on_save_without_user(self):
-        content = Content(text="foobar")
-        with transaction.atomic(), self.assertRaises(IntegrityError):
-            content.save()
 
     def test_get_rendered_contents_for_user(self):
         qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
@@ -157,14 +147,11 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_content_saved_in_correct_order(self):
         profile = ProfileFactory(guid="1234")
-        pinned_content_1 = Content(pinned=True, text="foobar")
-        pinned_content_2 = Content(pinned=True, text="foobar")
-        pinned_content_3 = Content(pinned=True, text="foobar")
-        pinned_content_1.save(author=profile)
-        pinned_content_2.save(author=profile)
-        pinned_content_3.save(author=profile)
+        pinned_content_1 = ContentFactory(pinned=True, text="foobar", author=profile)
+        pinned_content_2 = ContentFactory(pinned=True, text="foobar", author=profile)
+        pinned_content_3 = ContentFactory(pinned=True, text="foobar", author=profile)
 
-        assert [pinned_content_1.order, pinned_content_2.order, pinned_content_3.order] == [1, 2, 3]
+        self.assertEqual([pinned_content_1.order, pinned_content_2.order, pinned_content_3.order], [1, 2, 3])
 
     def test_edited_is_false_for_newly_created_content(self):
         self.assertFalse(self.public_content.edited)

@@ -8,7 +8,9 @@ from django.views.i18n import javascript_catalog
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from socialhome.views import HomeView
+from socialhome.content.viewsets import ContentViewSet
+from socialhome.viewsets import ImageUploadView
+from socialhome.views import HomeView, MarkdownXImageUploadView
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 js_translations = {
@@ -17,6 +19,7 @@ js_translations = {
 
 # API routes
 router = DefaultRouter()
+router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
 router.register(r"users", UserViewSet)
 
@@ -34,6 +37,8 @@ urlpatterns = [
     url(r"^accounts/", include("allauth.urls")),
 
     # Markdownx
+    # Use our own upload view based on the MarkdownX view
+    url(r"^markdownx/upload/$", MarkdownXImageUploadView.as_view(), name="markdownx_upload"),
     url(r"^markdownx/", include("markdownx.urls")),
 
     # Content
@@ -48,6 +53,7 @@ urlpatterns = [
 
     # API
     url(r"^api/", include(router.urls, namespace="api")),
+    url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", obtain_auth_token),
 

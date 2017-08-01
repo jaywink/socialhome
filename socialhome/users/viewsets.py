@@ -1,8 +1,9 @@
+from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
@@ -17,7 +18,7 @@ class IsOwnProfileOrReadOnly(BasePermission):
         return obj.user == request.user
 
 
-class ProfileViewSet(ModelViewSet):
+class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, GenericViewSet):
     queryset = Profile.objects.none()
     serializer_class = ProfileSerializer
     permission_classes = (IsOwnProfileOrReadOnly,)

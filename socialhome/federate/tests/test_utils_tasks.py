@@ -123,7 +123,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def setUp(self):
         super().setUp()
-        self.comment = base.Comment(target_guid=self.content.guid, raw_content="foobar")
+        self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar")
 
     def test_reply_is_created_from_entity(self):
         process_entity_comment(self.comment, ProfileFactory())

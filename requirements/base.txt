@@ -66,6 +66,7 @@ pyembed==1.3.3
 python-opengraph==0.0.2
 arrow==0.10.0
 django-settings-export==1.2.1
+Pillow==4.2.1
 
 # IPython for administration
 ipython
