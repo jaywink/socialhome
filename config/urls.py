@@ -8,7 +8,8 @@ from django.views.i18n import javascript_catalog
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from socialhome.content.viewsets import ContentViewSet, ImageUploadView
+from socialhome.content.viewsets import ContentViewSet
+from socialhome.viewsets import ImageUploadView
 from socialhome.views import HomeView, MarkdownXImageUploadView
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
