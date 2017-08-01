@@ -7,6 +7,8 @@ from django.views import defaults as default_views
 from django.views.i18n import javascript_catalog
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
+from rest_framework.schemas import get_schema_view
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
 from socialhome.content.viewsets import ContentViewSet
 from socialhome.viewsets import ImageUploadView
@@ -22,6 +24,9 @@ router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
 router.register(r"users", UserViewSet)
+
+# API docs
+schema_view = get_schema_view(title="Socialhome API", renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
@@ -52,6 +57,7 @@ urlpatterns = [
     url(r"^django-rq/", include("django_rq.urls")),
 
     # API
+    url(r"^api/$", schema_view, name="api-docs"),
     url(r"^api/", include(router.urls, namespace="api")),
     url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),

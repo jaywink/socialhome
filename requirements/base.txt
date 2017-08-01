@@ -73,6 +73,7 @@ ipython
 
 # API
 djangorestframework==3.6.3
+django-rest-swagger==2.1.2
 
 # User settings
 django-dynamic-preferences==1.2
