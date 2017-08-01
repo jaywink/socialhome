@@ -11,6 +11,15 @@ from socialhome.users.serializers import UserSerializer, ProfileSerializer
 
 
 class IsOwnProfileOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+
+        if not request.user.is_authenticated:
+            return False
+
+        return True
+
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
             return True
