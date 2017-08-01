@@ -115,11 +115,11 @@ class TestProfileViewSet(APITestCase):
         response = self.client.patch(
             reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}), {"name": "foo"}
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
         response = self.client.patch(
             reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}), {"name": "foo"}
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
         response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {"name": "foo"})
