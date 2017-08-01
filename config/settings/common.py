@@ -43,6 +43,7 @@ THIRD_PARTY_APPS = (
     "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_swagger",
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "django_tables2",
@@ -232,6 +233,7 @@ SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "home"
 LOGIN_URL = "account_login"
+LOGOUT_URL = "account_logout"
 
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
@@ -402,6 +404,13 @@ REST_FRAMEWORK = {
         "content_create": "100/day",
     },
     "DEFAULT_VERSION": "0.1",
+}
+
+# REST SWAGGER
+# ------------
+SWAGGER_SETTINGS = {
+    "APIS_SORTER": "alpha",
+    "DOC_EXPANSION": "list",
 }
 
 # DYNAMIC PREFERENCES
