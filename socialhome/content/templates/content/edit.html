@@ -37,10 +37,10 @@
                     <div class="form-group form-check-inline">
                         <label for="{{ form.pinned.id }}">{{ form.pinned.label }}</label>
                         {{ form.pinned }}
+                        <small class="form-text">
+                            {% trans "Pinned content will be shown on your personal profile in the order you want. Reorder pinned content from the profile menu. Pinned content will federate and otherwise function as any other content." %}
+                        </small>
                     </div>
-                    <small class="form-text">
-                        {% trans "Pinned content will be shown on your personal profile in the order you want. Reorder pinned content from the profile menu. Pinned content will federate and otherwise function as any other content." %}
-                    </small>
                 </div>
             </div>
         {% endif %}

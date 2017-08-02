@@ -20,8 +20,10 @@ class ContentForm(ModelForm):
         if is_reply:
             self.fields.pop("visibility")
             self.fields.pop("pinned")
-        for field in self.fields:
-            self.fields[field].widget.attrs = {"class": "form-control"}
+        else:
+            self.fields["visibility"].widget.attrs = {"class": "form-control"}
+            self.fields["pinned"].widget.attrs = {"class": "form-check"}
+        self.fields["text"].widget.attrs = {"class": "form-control"}
 
     def clean_text(self):
         """Sanitize text if user is untrusted."""
