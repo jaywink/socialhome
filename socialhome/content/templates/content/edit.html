@@ -12,8 +12,9 @@
         <div class="form-group">
             {{ form.text }}
             <small class="form-text">
-                {% trans "You can upload png/jpg/svg files by dragging them to the text area." %}
+                {% trans "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg." %}
             </small>
+            <div id="image-upload-progress-container" class="pt-2"></div>
         </div>
         {% if not is_reply %}
             <div class="row">
@@ -46,6 +47,12 @@
         {% endif %}
         <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
     </form>
+    {# "Hidden" form for image upload input #}
+    <div style="height:0px; overflow:hidden;">
+        <form id="image-upload-form" enctype="multipart/form-data">
+            <input type="file" id="image-upload-input" name="image" />
+        </form>
+    </div>
 {% endblock %}
 
 {% block javascript %}
