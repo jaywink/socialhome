@@ -299,6 +299,15 @@ class TestContentModel(SocialhomeTestCase):
         self.assertEqual(reply.visibility, Visibility.PUBLIC)
         self.assertFalse(reply.pinned)
 
+    def test_get_absolute_url(self):
+        self.assertEqual(self.public_content.get_absolute_url(),
+                         "/content/%s/%s/" % (self.public_content.id, self.public_content.slug))
+        self.public_content.text = "बियर राम्रो छ"
+        self.public_content.save()
+        del self.public_content.slug
+        del self.public_content.short_text
+        self.assertEqual(self.public_content.get_absolute_url(), "/content/%s/" % self.public_content.id)
+
 
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):

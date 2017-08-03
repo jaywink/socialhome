@@ -32,10 +32,6 @@ class TestContentCreateView:
         assert content.author == request.user.profile
         assert content.visibility == Visibility.PUBLIC
 
-    def test_get_success_url(self, admin_client, rf):
-        request, view = self._get_request_and_view(rf)
-        assert view.get_success_url() == "/"
-
     def test_create_view_renders(self, admin_client, rf):
         response = admin_client.get(reverse("content:create"))
         assert response.status_code == 200
@@ -74,10 +70,6 @@ class TestContentUpdateView:
         assert content.author == request.user.profile
         assert content.visibility == Visibility.PUBLIC
         assert content.text == "barfoo"
-
-    def test_get_success_url(self, admin_client, rf):
-        request, view, content = self._get_request_view_and_content(rf)
-        assert view.get_success_url() == "/"
 
     def test_update_view_renders(self, admin_client, rf):
         profile = Profile.objects.get(user__username="admin")

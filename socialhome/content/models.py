@@ -117,6 +117,11 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
+    def get_absolute_url(self):
+        if self.slug:
+            return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
+        return reverse("content:view", kwargs={"pk": self.id})
+
     def save(self, *args, **kwargs):
         if self.parent:
             # Ensure replies have sane values

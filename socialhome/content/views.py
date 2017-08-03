@@ -39,16 +39,13 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         object = form.save(commit=False)
         object.author = self.request.user.profile
         object.save()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(object.get_absolute_url())
 
     def get_form_kwargs(self):
         """Add user to form kwargs."""
         kwargs = super(ContentCreateView, self).get_form_kwargs()
         kwargs.update({"user": self.request.user, "is_reply": self.is_reply})
         return kwargs
-
-    def get_success_url(self):
-        return reverse("home")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,7 +69,7 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse("content:view-by-slug", kwargs={"pk": self.parent.id, "slug": self.parent.slug})
+        return self.parent.get_absolute_url()
 
 
 class ContentUpdateView(UserOwnsContentMixin, UpdateView):
@@ -90,7 +87,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
         return kwargs
 
     def get_success_url(self):
-        return reverse("home")
+        return self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
