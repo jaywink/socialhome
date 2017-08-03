@@ -65,7 +65,7 @@ class Tag(models.Model):
         self.name = self.name.strip().lower()
         super().save()
 
-    @property
+    @cached_property
     def channel_group_name(self):
         """Make a safe Channel group name.
 
@@ -117,6 +117,11 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
+    def get_absolute_url(self):
+        if self.slug:
+            return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
+        return reverse("content:view", kwargs={"pk": self.id})
+
     def save(self, *args, **kwargs):
         if self.parent:
             # Ensure replies have sane values
@@ -157,7 +162,7 @@ class Content(models.Model):
     def is_nsfw(self):
         return self.text.lower().find("#nsfw") > -1
 
-    @property
+    @cached_property
     def is_local(self):
         if self.author.user:
             return True
@@ -190,15 +195,15 @@ class Content(models.Model):
     def formatted_timestamp(self):
         return arrow.get(self.modified).format()
 
-    @property
+    @cached_property
     def short_text(self):
         return truncate_letters(self.text, 50)
 
-    @property
+    @cached_property
     def slug(self):
         return slugify(self.short_text)
 
-    @property
+    @cached_property
     def channel_group_name(self):
         """Make a safe Channel group name.
 

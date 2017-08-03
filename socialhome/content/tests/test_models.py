@@ -46,6 +46,14 @@ class TestContentModel(SocialhomeTestCase):
     def setUp(self):
         super().setUp()
         self.public_content.refresh_from_db()
+        try:
+            del self.public_content.short_text
+        except AttributeError:
+            pass
+        try:
+            del self.public_content.slug
+        except AttributeError:
+            pass
         self.site_content.refresh_from_db()
 
     def test_create(self):
@@ -124,6 +132,7 @@ class TestContentModel(SocialhomeTestCase):
         self.assertFalse(self.site_content.is_local)
         self.site_content.author = self.profile
         self.site_content.save()
+        del self.site_content.is_local
         self.assertTrue(self.site_content.is_local)
 
     def test_save_calls_fix_local_uploads(self):
@@ -298,6 +307,15 @@ class TestContentModel(SocialhomeTestCase):
         reply = ContentFactory(parent=self.public_content, visibility=Visibility.SELF, pinned=True)
         self.assertEqual(reply.visibility, Visibility.PUBLIC)
         self.assertFalse(reply.pinned)
+
+    def test_get_absolute_url(self):
+        self.assertEqual(self.public_content.get_absolute_url(),
+                         "/content/%s/%s/" % (self.public_content.id, self.public_content.slug))
+        self.public_content.text = "बियर राम्रो छ"
+        self.public_content.save()
+        del self.public_content.slug
+        del self.public_content.short_text
+        self.assertEqual(self.public_content.get_absolute_url(), "/content/%s/" % self.public_content.id)
 
 
 class TestContentRendered(SocialhomeTestCase):

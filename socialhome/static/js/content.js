@@ -35,7 +35,7 @@
                             '<span id="content-bar-actions"> ' +
                                 '&nbsp;' +
                                 '<a id="content-update-link" href="<%= content.update_url %>"><i class="fa fa-pencil" title="' + gettext("Update") + '" aria-label="' + gettext("Update") + '"></i></a> ' +
-                                '<a id="content-delete-link" href="<%= content.delete_url %>"><i class="fa fa-remove" title="' + gettext("Delete") + '" aria-label="' + gettext("Delete") + '"></i></a>' +
+                                '<a id="content-delete-link" href="<%= content.delete_url %>?next='+ window.location.pathname +'"><i class="fa fa-remove" title="' + gettext("Delete") + '" aria-label="' + gettext("Delete") + '"></i></a>' +
                             '</span>' +
                         '<% } %>' +
                     '</div>' +
