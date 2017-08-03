@@ -104,6 +104,9 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
     template_name = "content/delete.html"
 
     def get_success_url(self):
+        next = self.request.GET.get("next")
+        if next:
+            return next
         return reverse("home")
 
 

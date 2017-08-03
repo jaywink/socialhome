@@ -113,8 +113,11 @@ class TestContentUpdateView:
 
 @pytest.mark.usefixtures("admin_client", "rf")
 class TestContentDeleteView:
-    def _get_request_view_and_content(self, rf):
-        request = rf.get("/")
+    def _get_request_view_and_content(self, rf, next=False):
+        if next:
+            request = rf.get("/?next=/foobar")
+        else:
+            request = rf.get("/")
         request.user = UserFactory()
         content = ContentFactory(author=request.user.profile)
         view = ContentDeleteView(request=request, kwargs={"pk": content.id})
@@ -124,6 +127,8 @@ class TestContentDeleteView:
     def test_get_success_url(self, admin_client, rf):
         request, view, content = self._get_request_view_and_content(rf)
         assert view.get_success_url() == "/"
+        request, view, content = self._get_request_view_and_content(rf, next=True)
+        assert view.get_success_url() == "/foobar"
 
     def test_delete_view_renders(self, admin_client, rf):
         profile = Profile.objects.get(user__username="admin")
