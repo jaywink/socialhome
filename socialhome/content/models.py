@@ -22,7 +22,6 @@ from socialhome.content.querysets import TagQuerySet, ContentQuerySet
 from socialhome.content.utils import make_nsfw_safe, test_tag, linkify_text_urls
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
-from socialhome.utils import safe_clear_cached_property
 
 
 class OpenGraphCache(models.Model):
@@ -127,10 +126,7 @@ class Content(models.Model):
             # Ensure replies have sane values
             self.visibility = self.parent.visibility
             self.pinned = False
-        if self.pk:
-            # Old instance, bust the cache
-            self.bust_cache()
-        else:
+        if not self.pk:
             if not self.guid:
                 self.guid = uuid4()
             if self.pinned:
@@ -153,10 +149,6 @@ class Content(models.Model):
             tags_to_add.append(tag)
         final_tags = tags_to_add + list(Tag.objects.filter(name__in=tags & current))
         self.tags.set(final_tags)
-
-    def bust_cache(self):
-        """Clear relevant caches for this instance."""
-        safe_clear_cached_property(self, "is_nsfw")
 
     @cached_property
     def is_nsfw(self):

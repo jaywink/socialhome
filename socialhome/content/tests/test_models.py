@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import Mock, patch, call
+from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
@@ -114,18 +114,6 @@ class TestContentModel(SocialhomeTestCase):
                 "parent": "",
                 "profile_id": "",
             }
-        ])
-
-    def test_busts_cache_on_save(self):
-        self.public_content.bust_cache = Mock()
-        self.public_content.save()
-        self.public_content.bust_cache.assert_called_once_with()
-
-    @patch("socialhome.content.models.safe_clear_cached_property")
-    def test_bust_cache_calls_safe_cache_clearer(self, mock_clear):
-        self.public_content.bust_cache()
-        self.assertEqual(mock_clear.call_args_list, [
-            call(self.public_content, "is_nsfw"),
         ])
 
     def test_is_local(self):
