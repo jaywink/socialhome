@@ -22,10 +22,14 @@
                 </div>
             </div>
             <div class="mt-1">
-                <a class="btn btn-secondary" href="#" title="{% trans "Following" %}" aria-label="{% trans "Following" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> {{ profile.following.count }}</a>
+                <a class="btn btn-secondary" href="{% url "users:contacts-followed" %}" title="{% trans "Following" %}" aria-label="{% trans "Following" %}">
+                    <i class="fa fa-user"></i> <i class="fa fa-arrow-right"></i> <i class="fa fa-users"></i> &nbsp;{{ profile.following.count }}
+                </a>
             </div>
             <div class="mt-1">
-                <a class="btn btn-secondary" href="#" title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-left"></i> {{ followers_count }}</a>
+                <a class="btn btn-secondary" href="#" title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}">
+                    <i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> <i class="fa fa-user"></i> &nbsp;{{ followers_count }}
+                </a>
             </div>
         {% else %}
             <div class="text-right">
@@ -39,10 +43,14 @@
             </div>
             {% if profile.user %}
                 <div class="mt-1 text-right">
-                    <span title="{% trans "Following" %}" aria-label="{% trans "Following" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> {{ profile.following.count }}</span>
+                    <span title="{% trans "Following" %}" aria-label="{% trans "Following" %}">
+                        <i class="fa fa-user"></i> <i class="fa fa-arrow-right"></i> <i class="fa fa-users"></i> &nbsp;{{ profile.following.count }}
+                    </span>
                 </div>
                 <div class="mt-1">
-                    <span title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}"><i class="fa fa-users"></i> <i class="fa fa-arrow-left"></i> {{ followers_count }}</span>
+                    <span title="{% trans "Followers" %}" aria-label="{% trans "Followers" %}">
+                        <i class="fa fa-users"></i> <i class="fa fa-arrow-right"></i> <i class="fa fa-user"></i> &nbsp;{{ followers_count }}
+                    </span>
                 </div>
             {% endif %}
         {% endif %}

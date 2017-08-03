@@ -16,6 +16,7 @@ Added
 
 * New API docs exposed by Django REST Swagger. These are in the same place as the old ones, at ``/api/``. Adding to the documentation is still a work in progress.
 * Add image upload button to the create/reply editor. This makes it possible to upload images from mobile browsers. (`#120 <https://github.com/jaywink/socialhome/issues/120>`_)
+* Make profile "following" button link to "following contacts" page, if user is logged in and own profile.
 
 Changed
 .......
