@@ -9,12 +9,12 @@
     <h1>
         {% trans "Confirm delete" %}
     </h1>
-    <div>
+    <div class="grid-item w-100">
         {{ content.rendered|safe }}
     </div>
-    <form method="post">
+    <form method="post" class="mt-3">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">{% trans "Delete" %}</button>
-        <button type="button" onclick="window.history.back();" class="btn btn-default">{% trans "Cancel" %}</button>
+        <button type="button" onclick="window.history.back();" class="btn btn-secondary">{% trans "Cancel" %}</button>
     </form>
 {% endblock %}

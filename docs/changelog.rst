@@ -27,6 +27,7 @@ Fixed
 .....
 
 * Fix internal server error when replying to content that contained only characters outside the western Latin character sets.
+* Visual fixes for content rendering in content delete page.
 
 0.2.1 (2017-07-30)
 ------------------
