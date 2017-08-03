@@ -30,6 +30,8 @@ class GlobalSearchView(SearchView):
         """
         try:
             q = safe_text(request.GET.get("q"))
+            if q:
+                q = q.strip()
             validate_email(q)
         except ValidationError:
             pass

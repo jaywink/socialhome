@@ -94,3 +94,9 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertResponseNotContains("Results", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], profile)
+
+        # Survives extra spaces around
+        self.get("%s?q=%s" % (reverse("search:global"), "%20i-dont-exist-locally@example.com%20"), follow=True)
+        self.assertResponseNotContains("Results", html=False)
+        self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
+        self.assertEqual(self.context["object"], profile)
