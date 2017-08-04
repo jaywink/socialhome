@@ -4,9 +4,6 @@
         autofocus: true,
         iconlibrary: "fa",
         hiddenButtons: ["cmdPreview"],
-        onChange: function(e) {
-            e.$textarea.trigger("input");
-        }.bind(this),
         additionalButtons: [[{
             name: "groupCustom",
             data: [{
@@ -56,11 +53,25 @@
                 $("#" + imageId).hide();
             },
             success: function(data) {
+                var $textArea = $("#id_text");
+                var text = $textArea.val();
+                var position = document.getElementById("id_text").selectionStart;
                 if (data.code !== undefined) {
-                    $('#id_text').val(function(_, val) {
-                        return val + "\n" + data.code + "\n";
+                    var newText = text.substring(0, position) + "\n" + data.code + " " + text.substring(position);
+                    $textArea.val(newText);
+                    document.getElementById("id_text").selectionEnd = position + data.code.length + 2;
+
+                    // Placing new text doesn't trigger the textarea in a way that MarkdownX picks it up and does
+                    // a preview fetch - and have tried all posssible events to make it trigger to no benefit.
+                    // So, let's do it manually.
+                    $.post({
+                        url: "/markdownx/markdownify/",
+                        data: { content: newText },
+                        headers: { "X-CSRFToken": Cookies.get("csrftoken") },
+                        success: function(data) {
+                            $(".markdownx-preview").html(data);
+                        },
                     });
-                    // TODO: how do we make the preview trigger??
                 }
             },
         });
