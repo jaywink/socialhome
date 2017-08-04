@@ -32,7 +32,7 @@ class TestImageUploadView(SocialhomeAPITestCase, TestCase):
         self.assertEqual(response.status_code, 201)
         code = response.data["code"]
         url = response.data["url"]
-        self.assertIn("![](http://127.0.0.1:8000/media/markdownx/", code)
-        self.assertIn("http://127.0.0.1:8000/media/markdownx/", url)
+        self.assertIn("![](http://127.0.0.1:8000/media/uploads/", code)
+        self.assertIn("http://127.0.0.1:8000/media/uploads/", url)
         image_upload = ImageUpload.objects.filter(user=self.user).first()
         self.assertEqual(image_upload.image.name, url.replace("http://127.0.0.1:8000/media/", ""))
