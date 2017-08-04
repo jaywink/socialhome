@@ -311,9 +311,10 @@ MOCHA_TESTS = False
 MARKDOWNX_MARKDOWNIFY_FUNCTION = "CommonMark.commonmark"
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime("uploads/%Y/%m/%d")
 MARKDOWNX_IMAGE_MAX_SIZE = {
-    "size": (2048, 2048),
+    "size": (2048, 0),
     "quality": 90,
 }
+MARKDOWNX_UPLOAD_MAX_SIZE = 20 * 1024 * 1024
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
