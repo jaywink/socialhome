@@ -48,6 +48,15 @@ To make a user an admin, log in to the shell and execute the following to set th
 
     User.objects.filter(username=<username>).update(is_staff=True, is_superuser=True)
 
+Backups
+-------
+
+Three places should be backed up from the Socialhome instance to ensure recovery in the event of a disaster.
+
+* The database
+* Local settings in ``env.local`` (assuming you are using this way to configure the application)
+* The path ``socialhome/media/`` which contains for example image uploads
+
 Configuration
 -------------
 
