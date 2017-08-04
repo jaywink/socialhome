@@ -309,7 +309,7 @@ MOCHA_TESTS = False
 # MARKDOWN
 # --------
 MARKDOWNX_MARKDOWNIFY_FUNCTION = "CommonMark.commonmark"
-MARKDOWNX_MEDIA_PATH = datetime.now().strftime("markdownx/%Y/%m/%d")
+MARKDOWNX_MEDIA_PATH = datetime.now().strftime("uploads/%Y/%m/%d")
 MARKDOWNX_IMAGE_MAX_SIZE = {
     "size": (2048, 2048),
     "quality": 90,
