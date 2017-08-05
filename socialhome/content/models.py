@@ -289,7 +289,7 @@ class Content(models.Model):
 
             ![](https://socialhome.domain/media/markdownx/12345.jpg
         """
-        self.text = re.sub(r"!\[\]\(/media/markdownx/", "![](%s/media/markdownx/" % settings.SOCIALHOME_URL, self.text)
+        self.text = re.sub(r"!\[\]\(/media/uploads/", "![](%s/media/uploads/" % settings.SOCIALHOME_URL, self.text)
 
     def dict_for_view(self, user):
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp

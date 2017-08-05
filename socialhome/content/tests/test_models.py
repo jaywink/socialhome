@@ -129,11 +129,11 @@ class TestContentModel(SocialhomeTestCase):
         self.public_content.fix_local_uploads.assert_called_once_with()
 
     def test_fix_local_uploads(self):
-        self.public_content.text = "foobar ![](/media/markdownx/12345.jpg) barfoo"
+        self.public_content.text = "foobar ![](/media/uploads/12345.jpg) barfoo"
         self.public_content.save()
         self.assertEqual(
             self.public_content.text,
-            "foobar ![](http://127.0.0.1:8000/media/markdownx/12345.jpg) barfoo"
+            "foobar ![](http://127.0.0.1:8000/media/uploads/12345.jpg) barfoo"
         )
 
     def test_effective_created(self):
