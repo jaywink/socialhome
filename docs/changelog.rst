@@ -3,6 +3,15 @@
 Changelog
 =========
 
+[unreleased]
+------------
+
+Fixed
+.....
+
+* Bump ``federation`` library again to fix a regression in reply relaying due to security fixes in the library 0.14.0 release.
+
+
 0.3.0 (2017-08-06)
 ------------------
 
