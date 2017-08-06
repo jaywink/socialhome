@@ -5,20 +5,17 @@
             v-if="showAuthorBar"
             v-bind="author"
             :is-user-author="isUserAuthor"
+            :is-user-local="isUserLocal"
+            :current-browsing-user-id="currentBrowsingUserId"
             :is-user-authentificated="isUserAuthentificated"
         ></author-bar>
         <div class="grid-item-bar">
             <div class="row">
                 <div class="col-9">
-                    <!-- TODO: Modal and Socket need a rewrite to get rid of grid-item-open-action -->
-                    <span
-                        v-if="edited"
-                        class="grid-item-open-action"
-                        :data-content-id="id"
-                        :title="timestamp"
-                    >
-                        {{ humanizedTimestamp }}{{ editedText }}
-                    </span> &nbsp;
+                    <a :ref="contentUrl" :data-content-id="id" :title="timestamp" class="grid-item-open-action">
+                        {{ humanizedTimestamp }}
+                    </a>&nbsp;
+                    <span v-if="edited">{{ editedText }}</span>
                     <div v-if="isUserAuthor">
                         <a :href="updateUrl">
                             <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
@@ -57,14 +54,17 @@
             timestamp: {type: String, required: true},
             humanizedTimestamp: {type: String, required: true},
             htmlSafe: {type: String, required: true},
+            contentUrl: {type: String, required: true},
             updateUrl: {type: String, required: true},
             deleteUrl: {type: String, required: true},
             replyUrl: {type: String, required: true},
             childrenCount: {type: Number, required: true},
             edited: {type: Boolean, required: true},
+            isUserLocal: {type: Boolean, required: true},
             isUserAuthor: {type: Boolean, required: true},
             showAuthorBar: {type: Boolean, required: true},
-            isUserAuthentificated: {type: Boolean, required: true}
+            isUserAuthentificated: {type: Boolean, required: true},
+            currentBrowsingUserId: {type: String, default: ""}
         },
         computed: {
             editedText() { return this.edited ? " (edited)" : "" },

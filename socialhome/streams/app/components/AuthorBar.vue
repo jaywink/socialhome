@@ -1,6 +1,6 @@
 <template>
     <div class="grid-item-author-bar mt-1">
-        <div @click.stop.prevent="profileBoxTrigger" class="profile-box-trigg">
+        <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
             <img :src="imageUrlSmall" class="grid-item-author-bar-pic">
             {{ name }}
         </div>
@@ -17,7 +17,7 @@
                     v-if="showFollowBtn"
                     class="follower-button btn btn-secondary"
                     data-action="remove_follower"
-                    :data-profileid="guid"
+                    :data-profileid="currentBrowsingUserId"
                     :data-target="guid"
                     title="Unfollow"
                     aria-label="Unfollow"
@@ -28,7 +28,7 @@
                     v-if="showUnfollowBtn"
                     class="follower-button btn btn-secondary"
                     data-action="add_follower"
-                    :data-profileid="guid"
+                    :data-profileid="currentBrowsingUserId"
                     :data-target="guid"
                     title="Follow"
                     aria-label="Follow"
@@ -49,10 +49,12 @@
             handle: {type: String, required: true},
             name: {type: String, required: true},
             guid: {type: String, required: true},
+            currentBrowsingUserId: {type: String, required: true},
             homeUrl: {type: String, required: true},
             absoluteUrl: {type: String, required: true},
             imageUrlSmall: {type: String, required: true},
             isUserAuthor: {type: Boolean, required: true},
+            isUserLocal: {type: Boolean, required: true},
             isUserFollowingAuthor: {type: Boolean, required: true},
             isUserAuthentificated: {type: Boolean, required: true}
         },
@@ -80,7 +82,7 @@
 </script>
 
 <style scoped lang="scss">
-    .profile-box-trigg {
-        cursor: pointer
+    .profilebox-trigger {
+        cursor: pointer;
     }
 </style>

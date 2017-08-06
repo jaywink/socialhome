@@ -22,6 +22,7 @@
                 :data-content-id="content.id"
                 :is-user-authentificated="$store.state.isUserAuthentificated"
                 :show-author-bar="$store.state.showAuthorBar"
+                :current-browsing-user-id="$store.state.currentBrowsingUserId"
             >
             </stream-element>
         </div>
@@ -34,5 +35,5 @@
     import "streams/app/components/StreamElement.vue"
     import store from "streams/app/stores/streamStore"
 
-    export default Vue.component("stream", {store});
+    export default Vue.component("stream", {store})
 </script>

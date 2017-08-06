@@ -19,10 +19,12 @@
                             isUserFollowingAuthor: {% if not content.author.id in request.user.profile.following_ids %}true{% else %}false{% endif %}
                         },
                         id: {{ content.id }},
-                        timestamp: "{{ formatted_timestamp }}",
-                        humanizedTimestamp: "{{ humanized_timestamp }}",
+                        timestamp: "{{ content.formatted_timestamp }}",
+                        humanizedTimestamp: "{{ content.humanized_timestamp }}",
                         edited: {{ content.edited|json_safe }},
                         childrenCount: {{ content.children.count }},
+                        isUserLocal: {% if content.author.user %}true{% else %}false{% endif %},
+                        contentUrl: "{{ content.get_absolute_url }}",
                         {% if content.author == request.user.profile %}
                             isUserAuthor: true,
                             updateUrl: "{% url " content:update" content.id %}",
@@ -37,6 +39,7 @@
                     },
                 {% endfor -%}
             ],
+            currentBrowsingUserId: "{{ request.user.profile.id }}",
             streamName: "{{ stream_name }}",
             isUserAuthentificated: {% if request.user.is_authenticated %}true{% else %}false{% endif %},
             showAuthorBar: {% if not stream_name|startswith:"profile_" %}true{% else %}false{% endif %},
