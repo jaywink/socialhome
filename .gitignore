@@ -73,8 +73,8 @@ env.local
 # Collected statics
 socialhome/static/css/*.css
 socialhome/static/js/project.js
-socialhome/static/js/webpack.bundle.js
-socialhome/static/js/webpack.bundle.js.map
+socialhome/static/js/webpack.*.js
+socialhome/static/js/webpack.*.js.map
 socialhome/static/fonts/
 !/socialhome/static/fonts/.gitkeep
 staticfiles/

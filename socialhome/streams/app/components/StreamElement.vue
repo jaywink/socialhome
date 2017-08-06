@@ -48,7 +48,7 @@
 
 <script>
     import Vue from "vue"
-    import "./AuthorBar.vue"
+    import "streams/app/components/AuthorBar.vue"
 
     export default Vue.component("stream-element", {
         props: {

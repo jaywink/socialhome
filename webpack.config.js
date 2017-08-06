@@ -2,19 +2,20 @@ const path = require("path")
 const webpack = require("webpack")
 
 module.exports = {
-    entry: path.resolve(__dirname, "socialhome/streams/app/main.js"),
+    entry: {
+        stream: path.resolve(__dirname, "socialhome/streams/app/main.js")
+    },
     output: {
         path: path.resolve(__dirname, "socialhome/static/js"),
-        filename: "webpack.bundle.js"
+        filename: "webpack.[name].js"
     },
     module: {
         loaders: [
             {
                 test: /.js$/,
                 loader: "babel-loader",
-                query: {
-                    presets: ["es2017"]
-                }
+                exclude: /node_modules/,
+                query: {presets: ["es2017"]}
             },
             {
                 test: /\.scss$/,
@@ -33,12 +34,12 @@ module.exports = {
         ]
     },
     resolve: {
-        alias: {
-            vue: "vue/dist/vue.js"
-        }
+        modules: [
+            path.resolve(__dirname, "socialhome"),
+            path.resolve(__dirname, "node_modules")
+        ],
+        alias: {vue: "vue/dist/vue.js",}
     },
-    stats: {
-        colors: true
-    },
+    stats: {colors: true},
     devtool: "cheap-module-source-map"
 }
