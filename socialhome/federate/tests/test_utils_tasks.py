@@ -92,10 +92,18 @@ class TestProcessEntityPost(SocialhomeTestCase):
 
     def test_post_is_updated_from_entity(self):
         entity = entities.PostFactory()
-        ContentFactory(guid=entity.guid)
-        process_entity_post(entity, ProfileFactory())
+        author = ProfileFactory(handle=entity.handle)
+        ContentFactory(guid=entity.guid, author=author)
+        process_entity_post(entity, author)
         content = Content.objects.get(guid=entity.guid)
-        assert content.text == entity.raw_content
+        self.assertEqual(content.text, entity.raw_content)
+
+        # Don't allow updating if the author is different
+        invalid_entity = entities.PostFactory(guid=entity.guid)
+        process_entity_post(invalid_entity, ProfileFactory(handle=invalid_entity.handle))
+        content.refresh_from_db()
+        self.assertEqual(content.text, entity.raw_content)
+        self.assertEqual(content.author, author)
 
     def test_post_text_fields_are_cleaned(self):
         entity = entities.PostFactory(
@@ -123,7 +131,8 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def setUp(self):
         super().setUp()
-        self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar")
+        self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar",
+                                    handle="thor@example.com")
 
     def test_reply_is_created_from_entity(self):
         process_entity_comment(self.comment, ProfileFactory())
@@ -139,10 +148,27 @@ class TestProcessEntityComment(SocialhomeTestCase):
         self.assertEqual(content.text.index("![](foobar) ![](zoodee) \n\n%s" % self.comment.raw_content), 0)
 
     def test_reply_is_updated_from_entity(self):
-        ContentFactory(guid=self.comment.guid)
-        process_entity_comment(self.comment, ProfileFactory())
+        author = ProfileFactory(handle=self.comment.handle)
+        ContentFactory(guid=self.comment.guid, author=author)
+        process_entity_comment(self.comment, author)
         content = Content.objects.get(guid=self.comment.guid, parent=self.content)
         self.assertEqual(content.text, self.comment.raw_content)
+
+        # Don't allow updating if the author is different
+        invalid_entity = base.Comment(guid=self.comment.guid, raw_content="barfoo", handle="loki@example.com",
+                                      target_guid=self.content.guid)
+        process_entity_comment(invalid_entity, ProfileFactory(handle=invalid_entity.handle))
+        content.refresh_from_db()
+        self.assertEqual(content.text, self.comment.raw_content)
+        self.assertEqual(content.author, author)
+
+        # Don't allow changing parent
+        invalid_entity = base.Comment(guid=self.comment.guid, raw_content="barfoo", handle="thor@example.com",
+                                      target_guid=ContentFactory().guid)
+        process_entity_comment(invalid_entity, author)
+        content.refresh_from_db()
+        self.assertEqual(content.text, self.comment.raw_content)
+        self.assertEqual(content.author, author)
 
     def test_reply_text_fields_are_cleaned(self):
         self.comment.raw_content = "<script>alert('yup');</script>"

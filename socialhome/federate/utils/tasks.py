@@ -85,11 +85,31 @@ def process_entity_relationship(entity, profile):
     logger.info("Profile %s now follows user %s", profile, user)
 
 
+def validate_against_old_content(guid, entity, profile):
+    """Do some validation against a possible local object."""
+    try:
+        old_content = Content.objects.get(guid=guid)
+    except Content.DoesNotExist:
+        return True
+    # Do some validation
+    if old_content.author.user:
+        logger.warning("Remote sent update for content (%s) that is local (%s)! Skipping.",
+                       guid, old_content.author.handle)
+        return False
+    if old_content.author != profile:
+        logger.warning("Remote sent update for content (%s) with different author (%s) than our content (%s)! "
+                       "Skipping.", guid, profile.handle, old_content.author.handle)
+        return False
+    if old_content.parent and entity.target_guid and old_content.parent.guid != entity.target_guid:
+        logger.warning("Remote sent update for content (%s) with different parent! Skipping.", guid)
+        return False
+    return True
+
+
 def process_entity_post(entity, profile):
     """Process an entity of type Post."""
     guid = safe_text(entity.guid)
-    if Content.objects.filter(guid=guid, author__user__isnull=False).exists():
-        logger.warning("Remote sent content with guid %s is local! Skipping.", guid)
+    if not validate_against_old_content(guid, entity, profile):
         return
     values = {
         "text": safe_text_for_markdown(entity.raw_content),
@@ -109,8 +129,7 @@ def process_entity_post(entity, profile):
 def process_entity_comment(entity, profile):
     """Process an entity of type Comment."""
     guid = safe_text(entity.guid)
-    if Content.objects.filter(guid=guid, author__user__isnull=False).exists():
-        logger.warning("Remote sent comment with guid %s is local! Skipping.", guid)
+    if not validate_against_old_content(guid, entity, profile):
         return
     try:
         parent = Content.objects.get(guid=entity.target_guid)

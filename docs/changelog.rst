@@ -6,6 +6,15 @@ Changelog
 [unreleased]
 ------------
 
+Security
+........
+
+* Reject remote content updates via the federation layer which reference an already existing remote content object but have a different author.
+
+  Note that locally created content was previously safe from this kind of takeover. This, even though serious, affects only remote created content stored locally.
+
+* Reject remote reply updates via the federation layer which try to change the parent content reference.
+
 Added
 .....
 
