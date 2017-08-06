@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 # Federation documentation build configuration file, created by
 # sphinx-quickstart on Sun Oct  2 12:42:19 2016.
