@@ -25,9 +25,9 @@
                         childrenCount: {{ content.children.count }},
                         {% if content.author == request.user.profile %}
                             isUserAuthor: true,
-                            updateUrl: "{% url " content:update" content.id %}",
+                            updateUrl: "{% url "content:update" content.id %}",
                             replyUrl: "{% url "content:reply" pk=content.id %}",
-                            deleteUrl: "{% url " content:delete" content.id %}",
+                            deleteUrl: "{% url "content:delete" content.id %}",
                         {% else %}
                             isUserAuthor: false,
                             updateUrl: "",
@@ -52,6 +52,11 @@
         <stream></stream>
     </div>
 {% endblock %}
+
+{% block modal %}
+    <div id="vue-modal"></div>
+{% endblock %}
+
 
 {% block javascript %}
     {{ block.super }}
