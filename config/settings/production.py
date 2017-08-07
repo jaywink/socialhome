@@ -119,3 +119,9 @@ CACHES = {
 # RQ
 # --
 RQ_QUEUES["default"]["USE_REDIS_CACHE"] = "default"
+
+# VERSATILEIMAGEFIELD
+# -------------------
+VERSATILEIMAGEFIELD_SETTINGS = {
+    "create_images_on_demand": False,
+}

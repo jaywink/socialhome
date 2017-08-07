@@ -19,6 +19,11 @@ urlpatterns = [
         name="detail"
     ),
     url(
+        regex=r"^u/~update-picture/$",
+        view=views.UserPictureUpdateView.as_view(),
+        name="picture-update"
+    ),
+    url(
         regex=r"^p/~organize/$",
         view=views.OrganizeContentProfileDetailView.as_view(),
         name="profile-organize"

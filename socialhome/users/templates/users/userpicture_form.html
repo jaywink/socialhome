@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Change profile picture" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Change profile picture" %}</h1>
+    <h4 class="pt-2">{% trans "Uploading a new picture" %}</h4>
+    <p>{% trans "Click the file browse button and choose an image file from your computer. Click 'Save'." %}</p>
+    <h4>{% trans "Cropping an existing picture" %}</h4>
+    <p>{% trans "Profile pictures are square shaped. If your picture is not square shaped, you can choose a 'point of interest' by clicking the full image preview on the right. Click on the center point you would like your profile picture be around, then click 'Save'." %}</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <img src="{{ user.picture.crop.300x300 }}">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    {{ form.picture }}
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Return to profile" %}</a>
+          </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block css %}
+    {{ form.media.css }}
+    {{ block.super }}
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}

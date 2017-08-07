@@ -3,6 +3,16 @@
 Changelog
 =========
 
+[unreleased]
+------------
+
+Added
+.....
+
+* Allow user to change profile picture. (`#151 <https://github.com/jaywink/socialhome/issues/151>`_)
+
+  Profile menu now has an extra option "Change picture". This allows uploading a new picture and optionally setting focus point for cropping a picture that is not square shape.
+
 0.3.1 (2017-08-06)
 ------------------
 

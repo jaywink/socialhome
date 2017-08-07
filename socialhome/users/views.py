@@ -6,7 +6,7 @@ from django.views.generic import DetailView, ListView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 
 from socialhome.content.models import Content
-from socialhome.users.forms import ProfileForm
+from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.tables import FollowedTable
 
@@ -132,6 +132,18 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return Profile.objects.get(guid=self.request.user.profile.guid)
+
+
+class UserPictureUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = UserPictureForm
+    model = User
+    template_name = "users/userpicture_form.html"
+
+    def get_success_url(self):
+        return reverse("users:picture-update")
+
+    def get_object(self, queryset=None):
+        return User.objects.get(id=self.request.user.id)
 
 
 class UserListView(StaffuserRequiredMixin, ListView):

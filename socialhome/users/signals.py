@@ -14,10 +14,10 @@ logger = logging.getLogger("socialhome")
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, **kwargs):
+def user_post_save(sender, **kwargs):
+    user = kwargs.get("instance")
     if kwargs.get("created"):
         # Create the user profile
-        user = kwargs.get("instance")
         profile = Profile.objects.create(
             user=user,
             name=user.name,
@@ -27,6 +27,9 @@ def create_user_profile(sender, **kwargs):
         )
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()
+    else:
+        # Update profile data from user
+        user.copy_picture_to_profile()
 
 
 def on_commit_profile_following_change(action, pks, instance):

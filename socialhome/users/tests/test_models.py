@@ -1,23 +1,24 @@
+from unittest.mock import Mock, patch
+
 from django.test import override_settings
-from test_plus.test import TestCase
 
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 from socialhome.users.utils import get_pony_urls
 
 
-class TestUser(TestCase):
-    def setUp(self):
-        self.user = self.make_user()
+class TestUser(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
 
     def test__str__(self):
-        self.assertEqual(
-            self.user.__str__(),
-            "testuser"  # This is the default username for self.make_user()
-        )
+        self.assertEqual(self.user.__str__(), self.user.username)
 
     def test_get_absolute_url(self):
-        assert self.user.get_absolute_url() == "/u/testuser/"
+        assert self.user.get_absolute_url() == "/u/%s/" % self.user.username
 
     def test_get_first_name(self):
         self.user.first_name = "foo"
@@ -40,6 +41,24 @@ class TestUser(TestCase):
         self.user.last_name = ""
         self.user.name = ""
         assert self.user.get_last_name() == ""
+
+    @patch("socialhome.users.models.User.picture")
+    def test_copy_picture_to_profile(self, mock_picture):
+        class MockCropped(object):
+            def __init__(self, name):
+                self.name = name
+
+        self.profile.image_url_small = self.profile.image_url_medium = self.profile.image_url_large = "foo"
+        self.user.picture = Mock(crop={
+            "50x50": MockCropped("small"),
+            "100x100": MockCropped("medium"),
+            "300x300": MockCropped("large"),
+        })
+        self.user.copy_picture_to_profile()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.image_url_small, "http://127.0.0.1:8000/media/small")
+        self.assertEqual(self.profile.image_url_medium, "http://127.0.0.1:8000/media/medium")
+        self.assertEqual(self.profile.image_url_large, "http://127.0.0.1:8000/media/large")
 
 
 class TestProfile(SocialhomeTestCase):

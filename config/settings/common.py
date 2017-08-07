@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "django_tables2",
     "haystack",
+    "versatileimagefield",
 )
 LOCAL_APPS = (
     "socialhome",

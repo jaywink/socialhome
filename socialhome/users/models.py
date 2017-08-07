@@ -1,3 +1,5 @@
+import os
+
 from Crypto.PublicKey import RSA
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
@@ -7,12 +9,15 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from model_utils.models import TimeStampedModel
+from versatileimagefield.fields import VersatileImageField, PPOIField
+from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls
+from socialhome.utils import get_full_media_url
 
 
 class User(AbstractUser):
@@ -30,6 +35,18 @@ class User(AbstractUser):
     # TODO remove in favour of Profile.following
     followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following_set")
     following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers_set")
+
+    # Picture
+    picture = VersatileImageField(
+        _("Picture"), upload_to="profiles/", width_field="picture_width", height_field="picture_height",
+        placeholder_image=OnDiscPlaceholderImage(path=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "static", "images", "pony300.png",
+        )), blank=True, null=True, max_length=255, ppoi_field="picture_ppoi",
+    )
+    picture_height = models.PositiveIntegerField(_("Picture height"), blank=True, null=True)
+    picture_width = models.PositiveIntegerField(_("Picture width"), blank=True, null=True)
+    picture_ppoi = PPOIField("Picture PPOI")
+
 
     def __str__(self):
         return self.username
@@ -55,6 +72,14 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+
+    def copy_picture_to_profile(self):
+        """Copy picture to profile image urls"""
+        if self.picture:
+            self.profile.image_url_small = get_full_media_url(self.picture.crop["50x50"].name)
+            self.profile.image_url_medium = get_full_media_url(self.picture.crop["100x100"].name)
+            self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
+            self.profile.save(update_fields=["image_url_small", "image_url_medium", "image_url_large"])
 
 
 class Profile(TimeStampedModel):
