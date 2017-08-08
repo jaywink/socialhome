@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "django_tables2",
     "haystack",
+    "versatileimagefield",
 )
 LOCAL_APPS = (
     "socialhome",
@@ -436,3 +437,13 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
+
+# VERSATILEIMAGEFILED
+# -------------------
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "profile_picture": [
+        ("small", "crop__50x50"),
+        ("medium", "crop__100x100"),
+        ("large", "crop__300x300"),
+    ],
+}

@@ -372,3 +372,32 @@ class TestContactsFollowedView(SocialhomeTestCase):
             self.get("users:contacts-followed")
         self.assertTrue(isinstance(self.context["followed_table"], FollowedTable))
         self.assertContext("profile", self.user.profile)
+
+
+class TestUserPictureUpdateView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_login_required_and_view_responds_with_correct_object(self):
+        # Not logged in, redirects to login
+        self.get("users:picture-update")
+        self.response_302()
+        # Logged in
+        with self.login(self.user):
+            self.get("users:picture-update")
+        self.response_200()
+        self.assertContext("user", self.user)
+
+    def test_profile_picture_change(self):
+        self.client.force_login(self.user)
+        temp_image = self.get_temp_image()
+        response = self.client.post(
+            reverse("users:picture-update"),
+            {"picture_0": temp_image, "picture_1": "0.5x0.5"},
+            format="multipart",
+        )
+        self.assertEqual(response.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.picture.name, temp_image.name.replace("/tmp/", "profiles/"))

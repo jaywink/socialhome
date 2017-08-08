@@ -103,3 +103,12 @@ body {
 .btn, .card, .form-control {
   border-radius: unset;
 }
+
+// Versatileimagefield overrides
+.versatileimagefield {
+  float: unset !important;
+}
+
+.versatileimagefield-label {
+  padding-right: 10px;
+}

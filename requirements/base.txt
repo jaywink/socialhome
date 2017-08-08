@@ -26,6 +26,7 @@ django-floppyforms==1.7.0
 # Models
 django-model-utils==3.0.0
 django-enumfields==0.9.0
+django-versatileimagefield==1.7.1
 
 # User registration, either via email or social
 django-allauth==0.32.0

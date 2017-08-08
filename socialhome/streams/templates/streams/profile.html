@@ -14,6 +14,7 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenuButton">
                     <a class="dropdown-item" href="{% url "users:profile-update" %}" title="{% trans "Update profile" %}" aria-label="{% trans "Update profile" %}"><i class="fa fa-address-book"></i> {% trans "Update profile" %}</a>
+                    <a class="dropdown-item" href="{% url "users:picture-update" %}" title="{% trans "Change picture" %}" aria-label="{% trans "Change picture" %}"><i class="fa fa-camera"></i> {% trans "Change picture" %}</a>
                     <a class="dropdown-item" href="{% url "dynamic_preferences.user" %}" title="{% trans "Preferences" %}" aria-label="{% trans "Preferences" %}"><i class="fa fa-cog"></i> {% trans "Preferences" %}</a>
                     <a class="dropdown-item" href="{% url "account_email" %}" title="{% trans "Email" %}" aria-label="{% trans "Email" %}"><i class="fa fa-envelope"></i> {% trans "Email" %}</a>
                     {% if content_list %}
