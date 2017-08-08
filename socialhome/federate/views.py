@@ -19,7 +19,7 @@ from socialhome import __version__ as version
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task
-from socialhome.federate.utils.tasks import make_federable_entity
+from socialhome.federate.utils.tasks import make_federable_content
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -111,7 +111,7 @@ def content_xml_view(request, guid):
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     if not content.is_local:
         raise Http404()
-    entity = make_federable_entity(content)
+    entity = make_federable_content(content)
     xml = get_full_xml_representation(entity, content.author.private_key)
     return HttpResponse(xml, content_type="application/xml")
 
@@ -136,7 +136,7 @@ def content_fetch_view(request, objtype, guid):
             content.author.handle.split("@")[1], objtype, guid
         )
         return HttpResponseRedirect(url)
-    entity = make_federable_entity(content)
+    entity = make_federable_content(content)
     message = get_full_xml_representation(entity, content.author.private_key)
     document = MagicEnvelope(
         message=message, private_key=content.author.private_key, author_handle=content.author.handle

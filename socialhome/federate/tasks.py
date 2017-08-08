@@ -11,7 +11,7 @@ from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
-    process_entities, make_federable_entity, make_federable_retraction, sender_key_fetcher
+    process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher
 )
 from socialhome.users.models import Profile
 
@@ -57,7 +57,7 @@ def send_content(content_id):
         return
     if not content.is_local:
         return
-    entity = make_federable_entity(content)
+    entity = make_federable_content(content)
     if entity:
         if settings.DEBUG:
             # Don't send in development mode
@@ -104,7 +104,7 @@ def send_reply(content_id):
         return
     if not content.is_local:
         return
-    entity = make_federable_entity(content)
+    entity = make_federable_content(content)
     if not entity:
         logger.warning("No entity for %s", content)
     if settings.DEBUG:

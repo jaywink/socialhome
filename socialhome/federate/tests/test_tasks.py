@@ -40,20 +40,20 @@ class TestSendContent(TestCase):
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
-    @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
-    def test_only_public_content_calls_make_federable_entity(self, mock_maker):
+    @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
+    def test_only_public_content_calls_make_federable_content(self, mock_maker):
         send_content(self.limited_content.id)
         mock_maker.assert_not_called()
         send_content(self.public_content.id)
         mock_maker.assert_called_once_with(self.public_content)
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_handle_send_is_called(self, mock_maker, mock_send):
         send_content(self.public_content.id)
         mock_send.assert_called_once_with("entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')])
 
-    @patch("socialhome.federate.tasks.make_federable_entity", return_value=None)
+    @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
     def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
         send_content(self.public_content.id)
@@ -75,7 +75,7 @@ class TestSendContentRetraction(TestCase):
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
-    def test_only_public_content_calls_make_federable_entity(self, mock_maker):
+    def test_only_public_content_calls_make_federable_retraction(self, mock_maker):
         send_content_retraction(self.limited_content, self.limited_content.author_id)
         mock_maker.assert_not_called()
         send_content_retraction(self.public_content, self.public_content.author_id)
@@ -116,7 +116,7 @@ class TestSendReply(SocialhomeTestCase):
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_relayable")
-    @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_send_reply_relaying_via_local_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply.id)
         mock_forward.assert_called_once_with("entity", self.public_content.id)
@@ -124,7 +124,7 @@ class TestSendReply(SocialhomeTestCase):
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_relayable")
-    @patch("socialhome.federate.tasks.make_federable_entity", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author, [

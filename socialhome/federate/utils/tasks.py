@@ -32,7 +32,7 @@ def get_sender_profile(sender):
 def process_entities(entities):
     """Process a list of entities."""
     for entity in entities:
-        logging.info("Entity: %s" % entity)
+        logger.info("Entity: %s", entity)
         profile = get_sender_profile(entity.handle)
         if not profile:
             logger.warning("No sender profile for entity %s, skipping" % entity)
@@ -58,7 +58,7 @@ def process_entity_follow(entity, profile):
     try:
         user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
     except User.DoesNotExist:
-        logging.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
+        logger.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
         return
     if entity.following:
         profile.following.add(user.profile)
@@ -78,7 +78,7 @@ def process_entity_relationship(entity, profile):
     try:
         user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
     except User.DoesNotExist:
-        logging.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
+        logger.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
         return
     profile.following.add(user.profile)
     django_rq.enqueue(send_follow_notification, profile.id, user.profile.id)
@@ -201,7 +201,7 @@ def _retract_relationship(target_guid, profile):
     try:
         user = User.objects.get(profile__guid=target_guid)
     except User.DoesNotExist:
-        logging.warning("Could not find local user %s for relationship retraction", target_guid)
+        logger.warning("Could not find local user %s for relationship retraction", target_guid)
         return
     profile.following.remove(user.profile)
     logger.info("Profile %s has unfollowed user %s", profile, user)
@@ -250,9 +250,9 @@ def _make_comment(content):
         return None
 
 
-def make_federable_entity(content):
+def make_federable_content(content):
     """Make Content federable by converting it to a federation entity."""
-    logging.info("make_federable_entity - Content: %s" % content)
+    logger.info("make_federable_content - Content: %s", content)
     if content.parent:
         return _make_comment(content)
     return _make_post(content)
@@ -260,7 +260,7 @@ def make_federable_entity(content):
 
 def make_federable_retraction(content, author):
     """Make Content retraction federable by converting it to a federation entity."""
-    logging.info("make_federable_retraction - Content: %s" % content)
+    logger.info("make_federable_retraction - Content: %s", content)
     try:
         return base.Retraction(
             entity_type="Comment" if content.parent else "Post",
@@ -269,6 +269,27 @@ def make_federable_retraction(content, author):
         )
     except Exception as ex:
         logger.exception("make_federable_retraction - Failed to convert %s: %s", content.guid, ex)
+        return None
+
+
+def make_federable_profile(profile):
+    """Make a federable profile."""
+    logger.info("make_federable_profile - Profile: %s", profile)
+    try:
+        return base.Profile(
+            handle=profile.handle,
+            raw_content="",
+            public=True if profile.visibility == Visibility.PUBLIC else False,
+            guid=profile.guid,
+            name=profile.name,
+            image_urls={
+                "small": profile.safer_image_url_small,
+                "medium": profile.safer_image_url_medium,
+                "large": profile.safer_image_url_large,
+            },
+        )
+    except Exception as ex:
+        logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)
         return None
 
 
@@ -282,18 +303,18 @@ def sender_key_fetcher(handle):
     :returns: RSA public key or None
     :rtype: str
     """
-    logging.debug("sender_key_fetcher - Checking for handle '%s'", handle)
+    logger.debug("sender_key_fetcher - Checking for handle '%s'", handle)
     try:
         profile = Profile.objects.get(handle=handle, user__isnull=True)
-        logging.debug("sender_key_fetcher - Handle %s already exists as a profile", handle)
+        logger.debug("sender_key_fetcher - Handle %s already exists as a profile", handle)
     except Profile.DoesNotExist:
-        logging.debug("sender_key_fetcher - Handle %s was not found, fetching from remote", handle)
+        logger.debug("sender_key_fetcher - Handle %s was not found, fetching from remote", handle)
         remote_profile = retrieve_remote_profile(handle)
         if not remote_profile:
             logger.warning("Remote profile %s for sender key not found locally or remotely.", handle)
             return None
         # We might as well create the profile locally here since we'll need it again soon
-        logging.debug("sender_key_fetcher - Creating %s from remote profile", handle)
+        logger.debug("sender_key_fetcher - Creating %s from remote profile", handle)
         Profile.from_remote_profile(remote_profile)
         return remote_profile.public_key
     else:
