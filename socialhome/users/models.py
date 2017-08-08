@@ -191,6 +191,11 @@ class Profile(TimeStampedModel):
         """Is this profile public or one of the more limited visibilities?"""
         return self.visibility == Visibility.PUBLIC
 
+    @property
+    def is_local(self):
+        """If the profile has a user, it's local."""
+        return self.user is not None
+
     def safer_image_url(self, size):
         """Return a most likely more working image url for the profile.
 

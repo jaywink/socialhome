@@ -3,7 +3,7 @@ from unittest.mock import patch, call
 from django.conf import settings
 from django.test import TransactionTestCase, override_settings
 
-from socialhome.federate.tasks import send_follow_change
+from socialhome.federate.tasks import send_follow_change, send_profile
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
@@ -63,3 +63,15 @@ class TestProfileFollowingChange(TransactionTestCase):
                 call(send_follow_change, self.profile2.id, self.profile.id, False),
             ]
         )
+
+
+class TestFederateProfile(TransactionTestCase):
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_non_local_profile_does_not_get_sent(self, mock_send):
+        ProfileFactory()
+        mock_send.assert_not_called()
+
+    @patch("socialhome.content.signals.django_rq.enqueue")
+    def test_local_profile_gets_sent(self, mock_send):
+        user = UserFactory()
+        mock_send.assert_called_once_with(send_profile, user.profile.id)

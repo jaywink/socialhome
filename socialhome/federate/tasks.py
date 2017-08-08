@@ -11,8 +11,8 @@ from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
-    process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher
-)
+    process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher,
+    make_federable_profile)
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
@@ -68,7 +68,7 @@ def send_content(content_id):
         recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
-        logger.warning("No entity for %s", content)
+        logger.warning("send_content - No entity for %s", content)
 
 
 def _get_remote_participants_for_parent(parent, exclude=None):
@@ -106,7 +106,7 @@ def send_reply(content_id):
         return
     entity = make_federable_content(content)
     if not entity:
-        logger.warning("No entity for %s", content)
+        logger.warning("send_reply - No entity for %s", content)
     if settings.DEBUG:
         # Don't send in development mode
         return
@@ -140,7 +140,7 @@ def send_content_retraction(content, author_id):
         recipients.extend(_get_remote_followers(author))
         handle_send(entity, author, recipients)
     else:
-        logger.warning("No retraction entity for %s", content)
+        logger.warning("send_content_retraction - No retraction entity for %s", content)
 
 
 def forward_relayable(entity, parent_id):
@@ -156,7 +156,7 @@ def forward_relayable(entity, parent_id):
     try:
         content = Content.objects.get(guid=entity.guid, visibility=Visibility.PUBLIC)
     except Content.DoesNotExist:
-        logger.warning("No content found with guid %s", entity.guid)
+        logger.warning("forward_relayable - No content found with guid %s", entity.guid)
         return
     if settings.DEBUG:
         # Don't send in development mode
@@ -174,12 +174,12 @@ def send_follow_change(profile_id, followed_id, follow):
     try:
         profile = Profile.objects.get(id=profile_id, user__isnull=False)
     except Profile.DoesNotExist:
-        logger.warning("No local profile %s found to send follow with", profile_id)
+        logger.warning("send_follow_change - No local profile %s found to send follow with", profile_id)
         return
     try:
         remote_profile = Profile.objects.get(id=followed_id, user__isnull=True)
     except Profile.DoesNotExist:
-        logger.warning("No remote profile %s found to send follow for", followed_id)
+        logger.warning("send_follow_change - No remote profile %s found to send follow for", followed_id)
         return
     if settings.DEBUG:
         # Don't send in development mode
@@ -191,3 +191,35 @@ def send_follow_change(profile_id, followed_id, follow):
         remote_profile.handle.split("@")[1], remote_profile.guid,
     )
     send_document(url, payload)
+
+
+def send_profile(profile_id):
+    """Handle sending a Profile object out via the federation layer."""
+    try:
+        profile = Profile.objects.get(id=profile_id)
+    except Profile.DoesNotExist:
+        logger.warning("send_profile - No profile found with id %s", profile_id)
+        return
+    if not profile.is_local:
+        return
+    entity = make_federable_profile(profile)
+    if not entity:
+        logger.warning("send_profile - No entity for %s", profile)
+        return
+    if settings.DEBUG:
+        # Don't send in development mode
+        return
+    # From diaspora devs: "if the profile is private it needs to be encrypted, so to the private endpoint,
+    # starting with 0.7.0.0 diaspora starts sending public profiles to the public endpoint only once per pod".
+    # Let's just send everything to private endpoints as 0.7 isn't out yet.
+    # TODO: once 0.7 is out for longer, start sending public profiles to public endpoints
+    # TODO: add high level method support to federation for private payload delivery
+    recipients = _get_remote_followers(profile)
+    for handle, _network in recipients:
+        try:
+            remote_profile = Profile.objects.get(handle=handle)
+        except Profile.DoesNotExist:
+            continue
+        payload = handle_create_payload(entity, profile, to_user=remote_profile)
+        url = "https://%s/receive/users/%s" % (handle.split("@")[1], remote_profile.guid)
+        send_document(url, payload)

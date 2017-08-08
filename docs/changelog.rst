@@ -13,6 +13,8 @@ Added
 
   Profile menu now has an extra option "Change picture". This allows uploading a new picture and optionally setting focus point for cropping a picture that is not square shape.
 
+* Federate local profiles to remote followers on save. (`#168 <https://github.com/jaywink/socialhome/issues/168>`_)
+
 0.3.1 (2017-08-06)
 ------------------
 

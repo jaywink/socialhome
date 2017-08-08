@@ -7,7 +7,7 @@ from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
-from socialhome.federate.tasks import send_follow_change
+from socialhome.federate.tasks import send_follow_change, send_profile
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -52,3 +52,17 @@ def profile_following_change(sender, instance, action, pk_set, **kwargs):
         logger.debug("profile_following_change - Got %s from %s for %s", action, sender, instance)
         logger.debug("profile_following_change - pk_set %s", pk_set)
         transaction.on_commit(lambda: on_commit_profile_following_change(action, pk_set, instance))
+
+
+@receiver(post_save, sender=Profile)
+def profile_post_save(instance, **kwargs):
+    if instance.is_local:
+        transaction.on_commit(lambda: federate_profile(instance))
+
+
+def federate_profile(profile):
+    """Send out local profiles to the federation layer."""
+    try:
+        django_rq.enqueue(send_profile, profile.id)
+    except Exception as ex:
+        logger.exception("Failed to federate profile %s: %s", profile, ex)

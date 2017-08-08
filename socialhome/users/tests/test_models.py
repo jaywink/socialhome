@@ -62,6 +62,12 @@ class TestUser(SocialhomeTestCase):
 
 
 class TestProfile(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.profile = ProfileFactory(guid="1234")
+        cls.user = UserFactory()
+
     def test_generate_new_rsa_key(self):
         profile = ProfileFactory()
         current_rsa_key = profile.rsa_private_key
@@ -72,21 +78,17 @@ class TestProfile(SocialhomeTestCase):
         assert profile.rsa_public_key != current_public_key
 
     def test_get_absolute_url(self):
-        profile = ProfileFactory(guid="1234")
-        assert profile.get_absolute_url() == "/p/1234/"
+        self.assertEqual(self.profile.get_absolute_url(), "/p/1234/")
 
     def test_home_url(self):
-        profile = ProfileFactory(guid="1234")
-        assert profile.home_url == profile.remote_url
-        user = UserFactory()
-        assert user.profile.home_url == user.profile.get_absolute_url()
+        self.assertEqual(self.profile.home_url, self.profile.remote_url)
+        self.assertEqual(self.user.profile.home_url, self.user.profile.get_absolute_url())
 
     def test_remote_url(self):
-        profile = ProfileFactory(guid="1234")
-        assert profile.remote_url == "https://example.com/people/1234"
+        self.assertEqual(self.profile.remote_url, "https://example.com/people/1234")
 
     def test_profile_image_urls_default_to_ponies(self):
-        profile = ProfileFactory(guid="1234", image_url_small="", image_url_medium="", image_url_large="")
+        profile = ProfileFactory(image_url_small="", image_url_medium="", image_url_large="")
         ponies = get_pony_urls()
         urls = [profile.image_url_large, profile.image_url_medium, profile.image_url_small]
         self.assertEqual(urls, ponies)
@@ -134,3 +136,7 @@ class TestProfile(SocialhomeTestCase):
     def test_empty_guid(self):
         with self.assertRaises(ValueError):
             ProfileFactory(guid="")
+
+    def test_is_local(self):
+        self.assertTrue(self.user.profile.is_local)
+        self.assertFalse(self.profile.is_local)

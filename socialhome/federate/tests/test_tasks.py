@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import pytest
 from django.conf import settings
@@ -12,7 +12,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
     forward_relayable, _get_remote_followers,
-    send_follow_change)
+    send_follow_change, send_profile)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
@@ -202,3 +202,38 @@ class TestSendFollow(TestCase):
             "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
             "payload",
         )
+
+
+class TestSendProfile(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
+        cls.remote_profile2 = ProfileFactory()
+
+    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
+    @patch("socialhome.federate.tasks._get_remote_followers")
+    @patch("socialhome.federate.tasks.send_document")
+    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
+    def test_send_local_profile(self, mock_federable, mock_send, mock_get, mock_payload):
+        mock_get.return_value = [(self.remote_profile.handle, None), (self.remote_profile2.handle, None)]
+        send_profile(self.profile.id)
+        mock_payload_calls = [
+            call("profile", self.profile, to_user=self.remote_profile),
+            call("profile", self.profile, to_user=self.remote_profile2),
+        ]
+        self.assertEqual(mock_payload_calls, mock_payload.call_args_list)
+        mock_send_calls = [
+            call("https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
+                 "payload"),
+            call("https://%s/receive/users/%s" % (self.remote_profile2.handle.split("@")[1], self.remote_profile2.guid),
+                 "payload"),
+        ]
+        self.assertEqual(mock_send_calls, mock_send.call_args_list)
+
+    @patch("socialhome.federate.tasks.make_federable_profile")
+    def test_skip_remote_profile(self, mock_make):
+        send_profile(self.remote_profile.id)
+        self.assertFalse(mock_make.called)
