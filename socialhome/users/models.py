@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from model_utils.models import TimeStampedModel
 from versatileimagefield.fields import VersatileImageField, PPOIField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
 from socialhome.content.utils import safe_text
@@ -80,6 +81,15 @@ class User(AbstractUser):
             self.profile.image_url_medium = get_full_media_url(self.picture.crop["100x100"].name)
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
             self.profile.save(update_fields=["image_url_small", "image_url_medium", "image_url_large"])
+
+    def init_pictures_on_disk(self):
+        """Create image versions on disk."""
+        picture_warmer = VersatileImageFieldWarmer(
+            instance_or_queryset=self,
+            rendition_key_set="profile_picture",
+            image_attr="picture",
+        )
+        picture_warmer.warm()
 
 
 class Profile(TimeStampedModel):

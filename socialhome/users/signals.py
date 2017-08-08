@@ -27,9 +27,9 @@ def user_post_save(sender, **kwargs):
         )
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()
-    else:
-        # Update profile data from user
-        user.copy_picture_to_profile()
+    # Initialize and copy pictures to profile
+    user.init_pictures_on_disk()
+    user.copy_picture_to_profile()
 
 
 def on_commit_profile_following_change(action, pks, instance):
