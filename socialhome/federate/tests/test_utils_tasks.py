@@ -10,10 +10,10 @@ from socialhome.content.tests.factories import ContentFactory, LocalContentFacto
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import forward_relayable
 from socialhome.federate.utils.tasks import (
-    process_entities, get_sender_profile, make_federable_entity, make_federable_retraction, process_entity_post,
+    process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_relationship,
-)
+    make_federable_profile)
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
@@ -363,10 +363,10 @@ class TestGetSenderProfile:
         assert sender_profile.location == "alert('yup');"
 
 
-class TestMakeFederableEntity(TestCase):
+class TestMakeFederableContent(TestCase):
     def test_returns_entity(self):
         content = ContentFactory()
-        entity = make_federable_entity(content)
+        entity = make_federable_content(content)
         self.assertEqual(entity.raw_content, content.text)
         self.assertEqual(entity.guid, content.guid)
         self.assertEqual(entity.handle, content.author.handle)
@@ -378,7 +378,7 @@ class TestMakeFederableEntity(TestCase):
     def test_returns_none_on_exception(self, mock_post):
         mock_post = Mock()
         mock_post.parent = False
-        entity = make_federable_entity(mock_post)
+        entity = make_federable_content(mock_post)
         self.assertIsNone(entity)
 
 
@@ -394,6 +394,33 @@ class TestMakeFederableRetraction(TestCase):
     def test_returns_none_on_exception(self, mock_post):
         entity = make_federable_retraction(Mock(), Mock())
         self.assertIsNone(entity)
+
+
+class TestMakeFederableProfile(SocialhomeTestCase):
+    def test_make_federable_profile(self):
+        profile = ProfileFactory(visibility=Visibility.SELF)
+        entity = make_federable_profile(profile)
+        self.assertTrue(isinstance(entity, base.Profile))
+        self.assertEqual(entity.handle, profile.handle)
+        self.assertEqual(entity.raw_content, "")
+        self.assertEqual(entity.public, False)
+        self.assertEqual(entity.guid, profile.guid)
+        self.assertEqual(entity.name, profile.name)
+        self.assertEqual(entity.public_key, profile.rsa_public_key)
+        self.assertEqual(entity.image_urls, {
+            "small": profile.safer_image_url_small,
+            "medium": profile.safer_image_url_medium,
+            "large": profile.safer_image_url_large,
+        })
+        profile = ProfileFactory(visibility=Visibility.LIMITED)
+        entity = make_federable_profile(profile)
+        self.assertEqual(entity.public, False)
+        profile = ProfileFactory(visibility=Visibility.SITE)
+        entity = make_federable_profile(profile)
+        self.assertEqual(entity.public, False)
+        profile = ProfileFactory(visibility=Visibility.PUBLIC)
+        entity = make_federable_profile(profile)
+        self.assertEqual(entity.public, True)
 
 
 class TestSenderKeyFetcher(TestCase):

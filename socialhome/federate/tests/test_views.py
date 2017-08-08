@@ -113,13 +113,13 @@ class TestContentXMLView(SocialhomeTestCase):
         response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
         self.assertEqual(response.status_code, 200)
 
-    @patch("socialhome.federate.views.make_federable_entity")
+    @patch("socialhome.federate.views.make_federable_content")
     @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
-    def test_calls_make_federable_entity(self, mock_getter, mock_maker):
+    def test_calls_make_federable_content(self, mock_getter, mock_maker):
         self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
         mock_maker.assert_called_once_with(self.public_content)
 
-    @patch("socialhome.federate.views.make_federable_entity", return_value="entity")
+    @patch("socialhome.federate.views.make_federable_content", return_value="entity")
     @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
     def test_calls_get_full_xml_representation(self, mock_getter, mock_maker):
         self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))

@@ -95,7 +95,7 @@ class TestContentModel(SocialhomeTestCase):
                 "author": self.site_content.author_id,
                 "author_guid": self.site_content.author.guid,
                 "author_image": self.site_content.author.safer_image_url_small,
-                "author_name": self.site_content.author.handle,
+                "author_name": self.site_content.author.name,
                 "author_profile_url": self.site_content.author.get_absolute_url(),
                 "author_home_url": self.site_content.author.home_url,
                 "author_is_local": bool(self.site_content.author.user),

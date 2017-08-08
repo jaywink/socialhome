@@ -19,6 +19,7 @@ class AdminUserFactory(UserFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("name")
     email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
     handle = factory.SelfAttribute("email")
     guid = factory.Sequence(lambda n: "guid-{0}".format(n))

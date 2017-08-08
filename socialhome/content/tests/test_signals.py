@@ -89,6 +89,7 @@ class TestFederateContent(TransactionTestCase):
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_gets_sent(self, mock_send):
         user = UserFactory()
+        mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.is_local)
         mock_send.assert_called_once_with(send_content, content.id)
