@@ -406,6 +406,7 @@ class TestMakeFederableProfile(SocialhomeTestCase):
         self.assertEqual(entity.public, False)
         self.assertEqual(entity.guid, profile.guid)
         self.assertEqual(entity.name, profile.name)
+        self.assertEqual(entity.public_key, profile.rsa_public_key)
         self.assertEqual(entity.image_urls, {
             "small": profile.safer_image_url_small,
             "medium": profile.safer_image_url_medium,

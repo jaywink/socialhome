@@ -287,6 +287,7 @@ def make_federable_profile(profile):
                 "medium": profile.safer_image_url_medium,
                 "large": profile.safer_image_url_large,
             },
+            public_key=profile.rsa_public_key,
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)
