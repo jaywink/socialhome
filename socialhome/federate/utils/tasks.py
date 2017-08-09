@@ -48,6 +48,8 @@ def process_entities(entities):
                 process_entity_relationship(entity, profile)
             elif isinstance(entity, base.Follow):
                 process_entity_follow(entity, profile)
+            elif isinstance(entity, base.Profile):
+                Profile.from_remote_profile(entity)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
 

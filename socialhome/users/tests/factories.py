@@ -1,6 +1,8 @@
 import factory
 from factory import fuzzy
 
+from federation.entities import base
+
 
 class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: "user-{0}".format(n))
@@ -35,3 +37,24 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.Profile"
+
+
+class BaseProfileFactory(factory.Factory):
+    class Meta:
+        model = base.Profile
+
+    handle = factory.Faker("safe_email")
+    raw_content = factory.Faker("paragraphs", nb=3)
+    email = factory.Faker("safe_email")
+    gender = factory.Faker("job")
+    location = factory.Faker("country")
+    nsfw = factory.Faker("pybool")
+    public_key = factory.Faker("sha1")
+    public = factory.Faker("pybool")
+    guid = factory.Faker("uuid4")
+    image_urls = {
+        "small": factory.Faker("image_url", width=30, height=30).generate({}),
+        "medium": factory.Faker("image_url", width=100, height=100).generate({}),
+        "large": factory.Faker("image_url", width=300, height=300).generate({}),
+    }
+    tag_list = factory.Faker("words", nb=4)
