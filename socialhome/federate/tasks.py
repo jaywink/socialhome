@@ -191,10 +191,17 @@ def send_follow_change(profile_id, followed_id, follow):
         remote_profile.handle.split("@")[1], remote_profile.guid,
     )
     send_document(url, payload)
+    # Also trigger a profile send
+    send_profile(profile_id, recipients=[(remote_profile.handle, None)])
 
 
-def send_profile(profile_id):
-    """Handle sending a Profile object out via the federation layer."""
+def send_profile(profile_id, recipients=None):
+    """Handle sending a Profile object out via the federation layer.
+
+    :param profile_id: Profile.id of profile to send
+    :param recipients: Optional list of recipient tuples, in form tuple(handle, network), for example
+        ("foo@example.com", "diaspora"). Network can be None.
+    """
     try:
         profile = Profile.objects.get(id=profile_id)
     except Profile.DoesNotExist:
@@ -214,7 +221,8 @@ def send_profile(profile_id):
     # Let's just send everything to private endpoints as 0.7 isn't out yet.
     # TODO: once 0.7 is out for longer, start sending public profiles to public endpoints
     # TODO: add high level method support to federation for private payload delivery
-    recipients = _get_remote_followers(profile)
+    if not recipients:
+        recipients = _get_remote_followers(profile)
     for handle, _network in recipients:
         try:
             remote_profile = Profile.objects.get(handle=handle)
