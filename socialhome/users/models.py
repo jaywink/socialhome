@@ -1,3 +1,4 @@
+import logging
 import os
 
 from Crypto.PublicKey import RSA
@@ -19,6 +20,8 @@ from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls
 from socialhome.utils import get_full_media_url
+
+logger = logging.getLogger("socialhome")
 
 
 class User(AbstractUser):
@@ -263,18 +266,28 @@ class Profile(TimeStampedModel):
     @staticmethod
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
-        profile, _created = Profile.objects.update_or_create(
+        logger.info("from_remote_profile - Create or updating %s", remote_profile)
+        defaults = {
+            "name": safe_text(remote_profile.name),
+            "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
+            "image_url_large": safe_text(remote_profile.image_urls["large"]),
+            "image_url_medium": safe_text(remote_profile.image_urls["medium"]),
+            "image_url_small": safe_text(remote_profile.image_urls["small"]),
+            "location": safe_text(remote_profile.location),
+            "email": safe_text(remote_profile.email),
+        }
+        public_key = safe_text(remote_profile.public_key)
+        if public_key:
+            # Only update public key if it has a value
+            defaults["rsa_public_key"] = public_key
+        for img_size in ["small", "medium", "large"]:
+            # Possibly fix some broken by bleach urls
+            defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
+        logger.debug("from_remote_profile - defaults %s", defaults)
+        profile, created = Profile.objects.update_or_create(
             guid=safe_text(remote_profile.guid),
             handle=safe_text(remote_profile.handle),
-            defaults={
-                "name": safe_text(remote_profile.name),
-                "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
-                "rsa_public_key": safe_text(remote_profile.public_key),
-                "image_url_large": safe_text(remote_profile.image_urls["large"]),
-                "image_url_medium": safe_text(remote_profile.image_urls["medium"]),
-                "image_url_small": safe_text(remote_profile.image_urls["small"]),
-                "location": safe_text(remote_profile.location),
-                "email": safe_text(remote_profile.email),
-            },
+            defaults=defaults,
         )
+        logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

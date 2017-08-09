@@ -17,10 +17,10 @@ from socialhome.federate.utils.tasks import (
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory
 
 
-class TestProcessEntities(TestCase):
+class TestProcessEntities(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -29,6 +29,7 @@ class TestProcessEntities(TestCase):
         cls.retraction = base.Retraction()
         cls.relationship = base.Relationship()
         cls.follow = base.Follow()
+        cls.profile = BaseProfileFactory()
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -59,6 +60,12 @@ class TestProcessEntities(TestCase):
     def test_process_entity_comment_is_called(self, mock_sender, mock_process):
         process_entities([self.follow])
         mock_process.assert_called_once_with(self.follow, "profile")
+
+    @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_comment_is_called(self, mock_sender, mock_from):
+        process_entities([self.profile])
+        mock_from.assert_called_once_with(self.profile)
 
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
@@ -204,7 +211,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
         self.assertFalse(mock_update.called)
 
 
-class TestProcessEntityRetraction(TestCase):
+class TestProcessEntityRetraction(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -260,7 +267,7 @@ class TestProcessEntityRetraction(TestCase):
         self.assertEqual(self.remote_profile.following.count(), 0)
 
 
-class TestProcessEntityFollow(TestCase):
+class TestProcessEntityFollow(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -284,7 +291,7 @@ class TestProcessEntityFollow(TestCase):
         mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
 
 
-class TestProcessEntityRelationship(TestCase):
+class TestProcessEntityRelationship(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -363,7 +370,7 @@ class TestGetSenderProfile:
         assert sender_profile.location == "alert('yup');"
 
 
-class TestMakeFederableContent(TestCase):
+class TestMakeFederableContent(SocialhomeTestCase):
     def test_returns_entity(self):
         content = ContentFactory()
         entity = make_federable_content(content)
@@ -382,7 +389,7 @@ class TestMakeFederableContent(TestCase):
         self.assertIsNone(entity)
 
 
-class TestMakeFederableRetraction(TestCase):
+class TestMakeFederableRetraction(SocialhomeTestCase):
     def test_returns_entity(self):
         content = ContentFactory()
         entity = make_federable_retraction(content, content.author)
@@ -423,7 +430,7 @@ class TestMakeFederableProfile(SocialhomeTestCase):
         self.assertEqual(entity.public, True)
 
 
-class TestSenderKeyFetcher(TestCase):
+class TestSenderKeyFetcher(SocialhomeTestCase):
     def test_local_profile_public_key_is_returned(self):
         profile = ProfileFactory()
         self.assertEqual(sender_key_fetcher(profile.handle), profile.rsa_public_key)

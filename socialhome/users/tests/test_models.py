@@ -1,9 +1,13 @@
 from unittest.mock import Mock, patch
 
+import factory
 from django.test import override_settings
+from federation.entities import base
 
+from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.models import Profile
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory
 from socialhome.users.utils import get_pony_urls
 
 
@@ -140,3 +144,36 @@ class TestProfile(SocialhomeTestCase):
     def test_is_local(self):
         self.assertTrue(self.user.profile.is_local)
         self.assertFalse(self.profile.is_local)
+
+    def test_from_remote_profile(self):
+        remote_profile = BaseProfileFactory(public=False)
+        profile = Profile.from_remote_profile(remote_profile)
+        self.assertEqual(profile.guid, remote_profile.guid)
+        self.assertEqual(profile.handle, remote_profile.handle)
+        self.assertEqual(profile.name, remote_profile.name)
+        self.assertEqual(profile.visibility, Visibility.LIMITED)
+        self.assertEqual(profile.image_url_large, remote_profile.image_urls["large"])
+        self.assertEqual(profile.image_url_medium, remote_profile.image_urls["medium"])
+        self.assertEqual(profile.image_url_small, remote_profile.image_urls["small"])
+        self.assertEqual(profile.location, remote_profile.location)
+        self.assertEqual(profile.email, remote_profile.email)
+        self.assertEqual(profile.rsa_public_key, remote_profile.public_key)
+
+        # Update to public
+        remote_profile_update = BaseProfileFactory(public=True, guid=remote_profile.guid, handle=remote_profile.handle)
+        profile = Profile.from_remote_profile(remote_profile_update)
+        self.assertEqual(profile.guid, remote_profile.guid)
+        self.assertEqual(profile.handle, remote_profile.handle)
+        self.assertEqual(profile.visibility, Visibility.PUBLIC)
+
+        # Make sure public key doesn't get deleted if it doesn't have a value
+        public_key = profile.rsa_public_key
+        assert public_key
+        remote_profile_update = BaseProfileFactory(public_key="", guid=remote_profile.guid,
+                                                   handle=remote_profile.handle)
+        profile = Profile.from_remote_profile(remote_profile_update)
+        self.assertEqual(profile.rsa_public_key, public_key)
+        remote_profile_update = BaseProfileFactory(public_key=None, guid=remote_profile.guid,
+                                                   handle=remote_profile.handle)
+        profile = Profile.from_remote_profile(remote_profile_update)
+        self.assertEqual(profile.rsa_public_key, public_key)
