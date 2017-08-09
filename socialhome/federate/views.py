@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import django_rq
@@ -6,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
 from django.views.generic import View
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -86,12 +88,23 @@ def nodeinfo_well_known_view(request):
 def nodeinfo_view(request):
     """Generate a NodeInfo document."""
     site = Site.objects.get_current()
+    usage = {"users": {}}
+    if settings.SOCIALHOME_STATISTICS:
+        usage = {
+            "users": {
+                "total": User.objects.count(),
+                "activeHalfYear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
+                "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
+            },
+            "localPosts": Content.objects.filter(author__user__isnull=False, parent__isnull=True).count(),
+            "localComments": Content.objects.filter(author__user__isnull=False, parent__isnull=False).count(),
+        }
     nodeinfo = NodeInfo(
         software={"name": "socialhome", "version": version},
         protocols={"inbound": ["diaspora"], "outbound": ["diaspora"]},
         services={"inbound": [], "outbound": []},
         open_registrations=settings.ACCOUNT_ALLOW_REGISTRATION,
-        usage={"users": {}},
+        usage=usage,
         metadata={"nodeName": site.name}
     )
     return JsonResponse(nodeinfo.doc)

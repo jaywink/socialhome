@@ -57,6 +57,16 @@ Three places should be backed up from the Socialhome instance to ensure recovery
 * Local settings in ``env.local`` (assuming you are using this way to configure the application)
 * The path ``socialhome/media/`` which contains for example image uploads
 
+Give your instance some visibility
+----------------------------------
+
+If you want some public visibility to your instance, consider registering it at some lists that track nodes in "The Federation". Here are a few:
+
+* https://the-federation.info
+* https://podupti.me
+
+Why not also contribute to the numbers of the federated social web? Turn on :ref:`configuration-statistics` to expose some activity counts.
+
 Configuration
 -------------
 
@@ -74,9 +84,9 @@ This must be set to a proper database URL, for example ``postgres://socialhome:D
 DJANGO_ACCOUNT_ALLOW_REGISTRATION
 .................................
 
-Default: ``true``
+Default: ``True``
 
-Set this to ``false`` if you want to disable signups.
+Set this to ``False`` if you want to disable signups.
 
 DJANGO_ADMIN_MAIL
 .................
@@ -121,8 +131,8 @@ The possible email related additional settings are as follows:
 * ``DJANGO_EMAIL_PORT`` (default ``587``)
 * ``DJANGO_EMAIL_HOST_USER`` (default '')
 * ``DJANGO_EMAIL_HOST_PASSWORD`` (default '')
-* ``DJANGO_EMAIL_USE_TLS`` (default ``true``)
-* ``DJANGO_EMAIL_USE_SSL`` (default ``false``)
+* ``DJANGO_EMAIL_USE_TLS`` (default ``True``)
+* ``DJANGO_EMAIL_USE_SSL`` (default ``False``)
 * ``DJANGO_EMAIL_TIMEOUT`` (default '')
 * ``DJANGO_EMAIL_SSL_KEYFILE`` (default '')
 * ``DJANGO_EMAIL_SSL_CERTFILE`` (default '')
@@ -134,9 +144,9 @@ Note, email *is* required for signing up. Users will **not** be able to sign up 
 DJANGO_OPBEAT_ENABLE
 ....................
 
-Default: ``false``
+Default: ``False``
 
-If you wish to enable Opbeat integration, set this to ``true``. Also remember to set ``DJANGO_OPBEAT_ORGANIZATION_ID``, ``DJANGO_OPBEAT_APP_ID`` and ``DJANGO_OPBEAT_SECRET_TOKEN`` to the values from Opbeat.
+If you wish to enable Opbeat integration, set this to ``True``. Also remember to set ``DJANGO_OPBEAT_ORGANIZATION_ID``, ``DJANGO_OPBEAT_APP_ID`` and ``DJANGO_OPBEAT_SECRET_TOKEN`` to the values from Opbeat.
 
 DJANGO_SECRET_KEY
 .................
@@ -148,28 +158,28 @@ Must be set to a long secret string. Don't expose it to anyone. See `docs <https
 DJANGO_SECURE_CONTENT_TYPE_NOSNIFF
 ..................................
 
-Default: ``true``
+Default: ``True``
 
 See `docs <https://django-secure.readthedocs.io/en/latest/settings.html#secure-content-type-nosniff>`_.
 
 DJANGO_SECURE_FRAME_DENY
 ........................
 
-Default: ``true``
+Default: ``True``
 
 See `docs <https://django-secure.readthedocs.io/en/latest/settings.html#secure-frame-deny>`_.
 
 DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
 .....................................
 
-Default: ``true``
+Default: ``True``
 
 See `docs <https://docs.djangoproject.com/en/1.11/ref/settings/#secure-hsts-include-subdomains>`_.
 
 DJANGO_SECURE_SSL_REDIRECT
 ..........................
 
-Default: ``true``
+Default: ``True``
 
 Redirect all requests to HTTPS. See `docs <https://django-secure.readthedocs.io/en/latest/settings.html#secure-ssl-redirect>`_.
 
@@ -203,7 +213,7 @@ Must be set to your Socialhome instance domain. Used for example to generate out
 SOCIALHOME_HTTPS
 ................
 
-Default: ``true``
+Default: ``True``
 
 Force HTTPS. There should be no reason to turn this off.
 
@@ -235,3 +245,11 @@ Default: ''
 
 If this is set to a local username, that users profile will be shown when navigating to ``/`` as not logged in user. Logged in users will still see their own profile. Good for single user instances.
 
+.. _configuration-statistics:
+
+SOCIALHOME_STATISTICS
+.....................
+
+Default: ``False``
+
+Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts. User counts include 30 day and 6 month active users.

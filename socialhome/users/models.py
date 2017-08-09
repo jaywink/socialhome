@@ -51,7 +51,6 @@ class User(AbstractUser):
     picture_width = models.PositiveIntegerField(_("Picture width"), blank=True, null=True)
     picture_ppoi = PPOIField("Picture PPOI")
 
-
     def __str__(self):
         return self.username
 

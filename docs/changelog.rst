@@ -14,11 +14,16 @@ Added
   Profile menu now has an extra option "Change picture". This allows uploading a new picture and optionally setting focus point for cropping a picture that is not square shape.
 
 * Federate local profiles to remote followers on save. (`#168 <https://github.com/jaywink/socialhome/issues/168>`_)
+
 * Process remote profiles entities on receive.
 
   Remote profiles were so far only created on first encounter. Now we also process incoming ``Profile`` entities from the federation layer.
 
 * When following a remote profile, federate profile to them at the same time.
+
+* It is now possible to expose statistics from a Socialhome node. This includes counts for users (total, 30 day, 6 month), local content and local replies. These will be exposed via the ``NodeInfo`` documents that for example `the-federation.info <https://the-federation.info>`_ node list consumes.
+
+  By default statistics is off. Admins can switch the counts on by setting environment variable ``SOCIALHOME_STATISTICS=True`` and restarting Socialhome.
 
 0.3.1 (2017-08-06)
 ------------------
