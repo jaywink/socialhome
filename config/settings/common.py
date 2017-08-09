@@ -287,6 +287,10 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
 )
 # Relay to send public content to
 SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoast.net")
+# Statistics
+# Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts
+# User counts include 30 day and 6 month active users
+SOCIALHOME_STATISTICS = env.bool("SOCIALHOME_STATISTICS", default=False)
 
 # CHANNELS
 # --------

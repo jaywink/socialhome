@@ -1,14 +1,21 @@
+import datetime
+import json
 from unittest.mock import patch, Mock
 
 import pytest
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.utils.timezone import now
+from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
 from federation.tests.fixtures.keys import get_dummy_private_key
+from federation.utils.text import decode_if_bytes
 
+from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.views import DiasporaReceiveViewMixin
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.models import Profile
+from socialhome.users.models import Profile, User
 from socialhome.users.tests.factories import UserFactory
 
 
@@ -162,3 +169,31 @@ class TestContentFetchView(SocialhomeTestCase):
         self.assertEqual(response.url, "https://%s/fetch/post/%s" %(
             self.remote_content.author.handle.split("@")[1], self.remote_content.guid
         ))
+
+
+class TestNodeInfoView(SocialhomeTestCase):
+    @override_settings(SOCIALHOME_STATISTICS=False)
+    def test_view_responds_stats_off(self):
+        self.get(NODEINFO_DOCUMENT_PATH)
+        self.response_200()
+        self.assertEqual(
+            json.loads(decode_if_bytes(self.last_response.content))["usage"],
+            {"users": {}}
+        )
+
+    @override_settings(SOCIALHOME_STATISTICS=True)
+    def test_view_responds_stats_on(self):
+        self.get(NODEINFO_DOCUMENT_PATH)
+        self.response_200()
+        self.assertEqual(
+            json.loads(decode_if_bytes(self.last_response.content))["usage"],
+            {
+                "users": {
+                    "total": User.objects.count(),
+                    "activeHalfYear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
+                    "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
+                },
+                "localPosts": Content.objects.filter(author__user__isnull=False, parent__isnull=True).count(),
+                "localComments": Content.objects.filter(author__user__isnull=False, parent__isnull=False).count(),
+            }
+        )
