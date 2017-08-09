@@ -196,12 +196,14 @@ class TestSendFollow(TestCase):
 
     @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
     @patch("socialhome.federate.tasks.send_document")
-    def test_send_follow_change(self, mock_send, mock_payload):
+    @patch("socialhome.federate.tasks.send_profile")
+    def test_send_follow_change(self, mock_profile, mock_send, mock_payload):
         send_follow_change(self.profile.id, self.remote_profile.id, True)
         mock_send.assert_called_once_with(
             "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
             "payload",
         )
+        mock_profile.assert_called_once_with(self.profile.id, recipients=[(self.remote_profile.handle, None)])
 
 
 class TestSendProfile(SocialhomeTestCase):
@@ -237,3 +239,18 @@ class TestSendProfile(SocialhomeTestCase):
     def test_skip_remote_profile(self, mock_make):
         send_profile(self.remote_profile.id)
         self.assertFalse(mock_make.called)
+
+    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
+    @patch("socialhome.federate.tasks.send_document")
+    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
+    def test_send_to_given_recipients_only(self, mock_federable, mock_send, mock_payload):
+        send_profile(self.profile.id, recipients=[(self.remote_profile.handle, None)])
+        mock_payload_calls = [
+            call("profile", self.profile, to_user=self.remote_profile),
+        ]
+        self.assertEqual(mock_payload_calls, mock_payload.call_args_list)
+        mock_send_calls = [
+            call("https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
+                 "payload"),
+        ]
+        self.assertEqual(mock_send_calls, mock_send.call_args_list)

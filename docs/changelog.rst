@@ -18,6 +18,8 @@ Added
 
   Remote profiles were so far only created on first encounter. Now we also process incoming ``Profile`` entities from the federation layer.
 
+* When following a remote profile, federate profile to them at the same time.
+
 0.3.1 (2017-08-06)
 ------------------
 
