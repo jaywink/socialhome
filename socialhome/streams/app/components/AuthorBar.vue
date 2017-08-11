@@ -10,7 +10,7 @@
                 <a :href="absoluteUrl" class="btn btn-secondary" title="Profile" aria-label="Profile">
                     <i class="fa fa-user"></i>
                 </a>
-                <a v-if="isUserAuthor" :href="homeUrl" class="btn btn-secondary" title="Home" aria-label="Home">
+                <a v-if="isUserLocal" :href="homeUrl" class="btn btn-secondary" title="Home" aria-label="Home">
                     <i class="fa fa-home"></i>
                 </a>
                 <button
@@ -64,12 +64,12 @@
         computed: {
             showFollowBtn() {
                 return this.isUserAuthentificated
-                    && !this.isUserAuthor
+                    && !this.isUserLocal
                     && !this.isUserFollowingAuthor
             },
             showUnfollowBtn() {
                 return this.isUserAuthentificated
-                    && !this.isUserAuthor
+                    && !this.isUserLocal
                     && this.isUserFollowingAuthor
             }
         },

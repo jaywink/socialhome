@@ -10,13 +10,13 @@ export default new Vuex.Store({
     state: {
         translations: {
             stampedContent: {
-                h2: window.templateData.stampedContent.h2,
-                p: window.templateData.stampedContent.p
+                h2: window.context.translations.stampedContent.h2,
+                p: window.context.translations.stampedContent.p
             }
         },
-        contentList: window.templateData.contentList,
-        streamName: window.templateData.streamName,
-        isUserAuthentificated: window.templateData.isUserAuthentificated,
-        showAuthorBar: window.templateData.showAuthorBar
+        contentList: window.context.contentList,
+        streamName: window.context.streamName,
+        isUserAuthentificated: window.context.isUserAuthentificated,
+        showAuthorBar: window.context.showAuthorBar
     }
 });

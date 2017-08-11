@@ -1,55 +1,8 @@
 {% extends "streams/base.html" %}
-{% load staticfiles json_safe string_utils %}
+{% load staticfiles slurp_json_context string_utils %}
 
 {% block content %}
-    {# Temporary hack; to be removed #}
-    <script>
-        window.templateData = {
-            contentList: [
-                {% for content in content_list %}
-                    {
-                        htmlSafe: {{ content.rendered|json_safe }},
-                        author: {
-                            guid: "{{ content.author.guid }}",
-                            name: "{% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}",
-                            handle: "{{ content.author.handle }}",
-                            imageUrlSmall: "{{ content.author.safer_image_url_small }}",
-                            absoluteUrl: "{{ content.author.get_absolute_url }}",
-                            homeUrl: "{{ content.author.home_url }}",
-                            isUserFollowingAuthor: {% if not content.author.id in request.user.profile.following_ids %}true{% else %}false{% endif %}
-                        },
-                        id: {{ content.id }},
-                        timestamp: "{{ content.formatted_timestamp }}",
-                        humanizedTimestamp: "{{ content.humanized_timestamp }}",
-                        edited: {{ content.edited|json_safe }},
-                        childrenCount: {{ content.children.count }},
-                        isUserLocal: {% if content.author.user %}true{% else %}false{% endif %},
-                        contentUrl: "{{ content.get_absolute_url }}",
-                        {% if content.author == request.user.profile %}
-                            isUserAuthor: true,
-                            updateUrl: "{% url " content:update" content.id %}",
-                            replyUrl: "{% url "content:reply" pk=content.id %}",
-                            deleteUrl: "{% url " content:delete" content.id %}",
-                        {% else %}
-                            isUserAuthor: false,
-                            updateUrl: "",
-                            replyUrl: "",
-                            deleteUrl: "",
-                        {% endif %}
-                    },
-                {% endfor -%}
-            ],
-            currentBrowsingUserId: "{{ request.user.profile.id }}",
-            streamName: "{{ stream_name }}",
-            isUserAuthentificated: {% if request.user.is_authenticated %}true{% else %}false{% endif %},
-            showAuthorBar: {% if not stream_name|startswith:"profile_" %}true{% else %}false{% endif %},
-            {# Temporary hack; translation system to come #}
-            stampedContent: {
-                h2: "Public",
-                p: "Contains public content from around the network."
-            },
-        };
-    </script>
+    {% slurp_json_context %}
 
     <div id="app" class="streams-container">
         <stream></stream>
