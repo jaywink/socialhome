@@ -190,7 +190,7 @@ class TestNodeInfoView(SocialhomeTestCase):
             {
                 "users": {
                     "total": User.objects.count(),
-                    "activeHalfYear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
+                    "activeHalfyear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
                     "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
                 },
                 "localPosts": Content.objects.filter(author__user__isnull=False, parent__isnull=True).count(),
