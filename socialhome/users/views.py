@@ -1,9 +1,9 @@
 from braces.views import StaffuserRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import DetailView, ListView, UpdateView
-
-from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
+from django.views.generic import DetailView, ListView, UpdateView, TemplateView
+from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
 from socialhome.users.forms import ProfileForm, UserPictureForm
@@ -148,11 +148,34 @@ class UserPictureUpdateView(LoginRequiredMixin, UpdateView):
 
 class UserListView(StaffuserRequiredMixin, ListView):
     model = User
-    # These next two lines tell the view to index lookups by username
     slug_field = "username"
     slug_url_kwarg = "username"
     redirect_unauthenticated_users = True
     raise_exception = True
+
+
+class UserAPITokenView(LoginRequiredMixin, TemplateView):
+    template_name = "users/user_api_token.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return User.objects.get(id=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["token"], _created = Token.objects.get_or_create(user=self.request.user)
+        return context
+
+    def get_success_url(self):
+        return reverse("users:api-token")
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("regenerate") == "regenerate":
+            self.object.auth_token.delete()
+        return redirect(self.get_success_url())
 
 
 class ContactsFollowedView(LoginRequiredMixin, DetailView):

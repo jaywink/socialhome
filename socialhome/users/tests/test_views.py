@@ -2,6 +2,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
+from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
@@ -372,6 +373,28 @@ class TestContactsFollowedView(SocialhomeTestCase):
             self.get("users:contacts-followed")
         self.assertTrue(isinstance(self.context["followed_table"], FollowedTable))
         self.assertContext("profile", self.user.profile)
+
+
+class TestUserAPITokenView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_view_renders(self):
+        with self.login(self.user):
+            self.get("users:api-token")
+        self.response_200()
+        token = Token.objects.get(user=self.user)
+        self.assertContext("token", token)
+
+    def test_regenerate_token(self):
+        old_token, _created = Token.objects.get_or_create(user=self.user)
+        with self.login(self.user):
+            self.post("users:api-token", data={"regenerate": "regenerate"}, follow=True)
+        self.response_200()
+        new_token = Token.objects.get(user=self.user)
+        self.assertNotEqual(new_token.key, old_token.key)
 
 
 class TestUserPictureUpdateView(SocialhomeTestCase):
