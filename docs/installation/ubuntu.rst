@@ -203,11 +203,7 @@ Now you should be able to restart Apache.
 Change to Socialhome user
 '''''''''''''''''''''''''
 
-Change to user ``socialhome`` for the rest of the guide.
-
-::
-
-    sudo su - socialhome
+.. include:: /includes/socialhome_user.rst
 
 Install Virtualenvwrapper
 '''''''''''''''''''''''''
@@ -253,9 +249,7 @@ Get Socialhome code
 Install Python dependencies
 '''''''''''''''''''''''''''
 
-::
-
-    pip install -U -r requirements/production.txt
+.. include:: /includes/python_dependencies.rst
 
 Create configuration
 ''''''''''''''''''''
@@ -296,19 +290,12 @@ Note, email *is* required for signing up. Users will **not** be able to sign up 
 Run migrations
 ''''''''''''''
 
-::
-
-    python manage.py migrate
+.. include:: /includes/migrations.rst
 
 Install statics
 '''''''''''''''
 
-::
-
-    npm install
-    node_modules/.bin/bower install
-    node_modules/.bin/grunt build
-    python manage.py collectstatic
+.. include:: /includes/install_statics.rst
 
 Search index
 ''''''''''''

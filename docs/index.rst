@@ -51,6 +51,7 @@ Table of contents
 
    installation
    install_guides
+   updating
    running
    api
    community
