@@ -1,24 +1,20 @@
 .. _installation-ubuntu:
 
-Ubuntu
-======
-
-This guide is for a production install for Ubuntu. For development installation instructions, please see the :ref:`development` pages.
+Ubuntu (14.04, manual)
+----------------------
 
 This guide is very opinionated and experienced sysadmins will most likely want to do things differently. This guide will give you a Socialhome production install on uWSGI using an Apache2 web server.
 
-If you have issues following these instructions, please contact us via :ref:`community`.
-
 Supported versions
-------------------
+..................
 
 This guide is written for **Ubuntu 14.04** (with Upstart). Guide for non-upstart Ubuntu versions coming soon!
 
 Steps
------
+.....
 
 Fix locales
-...........
+'''''''''''
 
 Ubuntu 14.04 has a problem with locales which could bring problems when installing PostgreSQL. If you have already installed PostgreSQL, you can probably skip this step.
 
@@ -41,7 +37,7 @@ Save, logout and log back in.
 See `this post <https://www.digitalocean.com/community/questions/language-problem-on-ubuntu-14-04>`_ for example for a description of this problem.
 
 Install system packages
-.......................
+'''''''''''''''''''''''
 
 ::
 
@@ -58,12 +54,12 @@ Install system packages
     sudo apt-get install redis-server
 
 Install Node.js
-...............
+'''''''''''''''
 
 Node.js is needed for statics management. Install a version of choice by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
 
 Install PostgreSQL
-..................
+''''''''''''''''''
 
 If not installed or not using a remote PostgreSQL DB, install the database engine.
 
@@ -81,7 +77,7 @@ Create a database and user. Note down password for later.
     exit
 
 Create a local user
-...................
+'''''''''''''''''''
 
 It's better to run applications under their own user.
 
@@ -94,7 +90,7 @@ It's better to run applications under their own user.
     sudo adduser www-data socialhome
 
 Set up uWSGI
-............
+''''''''''''
 
 ::
 
@@ -123,7 +119,7 @@ Create the ini file with ``/home/socialhome/uwsgi.ini`` and add the following co
     harakiri=30
 
 Set up Apache
-.............
+'''''''''''''
 
 if not already installed, install the Apache2 web server.
 
@@ -181,7 +177,7 @@ Enable Apache virtualhost
     sudo a2ensite socialhome
 
 Get LetsEncrypt certificate
-...........................
+'''''''''''''''''''''''''''
 
 We wouldn't want to run our site without HTTPS. Install Certbot and get an LetsEncrypt certificate.
 
@@ -205,7 +201,7 @@ Now you should be able to restart Apache.
     sudo service apache2 restart
 
 Change to Socialhome user
-.........................
+'''''''''''''''''''''''''
 
 Change to user ``socialhome`` for the rest of the guide.
 
@@ -214,7 +210,7 @@ Change to user ``socialhome`` for the rest of the guide.
     sudo su - socialhome
 
 Install Virtualenvwrapper
-.........................
+'''''''''''''''''''''''''
 
 This is the easiest way to manage Python virtualenvs. We also add production Django configuration reference at the same time.
 
@@ -231,7 +227,7 @@ Add the following lines to your ``.bashrc`` and reload it via ``source ~/.bashrc
     export DJANGO_SETTINGS_MODULE=config.settings.production
 
 Create Python virtualenv
-........................
+''''''''''''''''''''''''
 
 ::
 
@@ -240,14 +236,14 @@ Create Python virtualenv
 The virtualenv is automatically activated. When you need it in the future, just type ``workon socialhome``.
 
 Update pip and setuptools
-.........................
+'''''''''''''''''''''''''
 
 ::
 
     pip install -U pip setuptools
 
 Get Socialhome code
-...................
+'''''''''''''''''''
 
 ::
 
@@ -255,14 +251,14 @@ Get Socialhome code
     cd socialhome
 
 Install Python dependencies
-...........................
+'''''''''''''''''''''''''''
 
 ::
 
     pip install -U -r requirements/production.txt
 
 Create configuration
-....................
+''''''''''''''''''''
 
 Create the file ``env.local`` with the following contents, replacing values as needed.
 
@@ -293,19 +289,19 @@ Make the env file a bit less readable.
     chmod 0600 env.local
 
 Configure email sending
-.......................
+'''''''''''''''''''''''
 
 Note, email *is* required for signing up. Users will **not** be able to sign up if the instance does not have working email sending. See :ref:`email-config` on how to configure email sending.
 
 Run migrations
-..............
+''''''''''''''
 
 ::
 
     python manage.py migrate
 
 Install statics
-...............
+'''''''''''''''
 
 ::
 
@@ -314,10 +310,13 @@ Install statics
     node_modules/.bin/grunt build
     python manage.py collectstatic
 
-.. include:: ../includes/search_index.rst
+Search index
+''''''''''''
+
+.. include:: /includes/search_index.rst
 
 Set the correct domain name in Django
-.....................................
+'''''''''''''''''''''''''''''''''''''
 
 Load up the Django shell with ``python manage.py shell_plus`` and then execute the following, replacing "yourdomain.tld" with your domain and "Socialhome" as the name of your site, assuming you want the name changed:
 
@@ -327,7 +326,7 @@ Load up the Django shell with ``python manage.py shell_plus`` and then execute t
     exit
 
 Set up Circus
-.............
+'''''''''''''
 
 Exit Socialhome user and create Upstart configuration for Circus process manager. Circus is used to control various processes that are needed in addition to the web server. This allows starting one process that will start and maintain a bunch of other processes we need. A configuration file for the processes is provided within the repository.
 
@@ -363,7 +362,7 @@ Start Circus. It will automatically start on system boot.
     sudo service socialhome start
 
 Done!
-.....
+'''''
 
 That wasn't so hard was it?
 
