@@ -8,7 +8,8 @@
             :is-user-local="isUserLocal"
             :current-browsing-user-id="currentBrowsingUserId"
             :is-user-authentificated="isUserAuthentificated"
-        ></author-bar>
+        >
+        </author-bar>
         <div class="grid-item-bar">
             <div class="row">
                 <div class="col-9">
@@ -37,7 +38,7 @@
         </div>
         <div v-if="showReactionBar" class="replies-container" :data-content-id="id">
             <div class="content-actions hidden" :data-content-id="id">
-                <a class="btn btn-secondary" :href="replyUrl">Reply</a>
+                <b-button variant="secondary" :href="replyUrl">Reply</b-button>
             </div>
         </div>
     </div>

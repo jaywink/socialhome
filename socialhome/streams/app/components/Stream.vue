@@ -2,10 +2,10 @@
     <div class="container">
         <div id="new-content-container" class="hidden">
             <a href="" id="new-content-load-link" onclick="return false;">
-                <span class="badge badge-pill badge-primary">
+                <b-badge pill variant="success">
                     <span id="new-content-count">0</span>
-                    new posts available
-                </span>
+                    <span>new posts available</span>
+                </b-badge>
             </a>
         </div>
         <div class="grid">

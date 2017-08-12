@@ -7,15 +7,16 @@
         <div v-show="showProfileBox" class="profile-box">
             {{ handle }}
             <div class="pull-right">
-                <a :href="absoluteUrl" class="btn btn-secondary" title="Profile" aria-label="Profile">
+                <b-button :href="absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
                     <i class="fa fa-user"></i>
-                </a>
-                <a v-if="isUserLocal" :href="homeUrl" class="btn btn-secondary" title="Home" aria-label="Home">
+                </b-button>
+                <b-button v-if="isUserLocal" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
                     <i class="fa fa-home"></i>
-                </a>
-                <button
+                </b-button>
+                <b-button
+                    variant="secondary"
                     v-if="showFollowBtn"
-                    class="follower-button btn btn-secondary"
+                    class="follower-button"
                     data-action="remove_follower"
                     :data-profileid="currentBrowsingUserId"
                     :data-target="guid"
@@ -23,10 +24,11 @@
                     aria-label="Unfollow"
                 >
                     <i class="fa fa-minus"></i>
-                </button>
-                <button
+                </b-button>
+                <b-button
+                    variant="secondary"
                     v-if="showUnfollowBtn"
-                    class="follower-button btn btn-secondary"
+                    class="follower-button"
                     data-action="add_follower"
                     :data-profileid="currentBrowsingUserId"
                     :data-target="guid"
@@ -34,7 +36,7 @@
                     aria-label="Follow"
                 >
                     <i class="fa fa-plus"></i>
-                </button>
+                </b-button>
             </div>
             <div class="clearfix"></div>
         </div>
