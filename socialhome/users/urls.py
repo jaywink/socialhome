@@ -24,6 +24,11 @@ urlpatterns = [
         name="picture-update"
     ),
     url(
+        regex=r"^u/~api-token/$",
+        view=views.UserAPITokenView.as_view(),
+        name="api-token",
+    ),
+    url(
         regex=r"^p/~organize/$",
         view=views.OrganizeContentProfileDetailView.as_view(),
         name="profile-organize"

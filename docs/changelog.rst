@@ -25,6 +25,8 @@ Added
 
   By default statistics is off. Admins can switch the counts on by setting environment variable ``SOCIALHOME_STATISTICS=True`` and restarting Socialhome.
 
+* Add user API token view. Allows retrieving an API token for usage in clients and tools. Allows also regenerating the token if it has been lost or exposed.
+
 0.3.1 (2017-08-06)
 ------------------
 

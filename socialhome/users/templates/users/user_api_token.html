@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "API token" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "API token" %}</h1>
+    <p>
+        {% trans "Copy the token to a client or tool which you want to use for interacting with your Socialhome account." %}
+    </p>
+    <p><strong>
+        {% trans "Important! Do not give anyone access to the token or they will be able to use your account through client apps! If you lose your token or need a new one, click 'Regenerate'." %}
+    </strong></p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-10 w-100">
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="{{ token.key }}" value="{{ token.key }}" readonly onclick="this.select()">
+                </div>
+            </div>
+            <div class="col-2 w-100">
+                <div class="form-group">
+                    <input type="hidden" value="regenerate" name="regenerate" />
+                    <button class="form-control btn btn-danger" type="submit">{% trans "Regenerate" %}</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Return to profile" %}</a>
+        </div>
+    </form>
+{% endblock %}
