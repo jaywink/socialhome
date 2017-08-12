@@ -26,15 +26,4 @@ Disk space will mostly be required for content and image uploads. As an example 
 Guides
 ------
 
-These instructions are for a production installation. For development installation instructions, see the :ref:`development` pages.
-
-Ubuntu
-......
-
- * Manual installation :ref:`installation-ubuntu` (14.04)
- * `Ansible role <https://github.com/jaywink/ansible-socialhome>`_ (14.04)
-
-Other platforms
-...............
-
-PR's welcome for guides for more platforms!
+See :ref:`install-guides`.

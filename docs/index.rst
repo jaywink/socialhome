@@ -50,6 +50,8 @@ Table of contents
    :maxdepth: 3
 
    installation
+   install_guides
+   updating
    running
    api
    community

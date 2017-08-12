@@ -1,6 +1,3 @@
-Search index
-............
-
 The search indexes must be initialized, otherwise there will be an error when trying to use search. Run this command once:
 
 ::

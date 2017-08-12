@@ -98,6 +98,9 @@ After this you need to log in once with the user via the user interface (which c
 
 You should now be able to log in as the user ``admin``.
 
+Search index
+............
+
 .. include:: includes/search_index.rst
 
 Running tests

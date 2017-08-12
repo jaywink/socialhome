@@ -1,0 +1,3 @@
+::
+
+    python manage.py migrate
