@@ -10,7 +10,7 @@
                 <b-button :href="absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
                     <i class="fa fa-user"></i>
                 </b-button>
-                <b-button v-if="isUserLocal" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
+                <b-button v-if="isUserRemote" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
                     <i class="fa fa-home"></i>
                 </b-button>
                 <b-button
@@ -18,7 +18,7 @@
                     v-if="showFollowBtn"
                     class="follower-button"
                     data-action="remove_follower"
-                    :data-profileid="currentBrowsingUserId"
+                    :data-profileid="currentBrowsingProfileId"
                     :data-target="guid"
                     title="Unfollow"
                     aria-label="Unfollow"
@@ -30,7 +30,7 @@
                     v-if="showUnfollowBtn"
                     class="follower-button"
                     data-action="add_follower"
-                    :data-profileid="currentBrowsingUserId"
+                    :data-profileid="currentBrowsingProfileId"
                     :data-target="guid"
                     title="Follow"
                     aria-label="Follow"
@@ -51,7 +51,7 @@
             handle: {type: String, required: true},
             name: {type: String, required: true},
             guid: {type: String, required: true},
-            currentBrowsingUserId: {type: String, required: true},
+            currentBrowsingProfileId: {type: String, required: true},
             homeUrl: {type: String, required: true},
             absoluteUrl: {type: String, required: true},
             imageUrlSmall: {type: String, required: true},
@@ -73,7 +73,8 @@
                 return this.isUserAuthentificated
                     && !this.isUserLocal
                     && this.isUserFollowingAuthor
-            }
+            },
+            isUserRemote: () => !this.isUserLocal
         },
         methods: {
             profileBoxTrigger() {

@@ -6,7 +6,7 @@
             v-bind="author"
             :is-user-author="isUserAuthor"
             :is-user-local="isUserLocal"
-            :current-browsing-user-id="currentBrowsingUserId"
+            :current-browsing-profile-id="currentBrowsingProfileId"
             :is-user-authentificated="isUserAuthentificated"
         >
         </author-bar>
@@ -65,7 +65,7 @@
             isUserAuthor: {type: Boolean, required: true},
             showAuthorBar: {type: Boolean, required: true},
             isUserAuthentificated: {type: Boolean, required: true},
-            currentBrowsingUserId: {type: String, default: ""}
+            currentBrowsingProfileId: {type: String, default: ""}
         },
         computed: {
             editedText() { return this.edited ? " (edited)" : "" },

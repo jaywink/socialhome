@@ -13,7 +13,6 @@ class BaseStreamView(ListView):
     paginate_by = 30
     stream_name = ""
     vue = False
-    queryset = []
 
     def dispatch(self, request, *args, **kwargs):
         self.vue = bool(request.GET.get("vue", False))
@@ -22,15 +21,15 @@ class BaseStreamView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["stream_name"] = self.stream_name
-        if self.vue:
+        if self.vue:  # pragma: no cover
             context["json_context"] = self._define_context_json(self.stream_name)
         return context
 
-    def _define_context_json(self, stream_name):
+    def _define_context_json(self, stream_name):  # pragma: no cover
         request_user_profile = getattr(self.request.user, "profile", None)
 
         def dump_content(content):
-            is_user_author = (request_user_profile is not None and content.author == request_user_profile)
+            is_user_author = (content.author == request_user_profile)
             return {
                 "htmlSafe": content.rendered,
                 "author": {
@@ -58,10 +57,10 @@ class BaseStreamView(ListView):
 
         return {
             "contentList": [dump_content(content) for content in self.queryset],
-            "currentBrowsingUserId": getattr(request_user_profile, "id", ""),
+            "currentBrowsingProfileId": getattr(request_user_profile, "id", ""),
             "streamName": stream_name,
             "isUserAuthentificated": bool(self.request.user.is_authenticated),
-            "showAuthorBar": stream_name.startswith("profile_"),
+            "showAuthorBar": not stream_name.startswith("profile_"),
             "translations": {
                 "stampedContent": {
                     "h2": gettext("Public"),

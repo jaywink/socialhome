@@ -1,9 +1,9 @@
 {% extends "streams/base.html" %}
-{% load staticfiles slurp_json_context string_utils %}
+{% load json_context %}
+{% load staticfiles %}
+{% load string_utils %}
 
 {% block content %}
-    {% slurp_json_context %}
-
     <div id="app" class="streams-container">
         <stream></stream>
     </div>
@@ -11,5 +11,6 @@
 
 {% block javascript %}
     {{ block.super }}
+    {% json_context %}
     <script src="{% static 'js/webpack.stream.js' %}"></script>
 {% endblock %}

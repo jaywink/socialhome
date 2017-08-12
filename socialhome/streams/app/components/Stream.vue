@@ -22,7 +22,7 @@
                 :data-content-id="content.id"
                 :is-user-authentificated="$store.state.isUserAuthentificated"
                 :show-author-bar="$store.state.showAuthorBar"
-                :current-browsing-user-id="$store.state.currentBrowsingUserId"
+                :current-browsing-profile-id="$store.state.currentBrowsingProfileId"
             >
             </stream-element>
         </div>
