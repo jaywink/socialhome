@@ -1,12 +1,12 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
 
 from socialhome.enums import Visibility
+from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-class TestUserViewSet(APITestCase):
+class TestUserViewSet(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -15,21 +15,16 @@ class TestUserViewSet(APITestCase):
         Profile.objects.filter(user_id__in=[cls.user.id, cls.staff_user.id]).update(visibility=Visibility.PUBLIC)
 
     def test_user_list(self):
-        url = reverse("api:user-list")
-        # Not authenticated
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
-        # Normal user authenticated
-        self.client.login(username=self.user.username, password="password")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 1)
-        self.assertEqual(response.data.get("results")[0]["username"], self.user.username)
-        # Staff user authenticated
-        self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 2)
+        self.get("api:user-list")
+        self.response_404()
+
+        with self.login(self.user):
+            self.get("api:user-list")
+            self.response_404()
+
+        with self.login(self.staff_user):
+            self.get("api:user-list")
+            self.response_404()
 
     def test_user_get(self):
         # Not authenticated
@@ -50,7 +45,7 @@ class TestUserViewSet(APITestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestProfileViewSet(APITestCase):
+class TestProfileViewSet(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -64,24 +59,16 @@ class TestProfileViewSet(APITestCase):
         Profile.objects.filter(id=cls.profile.id).update(visibility=Visibility.PUBLIC)
 
     def test_profile_list(self):
-        url = reverse("api:profile-list")
-        # Not authenticated
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 1)
-        self.assertEqual(response.data.get("results")[0]["handle"], self.profile.handle)
-        # Normal user authenticated
-        self.client.login(username=self.user.username, password="password")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 2)
-        for data in response.data.get("results"):
-            self.assertTrue(data["handle"] in [self.profile.handle, self.site_profile.handle])
-        # Staff user authenticated
-        self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data.get("results")), 5)
+        self.get("api:profile-list")
+        self.response_404()
+
+        with self.login(self.user):
+            self.get("api:profile-list")
+            self.response_404()
+
+        with self.login(self.staff_user):
+            self.get("api:profile-list")
+            self.response_404()
 
     def test_profile_get(self):
         # Not authenticated

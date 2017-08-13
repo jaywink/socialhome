@@ -32,22 +32,15 @@ class TestContentViewSet(SocialhomeAPITestCase, TestCase):
 
     def test_list_content(self):
         self.get("api:content-list")
-        self.response_200()
-        self.assertEqual(len(self.last_response.data["results"]), 1)
-        self.assertEqual(self.last_response.data["results"][0]["id"], self.public_content.id)
+        self.response_405()
 
         with self.login(self.user):
             self.get("api:content-list")
-            self.response_200()
-            self.assertEqual(len(self.last_response.data["results"]), 2)
-            self._check_result_ids({self.public_content.id, self.site_content.id})
+            self.response_405()
 
         with self.login(self.staff_user):
             self.get("api:content-list")
-            self.response_200()
-            self.assertEqual(len(self.last_response.data["results"]), 4)
-            self._check_result_ids({self.public_content.id, self.site_content.id, self.limited_content.id,
-                                    self.self_content.id})
+            self.response_405()
 
     def test_detail(self):
         self.get("api:content-detail", pk=self.public_content.id)
