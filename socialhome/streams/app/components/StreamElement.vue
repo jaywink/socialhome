@@ -48,6 +48,7 @@
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 
+
 export default Vue.component("stream-element", {
     props: {
         id: {type: Number, required: true},
@@ -65,11 +66,15 @@ export default Vue.component("stream-element", {
         isUserAuthor: {type: Boolean, required: true},
         showAuthorBar: {type: Boolean, required: true},
         isUserAuthentificated: {type: Boolean, required: true},
-        currentBrowsingProfileId: {type: String, default: ""},
+        currentBrowsingProfileId: {type: String, required: true},
     },
     computed: {
-        editedText() { return this.edited ? " (edited)" : "" },
-        showReactionBar() { return this.isUserAuthentificated || this.childrenCount > 0 },
+        editedText() {
+            return this.edited ? " (edited)" : ""
+        },
+        showReactionBar() {
+            return this.isUserAuthentificated || this.childrenCount > 0
+        },
     },
 })
 </script>

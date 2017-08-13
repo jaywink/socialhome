@@ -32,6 +32,7 @@ script:
   - python manage.py migrate --noinput -v 0
   - python manage.py collectstatic --noinput -v 0
   - node_modules/.bin/grunt test
+  - npm run test
 after_success:
   - codecov
 env:

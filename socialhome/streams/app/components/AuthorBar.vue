@@ -1,7 +1,7 @@
 <template>
     <div class="grid-item-author-bar mt-1">
         <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
-            <img :src="imageUrlSmall" class="grid-item-author-bar-pic">
+            <img :src="imageUrlSmall" class="grid-item-author-bar-pic" />
             {{ name }}
         </div>
         <div v-show="showProfileBox" class="profile-box">
@@ -14,24 +14,20 @@
                     <i class="fa fa-home"></i>
                 </b-button>
                 <b-button
+                    @click.prevent.stop="unfollow"
                     variant="secondary"
-                    v-if="showFollowBtn"
-                    class="follower-button"
-                    data-action="remove_follower"
-                    :data-profileid="currentBrowsingProfileId"
-                    :data-target="guid"
+                    v-if="showUnfollowBtn"
+                    class="unfollow-btn"
                     title="Unfollow"
                     aria-label="Unfollow"
                 >
                     <i class="fa fa-minus"></i>
                 </b-button>
                 <b-button
+                    @click.prevent.stop="follow"
                     variant="secondary"
-                    v-if="showUnfollowBtn"
-                    class="follower-button"
-                    data-action="add_follower"
-                    :data-profileid="currentBrowsingProfileId"
-                    :data-target="guid"
+                    v-if="showFollowBtn"
+                    class="follow-btn"
                     title="Follow"
                     aria-label="Follow"
                 >
@@ -45,6 +41,7 @@
 
 <script>
 import Vue from "vue"
+
 
 export default Vue.component("author-bar", {
     props: {
@@ -61,31 +58,60 @@ export default Vue.component("author-bar", {
         isUserAuthentificated: {type: Boolean, required: true},
     },
     data() {
-        return {showProfileBox: false}
+        return {
+            showProfileBox: false,
+            _isUserFollowingAuthor: this.isUserFollowingAuthor,
+        }
     },
     computed: {
+        isUserRemote(){
+            return !this.isUserLocal
+        },
         showFollowBtn() {
-            return this.isUserAuthentificated
-                    && !this.isUserLocal
-                    && !this.isUserFollowingAuthor
+            return this.canFollow && !this.$data._isUserFollowingAuthor
         },
         showUnfollowBtn() {
-            return this.isUserAuthentificated
-                    && !this.isUserLocal
-                    && this.isUserFollowingAuthor
+            return this.canFollow && this.$data._isUserFollowingAuthor
         },
-        isUserRemote: () => !this.isUserLocal,
+        canFollow() {
+            return this.isUserAuthentificated
+                && !this.isUserAuthor
+                && this.isUserLocal
+        },
     },
     methods: {
         profileBoxTrigger() {
             this.showProfileBox = !this.showProfileBox
         },
+        unfollow() {
+            if (!this.currentBrowsingProfileId) {
+                console.error("Not logged in")
+                return
+            }
+            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.guid})
+                .then(() => this.$data._isUserFollowingAuthor = false)
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        },
+        follow() {
+            if (!this.currentBrowsingProfileId) {
+                console.error("Not logged in")
+                return
+            }
+            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.guid})
+                .then(() => this.$data._isUserFollowingAuthor = true)
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        },
+    },
+    updated() {
+        Vue.redrawVueMasonry()
     },
 })
 </script>
 
 <style scoped lang="scss">
-    .profilebox-trigger {
+    .profilebox-trigger,
+    .follow-btn,
+    .unfollow-btn {
         cursor: pointer;
     }
 </style>

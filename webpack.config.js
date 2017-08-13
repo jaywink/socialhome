@@ -12,10 +12,10 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /.js$/,
+                test: /\.js$/,
                 loader: "babel-loader",
                 exclude: /node_modules/,
-                query: {presets: ["env"]}
+                query: {"presets": ["env"]}
             },
             {
                 test: /\.scss$/,
@@ -38,7 +38,11 @@ module.exports = {
             path.resolve(__dirname, "socialhome"),
             path.resolve(__dirname, "node_modules")
         ],
-        alias: {vue: "vue/dist/vue.js",}
+        alias: {
+            "vue": "vue/dist/vue.js",
+            "bootstrap-vue": "bootstrap-vue/dist/bootstrap-vue.esm.js",
+        },
+        extensions: [".webpack.js", ".js", ".vue"],
     },
     stats: {colors: true},
     devtool: "cheap-module-source-map"

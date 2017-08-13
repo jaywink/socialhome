@@ -9,5 +9,6 @@
 import Vue from "vue"
 import store from "streams/app/stores/streamStore"
 
+
 export default Vue.component("stamped-element", {store})
 </script>

@@ -1,20 +1,30 @@
 const wpConf = require("./webpack.config")
-wpConf.devtool = "inline-source-map"
 
 module.exports = config => {
     config.set({
-        browsers:      ["PhantomJS"],
-        files:         ["./socialhome/**/app/tests/**/*\.tests\.js"],
-        frameworks:    ["mocha"],
-        plugins:       [
+        browsers: ["PhantomJS"],
+        files: [
+            {pattern: "./node_modules/babel-polyfill/dist/polyfill.js", watched: false},
+            {pattern: "./socialhome/**/app/tests/**/*.tests.js", watched: false}
+        ],
+        frameworks: ["mocha"],
+        plugins: [
             "karma-phantomjs-launcher",
             "karma-mocha",
             "karma-sourcemap-loader",
-            "karma-webpack"
+            "karma-webpack",
         ],
-        preprocessors: {"./socialhome/**/app/tests/**/*\.tests\.js": ["webpack", "sourcemap"]},
-        reporters:     ["dots"],
-        singleRun:     true,
-        webpack:       wpConf
+        preprocessors: {
+            "./node_modules/babel-polyfill/dist/polyfill.js": ["webpack", "sourcemap"],
+            "./socialhome/**/app/tests/**/*.tests.js": ["webpack", "sourcemap"]
+        },
+        reporters: ["dots"],
+        singleRun: true,
+        webpack: {
+            module: wpConf.module,
+            resolve: wpConf.resolve,
+            devtool: "inline-source-map"
+        },
+        webpackMiddleware: {noInfo: true},
     })
 }
