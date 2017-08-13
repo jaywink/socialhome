@@ -28,6 +28,14 @@ class CreateContentThrottle(UserRateThrottle):
 
 
 class ContentViewSet(ModelViewSet):
+    """
+    create:
+        Create content
+
+        Required values: `text` and `visibility`.
+
+        `visibility` should be one of: `public`, `site`, `limited`, `self`.
+    """
     queryset = Content.objects.none()
     serializer_class = ContentSerializer
     permission_classes = (IsOwnContentOrReadOnly,)

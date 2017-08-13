@@ -6,7 +6,7 @@ from socialhome.enums import Visibility
 
 
 class ContentSerializer(ModelSerializer):
-    visibility = EnumField(Visibility, lenient=True)
+    visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
     class Meta:
         model = Content
