@@ -9,5 +9,5 @@ Vue.use(BootstrapVue)
 
 export default new Vue({
     el: "#app",
-    http: {root: "/"}
+    http: {root: "/"},
 })

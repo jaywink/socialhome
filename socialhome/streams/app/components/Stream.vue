@@ -30,10 +30,10 @@
 </template>
 
 <script>
-    import Vue from "vue"
-    import "streams/app/components/StampedElement.vue"
-    import "streams/app/components/StreamElement.vue"
-    import store from "streams/app/stores/streamStore"
+import Vue from "vue"
+import "streams/app/components/StampedElement.vue"
+import "streams/app/components/StreamElement.vue"
+import store from "streams/app/stores/streamStore"
 
-    export default Vue.component("stream", {store})
+export default Vue.component("stream", {store})
 </script>

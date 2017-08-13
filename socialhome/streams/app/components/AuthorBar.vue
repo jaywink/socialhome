@@ -44,44 +44,44 @@
 </template>
 
 <script>
-    import Vue from "vue"
+import Vue from "vue"
 
-    export default Vue.component("author-bar", {
-        props: {
-            handle: {type: String, required: true},
-            name: {type: String, required: true},
-            guid: {type: String, required: true},
-            currentBrowsingProfileId: {type: String, required: true},
-            homeUrl: {type: String, required: true},
-            absoluteUrl: {type: String, required: true},
-            imageUrlSmall: {type: String, required: true},
-            isUserAuthor: {type: Boolean, required: true},
-            isUserLocal: {type: Boolean, required: true},
-            isUserFollowingAuthor: {type: Boolean, required: true},
-            isUserAuthentificated: {type: Boolean, required: true}
-        },
-        data() {
-            return {showProfileBox: false}
-        },
-        computed: {
-            showFollowBtn() {
-                return this.isUserAuthentificated
+export default Vue.component("author-bar", {
+    props: {
+        handle: {type: String, required: true},
+        name: {type: String, required: true},
+        guid: {type: String, required: true},
+        currentBrowsingProfileId: {type: String, required: true},
+        homeUrl: {type: String, required: true},
+        absoluteUrl: {type: String, required: true},
+        imageUrlSmall: {type: String, required: true},
+        isUserAuthor: {type: Boolean, required: true},
+        isUserLocal: {type: Boolean, required: true},
+        isUserFollowingAuthor: {type: Boolean, required: true},
+        isUserAuthentificated: {type: Boolean, required: true},
+    },
+    data() {
+        return {showProfileBox: false}
+    },
+    computed: {
+        showFollowBtn() {
+            return this.isUserAuthentificated
                     && !this.isUserLocal
                     && !this.isUserFollowingAuthor
-            },
-            showUnfollowBtn() {
-                return this.isUserAuthentificated
+        },
+        showUnfollowBtn() {
+            return this.isUserAuthentificated
                     && !this.isUserLocal
                     && this.isUserFollowingAuthor
-            },
-            isUserRemote: () => !this.isUserLocal
         },
-        methods: {
-            profileBoxTrigger() {
-                this.showProfileBox = !this.showProfileBox
-            }
-        }
-    })
+        isUserRemote: () => !this.isUserLocal,
+    },
+    methods: {
+        profileBoxTrigger() {
+            this.showProfileBox = !this.showProfileBox
+        },
+    },
+})
 </script>
 
 <style scoped lang="scss">
