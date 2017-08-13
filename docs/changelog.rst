@@ -27,6 +27,11 @@ Added
 
 * Add user API token view. Allows retrieving an API token for usage in clients and tools. Allows also regenerating the token if it has been lost or exposed.
 
+Changed
+.......
+
+* **Breaking change**. Content API results now return `visibility` as a string ('public', 'limited', 'site' or 'self'), not an integer.
+
 0.3.1 (2017-08-06)
 ------------------
 
