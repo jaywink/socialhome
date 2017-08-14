@@ -32,6 +32,11 @@ Changed
 
 * **Breaking change**. Content API results now return `visibility` as a string ('public', 'limited', 'site' or 'self'), not an integer.
 
+Removed
+.......
+
+* **Breaking change**. Removed Content, Profile and Users API LIST routes. For now these are seen as not required for building a client and allow unnecessarily easy data mining.
+
 0.3.1 (2017-08-06)
 ------------------
 

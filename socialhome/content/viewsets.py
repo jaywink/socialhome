@@ -1,6 +1,7 @@
+from rest_framework import mixins
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.throttling import UserRateThrottle
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
@@ -27,7 +28,8 @@ class CreateContentThrottle(UserRateThrottle):
     scope = "content_create"
 
 
-class ContentViewSet(ModelViewSet):
+class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin, GenericViewSet):
     """
     create:
         Create content
