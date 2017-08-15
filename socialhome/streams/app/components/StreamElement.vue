@@ -45,31 +45,31 @@
 </template>
 
 <script>
-    import Vue from "vue"
-    import "streams/app/components/AuthorBar.vue"
+import Vue from "vue"
+import "streams/app/components/AuthorBar.vue"
 
-    export default Vue.component("stream-element", {
-        props: {
-            id: {type: Number, required: true},
-            author: {type: Object, required: true},
-            timestamp: {type: String, required: true},
-            humanizedTimestamp: {type: String, required: true},
-            htmlSafe: {type: String, required: true},
-            contentUrl: {type: String, required: true},
-            updateUrl: {type: String, required: true},
-            deleteUrl: {type: String, required: true},
-            replyUrl: {type: String, required: true},
-            childrenCount: {type: Number, required: true},
-            edited: {type: Boolean, required: true},
-            isUserLocal: {type: Boolean, required: true},
-            isUserAuthor: {type: Boolean, required: true},
-            showAuthorBar: {type: Boolean, required: true},
-            isUserAuthentificated: {type: Boolean, required: true},
-            currentBrowsingProfileId: {type: String, default: ""}
-        },
-        computed: {
-            editedText() { return this.edited ? " (edited)" : "" },
-            showReactionBar(){ return this.isUserAuthentificated || this.childrenCount > 0 }
-        }
-    });
+export default Vue.component("stream-element", {
+    props: {
+        id: {type: Number, required: true},
+        author: {type: Object, required: true},
+        timestamp: {type: String, required: true},
+        humanizedTimestamp: {type: String, required: true},
+        htmlSafe: {type: String, required: true},
+        contentUrl: {type: String, required: true},
+        updateUrl: {type: String, required: true},
+        deleteUrl: {type: String, required: true},
+        replyUrl: {type: String, required: true},
+        childrenCount: {type: Number, required: true},
+        edited: {type: Boolean, required: true},
+        isUserLocal: {type: Boolean, required: true},
+        isUserAuthor: {type: Boolean, required: true},
+        showAuthorBar: {type: Boolean, required: true},
+        isUserAuthentificated: {type: Boolean, required: true},
+        currentBrowsingProfileId: {type: String, default: ""},
+    },
+    computed: {
+        editedText() { return this.edited ? " (edited)" : "" },
+        showReactionBar() { return this.isUserAuthentificated || this.childrenCount > 0 },
+    },
+})
 </script>

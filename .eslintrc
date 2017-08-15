@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "airbnb-base",
+    "plugin:vue/recommended"
+  ],
+  "rules": {
+    "indent": ["error", 4],
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-unresolved": "off",
+    "max-len": ["error", 120],
+    "object-curly-spacing": ["error", "never"],
+    "quotes": ["warn", "double"],
+    "semi": ["error", "never"]
+  }
+}

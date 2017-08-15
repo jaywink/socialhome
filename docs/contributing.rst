@@ -56,10 +56,10 @@ We use ``py.test`` as test runner but the tests themselves are Django based test
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
 
-We also have some ``Mocha`` based JavaScript tests. Any new JS code that affects for example streams functionality should have at least basic tests written.
-
 Code style
 ----------
 
 As a general rule, for Python code follow PEP8, except with a 120 character line length. We provide an
 ``.editorconfig`` in the repository root.
+
+There is an ``.eslintrc`` configuration provided as well. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.

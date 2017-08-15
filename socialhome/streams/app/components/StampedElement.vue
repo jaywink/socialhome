@@ -6,8 +6,8 @@
 </template>
 
 <script>
-    import Vue from "vue"
-    import store from "streams/app/stores/streamStore"
+import Vue from "vue"
+import store from "streams/app/stores/streamStore"
 
-    export default Vue.component("stamped-element", {store});
+export default Vue.component("stamped-element", {store})
 </script>

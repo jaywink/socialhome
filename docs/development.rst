@@ -33,8 +33,8 @@ Install requirements
 
 ::
 
-    pip install -r requirements/local.txt
-    pip install -r requirements/test.txt
+    pip install -U setuptools pip
+    pip install -U -r requirements/local.txt -r requirements/test.txt
 
 Do NPM, Bower
 .............
@@ -45,6 +45,21 @@ Do NPM, Bower
     bower install
     sudo npm -g install grunt
     grunt dev
+
+New Vue based frontend
+......................
+
+The new Vue based frontend builds the bundles with Webpack. Execute the following to build the bundle.
+
+::
+
+    npm run dev
+
+To watch files and build bundles automatically, use this.
+
+::
+
+    npm run watch
 
 Configure
 .........
@@ -116,11 +131,35 @@ Python tests
 JavaScript tests
 ................
 
+Legacy frontend
+'''''''''''''''
+
 This will launch a separate ``runserver`` on port 8181 and execute the tests against that. The separate ``runserver`` instance will be killed after the tests have been executed.
 
 ::
 
     grunt test
+
+New Vue based frontend
+''''''''''''''''''''''
+
+Execute the following to run the new frontend JavaScript tests.
+
+::
+
+    npm run test
+
+Linters
+-------
+
+ESLint
+''''''
+
+There is an ``.eslintrc`` provided. We follow the Airbnb and Vue guidelines with some tweaks. It's recommended to add this configuration to your editor directly. To run ESLint directly, use the following command. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
+
+::
+
+    npm run lint
 
 Building local documentation
 ----------------------------
