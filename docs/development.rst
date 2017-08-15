@@ -153,7 +153,7 @@ Linters
 -------
 
 ESLint
-''''''
+......
 
 There is an ``.eslintrc`` provided. We follow the Airbnb and Vue guidelines with some tweaks. It's recommended to add this configuration to your editor directly. To run ESLint directly, use the following command. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
 

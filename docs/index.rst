@@ -54,6 +54,7 @@ Table of contents
    updating
    running
    api
+   clients
    community
    development
    architecture

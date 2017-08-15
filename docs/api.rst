@@ -1,7 +1,11 @@
+.. _api:
+
 API
 ===
 
-Socialhome has a (work in progress) REST API. This allows (in the future) to build clients, bots and alternative frontends.
+Socialhome has a REST API. This allows to build clients, bots and alternative frontends.
+
+Note, some parts of the API are still work in progress and thus changes could still happen.
 
 API routes
 ----------
@@ -33,7 +37,14 @@ Your client can obtain a token for the user by posting ``username`` and ``passwo
 
     { 'token' : '9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' }
 
+Users can also retrieve and regenerate tokens from the UI from their profile menu.
+
 Development
 -----------
 
-The API is made with `Django REST Framework <http://www.django-rest-framework.org/>`_. The idea is to have a full API that enables users to do everything that possibly could be required from a client or frontend UI. Help is welcome to expand the API!
+The API is made with `Django REST Framework <http://www.django-rest-framework.org/>`_. Help is welcome to expand the API!
+
+Clients
+-------
+
+See the :ref:`clients` section.
