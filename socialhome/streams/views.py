@@ -56,7 +56,7 @@ class BaseStreamView(ListView):
             }
 
         return {
-            "contentList": [dump_content(content) for content in self.queryset],
+            "contentList": [dump_content(content) for content in self.queryset[:self.paginate_by]],
             "currentBrowsingProfileId": getattr(request_user_profile, "id", ""),
             "streamName": stream_name,
             "isUserAuthentificated": bool(self.request.user.is_authenticated),
