@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<h1>{% include "content/_edit_title.html" %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.text }}
+        <small class="form-text">
+            {% trans "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg." %}
+        </small>
+        <div id="image-upload-progress-container" class="pt-2"></div>
+    </div>
+    {% if not is_reply %}
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="{{ form.visibility.id }}">{{ form.visibility.label }}</label>
+                    {{ form.visibility }}
+                    <small class="form-text">
+                        <ul>
+                            <li>{% trans "Public - visible to anyone, even anonymous users and internet search bots." %}</li>
+                            <li>{% trans "Limited - visible to only those who shared with. NOTE! Currently cannot be shared, so visible to only self." %}</li>
+                            <li>{% trans "Site - visible to only users who are logged in." %}</li>
+                            <li>{% trans "Self - visible to only self." %}</li>
+                        </ul>
+                        <p>{% trans "NOTE! Currently only 'Public' content will federate." %}</p>
+                        <p>{% trans "Tip: You can use the 'Self' visibility to create draft content and then change the visibility to for example 'Public' when you want to publish it." %}</p>
+                    </small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group form-check-inline">
+                    <label for="{{ form.pinned.id }}">{{ form.pinned.label }}</label>
+                    {{ form.pinned }}
+                    <small class="form-text">
+                        {% trans "Pinned content will be shown on your personal profile in the order you want. Reorder pinned content from the profile menu. Pinned content will federate and otherwise function as any other content." %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+</form>
+{# "Hidden" form for image upload input #}
+<div style="height:0px; overflow:hidden;">
+    <form id="image-upload-form" enctype="multipart/form-data">
+        <input type="file" id="image-upload-input" name="image" />
+    </form>
+</div>

@@ -27,6 +27,10 @@ Added
 
 * Add user API token view. Allows retrieving an API token for usage in clients and tools. Allows also regenerating the token if it has been lost or exposed.
 
+* Added bookmarklet to easily share external pages. The bookmarklet can be bookmarked from the 'Create' page. (`#138 <https://github.com/jaywink/socialhome/issues/138>`_)
+
+  Sharing with the bookmarklet will copy the page url, title and optionally selected text into the create content text area. The bookmarklet is compatible with Diaspora, so for example the Firefox `sharing service <https://activations.cdn.mozilla.net/en-US/diaspora.html>`_ will work.
+
 Changed
 .......
 

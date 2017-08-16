@@ -10,6 +10,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
+from socialhome.content.views import ContentBookmarkletView
 from socialhome.content.viewsets import ContentViewSet
 from socialhome.viewsets import ImageUploadView
 from socialhome.views import HomeView, MarkdownXImageUploadView
@@ -48,6 +49,8 @@ urlpatterns = [
 
     # Content
     url(r"^content/", include("socialhome.content.urls", namespace="content")),
+    # Fallback for bookmarklet route for cross-project support
+    url(r"^bookmarklet/", ContentBookmarkletView.as_view(), name="bookmarklet"),
 
     # JavaScript translations
     url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
