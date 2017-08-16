@@ -1,0 +1,5 @@
+{% if title %}### {{ title }}{% endif %}{% if notes %}{% if title %}
+
+{% endif %}> {{ notes }}{% endif %}{% if url %}{% if title or notes %}
+
+{% endif %}{{ url }}{% endif %}

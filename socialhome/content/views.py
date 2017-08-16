@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 
 from socialhome.content.forms import ContentForm
@@ -49,8 +50,29 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["bookmarklet"] = render_to_string("content/bookmarklet.min.js", {}, request=self.request)
         context["is_reply"] = self.is_reply
         return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["text"] = self._get_text_initial_from_parameters()
+        return initial
+
+    def _get_text_initial_from_parameters(self):
+        parameters = {}
+        if self.request.GET.get("url"):
+            parameters["url"] = self.request.GET.get("url")
+        if self.request.GET.get("title"):
+            parameters["title"] = self.request.GET.get("title")
+        if self.request.GET.get("notes"):
+            parameters["notes"] = self.request.GET.get("notes")
+        if parameters:
+            return render_to_string("content/_bookmarklet_initial.html", parameters, request=self.request)
+
+
+class ContentBookmarkletView(ContentCreateView):
+    template_name = "content/bookmarklet.html"
 
 
 class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):

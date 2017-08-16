@@ -1,48 +1,80 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase
-from django.test.client import Client
+from django.template.loader import render_to_string
+from django.test.client import Client, RequestFactory
 
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.enums import Visibility
-from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.tests.utils import SocialhomeTestCase, SocialhomeCBVTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures("admin_client", "rf")
-class TestContentCreateView:
-    def _get_request_and_view(self, rf):
-        request = rf.get("/")
-        request.user = UserFactory()
-        view = ContentCreateView(request=request)
-        return request, view
+class TestContentCreateView(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
 
-    def test_form_valid(self, admin_client, rf):
-        request, view = self._get_request_and_view(rf)
-        form = ContentForm(data={"text": "barfoo", "visibility": Visibility.PUBLIC.value}, user=request.user)
+    def setUp(self):
+        super().setUp()
+        self.req = RequestFactory().get("/")
+        self.req.user = self.user
+
+    def test_form_valid(self):
+        view = self.get_instance(ContentCreateView, request=self.req)
+        form = ContentForm(data={"text": "barfoo", "visibility": Visibility.PUBLIC.value}, user=self.user)
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
         assert content.text == "barfoo"
-        assert content.author == request.user.profile
+        assert content.author == self.user.profile
         assert content.visibility == Visibility.PUBLIC
 
-    def test_create_view_renders(self, admin_client, rf):
-        response = admin_client.get(reverse("content:create"))
+    def test_view_renders(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("content:create"))
         assert response.status_code == 200
 
-    def test_untrusted_editor_text_is_cleaned(self, admin_client, rf):
-        request, view = self._get_request_and_view(rf)
-        request.user.trusted_editor = False
-        request.user.save()
-        form = ContentForm(data={"text": "<script>console.log</script>"}, user=request.user)
+    def test_untrusted_editor_text_is_cleaned(self):
+        self.user.trusted_editor = False
+        self.user.save()
+        form = ContentForm(data={"text": "<script>console.log</script>"}, user=self.user)
         form.full_clean()
         assert form.cleaned_data["text"] == "&lt;script&gt;console.log&lt;/script&gt;"
+
+    def test_has_bookmarklet_in_context(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("content:create"))
+        self.assertIsNotNone(response.context["bookmarklet"])
+
+    def test_get_initial(self):
+        request = RequestFactory().get("/")
+        view = self.get_instance(ContentCreateView, request=request)
+        initial = view.get_initial()
+        self.assertIsNone(initial.get("text"))
+        view.request = RequestFactory().get("/?url=url&title=title&notes=notes&dummy=dummy")
+        initial = view.get_initial()
+        self.assertEqual(initial.get("text"), render_to_string("content/_bookmarklet_initial.html", {
+            "title": "title", "notes": "notes", "url": "url",
+        }))
+
+
+class TestContentBookmarkletView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_view_renders(self):
+        with self.login(self.user):
+            self.get("content:bookmarklet")
+            self.get("bookmarklet")
+        self.response_200()
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
