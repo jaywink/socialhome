@@ -50,6 +50,8 @@ def process_entities(entities):
                 process_entity_follow(entity, profile)
             elif isinstance(entity, base.Profile):
                 Profile.from_remote_profile(entity)
+            elif isinstance(entity, base.Share):
+                process_entity_share(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.guid, ex)
 
@@ -223,6 +225,41 @@ def process_entity_retraction(entity, profile):
         logger.debug("Ignoring retraction of entity_type %s", entity_type)
 
 
+def process_entity_share(entity, profile):
+    """Process an entity of type Share."""
+    if not entity.entity_type == "Post":
+        # TODO: enable shares of replies too
+        logger.warning("Ignoring share entity type that is not of type Post")
+        return
+    try:
+        target_content = Content.objects.get(guid=entity.target_guid, share_of__isnull=True)
+    except Content.DoesNotExist:
+        # Try fetching
+        # TODO federation library fetch util, for now just return
+        logger.warning("No target found for share even after fetching from remote: %s", entity)
+        return
+    if not target_content.author.handle == entity.target_handle:
+        logger.warning("Share target handle is different from the author of locally known shared content!")
+        return
+    values = {
+        "text": safe_text_for_markdown(entity.raw_content),
+        "author": profile,
+        # TODO: ensure visibility constraints depending on shared content?
+        "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
+        "remote_created": safe_make_aware(entity.created_at, "UTC"),
+        "service_label": safe_text(entity.provider_display_name) or "",
+    }
+    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
+    guid = safe_text(entity.guid)
+    content, created = Content.objects.update_or_create(guid=guid, share_of=target_content, defaults=values)
+    if created:
+        logger.info("Saved share: %s", content)
+    else:
+        logger.info("Updated share: %s", content)
+    # TODO: send participation to the share from the author, if local
+    # We probably want that to happen even though our shares are not separate in the stream?
+
+
 def _make_post(content):
     try:
         return base.Post(
@@ -265,7 +302,8 @@ def make_federable_retraction(content, author):
     logger.info("make_federable_retraction - Content: %s", content)
     try:
         return base.Retraction(
-            entity_type="Comment" if content.parent else "Post",
+            # TODO check share federation
+            entity_type="Comment" if content.parent else "Share" if content.share_of else "Post",
             handle=author.handle,
             target_guid=content.guid,
         )

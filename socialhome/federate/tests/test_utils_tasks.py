@@ -1,9 +1,10 @@
 from unittest.mock import patch, Mock, call
+from uuid import uuid4
 
 import pytest
+from django.db import IntegrityError
 from federation.entities import base
 from federation.tests.factories import entities
-from test_plus import TestCase
 
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
@@ -13,7 +14,7 @@ from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_relationship,
-    make_federable_profile)
+    make_federable_profile, process_entity_share)
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
@@ -217,9 +218,7 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
         super().setUpTestData()
         cls.content = ContentFactory()
         cls.local_content = LocalContentFactory()
-        cls.user = UserFactory()
-        cls.profile = cls.user.profile
-        cls.remote_profile = ProfileFactory()
+        cls.create_local_and_remote_user()
 
     def setUp(self):
         super().setUp()
@@ -271,9 +270,7 @@ class TestProcessEntityFollow(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory()
-        cls.profile = cls.user.profile
-        cls.remote_profile = ProfileFactory()
+        cls.create_local_and_remote_user()
 
     def test_follower_added_on_following_true(self):
         process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
@@ -295,29 +292,78 @@ class TestProcessEntityRelationship(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory()
-        cls.profile = cls.user.profile
-        cls.remote_profile = ProfileFactory()
+        cls.create_local_and_remote_user()
 
     def test_follower_added_on_following(self):
-        process_entity_relationship(base.Relationship(
-            target_handle=self.profile.handle, relationship="following"), self.remote_profile
+        process_entity_relationship(
+            base.Relationship(target_handle=self.profile.handle, relationship="following"), self.remote_profile,
         )
         self.assertEqual(self.remote_profile.following.count(), 1)
         self.assertEqual(self.remote_profile.following.first().handle, self.profile.handle)
 
     def test_follower_not_added_on_not_following(self):
-        process_entity_relationship(base.Relationship(
-            target_handle=self.profile.handle, relationship="sharing"), self.remote_profile
+        process_entity_relationship(
+            base.Relationship(target_handle=self.profile.handle, relationship="sharing"), self.remote_profile,
         )
         self.assertEqual(self.remote_profile.following.count(), 0)
 
     @patch("socialhome.users.signals.django_rq.enqueue")
     def test_follower_added_sends_a_notification(self, mock_enqueue):
-        process_entity_relationship(base.Relationship(
-            target_handle=self.profile.handle, relationship="following"), self.remote_profile
+        process_entity_relationship(
+            base.Relationship(target_handle=self.profile.handle, relationship="following"), self.remote_profile,
         )
         mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
+
+
+class TestProcessEntityShare(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.local_content = LocalContentFactory()
+        cls.local_content2 = LocalContentFactory(guid=str(uuid4()))
+
+    def test_share_is_created(self):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
+            target_handle=self.local_content.author.handle, public=True,
+        )
+        process_entity_share(entity, self.remote_profile)
+        share = Content.objects.get(guid=entity.guid, share_of=self.local_content)
+        self.assertEqual(share.text, "")
+        self.assertEqual(share.author, self.remote_profile)
+        self.assertEqual(share.visibility, Visibility.PUBLIC)
+        self.assertEqual(share.service_label, "")
+        self.assertEqual(share.guid, entity.guid)
+
+    def test_share_is_not_created_if_no_target_found(self):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid="notexistingguid",
+            target_handle=self.local_content.author.handle, public=True,
+        )
+        process_entity_share(entity, self.remote_profile)
+        self.assertFalse(Content.objects.filter(guid=entity.guid, share_of=self.local_content).exists())
+
+    def test_share_is_not_created_if_target_handle_and_local_owner_differ(self):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
+            target_handle="someoneelse@example.com", public=True,
+        )
+        process_entity_share(entity, self.remote_profile)
+        self.assertFalse(Content.objects.filter(guid=entity.guid, share_of=self.local_content).exists())
+
+    def test_share_cant_hijack_local_content(self):
+        entity = base.Share(
+            guid=self.local_content2.guid, handle=self.local_content2.author.handle,
+            target_guid=self.local_content.guid, target_handle=self.local_content.author.handle, public=True,
+            raw_content="this should never get saved",
+        )
+        current_text = self.local_content2.text
+        with self.assertRaises(IntegrityError):
+            process_entity_share(entity, self.remote_profile)
+        self.local_content2.refresh_from_db()
+        self.assertIsNone(self.local_content2.share_of)
+        self.assertEqual(self.local_content2.text, current_text)
 
 
 @pytest.mark.usefixtures("db")

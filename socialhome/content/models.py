@@ -105,6 +105,10 @@ class Content(models.Model):
         "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
     )
 
+    share_of = models.ForeignKey(
+        "self", on_delete=models.CASCADE, verbose_name=_("Share of"), related_name="shares", null=True, blank=True,
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -122,6 +126,9 @@ class Content(models.Model):
         return reverse("content:view", kwargs={"pk": self.id})
 
     def save(self, *args, **kwargs):
+        # TODO should we cache an internal type, ie "content", "reply" or "share"? to avoid checking parent and share_of
+        if self.parent and self.share_of:
+            raise ValueError("Can't be both a reply and a share!")
         if self.parent:
             # Ensure replies have sane values
             self.visibility = self.parent.visibility

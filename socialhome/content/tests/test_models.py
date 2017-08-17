@@ -305,6 +305,10 @@ class TestContentModel(SocialhomeTestCase):
         del self.public_content.short_text
         self.assertEqual(self.public_content.get_absolute_url(), "/content/%s/" % self.public_content.id)
 
+    def test_save_raises_if_parent_and_share_of(self):
+        with self.assertRaises(ValueError):
+            ContentFactory(parent=ContentFactory(), share_of=ContentFactory())
+
 
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):

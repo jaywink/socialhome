@@ -58,8 +58,12 @@ def notify_listeners(content):
     """Send out to listening consumers."""
     data = json.dumps({"event": "new", "id": content.id})
     if content.parent:
-        # Content comments
+        # Content reply
         StreamConsumer.group_send("streams_content__%s" % content.parent.channel_group_name, data)
+    elif content.share_of:
+        # Share
+        # TODO do we need to do much?
+        pass
     else:
         # Public stream
         if content.visibility == Visibility.PUBLIC:
@@ -84,6 +88,9 @@ def federate_content(content):
     try:
         if content.parent:
             django_rq.enqueue(send_reply, content.id)
+        elif content.share_of:
+            # TODO federate share
+            pass
         else:
             django_rq.enqueue(send_content, content.id)
     except Exception as ex:
