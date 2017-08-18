@@ -9,6 +9,7 @@ from django.utils.timezone import make_aware
 from django_extensions.utils.text import truncate_letters
 from freezegun import freeze_time
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
 from socialhome.enums import Visibility
@@ -308,6 +309,13 @@ class TestContentModel(SocialhomeTestCase):
     def test_save_raises_if_parent_and_share_of(self):
         with self.assertRaises(ValueError):
             ContentFactory(parent=ContentFactory(), share_of=ContentFactory())
+
+    def test_save_sets_correct_content_type(self):
+        self.assertEqual(self.public_content.content_type, ContentType.CONTENT)
+        reply = ContentFactory(parent=ContentFactory())
+        self.assertEqual(reply.content_type, ContentType.REPLY)
+        share = ContentFactory(share_of=ContentFactory())
+        self.assertEqual(share.content_type, ContentType.SHARE)
 
 
 class TestContentRendered(SocialhomeTestCase):

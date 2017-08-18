@@ -18,6 +18,7 @@ from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentQuerySet
 from socialhome.content.utils import make_nsfw_safe, test_tag, linkify_text_urls
 from socialhome.enums import Visibility
@@ -82,6 +83,7 @@ class Content(models.Model):
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+    content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -130,9 +132,12 @@ class Content(models.Model):
         if self.parent and self.share_of:
             raise ValueError("Can't be both a reply and a share!")
         if self.parent:
+            self.content_type = ContentType.REPLY
             # Ensure replies have sane values
             self.visibility = self.parent.visibility
             self.pinned = False
+        elif self.share_of:
+            self.content_type = ContentType.SHARE
         if not self.pk:
             if not self.guid:
                 self.guid = uuid4()
