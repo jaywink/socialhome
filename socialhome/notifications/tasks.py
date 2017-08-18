@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.users.models import User, Profile
 
@@ -19,7 +20,7 @@ def send_reply_notifications(content_id):
         # Don't send in development mode
         return
     try:
-        content = Content.objects.get(id=content_id, parent__isnull=False)
+        content = Content.objects.get(id=content_id, content_type=ContentType.REPLY)
     except Content.DoesNotExist:
         logger.warning("No reply content found with id %s", content_id)
         return

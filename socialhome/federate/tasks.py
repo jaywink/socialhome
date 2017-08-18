@@ -7,6 +7,7 @@ from federation.inbound import handle_receive
 from federation.outbound import handle_send, handle_create_payload
 from federation.utils.network import send_document
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 
 from socialhome.enums import Visibility
@@ -98,7 +99,7 @@ def send_reply(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, parent_id__isnull=False)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.REPLY)
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return

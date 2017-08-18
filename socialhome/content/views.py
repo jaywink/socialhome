@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 
+from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 
@@ -118,7 +119,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
     @property
     def is_reply(self):
-        return True if self.object.parent else False
+        return True if self.object.content_type == ContentType.REPLY else False
 
 
 class ContentDeleteView(UserOwnsContentMixin, DeleteView):

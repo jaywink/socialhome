@@ -4,6 +4,7 @@ import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
@@ -292,7 +293,7 @@ def _make_comment(content):
 def make_federable_content(content):
     """Make Content federable by converting it to a federation entity."""
     logger.info("make_federable_content - Content: %s", content)
-    if content.parent:
+    if content.content_type == ContentType.REPLY:
         return _make_comment(content)
     return _make_post(content)
 
@@ -301,9 +302,11 @@ def make_federable_retraction(content, author):
     """Make Content retraction federable by converting it to a federation entity."""
     logger.info("make_federable_retraction - Content: %s", content)
     try:
+        entity_type = "Comment" if content.content_type == ContentType.REPLY else \
+            "Share" if content.content_type == ContentType.SHARE else "Post"
         return base.Retraction(
             # TODO check share federation
-            entity_type="Comment" if content.parent else "Share" if content.share_of else "Post",
+            entity_type=entity_type,
             handle=author.handle,
             target_guid=content.guid,
         )

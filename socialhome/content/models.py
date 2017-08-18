@@ -128,7 +128,6 @@ class Content(models.Model):
         return reverse("content:view", kwargs={"pk": self.id})
 
     def save(self, *args, **kwargs):
-        # TODO should we cache an internal type, ie "content", "reply" or "share"? to avoid checking parent and share_of
         if self.parent and self.share_of:
             raise ValueError("Can't be both a reply and a share!")
         if self.parent:
@@ -323,7 +322,7 @@ class Content(models.Model):
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
             "child_count": self.children.count(),
-            "parent": self.parent_id if self.parent else "",
+            "parent": self.parent_id if self.content_type == ContentType.REPLY else "",
             "is_author": is_author,
             "is_following_author": is_following_author,
             "is_authenticated": bool(user.is_authenticated),

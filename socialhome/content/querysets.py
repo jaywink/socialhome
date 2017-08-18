@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 
+from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 
@@ -22,7 +23,7 @@ class ContentQuerySet(models.QuerySet):
         return self.select_related("oembed", "opengraph")
 
     def top_level(self):
-        return self.filter(parent=None)
+        return self.filter(content_type=ContentType.CONTENT)
 
     def visible_for_user(self, user):
         """Filter by visibility to given user."""

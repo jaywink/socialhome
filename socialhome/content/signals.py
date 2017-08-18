@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
@@ -23,7 +24,7 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     if kwargs.get("created"):
         notify_listeners(instance)
-        if instance.parent:
+        if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
     if instance.is_local:
         transaction.on_commit(lambda: federate_content(instance))
@@ -57,10 +58,10 @@ def render_content(content):
 def notify_listeners(content):
     """Send out to listening consumers."""
     data = json.dumps({"event": "new", "id": content.id})
-    if content.parent:
+    if content.content_type == ContentType.REPLY:
         # Content reply
         StreamConsumer.group_send("streams_content__%s" % content.parent.channel_group_name, data)
-    elif content.share_of:
+    elif content.content_type == ContentType.SHARE:
         # Share
         # TODO do we need to do much?
         pass
@@ -86,9 +87,9 @@ def federate_content(content):
     Yes, edits also. The federation layer should decide whether these are really worth sending out.
     """
     try:
-        if content.parent:
+        if content.content_type == ContentType.REPLY:
             django_rq.enqueue(send_reply, content.id)
-        elif content.share_of:
+        elif content.content_type == ContentType.SHARE:
             # TODO federate share
             pass
         else:
