@@ -39,7 +39,7 @@ module.exports = {
             path.resolve(__dirname, "node_modules")
         ],
         alias: {
-            "vue": "vue/dist/vue.js",
+            'vue$': 'vue/dist/vue.esm.js',
             "bootstrap-vue": "bootstrap-vue/dist/bootstrap-vue.esm.js",
         },
         extensions: [".webpack.js", ".js", ".vue"],

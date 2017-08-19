@@ -1,13 +1,13 @@
 import Vue from "vue"
-import VueMasonry from "vue-masonry"
+import {VueMasonryPlugin} from "vue-masonry"
 import BootstrapVue from "bootstrap-vue"
 
 import Axios from "axios"
 
-import "streams/app/components/Stream.vue"
+import "./components/Stream.vue"
 
 
-Vue.use(VueMasonry)
+Vue.use(VueMasonryPlugin)
 Vue.use(BootstrapVue)
 
 Vue.prototype.$http = Axios.create({

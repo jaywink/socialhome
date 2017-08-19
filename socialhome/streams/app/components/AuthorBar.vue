@@ -1,40 +1,42 @@
 <template>
-    <div class="grid-item-author-bar mt-1">
-        <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
-            <img :src="imageUrlSmall" class="grid-item-author-bar-pic" />
-            {{ name }}
-        </div>
-        <div v-show="showProfileBox" class="profile-box">
-            {{ handle }}
-            <div class="pull-right">
-                <b-button :href="absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
-                    <i class="fa fa-user"></i>
-                </b-button>
-                <b-button v-if="isUserRemote" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
-                    <i class="fa fa-home"></i>
-                </b-button>
-                <b-button
-                    @click.prevent.stop="unfollow"
-                    variant="secondary"
-                    v-if="showUnfollowBtn"
-                    class="unfollow-btn"
-                    title="Unfollow"
-                    aria-label="Unfollow"
-                >
-                    <i class="fa fa-minus"></i>
-                </b-button>
-                <b-button
-                    @click.prevent.stop="follow"
-                    variant="secondary"
-                    v-if="showFollowBtn"
-                    class="follow-btn"
-                    title="Follow"
-                    aria-label="Follow"
-                >
-                    <i class="fa fa-plus"></i>
-                </b-button>
+    <div>
+        <div class="grid-item-author-bar mt-1">
+            <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
+                <img :src="imageUrlSmall" class="grid-item-author-bar-pic" />
+                {{ name }}
             </div>
-            <div class="clearfix"></div>
+            <div v-show="showProfileBox" class="profile-box">
+                {{ handle }}
+                <div class="pull-right">
+                    <b-button :href="absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
+                        <i class="fa fa-user"></i>
+                    </b-button>
+                    <b-button v-if="isUserRemote" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
+                        <i class="fa fa-home"></i>
+                    </b-button>
+                    <b-button
+                        @click.prevent.stop="unfollow"
+                        variant="secondary"
+                        v-if="showUnfollowBtn"
+                        class="unfollow-btn"
+                        title="Unfollow"
+                        aria-label="Unfollow"
+                    >
+                        <i class="fa fa-minus"></i>
+                    </b-button>
+                    <b-button
+                        @click.prevent.stop="follow"
+                        variant="secondary"
+                        v-if="showFollowBtn"
+                        class="follow-btn"
+                        title="Follow"
+                        aria-label="Follow"
+                    >
+                        <i class="fa fa-plus"></i>
+                    </b-button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
         </div>
     </div>
 </template>
