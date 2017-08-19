@@ -49,11 +49,11 @@ export default Vue.component("stream", {
             masonryOptions: {
                 "item-selector": ".grid-item",
                 "column-width": ".grid-sizer",
-                "gutter": ".gutter-sizer",
+                gutter: ".gutter-sizer",
                 "percent-position": true,
-                "stamp": ".stamped",
+                stamp: ".stamped",
                 "transition-duration": "0s",
-                "stagger": 0,
+                stagger: 0,
             },
         }
     },

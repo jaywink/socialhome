@@ -1,5 +1,6 @@
 import Vue from "vue"
 import Vuex from "vuex"
+import isNil from "lodash/isNil"
 
 // Vue setup
 Vue.use(Vuex)
@@ -18,9 +19,8 @@ function getContext() {
                 streamName: window.context.streamName,
                 isUserAuthentificated: window.context.isUserAuthentificated,
                 showAuthorBar: window.context.showAuthorBar,
-                currentBrowsingProfileId: (window.context.currentBrowsingProfileId
-                    ? `${window.context.currentBrowsingProfileId}`
-                    : void(0)),
+                currentBrowsingProfileId: (isNil(window.context.currentBrowsingProfileId)
+                    ? `${window.context.currentBrowsingProfileId}` : undefined),
             },
         }
     } catch (_) {

@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js",
     "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch",
-    "test": "./node_modules/.bin/mocha-webpack --recursive --webpack-config webpack.config.js test --require socialhome/streams/app/tests/.setup.js socialhome/streams/app/tests/",
+    "test": "./node_modules/.bin/mocha-webpack --recursive --webpack-config webpack.config.js test --require mocha/setup.js socialhome/streams/app/tests/",
     "lint": "./node_modules/.bin/eslint socialhome/streams/app/ --ext vue,js"
   },
   "devDependencies": {
@@ -34,29 +34,30 @@
     "jsdom": "^11.1.0",
     "jsdom-global": "^3.0.2",
     "load-grunt-tasks": "~3.5.2",
-    "mocha": "^3.5.0",
-    "mocha-webpack": "^1.0.0-rc.1",
+    "mocha": "~3.5.0",
+    "mocha-webpack": "~1.0.0-rc.1",
     "node-sass": "^4.5.3",
     "pixrem": "~3.0.2",
     "sass-loader": "^6.0.6",
     "sinon": "^3.2.0",
     "style-loader": "^0.18.2",
     "time-grunt": "~1.4.0",
-    "vue-loader": "^12.2.2",
-    "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.4.1",
+    "vue-loader": "~12.2.2",
+    "vue-style-loader": "~3.0.1",
+    "vue-template-compiler": "~2.4.1",
     "webpack": "^3.2.0"
   },
   "engines": {
     "node": ">=0.8.0"
   },
   "dependencies": {
-    "axios": "^0.16.2",
-    "bootstrap-vue": "^0.20.2",
-    "vue": "^2.4.1",
-    "vue-images-loaded": "^1.1.2",
-    "vue-masonry": "^0.10.3",
-    "vuex": "^2.3.1"
+    "axios": "~0.16.2",
+    "bootstrap-vue": "~0.20.2",
+    "lodash": "~4.17.4",
+    "vue": "~2.4.1",
+    "vue-images-loaded": "1.1.2",
+    "vue-masonry": "~0.10.3",
+    "vuex": "~2.3.1"
   },
   "eslintIgnore": [
     "**/tests/*",
