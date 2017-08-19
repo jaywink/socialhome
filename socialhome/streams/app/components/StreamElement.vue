@@ -27,7 +27,11 @@
                     </div>
                 </div>
                 <div class="col-3 text-right grid-item-reactions mt-1">
-                    <div v-if="showReactionBar" class="item-reaction">
+                    <div v-if="showShares" class="item-reaction">
+                        <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
+                        <span class="item-reaction-counter">{{ sharesCount }}</span>
+                    </div>
+                    <div v-if="showReplies" class="item-reaction">
                         <span class="item-open-replies-action" :data-content-id="id">
                             <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
                         </span>
@@ -36,10 +40,9 @@
                 </div>
             </div>
         </div>
-        <div v-if="showReactionBar" class="replies-container" :data-content-id="id">
-            <div class="content-actions hidden" :data-content-id="id">
-                <b-button variant="secondary" :href="replyUrl">Reply</b-button>
-            </div>
+        <div class="replies-container" :data-content-id="id"></div>
+        <div v-if="isUserAuthenticated" class="content-actions hidden" :data-content-id="id">
+            <b-button variant="secondary" :href="replyUrl">Reply</b-button>
         </div>
     </div>
 </template>
@@ -61,6 +64,7 @@ export default Vue.component("stream-element", {
         deleteUrl: {type: String, required: true},
         replyUrl: {type: String, required: true},
         childrenCount: {type: Number, required: true},
+        sharesCount: {type: Number, required: true},
         edited: {type: Boolean, required: true},
         isUserLocal: {type: Boolean, required: true},
         isUserAuthor: {type: Boolean, required: true},
@@ -72,8 +76,11 @@ export default Vue.component("stream-element", {
         editedText() {
             return this.edited ? " (edited)" : ""
         },
-        showReactionBar() {
+        showReplies() {
             return this.isUserAuthenticated || this.childrenCount > 0
+        },
+        showShares() {
+            return this.isUserAuthenticated || this.sharesCount > 0
         },
     },
 })
