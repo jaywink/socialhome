@@ -28,16 +28,16 @@ describe("AuthorBar", () => {
         })
 
         describe("canFollow", () => {
-            it("sould be true if user is authentificated and not the author", () => {
-                let propsData = getPropsData({isUserAuthentificated: false, isUserAuthor: true})
+            it("sould be true if user is authenticated and not the author", () => {
+                let propsData = getPropsData({isUserAuthenticated: false, isUserAuthor: true})
                 let target = new AuthorBar({propsData})
                 target.canFollow.should.be.false
 
-                propsData = getPropsData({isUserAuthentificated: true, isUserAuthor: true})
+                propsData = getPropsData({isUserAuthenticated: true, isUserAuthor: true})
                 target = new AuthorBar({propsData})
                 target.canFollow.should.be.false
 
-                propsData = getPropsData({isUserAuthentificated: true, isUserAuthor: false})
+                propsData = getPropsData({isUserAuthenticated: true, isUserAuthor: false})
                 target = new AuthorBar({propsData})
                 target.canFollow.should.be.true
             })

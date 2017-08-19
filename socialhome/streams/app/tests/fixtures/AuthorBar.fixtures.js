@@ -12,7 +12,7 @@ const getPropsData = function (args = {}) {
         isUserAuthor: true,
         isUserLocal: true,
         isUserFollowingAuthor: true,
-        isUserAuthentificated: true,
+        isUserAuthenticated: true,
     })
 }
 
