@@ -55,6 +55,10 @@ class TestContentModel(SocialhomeTestCase):
             del self.public_content.slug
         except AttributeError:
             pass
+        try:
+            del self.public_content.shares_count
+        except AttributeError:
+            pass
         self.site_content.refresh_from_db()
 
     def test_create(self):
@@ -195,6 +199,7 @@ class TestContentModel(SocialhomeTestCase):
         })
 
         # Add a share
+        del self.public_content.shares_count
         ContentFactory(share_of=self.public_content)
         dict_for_view = self.public_content.dict_for_view(self.user2)
         self.assertEqual(dict_for_view.get("shares_count"), 1)

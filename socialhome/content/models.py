@@ -122,6 +122,10 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
+    @cached_property
+    def children_count(self):
+        return self.children.count()
+
     def get_absolute_url(self):
         if self.slug:
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
@@ -160,6 +164,10 @@ class Content(models.Model):
             tags_to_add.append(tag)
         final_tags = tags_to_add + list(Tag.objects.filter(name__in=tags & current))
         self.tags.set(final_tags)
+
+    @cached_property
+    def shares_count(self):
+        return self.shares.count()
 
     @cached_property
     def is_nsfw(self):
@@ -321,8 +329,8 @@ class Content(models.Model):
             "author_is_local": bool(self.author.user),
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
-            "child_count": self.children.count(),
-            "shares_count": self.shares.count(),
+            "child_count": self.children_count,
+            "shares_count": self.shares_count,
             "parent": self.parent_id if self.content_type == ContentType.REPLY else "",
             "is_author": is_author,
             "is_following_author": is_following_author,

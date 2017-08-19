@@ -46,7 +46,7 @@ class BaseStreamView(ListView):
                 "timestamp": content.formatted_timestamp,
                 "humanizedTimestamp": content.humanized_timestamp,
                 "edited": bool(content.edited),
-                "childrenCount": content.children.count(),
+                "childrenCount": content.children_count,
                 "isUserLocal": bool(content.author.user),
                 "contentUrl": content.get_absolute_url(),
                 "isUserAuthor": is_user_author,
