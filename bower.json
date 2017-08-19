@@ -27,7 +27,6 @@
     "js-cookie": "^2.1.4"
   },
   "devDependencies": {
-    "sinon": "http://sinonjs.org/releases/sinon-1.17.4.js",
     "mock-socket": "^2.0.2"
   },
   "resolutions": {

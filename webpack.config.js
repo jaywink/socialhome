@@ -1,25 +1,28 @@
 const path = require("path")
-const webpack = require("webpack")
 
 module.exports = {
     entry: {
-        stream: path.resolve(__dirname, "socialhome/streams/app/main.js")
+        stream: path.resolve(__dirname, "socialhome/streams/app/main.js"),
     },
     output: {
         path: path.resolve(__dirname, "socialhome/static/js"),
-        filename: "webpack.[name].js"
+        filename: "webpack.[name].js",
     },
     module: {
         loaders: [
             {
-                test: /.js$/,
+                test: /\.js$/,
                 loader: "babel-loader",
-                exclude: /node_modules/,
-                query: {presets: ["env"]}
+                include: [
+                    path.resolve(__dirname, "socialhome"),
+                    path.resolve(__dirname, "mocha"),
+                ],
+                exclude: path.resolve(__dirname, "socialhome/static/js"),
+                query: {presets: ["env"]},
             },
             {
                 test: /\.scss$/,
-                loaders: ["css-loader", "sass-loader"]
+                loaders: ["css-loader", "sass-loader"],
             },
             {
                 test: /\.vue$/,
@@ -27,19 +30,23 @@ module.exports = {
                 options: {
                     loaders: {
                         scss: ["vue-style-loader", "css-loader", "sass-loader"],
-                        js: "babel-loader"
-                    }
-                }
-            }
-        ]
+                        js: "babel-loader",
+                    },
+                },
+            },
+        ],
     },
     resolve: {
         modules: [
             path.resolve(__dirname, "socialhome"),
-            path.resolve(__dirname, "node_modules")
+            path.resolve(__dirname, "node_modules"),
         ],
-        alias: {vue: "vue/dist/vue.js",}
+        alias: {
+            vue$: "vue/dist/vue.esm.js",
+            "bootstrap-vue": "bootstrap-vue/dist/bootstrap-vue.esm.js",
+        },
+        extensions: [".webpack.js", ".js", ".vue"],
     },
     stats: {colors: true},
-    devtool: "cheap-module-source-map"
+    devtool: "cheap-module-source-map",
 }

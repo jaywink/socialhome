@@ -4,6 +4,7 @@
     "plugin:vue/recommended"
   ],
   "rules": {
+    "arrow-parens": ["error", "as-needed"],
     "indent": ["error", 4],
     "import/extensions": "off",
     "import/no-extraneous-dependencies": "off",

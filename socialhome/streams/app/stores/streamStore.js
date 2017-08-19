@@ -1,22 +1,31 @@
 import Vue from "vue"
 import Vuex from "vuex"
-import VueResource from "vue-resource"
+import isNil from "lodash/isNil"
 
 // Vue setup
 Vue.use(Vuex)
-Vue.use(VueResource)
 
-export default new Vuex.Store({
-    state: {
-        translations: {
-            stampedContent: {
-                h2: window.context.translations.stampedContent.h2,
-                p: window.context.translations.stampedContent.p,
+function getContext() {
+    try {
+        return {
+            state: {
+                translations: {
+                    stampedContent: {
+                        h2: window.context.translations.stampedContent.h2,
+                        p: window.context.translations.stampedContent.p,
+                    },
+                },
+                contentList: window.context.contentList,
+                streamName: window.context.streamName,
+                isUserAuthentificated: window.context.isUserAuthentificated,
+                showAuthorBar: window.context.showAuthorBar,
+                currentBrowsingProfileId: (isNil(window.context.currentBrowsingProfileId)
+                    ? `${window.context.currentBrowsingProfileId}` : undefined),
             },
-        },
-        contentList: window.context.contentList,
-        streamName: window.context.streamName,
-        isUserAuthentificated: window.context.isUserAuthentificated,
-        showAuthorBar: window.context.showAuthorBar,
-    },
-})
+        }
+    } catch (_) {
+        return {}
+    }
+}
+
+export default new Vuex.Store(getContext())

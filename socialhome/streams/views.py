@@ -56,17 +56,18 @@ class BaseStreamView(ListView):
             }
 
         return {
-            "contentList": [dump_content(content) for content in self.queryset[:self.paginate_by]],
+            "contentList": [dump_content(content) for content in self.get_queryset()[:self.paginate_by]],
             "currentBrowsingProfileId": getattr(request_user_profile, "id", ""),
             "streamName": stream_name,
             "isUserAuthentificated": bool(self.request.user.is_authenticated),
             "showAuthorBar": not stream_name.startswith("profile_"),
-            "translations": {
-                "stampedContent": {
-                    "h2": gettext("Public"),
-                    "p": gettext("Contains public content from around the network.")
-                }
-            }
+            "translations": {"stampedContent": self._get_stamped_content_translations()}
+        }
+
+    def _get_stamped_content_translations(self):  # pragma: no cover
+        return {
+            "h2": gettext("Public"),
+            "p": gettext("Contains public content from around the network.")
         }
 
     def get_template_names(self):
@@ -106,3 +107,9 @@ class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
 
     def get_queryset(self):
         return Content.objects.followed(self.request.user)
+
+    def _get_stamped_content_translations(self):  # pragma: no cover
+        return {
+            "h2": gettext("Followed"),
+            "p": gettext("Content from followed users.")
+        }

@@ -22,7 +22,7 @@ before_script:
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
   - (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
-  - source ~/.nvm/nvm.sh && nvm install 4
+  - source ~/.nvm/nvm.sh && nvm install 7
   - npm install
   - node_modules/.bin/bower install
   - node_modules/.bin/grunt build
@@ -32,6 +32,7 @@ script:
   - python manage.py migrate --noinput -v 0
   - python manage.py collectstatic --noinput -v 0
   - node_modules/.bin/grunt test
+  - npm run test
 after_success:
   - codecov
 env:

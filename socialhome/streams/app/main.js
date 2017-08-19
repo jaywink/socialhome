@@ -1,13 +1,18 @@
 import Vue from "vue"
-import VueResource from "vue-resource"
-import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm"
-import "streams/app/stores/streamStore"
+import {VueMasonryPlugin} from "vue-masonry"
+import BootstrapVue from "bootstrap-vue"
+
+import Axios from "axios"
+
 import "streams/app/components/Stream.vue"
 
-Vue.use(VueResource)
+
+Vue.use(VueMasonryPlugin)
 Vue.use(BootstrapVue)
 
-export default new Vue({
-    el: "#app",
-    http: {root: "/"},
+Vue.prototype.$http = Axios.create({
+    xsrfCookieName: "csrftoken",
+    xsrfHeaderName: "X-CSRFToken",
 })
+
+export default new Vue({el: "#app"})
