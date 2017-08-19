@@ -91,7 +91,7 @@ describe("AuthorBar", () => {
 
         describe("unfollow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let propsData = getPropsData({currentBrowsingProfileId: void(0)})
+                let propsData = getPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
                 sinon.spy(console, "error")
                 target.instance().unfollow()
@@ -100,7 +100,7 @@ describe("AuthorBar", () => {
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let propsData = getPropsData({currentBrowsingProfileId: void(0)})
+                let propsData = getPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
                 sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
@@ -142,7 +142,7 @@ describe("AuthorBar", () => {
 
         describe("follow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let propsData = getPropsData({currentBrowsingProfileId: null})
+                let propsData = getPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
                 sinon.spy(console, "error")
                 target.instance().follow()
@@ -151,7 +151,7 @@ describe("AuthorBar", () => {
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let propsData = getPropsData({currentBrowsingProfileId: null})
+                let propsData = getPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
                 sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
