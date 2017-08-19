@@ -14,7 +14,8 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: "babel-loader",
-                exclude: /node_modules/,
+                include: path.resolve(__dirname, "socialhome"),
+                exclude: path.resolve(__dirname, "socialhome/static/js"),
                 query: {"presets": ["env"]}
             },
             {

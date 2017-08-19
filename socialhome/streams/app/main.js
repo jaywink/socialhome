@@ -4,7 +4,7 @@ import BootstrapVue from "bootstrap-vue"
 
 import Axios from "axios"
 
-import "./components/Stream.vue"
+import "streams/app/components/Stream.vue"
 
 
 Vue.use(VueMasonryPlugin)

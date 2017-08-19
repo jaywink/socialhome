@@ -23,8 +23,7 @@ function getContext() {
                     : void(0)),
             },
         }
-    }
-    catch (_) {
+    } catch (_) {
         return {}
     }
 }

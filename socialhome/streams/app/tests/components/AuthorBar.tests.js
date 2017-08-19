@@ -1,7 +1,7 @@
 import "chai/register-should"
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
-import AuthorBar from "../../components/AuthorBar.vue"
+import AuthorBar from "streams/app/components/AuthorBar.vue"
 
 
 Vue.use(BootstrapVue)

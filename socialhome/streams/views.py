@@ -108,7 +108,7 @@ class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
     def get_queryset(self):
         return Content.objects.followed(self.request.user)
 
-    def _get_stamped_content_translations(self):
+    def _get_stamped_content_translations(self):  # pragma: no cover
         return {
             "h2": gettext("Followed"),
             "p": gettext("Content from followed users.")

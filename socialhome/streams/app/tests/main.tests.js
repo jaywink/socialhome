@@ -1,5 +1,5 @@
 import "chai/register-should"
-import "../main"
+import "streams/app/main"
 
 import Vue from "vue"
 
