@@ -57,7 +57,7 @@ export default Vue.component("author-bar", {
         isUserAuthor: {type: Boolean, required: true},
         isUserLocal: {type: Boolean, required: true},
         isUserFollowingAuthor: {type: Boolean, required: true},
-        isUserAuthentificated: {type: Boolean, required: true},
+        isUserAuthenticated: {type: Boolean, required: true},
     },
     data() {
         return {
@@ -76,7 +76,7 @@ export default Vue.component("author-bar", {
             return this.canFollow && this.$data._isUserFollowingAuthor
         },
         canFollow() {
-            return this.isUserAuthentificated && !this.isUserAuthor
+            return this.isUserAuthenticated && !this.isUserAuthor
         },
     },
     methods: {

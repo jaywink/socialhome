@@ -7,7 +7,7 @@
             :is-user-author="isUserAuthor"
             :is-user-local="isUserLocal"
             :current-browsing-profile-id="currentBrowsingProfileId"
-            :is-user-authentificated="isUserAuthentificated"
+            :is-user-authenticated="isUserAuthenticated"
         >
         </author-bar>
         <div class="grid-item-bar">
@@ -65,7 +65,7 @@ export default Vue.component("stream-element", {
         isUserLocal: {type: Boolean, required: true},
         isUserAuthor: {type: Boolean, required: true},
         showAuthorBar: {type: Boolean, required: true},
-        isUserAuthentificated: {type: Boolean, required: true},
+        isUserAuthenticated: {type: Boolean, required: true},
         currentBrowsingProfileId: {type: String, required: true},
     },
     computed: {
@@ -73,7 +73,7 @@ export default Vue.component("stream-element", {
             return this.edited ? " (edited)" : ""
         },
         showReactionBar() {
-            return this.isUserAuthentificated || this.childrenCount > 0
+            return this.isUserAuthenticated || this.childrenCount > 0
         },
     },
 })

@@ -21,7 +21,7 @@
                     v-bind="content"
                     v-masonry-tile
                     :key="content.id"
-                    :is-user-authentificated="$store.state.isUserAuthentificated"
+                    :is-user-authenticated="$store.state.isUserAuthenticated"
                     :show-author-bar="$store.state.showAuthorBar"
                     :current-browsing-profile-id="$store.state.currentBrowsingProfileId"
                 >

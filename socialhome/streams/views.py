@@ -59,7 +59,7 @@ class BaseStreamView(ListView):
             "contentList": [dump_content(content) for content in self.get_queryset()[:self.paginate_by]],
             "currentBrowsingProfileId": getattr(request_user_profile, "id", ""),
             "streamName": stream_name,
-            "isUserAuthentificated": bool(self.request.user.is_authenticated),
+            "isUserAuthenticated": bool(self.request.user.is_authenticated),
             "showAuthorBar": not stream_name.startswith("profile_"),
             "translations": {"stampedContent": self._get_stamped_content_translations()}
         }

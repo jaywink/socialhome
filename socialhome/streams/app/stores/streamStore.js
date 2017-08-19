@@ -17,7 +17,7 @@ function getContext() {
                 },
                 contentList: window.context.contentList,
                 streamName: window.context.streamName,
-                isUserAuthentificated: window.context.isUserAuthentificated,
+                isUserAuthenticated: window.context.isUserAuthenticated,
                 showAuthorBar: window.context.showAuthorBar,
                 currentBrowsingProfileId: (isNil(window.context.currentBrowsingProfileId)
                     ? `${window.context.currentBrowsingProfileId}` : undefined),
