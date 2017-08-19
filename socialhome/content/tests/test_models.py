@@ -86,6 +86,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": "",
                 "reply_url": "",
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
@@ -111,6 +112,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": "",
                 "reply_url": "",
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
@@ -186,10 +188,16 @@ class TestContentModel(SocialhomeTestCase):
             "delete_url": "",
             "reply_url": "",
             "child_count": 0,
+            "shares_count": 0,
             "is_authenticated": False,
             "parent": "",
             "profile_id": "",
         })
+
+        # Add a share
+        ContentFactory(share_of=self.public_content)
+        dict_for_view = self.public_content.dict_for_view(self.user2)
+        self.assertEqual(dict_for_view.get("shares_count"), 1)
 
     def test_dict_for_view_for_author(self):
         Profile.objects.filter(id=self.profile.id).update(name="Foo Bar")
@@ -214,6 +222,7 @@ class TestContentModel(SocialhomeTestCase):
             "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
             "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
             "child_count": 0,
+            "shares_count": 0,
             "is_authenticated": True,
             "parent": "",
             "profile_id": self.public_content.author.id,
@@ -243,6 +252,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
                 "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": True,
                 "parent": "",
                 "profile_id": self.public_content.author.id,

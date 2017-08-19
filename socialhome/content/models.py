@@ -322,6 +322,7 @@ class Content(models.Model):
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
             "child_count": self.children.count(),
+            "shares_count": self.shares.count(),
             "parent": self.parent_id if self.content_type == ContentType.REPLY else "",
             "is_author": is_author,
             "is_following_author": is_following_author,

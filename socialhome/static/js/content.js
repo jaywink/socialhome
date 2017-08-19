@@ -40,6 +40,12 @@
                         '<% } %>' +
                     '</div>' +
                     '<div class="col-3 text-right grid-item-reactions mt-1">' +
+                        '<% if (! content.parent && (content.is_authenticated || content.shares_count)) { %>' +
+                            '<div class="item-reaction">' +
+                                '<i class="fa fa-refresh" title="' + gettext("Shares") + '" aria-label="' + gettext("Shares") + '"></i>&nbsp;' +
+                                '<span class="item-reaction-counter"><%= content.shares_count %></span>' +
+                            '</div>' +
+                        '<% } %>' +
                         '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
                             '<div class="item-reaction">' +
                                 '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
