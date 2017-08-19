@@ -39,11 +39,11 @@
                         </span>
                     </div>
                     <div class="col-5 text-right grid-item-reactions mt-1">
-                        <div class="item-reaction">
+                        <div class="item-reaction {% if content and content.shares.count %}item-reaction-counter-positive{% endif %}">
                             <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
                             <span class="item-reaction-counter">{% if content %}{{ content.shares.count }}{% endif %}</span>
                         </div>
-                        <div class="item-reaction">
+                        <div class="item-reaction {% if content and content.children.count %}item-reaction-counter-positive{% endif %}">
                             <span><i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i></span>&nbsp;
                             <span class="item-reaction-counter" id="content-reply-count">{% if content %}{{ content.children.count }}{% endif %}</span>
                         </div>

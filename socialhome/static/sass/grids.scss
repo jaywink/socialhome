@@ -38,6 +38,11 @@
   cursor: pointer;
 }
 
+.item-reaction-counter-positive {
+  color: $active;
+  border-color: $active;
+}
+
 .grid-item-author-bar {
   margin-bottom: 3px;
 

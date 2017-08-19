@@ -64,13 +64,13 @@
                             </div>
                             <div class="col-3 text-right grid-item-reactions mt-1">
                                 {% if request.user.is_authenticated or content.shares.count %}
-                                    <div class="item-reaction">
+                                    <div class="item-reaction {% if content.shares.count %}item-reaction-counter-positive{% endif %}">
                                         <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
                                         <span class="item-reaction-counter">{{ content.shares.count }}</span>
                                     </div>
                                 {% endif %}
                                 {% if request.user.is_authenticated or content.children.count %}
-                                    <div class="item-reaction">
+                                    <div class="item-reaction {% if content.children.count %}item-reaction-counter-positive{% endif %}">
                                         <span class="item-open-replies-action" data-content-id="{{ content.id }}">
                                             <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
                                         </span>
