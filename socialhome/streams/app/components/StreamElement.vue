@@ -10,33 +10,31 @@
             :is-user-authenticated="isUserAuthenticated"
         >
         </author-bar>
-        <div class="grid-item-bar">
-            <div class="row">
-                <div class="col-9">
-                    <a :ref="contentUrl" :data-content-id="id" :title="timestamp" class="grid-item-open-action">
-                        {{ humanizedTimestamp }}
-                    </a>&nbsp;
-                    <span v-if="edited">{{ editedText }}</span>
-                    <div v-if="isUserAuthor">
-                        <a :href="updateUrl">
-                            <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
-                        </a>
-                        <a :href="deleteUrl">
-                            <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
-                        </a>
-                    </div>
+        <div class="grid-item-bar d-flex justify-content-start">
+            <div class="mt-1">
+                <a :ref="contentUrl" :data-content-id="id" :title="timestamp" class="grid-item-open-action">
+                    {{ humanizedTimestamp }}
+                </a>&nbsp;
+                <span v-if="edited">{{ editedText }}</span>
+                <div v-if="isUserAuthor">
+                    <a :href="updateUrl">
+                        <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
+                    </a>
+                    <a :href="deleteUrl">
+                        <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
+                    </a>
                 </div>
-                <div class="col-3 text-right grid-item-reactions mt-1">
-                    <div v-if="showShares" class="item-reaction">
-                        <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                        <span class="item-reaction-counter">{{ sharesCount }}</span>
-                    </div>
-                    <div v-if="showReplies" class="item-reaction">
-                        <span class="item-open-replies-action" :data-content-id="id">
-                            <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
-                        </span>
-                        <span class="item-reaction-counter">{{ childrenCount }}</span>
-                    </div>
+            </div>
+            <div class="ml-auto grid-item-reactions mt-1">
+                <div v-if="showShares" class="item-reaction">
+                    <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
+                    <span class="item-reaction-counter">{{ sharesCount }}</span>
+                </div>
+                <div v-if="showReplies" class="item-reaction">
+                    <span class="item-open-replies-action" :data-content-id="id">
+                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
+                    </span>
+                    <span class="item-reaction-counter">{{ childrenCount }}</span>
                 </div>
             </div>
         </div>
