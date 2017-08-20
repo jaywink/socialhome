@@ -66,7 +66,7 @@ export default Vue.component("stream-element", {
         isUserAuthor: {type: Boolean, required: true},
         showAuthorBar: {type: Boolean, required: true},
         isUserAuthenticated: {type: Boolean, required: true},
-        currentBrowsingProfileId: {type: String, required: true},
+        currentBrowsingProfileId: {type: String, required: false},
     },
     computed: {
         editedText() {

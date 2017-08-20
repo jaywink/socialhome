@@ -20,7 +20,7 @@ function getContext() {
                 isUserAuthenticated: window.context.isUserAuthenticated,
                 showAuthorBar: window.context.showAuthorBar,
                 currentBrowsingProfileId: (isNil(window.context.currentBrowsingProfileId)
-                    ? `${window.context.currentBrowsingProfileId}` : undefined),
+                    ? undefined : `${window.context.currentBrowsingProfileId}`),
             },
         }
     } catch (_) {

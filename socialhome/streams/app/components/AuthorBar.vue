@@ -50,7 +50,7 @@ export default Vue.component("author-bar", {
         handle: {type: String, required: true},
         name: {type: String, required: true},
         guid: {type: String, required: true},
-        currentBrowsingProfileId: {type: String, required: true},
+        currentBrowsingProfileId: {type: String, required: false},
         homeUrl: {type: String, required: true},
         absoluteUrl: {type: String, required: true},
         imageUrlSmall: {type: String, required: true},
@@ -84,7 +84,7 @@ export default Vue.component("author-bar", {
             this.showProfileBox = !this.showProfileBox
         },
         unfollow() {
-            if (!this.currentBrowsingProfileId) {
+            if (!this.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
             }
@@ -93,7 +93,7 @@ export default Vue.component("author-bar", {
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
         follow() {
-            if (!this.currentBrowsingProfileId) {
+            if (!this.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
             }
