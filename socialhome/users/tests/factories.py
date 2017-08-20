@@ -58,3 +58,14 @@ class BaseProfileFactory(factory.Factory):
         "large": factory.Faker("image_url", width=300, height=300).generate({}),
     }
     tag_list = factory.Faker("words", nb=4)
+
+
+class BaseShareFactory(factory.Factory):
+    class Meta:
+        model = base.Share
+
+    guid = factory.Faker("uuid4")
+    handle = factory.Faker("safe_email")
+    target_guid = factory.Faker("sha1")
+    target_handle = factory.Faker("safe_email")
+    public = factory.Faker("pybool")

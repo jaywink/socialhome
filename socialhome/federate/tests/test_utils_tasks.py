@@ -18,7 +18,7 @@ from socialhome.federate.utils.tasks import (
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory
 
 
 class TestProcessEntities(SocialhomeTestCase):
@@ -31,6 +31,7 @@ class TestProcessEntities(SocialhomeTestCase):
         cls.relationship = base.Relationship()
         cls.follow = base.Follow()
         cls.profile = BaseProfileFactory()
+        cls.share = BaseShareFactory()
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -52,21 +53,27 @@ class TestProcessEntities(SocialhomeTestCase):
 
     @patch("socialhome.federate.utils.tasks.process_entity_relationship")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
-    def test_process_entity_comment_is_called(self, mock_sender, mock_process):
+    def test_process_entity_relationship_is_called(self, mock_sender, mock_process):
         process_entities([self.relationship])
         mock_process.assert_called_once_with(self.relationship, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_follow")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
-    def test_process_entity_comment_is_called(self, mock_sender, mock_process):
+    def test_process_entity_follow_is_called(self, mock_sender, mock_process):
         process_entities([self.follow])
         mock_process.assert_called_once_with(self.follow, "profile")
 
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
-    def test_process_entity_comment_is_called(self, mock_sender, mock_from):
+    def test_process_entity_profile_is_called(self, mock_sender, mock_from):
         process_entities([self.profile])
         mock_from.assert_called_once_with(self.profile)
+
+    @patch("socialhome.federate.utils.tasks.process_entity_share")
+    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    def test_process_entity_share_is_called(self, mock_sender, mock_process):
+        process_entities([self.share])
+        mock_process.assert_called_once_with(self.share, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
@@ -335,6 +342,12 @@ class TestProcessEntityShare(SocialhomeTestCase):
         self.assertEqual(share.visibility, Visibility.PUBLIC)
         self.assertEqual(share.service_label, "")
         self.assertEqual(share.guid, entity.guid)
+
+        # Update
+        entity.raw_content = "now we have text"
+        process_entity_share(entity, self.remote_profile)
+        share.refresh_from_db()
+        self.assertEqual(share.text, "now we have text")
 
     def test_share_is_not_created_if_no_target_found(self):
         entity = base.Share(
