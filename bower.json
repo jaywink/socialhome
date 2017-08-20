@@ -21,13 +21,9 @@
     "imagesloaded": "~4.1.0",
     "fontawesome": "~4.7.0",
     "jquery-ui": "jqueryui#^1.12.1",
-    "reconnecting-websocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
     "underscore": "^1.8.3",
     "bootstrap-markdown": "2.10.0",
     "js-cookie": "^2.1.4"
-  },
-  "devDependencies": {
-    "mock-socket": "^2.0.2"
   },
   "resolutions": {
     "bootstrap": "v4.0.0-alpha.6"

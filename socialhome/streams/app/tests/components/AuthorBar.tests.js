@@ -1,17 +1,21 @@
 import "chai/register-should"
-import Axios from "axios"
-import BootstrapVue from "bootstrap-vue"
-import sinon from "sinon"
-import Vue from "vue"
 import {mount} from "avoriaz"
 
+import Axios from "axios"
+import BootstrapVue from "bootstrap-vue"
+import Vue from "vue"
+
 import AuthorBar from "streams/app/components/AuthorBar.vue"
-import {getAuthorBarPropsData} from "../fixtures/AuthorBar.fixtures"
+import {getAuthorBarPropsData} from "streams/app/tests/fixtures/AuthorBar.fixtures"
 
 
 Vue.use(BootstrapVue)
 
 describe("AuthorBar", () => {
+    afterEach(() => {
+        Sinon.restore()
+    })
+
     describe("computed", () => {
         describe("isUserRemote", () => {
             it("should be the opposite of property isUserLocal", () => {
@@ -79,7 +83,7 @@ describe("AuthorBar", () => {
             it("should show profilebox when the author's name is clicked", () => {
                 let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(target.instance(), "profileBoxTrigger")
+                Sinon.spy(target.instance(), "profileBoxTrigger")
                 target.find(".profilebox-trigger")[0].trigger("click")
                 target.instance().profileBoxTrigger.calledOnce.should.be.true
                 target.instance().showProfileBox.should.be.true
@@ -91,16 +95,15 @@ describe("AuthorBar", () => {
             it("should display an error message if the user is not logged in", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(console, "error")
+                Sinon.spy(console, "error")
                 target.instance().unfollow()
                 console.error.calledWith("Not logged in").should.be.true
-                console.error.restore()
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
                 target.instance().$http.post.called.should.be.false
             })
@@ -108,7 +111,7 @@ describe("AuthorBar", () => {
             it("should send an HTTP request with the right parameters when user is logged in", () => {
                 let propsData = getAuthorBarPropsData({currentBrowsingProfileId: "26", guid: "42"})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
                 target.instance().$http.post
                     .calledWith("/api/profiles/26/remove_follower/", {guid: "42"}).should.be.true
@@ -119,7 +122,7 @@ describe("AuthorBar", () => {
                     currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
                 })
                 let target = mount(AuthorBar, {propsData})
-                sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
+                Sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
                     resolve()
                     target.instance().$data._isUserFollowingAuthor.should.be.false
                     target.find(".follow-btn").length.should.equal(1)
@@ -132,11 +135,10 @@ describe("AuthorBar", () => {
                     currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
                 })
                 let target = mount(AuthorBar, {propsData})
-                sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
+                Sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
                     reject()
-                    sinon.spy(console, "error")
+                    Sinon.spy(console, "error")
                     console.error.calledWith("Not logged in").should.be.true
-                    console.error.restore()
                 }))
                 target.instance().unfollow()
             })
@@ -146,16 +148,15 @@ describe("AuthorBar", () => {
             it("should display an error message if the user is not logged in", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(console, "error")
+                Sinon.spy(console, "error")
                 target.instance().follow()
                 console.error.calledWith("Not logged in").should.be.true
-                console.error.restore()
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
                 target.instance().$http.post.called.should.be.false
             })
@@ -163,7 +164,7 @@ describe("AuthorBar", () => {
             it("should send an HTTP request with the right parameters when user is logged in", () => {
                 let propsData = getAuthorBarPropsData({currentBrowsingProfileId: "26", guid: "42"})
                 let target = mount(AuthorBar, {propsData})
-                sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
                 target.instance().$http.post
                     .calledWith("/api/profiles/26/add_follower/", {guid: "42"}).should.be.true
@@ -174,7 +175,7 @@ describe("AuthorBar", () => {
                     currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: false,
                 })
                 let target = mount(AuthorBar, {propsData})
-                sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
+                Sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
                     resolve()
                     target.instance().$data._isUserFollowingAuthor.should.be.true
                     target.find(".unfollow-btn").length.should.equal(1)
@@ -187,11 +188,10 @@ describe("AuthorBar", () => {
                     currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
                 })
                 let target = mount(AuthorBar, {propsData})
-                sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
+                Sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
                     reject()
-                    sinon.spy(console, "error")
+                    Sinon.spy(console, "error")
                     console.error.calledWith("Not logged in").should.be.true
-                    console.error.restore()
                 }))
                 target.instance().follow()
             })
@@ -201,9 +201,9 @@ describe("AuthorBar", () => {
     describe("lifecycle", () => {
         describe("updated", () => {
             it("should redraw VueMasonry", (done) => {
+                Sinon.spy(Vue, "redrawVueMasonry")
                 let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
-                Vue.redrawVueMasonry = sinon.spy()
                 target.update()
                 target.vm.$nextTick(() => {
                     Vue.redrawVueMasonry.called.should.be.true

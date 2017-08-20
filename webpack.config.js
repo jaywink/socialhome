@@ -42,8 +42,10 @@ module.exports = {
             path.resolve(__dirname, "node_modules"),
         ],
         alias: {
-            vue$: "vue/dist/vue.esm.js",
             "bootstrap-vue": "bootstrap-vue/dist/bootstrap-vue.esm.js",
+            "mock-socket": "mock-socket/dist/mock-socket.js",
+            "reconnecting-websocket": "ReconnectingWebSocket/reconnecting-websocket.min.js",
+            vue$: "vue/dist/vue.esm.js",
         },
         extensions: [".webpack.js", ".js", ".vue"],
     },

@@ -1,13 +1,12 @@
 <template>
     <div>
         <div class="container-flex">
-            <div id="new-content-container" class="hidden">
-                <a href="" id="new-content-load-link" onclick="return false;">
-                    <b-badge pill variant="success">
-                        <span id="new-content-count">0</span>
-                        <span>new posts available</span>
+            <div v-show="$store.state.stream.hasNewContent" class="new-content-container">
+                <b-button @click.prenvent.stop="onNewContentClick" variant="link" class="new-content-load-link">
+                    <b-badge pill variant="primary">
+                        {{ $store.state.stream.newContentLengh }} new posts available
                     </b-badge>
-                </a>
+                </b-button>
             </div>
             <div v-images-loaded.on.progress="onImageLoad" v-masonry v-bind="masonryOptions">
                 <div class="stamped">
@@ -36,7 +35,7 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 import "streams/app/components/StampedElement.vue"
 import "streams/app/components/StreamElement.vue"
-import store from "streams/app/stores/streamStore"
+import {store, stateOperations} from "streams/app/stores/streamStore"
 
 
 export default Vue.component("stream", {
@@ -61,6 +60,15 @@ export default Vue.component("stream", {
         onImageLoad() {
             Vue.redrawVueMasonry()
         },
+        onNewContentClick() {
+            this.$store.dispatch(stateOperations.newContentAck)
+        },
     },
 })
 </script>
+
+<style scoped lang="scss">
+    .new-content-load-link {
+        cursor: pointer;
+    }
+</style>

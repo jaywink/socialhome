@@ -6,10 +6,14 @@ import Vue from "vue"
 import {mount} from "avoriaz"
 
 import StreamElement from "streams/app/components/StreamElement.vue"
-import {getStreamElementPropsData} from "../fixtures/StreamElement.fixtures";
+import {getStreamElementPropsData} from "streams/app/tests/fixtures/StreamElement.fixtures";
 
 
 describe("StreamElement", () => {
+    afterEach(() => {
+        Sinon.restore()
+    })
+
     describe("computed", () => {
         describe("showReplies", () => {
             it("true if authenticated or has children", () => {

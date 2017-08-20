@@ -10,4 +10,8 @@ describe("Main", () => {
         Vue.prototype.$http.defaults.xsrfCookieName.should.equal("csrftoken")
         Vue.prototype.$http.defaults.xsrfHeaderName.should.equal("X-CSRFToken")
     })
+
+    it("Vue.redrawVueMasonry is defined", () => {
+        (typeof Vue.redrawVueMasonry).should.equal("function")
+    })
 })
