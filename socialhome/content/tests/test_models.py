@@ -9,6 +9,7 @@ from django.utils.timezone import make_aware
 from django_extensions.utils.text import truncate_letters
 from freezegun import freeze_time
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
 from socialhome.enums import Visibility
@@ -54,6 +55,10 @@ class TestContentModel(SocialhomeTestCase):
             del self.public_content.slug
         except AttributeError:
             pass
+        try:
+            del self.public_content.shares_count
+        except AttributeError:
+            pass
         self.site_content.refresh_from_db()
 
     def test_create(self):
@@ -85,6 +90,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": "",
                 "reply_url": "",
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
@@ -110,6 +116,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": "",
                 "reply_url": "",
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
@@ -185,10 +192,17 @@ class TestContentModel(SocialhomeTestCase):
             "delete_url": "",
             "reply_url": "",
             "child_count": 0,
+            "shares_count": 0,
             "is_authenticated": False,
             "parent": "",
             "profile_id": "",
         })
+
+        # Add a share
+        del self.public_content.shares_count
+        ContentFactory(share_of=self.public_content)
+        dict_for_view = self.public_content.dict_for_view(self.user2)
+        self.assertEqual(dict_for_view.get("shares_count"), 1)
 
     def test_dict_for_view_for_author(self):
         Profile.objects.filter(id=self.profile.id).update(name="Foo Bar")
@@ -213,6 +227,7 @@ class TestContentModel(SocialhomeTestCase):
             "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
             "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
             "child_count": 0,
+            "shares_count": 0,
             "is_authenticated": True,
             "parent": "",
             "profile_id": self.public_content.author.id,
@@ -242,6 +257,7 @@ class TestContentModel(SocialhomeTestCase):
                 "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
                 "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
                 "child_count": 0,
+                "shares_count": 0,
                 "is_authenticated": True,
                 "parent": "",
                 "profile_id": self.public_content.author.id,
@@ -304,6 +320,17 @@ class TestContentModel(SocialhomeTestCase):
         del self.public_content.slug
         del self.public_content.short_text
         self.assertEqual(self.public_content.get_absolute_url(), "/content/%s/" % self.public_content.id)
+
+    def test_save_raises_if_parent_and_share_of(self):
+        with self.assertRaises(ValueError):
+            ContentFactory(parent=ContentFactory(), share_of=ContentFactory())
+
+    def test_save_sets_correct_content_type(self):
+        self.assertEqual(self.public_content.content_type, ContentType.CONTENT)
+        reply = ContentFactory(parent=ContentFactory())
+        self.assertEqual(reply.content_type, ContentType.REPLY)
+        share = ContentFactory(share_of=ContentFactory())
+        self.assertEqual(share.content_type, ContentType.SHARE)
 
 
 class TestContentRendered(SocialhomeTestCase):

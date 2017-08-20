@@ -52,26 +52,30 @@
                             </div>
                         </div>
                     {% endif %}
-                    <div class="grid-item-bar">
-                        <div class="row">
-                            <div class="col-9">
-                                <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
-                                {% if content.author == request.user.profile %}
-                                    &nbsp;
-                                    <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
-                                    <a href="{% url "content:delete" content.id %}?next={{ request.path }}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
-                                {% endif %}
-                            </div>
-                            <div class="col-3 text-right grid-item-reactions mt-1">
-                                {% if request.user.is_authenticated or content.children.count %}
-                                    <div class="item-reaction">
-                                        <span class="item-open-replies-action" data-content-id="{{ content.id }}">
-                                            <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
-                                        </span>
-                                        <span class="item-reaction-counter">{{ content.children.count }}</span>
-                                    </div>
-                                {% endif %}
-                            </div>
+                    <div class="grid-item-bar d-flex justify-content-start">
+                        <div class="mt-1">
+                            <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
+                            {% if content.author == request.user.profile %}
+                                &nbsp;
+                                <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
+                                <a href="{% url "content:delete" content.id %}?next={{ request.path }}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
+                            {% endif %}
+                        </div>
+                        <div class="ml-auto grid-item-reactions mt-1">
+                            {% if request.user.is_authenticated or content.shares_count %}
+                                <div class="item-reaction {% if content.shares_count %}item-reaction-counter-positive{% endif %}">
+                                    <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
+                                    <span class="item-reaction-counter">{{ content.shares_count }}</span>
+                                </div>
+                            {% endif %}
+                            {% if request.user.is_authenticated or content.children_count %}
+                                <div class="item-reaction {% if content.children_count %}item-reaction-counter-positive{% endif %}">
+                                    <span class="item-open-replies-action" data-content-id="{{ content.id }}">
+                                        <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
+                                    </span>
+                                    <span class="item-reaction-counter">{{ content.children_count }}</span>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="replies-container" data-content-id="{{ content.id }}"></div>

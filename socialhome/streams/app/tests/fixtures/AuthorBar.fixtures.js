@@ -1,6 +1,7 @@
 import _ from "lodash/core"
 
-const getPropsData = function (args = {}) {
+
+const getAuthorBarPropsData = function (args = {}) {
     return _.defaults({}, args, {
         handle: "",
         name: "",
@@ -16,4 +17,4 @@ const getPropsData = function (args = {}) {
     })
 }
 
-export {getPropsData}
+export {getAuthorBarPropsData}

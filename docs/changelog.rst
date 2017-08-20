@@ -31,6 +31,10 @@ Added
 
   Sharing with the bookmarklet will copy the page url, title and optionally selected text into the create content text area. The bookmarklet is compatible with Diaspora, so for example the Firefox `sharing service <https://activations.cdn.mozilla.net/en-US/diaspora.html>`_ will work.
 
+* Support receiving 'Share' entities. Show amount of shares on content. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
+  Currently shares are saved to the database and there is a share count, but sharing is not yet possible.
+
 Changed
 .......
 

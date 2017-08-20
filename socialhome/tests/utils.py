@@ -8,10 +8,17 @@ from test_plus import TestCase
 from test_plus.test import CBVTestCase
 
 import socialhome.tests.environment  # Set some environment tweaks
+from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-class SocialhomeTestBase:
+class SocialhomeTestBase(TestCase):
     maxDiff = None
+
+    @classmethod
+    def create_local_and_remote_user(cls):
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.remote_profile = ProfileFactory()
 
     @staticmethod
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
@@ -23,15 +30,15 @@ class SocialhomeTestBase:
         return tmp_file
 
 
-class SocialhomeTestCase(SocialhomeTestBase, TestCase):
+class SocialhomeTestCase(SocialhomeTestBase):
     pass
 
 
-class SocialhomeCBVTestCase(SocialhomeTestBase, CBVTestCase):
+class SocialhomeCBVTestCase(CBVTestCase, SocialhomeTestBase):
     pass
 
 
-class SocialhomeAPITestCase(SocialhomeTestBase, APITestCase, TestCase):
+class SocialhomeAPITestCase(APITestCase, SocialhomeTestBase):
     pass
 
 

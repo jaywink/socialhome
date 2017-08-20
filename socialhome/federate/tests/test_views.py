@@ -10,6 +10,7 @@ from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
 from federation.tests.fixtures.keys import get_dummy_private_key
 from federation.utils.text import decode_if_bytes
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
@@ -193,7 +194,9 @@ class TestNodeInfoView(SocialhomeTestCase):
                     "activeHalfyear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
                     "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
                 },
-                "localPosts": Content.objects.filter(author__user__isnull=False, parent__isnull=True).count(),
-                "localComments": Content.objects.filter(author__user__isnull=False, parent__isnull=False).count(),
+                "localPosts": Content.objects.filter(
+                    author__user__isnull=False, content_type=ContentType.CONTENT).count(),
+                "localComments": Content.objects.filter(
+                    author__user__isnull=False, content_type=ContentType.REPLY).count(),
             }
         )

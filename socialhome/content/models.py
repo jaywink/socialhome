@@ -18,6 +18,7 @@ from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentQuerySet
 from socialhome.content.utils import make_nsfw_safe, test_tag, linkify_text_urls
 from socialhome.enums import Visibility
@@ -82,6 +83,7 @@ class Content(models.Model):
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+    content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -105,6 +107,10 @@ class Content(models.Model):
         "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
     )
 
+    share_of = models.ForeignKey(
+        "self", on_delete=models.CASCADE, verbose_name=_("Share of"), related_name="shares", null=True, blank=True,
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -116,16 +122,25 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
+    @cached_property
+    def children_count(self):
+        return self.children.count()
+
     def get_absolute_url(self):
         if self.slug:
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
         return reverse("content:view", kwargs={"pk": self.id})
 
     def save(self, *args, **kwargs):
+        if self.parent and self.share_of:
+            raise ValueError("Can't be both a reply and a share!")
         if self.parent:
+            self.content_type = ContentType.REPLY
             # Ensure replies have sane values
             self.visibility = self.parent.visibility
             self.pinned = False
+        elif self.share_of:
+            self.content_type = ContentType.SHARE
         if not self.pk:
             if not self.guid:
                 self.guid = uuid4()
@@ -149,6 +164,10 @@ class Content(models.Model):
             tags_to_add.append(tag)
         final_tags = tags_to_add + list(Tag.objects.filter(name__in=tags & current))
         self.tags.set(final_tags)
+
+    @cached_property
+    def shares_count(self):
+        return self.shares.count()
 
     @cached_property
     def is_nsfw(self):
@@ -310,8 +329,9 @@ class Content(models.Model):
             "author_is_local": bool(self.author.user),
             "humanized_timestamp": humanized_timestamp,
             "formatted_timestamp": self.formatted_timestamp,
-            "child_count": self.children.count(),
-            "parent": self.parent_id if self.parent else "",
+            "child_count": self.children_count,
+            "shares_count": self.shares_count,
+            "parent": self.parent_id if self.content_type == ContentType.REPLY else "",
             "is_author": is_author,
             "is_following_author": is_following_author,
             "is_authenticated": bool(user.is_authenticated),

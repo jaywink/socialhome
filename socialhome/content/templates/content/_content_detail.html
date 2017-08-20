@@ -28,21 +28,23 @@
             <div id="content-body" class="modal-body" {% if content %}data-content-id="{{ content.id }}"{% endif %}>
                 {% if content %}{{ content.rendered|safe }}{% endif %}
             </div>
-            <div class="content-bar">
-                <div class="row">
-                    <div class="col-7">
-                        <span id="content-timestamp" title="{% if content %}{{ content.formatted_timestamp }}{% endif %}">{% if content %}{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}{% endif %}</span>
-                        <span id="content-bar-actions" class="{% if not content or content.author != request.user.profile %}hidden{% endif %}">
-                            &nbsp;
-                            <a id="content-update-link" href="{% if content %}{% url "content:update" content.id %}{% endif %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
-                            <a id="content-delete-link" href="{% if content %}{% url "content:delete" content.id %}{% endif %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
-                        </span>
+            <div class="content-bar d-flex justify-content-start">
+                <div class="mt-1">
+                    <span id="content-timestamp" title="{% if content %}{{ content.formatted_timestamp }}{% endif %}">{% if content %}{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}{% endif %}</span>
+                    <span id="content-bar-actions" class="{% if not content or content.author != request.user.profile %}hidden{% endif %}">
+                        &nbsp;
+                        <a id="content-update-link" href="{% if content %}{% url "content:update" content.id %}{% endif %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
+                        <a id="content-delete-link" href="{% if content %}{% url "content:delete" content.id %}{% endif %}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
+                    </span>
+                </div>
+                <div class="ml-auto grid-item-reactions mt-1">
+                    <div class="item-reaction {% if content and content.shares_count %}item-reaction-counter-positive{% endif %}">
+                        <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
+                        <span class="item-reaction-counter">{% if content %}{{ content.shares_count }}{% endif %}</span>
                     </div>
-                    <div class="col-5 text-right grid-item-reactions mt-1">
-                        <div class="item-reaction">
-                            <span><i class="fa fa-envelope"></i></span>&nbsp;
-                            <span class="item-reaction-counter" id="content-reply-count">{% if content %}{{ content.children.count }}{% endif %}</span>
-                        </div>
+                    <div class="item-reaction {% if content and content.children_count %}item-reaction-counter-positive{% endif %}">
+                        <span><i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i></span>&nbsp;
+                        <span class="item-reaction-counter" id="content-reply-count">{% if content %}{{ content.children_count }}{% endif %}</span>
                     </div>
                 </div>
             </div>

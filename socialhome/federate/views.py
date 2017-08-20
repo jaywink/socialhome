@@ -18,6 +18,7 @@ from federation.hostmeta.generators import (
 from federation.protocols.diaspora.magic_envelope import MagicEnvelope
 
 from socialhome import __version__ as version
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task
@@ -96,8 +97,8 @@ def nodeinfo_view(request):
                 "activeHalfyear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
                 "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
             },
-            "localPosts": Content.objects.filter(author__user__isnull=False, parent__isnull=True).count(),
-            "localComments": Content.objects.filter(author__user__isnull=False, parent__isnull=False).count(),
+            "localPosts": Content.objects.filter(author__user__isnull=False, content_type=ContentType.CONTENT).count(),
+            "localComments": Content.objects.filter(author__user__isnull=False, content_type=ContentType.REPLY).count(),
         }
     nodeinfo = NodeInfo(
         software={"name": "socialhome", "version": version},
