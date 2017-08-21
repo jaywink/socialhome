@@ -1,6 +1,6 @@
 @import "variables";
 
-.markdownx-preview, .grid-item, #content-body, .reply {
+.markdownx-preview, .grid-item, .reply {
   // Apply Bootstrap blockquote styling except for font-size change
   blockquote {
     padding: .5rem 1rem;
@@ -31,49 +31,6 @@ a.opengraph-card {
   }
 }
 
-#content-modal {
-  overflow-wrap: break-word;
-  color: $dark;
-
-  img {
-    max-width: 100%;
-  }
-
-  .modal-content {
-    border-radius: unset;
-  }
-
-  #content-profile-pic {
-    max-width: 50px;
-    max-height: 50px;
-  }
-
-  #content-title {
-    display: inline;
-    padding-left: 20px;
-  }
-
-  .content-bar {
-    font-size: smaller;
-    opacity: 0.5;
-    padding: 0 15px 15px;
-
-    @media all and (max-width: $largeDevice) {
-      font-size: small;
-    }
-    @media all and (max-width: $mediumDevice) {
-      font-size: medium;
-    }
-    @media all and (max-width: $bsSmallDevice) {
-      font-size: large;
-    }
-  }
-
-  .item-reaction {
-    cursor: unset;
-  }
-}
-
 .content-actions {
   padding-top: 10px;
 
@@ -90,10 +47,6 @@ a.opengraph-card {
   img {
     max-width: 100%;
   }
-}
-
-#content-modal-replies {
-  padding: 0 30px;
 }
 
 .reply {

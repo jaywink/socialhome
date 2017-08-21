@@ -25,11 +25,6 @@
   }
 }
 
-.grid-item-open-action {
-  text-decoration: none;
-  cursor: pointer;
-}
-
 .item-reaction {
   display: inline-block;
   border: 1px solid #03adae;
@@ -49,6 +44,12 @@
   .grid-item-author-bar-pic {
     max-width: 24px;
     max-height: 24px;
+    margin-right: 5px;
+  }
+
+  .grid-item-author-bar-pic-large {
+    max-width: 48px;
+    max-height: 48px;
     margin-right: 5px;
   }
 }
@@ -80,6 +81,11 @@
     width: 24.2%;
     padding: 0.5%;
   }
+}
+
+.grid-item-full {
+  width: 100%;
+  padding: 20px;
 }
 
 // Stamped element centered on top

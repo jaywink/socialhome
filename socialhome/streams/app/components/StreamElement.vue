@@ -12,10 +12,9 @@
         </author-bar>
         <div class="grid-item-bar d-flex justify-content-start">
             <div class="mt-1">
-                <a :ref="contentUrl" :data-content-id="id" :title="timestamp" class="grid-item-open-action">
-                    {{ humanizedTimestamp }}
-                </a>&nbsp;
-                <span v-if="edited">{{ editedText }}</span>
+                <a :ref="contentUrl" :title="timestamp">
+                    {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
+                </a>
                 <div v-if="isUserAuthor">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>

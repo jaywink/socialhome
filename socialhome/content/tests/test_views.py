@@ -252,16 +252,12 @@ class TestContentView(SocialhomeTestCase):
         response = self.client.get(
             reverse("content:view", kwargs={"pk": self.content.id})
         )
-        self.assertNotContains(response, "modal-dialog modal-lg")
         self.assertContains(response, self.content.author.safer_image_url_small)
         self.assertContains(response, self.content.author.name)
         self.assertContains(response, self.content.author.handle)
-        self.assertNotContains(response, 'data-dismiss="modal"')
         self.assertContains(response, self.content.rendered)
         self.assertContains(response, self.content.humanized_timestamp)
         self.assertContains(response, self.content.formatted_timestamp)
-        self.assertContains(response, '<span id="content-bar-actions" class="hidden"')
-        self.assertNotContains(response, "modal-footer")
         self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.channel_group_name)
 
     def test_content_view_content_as_author(self):
