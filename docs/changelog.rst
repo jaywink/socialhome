@@ -45,6 +45,10 @@ Removed
 
 * **Breaking change**. Removed Content, Profile and Users API LIST routes. For now these are seen as not required for building a client and allow unnecessarily easy data mining.
 
+* Removed content modal. Clicking timestamp in grid now directly loads the content detail view. (`#162 <https://github.com/jaywink/socialhome/issues/162>`_)
+
+  Loading the content in a modal was an early experiment and didn't end out very usable.
+
 0.3.1 (2017-08-06)
 ------------------
 

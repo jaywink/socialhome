@@ -37,11 +37,7 @@ $(function () {
             } else if (placement === "prepended") {
                 $('.grid').prepend($contents).masonry(placement, $contents, true);
             } else if (placement === "children") {
-                if ($("#content-modal:visible").length) {
-                    $("#content-modal-replies").html($contents);
-                } else {
-                    $(".replies-container[data-content-id='" + parent_id + "']").html($contents);
-                }
+                $(".replies-container[data-content-id='" + parent_id + "']").html($contents);
             }
             view.layoutMasonry();
             view.addNSFWShield();
@@ -104,68 +100,6 @@ $(function () {
             $elem.remove();
         },
 
-        showContentModal: function() {
-            $('#content-modal').modal('show').on('hide.bs.modal', function () {
-                $('#content-modal').off("hide.bs.modal");
-                history.back();
-            });
-            // Close modal on esc key
-            $(document).keypress(function (ev) {
-                if (ev.keyCode === 27) {
-                    view.hideContentModal();
-                }
-            });
-        },
-
-        hideContentModal: function() {
-            $('#content-modal').modal("hide");
-        },
-
-        cleanContentModal: function() {
-            $('#content-title, #content-body').html("");
-            $("#content-profile-pic").attr("src", "");
-            $("#content-timestamp").attr("title", "").html("");
-            $("#content-bar-actions").addClass("hidden");
-            $("#content-update-link, #content-delete-link, #content-reply-url").attr("href", "");
-            $("#content-reply-count").html("");
-            $("#content-modal-replies").html("");
-        },
-
-        setContentModalData: function(data) {
-            // Add content to the modal
-            $("#content-title").html(data.author_name + " &lt;" + data.author_handle + "&gt;");
-            $("#content-body").html(data.rendered);
-            $("#content-profile-pic").attr("src", data.author_image);
-            $("#content-timestamp").attr("title", data.formatted_timestamp).html(data.humanized_timestamp);
-            if (data.is_author) {
-                $("#content-bar-actions").removeClass("hidden");
-                $("#content-update-link").attr("href", data.update_url);
-                $("#content-delete-link").attr("href", data.delete_url);
-            }
-            if (! data.parent) {
-                $("#content-reply-count").html(data.child_count);
-                $("#content-reply-url").attr("href", data.reply_url);
-            }
-        },
-
-        loadContentModal: function(contentId) {
-            $.getJSON(
-                "/content/" + contentId + "/",
-                function(data) {
-                    // Change URL to the content URL
-                    var url = "/content/" + data.id + "/";
-                    if (data.slug !== "") {
-                        url = url + data.slug + "/"
-                    }
-                    window.history.pushState(
-                        {content: data.id}, data.id, url
-                    );
-                    view.setContentModalData(data);
-                    view.addNSFWShield();
-                }
-            );
-        },
-
         initContentIds: function() {
             $(".grid-item").each(function() {
                 view.contentIds.push($(this).data("content-id"));
@@ -183,7 +117,6 @@ $(function () {
 
         init: function() {
             view.initContentIds();
-            this.addContentListeners();
             this.addReplyTriggers();
             this.initProfileBoxTriggers();
             window.SocialhomeContacts.addFollowUnfollowTriggers();
@@ -192,11 +125,6 @@ $(function () {
             this.socket.onmessage = this.handleMessage;
             this.socket.onopen = this.handleSocketOpen;
             this.socket.onclose = this.handleSocketClose;
-            // Hide content modal on back navigation
-            window.onpopstate = function() {
-                $('#content-modal').off("hide.bs.modal");
-                view.hideContentModal();
-            };
         },
 
         createConnection: function() {
@@ -219,7 +147,7 @@ $(function () {
             controller.addLoadMoreTrigger();
             // Replies if single content view
             if (controller.isContentDetail()) {
-                var contentId = $("#content-body").data("content-id");
+                var contentId = $(".replies-container").data("content-id");
                 controller.loadReplies(contentId);
             }
         },
@@ -253,7 +181,6 @@ $(function () {
                 view.updateNewLabelCount(controller.availableContent.length);
                 view.addContentToGrid($contents, data.placement, data.parent_id, function() {
                     if (!controller.isContentDetail()) {
-                        controller.addContentListeners();
                         controller.addReplyTriggers();
                         if (ids.length && data.placement === "appended") {
                             controller.addLoadMoreTrigger();
@@ -302,17 +229,6 @@ $(function () {
             }
         },
 
-        loadContentModal: function(ev) {
-            var contentId = $(ev.currentTarget).data("content-id");
-            $("#content-modal").on("shown.bs.modal", function() {
-                controller.loadReplies(contentId);
-                $("#content-modal").off("shown.bs.modal");
-            });
-            view.cleanContentModal();
-            view.showContentModal();
-            view.loadContentModal(contentId);
-        },
-
         openReplies: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
             controller.loadReplies(contentId);
@@ -330,10 +246,6 @@ $(function () {
             } catch(e) {
                 console.log(e);
             }
-        },
-
-        addContentListeners: function() {
-            $(".grid-item-open-action").off("click", controller.loadContentModal).click(controller.loadContentModal);
         },
 
         addReplyTriggers: function() {

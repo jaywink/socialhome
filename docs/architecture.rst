@@ -126,14 +126,14 @@ This basic design should be kept in mind when touching stream related code.
 Stream templates
 ::::::::::::::::
 
-Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code. Different from this is the single content view which is rendered with a slightly different template.
+Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code.
 
-There are three locations to modify when changing how content is rendered in streams or single content views:
+There are a few locations to modify when changing how content is rendered in streams or the content detail view:
 
 * ``socialhome/streams/templates/streams/base.html`` - This renders the initial stream as a basic Django template on page load.
+* ``socialhome/streams/templates/streams/_grid_item.html`` - Renders actual content item in initial stream and content detial.
 * ``socialhome/static/js/content.js`` - This is the main JavaScript template which is used to insert content into the stream. This is used for both top level content and replies in content streams.
-* ``socialhome/content/templates/content/_content_detail.html`` - This template is used to render the single content view.
 
-All these three templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
+All these templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
 
 NOTE! The Vue.js streams rewrite will change templates mentioned here but shouldn't change the actual way streams work.

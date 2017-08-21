@@ -27,9 +27,9 @@
             '<% } %>' +
             '<div class="grid-item-bar d-flex justify-content-start">' +
                 '<div class="mt-1">' +
-                    '<span class="grid-item-open-action" data-content-id="<%= content.id %>" ' +
-                        'title="<%= content.formatted_timestamp %>"><%= content.humanized_timestamp %>' +
-                    '</span>' +
+                    '<a class="unstyled-link" href="<%= content.detail_url %>" title="<%= content.formatted_timestamp %>">' +
+                        '<%= content.humanized_timestamp %>' +
+                    '</a>' +
                     '<% if (content.is_author) { %>' +
                         '<span id="content-bar-actions"> ' +
                             '&nbsp;' +

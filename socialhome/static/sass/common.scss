@@ -112,3 +112,10 @@ body {
 .versatileimagefield-label {
   padding-right: 10px;
 }
+
+#{$a-tags} {
+  &.unstyled-link {
+    color: unset;
+    text-decoration: unset;
+  }
+}

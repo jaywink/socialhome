@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load string_utils %}
 
 {% block containertype %}container-fluid{% endblock %}
 
@@ -29,67 +28,8 @@
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
             {% for content in content_list %}
-                <div class="grid-item" data-content-id="{{ content.id }}">
-                    {{ content.rendered|safe }}
-                    {% if not stream_name|startswith:"profile_" %}
-                        <div class="grid-item-author-bar mt-1">
-                            <div class="profile-box-trigger">
-                                <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
-                            </div>
-                            <div class="profile-box hidden">
-                                {{ content.author.handle }}
-                                <div class="pull-right">
-                                    <a href="{{ content.author.get_absolute_url }}" class="btn btn-secondary" title="{% trans "Profile" %}" aria-label="{% trans "Profile" %}"><i class="fa fa-user"></i></a>
-                                    {% if not content.author.user %}
-                                        <a href="{{ content.author.home_url }}" class="btn btn-secondary" title="{% trans "Home" %}" aria-label="{% trans "Home" %}"><i class="fa fa-home"></i></a>
-                                    {% endif %}
-                                    {% if request.user.is_authenticated and content.author != request.user.profile %}
-                                        <button class="follower-button btn btn-secondary {% if not content.author.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ content.author.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
-                                        <button class="follower-button btn btn-secondary {% if content.author.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ content.author.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
-                                    {% endif %}
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="grid-item-bar d-flex justify-content-start">
-                        <div class="mt-1">
-                            <span class="grid-item-open-action" data-content-id="{{ content.id }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</span>
-                            {% if content.author == request.user.profile %}
-                                &nbsp;
-                                <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>
-                                <a href="{% url "content:delete" content.id %}?next={{ request.path }}"><i class="fa fa-remove" title="{% trans "Delete" %}" aria-label="{% trans "Delete" %}"></i></a>
-                            {% endif %}
-                        </div>
-                        <div class="ml-auto grid-item-reactions mt-1">
-                            {% if request.user.is_authenticated or content.shares_count %}
-                                <div class="item-reaction {% if content.shares_count %}item-reaction-counter-positive{% endif %}">
-                                    <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
-                                    <span class="item-reaction-counter">{{ content.shares_count }}</span>
-                                </div>
-                            {% endif %}
-                            {% if request.user.is_authenticated or content.children_count %}
-                                <div class="item-reaction {% if content.children_count %}item-reaction-counter-positive{% endif %}">
-                                    <span class="item-open-replies-action" data-content-id="{{ content.id }}">
-                                        <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
-                                    </span>
-                                    <span class="item-reaction-counter">{{ content.children_count }}</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="replies-container" data-content-id="{{ content.id }}"></div>
-                    {% if request.user.is_authenticated %}
-                        <div class="content-actions hidden" data-content-id="{{ content.id }}">
-                            <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>
-                        </div>
-                    {% endif %}
-                </div>
+                {% include "streams/_grid_item.html" %}
             {% endfor %}
         </div>
     </div>
 {% endblock content %}
-
-{% block modal %}
-    {% include "content/_content_detail.html" with modal=True content=None %}
-{% endblock %}
