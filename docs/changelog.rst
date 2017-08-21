@@ -35,6 +35,8 @@ Added
 
   Currently shares are saved to the database and there is a share count, but sharing is not yet possible.
 
+* There is now a 'My content' stream link in the navbar 'Streams' dropdown. This goes to your own profile all content stream.
+
 Changed
 .......
 
