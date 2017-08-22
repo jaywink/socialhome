@@ -20,3 +20,7 @@ class ContentType(Enum):
         CONTENT = _("Content")
         REPLY = _("Reply")
         SHARE = _("Share")
+
+    @property
+    def string_value(self):
+        return {0: "content", 1: "reply", 2: "share"}.get(self.value)

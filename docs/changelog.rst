@@ -40,7 +40,7 @@ Added
 Changed
 .......
 
-* **Breaking change**. Content API results now return `visibility` as a string ('public', 'limited', 'site' or 'self'), not an integer.
+* **Breaking change**. Content API results now return ``visibility`` as a string ('public', 'limited', 'site' or 'self'), not an integer.
 
 Removed
 .......
@@ -50,6 +50,8 @@ Removed
 * Removed content modal. Clicking timestamp in grid now directly loads the content detail view. (`#162 <https://github.com/jaywink/socialhome/issues/162>`_)
 
   Loading the content in a modal was an early experiment and didn't end out very usable.
+
+* Removed reply button from replies. Technically, threaded replies are possible but the UI implementation is not done. Replying to a reply will be back once UI and federation layer will handle threaded replies properly.
 
 0.3.1 (2017-08-06)
 ------------------
