@@ -192,3 +192,33 @@ class TestContentViewSet(SocialhomeAPITestCase, TestCase):
             self.post("api:content-list", data=data)
             content = Content.objects.get(id=self.last_response.data["id"])
             self.assertEqual(content.author_id, self.staff_user.profile.id)
+
+    def test_share(self):
+        self.post("api:content-share", pk=self.public_content.id)
+        self.response_403()
+        self.post("api:content-share", pk=self.site_content.id)
+        self.response_403()
+        self.post("api:content-share", pk=self.limited_content.id)
+        self.response_403()
+        self.post("api:content-share", pk=self.self_content.id)
+        self.response_403()
+
+        with self.login(self.user):
+            self.post("api:content-share", pk=self.public_content.id)
+            self.response_200()
+            self.post("api:content-share", pk=self.site_content.id)
+            self.response_200()
+            self.post("api:content-share", pk=self.limited_content.id)
+            self.response_404()
+            self.post("api:content-share", pk=self.self_content.id)
+            self.response_404()
+
+        with self.login(self.staff_user):
+            self.post("api:content-share", pk=self.public_content.id)
+            self.response_200()
+            self.post("api:content-share", pk=self.site_content.id)
+            self.response_200()
+            self.post("api:content-share", pk=self.limited_content.id)
+            self.response_400()
+            self.post("api:content-share", pk=self.self_content.id)
+            self.response_400()

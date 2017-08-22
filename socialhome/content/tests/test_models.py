@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.text import slugify
@@ -11,7 +12,8 @@ from freezegun import freeze_time
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
-from socialhome.content.tests.factories import ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory
+from socialhome.content.tests.factories import (
+    ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory, LocalContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
@@ -23,9 +25,9 @@ class TestContentModel(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory()
+        cls.create_local_and_remote_user()
         cls.user2 = AnonymousUser()
-        cls.profile = cls.user.profile
+        cls.local_user = UserFactory()
         cls.public_content = ContentFactory(
             visibility=Visibility.PUBLIC, text="**Foobar**", author=cls.profile,
         )
@@ -35,7 +37,8 @@ class TestContentModel(SocialhomeTestCase):
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.self_content = ContentFactory(visibility=Visibility.SELF)
         cls.remote_content = ContentFactory(
-            visibility=Visibility.PUBLIC, remote_created=make_aware(datetime.datetime(2015, 1, 1))
+            visibility=Visibility.PUBLIC, remote_created=make_aware(datetime.datetime(2015, 1, 1)),
+            author=cls.remote_profile,
         )
         cls.ids = [
             cls.public_content.id, cls.site_content.id, cls.limited_content.id, cls.self_content.id
@@ -138,6 +141,29 @@ class TestContentModel(SocialhomeTestCase):
         self.public_content.fix_local_uploads = Mock()
         self.public_content.save()
         self.public_content.fix_local_uploads.assert_called_once_with()
+
+    def test_share_raises_on_non_content_content_type(self):
+        with self.assertRaises(ValidationError):
+            LocalContentFactory(parent=self.public_content, author=self.local_user.profile).share(self.profile)
+
+    def test_share_raises_if_shared_before(self):
+        self.public_content.share(self.local_user.profile)
+        with self.assertRaises(ValidationError):
+            self.public_content.share(self.local_user.profile)
+
+    def test_share_raises_if_sharing_own_content(self):
+        with self.assertRaises(ValidationError):
+            self.public_content.share(self.profile)
+
+    def test_share_raises_if_content_not_visible(self):
+        with self.assertRaises(ValidationError):
+            self.self_content.share(self.profile)
+
+    def test_share(self):
+        share = self.public_content.share(self.local_user.profile)
+        self.assertEqual(share.share_of, self.public_content)
+        self.assertNotEqual(share.id, self.public_content.id)
+        self.assertEqual(share.author, self.local_user.profile)
 
     def test_fix_local_uploads(self):
         self.public_content.text = "foobar ![](/media/uploads/12345.jpg) barfoo"
