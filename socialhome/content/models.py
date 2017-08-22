@@ -325,6 +325,7 @@ class Content(models.Model):
             "author_name": escape(self.author.name) or self.author.handle,
             "author_profile_url": self.author.get_absolute_url(),
             "child_count": self.children_count,
+            "content_type": self.content_type.string_value,
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
             "detail_url": self.get_absolute_url(),
             "formatted_timestamp": self.formatted_timestamp,

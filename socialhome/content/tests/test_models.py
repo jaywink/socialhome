@@ -95,6 +95,7 @@ class TestContentModel(SocialhomeTestCase):
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
+                "content_type": self.public_content.content_type.string_value,
             },
             {
                 "id": self.site_content.id,
@@ -122,6 +123,7 @@ class TestContentModel(SocialhomeTestCase):
                 "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
+                "content_type": self.site_content.content_type.string_value,
             }
         ])
 
@@ -199,6 +201,7 @@ class TestContentModel(SocialhomeTestCase):
             "is_authenticated": False,
             "parent": "",
             "profile_id": "",
+            "content_type": self.public_content.content_type.string_value,
         })
 
         # Add a share
@@ -235,6 +238,7 @@ class TestContentModel(SocialhomeTestCase):
             "is_authenticated": True,
             "parent": "",
             "profile_id": self.public_content.author.id,
+            "content_type": self.public_content.content_type.string_value,
         })
 
     def test_dict_for_view_edited_post(self):
@@ -266,6 +270,7 @@ class TestContentModel(SocialhomeTestCase):
                 "is_authenticated": True,
                 "parent": "",
                 "profile_id": self.public_content.author.id,
+                "content_type": self.public_content.content_type.string_value,
             })
 
     def test_short_text(self):

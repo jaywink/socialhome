@@ -51,7 +51,7 @@
         </div>
     </div>
     <div class="replies-container" data-content-id="{{ content.id }}"></div>
-    {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated and content.content_type.string_value == "content" %}
         <div class="content-actions {% if not stream_name|startswith:"content_" %}hidden{% endif %}" data-content-id="{{ content.id }}">
             <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>
         </div>
