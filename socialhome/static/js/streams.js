@@ -44,6 +44,10 @@ $(function () {
             done();
         },
 
+        doMasonryLayout: function() {
+            $('.grid').masonry('layout');
+        },
+
         layoutMasonry: function() {
             var $grid = $('.grid');
             $grid.imagesLoaded().progress(function (instance) {
@@ -117,7 +121,7 @@ $(function () {
 
         init: function() {
             view.initContentIds();
-            this.addReplyTriggers();
+            this.addReactionTriggers();
             this.initProfileBoxTriggers();
             window.SocialhomeContacts.addFollowUnfollowTriggers();
             view.addNSFWShield();
@@ -181,7 +185,7 @@ $(function () {
                 view.updateNewLabelCount(controller.availableContent.length);
                 view.addContentToGrid($contents, data.placement, data.parent_id, function() {
                     if (!controller.isContentDetail()) {
-                        controller.addReplyTriggers();
+                        controller.addReactionTriggers();
                         if (ids.length && data.placement === "appended") {
                             controller.addLoadMoreTrigger();
                         }
@@ -232,8 +236,29 @@ $(function () {
         openReplies: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
             controller.loadReplies(contentId);
-            $(".content-actions[data-content-id='" + contentId + "']").removeClass("hidden");
+            $(".reply-action[data-content-id='" + contentId + "']").removeClass("hidden");
             $(ev.currentTarget).removeClass("item-open-replies-action").off("click", controller.openReplies);
+        },
+
+        openShares: function(ev) {
+            var contentId = $(ev.currentTarget).data("content-id");
+            $(".share-action[data-content-id='" + contentId + "']").removeClass("hidden").click(controller.doShare);
+            view.doMasonryLayout();
+        },
+
+        doShare: function(ev) {
+            var contentId = $(ev.currentTarget).data("content-id");
+            $.post({
+                url: "/api/content/" + contentId + "/share/",
+                success: function () {
+                    $(".share-action[data-content-id='" + contentId + "']").addClass("hidden");
+                    $(".share-action[data-content-id='" + contentId + "'] button").addClass("hidden");
+                    var $shareCount = $(".item-open-shares-action[data-content-id='" + contentId + "'] .item-reaction-counter");
+                    $shareCount.html(parseInt($shareCount.html()) + 1);
+                    view.doMasonryLayout();
+                },
+                headers: { "X-CSRFToken": Cookies.get('csrftoken') },
+            });
         },
 
         loadReplies: function(contentId) {
@@ -248,8 +273,9 @@ $(function () {
             }
         },
 
-        addReplyTriggers: function() {
+        addReactionTriggers: function() {
             $(".item-open-replies-action").off("click", controller.openReplies).click(controller.openReplies);
+            $(".item-open-shares-action").off("click", controller.openShares).click(controller.openShares);
         },
 
         initProfileBoxTriggers: function() {
