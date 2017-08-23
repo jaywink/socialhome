@@ -40,7 +40,7 @@
                 '</div>' +
                 '<div class="ml-auto grid-item-reactions mt-1">' +
                     '<% if (! content.parent && (content.is_authenticated || content.shares_count)) { %>' +
-                        '<div class="item-reaction <% if (content.shares_count) { %>item-reaction-counter-positive<% } %>">' +
+                        '<div class="item-reaction item-open-shares-action <% if (content.shares_count) { %>item-reaction-counter-positive<% } %>" data-content-id="<%= content.id %>">' +
                             '<i class="fa fa-refresh" title="' + gettext("Shares") + '" aria-label="' + gettext("Shares") + '"></i>&nbsp;' +
                             '<span class="item-reaction-counter"><%= content.shares_count %></span>' +
                         '</div>' +
@@ -49,15 +49,18 @@
                         '<div class="item-reaction ml-1 <% if (content.child_count) { %>item-reaction-counter-positive<% } %>">' +
                             '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
                                 '<i class="fa fa-envelope" title="' + gettext("Replies") +'" aria-label="' + gettext("Replies") +'"></i>' +
+                                '<span class="item-reaction-counter"><%= content.child_count %></span>' +
                             '</span>&nbsp;' +
-                            '<span class="item-reaction-counter"><%= content.child_count %></span>' +
                         '</div>' +
                     '<% } %>' +
                 '</div>' +
             '</div>' +
+            '<div class="content-actions share-action hidden" data-content-id="<%= content.id %>">' +
+                '<button class="btn btn-secondary" aria-label="' + gettext("Share") + '" type="button">' + gettext("Share") + '</button>' +
+            '</div>' +
             '<div class="replies-container" data-content-id="<%= content.id %>"></div>' +
             '<% if (content.is_authenticated && content.content_type === "content") { %>' +
-                '<div class="content-actions hidden" data-content-id="<%= content.id %>">' +
+                '<div class="content-actions reply-action hidden" data-content-id="<%= content.id %>">' +
                     '<a class="btn btn-secondary" href="<%= content.reply_url %>" aria-label="' + gettext("Reply") + '">' + gettext("Reply") +'</a>' +
                 '</div>' +
             '<% } %>' +

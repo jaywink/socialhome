@@ -35,7 +35,7 @@
         </div>
         <div class="ml-auto grid-item-reactions mt-1">
             {% if request.user.is_authenticated or content.shares_count %}
-                <div class="item-reaction {% if content.shares_count %}item-reaction-counter-positive{% endif %}">
+                <div class="item-reaction item-open-shares-action {% if content.shares_count %}item-reaction-counter-positive{% endif %}" data-content-id="{{ content.id }}">
                     <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </div>
@@ -44,15 +44,18 @@
                 <div class="item-reaction {% if content.children_count %}item-reaction-counter-positive{% endif %}">
                     <span class="item-open-replies-action" data-content-id="{{ content.id }}">
                         <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
+                        <span class="item-reaction-counter">{{ content.children_count }}</span>
                     </span>
-                    <span class="item-reaction-counter">{{ content.children_count }}</span>
                 </div>
             {% endif %}
         </div>
     </div>
+    <div class="content-actions share-action hidden" data-content-id="{{ content.id }}">
+        <button class="btn btn-secondary" type="button">{% trans "Share" %}</button>
+    </div>
     <div class="replies-container" data-content-id="{{ content.id }}"></div>
     {% if request.user.is_authenticated and content.content_type.string_value == "content" %}
-        <div class="content-actions {% if not stream_name|startswith:"content_" %}hidden{% endif %}" data-content-id="{{ content.id }}">
+        <div class="content-actions reply-action {% if not stream_name|startswith:"content_" %}hidden{% endif %}" data-content-id="{{ content.id }}">
             <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>
         </div>
     {% endif %}

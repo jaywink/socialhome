@@ -37,6 +37,7 @@
     "load-grunt-tasks": "~3.5.2",
     "mocha": "~3.5.0",
     "mocha-webpack": "~1.0.0-rc.1",
+    "moxios": "^0.4.0",
     "node-sass": "^4.5.3",
     "pixrem": "~3.0.2",
     "sass-loader": "^6.0.6",
