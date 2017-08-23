@@ -1,4 +1,3 @@
-import "chai/register-should"
 import "streams/app/main"
 
 import Vue from "vue"

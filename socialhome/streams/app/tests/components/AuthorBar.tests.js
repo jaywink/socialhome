@@ -1,4 +1,3 @@
-import "chai/register-should"
 import {mount} from "avoriaz"
 
 import Axios from "axios"

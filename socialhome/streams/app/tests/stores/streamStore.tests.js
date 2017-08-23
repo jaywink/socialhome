@@ -1,4 +1,3 @@
-import "chai/register-should"
 import {Server, WebSocket} from "mock-socket"
 
 import Vuex from "vuex"

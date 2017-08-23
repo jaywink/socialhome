@@ -1,5 +1,3 @@
-import "chai/register-should"
-
 import Axios from "axios"
 import moxios from 'moxios'
 import Vue from "vue"

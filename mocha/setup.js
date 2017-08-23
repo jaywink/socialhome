@@ -25,6 +25,8 @@
     })
 }())
 
+require("chai/register-should")
+
 // Noop function to make the tests pass
 global.WebSocket = function () {} // eslint-disable-line func-names
 global.Sinon = require("sinon").sandbox.create()
