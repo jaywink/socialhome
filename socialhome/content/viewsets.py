@@ -1,5 +1,9 @@
+from django.core.exceptions import ValidationError
+from rest_framework import exceptions
 from rest_framework import mixins
+from rest_framework.decorators import detail_route
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import GenericViewSet
 
@@ -21,7 +25,11 @@ class IsOwnContentOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return request.user.is_authenticated and obj.author == request.user.profile
+        if request.user.is_authenticated:
+            if view.action == "share" or obj.author == request.user.profile:
+                return True
+
+        return False
 
 
 class CreateContentThrottle(UserRateThrottle):
@@ -37,6 +45,12 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         Required values: `text` and `visibility`.
 
         `visibility` should be one of: `public`, `site`, `limited`, `self`.
+
+    share:
+        Share content
+
+        No additional required values. Will share the content using the authenticated profile. Returns
+        share content ID as `content_id`.
     """
     queryset = Content.objects.none()
     serializer_class = ContentSerializer
@@ -47,6 +61,17 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         if self.request.user.is_staff:
             return Content.objects.all()
         return Content.objects.visible_for_user(self.request.user)
+
+    @detail_route(methods=["post"])
+    def share(self, request, pk=None):
+        content = self.get_object()
+        try:
+            share = content.share(request.user.profile)
+        except ValidationError as e:
+            raise exceptions.ValidationError(e.message)
+        except Exception:
+            raise exceptions.APIException("Unknown error when creating share.")
+        return Response({"status": "ok", "content_id": share.id})
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.profile)

@@ -5,6 +5,7 @@ from uuid import uuid4
 import arrow
 from CommonMark import commonmark
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Max
 from django.template.loader import render_to_string
@@ -164,6 +165,23 @@ class Content(models.Model):
             tags_to_add.append(tag)
         final_tags = tags_to_add + list(Tag.objects.filter(name__in=tags & current))
         self.tags.set(final_tags)
+
+    def share(self, profile):
+        """Share this content as the profile given."""
+        if self.content_type != ContentType.CONTENT:
+            # TODO: support sharing replies too
+            raise ValidationError("Can only share top level content.")
+        if self.author == profile:
+            raise ValidationError("Cannot share own content")
+        if not self.visible_for_user(profile.user):
+            raise ValidationError("Content to be shared is not visible to sharer.")
+        if self.shares.filter(author=profile).exists():
+            raise ValidationError("Profile has already shared this content.")
+        # Use get or created as a safety to stop duplicates
+        share, _created = Content.objects.get_or_create(author=profile, share_of=self, defaults={
+            "visibility": self.visibility,
+        })
+        return share
 
     @cached_property
     def shares_count(self):

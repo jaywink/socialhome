@@ -37,6 +37,8 @@ Added
 
 * There is now a 'My content' stream link in the navbar 'Streams' dropdown. This goes to your own profile all content stream.
 
+* Add ``share`` action to Content API. This enables creating shares via the API.  (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 Changed
 .......
 
