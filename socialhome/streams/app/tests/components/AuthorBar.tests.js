@@ -1,17 +1,20 @@
 import {mount} from "avoriaz"
+import moxios from "moxios"
 
 import Axios from "axios"
 import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
+import VueMasonryPlugin from "vue-masonry"
 
 import AuthorBar from "streams/app/components/AuthorBar.vue"
 import {getAuthorBarPropsData} from "streams/app/tests/fixtures/AuthorBar.fixtures"
 
 
 Vue.use(BootstrapVue)
+Vue.use(VueMasonryPlugin)
 
 describe("AuthorBar", () => {
-    afterEach(() => {
+    beforeEach(() => {
         Sinon.restore()
     })
 
@@ -69,6 +72,11 @@ describe("AuthorBar", () => {
                 xsrfCookieName: "csrftoken",
                 xsrfHeaderName: "X-CSRFToken",
             })
+            moxios.install(Vue.prototype.$http)
+        })
+
+        afterEach(() => {
+            moxios.uninstall()
         })
 
         describe("profileBoxTrigger", () => {
@@ -118,28 +126,42 @@ describe("AuthorBar", () => {
 
             it("should show that user is following author when the HTTP request succeeds", () => {
                 let propsData = getAuthorBarPropsData({
-                    currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
+                    currentBrowsingProfileId: "26",
+                    guid: "42",
+                    isUserAuthor: false,
+                    isUserFollowingAuthor: true,
                 })
+
                 let target = mount(AuthorBar, {propsData})
-                Sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
-                    resolve()
-                    target.instance().$data._isUserFollowingAuthor.should.be.false
-                    target.find(".follow-btn").length.should.equal(1)
-                }))
                 target.instance().unfollow()
+
+                moxios.wait(() => {
+                    moxios.requests.mostRecent().respondWith({statusCode: 200}).then(() => {
+                        target.instance().$data._isUserFollowingAuthor.should.be.false
+                        target.instance().$nextTick(() => {
+                            target.find(".follow-btn").length.should.equal(1)
+                        })
+                    })
+                })
             })
 
             it("should show an error message when the HTTP request fails", () => {
                 let propsData = getAuthorBarPropsData({
-                    currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
+                    currentBrowsingProfileId: "26",
+                    guid: "42",
+                    isUserAuthor: false,
+                    isUserFollowingAuthor: true,
                 })
                 let target = mount(AuthorBar, {propsData})
-                Sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
-                    reject()
-                    Sinon.spy(console, "error")
-                    console.error.calledWith("Not logged in").should.be.true
-                }))
+                Sinon.spy(console, "error")
+
                 target.instance().unfollow()
+
+                moxios.wait(() => {
+                    moxios.requests.mostRecent().respondWith({statusCode: 500}).then(() => {
+                        console.error.getCall(0).args[0].should.equal("Error")
+                    })
+                })
             })
         })
 
@@ -171,28 +193,41 @@ describe("AuthorBar", () => {
 
             it("should show that user is following author when the HTTP request succeeds", () => {
                 let propsData = getAuthorBarPropsData({
-                    currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: false,
+                    currentBrowsingProfileId: "26",
+                    guid: "42",
+                    isUserAuthor: false,
+                    isUserFollowingAuthor: false,
                 })
                 let target = mount(AuthorBar, {propsData})
-                Sinon.stub(target.instance().$http, "post").returns(new Promise(resolve => {
-                    resolve()
-                    target.instance().$data._isUserFollowingAuthor.should.be.true
-                    target.find(".unfollow-btn").length.should.equal(1)
-                }))
                 target.instance().follow()
+
+                moxios.wait(() => {
+                    moxios.requests.mostRecent().respondWith({statusCode: 200}).then(() => {
+                        target.instance().$data._isUserFollowingAuthor.should.be.false
+                        target.instance().$nextTick(() => {
+                            target.find(".unfollow-btn").length.should.equal(1)
+                        })
+                    })
+                })
             })
 
             it("should show an error message when the HTTP request fails", () => {
                 let propsData = getAuthorBarPropsData({
-                    currentBrowsingProfileId: "26", guid: "42", isUserFollowingAuthor: true,
+                    currentBrowsingProfileId: "26",
+                    guid: "42",
+                    isUserAuthor: false,
+                    isUserFollowingAuthor: true,
                 })
                 let target = mount(AuthorBar, {propsData})
-                Sinon.stub(target.instance().$http, "post").returns(new Promise(_, reject => {
-                    reject()
-                    Sinon.spy(console, "error")
-                    console.error.calledWith("Not logged in").should.be.true
-                }))
+
+                Sinon.spy(console, "error")
                 target.instance().follow()
+
+                moxios.wait(() => {
+                    moxios.requests.mostRecent().respondWith({statusCode: 500}).then(() => {
+                        console.error.getCall(0).args[0].should.equal("Error")
+                    })
+                })
             })
         })
     })
@@ -200,9 +235,9 @@ describe("AuthorBar", () => {
     describe("lifecycle", () => {
         describe("updated", () => {
             it("should redraw VueMasonry", (done) => {
-                Sinon.spy(Vue, "redrawVueMasonry")
                 let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
+                Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
                 target.vm.$nextTick(() => {
                     Vue.redrawVueMasonry.called.should.be.true

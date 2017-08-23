@@ -10,7 +10,7 @@ import {store, stateOperations} from "streams/app/stores/streamStore"
 Vue.use(BootstrapVue)
 
 describe("Stream", () => {
-    afterEach(() => {
+    beforeEach(() => {
         Sinon.restore()
     })
 
@@ -39,7 +39,7 @@ describe("Stream", () => {
                 store.commit(stateOperations.receivedNewContent, 1)
                 Sinon.spy(store, "dispatch")
                 target.find(".new-content-load-link")[0].trigger("click")
-                store.dispatch.calledWith(stateOperations.newContentAck).should.be.true
+                store.dispatch.getCall(0).args[0].should.eql(stateOperations.newContentAck)
             })
         })
     })

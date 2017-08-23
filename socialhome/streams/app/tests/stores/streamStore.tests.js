@@ -41,7 +41,7 @@ describe("streamStore", () => {
                 setTimeout(() => {
                     Vuex.Store.prototype.dispatch.getCall(0).args.should.eql([stateOperations.receivedNewContent, 1])
                     done()
-                }, 1500)
+                }, 200)
             })
         })
     })

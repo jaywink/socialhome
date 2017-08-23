@@ -4,6 +4,10 @@ import Vue from "vue"
 
 
 describe("Main", () => {
+    beforeEach(() => {
+        Sinon.restore()
+    })
+
     it("should initialize Axios library with correct parameters", () => {
         Vue.prototype.$http.should.exist
         Vue.prototype.$http.defaults.xsrfCookieName.should.equal("csrftoken")

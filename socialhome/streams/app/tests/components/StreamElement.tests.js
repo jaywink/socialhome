@@ -1,5 +1,5 @@
 import Axios from "axios"
-import moxios from 'moxios'
+import moxios from "moxios"
 import Vue from "vue"
 import {mount} from "avoriaz"
 
@@ -8,7 +8,7 @@ import {getStreamElementPropsData} from "streams/app/tests/fixtures/StreamElemen
 
 
 describe("StreamElement", () => {
-    afterEach(() => {
+    beforeEach(() => {
         Sinon.restore()
     })
 
@@ -89,14 +89,14 @@ describe("StreamElement", () => {
                 // Actual thing we are testing - the share
                 target.instance().share()
 
-                moxios.wait(function() {
+                moxios.wait(() => {
                     let request = moxios.requests.mostRecent()
                     request.respondWith({
                         status: 200,
                         response: {
                             status: "ok", content_id: 123,
                         }
-                    }).then(function () {
+                    }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
                         target.instance().$data._sharesCount.should.eq(propsData.sharesCount + 1)
                         done()
