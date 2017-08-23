@@ -12,6 +12,20 @@ describe("StreamElement", () => {
         Sinon.restore()
     })
 
+    describe("template", () => {
+        describe("share reaction", () => {
+            it("has item-reaction-shared if has shared", () => {
+                let propsData = getStreamElementPropsData({hasShared: false})
+                let target = mount(StreamElement, {propsData})
+                target.find(".item-reaction.item-reaction-shared").length.should.eq(0)
+
+                propsData = getStreamElementPropsData({hasShared: true})
+                target = mount(StreamElement, {propsData})
+                target.find(".item-reaction.item-reaction-shared").length.should.eq(1)
+            })
+        })
+    })
+
     describe("computed", () => {
         describe("showReplies", () => {
             it("true if authenticated or has children", () => {
@@ -52,6 +66,24 @@ describe("StreamElement", () => {
                 target.getSharesCount.should.eq(56)
             })
         })
+
+        describe("getHasShared", () => {
+            it("returns has shared status", () => {
+                let propsData = getStreamElementPropsData({hasShared: false})
+                let target = new StreamElement({propsData})
+                target.getHasShared.should.eq(false)
+
+                propsData = getStreamElementPropsData({hasShared: true})
+                target = new StreamElement({propsData})
+                target.getHasShared.should.eq(true)
+
+                target.$data._hasShared = false
+                target.getHasShared.should.eq(false)
+
+                target.$data._hasShared = true
+                target.getHasShared.should.eq(true)
+            })
+        })
     })
 
     describe("methods", () => {
@@ -80,11 +112,12 @@ describe("StreamElement", () => {
             })
 
             it("creates share on server", (done) => {
-                let propsData = getStreamElementPropsData({isUserAuthenticated: true})
+                let propsData = getStreamElementPropsData({isUserAuthenticated: true, hasShared: false})
                 let target = mount(StreamElement, {propsData})
-                // Ensure shares are expanded
+                // Ensure data
                 target.instance().expandShares()
                 target.instance().$data.showSharesBox.should.be.true
+                target.instance().$data._hasShared.should.be.false
 
                 // Actual thing we are testing - the share
                 target.instance().share()
@@ -99,6 +132,7 @@ describe("StreamElement", () => {
                     }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
                         target.instance().$data._sharesCount.should.eq(propsData.sharesCount + 1)
+                        target.instance().$data._hasShared.should.be.true
                         done()
                     })
                 })

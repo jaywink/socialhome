@@ -52,7 +52,8 @@ class BaseStreamView(ListView):
                 "isUserAuthor": is_user_author,
                 "updateUrl": reverse("content:update", kwargs={"pk": content.id}) if is_user_author else "",
                 "replyUrl": reverse("content:reply", kwargs={"pk": content.id}) if is_user_author else "",
-                "deleteUrl": reverse("content:reply", kwargs={"pk": content.id}) if is_user_author else ""
+                "deleteUrl": reverse("content:reply", kwargs={"pk": content.id}) if is_user_author else "",
+                "hasShared": Content.has_shared(content.id, request_user_profile.id) if request_user_profile else False,
             }
 
         return {

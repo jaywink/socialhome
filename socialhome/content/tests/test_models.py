@@ -99,6 +99,7 @@ class TestContentModel(SocialhomeTestCase):
                 "parent": "",
                 "profile_id": "",
                 "content_type": self.public_content.content_type.string_value,
+                "has_shared": False,
             },
             {
                 "id": self.site_content.id,
@@ -127,8 +128,15 @@ class TestContentModel(SocialhomeTestCase):
                 "parent": "",
                 "profile_id": "",
                 "content_type": self.site_content.content_type.string_value,
+                "has_shared": False,
             }
         ])
+
+    def test_has_shared(self):
+        self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))
+        # Do a share
+        self.public_content.share(self.local_user.profile)
+        self.assertTrue(Content.has_shared(self.public_content.id, self.local_user.profile.id))
 
     def test_is_local(self):
         self.assertFalse(self.site_content.is_local)
@@ -228,6 +236,7 @@ class TestContentModel(SocialhomeTestCase):
             "parent": "",
             "profile_id": "",
             "content_type": self.public_content.content_type.string_value,
+            "has_shared": False,
         })
 
         # Add a share
@@ -265,6 +274,7 @@ class TestContentModel(SocialhomeTestCase):
             "parent": "",
             "profile_id": self.public_content.author.id,
             "content_type": self.public_content.content_type.string_value,
+            "has_shared": False,
         })
 
     def test_dict_for_view_edited_post(self):
@@ -297,6 +307,7 @@ class TestContentModel(SocialhomeTestCase):
                 "parent": "",
                 "profile_id": self.public_content.author.id,
                 "content_type": self.public_content.content_type.string_value,
+                "has_shared": False,
             })
 
     def test_short_text(self):

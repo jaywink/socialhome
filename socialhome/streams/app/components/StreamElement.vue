@@ -25,7 +25,9 @@
                 </div>
             </div>
             <div class="ml-auto grid-item-reactions mt-1">
-                <div v-if="showShares" class="item-reaction" @click.stop.prevent="expandShares">
+                <div v-if="showShares" class="item-reaction" v-bind:class="{'item-reaction-shared': getHasShared}"
+                     @click.stop.prevent="expandShares"
+                >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
                     <span class="item-reaction-counter">{{ getSharesCount }}</span>
                 </div>
@@ -71,11 +73,13 @@ export default Vue.component("stream-element", {
         showAuthorBar: {type: Boolean, required: true},
         isUserAuthenticated: {type: Boolean, required: true},
         currentBrowsingProfileId: {type: String, required: false},
+        hasShared: {type: Boolean, required: true},
     },
     data() {
         return {
             showSharesBox: false,
             _sharesCount: this.sharesCount,
+            _hasShared: this.hasShared,
         }
     },
     computed: {
@@ -87,6 +91,9 @@ export default Vue.component("stream-element", {
         },
         showShares() {
             return this.isUserAuthenticated || this.sharesCount > 0
+        },
+        getHasShared() {
+            return this.$data._hasShared
         },
         getSharesCount() {
             // TODO: maybe replace this at some point by just refreshing content from server?
@@ -106,6 +113,7 @@ export default Vue.component("stream-element", {
                 .then(() => {
                     this.$data.showSharesBox = false
                     this.$data._sharesCount += 1
+                    this.$data._hasShared = true
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },

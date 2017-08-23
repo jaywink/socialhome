@@ -40,7 +40,7 @@
                 '</div>' +
                 '<div class="ml-auto grid-item-reactions mt-1">' +
                     '<% if (! content.parent && (content.is_authenticated || content.shares_count)) { %>' +
-                        '<div class="item-reaction item-open-shares-action <% if (content.shares_count) { %>item-reaction-counter-positive<% } %>" data-content-id="<%= content.id %>">' +
+                        '<div class="item-reaction item-open-shares-action <% if (content.has_shared) { %>item-reaction-shared<% } %> <% if (content.shares_count) { %>item-reaction-counter-positive<% } %>" data-content-id="<%= content.id %>">' +
                             '<i class="fa fa-refresh" title="' + gettext("Shares") + '" aria-label="' + gettext("Shares") + '"></i>&nbsp;' +
                             '<span class="item-reaction-counter"><%= content.shares_count %></span>' +
                         '</div>' +

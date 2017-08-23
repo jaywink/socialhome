@@ -1,3 +1,4 @@
+{% load content %}
 {% load i18n %}
 {% load string_utils %}
 
@@ -35,7 +36,7 @@
         </div>
         <div class="ml-auto grid-item-reactions mt-1">
             {% if request.user.is_authenticated or content.shares_count %}
-                <div class="item-reaction item-open-shares-action {% if content.shares_count %}item-reaction-counter-positive{% endif %}" data-content-id="{{ content.id }}">
+                <div class="item-reaction item-open-shares-action {% if content|has_shared:request.user %}item-reaction-shared{% endif %} {% if content.shares_count %}item-reaction-counter-positive{% endif %}" data-content-id="{{ content.id }}">
                     <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </div>

@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = (
     "django_tables2",
     "haystack",
     "versatileimagefield",
+    "memoize",
 )
 LOCAL_APPS = (
     "socialhome",

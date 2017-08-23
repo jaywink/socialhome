@@ -253,6 +253,7 @@ $(function () {
                 success: function () {
                     $(".share-action[data-content-id='" + contentId + "']").addClass("hidden");
                     $(".share-action[data-content-id='" + contentId + "'] button").addClass("hidden");
+                    $(".item-open-shares-action[data-content-id='" + contentId + "']").addClass("item-reaction-shared").addClass("item-reaction-counter-positive");
                     var $shareCount = $(".item-open-shares-action[data-content-id='" + contentId + "'] .item-reaction-counter");
                     $shareCount.html(parseInt($shareCount.html()) + 1);
                     view.doMasonryLayout();
