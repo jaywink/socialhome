@@ -242,24 +242,49 @@ $(function () {
 
         openShares: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
-            $(".share-action[data-content-id='" + contentId + "']").removeClass("hidden").click(controller.doShare);
+            $(".share-action[data-content-id='" + contentId + "']").removeClass("hidden")
+                .off("click", controller.doShareAction).click(controller.doShareAction);
             view.doMasonryLayout();
         },
 
-        doShare: function(ev) {
+        doShareAction: function(ev) {
             var contentId = $(ev.currentTarget).data("content-id");
-            $.post({
-                url: "/api/content/" + contentId + "/share/",
-                success: function () {
-                    $(".share-action[data-content-id='" + contentId + "']").addClass("hidden");
-                    $(".share-action[data-content-id='" + contentId + "'] button").addClass("hidden");
-                    $(".item-open-shares-action[data-content-id='" + contentId + "']").addClass("item-reaction-shared").addClass("item-reaction-counter-positive");
-                    var $shareCount = $(".item-open-shares-action[data-content-id='" + contentId + "'] .item-reaction-counter");
-                    $shareCount.html(parseInt($shareCount.html()) + 1);
-                    view.doMasonryLayout();
-                },
-                headers: { "X-CSRFToken": Cookies.get('csrftoken') },
-            });
+            var action = $(ev.currentTarget).children(":visible").first().data("action");
+            if (action === "share") {
+                $.post({
+                    url: "/api/content/" + contentId + "/share/",
+                    success: function() {
+                        $(ev.currentTarget).children().toggleClass("hidden");
+                        $(".share-action[data-content-id='" + contentId + "']").addClass("hidden");
+                        $(".item-open-shares-action[data-content-id='" + contentId + "']")
+                            .addClass("item-reaction-shared").addClass("item-reaction-counter-positive");
+                        var $shareCount = $(
+                            ".item-open-shares-action[data-content-id='" + contentId + "'] .item-reaction-counter");
+                        $shareCount.html(parseInt($shareCount.html()) + 1);
+                        view.doMasonryLayout();
+                    },
+                    headers: {"X-CSRFToken": Cookies.get('csrftoken')},
+                });
+            } else if (action === "unshare") {
+                $.ajax("/api/content/" + contentId + "/share/", {
+                    method: "DELETE",
+                    success: function() {
+                        $(ev.currentTarget).children().toggleClass("hidden");
+                        $(".share-action[data-content-id='" + contentId + "']").addClass("hidden");
+                        var $openSharesIcon = $(".item-open-shares-action[data-content-id='" + contentId + "']");
+                        $openSharesIcon.removeClass("item-reaction-shared");
+                        var $shareCount = $(
+                            ".item-open-shares-action[data-content-id='" + contentId + "'] .item-reaction-counter");
+                        var shareCount = parseInt($shareCount.html()) - 1;
+                        $shareCount.html(shareCount);
+                        if (shareCount === 0) {
+                            $openSharesIcon.removeClass("item-reaction-counter-positive");
+                        }
+                        view.doMasonryLayout();
+                    },
+                    headers: {"X-CSRFToken": Cookies.get('csrftoken')},
+                });
+            }
         },
 
         loadReplies: function(contentId) {

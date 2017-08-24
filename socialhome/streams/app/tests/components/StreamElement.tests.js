@@ -138,5 +138,46 @@ describe("StreamElement", () => {
                 })
             })
         })
+
+        describe("unshare", () => {
+            beforeEach(() => {
+                Vue.prototype.$http = Axios.create({
+                    xsrfCookieName: "csrftoken",
+                    xsrfHeaderName: "X-CSRFToken",
+                })
+                moxios.install(Vue.prototype.$http)
+            })
+
+            afterEach(() => {
+                moxios.uninstall()
+            })
+
+            it("removes share on server", (done) => {
+                let propsData = getStreamElementPropsData({isUserAuthenticated: true, hasShared: true})
+                let target = mount(StreamElement, {propsData})
+                // Ensure data
+                target.instance().expandShares()
+                target.instance().$data.showSharesBox.should.be.true
+                target.instance().$data._hasShared.should.be.true
+
+                // Actual thing we are testing - the unshare
+                target.instance().unshare()
+
+                moxios.wait(() => {
+                    let request = moxios.requests.mostRecent()
+                    request.respondWith({
+                        status: 200,
+                        response: {
+                            status: "ok",
+                        }
+                    }).then(() => {
+                        target.instance().$data.showSharesBox.should.be.false
+                        target.instance().$data._sharesCount.should.eq(propsData.sharesCount - 1)
+                        target.instance().$data._hasShared.should.be.false
+                        done()
+                    })
+                })
+            })
+        })
     })
 })

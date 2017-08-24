@@ -37,6 +37,8 @@ Added
 
 * Allow sharing content. Clicking the share counter icon exposes a 'Share' button which when clicked will create a share. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
+* Allow unsharing content. Clicking the share counter icon exposes an 'Unshare' button (assuming the user has shared the content) which when clicked will remove the share. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 * There is now a 'My content' stream link in the navbar 'Streams' dropdown. This goes to your own profile all content stream.
 
 Changed

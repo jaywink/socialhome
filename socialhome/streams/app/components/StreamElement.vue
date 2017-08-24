@@ -40,7 +40,8 @@
             </div>
         </div>
         <div v-if="showSharesBox" class="content-actions">
-            <b-button variant="secondary" @click.prevent.stop="share">Share</b-button>
+            <b-button v-if="getHasShared" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
+            <b-button v-if="!getHasShared" variant="secondary" @click.prevent.stop="share">Share</b-button>
         </div>
         <div class="replies-container" :data-content-id="id"></div>
         <div v-if="isUserAuthenticated" class="content-actions hidden" :data-content-id="id">
@@ -114,6 +115,19 @@ export default Vue.component("stream-element", {
                     this.$data.showSharesBox = false
                     this.$data._sharesCount += 1
                     this.$data._hasShared = true
+                })
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        },
+        unshare() {
+            if (!this.isUserAuthenticated) {
+                console.error("Not logged in")
+                return
+            }
+            this.$http.delete(`/api/content/${this.id}/share/`)
+                .then(() => {
+                    this.$data.showSharesBox = false
+                    this.$data._sharesCount -= 1
+                    this.$data._hasShared = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },

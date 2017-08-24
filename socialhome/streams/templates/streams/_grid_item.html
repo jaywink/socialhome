@@ -52,7 +52,8 @@
         </div>
     </div>
     <div class="content-actions share-action hidden" data-content-id="{{ content.id }}">
-        <button class="btn btn-secondary" type="button">{% trans "Share" %}</button>
+        <button class="btn btn-secondary {% if not content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="unshare" aria-label="{% trans "Unshare" %}">{% trans "Unshare" %}</button>
+        <button class="btn btn-secondary {% if content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="share" aria-label="{% trans "Share" %}">{% trans "Share" %}</button>
     </div>
     <div class="replies-container" data-content-id="{{ content.id }}"></div>
     {% if request.user.is_authenticated and content.content_type.string_value == "content" %}
