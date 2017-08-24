@@ -173,6 +173,16 @@ class TestContentModel(SocialhomeTestCase):
         self.assertNotEqual(share.id, self.public_content.id)
         self.assertEqual(share.author, self.local_user.profile)
 
+    def test_unshare_raises_if_no_share_exists(self):
+        with self.assertRaises(ValidationError):
+            self.public_content.unshare(self.profile)
+
+    def test_unshare_removes_a_share(self):
+        self.public_content.share(self.local_user.profile)
+        assert Content.has_shared(self.public_content.id, self.local_user.profile.id)
+        self.public_content.unshare(self.local_user.profile)
+        self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.id))
+
     def test_fix_local_uploads(self):
         self.public_content.text = "foobar ![](/media/uploads/12345.jpg) barfoo"
         self.public_content.save()

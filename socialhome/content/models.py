@@ -194,6 +194,19 @@ class Content(models.Model):
     def shares_count(self):
         return self.shares.count()
 
+    def unshare(self, profile):
+        """Unshare this content as the profile given."""
+        if not self.shares.filter(author=profile).exists():
+            raise ValidationError("No share found.")
+        try:
+            share = Content.objects.get(author=profile, share_of=self)
+        except Content.DoesNotExist:
+            # Something got before us
+            pass
+        else:
+            share.delete()
+            delete_memoized(Content.has_shared, self.id, profile.id)
+
     @cached_property
     def is_nsfw(self):
         return self.text.lower().find("#nsfw") > -1
