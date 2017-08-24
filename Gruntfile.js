@@ -182,7 +182,7 @@ module.exports = function (grunt) {
                     "<%= paths.node %>/mocha/mocha.js",
                     "<%= paths.node %>/mocha/mocha.css",
                     "<%= paths.node %>/chai/chai.js",
-                    "<%= paths.node %>/mock-socket/dist/mock-socket.js",
+                    "<%= paths.bower %>/mock-socket/dist/mock-socket.js",
                 ],
                 dest: "<%= paths.mocha %>/",
             },
