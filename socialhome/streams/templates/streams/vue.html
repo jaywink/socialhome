@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block javascript %}
-    {{ block.super }}
     {% json_context %}
     <script src="{% static 'js/webpack.stream.js' %}"></script>
+    {{ block.super }}
 {% endblock %}

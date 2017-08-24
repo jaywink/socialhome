@@ -1,31 +1,34 @@
 import Vue from "vue"
 import Vuex from "vuex"
-import isNil from "lodash/isNil"
+import ReconnectingWebSocket from "reconnecting-websocket"
 
-// Vue setup
+import getState from "streams/app/stores/streamStore.state"
+import {actions, mutations, stateOperations} from "streams/app/stores/streamStore.operations"
+
+
 Vue.use(Vuex)
 
-function getContext() {
-    try {
-        return {
-            state: {
-                translations: {
-                    stampedContent: {
-                        h2: window.context.translations.stampedContent.h2,
-                        p: window.context.translations.stampedContent.p,
-                    },
-                },
-                contentList: window.context.contentList,
-                streamName: window.context.streamName,
-                isUserAuthenticated: window.context.isUserAuthenticated,
-                showAuthorBar: window.context.showAuthorBar,
-                currentBrowsingProfileId: (isNil(window.context.currentBrowsingProfileId)
-                    ? undefined : `${window.context.currentBrowsingProfileId}`),
-            },
+function newinstance(WebSocketImpl = ReconnectingWebSocket) {
+    const state = getState()
+    const store = new Vuex.Store({state, mutations, actions})
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"
+    const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.stream.streamName}/`
+    const ws = new WebSocketImpl(wsPath)
+
+    ws.onmessage = message => {
+        const data = JSON.parse(message.data)
+
+        if (data.event === "new") {
+            store.dispatch(stateOperations.receivedNewContent, 1)
         }
-    } catch (_) {
-        return {}
     }
+
+    store.$websocket = ws
+
+    return store
 }
 
-export default new Vuex.Store(getContext())
+const store = newinstance()
+
+export default store
+export {store, stateOperations, newinstance}

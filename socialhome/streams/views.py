@@ -39,8 +39,7 @@ class BaseStreamView(ListView):
                     "imageUrlSmall": content.author.safer_image_url_small,
                     "absoluteUrl": content.author.get_absolute_url(),
                     "homeUrl": content.author.home_url,
-                    "isUserFollowingAuthor": (
-                        content.author.id in getattr(request_user_profile, "following_ids", []))
+                    "isUserFollowingAuthor": (content.author.id in getattr(request_user_profile, "following_ids", []))
                 },
                 "id": content.id,
                 "timestamp": content.formatted_timestamp,

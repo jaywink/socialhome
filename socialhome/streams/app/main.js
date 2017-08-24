@@ -1,6 +1,6 @@
 import Vue from "vue"
-import {VueMasonryPlugin} from "vue-masonry"
 import BootstrapVue from "bootstrap-vue"
+import VueMasonryPlugin from "vue-masonry"
 
 import Axios from "axios"
 

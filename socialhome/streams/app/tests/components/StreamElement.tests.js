@@ -1,15 +1,17 @@
-import "chai/register-should"
-
 import Axios from "axios"
-import moxios from 'moxios'
+import moxios from "moxios"
 import Vue from "vue"
 import {mount} from "avoriaz"
 
 import StreamElement from "streams/app/components/StreamElement.vue"
-import {getStreamElementPropsData} from "../fixtures/StreamElement.fixtures";
+import {getStreamElementPropsData} from "streams/app/tests/fixtures/StreamElement.fixtures";
 
 
 describe("StreamElement", () => {
+    beforeEach(() => {
+        Sinon.restore()
+    })
+
     describe("computed", () => {
         describe("showReplies", () => {
             it("true if authenticated or has children", () => {
@@ -87,14 +89,14 @@ describe("StreamElement", () => {
                 // Actual thing we are testing - the share
                 target.instance().share()
 
-                moxios.wait(function() {
+                moxios.wait(() => {
                     let request = moxios.requests.mostRecent()
                     request.respondWith({
                         status: 200,
                         response: {
                             status: "ok", content_id: 123,
                         }
-                    }).then(function () {
+                    }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
                         target.instance().$data._sharesCount.should.eq(propsData.sharesCount + 1)
                         done()

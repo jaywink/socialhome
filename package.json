@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js",
     "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch",
-    "test": "./node_modules/.bin/mocha-webpack --recursive --webpack-config webpack.config.js test --require mocha/setup.js socialhome/streams/app/tests/",
+    "test": "./node_modules/.bin/mocha-webpack --opts mocha/mocha.opts test socialhome/**/app/tests/**/*.tests.js",
     "lint": "./node_modules/.bin/eslint socialhome/streams/app/ --ext vue,js"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
     "load-grunt-tasks": "~3.5.2",
     "mocha": "~3.5.0",
     "mocha-webpack": "~1.0.0-rc.1",
+    "mock-socket": "^7.0.0",
     "moxios": "^0.4.0",
     "node-sass": "^4.5.3",
     "pixrem": "~3.0.2",
@@ -53,12 +54,13 @@
     "node": ">=0.8.0"
   },
   "dependencies": {
+    "ReconnectingWebSocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
     "axios": "~0.16.2",
     "bootstrap-vue": "~0.20.2",
     "lodash": "~4.17.4",
     "vue": "~2.4.1",
     "vue-images-loaded": "1.1.2",
-    "vue-masonry": "~0.10.3",
+    "vue-masonry": "=0.10.3",
     "vuex": "~2.3.1"
   },
   "eslintIgnore": [

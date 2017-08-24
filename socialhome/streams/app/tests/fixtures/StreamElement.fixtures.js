@@ -1,7 +1,7 @@
 import _ from "lodash/core"
 import faker from "faker"
 
-import {getAuthorBarPropsData} from "./AuthorBar.fixtures";
+import {getAuthorBarPropsData} from "streams/app/tests/fixtures/AuthorBar.fixtures";
 
 
 const getStreamElementPropsData = function (args = {}) {
