@@ -17,7 +17,7 @@ describe("streamStore", () => {
                 jsdom.reconfigure({url: "https://localhost"})
                 window.context = {streamName: "public"}
                 const mockWebSocket = Sinon.spy()
-                newinstance(mockWebSocket)
+                newinstance({WebSocketImpl: mockWebSocket})
                 mockWebSocket.getCall(0).args[0].should.equal("wss://localhost/ch/streams/public/")
             })
 
@@ -25,7 +25,7 @@ describe("streamStore", () => {
                 jsdom.reconfigure({url: "http://localhost"})
                 window.context = {streamName: "public"}
                 const mockWebSocket = Sinon.spy()
-                newinstance(mockWebSocket)
+                newinstance({WebSocketImpl: mockWebSocket})
                 mockWebSocket.getCall(0).args[0].should.equal("ws://localhost/ch/streams/public/")
             })
         })
@@ -37,7 +37,7 @@ describe("streamStore", () => {
                 window.context = {streamName: "public"}
                 Sinon.spy(Vuex.Store.prototype, "dispatch")
                 mockserver.on("connection", () => mockserver.send(JSON.stringify({event: "new", id: 4})))
-                newinstance(WebSocket)
+                newinstance({WebSocketImpl: WebSocket})
                 setTimeout(() => {
                     Vuex.Store.prototype.dispatch.getCall(0).args.should.eql([stateOperations.receivedNewContent, 1])
                     done()
@@ -49,28 +49,28 @@ describe("streamStore", () => {
     describe("mutations", () => {
         describe("receivedNewContent", () => {
             it("should set state.stream.hasNewContent to true", () => {
-                let state = {stream: {hasNewContent: false, newContentLengh: 0}}
+                let state = {hasNewContent: false, newContentLengh: 0}
                 mutations[stateOperations.receivedNewContent](state, 1)
-                state.stream.hasNewContent.should.be.true
+                state.hasNewContent.should.be.true
             })
 
             it("should increment state.stream.newContentLengh by 1", () => {
-                let state = {stream: {hasNewContent: false, newContentLengh: 0}}
+                let state = {hasNewContent: false, newContentLengh: 0}
                 mutations[stateOperations.receivedNewContent](state, 1)
-                state.stream.newContentLengh.should.equal(1)
+                state.newContentLengh.should.equal(1)
             })
         })
         describe("newContentAck", () => {
             it("should set state.stream.hasNewContent to true", () => {
-                let state = {stream: {hasNewContent: true, newContentLengh: 0}}
+                let state = {hasNewContent: true, newContentLengh: 0}
                 mutations[stateOperations.newContentAck](state)
-                state.stream.hasNewContent.should.be.false
+                state.hasNewContent.should.be.false
             })
 
             it("should set state.stream.newContentLengh to 0", () => {
-                let state = {stream: {hasNewContent: true, newContentLengh: 10}}
+                let state = {hasNewContent: true, newContentLengh: 10}
                 mutations[stateOperations.newContentAck](state)
-                state.stream.newContentLengh.should.equal(0)
+                state.newContentLengh.should.equal(0)
             })
         })
     })

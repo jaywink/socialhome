@@ -7,12 +7,12 @@ const stateOperations = {
 /* eslint-disable no-param-reassign */
 const mutations = {
     [stateOperations.receivedNewContent](state, newContentLengh) {
-        state.stream.hasNewContent = true
-        state.stream.newContentLengh += newContentLengh
+        state.hasNewContent = true
+        state.newContentLengh += newContentLengh
     },
     [stateOperations.newContentAck](state) {
-        state.stream.hasNewContent = false
-        state.stream.newContentLengh = 0
+        state.hasNewContent = false
+        state.newContentLengh = 0
     },
 }
 /* eslint-enable no-param-reassign */

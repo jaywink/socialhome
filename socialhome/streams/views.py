@@ -64,7 +64,6 @@ class BaseStreamView(ListView):
             "currentBrowsingProfileId": getattr(request_user_profile, "id", None),
             "streamName": stream_name,
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
-            "showAuthorBar": not stream_name.startswith("profile_"),
             "translations": {"stampedContent": self._get_stamped_content_translations()}
         }
 
