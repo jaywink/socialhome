@@ -10,7 +10,7 @@
             </div>
             <div v-images-loaded.on.progress="onImageLoad" v-masonry v-bind="masonryOptions">
                 <div class="stamped">
-                    <stamped-element/>
+                    <stamped-element />
                 </div>
                 <div class="grid-sizer"></div>
                 <div class="gutter-sizer"></div>
@@ -35,7 +35,7 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 import "streams/app/components/StampedElement.vue"
 import "streams/app/components/StreamElement.vue"
-import {newinstance as newStreamStore, stateOperations} from "streams/app/stores/streamStore"
+import {newStreamStore, streamStoreOerations} from "streams/app/stores/streamStore"
 import globalStore from "streams/app/stores/globalStore"
 
 
@@ -60,8 +60,11 @@ export default Vue.component("stream", {
             Vue.redrawVueMasonry()
         },
         onNewContentClick() {
-            this.$store.dispatch(stateOperations.newContentAck)
+            this.$store.dispatch(streamStoreOerations.newContentAck)
         },
+    },
+    beforeDestroy() {
+        this.$store.$websocket.close()
     },
 })
 </script>

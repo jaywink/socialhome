@@ -1,4 +1,4 @@
-const stateOperations = {
+const streamStoreOerations = {
     receivedNewContent: "receivedNewContent",
     newContentAck: "newContentAck",
 }
@@ -6,12 +6,12 @@ const stateOperations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
-    [stateOperations.receivedNewContent](state, contentId) {
+    [streamStoreOerations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
         state.newContentLengh += 1
         state.contentList[contentId] = undefined
     },
-    [stateOperations.newContentAck](state) {
+    [streamStoreOerations.newContentAck](state) {
         state.hasNewContent = false
         state.newContentLengh = 0
     },
@@ -19,12 +19,12 @@ const mutations = {
 /* eslint-enable no-param-reassign */
 
 const actions = {
-    [stateOperations.receivedNewContent]({commit}, newContentLengh) {
-        commit(stateOperations.receivedNewContent, newContentLengh)
+    [streamStoreOerations.receivedNewContent]({commit}, newContentLengh) {
+        commit(streamStoreOerations.receivedNewContent, newContentLengh)
     },
-    [stateOperations.newContentAck]({commit}) {
-        commit(stateOperations.newContentAck)
+    [streamStoreOerations.newContentAck]({commit}) {
+        commit(streamStoreOerations.newContentAck)
     },
 }
 
-export {actions, mutations, stateOperations}
+export {actions, mutations, streamStoreOerations}

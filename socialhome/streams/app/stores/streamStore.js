@@ -5,12 +5,12 @@ import _defaults from "lodash/defaults"
 import _get from "lodash/get"
 
 import getState from "streams/app/stores/streamStore.state"
-import {actions, mutations, stateOperations} from "streams/app/stores/streamStore.operations"
+import {actions, mutations, streamStoreOerations} from "streams/app/stores/streamStore.operations"
 
 
 Vue.use(Vuex)
 
-function newinstance(options) {
+function newStreamStore(options) {
     const state = getState()
     const opts = _defaults({}, {state, mutations, actions}, options)
     const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
@@ -25,7 +25,7 @@ function newinstance(options) {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(stateOperations.receivedNewContent, 1)
+            store.dispatch(streamStoreOerations.receivedNewContent, 1)
         }
     }
 
@@ -34,4 +34,4 @@ function newinstance(options) {
     return store
 }
 
-export {stateOperations, newinstance}
+export {streamStoreOerations, newStreamStore}

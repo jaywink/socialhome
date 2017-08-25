@@ -6,7 +6,7 @@ import _get from "lodash/get"
 
 Vue.use(Vuex)
 
-function newinstance() {
+function newGlobalStore() {
     return new Vuex.Store({
         state: {
             translations: {
@@ -22,6 +22,6 @@ function newinstance() {
     })
 }
 
-const store = newinstance()
-export default store
-export {store, newinstance}
+const globalStore = newGlobalStore()
+export default globalStore
+export {globalStore, newGlobalStore}
