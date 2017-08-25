@@ -43,21 +43,21 @@
 
 <script>
 import Vue from "vue"
+import store from "streams/app/stores/globalStore"
 
 
 export default Vue.component("author-bar", {
+    store,
     props: {
         handle: {type: String, required: true},
         name: {type: String, required: true},
         guid: {type: String, required: true},
-        currentBrowsingProfileId: {type: String, required: false},
         homeUrl: {type: String, required: true},
         absoluteUrl: {type: String, required: true},
         imageUrlSmall: {type: String, required: true},
         isUserAuthor: {type: Boolean, required: true},
         isUserLocal: {type: Boolean, required: true},
         isUserFollowingAuthor: {type: Boolean, required: true},
-        isUserAuthenticated: {type: Boolean, required: true},
     },
     data() {
         return {
@@ -77,6 +77,12 @@ export default Vue.component("author-bar", {
         },
         canFollow() {
             return this.isUserAuthenticated && !this.isUserAuthor
+        },
+        isUserAuthenticated(){
+            return this.$store.state.isUserAuthenticated
+        },
+        currentBrowsingProfileId() {
+            return this.$store.state.currentBrowsingProfileId
         },
     },
     methods: {

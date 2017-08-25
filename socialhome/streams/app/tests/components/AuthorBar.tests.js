@@ -7,6 +7,7 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import AuthorBar from "streams/app/components/AuthorBar.vue"
+import globalStore from "streams/app/stores/globalStore"
 import {getAuthorBarPropsData} from "streams/app/tests/fixtures/AuthorBar.fixtures"
 
 
@@ -32,18 +33,22 @@ describe("AuthorBar", () => {
         })
 
         describe("canFollow", () => {
-            it("sould be true if user is authenticated and not the author", () => {
-                let propsData = getAuthorBarPropsData({isUserAuthenticated: false, isUserAuthor: true})
-                let target = new AuthorBar({propsData})
-                target.canFollow.should.be.false
+            it("should be true if user is authenticated and not the author", () => {
 
-                propsData = getAuthorBarPropsData({isUserAuthenticated: true, isUserAuthor: true})
-                target = new AuthorBar({propsData})
-                target.canFollow.should.be.false
+                let propsData = getAuthorBarPropsData({isUserAuthor: true})
+                let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = false
+                target.instance().canFollow.should.be.false
 
-                propsData = getAuthorBarPropsData({isUserAuthenticated: true, isUserAuthor: false})
-                target = new AuthorBar({propsData})
-                target.canFollow.should.be.true
+                propsData = getAuthorBarPropsData({isUserAuthor: true})
+                target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
+                target.instance().canFollow.should.be.false
+
+                propsData = getAuthorBarPropsData({isUserAuthor: false})
+                target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
+                target.instance().canFollow.should.be.true
             })
         })
 
@@ -51,6 +56,7 @@ describe("AuthorBar", () => {
             it("should show the follow button when the user can and is not following the author", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthor: false, isUserFollowingAuthor: false})
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
                 target.instance().showFollowBtn.should.be.true
                 target.instance().showUnfollowBtn.should.not.be.true
                 target.find(".follow-btn").length.should.equal(1)
@@ -59,6 +65,7 @@ describe("AuthorBar", () => {
             it("should show the unfollow button when the user can and is not following the author", () => {
                 let propsData = getAuthorBarPropsData({isUserAuthor: false, isUserFollowingAuthor: true})
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
                 target.instance().showFollowBtn.should.not.be.true
                 target.instance().showUnfollowBtn.should.be.true
                 target.find(".unfollow-btn").length.should.equal(1)
@@ -100,28 +107,33 @@ describe("AuthorBar", () => {
 
         describe("unfollow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
+                let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = false
                 Sinon.spy(console, "error")
                 target.instance().unfollow()
                 console.error.calledWith("Not logged in").should.be.true
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
+                let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = false
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
                 target.instance().$http.post.called.should.be.false
             })
 
             it("should send an HTTP request with the right parameters when user is logged in", () => {
-                let propsData = getAuthorBarPropsData({currentBrowsingProfileId: "26", guid: "42"})
+                let propsData = getAuthorBarPropsData({guid: "42"})
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
+                target.instance().$store.state.currentBrowsingProfileId = 26
+
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
-                target.instance().$http.post
-                    .calledWith("/api/profiles/26/remove_follower/", {guid: "42"}).should.be.true
+                target.instance().$http.post.getCall(0).args
+                    .should.eql(["/api/profiles/26/remove_follower/", {guid: "42"}])
             })
 
             it("should show that user is following author when the HTTP request succeeds", () => {
@@ -167,24 +179,28 @@ describe("AuthorBar", () => {
 
         describe("follow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
+                let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = false
                 Sinon.spy(console, "error")
                 target.instance().follow()
-                console.error.calledWith("Not logged in").should.be.true
+                console.error.getCall(0).args[0].should.equal("Not logged in")
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let propsData = getAuthorBarPropsData({isUserAuthenticated: false})
+                let propsData = getAuthorBarPropsData()
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = false
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
                 target.instance().$http.post.called.should.be.false
             })
 
             it("should send an HTTP request with the right parameters when user is logged in", () => {
-                let propsData = getAuthorBarPropsData({currentBrowsingProfileId: "26", guid: "42"})
+                let propsData = getAuthorBarPropsData({guid: "42"})
                 let target = mount(AuthorBar, {propsData})
+                target.instance().$store.state.isUserAuthenticated = true
+                target.instance().$store.state.currentBrowsingProfileId = "26"
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
                 target.instance().$http.post

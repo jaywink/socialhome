@@ -21,9 +21,7 @@
                     v-bind="content"
                     v-masonry-tile
                     :key="content.id"
-                    :is-user-authenticated="$store.state.globalStore.isUserAuthenticated"
                     :show-author-bar="$store.state.showAuthorBar"
-                    :current-browsing-profile-id="$store.state.globalStore.currentBrowsingProfileId"
                 />
             </div>
         </div>
@@ -40,7 +38,7 @@ import globalStore from "streams/app/stores/globalStore"
 
 
 export default Vue.component("stream", {
-    store: newStreamStore({modules: {globalStore}}),
+    store: newStreamStore(),
     directives: {imagesLoaded},
     data() {
         return {
