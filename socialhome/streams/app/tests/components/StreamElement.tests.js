@@ -58,32 +58,6 @@ describe("StreamElement", () => {
                 target.showShares.should.be.false
             })
         })
-
-        describe("getSharesCount", () => {
-            it("returns share count", () => {
-                let propsData = getStreamElementPropsData({sharesCount: 56})
-                let target = new StreamElement({propsData})
-                target.getSharesCount.should.eq(56)
-            })
-        })
-
-        describe("getHasShared", () => {
-            it("returns has shared status", () => {
-                let propsData = getStreamElementPropsData({hasShared: false})
-                let target = new StreamElement({propsData})
-                target.getHasShared.should.be.false
-
-                propsData = getStreamElementPropsData({hasShared: true})
-                target = new StreamElement({propsData})
-                target.getHasShared.should.be.true
-
-                target.$data._hasShared = false
-                target.getHasShared.should.be.false
-
-                target.$data._hasShared = true
-                target.getHasShared.should.be.true
-            })
-        })
     })
 
     describe("methods", () => {
@@ -117,7 +91,7 @@ describe("StreamElement", () => {
                 // Ensure data
                 target.instance().expandShares()
                 target.instance().$data.showSharesBox.should.be.true
-                target.instance().$data._hasShared.should.be.false
+                target.instance().hasShared$.should.be.false
 
                 // Actual thing we are testing - the share
                 target.instance().share()
@@ -130,9 +104,9 @@ describe("StreamElement", () => {
                             status: "ok", content_id: 123,
                         }
                     }).then(() => {
-                        target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$data._sharesCount.should.eq(propsData.sharesCount + 1)
-                        target.instance().$data._hasShared.should.be.true
+                        target.instance().showSharesBox.should.be.false
+                        target.instance().sharesCount$.should.eq(propsData.sharesCount + 1)
+                        target.instance().hasShared$.should.be.true
                         done()
                     })
                 })
@@ -157,8 +131,8 @@ describe("StreamElement", () => {
                 let target = mount(StreamElement, {propsData})
                 // Ensure data
                 target.instance().expandShares()
-                target.instance().$data.showSharesBox.should.be.true
-                target.instance().$data._hasShared.should.be.true
+                target.instance().showSharesBox.should.be.true
+                target.instance().hasShared$.should.be.true
 
                 // Actual thing we are testing - the unshare
                 target.instance().unshare()
@@ -169,9 +143,9 @@ describe("StreamElement", () => {
                         status: 200,
                         response: {status: "ok"},
                     }).then(() => {
-                        target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$data._sharesCount.should.eq(propsData.sharesCount - 1)
-                        target.instance().$data._hasShared.should.be.false
+                        target.instance().showSharesBox.should.be.false
+                        target.instance().sharesCount$.should.eq(propsData.sharesCount - 1)
+                        target.instance().hasShared$.should.be.false
                         done()
                     })
                 })
