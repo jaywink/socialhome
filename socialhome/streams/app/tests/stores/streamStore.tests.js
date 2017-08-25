@@ -49,15 +49,21 @@ describe("streamStore", () => {
     describe("mutations", () => {
         describe("receivedNewContent", () => {
             it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: false, newContentLengh: 0}
-                mutations[stateOperations.receivedNewContent](state, 1)
+                let state = {hasNewContent: false, newContentLengh: 0, contentList: {}}
+                mutations[stateOperations.receivedNewContent](state, 42)
                 state.hasNewContent.should.be.true
             })
 
             it("should increment state.stream.newContentLengh by 1", () => {
-                let state = {hasNewContent: false, newContentLengh: 0}
-                mutations[stateOperations.receivedNewContent](state, 1)
+                let state = {hasNewContent: false, newContentLengh: 0, contentList: {}}
+                mutations[stateOperations.receivedNewContent](state, 42)
                 state.newContentLengh.should.equal(1)
+            })
+
+            it("should add the new post id to the content list with undefined value", () => {
+                let state = {hasNewContent: false, newContentLengh: 0, contentList: {}}
+                mutations[stateOperations.receivedNewContent](state, 42)
+                state.contentList.should.eql({42: undefined})
             })
         })
         describe("newContentAck", () => {

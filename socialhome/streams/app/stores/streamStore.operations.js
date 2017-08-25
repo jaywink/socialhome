@@ -6,9 +6,10 @@ const stateOperations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
-    [stateOperations.receivedNewContent](state, newContentLengh) {
+    [stateOperations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
-        state.newContentLengh += newContentLengh
+        state.newContentLengh += 1
+        state.contentList[contentId] = undefined
     },
     [stateOperations.newContentAck](state) {
         state.hasNewContent = false

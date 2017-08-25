@@ -17,6 +17,7 @@
                 <stream-element
                     class="grid-item"
                     v-for="content in $store.state.contentList"
+                    v-if="content"
                     v-bind="content"
                     v-masonry-tile
                     :key="content.id"
@@ -40,9 +41,7 @@ import globalStore from "streams/app/stores/globalStore"
 
 export default Vue.component("stream", {
     store: newStreamStore({modules: {globalStore}}),
-    directives: {
-        imagesLoaded,
-    },
+    directives: {imagesLoaded},
     data() {
         return {
             masonryOptions: {

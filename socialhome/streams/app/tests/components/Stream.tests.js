@@ -43,4 +43,15 @@ describe("Stream", () => {
             })
         })
     })
+
+    describe("Lifecycle", () => {
+        describe("render", () => {
+            it("should not render unfetched content", () => {
+                let target = mount(Stream, {})
+                target.find(".grid-item").length.should.eq(0)
+                target.instance().$store.commit(stateOperations.receivedNewContent, 1)
+                target.find(".grid-item").length.should.eq(0)
+            })
+        })
+    })
 })
