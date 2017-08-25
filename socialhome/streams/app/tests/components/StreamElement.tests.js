@@ -71,17 +71,17 @@ describe("StreamElement", () => {
             it("returns has shared status", () => {
                 let propsData = getStreamElementPropsData({hasShared: false})
                 let target = new StreamElement({propsData})
-                target.getHasShared.should.eq(false)
+                target.getHasShared.should.be.false
 
                 propsData = getStreamElementPropsData({hasShared: true})
                 target = new StreamElement({propsData})
-                target.getHasShared.should.eq(true)
+                target.getHasShared.should.be.true
 
                 target.$data._hasShared = false
-                target.getHasShared.should.eq(false)
+                target.getHasShared.should.be.false
 
                 target.$data._hasShared = true
-                target.getHasShared.should.eq(true)
+                target.getHasShared.should.be.true
             })
         })
     })
@@ -167,9 +167,7 @@ describe("StreamElement", () => {
                     let request = moxios.requests.mostRecent()
                     request.respondWith({
                         status: 200,
-                        response: {
-                            status: "ok",
-                        }
+                        response: {status: "ok"},
                     }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
                         target.instance().$data._sharesCount.should.eq(propsData.sharesCount - 1)

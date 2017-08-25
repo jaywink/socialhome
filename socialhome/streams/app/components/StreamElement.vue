@@ -25,8 +25,11 @@
                 </div>
             </div>
             <div class="ml-auto grid-item-reactions mt-1">
-                <div v-if="showShares" class="item-reaction" v-bind:class="{'item-reaction-shared': getHasShared}"
-                     @click.stop.prevent="expandShares"
+                <div
+                    v-if="showShares"
+                    class="item-reaction"
+                    :class="{'item-reaction-shared': getHasShared}"
+                    @click.stop.prevent="expandShares"
                 >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
                     <span class="item-reaction-counter">{{ getSharesCount }}</span>
