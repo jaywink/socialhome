@@ -10,7 +10,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import send_content, send_content_retraction, send_reply
+from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
 from socialhome.notifications.tasks import send_reply_notifications
 from socialhome.streams.consumers import StreamConsumer
 from socialhome.users.models import Profile
@@ -26,6 +26,7 @@ def content_post_save(instance, **kwargs):
         notify_listeners(instance)
         if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
+        # TODO send notification about share
     if instance.is_local:
         transaction.on_commit(lambda: federate_content(instance))
 
@@ -90,8 +91,7 @@ def federate_content(content):
         if content.content_type == ContentType.REPLY:
             django_rq.enqueue(send_reply, content.id)
         elif content.content_type == ContentType.SHARE:
-            # TODO federate share
-            pass
+            django_rq.enqueue(send_share, content.id)
         else:
             django_rq.enqueue(send_content, content.id)
     except Exception as ex:

@@ -52,7 +52,7 @@ def send_content(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.CONTENT)
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
@@ -120,6 +120,33 @@ def send_reply(content_id):
             (content.parent.author.handle, None),
         ]
         handle_send(entity, content.author, recipients)
+
+
+def send_share(content_id):
+    """Handle sending a share of a Content object to the federation layer.
+
+    Currently we only deliver public shares.
+    """
+    try:
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE)
+    except Content.DoesNotExist:
+        logger.warning("No share found with id %s", content_id)
+        return
+    if not content.is_local:
+        return
+    entity = make_federable_content(content)
+    if entity:
+        if settings.DEBUG:
+            # Don't send in development mode
+            return
+        recipients = [
+            # Send to original author
+            (content.share_of.author.handle, None),
+        ]
+        recipients.extend(_get_remote_followers(content.author))
+        handle_send(entity, content.author, recipients)
+    else:
+        logger.warning("send_share - No entity for %s", content)
 
 
 def send_content_retraction(content, author_id):

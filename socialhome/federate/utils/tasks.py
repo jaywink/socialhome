@@ -267,7 +267,7 @@ def _make_post(content):
             raw_content=content.text,
             guid=str(content.guid),
             handle=content.author.handle,
-            public=True,
+            public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
             created_at=content.effective_created,
         )
@@ -290,11 +290,29 @@ def _make_comment(content):
         return None
 
 
+def _make_share(content):
+    try:
+        return base.Share(
+            raw_content=content.text,
+            guid=str(content.guid),
+            target_guid=str(content.share_of.guid),
+            handle=content.author.handle,
+            target_handle=content.share_of.author.handle,
+            created_at=content.effective_created,
+            public=True if content.visibility == Visibility.PUBLIC else False,
+            provider_display_name="Socialhome",
+        )
+    except Exception as ex:
+        logger.exception("_make_share - Failed to convert %s: %s", content.guid, ex)
+
+
 def make_federable_content(content):
     """Make Content federable by converting it to a federation entity."""
     logger.info("make_federable_content - Content: %s", content)
     if content.content_type == ContentType.REPLY:
         return _make_comment(content)
+    elif content.content_type == ContentType.SHARE:
+        return _make_share(content)
     return _make_post(content)
 
 

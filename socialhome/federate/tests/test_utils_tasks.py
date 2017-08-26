@@ -430,15 +430,67 @@ class TestGetSenderProfile:
 
 
 class TestMakeFederableContent(SocialhomeTestCase):
-    def test_returns_entity(self):
-        content = ContentFactory()
-        entity = make_federable_content(content)
-        self.assertEqual(entity.raw_content, content.text)
-        self.assertEqual(entity.guid, content.guid)
-        self.assertEqual(entity.handle, content.author.handle)
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.reply = ContentFactory(parent=cls.content, visibility=Visibility.PUBLIC)
+        cls.share = ContentFactory(share_of=cls.content, visibility=Visibility.PUBLIC)
+
+    def test_content_returns_entity(self):
+        entity = make_federable_content(self.content)
+        self.assertTrue(isinstance(entity, base.Post))
+        self.assertEqual(entity.raw_content, self.content.text)
+        self.assertEqual(entity.guid, self.content.guid)
+        self.assertEqual(entity.handle, self.content.author.handle)
         self.assertEqual(entity.public, True)
         self.assertEqual(entity.provider_display_name, "Socialhome")
-        self.assertEqual(entity.created_at, content.effective_created)
+        self.assertEqual(entity.created_at, self.content.effective_created)
+
+        self.content.visibility = Visibility.LIMITED
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
+
+        self.content.visibility = Visibility.SELF
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
+
+        self.content.visibility = Visibility.SITE
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
+
+    def test_reply_returns_entity(self):
+        entity = make_federable_content(self.reply)
+        self.assertTrue(isinstance(entity, base.Comment))
+        self.assertEqual(entity.raw_content, self.reply.text)
+        self.assertEqual(entity.guid, self.reply.guid)
+        self.assertEqual(entity.target_guid, self.reply.parent.guid)
+        self.assertEqual(entity.handle, self.reply.author.handle)
+        self.assertEqual(entity.created_at, self.reply.effective_created)
+
+    def test_share_returns_entity(self):
+        entity = make_federable_content(self.share)
+        self.assertTrue(isinstance(entity, base.Share))
+        self.assertEqual(entity.raw_content, self.share.text)
+        self.assertEqual(entity.guid, self.share.guid)
+        self.assertEqual(entity.target_guid, self.share.share_of.guid)
+        self.assertEqual(entity.handle, self.share.author.handle)
+        self.assertEqual(entity.target_handle, self.share.share_of.author.handle)
+        self.assertEqual(entity.public, True)
+        self.assertEqual(entity.provider_display_name, "Socialhome")
+        self.assertEqual(entity.created_at, self.share.effective_created)
+
+        self.content.visibility = Visibility.LIMITED
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
+
+        self.content.visibility = Visibility.SELF
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
+
+        self.content.visibility = Visibility.SITE
+        entity = make_federable_content(self.content)
+        self.assertEqual(entity.public, False)
 
     @patch("socialhome.federate.utils.tasks.base.Post", side_effect=Exception)
     def test_returns_none_on_exception(self, mock_post):
