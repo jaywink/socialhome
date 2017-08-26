@@ -3,11 +3,11 @@ import moxios from "moxios"
 import Vue from "vue"
 import {mount} from "avoriaz"
 
-import StreamElementReactionsBar from "streams/app/components/StreamElementReactionsBar.vue"
-import {getStreamElementReactionsBarPropsData} from "streams/app/tests/fixtures/StreamElementReactionsBar.fixtures"
+import StreamElementReactionsBar from "streams/app/components/ReactionsBar.vue"
+import {getStreamElementReactionsBarPropsData} from "streams/app/tests/fixtures/ReactionsBar.fixtures"
 
 
-describe("StreamElementReactionsBar", () => {
+describe("ReactionsBar", () => {
     beforeEach(() => {
         Sinon.restore()
     })

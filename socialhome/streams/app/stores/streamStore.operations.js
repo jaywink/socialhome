@@ -1,3 +1,6 @@
+import _forEach from "lodash/forEach"
+
+
 const streamStoreOerations = {
     receivedNewContent: "receivedNewContent",
     newContentAck: "newContentAck",
@@ -9,7 +12,8 @@ const mutations = {
     [streamStoreOerations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
         state.newContentLengh += 1
-        state.contentList[contentId] = undefined
+        state.contentIds.unshift(contentId)
+        state.contents[contentId] = undefined
     },
     [streamStoreOerations.newContentAck](state) {
         state.hasNewContent = false
@@ -27,4 +31,16 @@ const actions = {
     },
 }
 
-export {actions, mutations, streamStoreOerations}
+const getters = {
+    contentList(state) {
+        const contents = []
+        _forEach(state.contentIds, id => {
+            if (state.contents[id] !== undefined) {
+                contents.push(state.contents[id])
+            }
+        })
+        return contents
+    },
+}
+
+export {actions, mutations, streamStoreOerations, getters}

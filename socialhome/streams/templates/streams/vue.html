@@ -1,16 +1,18 @@
 {% extends "streams/base.html" %}
 {% load json_context %}
+{% load js_reverse %}
 {% load staticfiles %}
 {% load string_utils %}
 
 {% block content %}
     <div id="app" class="streams-container">
-        <stream></stream>
+        <stream />
     </div>
 {% endblock %}
 
 {% block javascript %}
     {% json_context %}
+    <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
     <script src="{% static 'js/webpack.stream.js' %}"></script>
     {{ block.super }}
 {% endblock %}

@@ -5,14 +5,16 @@ import _defaults from "lodash/defaults"
 import _get from "lodash/get"
 
 import getState from "streams/app/stores/streamStore.state"
-import {actions, mutations, streamStoreOerations} from "streams/app/stores/streamStore.operations"
+import {actions, mutations, streamStoreOerations, getters} from "streams/app/stores/streamStore.operations"
 
 
 Vue.use(Vuex)
 
 function newStreamStore(options) {
     const state = getState()
-    const opts = _defaults({}, {state, mutations, actions}, options)
+    const opts = _defaults({}, {state, mutations, actions, getters}, options)
+
+    // This exists for test puposes
     const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
     delete opts.WebSocketImpl
 

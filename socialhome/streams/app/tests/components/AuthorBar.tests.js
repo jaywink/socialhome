@@ -7,7 +7,6 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import AuthorBar from "streams/app/components/AuthorBar.vue"
-import globalStore from "streams/app/stores/globalStore"
 import {getAuthorBarPropsData} from "streams/app/tests/fixtures/AuthorBar.fixtures"
 
 

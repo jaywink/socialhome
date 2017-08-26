@@ -16,8 +16,7 @@
                 <div class="gutter-sizer"></div>
                 <stream-element
                     class="grid-item"
-                    v-for="content in $store.state.contentList"
-                    v-if="content"
+                    v-for="content in $store.getters.contentList"
                     v-bind="content"
                     v-masonry-tile
                     :key="content.id"

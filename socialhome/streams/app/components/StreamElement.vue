@@ -8,34 +8,35 @@
             :is-user-local="isUserLocal"
         >
         </author-bar>
-        <div class="grid-item-bar d-flex justify-content-start">
-            <div class="mt-1">
-                <b-button :href="contentUrl" :title="timestamp">
-                    {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
-                </b-button>
-                <div v-if="isUserAuthor">
-                    <b-button :href="updateUrl">
-                        <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
-                    </b-button>
-                    <b-button :href="deleteUrl">
-                        <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
-                    </b-button>
-                </div>
-            </div>
-        </div>
-        <stream-element-reactions-bar
+        <reactions-bar
             :id="id"
             :replies-count="repliesCount"
             :shares-count="sharesCount"
             :has-shared="hasShared"
-        />
+        >
+            <div class="mt-1">
+                <a :href="contentUrl" :title="timestamp" variant="link" class="unstyled-link">
+                    {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
+                </a>
+                &nbsp;
+                <template v-if="isUserAuthor">
+                    <a :href="updateUrl" variant="link">
+                        <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
+                    </a>
+                    &nbsp;
+                    <a :href="deleteUrl" variant="link">
+                        <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
+                    </a>
+                </template>
+            </div>
+        </reactions-bar>
     </div>
 </template>
 
 <script>
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
-import "streams/app/components/StreamElementReactionsBar.vue"
+import "streams/app/components/ReactionsBar.vue"
 import store from "streams/app/stores/globalStore"
 
 
@@ -61,9 +62,9 @@ export default Vue.component("stream-element", {
         editedText() {
             return this.edited ? " (edited)" : ""
         },
-        deleteUrl(){
-
-        }
+        deleteUrl() {
+            return Urls["content:delete"]({pk: this.id})
+        },
     },
     updated() {
         Vue.redrawVueMasonry()
