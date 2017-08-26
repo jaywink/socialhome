@@ -47,7 +47,7 @@ class BaseProfileFactory(factory.Factory):
     raw_content = factory.Faker("paragraphs", nb=3)
     email = factory.Faker("safe_email")
     gender = factory.Faker("job")
-    location = factory.Faker("country")
+    location = "internet"
     nsfw = factory.Faker("pybool")
     public_key = factory.Faker("sha1")
     public = factory.Faker("pybool")
