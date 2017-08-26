@@ -1,3 +1,4 @@
+{% load content %}
 {% load i18n %}
 {% load string_utils %}
 
@@ -35,7 +36,7 @@
         </div>
         <div class="ml-auto grid-item-reactions mt-1">
             {% if request.user.is_authenticated or content.shares_count %}
-                <div class="item-reaction item-open-shares-action {% if content.shares_count %}item-reaction-counter-positive{% endif %}" data-content-id="{{ content.id }}">
+                <div class="item-reaction item-open-shares-action {% if content|has_shared:request.user %}item-reaction-shared{% endif %} {% if content.shares_count %}item-reaction-counter-positive{% endif %}" data-content-id="{{ content.id }}">
                     <i class="fa fa-refresh" title="{% trans "Shares" %}" aria-label="{% trans "Shares" %}"></i>
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </div>
@@ -51,7 +52,8 @@
         </div>
     </div>
     <div class="content-actions share-action hidden" data-content-id="{{ content.id }}">
-        <button class="btn btn-secondary" type="button">{% trans "Share" %}</button>
+        <button class="btn btn-secondary {% if not content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="unshare" aria-label="{% trans "Unshare" %}">{% trans "Unshare" %}</button>
+        <button class="btn btn-secondary {% if content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="share" aria-label="{% trans "Share" %}">{% trans "Share" %}</button>
     </div>
     <div class="replies-container" data-content-id="{{ content.id }}"></div>
     {% if request.user.is_authenticated and content.content_type.string_value == "content" %}

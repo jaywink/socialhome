@@ -17,6 +17,7 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
+from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.enums import ContentType
@@ -132,6 +133,11 @@ class Content(models.Model):
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
         return reverse("content:view", kwargs={"pk": self.id})
 
+    @staticmethod
+    @memoize(timeout=604800)  # a week
+    def has_shared(content_id, profile_id):
+        return Content.objects.filter(id=content_id, shares__author_id=profile_id).exists()
+
     def save(self, *args, **kwargs):
         if self.parent and self.share_of:
             raise ValueError("Can't be both a reply and a share!")
@@ -181,11 +187,25 @@ class Content(models.Model):
         share, _created = Content.objects.get_or_create(author=profile, share_of=self, defaults={
             "visibility": self.visibility,
         })
+        delete_memoized(Content.has_shared, self.id, profile.id)
         return share
 
     @cached_property
     def shares_count(self):
         return self.shares.count()
+
+    def unshare(self, profile):
+        """Unshare this content as the profile given."""
+        if not self.shares.filter(author=profile).exists():
+            raise ValidationError("No share found.")
+        try:
+            share = Content.objects.get(author=profile, share_of=self)
+        except Content.DoesNotExist:
+            # Something got before us
+            pass
+        else:
+            share.delete()
+            delete_memoized(Content.has_shared, self.id, profile.id)
 
     @cached_property
     def is_nsfw(self):
@@ -348,6 +368,7 @@ class Content(models.Model):
             "detail_url": self.get_absolute_url(),
             "formatted_timestamp": self.formatted_timestamp,
             "guid": self.guid,
+            "has_shared": Content.has_shared(self.id, profile_id) if profile_id else False,
             "humanized_timestamp": humanized_timestamp,
             "id": self.id,
             "is_authenticated": bool(user.is_authenticated),

@@ -12,6 +12,20 @@ describe("StreamElement", () => {
         Sinon.restore()
     })
 
+    describe("template", () => {
+        describe("share reaction", () => {
+            it("has item-reaction-shared if has shared", () => {
+                let propsData = getStreamElementPropsData({hasShared: false})
+                let target = mount(StreamElement, {propsData})
+                target.find(".item-reaction.item-reaction-shared").length.should.eq(0)
+
+                propsData = getStreamElementPropsData({hasShared: true})
+                target = mount(StreamElement, {propsData})
+                target.find(".item-reaction.item-reaction-shared").length.should.eq(1)
+            })
+        })
+    })
+
     describe("computed", () => {
         describe("showReplies", () => {
             it("true if authenticated or has children", () => {
@@ -44,14 +58,6 @@ describe("StreamElement", () => {
                 target.showShares.should.be.false
             })
         })
-
-        describe("getSharesCount", () => {
-            it("returns share count", () => {
-                let propsData = getStreamElementPropsData({sharesCount: 56})
-                let target = new StreamElement({propsData})
-                target.getSharesCount.should.eq(56)
-            })
-        })
     })
 
     describe("methods", () => {
@@ -80,11 +86,12 @@ describe("StreamElement", () => {
             })
 
             it("creates share on server", (done) => {
-                let propsData = getStreamElementPropsData({isUserAuthenticated: true})
+                let propsData = getStreamElementPropsData({isUserAuthenticated: true, hasShared: false})
                 let target = mount(StreamElement, {propsData})
-                // Ensure shares are expanded
+                // Ensure data
                 target.instance().expandShares()
                 target.instance().$data.showSharesBox.should.be.true
+                target.instance().hasShared$.should.be.false
 
                 // Actual thing we are testing - the share
                 target.instance().share()
@@ -97,8 +104,48 @@ describe("StreamElement", () => {
                             status: "ok", content_id: 123,
                         }
                     }).then(() => {
-                        target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$data._sharesCount.should.eq(propsData.sharesCount + 1)
+                        target.instance().showSharesBox.should.be.false
+                        target.instance().sharesCount$.should.eq(propsData.sharesCount + 1)
+                        target.instance().hasShared$.should.be.true
+                        done()
+                    })
+                })
+            })
+        })
+
+        describe("unshare", () => {
+            beforeEach(() => {
+                Vue.prototype.$http = Axios.create({
+                    xsrfCookieName: "csrftoken",
+                    xsrfHeaderName: "X-CSRFToken",
+                })
+                moxios.install(Vue.prototype.$http)
+            })
+
+            afterEach(() => {
+                moxios.uninstall()
+            })
+
+            it("removes share on server", (done) => {
+                let propsData = getStreamElementPropsData({isUserAuthenticated: true, hasShared: true})
+                let target = mount(StreamElement, {propsData})
+                // Ensure data
+                target.instance().expandShares()
+                target.instance().showSharesBox.should.be.true
+                target.instance().hasShared$.should.be.true
+
+                // Actual thing we are testing - the unshare
+                target.instance().unshare()
+
+                moxios.wait(() => {
+                    let request = moxios.requests.mostRecent()
+                    request.respondWith({
+                        status: 200,
+                        response: {status: "ok"},
+                    }).then(() => {
+                        target.instance().showSharesBox.should.be.false
+                        target.instance().sharesCount$.should.eq(propsData.sharesCount - 1)
+                        target.instance().hasShared$.should.be.false
                         done()
                     })
                 })

@@ -25,9 +25,14 @@
                 </div>
             </div>
             <div class="ml-auto grid-item-reactions mt-1">
-                <div v-if="showShares" class="item-reaction" @click.stop.prevent="expandShares">
+                <div
+                    v-if="showShares"
+                    class="item-reaction"
+                    :class="{'item-reaction-shared': hasShared$}"
+                    @click.stop.prevent="expandShares"
+                >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                    <span class="item-reaction-counter">{{ getSharesCount }}</span>
+                    <span class="item-reaction-counter">{{ sharesCount$ }}</span>
                 </div>
                 <div v-if="showReplies" class="item-reaction">
                     <span class="item-open-replies-action" :data-content-id="id">
@@ -38,7 +43,8 @@
             </div>
         </div>
         <div v-if="showSharesBox" class="content-actions">
-            <b-button variant="secondary" @click.prevent.stop="share">Share</b-button>
+            <b-button v-if="hasShared$" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
+            <b-button v-if="!hasShared$" variant="secondary" @click.prevent.stop="share">Share</b-button>
         </div>
         <div class="replies-container" :data-content-id="id"></div>
         <div v-if="isUserAuthenticated" class="content-actions hidden" :data-content-id="id">
@@ -71,11 +77,13 @@ export default Vue.component("stream-element", {
         showAuthorBar: {type: Boolean, required: true},
         isUserAuthenticated: {type: Boolean, required: true},
         currentBrowsingProfileId: {type: String, required: false},
+        hasShared: {type: Boolean, required: true},
     },
     data() {
         return {
             showSharesBox: false,
-            _sharesCount: this.sharesCount,
+            sharesCount$: this.sharesCount,
+            hasShared$: this.hasShared,
         }
     },
     computed: {
@@ -86,11 +94,7 @@ export default Vue.component("stream-element", {
             return this.isUserAuthenticated || this.childrenCount > 0
         },
         showShares() {
-            return this.isUserAuthenticated || this.sharesCount > 0
-        },
-        getSharesCount() {
-            // TODO: maybe replace this at some point by just refreshing content from server?
-            return this.$data._sharesCount
+            return this.isUserAuthenticated || this.sharesCount$ > 0
         },
     },
     methods: {
@@ -105,7 +109,21 @@ export default Vue.component("stream-element", {
             this.$http.post(`/api/content/${this.id}/share/`)
                 .then(() => {
                     this.$data.showSharesBox = false
-                    this.$data._sharesCount += 1
+                    this.sharesCount$ += 1
+                    this.hasShared$ = true
+                })
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        },
+        unshare() {
+            if (!this.isUserAuthenticated) {
+                console.error("Not logged in")
+                return
+            }
+            this.$http.delete(`/api/content/${this.id}/share/`)
+                .then(() => {
+                    this.$data.showSharesBox = false
+                    this.sharesCount$ -= 1
+                    this.hasShared$ = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },

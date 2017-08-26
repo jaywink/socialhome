@@ -33,9 +33,11 @@ Added
 
 * Support receiving 'Share' entities. Show amount of shares on content. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
-* Add ``share`` action to Content API. This enables creating shares via the API. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+* Add ``share`` endpoint to Content API. This enables creating and removing shares via the API. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
 * Allow sharing content. Clicking the share counter icon exposes a 'Share' button which when clicked will create a share. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
+* Allow unsharing content. Clicking the share counter icon exposes an 'Unshare' button (assuming the user has shared the content) which when clicked will remove the share. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
 * There is now a 'My content' stream link in the navbar 'Streams' dropdown. This goes to your own profile all content stream.
 

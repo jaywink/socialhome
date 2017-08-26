@@ -23,6 +23,7 @@ const getStreamElementPropsData = function (args = {}) {
         showAuthorBar: faker.random.boolean(),
         isUserAuthenticated: faker.random.boolean(),
         currentBrowsingProfileId: faker.random.number().toString(),
+        hasShared: faker.random.boolean(),
     })
 }
 

@@ -4,6 +4,7 @@ from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import GenericViewSet
 
@@ -47,31 +48,48 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         `visibility` should be one of: `public`, `site`, `limited`, `self`.
 
     share:
-        Share content
+        Content sharing
 
-        No additional required values. Will share the content using the authenticated profile. Returns
-        share content ID as `content_id`.
+        No additional required values. Create or remove a share of this content.
+
+        Successful create share returns content ID as `content_id`.
     """
     queryset = Content.objects.none()
     serializer_class = ContentSerializer
     permission_classes = (IsOwnContentOrReadOnly,)
     throttle_classes = (CreateContentThrottle,)
 
+    def _share(self):
+        content = self.get_object()
+        try:
+            share = content.share(self.request.user.profile)
+        except ValidationError as e:
+            raise exceptions.ValidationError(e.message)
+        except Exception:
+            raise exceptions.APIException("Unknown error when creating share.")
+        return Response({"status": "ok", "content_id": share.id}, status=HTTP_201_CREATED)
+
+    def _unshare(self):
+        content = self.get_object()
+        try:
+            share = content.unshare(self.request.user.profile)
+        except ValidationError as e:
+            raise exceptions.ValidationError(e.message)
+        except Exception:
+            raise exceptions.APIException("Unknown error when creating share.")
+        return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
+
     def get_queryset(self):
         if self.request.user.is_staff:
             return Content.objects.all()
         return Content.objects.visible_for_user(self.request.user)
 
-    @detail_route(methods=["post"])
+    @detail_route(methods=["delete", "post"])
     def share(self, request, pk=None):
-        content = self.get_object()
-        try:
-            share = content.share(request.user.profile)
-        except ValidationError as e:
-            raise exceptions.ValidationError(e.message)
-        except Exception:
-            raise exceptions.APIException("Unknown error when creating share.")
-        return Response({"status": "ok", "content_id": share.id})
+        if request.method == "POST":
+            return self._share()
+        elif request.method == "DELETE":
+            return self._unshare()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.profile)
