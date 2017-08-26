@@ -33,6 +33,8 @@ Added
 
 * Support receiving 'Share' entities. Show amount of shares on content. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
+* Show replies to shares on the original shared content. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 * Add ``share`` endpoint to Content API. This enables creating and removing shares via the API. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
 * Allow sharing content. Clicking the share counter icon exposes a 'Share' button which when clicked will create a share. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)

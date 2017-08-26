@@ -14,6 +14,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         super().setUpTestData()
         cls.public_content = ContentFactory(pinned=True)
         cls.public_tags_content = ContentFactory(text="#foobar")
+        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.tag = Tag.objects.get(name="foobar")
         cls.site_content = ContentFactory(visibility=Visibility.SITE, pinned=True)
         cls.site_tags_content = ContentFactory(visibility=Visibility.SITE, text="#foobar")
@@ -23,16 +24,32 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
         cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
+        cls.public_reply = ContentFactory(visibility=Visibility.PUBLIC, parent=cls.public_content)
+        cls.limited_reply = ContentFactory(visibility=Visibility.LIMITED, parent=cls.limited_content)
+        cls.self_reply = ContentFactory(visibility=Visibility.SELF, parent=cls.self_content)
+        cls.site_reply = ContentFactory(visibility=Visibility.SITE, parent=cls.site_content)
+        cls.public_share = ContentFactory(visibility=Visibility.PUBLIC, share_of=cls.public_content)
+        cls.limited_share = ContentFactory(visibility=Visibility.LIMITED, share_of=cls.limited_content)
+        cls.self_share = ContentFactory(visibility=Visibility.SELF, share_of=cls.self_content)
+        cls.site_share = ContentFactory(visibility=Visibility.SITE, share_of=cls.site_content)
+        cls.public_share_reply = ContentFactory(visibility=Visibility.PUBLIC, parent=cls.public_share)
+        cls.share_limited_reply = ContentFactory(visibility=Visibility.LIMITED, parent=cls.limited_share)
+        cls.share_self_reply = ContentFactory(visibility=Visibility.SELF, parent=cls.self_share)
+        cls.share_site_reply = ContentFactory(visibility=Visibility.SITE, parent=cls.site_share)
 
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
-        self.assertEqual(contents, {self.public_content, self.public_tags_content})
+        self.assertEqual(contents, {self.public_content, self.public_tags_content, self.public_reply,
+                                    self.public_share, self.public_share_reply})
         contents = set(Content.objects.visible_for_user(self.other_user))
         self.assertEqual(contents, {self.public_content, self.public_tags_content, self.site_content,
-                                    self.site_tags_content})
+                                    self.site_tags_content, self.public_reply, self.site_reply, self.public_share,
+                                    self.site_share, self.public_share_reply, self.share_site_reply})
         contents = set(Content.objects.visible_for_user(self.self_content.author.user))
         self.assertEqual(contents, {self.public_content, self.public_tags_content, self.site_content,
-                                    self.site_tags_content, self.self_content, self.self_tags_content})
+                                    self.site_tags_content, self.self_content, self.self_tags_content,
+                                    self.public_reply, self.site_reply, self.public_share,
+                                    self.site_share, self.public_share_reply, self.share_site_reply})
 
     def test_public(self):
         contents = set(Content.objects.public())
@@ -184,3 +201,22 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.site_content})
         contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.self_user))
         self.assertEqual(contents, {self.self_content})
+
+    def test_children(self):
+        contents = set(Content.objects.children(self.public_content.id, self.anonymous_user))
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
+        contents = set(Content.objects.children(self.limited_content.id, self.anonymous_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.children(self.self_content.id, self.anonymous_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.children(self.site_content.id, self.anonymous_user))
+        self.assertEqual(contents, set())
+
+        contents = set(Content.objects.children(self.public_content.id, self.self_user))
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
+        contents = set(Content.objects.children(self.limited_content.id, self.self_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.children(self.self_content.id, self.self_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.children(self.site_content.id, self.self_user))
+        self.assertEqual(contents, {self.site_reply, self.share_site_reply})

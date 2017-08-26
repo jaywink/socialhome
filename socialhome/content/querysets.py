@@ -79,4 +79,9 @@ class ContentQuerySet(models.QuerySet):
         return self.profile(profile.guid, user)
 
     def children(self, parent_id, user):
-        return self._select_related().visible_for_user(user).filter(parent_id=parent_id).order_by("created")
+        from socialhome.content.models import Content
+        base_qs = self._select_related().visible_for_user(user)
+        share_ids = Content.objects.filter(share_of_id=parent_id).values_list("id", flat=True)
+        # Immediate replies to parent and replies to shares
+        qs = base_qs.filter(parent_id=parent_id) | base_qs.filter(parent_id__in=share_ids)
+        return qs.order_by("created")
