@@ -12,7 +12,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
     forward_relayable, _get_remote_followers,
-    send_follow_change, send_profile)
+    send_follow_change, send_profile, send_share)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
@@ -20,7 +20,7 @@ from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 @pytest.mark.usefixtures("db")
 @patch("socialhome.federate.tasks.process_entities")
-class TestReceiveTask():
+class TestReceiveTask:
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
     def test_receive_task_runs(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar")
@@ -131,6 +131,45 @@ class TestSendReply(SocialhomeTestCase):
             (self.remote_content.author.handle, None),
         ])
         assert mock_forward.called == 0
+
+
+class TestSendShare(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        Profile.objects.filter(id=cls.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        cls.content = ContentFactory(author=cls.remote_profile, visibility=Visibility.PUBLIC)
+        cls.limited_content = ContentFactory(author=cls.remote_profile, visibility=Visibility.LIMITED)
+        cls.share = ContentFactory(share_of=cls.content, author=cls.profile, visibility=Visibility.PUBLIC)
+        cls.limited_share = ContentFactory(
+            share_of=cls.limited_content, author=cls.profile, visibility=Visibility.LIMITED
+        )
+
+    @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
+    def test_only_public_share_calls_make_federable_content(self, mock_maker):
+        send_share(self.limited_share.id)
+        mock_maker.assert_not_called()
+        send_share(self.share.id)
+        mock_maker.assert_called_once_with(self.share)
+
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    def test_handle_send_is_called(self, mock_maker, mock_send):
+        send_share(self.share.id)
+        mock_send.assert_called_once_with("entity", self.share.author, [(self.content.author.handle, None)])
+
+    @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
+    @patch("socialhome.federate.tasks.logger.warning")
+    def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
+        send_share(self.share.id)
+        self.assertTrue(mock_logger.called)
+
+    @override_settings(DEBUG=True)
+    @patch("socialhome.federate.tasks.handle_send")
+    def test_content_not_sent_in_debug_mode(self, mock_send):
+        send_share(self.share.id)
+        mock_send.assert_not_called()
 
 
 class TestForwardRelayable(TestCase):
