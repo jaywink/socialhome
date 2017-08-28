@@ -50,23 +50,6 @@ describe("Content", function() {
         expect($(tpl).find(".grid-item-author-bar").length).to.eql(1);
     });
 
-    it("renders content actions if author", function() {
-        var tpl = Content.template({
-            content: {
-                is_author: false,
-            },
-            stream: "foobar",
-        });
-        expect($(tpl).find("#content-bar-actions").length).to.eql(0);
-        tpl = Content.template({
-            content: {
-                is_author: true,
-            },
-            stream: "foobar",
-        });
-        expect($(tpl).find("#content-bar-actions").length).to.eql(1);
-    });
-
     it("renders reply reactions if top level or (user authenticated or has replies)", function() {
         var tpl = Content.template({
             content: {

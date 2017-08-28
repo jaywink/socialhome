@@ -31,15 +31,13 @@
                         '<%= content.humanized_timestamp %>' +
                     '</a>' +
                     '<% if (content.is_author) { %>' +
-                        '<span id="content-bar-actions"> ' +
-                            '&nbsp;' +
-                            '<a id="content-update-link" href="<%= content.update_url %>"><i class="fa fa-pencil" title="' + gettext("Update") + '" aria-label="' + gettext("Update") + '"></i></a> ' +
-                            '<a id="content-delete-link" href="<%= content.delete_url %>?next='+ window.location.pathname +'"><i class="fa fa-remove" title="' + gettext("Delete") + '" aria-label="' + gettext("Delete") + '"></i></a>' +
-                        '</span>' +
+                        '&nbsp;' +
+                        '<a id="content-update-link" href="<%= content.update_url %>"><i class="fa fa-pencil" title="' + gettext("Update") + '" aria-label="' + gettext("Update") + '"></i></a> ' +
+                        '<a id="content-delete-link" href="<%= content.delete_url %>?next='+ window.location.pathname +'"><i class="fa fa-remove" title="' + gettext("Delete") + '" aria-label="' + gettext("Delete") + '"></i></a>' +
                     '<% } %>' +
                 '</div>' +
                 '<div class="ml-auto grid-item-reactions mt-1">' +
-                    '<% if (! content.parent && (content.is_authenticated || content.shares_count)) { %>' +
+                    '<% if (! content.parent && ((content.is_authenticated && !content.is_author) || content.shares_count)) { %>' +
                         '<div class="item-reaction item-open-shares-action <% if (content.has_shared) { %>item-reaction-shared<% } %> <% if (content.shares_count) { %>item-reaction-counter-positive<% } %>" data-content-id="<%= content.id %>">' +
                             '<i class="fa fa-refresh" title="' + gettext("Shares") + '" aria-label="' + gettext("Shares") + '"></i>&nbsp;' +
                             '<span class="item-reaction-counter"><%= content.shares_count %></span>' +
@@ -55,10 +53,12 @@
                     '<% } %>' +
                 '</div>' +
             '</div>' +
-            '<div class="content-actions share-action hidden" data-content-id="<%= content.id %>">' +
-                '<button class="btn btn-secondary <% if (!content.has_shared) { %>hidden<% } %>" data-action="unshare" aria-label="' + gettext("Unshare") + '" type="button">' + gettext("Unshare") + '</button>' +
-                '<button class="btn btn-secondary <% if (content.has_shared) { %>hidden<% } %>" data-action="share" aria-label="' + gettext("Share") + '" type="button">' + gettext("Share") + '</button>' +
-            '</div>' +
+            '<% if (!content.is_author) { %>' +
+                '<div class="content-actions share-action hidden" data-content-id="<%= content.id %>">' +
+                    '<button class="btn btn-secondary <% if (!content.has_shared) { %>hidden<% } %>" data-action="unshare" aria-label="' + gettext("Unshare") + '" type="button">' + gettext("Unshare") + '</button>' +
+                    '<button class="btn btn-secondary <% if (content.has_shared) { %>hidden<% } %>" data-action="share" aria-label="' + gettext("Share") + '" type="button">' + gettext("Share") + '</button>' +
+                '</div>' +
+            '<% } %>' +
             '<div class="replies-container" data-content-id="<%= content.id %>"></div>' +
             '<% if (content.is_authenticated && content.content_type === "content") { %>' +
                 '<div class="content-actions reply-action hidden" data-content-id="<%= content.id %>">' +
