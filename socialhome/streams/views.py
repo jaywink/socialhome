@@ -15,7 +15,10 @@ class BaseStreamView(ListView):
     vue = False
 
     def dispatch(self, request, *args, **kwargs):
-        self.vue = bool(request.GET.get("vue", False))
+        use_new_stream = (
+            hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
+        )
+        self.vue = bool(request.GET.get("vue", False)) or use_new_stream
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
