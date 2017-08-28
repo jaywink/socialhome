@@ -72,7 +72,7 @@ describe("Content", function() {
             content: {
                 parent: 2,
                 is_authenticated: true,
-                child_count: 5,
+                reply_count: 5,
             },
             stream: "foobar",
         });
@@ -81,7 +81,7 @@ describe("Content", function() {
             content: {
                 parent: "",
                 is_authenticated: false,
-                child_count: 0,
+                reply_count: 0,
             },
             stream: "foobar",
         });
@@ -90,7 +90,7 @@ describe("Content", function() {
             content: {
                 parent: "",
                 is_authenticated: true,
-                child_count: 0,
+                reply_count: 0,
             },
             stream: "foobar",
         });
@@ -99,7 +99,7 @@ describe("Content", function() {
             content: {
                 parent: "",
                 is_authenticated: false,
-                child_count: 1,
+                reply_count: 1,
             },
             stream: "foobar",
         });

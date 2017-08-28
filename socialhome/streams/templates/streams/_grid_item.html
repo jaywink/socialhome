@@ -41,11 +41,11 @@
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </div>
             {% endif %}
-            {% if request.user.is_authenticated or content.children_count %}
-                <div class="item-reaction {% if content.children_count %}item-reaction-counter-positive{% endif %}">
+            {% if request.user.is_authenticated or content.reply_count %}
+                <div class="item-reaction {% if content.reply_count %}item-reaction-counter-positive{% endif %}">
                     <span class="item-open-replies-action" data-content-id="{{ content.id }}">
                         <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
-                        <span class="item-reaction-counter">{{ content.children_count }}</span>
+                        <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </div>
             {% endif %}

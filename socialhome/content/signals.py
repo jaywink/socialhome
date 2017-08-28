@@ -27,14 +27,14 @@ def content_post_save(instance, **kwargs):
         if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
         # TODO send notification about share
-    if instance.is_local:
+    if instance.local:
         transaction.on_commit(lambda: federate_content(instance))
 
 
 @receiver(post_delete, sender=Content)
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
-    if instance.is_local:
+    if instance.local:
         try:
             django_rq.enqueue(send_content_retraction, instance, instance.author_id)
         except Exception as ex:

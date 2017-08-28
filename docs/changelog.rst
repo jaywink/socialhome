@@ -49,6 +49,12 @@ Added
 
   Warning! The new frontent code doesn't have all the features of the current on yet.
 
+* Content API has three new read only fields available:
+
+    * ``local``, boolean whether the content is local or remote.
+    * ``reply_count``, count of replies (including replies on shares)
+    * ``shares_count``, count of shares
+
 Changed
 .......
 

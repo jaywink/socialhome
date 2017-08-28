@@ -79,7 +79,7 @@ class TestFederateContent(TransactionTestCase):
         parent = ContentFactory(author=user.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, parent=parent)
-        self.assertTrue(content.is_local)
+        self.assertTrue(content.local)
         call_args = [
             call(send_reply_notifications, content.id),
             call(send_reply, content.id),
@@ -91,7 +91,7 @@ class TestFederateContent(TransactionTestCase):
         user = UserFactory()
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
-        self.assertTrue(content.is_local)
+        self.assertTrue(content.local)
         mock_send.assert_called_once_with(send_content, content.id)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
@@ -122,7 +122,7 @@ class TestFederateContentRetraction(TestCase):
     def test_local_content_retraction_gets_sent(self, mock_send):
         user = UserFactory()
         content = ContentFactory(author=user.profile)
-        self.assertTrue(content.is_local)
+        self.assertTrue(content.local)
         mock_send.reset_mock()
         content_id = content.id
         content.delete()
