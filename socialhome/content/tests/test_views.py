@@ -260,13 +260,6 @@ class TestContentView(SocialhomeTestCase):
         self.assertContains(response, self.content.formatted_timestamp)
         self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.channel_group_name)
 
-    def test_content_view_content_as_author(self):
-        self.client.force_login(self.content.author.user)
-        response = self.client.get(
-            reverse("content:view", kwargs={"pk": self.content.id})
-        )
-        self.assertNotContains(response, '<span id="content-bar-actions" class="hidden"')
-
 
 class TestContentReplyView(SocialhomeTestCase):
     @classmethod
