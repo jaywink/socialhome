@@ -45,6 +45,10 @@ Added
 
 * There is now a 'My content' stream link in the navbar 'Streams' dropdown. This goes to your own profile all content stream.
 
+* Add user preference for the new stream refactoring. If enabled, all streams that have a new version in progress will be rendered with the new frontend code based on Vue.js. (`#202 <https://github.com/jaywink/socialhome/issues/202>`_)
+
+  Warning! The new frontent code doesn't have all the features of the current on yet.
+
 Changed
 .......
 
