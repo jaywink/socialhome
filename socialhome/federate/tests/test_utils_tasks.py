@@ -239,13 +239,13 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_does_nothing_if_content_doesnt_exist(self, mock_logger):
         process_entity_retraction(Mock(entity_type="Post", target_guid="bar"), Mock())
-        mock_logger.assert_called_with("Retracted content %s cannot be found", "bar")
+        mock_logger.assert_called_with("Retracted remote content %s cannot be found", "bar")
 
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_does_nothing_if_content_is_not_local(self, mock_logger):
         process_entity_retraction(Mock(entity_type="Post", target_guid=self.local_content.guid), Mock())
         mock_logger.assert_called_with(
-            "Local content %s cannot be retracted by a remote retraction!", self.local_content
+            "Retracted remote content %s cannot be found", self.local_content.guid,
         )
 
     @patch("socialhome.federate.utils.tasks.logger.warning")

@@ -45,11 +45,11 @@
                             '<span class="item-reaction-counter"><%= content.shares_count %></span>' +
                         '</div>' +
                     '<% } %>' +
-                    '<% if (! content.parent && (content.is_authenticated || content.child_count)) { %>' +
-                        '<div class="item-reaction ml-1 <% if (content.child_count) { %>item-reaction-counter-positive<% } %>">' +
+                    '<% if (! content.parent && (content.is_authenticated || content.reply_count)) { %>' +
+                        '<div class="item-reaction ml-1 <% if (content.reply_count) { %>item-reaction-counter-positive<% } %>">' +
                             '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
                                 '<i class="fa fa-envelope" title="' + gettext("Replies") +'" aria-label="' + gettext("Replies") +'"></i>' +
-                                '<span class="item-reaction-counter"><%= content.child_count %></span>' +
+                                '<span class="item-reaction-counter"><%= content.reply_count %></span>' +
                             '</span>&nbsp;' +
                         '</div>' +
                     '<% } %>' +

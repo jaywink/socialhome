@@ -12,8 +12,42 @@ class ContentSerializer(ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ("id", "text", "rendered", "guid", "author", "pinned", "order", "service_label", "oembed",
-                  "opengraph", "tags", "parent", "remote_created", "created", "modified", "visibility",
-                  "content_type")
-        read_only_fields = ("id", "rendered", "guid", "author", "oembed", "opengraph", "tags", "parent",
-                            "remote_created", "created", "modified", "content_type")
+        fields = (
+            "author",
+            "content_type",
+            "created",
+            "guid",
+            "id",
+            "local",
+            "modified",
+            "oembed",
+            "opengraph",
+            "order",
+            "parent",
+            "pinned",
+            "remote_created",
+            "rendered",
+            "reply_count",
+            "service_label",
+            "shares_count",
+            "tags",
+            "text",
+            "visibility",
+        )
+        read_only_fields = (
+            "author",
+            "content_type"
+            "created",
+            "guid",
+            "id",
+            "local",
+            "modified",
+            "oembed",
+            "opengraph",
+            "parent",
+            "remote_created",
+            "rendered",
+            "reply_count",
+            "shares_count",
+            "tags",
+        )

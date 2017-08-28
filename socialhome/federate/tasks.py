@@ -52,11 +52,10 @@ def send_content(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.CONTENT)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.CONTENT,
+                                      local=True)
     except Content.DoesNotExist:
-        logger.warning("No content found with id %s", content_id)
-        return
-    if not content.is_local:
+        logger.warning("No local content found with id %s", content_id)
         return
     entity = make_federable_content(content)
     if entity:
@@ -75,11 +74,11 @@ def send_content(content_id):
 def _get_remote_participants_for_parent(parent, exclude=None):
     """Get remote participants for a parent."""
     participants = []
-    if not parent.is_local:
+    if not parent.local:
         participants.append((parent.author.handle, None))
-    replies = Content.objects.filter(parent_id=parent.id, visibility=Visibility.PUBLIC)
+    replies = Content.objects.filter(parent_id=parent.id, visibility=Visibility.PUBLIC, local=False)
     for reply in replies:
-        if not reply.is_local and reply.author.handle != exclude:
+        if reply.author.handle != exclude:
             participants.append((reply.author.handle, None))
     return participants
 
@@ -99,11 +98,10 @@ def send_reply(content_id):
     Currently we only deliver public content.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.REPLY)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.REPLY,
+                                      local=True)
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
-        return
-    if not content.is_local:
         return
     entity = make_federable_content(content)
     if not entity:
@@ -112,7 +110,7 @@ def send_reply(content_id):
         # Don't send in development mode
         return
     # Send directly (remote parent) or as a relayable (local parent)
-    if content.parent.is_local:
+    if content.parent.local:
         forward_relayable(entity, content.parent.id)
     else:
         # We only need to send to the original author
@@ -128,11 +126,10 @@ def send_share(content_id):
     Currently we only deliver public shares.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE)
+        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
+                                      local=True)
     except Content.DoesNotExist:
-        logger.warning("No share found with id %s", content_id)
-        return
-    if not content.is_local:
+        logger.warning("No local share found with id %s", content_id)
         return
     entity = make_federable_content(content)
     if entity:
@@ -154,7 +151,7 @@ def send_content_retraction(content, author_id):
 
     Currently only for public content.
     """
-    if not content.visibility == Visibility.PUBLIC or not content.is_local:
+    if not content.visibility == Visibility.PUBLIC or not content.local:
         return
     author = Profile.objects.get(id=author_id)
     entity = make_federable_retraction(content, author)
@@ -231,11 +228,9 @@ def send_profile(profile_id, recipients=None):
         ("foo@example.com", "diaspora"). Network can be None.
     """
     try:
-        profile = Profile.objects.get(id=profile_id)
+        profile = Profile.objects.get(id=profile_id, user__isnull=False)
     except Profile.DoesNotExist:
-        logger.warning("send_profile - No profile found with id %s", profile_id)
-        return
-    if not profile.is_local:
+        logger.warning("send_profile - No local profile found with id %s", profile_id)
         return
     entity = make_federable_profile(profile)
     if not entity:

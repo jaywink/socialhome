@@ -79,13 +79,11 @@ class Tag(models.Model):
 
 class Content(models.Model):
     text = models.TextField(_("Text"), blank=True)
-    rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
 
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
-    content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -117,6 +115,13 @@ class Content(models.Model):
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
 
+    # Cached data on save
+    content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
+    local = models.BooleanField(_("Local"), default=False, editable=False)
+    rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
+    reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
+    shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
+
     objects = ContentQuerySet.as_manager()
 
     def __str__(self):
@@ -124,9 +129,20 @@ class Content(models.Model):
             text=truncate_letters(self.text, 100), guid=self.guid
         )
 
-    @cached_property
-    def children_count(self):
-        return self.children.count()
+    def cache_data(self, commit=False):
+        """Calculate some extra data."""
+        # Local
+        self.local = self.author.user is not None
+        if self.pk:
+            # Reply count
+            share_ids = Content.objects.filter(share_of=self).values_list("id", flat=True)
+            self.reply_count = self.children.count() + Content.objects.filter(parent_id__in=share_ids).count()
+            # Share count
+            self.shares_count = self.shares.count()
+            if commit:
+                Content.objects.filter(id=self.id).update(
+                    local=self.local, reply_count=self.reply_count, shares_count=self.shares_count,
+                )
 
     def get_absolute_url(self):
         if self.slug:
@@ -141,6 +157,8 @@ class Content(models.Model):
     def save(self, *args, **kwargs):
         if self.parent and self.share_of:
             raise ValueError("Can't be both a reply and a share!")
+        self.cache_data()
+
         if self.parent:
             self.content_type = ContentType.REPLY
             # Ensure replies have sane values
@@ -148,6 +166,7 @@ class Content(models.Model):
             self.pinned = False
         elif self.share_of:
             self.content_type = ContentType.SHARE
+
         if not self.pk:
             if not self.guid:
                 self.guid = uuid4()
@@ -157,7 +176,11 @@ class Content(models.Model):
                     self.order = max_order + 1
 
         self.fix_local_uploads()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+        if self.share_of:
+            # Update parent cached data, for example share count
+            self.share_of.cache_data(commit=True)
 
     def save_tags(self, tags):
         """Save given tag relations."""
@@ -190,10 +213,6 @@ class Content(models.Model):
         delete_memoized(Content.has_shared, self.id, profile.id)
         return share
 
-    @cached_property
-    def shares_count(self):
-        return self.shares.count()
-
     def unshare(self, profile):
         """Unshare this content as the profile given."""
         if not self.shares.filter(author=profile).exists():
@@ -210,12 +229,6 @@ class Content(models.Model):
     @cached_property
     def is_nsfw(self):
         return self.text.lower().find("#nsfw") > -1
-
-    @cached_property
-    def is_local(self):
-        if self.author.user:
-            return True
-        return False
 
     @property
     def effective_created(self):
@@ -359,10 +372,10 @@ class Content(models.Model):
             "author_handle": self.author.handle,
             "author_home_url": self.author.home_url,
             "author_image": self.author.safer_image_url_small,
-            "author_is_local": bool(self.author.user),
+            "author_is_local": self.local,
             "author_name": escape(self.author.name) or self.author.handle,
             "author_profile_url": self.author.get_absolute_url(),
-            "child_count": self.children_count,
+            "reply_count": self.reply_count,
             "content_type": self.content_type.string_value,
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
             "detail_url": self.get_absolute_url(),

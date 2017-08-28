@@ -122,9 +122,7 @@ def content_xml_view(request, guid):
 
     Fetched by remote servers in certain situations.
     """
-    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
-    if not content.is_local:
-        raise Http404()
+    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC, local=True)
     entity = make_federable_content(content)
     xml = get_full_xml_representation(entity, content.author.private_key)
     return HttpResponse(xml, content_type="application/xml")
@@ -145,7 +143,7 @@ def content_fetch_view(request, objtype, guid):
     if objtype not in ["status_message", "post", "reshare", "comment"]:
         raise Http404()
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
-    if not content.is_local:
+    if not content.local:
         url = "https://%s/fetch/%s/%s" % (
             content.author.handle.split("@")[1], objtype, guid
         )

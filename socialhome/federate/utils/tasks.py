@@ -154,7 +154,7 @@ def process_entity_comment(entity, profile):
         logger.info("Saved Content from comment entity: %s", content)
     else:
         logger.info("Updated Content from comment entity: %s", content)
-    if parent.is_local:
+    if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_relayable
         django_rq.enqueue(forward_relayable, entity, parent.id)
@@ -186,12 +186,9 @@ def _embed_entity_images_to_post(children, text):
 def _retract_content(target_guid, profile):
     """Retract a Content."""
     try:
-        content = Content.objects.get(guid=target_guid)
+        content = Content.objects.get(guid=target_guid, local=False)
     except Content.DoesNotExist:
-        logger.warning("Retracted content %s cannot be found", target_guid)
-        return
-    if content.is_local:
-        logger.warning("Local content %s cannot be retracted by a remote retraction!", content)
+        logger.warning("Retracted remote content %s cannot be found", target_guid)
         return
     if content.author != profile:
         logger.warning("Content %s is not owned by remote retraction profile %s", content, profile)

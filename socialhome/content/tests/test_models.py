@@ -58,10 +58,6 @@ class TestContentModel(SocialhomeTestCase):
             del self.public_content.slug
         except AttributeError:
             pass
-        try:
-            del self.public_content.shares_count
-        except AttributeError:
-            pass
         self.site_content.refresh_from_db()
 
     def test_create(self):
@@ -93,7 +89,7 @@ class TestContentModel(SocialhomeTestCase):
                 "update_url": "",
                 "delete_url": "",
                 "reply_url": "",
-                "child_count": 0,
+                "reply_count": 0,
                 "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
@@ -122,7 +118,7 @@ class TestContentModel(SocialhomeTestCase):
                 "update_url": "",
                 "delete_url": "",
                 "reply_url": "",
-                "child_count": 0,
+                "reply_count": 0,
                 "shares_count": 0,
                 "is_authenticated": False,
                 "parent": "",
@@ -139,11 +135,10 @@ class TestContentModel(SocialhomeTestCase):
         self.assertTrue(Content.has_shared(self.public_content.id, self.local_user.profile.id))
 
     def test_is_local(self):
-        self.assertFalse(self.site_content.is_local)
+        self.assertFalse(self.site_content.local)
         self.site_content.author = self.profile
         self.site_content.save()
-        del self.site_content.is_local
-        self.assertTrue(self.site_content.is_local)
+        self.assertTrue(self.site_content.local)
 
     def test_save_calls_fix_local_uploads(self):
         self.public_content.fix_local_uploads = Mock()
@@ -240,7 +235,7 @@ class TestContentModel(SocialhomeTestCase):
             "update_url": "",
             "delete_url": "",
             "reply_url": "",
-            "child_count": 0,
+            "reply_count": 0,
             "shares_count": 0,
             "is_authenticated": False,
             "parent": "",
@@ -250,7 +245,6 @@ class TestContentModel(SocialhomeTestCase):
         })
 
         # Add a share
-        del self.public_content.shares_count
         ContentFactory(share_of=self.public_content)
         dict_for_view = self.public_content.dict_for_view(self.user2)
         self.assertEqual(dict_for_view.get("shares_count"), 1)
@@ -278,7 +272,7 @@ class TestContentModel(SocialhomeTestCase):
             "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
             "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
             "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-            "child_count": 0,
+            "reply_count": 0,
             "shares_count": 0,
             "is_authenticated": True,
             "parent": "",
@@ -311,7 +305,7 @@ class TestContentModel(SocialhomeTestCase):
                 "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
                 "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
                 "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-                "child_count": 0,
+                "reply_count": 0,
                 "shares_count": 0,
                 "is_authenticated": True,
                 "parent": "",
