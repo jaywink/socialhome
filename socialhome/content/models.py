@@ -150,6 +150,8 @@ class Content(models.Model):
             self.share_of.cache_data(commit=True)
         if self.parent:
             self.parent.cache_data(commit=True)
+            if self.parent.share_of:
+                self.parent.share_of.cache_data(commit=True)
 
     def get_absolute_url(self):
         if self.slug:
