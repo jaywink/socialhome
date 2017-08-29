@@ -53,7 +53,6 @@ class BaseStreamView(ListView):
                 "isUserLocal": bool(content.author.user),
                 "contentUrl": content.get_absolute_url(),
                 "isUserAuthor": is_user_author,
-                "updateUrl": reverse("content:update", kwargs={"pk": content.id}) if is_user_author else "",
                 "hasShared": Content.has_shared(content.id, request_user_profile.id) if request_user_profile else False,
             }
 

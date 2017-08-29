@@ -43,7 +43,7 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/globalStore"
+import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("author-bar", {

@@ -5,7 +5,7 @@ import _defaults from "lodash/defaults"
 import _get from "lodash/get"
 
 import getState from "streams/app/stores/streamStore.state"
-import {actions, mutations, streamStoreOerations, getters} from "streams/app/stores/streamStore.operations"
+import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
 
 
 Vue.use(Vuex)
@@ -27,7 +27,7 @@ function newStreamStore(options) {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(streamStoreOerations.receivedNewContent, 1)
+            store.dispatch(streamStoreOperations.receivedNewContent, 1)
         }
     }
 
@@ -36,4 +36,4 @@ function newStreamStore(options) {
     return store
 }
 
-export {streamStoreOerations, newStreamStore}
+export {streamStoreOperations, newStreamStore}

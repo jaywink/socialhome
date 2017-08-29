@@ -1,7 +1,7 @@
 import _forEach from "lodash/forEach"
 
 
-const streamStoreOerations = {
+const streamStoreOperations = {
     receivedNewContent: "receivedNewContent",
     newContentAck: "newContentAck",
 }
@@ -9,13 +9,13 @@ const streamStoreOerations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
-    [streamStoreOerations.receivedNewContent](state, contentId) {
+    [streamStoreOperations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
         state.newContentLengh += 1
         state.contentIds.unshift(contentId)
         state.contents[contentId] = undefined
     },
-    [streamStoreOerations.newContentAck](state) {
+    [streamStoreOperations.newContentAck](state) {
         state.hasNewContent = false
         state.newContentLengh = 0
     },
@@ -23,11 +23,11 @@ const mutations = {
 /* eslint-enable no-param-reassign */
 
 const actions = {
-    [streamStoreOerations.receivedNewContent]({commit}, newContentLengh) {
-        commit(streamStoreOerations.receivedNewContent, newContentLengh)
+    [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
+        commit(streamStoreOperations.receivedNewContent, newContentLengh)
     },
-    [streamStoreOerations.newContentAck]({commit}) {
-        commit(streamStoreOerations.newContentAck)
+    [streamStoreOperations.newContentAck]({commit}) {
+        commit(streamStoreOperations.newContentAck)
     },
 }
 
@@ -43,4 +43,4 @@ const getters = {
     },
 }
 
-export {actions, mutations, streamStoreOerations, getters}
+export {actions, mutations, streamStoreOperations, getters}

@@ -2,7 +2,7 @@ import {Server, WebSocket} from "mock-socket"
 
 import Vuex from "vuex"
 
-import {newStreamStore, streamStoreOerations} from "streams/app/stores/streamStore"
+import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import {actions, mutations} from "streams/app/stores/streamStore.operations"
 
 
@@ -39,7 +39,7 @@ describe("streamStore", () => {
                 mockserver.on("connection", () => mockserver.send(JSON.stringify({event: "new", id: 4})))
                 newStreamStore({WebSocketImpl: WebSocket})
                 setTimeout(() => {
-                    Vuex.Store.prototype.dispatch.getCall(0).args.should.eql([streamStoreOerations.receivedNewContent, 1])
+                    Vuex.Store.prototype.dispatch.getCall(0).args.should.eql([streamStoreOperations.receivedNewContent, 1])
                     done()
                 }, 200)
             })
@@ -50,19 +50,19 @@ describe("streamStore", () => {
         describe("receivedNewContent", () => {
             it("should set state.stream.hasNewContent to true", () => {
                 let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOerations.receivedNewContent](state, 42)
+                mutations[streamStoreOperations.receivedNewContent](state, 42)
                 state.hasNewContent.should.be.true
             })
 
             it("should increment state.stream.newContentLengh by 1", () => {
                 let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOerations.receivedNewContent](state, 42)
+                mutations[streamStoreOperations.receivedNewContent](state, 42)
                 state.newContentLengh.should.equal(1)
             })
 
             it("should add the new post id to the content list with undefined value", () => {
                 let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOerations.receivedNewContent](state, 42)
+                mutations[streamStoreOperations.receivedNewContent](state, 42)
                 state.contentIds.should.eql([42])
                 state.contents.should.eql({42: undefined})
             })
@@ -70,13 +70,13 @@ describe("streamStore", () => {
         describe("newContentAck", () => {
             it("should set state.stream.hasNewContent to true", () => {
                 let state = {hasNewContent: true, newContentLengh: 0}
-                mutations[streamStoreOerations.newContentAck](state)
+                mutations[streamStoreOperations.newContentAck](state)
                 state.hasNewContent.should.be.false
             })
 
             it("should set state.stream.newContentLengh to 0", () => {
                 let state = {hasNewContent: true, newContentLengh: 10}
-                mutations[streamStoreOerations.newContentAck](state)
+                mutations[streamStoreOperations.newContentAck](state)
                 state.newContentLengh.should.equal(0)
             })
         })
@@ -86,15 +86,15 @@ describe("streamStore", () => {
         describe("receivedNewContent", () => {
             it("should commit with the correct parameters", () => {
                 let commit = Sinon.spy()
-                actions[streamStoreOerations.receivedNewContent]({commit}, 10)
-                commit.getCall(0).args.should.eql([streamStoreOerations.receivedNewContent, 10])
+                actions[streamStoreOperations.receivedNewContent]({commit}, 10)
+                commit.getCall(0).args.should.eql([streamStoreOperations.receivedNewContent, 10])
             })
         })
         describe("newContentAck", () => {
             it("should commit with the correct parameters", () => {
                 let commit = Sinon.spy()
-                actions[streamStoreOerations.newContentAck]({commit})
-                commit.getCall(0).args[0].should.equal(streamStoreOerations.newContentAck)
+                actions[streamStoreOperations.newContentAck]({commit})
+                commit.getCall(0).args[0].should.equal(streamStoreOperations.newContentAck)
             })
         })
     })

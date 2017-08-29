@@ -32,8 +32,8 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 import "streams/app/components/StampedElement.vue"
 import "streams/app/components/StreamElement.vue"
-import {newStreamStore, streamStoreOerations} from "streams/app/stores/streamStore"
-import globalStore from "streams/app/stores/globalStore"
+import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
+import globalStore from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream", {
@@ -57,7 +57,7 @@ export default Vue.component("stream", {
             Vue.redrawVueMasonry()
         },
         onNewContentClick() {
-            this.$store.dispatch(streamStoreOerations.newContentAck)
+            this.$store.dispatch(streamStoreOperations.newContentAck)
         },
     },
     beforeDestroy() {

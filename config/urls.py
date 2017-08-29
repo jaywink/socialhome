@@ -9,7 +9,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
-from django_js_reverse import views as django_js_reverse_views
+from django_js_reverse.views import urls_js
 
 from socialhome.content.views import ContentBookmarkletView
 from socialhome.content.viewsets import ContentViewSet
@@ -57,7 +57,7 @@ urlpatterns = [
     url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
 
     # Django URLs in JS
-    url(r'^jsreverse/$', django_js_reverse_views.urls_js, name='js_reverse'),
+    url(r"^jsreverse/$", urls_js, name="js_reverse"),
 
     # Admin pages
     url(settings.ADMIN_URL, include(admin.site.urls)),

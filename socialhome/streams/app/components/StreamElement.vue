@@ -15,16 +15,16 @@
             :has-shared="hasShared"
         >
             <div class="mt-1">
-                <a :href="contentUrl" :title="timestamp" variant="link" class="unstyled-link">
+                <a :href="contentUrl" :title="timestamp" class="unstyled-link">
                     {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
                 </a>
                 &nbsp;
                 <template v-if="isUserAuthor">
-                    <a :href="updateUrl" variant="link">
+                    <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
                     </a>
                     &nbsp;
-                    <a :href="deleteUrl" variant="link">
+                    <a :href="deleteUrl">
                         <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
                     </a>
                 </template>
@@ -37,7 +37,7 @@
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
-import store from "streams/app/stores/globalStore"
+import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
@@ -49,7 +49,6 @@ export default Vue.component("stream-element", {
         humanizedTimestamp: {type: String, required: true},
         htmlSafe: {type: String, required: true},
         contentUrl: {type: String, required: true},
-        updateUrl: {type: String, required: true},
         repliesCount: {type: Number, required: true},
         sharesCount: {type: Number, required: true},
         edited: {type: Boolean, required: true},
@@ -64,6 +63,9 @@ export default Vue.component("stream-element", {
         },
         deleteUrl() {
             return Urls["content:delete"]({pk: this.id})
+        },
+        updateUrl() {
+            return Urls["content:update"]({pk: this.id})
         },
     },
     updated() {

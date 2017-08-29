@@ -2,7 +2,12 @@
     <div class="grid-item-bar d-flex justify-content-start">
         <slot />
         <div class="ml-auto grid-item-reactions mt-1">
-            <b-button v-if="showShares" class="item-reaction" @click.stop.prevent="expandShares">
+            <b-button
+                v-if="showShares"
+                :class="{'item-reaction-shared': hasShared$}"
+                class="item-reaction"
+                @click.stop.prevent="expandShares"
+            >
                 <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
                 <span class="item-reaction-counter">{{ sharesCount$ }}</span>
             </b-button>
@@ -14,10 +19,11 @@
             </b-button>
         </div>
         <div v-if="showSharesBox" class="content-actions">
-            <b-button variant="secondary" @click.prevent.stop="share">Share</b-button>
+            <b-button v-if="hasShared$" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
+            <b-button v-if="!hasShared$" variant="secondary" @click.prevent.stop="share">Share</b-button>
         </div>
+        <div class="replies-container"></div>
         <div v-if="showRepliesBox">
-            <div class="replies-container"></div>
             <div v-if="$store.state.isUserAuthenticated" class="content-actions">
                 <b-button :href="replyUrl" variant="secondary">Reply</b-button>
             </div>
@@ -27,7 +33,7 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/globalStore"
+import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("reactions-bar", {
@@ -59,9 +65,11 @@ export default Vue.component("reactions-bar", {
         },
     },
     methods: {
+        expandComments() {
+            this.showRepliesBox = !this.showRepliesBox
+        },
         expandShares() {
             this.showSharesBox = !this.showSharesBox
-            this.showRepliesBox = this.showSharesBox ? false : this.showRepliesBox
         },
         share() {
             if (!this.$store.state.isUserAuthenticated) {
@@ -70,8 +78,9 @@ export default Vue.component("reactions-bar", {
             }
             this.$http.post(`/api/content/${this.id}/share/`)
                 .then(() => {
-                    this.$data.showSharesBox = false
-                    this.$data.sharesCount$ += 1
+                    this.showSharesBox = false
+                    this.sharesCount$ += 1
+                    this.hasShared$ = true
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
@@ -82,15 +91,11 @@ export default Vue.component("reactions-bar", {
             }
             this.$http.delete(`/api/content/${this.id}/share/`)
                 .then(() => {
-                    this.$data.showSharesBox = false
+                    this.showSharesBox = false
                     this.sharesCount$ -= 1
                     this.hasShared$ = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
-        },
-        expandComments() {
-            this.showRepliesBox = !this.showRepliesBox
-            this.showSharesBox = this.showRepliesBox ? false : this.showSharesBox
         },
     },
     updated() {
