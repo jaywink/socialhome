@@ -2,7 +2,7 @@ import tempfile
 from unittest.mock import Mock
 
 from PIL import Image
-from django.test import override_settings
+from django.test import override_settings, TransactionTestCase
 from rest_framework.test import APITestCase
 from test_plus import TestCase
 from test_plus.test import CBVTestCase
@@ -40,6 +40,15 @@ class SocialhomeCBVTestCase(CBVTestCase, SocialhomeTestBase):
 
 class SocialhomeAPITestCase(APITestCase, SocialhomeTestBase):
     pass
+
+
+class SocialhomeTransactionTestCase(TransactionTestCase):
+    maxDiff = None
+
+    def create_local_and_remote_user(self):
+        self.user = UserFactory()
+        self.profile = self.user.profile
+        self.remote_profile = ProfileFactory()
 
 
 # py.test monkeypatches while we still have two kinds of tests

@@ -1,15 +1,15 @@
 from unittest.mock import patch
 
 from django.conf import settings
-from django.test import TestCase
 from django.urls import reverse
 
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.notifications.tasks import send_reply_notifications, send_follow_notification
+from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-class TestSendReplyNotification(TestCase):
+class TestSendReplyNotification(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -32,16 +32,13 @@ class TestSendReplyNotification(TestCase):
         self.assertEqual(mock_send.call_count, 2)
         for cal in mock_send.call_args_list:
             args, kwargs = cal
-            self.assertEqual(args[0], "[Django] New reply to content you have participated in")
-            self.assertEqual(args[1], "There is a new reply to content you have participated in, see it here: %s" %
-                             self.content_url,)
             self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
             self.assertTrue(args[3][0] in self.participant_emails)
             self.assertEqual(len(args[3]), 1)
             self.assertFalse(kwargs.get("fail_silently"))
 
 
-class TestSendFollowNotification(TestCase):
+class TestSendFollowNotification(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -51,10 +48,8 @@ class TestSendFollowNotification(TestCase):
     @patch("socialhome.notifications.tasks.send_mail")
     def test_calls_send_email(self, mock_send):
         send_follow_notification(self.profile.id, self.user.profile.id)
-        mock_send.assert_called_once_with(
-            "[Django] New follower",
-            "You have a new follower: %s" % self.profile.handle,
-            settings.DEFAULT_FROM_EMAIL,
-            [self.user.email],
-            fail_silently=False,
-        )
+        self.assertEqual(mock_send.call_count, 1)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(args[3], [self.user.email])
+        self.assertFalse(kwargs.get("fail_silently"))
