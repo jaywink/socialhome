@@ -34,8 +34,8 @@ def get_reply_participants(content):
 
 def send_follow_notification(follower_id, followed_id):
     """Super simple you've been followed notification to a user."""
-    # if settings.DEBUG:
-    #     return
+    if settings.DEBUG:
+        return
     try:
         user = User.objects.get(profile__id=followed_id, is_active=True)
     except User.DoesNotExist:
@@ -69,8 +69,8 @@ def send_reply_notifications(content_id):
 
     Until proper notifications is supported, just pop out an email.
     """
-    # if settings.DEBUG:
-    #     return
+    if settings.DEBUG:
+        return
     try:
         content = Content.objects.get(id=content_id, content_type=ContentType.REPLY)
     except Content.DoesNotExist:
@@ -107,8 +107,8 @@ def send_reply_notifications(content_id):
 
 def send_share_notification(share_id):
     """Super simple you're content has been shared notification to a user."""
-    # if settings.DEBUG:
-    #     return
+    if settings.DEBUG:
+        return
     try:
         content = Content.objects.get(id=share_id, content_type=ContentType.SHARE, share_of__local=True)
     except Content.DoesNotExist:
