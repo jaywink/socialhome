@@ -64,6 +64,11 @@ Changed
 
 * **Breaking change**. Content API results now return ``visibility`` as a string ('public', 'limited', 'site' or 'self'), not an integer.
 
+Fixed
+.....
+
+* There was no notification sent out when a local user followed a local user. This has now been fixed.
+
 Removed
 .......
 

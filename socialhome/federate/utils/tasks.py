@@ -66,7 +66,6 @@ def process_entity_follow(entity, profile):
         return
     if entity.following:
         profile.following.add(user.profile)
-        django_rq.enqueue(send_follow_notification, profile.id, user.profile.id)
         logger.info("Profile %s now follows user %s", profile, user)
     else:
         profile.following.remove(user.profile)
