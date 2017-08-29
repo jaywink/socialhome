@@ -144,6 +144,13 @@ class Content(models.Model):
                     local=self.local, reply_count=self.reply_count, shares_count=self.shares_count,
                 )
 
+    def cache_related_object_data(self):
+        """Update parent/shared_of cached data, for example share count"""
+        if self.share_of:
+            self.share_of.cache_data(commit=True)
+        if self.parent:
+            self.parent.cache_data(commit=True)
+
     def get_absolute_url(self):
         if self.slug:
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
@@ -177,10 +184,7 @@ class Content(models.Model):
 
         self.fix_local_uploads()
         super().save(*args, **kwargs)
-
-        if self.share_of:
-            # Update parent cached data, for example share count
-            self.share_of.cache_data(commit=True)
+        self.cache_related_object_data()
 
     def save_tags(self, tags):
         """Save given tag relations."""
