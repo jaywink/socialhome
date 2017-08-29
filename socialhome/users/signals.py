@@ -43,7 +43,7 @@ def on_commit_profile_following_change(action, pks, instance):
                 send_follow_change, instance.id, id, True if action == "post_add" else False
             )
         # Send out notification if local followed
-        if Profile.objects.filter(id=id, user__isnull=False):
+        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False):
             django_rq.enqueue(send_follow_notification, instance.id, id)
 
 
