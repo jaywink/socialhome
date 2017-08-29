@@ -59,7 +59,6 @@ def process_entities(entities):
 
 def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
-    from socialhome.notifications.tasks import send_follow_notification
     try:
         user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
     except User.DoesNotExist:

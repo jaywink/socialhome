@@ -57,6 +57,7 @@ LOCAL_APPS = (
     "socialhome.users",
     "socialhome.federate",
     "socialhome.content",
+    "socialhome.notifications",
     "socialhome.streams",
     "socialhome.search",
 )

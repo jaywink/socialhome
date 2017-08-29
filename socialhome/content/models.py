@@ -265,7 +265,11 @@ class Content(models.Model):
 
     @cached_property
     def short_text(self):
-        return truncate_letters(self.text, 50)
+        return truncate_letters(self.text, 50) or ""
+
+    @property
+    def short_text_inline(self):
+        return self.short_text.replace("\n", " ").replace("\r", "")
 
     @cached_property
     def slug(self):

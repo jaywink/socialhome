@@ -1,0 +1,10 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "There is a new reply to content you have participated in by" %} {{ actor_name }} ({{ actor_url }}).
+
+> {{ reply_text }}
+
+{{ reply_url }}
+{% endblock %}

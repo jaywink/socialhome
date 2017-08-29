@@ -1,0 +1,6 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "You have a new follower:" %} {{ actor_name }} ({{ actor_url }}).
+{% endblock %}

@@ -1,0 +1,25 @@
+{% load i18n %}<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ subject }}</title>
+</head>
+<body>
+    <div>
+        {% trans "Dear" %} {{ name }},
+    </div>
+    <div>
+        {% block body %}{% endblock %}
+    </div>
+    <div>
+        <p>
+            {% trans "Wishing you a nice day" %},<br>{% blocktrans %}The friendly {{ site_name }} notifications robot{% endblocktrans %}
+        </p>
+        <p>
+            <a href="{{ site_url }}">{{ site_name }}</a>
+        </p>
+    </div>
+</body>
+</html>

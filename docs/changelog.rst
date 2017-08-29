@@ -55,6 +55,10 @@ Added
     * ``reply_count``, count of replies (including replies on shares)
     * ``shares_count``, count of shares
 
+* Make email notifications nicer by using HTML templates in addition to the plain text version. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
+  In addition to reply and follow notifications, send also when own content is shared.
+
 Changed
 .......
 

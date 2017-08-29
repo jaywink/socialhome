@@ -137,6 +137,10 @@ class Profile(TimeStampedModel):
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
+    @property
+    def name_or_handle(self):
+        return self.name or self.handle
+
     def save(self, *args, **kwargs):
         # Protect against empty guids which the search indexing would crash on
         if not self.guid:
