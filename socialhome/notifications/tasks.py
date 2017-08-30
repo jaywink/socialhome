@@ -90,7 +90,7 @@ def send_reply_notifications(content_id):
     context.update({
         "subject": subject, "actor_name": content.author.name_or_handle,
         "actor_url": "%s%s" % (settings.SOCIALHOME_URL, content.author.get_absolute_url()),
-        "reply_text": content.short_text_inline, "reply_url": content_url,
+        "reply_text": content.text, "reply_rendered": content.rendered, "reply_url": content_url,
     })
     for participant in participants:
         context["name"] = participant.profile.name_or_handle
@@ -120,8 +120,7 @@ def send_share_notification(share_id):
     context.update({
         "subject": subject, "actor_name": content.author.name_or_handle,
         "actor_url": "%s%s" % (settings.SOCIALHOME_URL, content.author.get_absolute_url()),
-        "content_text": content.share_of.short_text_inline, "content_url": content_url,
-        "name": content.share_of.author.name_or_handle,
+        "content_url": content_url, "name": content.share_of.author.name_or_handle,
     })
     send_mail(
         "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),

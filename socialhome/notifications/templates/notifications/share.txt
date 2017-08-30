@@ -2,9 +2,7 @@
 {% load i18n %}
 
 {% block body %}
-{% trans "Your content below has received a new share by" %} {{ actor_name }} ({{ actor_url }}).
+{% trans "Your content has received a new share by" %} {{ actor_name }} ({{ actor_url }}).
 
-> {{ content_text }}
-
-{{ content_url }}
+{% trans "Link to the content:" %} {{ content_url }}
 {% endblock %}

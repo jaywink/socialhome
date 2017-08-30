@@ -4,7 +4,9 @@
 {% block body %}
 {% trans "There is a new reply to content you have participated in by" %} {{ actor_name }} ({{ actor_url }}).
 
-> {{ reply_text }}
+{% trans "React to the reply here:" %} {{ reply_url }}
 
-{{ reply_url }}
+------reply------
+{{ reply_text }}
+-----------------
 {% endblock %}

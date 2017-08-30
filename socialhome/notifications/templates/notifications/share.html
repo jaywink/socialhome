@@ -3,9 +3,9 @@
 
 {% block body %}
     <p>
-        {% trans "Your content below has received a new share by" %} <a href="{{ actor_url }}">{{ actor_name }}</a>.
+        {% trans "Your content has received a new share by" %} <a href="{{ actor_url }}">{{ actor_name }}</a>.
     </p>
-    <blockquote>
-        <a href="{{ content_url }}">{{ content_text }}</a>
-    </blockquote>
+    <p>
+        {% trans "Link to the content:" %} <a href="{{ content_url }}">{{ content_url }}</a>.
+    </p>
 {% endblock %}
