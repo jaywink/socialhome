@@ -140,6 +140,19 @@ class TestContentModel(SocialhomeTestCase):
         self.site_content.save()
         self.assertTrue(self.site_content.local)
 
+    def test_root(self):
+        self.assertEqual(self.public_content.root, self.public_content)
+        reply = ContentFactory(parent=self.public_content)
+        self.assertEqual(reply.root, self.public_content)
+        reply_of_reply = ContentFactory(parent=reply)
+        self.assertEqual(reply_of_reply.root, self.public_content)
+        share = ContentFactory(share_of=self.public_content)
+        self.assertEqual(share.root, self.public_content)
+        share_reply = ContentFactory(parent=share)
+        self.assertEqual(share_reply.root, self.public_content)
+        share_reply_of_reply = ContentFactory(parent=share_reply)
+        self.assertEqual(share_reply_of_reply.root, self.public_content)
+
     def test_save_calls_fix_local_uploads(self):
         self.public_content.fix_local_uploads = Mock()
         self.public_content.save()
@@ -316,6 +329,10 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_short_text(self):
         self.assertEqual(self.public_content.short_text, truncate_letters(self.public_content.text, 50))
+
+    def test_short_text_inline(self):
+        self.public_content.text = "foo\n\rbar"
+        self.assertEqual(self.public_content.short_text_inline, "foo bar")
 
     def test_slug(self):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
