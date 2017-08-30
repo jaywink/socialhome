@@ -158,6 +158,16 @@ class Content(models.Model):
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
         return reverse("content:view", kwargs={"pk": self.id})
 
+    @cached_property
+    def root(self):
+        """Get root content if a reply or share."""
+        if self.content_type == ContentType.CONTENT:
+            return self
+        elif self.content_type == ContentType.REPLY:
+            return self.parent.root
+        elif self.content_type == ContentType.SHARE:
+            return self.share_of.root
+
     @staticmethod
     @memoize(timeout=604800)  # a week
     def has_shared(content_id, profile_id):

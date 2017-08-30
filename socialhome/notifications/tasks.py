@@ -18,18 +18,24 @@ def get_common_context():
     return {"site_name": site.name, "site_url": settings.SOCIALHOME_URL}
 
 
-def get_reply_participants(content):
+def get_root_content_participants(content, exclude_user=None):
+    """Get participants in a root content.
+
+    :param content: The root Content object
+    :param exclude: A User object to exclude
+    :returns: Set of User objects
+    """
     # Author of parent content
-    participants = User.objects.filter(profile__content__id=content.parent.id)
+    participants = User.objects.filter(profile__content__id=content.id)
     # Other replies
-    participants = participants | User.objects.filter(profile__content__parent_id=content.parent.id)
-    if content.parent.content_type == ContentType.SHARE:
-        # Share replies too
-        participants = participants | User.objects.filter(
-            profile__content__parent__share_of_id=content.parent.share_of.id)
-    # Exclude actual reply author
-    participants = set(participants.exclude(profile=content.author))
-    return participants
+    participants = participants | User.objects.filter(profile__content__parent_id=content.id)
+    # Shares
+    participants = participants | User.objects.filter(profile__content__share_of_id=content.id)
+    # Replies on shares
+    participants = participants | User.objects.filter(profile__content__parent__share_of_id=content.id)
+    if exclude_user:
+        participants = participants.exclude(id=exclude_user.id)
+    return set(participants)
 
 
 def send_follow_notification(follower_id, followed_id):
@@ -76,16 +82,14 @@ def send_reply_notifications(content_id):
     except Content.DoesNotExist:
         logger.warning("No reply content found with id %s", content_id)
         return
-    participants = get_reply_participants(content)
+    root_content = content.root
+    exclude_user = content.author.user if content.local else None
+    participants = get_root_content_participants(root_content, exclude_user=exclude_user)
     if not participants:
         return
-    if content.parent.content_type == ContentType.SHARE:
-        parent = content.parent.share_of
-    else:
-        parent = content.parent
-    subject = _("New reply to: %s" % parent.short_text_inline)
+    subject = _("New reply to: %s" % root_content.short_text_inline)
     # TODO use fragment url to reply directly when available
-    content_url = "%s%s" % (settings.SOCIALHOME_URL, parent.get_absolute_url())
+    content_url = "%s%s" % (settings.SOCIALHOME_URL, root_content.get_absolute_url())
     context = get_common_context()
     context.update({
         "subject": subject, "actor_name": content.author.name_or_handle,
