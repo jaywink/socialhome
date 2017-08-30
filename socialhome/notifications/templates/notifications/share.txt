@@ -1,0 +1,8 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "Your content has received a new share by" %} {{ actor_name }} ({{ actor_url }}).
+
+{% trans "Link to the content:" %} {{ content_url }}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% load i18n %}
+
+{% trans "Dear" %} {{ name }},
+
+{% block body %}{% endblock %}
+
+{% trans "Wishing you a nice day" %},
+{% blocktrans %}The friendly {{ site_name }} notifications robot{% endblocktrans %}
+
+{{ site_name }}
+{{ site_url }}

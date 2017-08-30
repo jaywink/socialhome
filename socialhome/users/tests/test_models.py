@@ -88,6 +88,11 @@ class TestProfile(SocialhomeTestCase):
         self.assertEqual(self.profile.home_url, self.profile.remote_url)
         self.assertEqual(self.user.profile.home_url, self.user.profile.get_absolute_url())
 
+    def test_name_or_handle(self):
+        self.assertEqual(self.profile.name_or_handle, self.profile.name)
+        self.profile.name = ""
+        self.assertEqual(self.profile.name_or_handle, self.profile.handle)
+
     def test_remote_url(self):
         self.assertEqual(self.profile.remote_url, "https://example.com/people/1234")
 

@@ -1,8 +1,10 @@
 import logging
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-from django.urls import reverse
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -11,40 +13,29 @@ from socialhome.users.models import User, Profile
 logger = logging.getLogger("socialhome")
 
 
-def send_reply_notifications(content_id):
-    """Super simple reply notification to content local participants.
+def get_common_context():
+    site = Site.objects.get_current()
+    return {"site_name": site.name, "site_url": settings.SOCIALHOME_URL}
 
-    Until proper notifications is supported, just pop out an email.
+
+def get_root_content_participants(content, exclude_user=None):
+    """Get participants in a root content.
+
+    :param content: The root Content object
+    :param exclude: A User object to exclude
+    :returns: Set of User objects
     """
-    if settings.DEBUG:
-        # Don't send in development mode
-        return
-    try:
-        content = Content.objects.get(id=content_id, content_type=ContentType.REPLY)
-    except Content.DoesNotExist:
-        logger.warning("No reply content found with id %s", content_id)
-        return
-    parent = content.parent
     # Author of parent content
-    participants = User.objects.filter(profile__content__id=parent.id)
+    participants = User.objects.filter(profile__content__id=content.id)
     # Other replies
-    participants = participants | User.objects.filter(profile__content__parent_id=parent.id)
-    # Exclude actual reply author and make a set of emails
-    participants = set(participants.exclude(profile=content.author).values_list("email", flat=True))
-    if not participants:
-        return
-    parent_url = "%s%s" % (
-        settings.SOCIALHOME_URL,
-        reverse("content:view-by-slug", kwargs={"pk": parent.id, "slug": parent.slug}),
-    )
-    for participant in participants:
-        send_mail(
-            "%sNew reply to content you have participated in" % settings.EMAIL_SUBJECT_PREFIX,
-            "There is a new reply to content you have participated in, see it here: %s" % parent_url,
-            settings.DEFAULT_FROM_EMAIL,
-            [participant],
-            fail_silently=False,
-        )
+    participants = participants | User.objects.filter(profile__content__parent_id=content.id)
+    # Shares
+    participants = participants | User.objects.filter(profile__content__share_of_id=content.id)
+    # Replies on shares
+    participants = participants | User.objects.filter(profile__content__parent__share_of_id=content.id)
+    if exclude_user:
+        participants = participants.exclude(id=exclude_user.id)
+    return set(participants)
 
 
 def send_follow_notification(follower_id, followed_id):
@@ -62,10 +53,84 @@ def send_follow_notification(follower_id, followed_id):
         logger.warning("No follower profile %s found for follow notifications", follower_id)
         return
     logger.info("send_follow_notification - Sending mail to %s", user.email)
+    subject = _("New follower: %s" % follower.handle)
+    context = get_common_context()
+    context.update({
+        "subject": subject, "actor_name": follower.name_or_handle,
+        "actor_url": "%s%s" % (settings.SOCIALHOME_URL, follower.get_absolute_url()),
+        "name": user.profile.name_or_handle,
+    })
     send_mail(
-        "%sNew follower" % settings.EMAIL_SUBJECT_PREFIX,
-        "You have a new follower: %s" % follower.handle,
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/follow.txt", context=context),
         settings.DEFAULT_FROM_EMAIL,
         [user.email],
         fail_silently=False,
+        html_message=render_to_string("notifications/follow.html", context=context),
+    )
+
+
+def send_reply_notifications(content_id):
+    """Super simple reply notification to content local participants.
+
+    Until proper notifications is supported, just pop out an email.
+    """
+    if settings.DEBUG:
+        return
+    try:
+        content = Content.objects.get(id=content_id, content_type=ContentType.REPLY)
+    except Content.DoesNotExist:
+        logger.warning("No reply content found with id %s", content_id)
+        return
+    root_content = content.root
+    exclude_user = content.author.user if content.local else None
+    participants = get_root_content_participants(root_content, exclude_user=exclude_user)
+    if not participants:
+        return
+    subject = _("New reply to: %s" % root_content.short_text_inline)
+    # TODO use fragment url to reply directly when available
+    content_url = "%s%s" % (settings.SOCIALHOME_URL, root_content.get_absolute_url())
+    context = get_common_context()
+    context.update({
+        "subject": subject, "actor_name": content.author.name_or_handle,
+        "actor_url": "%s%s" % (settings.SOCIALHOME_URL, content.author.get_absolute_url()),
+        "reply_text": content.text, "reply_rendered": content.rendered, "reply_url": content_url,
+    })
+    for participant in participants:
+        context["name"] = participant.profile.name_or_handle
+        logger.info("send_reply_notifications - Sending mail to %s", participant.email)
+        send_mail(
+            "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+            render_to_string("notifications/reply.txt", context=context),
+            settings.DEFAULT_FROM_EMAIL,
+            [participant.email],
+            fail_silently=False,
+            html_message=render_to_string("notifications/reply.html", context=context),
+        )
+
+
+def send_share_notification(share_id):
+    """Super simple you're content has been shared notification to a user."""
+    if settings.DEBUG:
+        return
+    try:
+        content = Content.objects.get(id=share_id, content_type=ContentType.SHARE, share_of__local=True)
+    except Content.DoesNotExist:
+        logger.warning("No share content found with id %s", share_id)
+        return
+    content_url = "%s%s" % (settings.SOCIALHOME_URL, content.share_of.get_absolute_url())
+    subject = _("New share of: %s" % content.share_of.short_text_inline)
+    context = get_common_context()
+    context.update({
+        "subject": subject, "actor_name": content.author.name_or_handle,
+        "actor_url": "%s%s" % (settings.SOCIALHOME_URL, content.author.get_absolute_url()),
+        "content_url": content_url, "name": content.share_of.author.name_or_handle,
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/share.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [content.share_of.author.user.email],
+        fail_silently=False,
+        html_message=render_to_string("notifications/share.html", context=context),
     )

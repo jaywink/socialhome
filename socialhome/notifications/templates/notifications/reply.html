@@ -1,0 +1,14 @@
+{% extends "notifications/base.html" %}
+{% load i18n %}
+
+{% block body %}
+    <p>
+        {% trans "There is a new reply to content you have participated in by" %} <a href="{{ actor_url }}">{{ actor_name }}</a>.
+    </p>
+    <p>
+        {% trans "React to the reply here:" %} <a href="{{ reply_url }}">{{ reply_url }}</a>.
+    </p>
+    <blockquote>
+        {{ reply_rendered|safe }}
+    </blockquote>
+{% endblock %}

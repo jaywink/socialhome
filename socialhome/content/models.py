@@ -150,11 +150,23 @@ class Content(models.Model):
             self.share_of.cache_data(commit=True)
         if self.parent:
             self.parent.cache_data(commit=True)
+            if self.parent.share_of:
+                self.parent.share_of.cache_data(commit=True)
 
     def get_absolute_url(self):
         if self.slug:
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
         return reverse("content:view", kwargs={"pk": self.id})
+
+    @cached_property
+    def root(self):
+        """Get root content if a reply or share."""
+        if self.content_type == ContentType.CONTENT:
+            return self
+        elif self.content_type == ContentType.REPLY:
+            return self.parent.root
+        elif self.content_type == ContentType.SHARE:
+            return self.share_of.root
 
     @staticmethod
     @memoize(timeout=604800)  # a week
@@ -263,7 +275,11 @@ class Content(models.Model):
 
     @cached_property
     def short_text(self):
-        return truncate_letters(self.text, 50)
+        return truncate_letters(self.text, 50) or ""
+
+    @property
+    def short_text_inline(self):
+        return self.short_text.replace("\n", " ").replace("\r", "")
 
     @cached_property
     def slug(self):

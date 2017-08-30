@@ -8,6 +8,7 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 from socialhome.federate.tasks import send_follow_change, send_profile
+from socialhome.notifications.tasks import send_follow_notification
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -41,6 +42,9 @@ def on_commit_profile_following_change(action, pks, instance):
             django_rq.enqueue(
                 send_follow_change, instance.id, id, True if action == "post_add" else False
             )
+        # Send out notification if local followed
+        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False):
+            django_rq.enqueue(send_follow_notification, instance.id, id)
 
 
 @receiver(m2m_changed, sender=Profile.following.through)

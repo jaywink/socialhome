@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import pytest
 from django.db import IntegrityError
+from django.test import TransactionTestCase
 from federation.entities import base
 from federation.tests.factories import entities
 
@@ -16,7 +17,7 @@ from socialhome.federate.utils.tasks import (
     process_entity_relationship,
     make_federable_profile, process_entity_share)
 from socialhome.notifications.tasks import send_follow_notification
-from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory
 
@@ -273,11 +274,10 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
         self.assertEqual(self.remote_profile.following.count(), 0)
 
 
-class TestProcessEntityFollow(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.create_local_and_remote_user()
+class TestProcessEntityFollow(SocialhomeTransactionTestCase):
+    def setUp(self):
+        super().setUp()
+        self.create_local_and_remote_user()
 
     def test_follower_added_on_following_true(self):
         process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
@@ -295,11 +295,10 @@ class TestProcessEntityFollow(SocialhomeTestCase):
         mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
 
 
-class TestProcessEntityRelationship(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.create_local_and_remote_user()
+class TestProcessEntityRelationship(SocialhomeTransactionTestCase):
+    def setUp(self):
+        super().setUp()
+        self.create_local_and_remote_user()
 
     def test_follower_added_on_following(self):
         process_entity_relationship(

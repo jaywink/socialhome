@@ -8,7 +8,7 @@ from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
-from socialhome.notifications.tasks import send_reply_notifications
+from socialhome.notifications.tasks import send_reply_notifications, send_share_notification
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
@@ -101,7 +101,11 @@ class TestFederateContent(TransactionTestCase):
         share_of = ContentFactory(author=user2.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, share_of=share_of)
-        mock_send.assert_called_once_with(send_share, content.id)
+        call_args = [
+            call(send_share_notification, content.id),
+            call(send_share, content.id),
+        ]
+        assert mock_send.call_args_list == call_args
 
     @patch("socialhome.content.signals.django_rq.enqueue", side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")
