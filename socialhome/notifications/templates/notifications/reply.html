@@ -9,6 +9,6 @@
         {% trans "React to the reply here:" %} <a href="{{ reply_url }}">{{ reply_url }}</a>.
     </p>
     <blockquote>
-        {{ reply_rendered }}
+        {{ reply_rendered|safe }}
     </blockquote>
 {% endblock %}
