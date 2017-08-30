@@ -1,4 +1,7 @@
-const stateOperations = {
+import _forEach from "lodash/forEach"
+
+
+const streamStoreOperations = {
     receivedNewContent: "receivedNewContent",
     newContentAck: "newContentAck",
 }
@@ -6,24 +9,38 @@ const stateOperations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
-    [stateOperations.receivedNewContent](state, newContentLengh) {
-        state.stream.hasNewContent = true
-        state.stream.newContentLengh += newContentLengh
+    [streamStoreOperations.receivedNewContent](state, contentId) {
+        state.hasNewContent = true
+        state.newContentLengh += 1
+        state.contentIds.unshift(contentId)
+        state.contents[contentId] = undefined
     },
-    [stateOperations.newContentAck](state) {
-        state.stream.hasNewContent = false
-        state.stream.newContentLengh = 0
+    [streamStoreOperations.newContentAck](state) {
+        state.hasNewContent = false
+        state.newContentLengh = 0
     },
 }
 /* eslint-enable no-param-reassign */
 
 const actions = {
-    [stateOperations.receivedNewContent]({commit}, newContentLengh) {
-        commit(stateOperations.receivedNewContent, newContentLengh)
+    [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
+        commit(streamStoreOperations.receivedNewContent, newContentLengh)
     },
-    [stateOperations.newContentAck]({commit}) {
-        commit(stateOperations.newContentAck)
+    [streamStoreOperations.newContentAck]({commit}) {
+        commit(streamStoreOperations.newContentAck)
     },
 }
 
-export {actions, mutations, stateOperations}
+const getters = {
+    contentList(state) {
+        const contents = []
+        _forEach(state.contentIds, id => {
+            if (state.contents[id] !== undefined) {
+                contents.push(state.contents[id])
+            }
+        })
+        return contents
+    },
+}
+
+export {actions, mutations, streamStoreOperations, getters}

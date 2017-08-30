@@ -48,14 +48,11 @@ class BaseStreamView(ListView):
                 "timestamp": content.formatted_timestamp,
                 "humanizedTimestamp": content.humanized_timestamp,
                 "edited": bool(content.edited),
-                "childrenCount": content.reply_count,
+                "repliesCount": content.reply_count,
                 "sharesCount": content.shares_count,
                 "isUserLocal": bool(content.author.user),
                 "contentUrl": content.get_absolute_url(),
                 "isUserAuthor": is_user_author,
-                "updateUrl": reverse("content:update", kwargs={"pk": content.id}) if is_user_author else "",
-                "replyUrl": reverse("content:reply", kwargs={"pk": content.id}) if is_user_author else "",
-                "deleteUrl": reverse("content:reply", kwargs={"pk": content.id}) if is_user_author else "",
                 "hasShared": Content.has_shared(content.id, request_user_profile.id) if request_user_profile else False,
             }
 
@@ -64,7 +61,6 @@ class BaseStreamView(ListView):
             "currentBrowsingProfileId": getattr(request_user_profile, "id", None),
             "streamName": stream_name,
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
-            "showAuthorBar": not stream_name.startswith("profile_"),
             "translations": {"stampedContent": self._get_stamped_content_translations()}
         }
 

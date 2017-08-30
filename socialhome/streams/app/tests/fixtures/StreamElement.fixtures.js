@@ -14,16 +14,12 @@ const getStreamElementPropsData = function (args = {}) {
         contentUrl: "https://127.0.0.1",
         updateUrl: "https://127.0.0.1",
         deleteUrl: "https://127.0.0.1",
-        replyUrl: "https://127.0.0.1",
-        childrenCount: faker.random.number(),
+        repliesCount: faker.random.number(),
         sharesCount: faker.random.number(),
         edited: faker.random.boolean(),
         isUserLocal: faker.random.boolean(),
         isUserAuthor: faker.random.boolean(),
         showAuthorBar: faker.random.boolean(),
-        isUserAuthenticated: faker.random.boolean(),
-        currentBrowsingProfileId: faker.random.number().toString(),
-        hasShared: faker.random.boolean(),
     })
 }
 

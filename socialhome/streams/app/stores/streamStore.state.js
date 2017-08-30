@@ -1,24 +1,23 @@
-import _isNumber from "lodash/isNumber"
 import _get from "lodash/get"
+import _forEach from "lodash/forEach"
 
 
 export default function () {
+    const contentIds = []
+    const contents = {}
+    _forEach(_get(window, ["context", "contentList"], []), content => {
+        contentIds.push(content.id)
+        contents[content.id] = content
+    })
+
+    const streamName = _get(window, ["context", "streamName"], "")
+
     return {
-        translations: {
-            stampedContent: {
-                h2: _get(window, ["context", "translations", "stampedContent", "h2"], ""),
-                p: _get(window, ["context", "translations", "stampedContent", "p"], ""),
-            },
-        },
-        contentList: _get(window, ["context", "contentList"], []),
-        stream: {
-            hasNewContent: false,
-            newContentLengh: 0,
-            streamName: _get(window, ["context", "streamName"], ""),
-        },
-        isUserAuthenticated: _get(window, ["context", "isUserAuthenticated"], false),
-        showAuthorBar: _get(window, ["context", "showAuthorBar"], false),
-        currentBrowsingProfileId: (_isNumber(_get(window, ["context", "currentBrowsingProfileId"], undefined))
-            ? `${window.context.currentBrowsingProfileId}` : undefined),
+        contents,
+        contentIds,
+        showAuthorBar: streamName.length > 0 ? !streamName.startsWith("profile_") : false,
+        hasNewContent: false,
+        newContentLengh: 0,
+        streamName,
     }
 }

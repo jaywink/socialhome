@@ -1,25 +1,33 @@
 import Vue from "vue"
 import Vuex from "vuex"
 import ReconnectingWebSocket from "reconnecting-websocket"
+import _defaults from "lodash/defaults"
+import _get from "lodash/get"
 
 import getState from "streams/app/stores/streamStore.state"
-import {actions, mutations, stateOperations} from "streams/app/stores/streamStore.operations"
+import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
 
 
 Vue.use(Vuex)
 
-function newinstance(WebSocketImpl = ReconnectingWebSocket) {
+function newStreamStore(options) {
     const state = getState()
-    const store = new Vuex.Store({state, mutations, actions})
+    const opts = _defaults({}, {state, mutations, actions, getters}, options)
+
+    // This exists for test puposes
+    const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
+    delete opts.WebSocketImpl
+
+    const store = new Vuex.Store(opts)
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"
-    const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.stream.streamName}/`
+    const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.streamName}/`
     const ws = new WebSocketImpl(wsPath)
 
     ws.onmessage = message => {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(stateOperations.receivedNewContent, 1)
+            store.dispatch(streamStoreOperations.receivedNewContent, 1)
         }
     }
 
@@ -28,7 +36,4 @@ function newinstance(WebSocketImpl = ReconnectingWebSocket) {
     return store
 }
 
-const store = newinstance()
-
-export default store
-export {store, stateOperations, newinstance}
+export {streamStoreOperations, newStreamStore}

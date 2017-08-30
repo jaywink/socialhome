@@ -6,59 +6,42 @@
             v-bind="author"
             :is-user-author="isUserAuthor"
             :is-user-local="isUserLocal"
-            :current-browsing-profile-id="currentBrowsingProfileId"
-            :is-user-authenticated="isUserAuthenticated"
         >
         </author-bar>
-        <div class="grid-item-bar d-flex justify-content-start">
+        <reactions-bar
+            :id="id"
+            :replies-count="repliesCount"
+            :shares-count="sharesCount"
+            :has-shared="hasShared"
+        >
             <div class="mt-1">
-                <a :ref="contentUrl" :title="timestamp">
+                <a :href="contentUrl" :title="timestamp" class="unstyled-link">
                     {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
                 </a>
-                <div v-if="isUserAuthor">
+                &nbsp;
+                <template v-if="isUserAuthor">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
                     </a>
+                    &nbsp;
                     <a :href="deleteUrl">
                         <i class="fa fa-remove" title="Delete" aria-label="Delete"></i>
                     </a>
-                </div>
+                </template>
             </div>
-            <div class="ml-auto grid-item-reactions mt-1">
-                <div
-                    v-if="showShares"
-                    class="item-reaction"
-                    :class="{'item-reaction-shared': hasShared$}"
-                    @click.stop.prevent="expandShares"
-                >
-                    <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                    <span class="item-reaction-counter">{{ sharesCount$ }}</span>
-                </div>
-                <div v-if="showReplies" class="item-reaction">
-                    <span class="item-open-replies-action" :data-content-id="id">
-                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
-                        <span class="item-reaction-counter">{{ childrenCount }}</span>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div v-if="showSharesBox" class="content-actions">
-            <b-button v-if="hasShared$" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
-            <b-button v-if="!hasShared$" variant="secondary" @click.prevent.stop="share">Share</b-button>
-        </div>
-        <div class="replies-container" :data-content-id="id"></div>
-        <div v-if="isUserAuthenticated" class="content-actions hidden" :data-content-id="id">
-            <b-button variant="secondary" :href="replyUrl">Reply</b-button>
-        </div>
+        </reactions-bar>
     </div>
 </template>
 
 <script>
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
+import "streams/app/components/ReactionsBar.vue"
+import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
+    store,
     props: {
         id: {type: Number, required: true},
         author: {type: Object, required: true},
@@ -66,66 +49,23 @@ export default Vue.component("stream-element", {
         humanizedTimestamp: {type: String, required: true},
         htmlSafe: {type: String, required: true},
         contentUrl: {type: String, required: true},
-        updateUrl: {type: String, required: true},
-        deleteUrl: {type: String, required: true},
-        replyUrl: {type: String, required: true},
-        childrenCount: {type: Number, required: true},
+        repliesCount: {type: Number, required: true},
         sharesCount: {type: Number, required: true},
         edited: {type: Boolean, required: true},
         isUserLocal: {type: Boolean, required: true},
         isUserAuthor: {type: Boolean, required: true},
         showAuthorBar: {type: Boolean, required: true},
-        isUserAuthenticated: {type: Boolean, required: true},
-        currentBrowsingProfileId: {type: String, required: false},
         hasShared: {type: Boolean, required: true},
-    },
-    data() {
-        return {
-            showSharesBox: false,
-            sharesCount$: this.sharesCount,
-            hasShared$: this.hasShared,
-        }
     },
     computed: {
         editedText() {
             return this.edited ? " (edited)" : ""
         },
-        showReplies() {
-            return this.isUserAuthenticated || this.childrenCount > 0
+        deleteUrl() {
+            return Urls["content:delete"]({pk: this.id})
         },
-        showShares() {
-            return this.isUserAuthenticated || this.sharesCount$ > 0
-        },
-    },
-    methods: {
-        expandShares() {
-            this.showSharesBox = !this.showSharesBox
-        },
-        share() {
-            if (!this.isUserAuthenticated) {
-                console.error("Not logged in")
-                return
-            }
-            this.$http.post(`/api/content/${this.id}/share/`)
-                .then(() => {
-                    this.$data.showSharesBox = false
-                    this.sharesCount$ += 1
-                    this.hasShared$ = true
-                })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
-        },
-        unshare() {
-            if (!this.isUserAuthenticated) {
-                console.error("Not logged in")
-                return
-            }
-            this.$http.delete(`/api/content/${this.id}/share/`)
-                .then(() => {
-                    this.$data.showSharesBox = false
-                    this.sharesCount$ -= 1
-                    this.hasShared$ = false
-                })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        updateUrl() {
+            return Urls["content:update"]({pk: this.id})
         },
     },
     updated() {

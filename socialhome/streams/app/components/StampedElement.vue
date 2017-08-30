@@ -12,7 +12,7 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/streamStore"
+import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stamped-element", {store})
