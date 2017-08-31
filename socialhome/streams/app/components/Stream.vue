@@ -10,7 +10,7 @@
             </div>
             <div v-images-loaded.on.progress="onImageLoad" v-masonry v-bind="masonryOptions">
                 <div class="stamped">
-                    <stamped-element />
+                    <component :is="stampedElement" />
                 </div>
                 <div class="grid-sizer"></div>
                 <div class="gutter-sizer"></div>
@@ -30,8 +30,9 @@
 <script>
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
-import "streams/app/components/StampedElement.vue"
 import "streams/app/components/StreamElement.vue"
+import PublicStampedElement from "streams/app/components/PublicStampedElement.vue"
+import FollowedStampedElement from "streams/app/components/FollowedStampedElement.vue"
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import globalStore from "streams/app/stores/applicationStore"
 
@@ -39,6 +40,7 @@ import globalStore from "streams/app/stores/applicationStore"
 export default Vue.component("stream", {
     store: newStreamStore(),
     directives: {imagesLoaded},
+    components: {FollowedStampedElement, PublicStampedElement},
     data() {
         return {
             masonryOptions: {
@@ -51,6 +53,17 @@ export default Vue.component("stream", {
                 stagger: 0,
             },
         }
+    },
+    computed: {
+        stampedElement() {
+            if (this.$store.state.streamName.match(/followed/)) {
+                return "FollowedStampedElement"
+            } else if (this.$store.state.streamName.match(/public/)) {
+                return "PublicStampedElement"
+            } else {
+                console.error(`Unsupported stream name ${this.$store.state.streamName}`)
+            }
+        },
     },
     methods: {
         onImageLoad() {
