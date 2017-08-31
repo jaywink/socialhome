@@ -3,8 +3,13 @@
 Changelog
 =========
 
-[unreleased]
-------------
+0.4.0 (2018-08-31)
+------------------
+
+Update notes
+............
+
+This release contains long running migrations. Please allow up to 10 minutes for the migrations to run, depending on your database size.
 
 Added
 .....
