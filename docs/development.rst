@@ -193,6 +193,6 @@ Then execute the following and copy the markdown version for pasting to GitHub r
 Contact for help
 ----------------
 
-Easiest via FreeNode IRC, channel #socialhome (`webchat here <http://webchat.freenode.net?channels=%23socialhome&uio=d4>`_) or `Gitter chat <https://gitter.im/socialhome/Lobby>`_
+See our communication channels in the :ref:`community` page.
 
 You can also ask questions or give feedback via issues.
