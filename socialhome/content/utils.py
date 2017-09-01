@@ -102,6 +102,9 @@ def find_urls_in_text(text):
     """Find url's from text.
 
     Bleach does the heavy lifting here by identifying the links.
+
+    :param text: Text to search links from
+    :returns: set of urls
     """
     urls = []
 
@@ -111,7 +114,7 @@ def find_urls_in_text(text):
         return None
 
     bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
-    return urls
+    return set(urls)
 
 
 def test_tag(tag):
