@@ -1,6 +1,7 @@
 import re
 
 import bleach
+from bleach import callbacks
 from bs4 import BeautifulSoup
 
 
@@ -26,19 +27,15 @@ def safe_text_for_markdown(text):
     return text
 
 
-def code_blocks_add_markers(text, style="markdown"):
+def code_blocks_add_markers(text):
     """Store code block contents to safety.
 
     :param text: Text to process
-    :param style: Either 'markdown' or 'html'
     :returns: tuple (list of extracted code block texts, processed text without code block contents)
     """
-    if style == "markdown":
-        # Regexp match all ` and ``` pairs
-        codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
-                re.findall(r"```.*```", text, flags=re.DOTALL)
-    else:
-        codes = re.findall(r"<code>.*</code>", text, flags=re.DOTALL)
+    # Regexp match all ` and ``` pairs
+    codes = re.findall(r"`(?!`)[^\r\n].*[^\r\n]`(?!`)", text, flags=re.DOTALL) + \
+            re.findall(r"```.*```", text, flags=re.DOTALL)
     # Store to safety, replacing with markers
     safety = []
     for counter, code in enumerate(codes, 1):
@@ -78,28 +75,27 @@ def make_nsfw_safe(text):
     return result
 
 
-def linkify_re_match(match):
-    return '<a href="{url}" target="_blank" rel="noopener">{url}</a>'.format(url=match.group())
+def process_text_links(text):
+    """Process links in text, adding some attributes and linkifying textual links."""
+    link_callbacks = [callbacks.nofollow, callbacks.target_blank]
 
+    def link_attributes(attrs, new=False):
+        """Run standard callbacks except for internal links."""
+        href_key = (None, "href")
+        if attrs.get(href_key).startswith("/"):
+            return attrs
 
-def linkify_text_urls(text):
-    """Find textual lonely urls in the text and make them proper HTML links."""
-    urls = find_urls_in_text(text)
-    if not urls:
-        return text
-    code_blocks, text = code_blocks_add_markers(text, style="html")
-    text = re.sub(
-        r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*',
-        linkify_re_match,
+        # Run the standard callbacks
+        for callback in link_callbacks:
+            attrs = callback(attrs, new)
+        return attrs
+
+    return bleach.linkify(
         text,
+        callbacks=[link_attributes],
+        parse_email=False,
+        skip_tags=["code"],
     )
-    text = re.sub(
-        r'(?<=[ \n]{1})https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*',
-        linkify_re_match,
-        text,
-    )
-    text = code_blocks_restore(code_blocks, text)
-    return text
 
 
 def find_urls_in_text(text):

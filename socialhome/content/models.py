@@ -22,7 +22,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentQuerySet
-from socialhome.content.utils import make_nsfw_safe, test_tag, linkify_text_urls
+from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 
@@ -298,7 +298,7 @@ class Content(models.Model):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
         rendered = commonmark(text).strip()
-        rendered = linkify_text_urls(rendered)
+        rendered = process_text_links(rendered)
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
         if self.oembed:

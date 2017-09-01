@@ -3,6 +3,14 @@
 Changelog
 =========
 
+[unreleased]
+------------
+
+Changed
+.......
+
+* Rendered link processing has been rewritten. This fixes issues with some links not being linkified when rendering. Additionally now all external links are made to open in a new tab or window. (`#197 <https://github.com/jaywink/socialhome/issues/197>`_)
+
 0.4.0 (2017-08-31)
 ------------------
 

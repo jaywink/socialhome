@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from socialhome.content.utils import safe_text_for_markdown, safe_text, make_nsfw_safe, find_urls_in_text
+from socialhome.content.utils import (
+    safe_text_for_markdown, safe_text, make_nsfw_safe, find_urls_in_text, process_text_links)
 
 PLAIN_TEXT = "abcdefg kissa kävelee"
 MARKDOWN_TEXT = "## header\n\nFoo Bar. *fooo*"
@@ -119,3 +120,37 @@ class TestFindUrlsInText(TestCase):
     def test_href_markdown_etc_skipped(self):
         urls = find_urls_in_text(self.href_and_markdown)
         self.assertEqual(urls, [])
+
+
+class TestProcessTextLinks(TestCase):
+    def test_link_at_start_or_end(self):
+        self.assertEqual(
+            process_text_links('https://example.org example.org\nhttp://example.org'),
+            '<a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a> '
+            '<a href="http://example.org" rel="nofollow" target="_blank">example.org</a>\n'
+            '<a href="http://example.org" rel="nofollow" target="_blank">http://example.org</a>',
+        )
+
+    def test_existing_links_get_attrs_added(self):
+        self.assertEqual(
+            process_text_links('<a href="https://example.org">https://example.org</a>'),
+            '<a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a>',
+        )
+
+    def test_code_sections_are_skipped(self):
+        self.assertEqual(
+            process_text_links('<code>https://example.org</code><code>\nhttps://example.org\n</code>'),
+            '<code>https://example.org</code><code>\nhttps://example.org\n</code>',
+        )
+
+    def test_emails_are_skipped(self):
+        self.assertEqual(
+            process_text_links('foo@example.org'),
+            'foo@example.org',
+        )
+
+    def test_does_not_add_target_blank_if_link_is_internal(self):
+        self.assertEqual(
+            process_text_links('<a href="/tags/foobar">#foobar</a>'),
+            '<a href="/tags/foobar">#foobar</a>',
+        )
