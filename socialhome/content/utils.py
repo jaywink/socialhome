@@ -101,15 +101,20 @@ def process_text_links(text):
 def find_urls_in_text(text):
     """Find url's from text.
 
-    URL matching by design only picks up "orphan" urls which are not href attributes or markdown links.
-    There must be an empty space, line feed or text start before the url for a match to happen.
+    Bleach does the heavy lifting here by identifying the links.
 
-    Note, this is not entirely accurate, we're just trying to match as many as we can, allowing possibly
-    a few false positives.
+    :param text: Text to search links from
+    :returns: set of urls
     """
-    urls = re.findall(r'^https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text) + \
-           re.findall(r'(?<=[ \n]{1})https?://[\w\./\?=#\-&_%\+~:\[\]@\!\$\(\)\*,;]*', text)
-    return urls
+    urls = []
+
+    def link_collector(attrs, new=False):
+        href_key = (None, "href")
+        urls.append(attrs.get(href_key))
+        return None
+
+    bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
+    return set(urls)
 
 
 def test_tag(tag):

@@ -11,6 +11,8 @@ Changed
 
 * Rendered link processing has been rewritten. This fixes issues with some links not being linkified when rendering. Additionally now all external links are made to open in a new tab or window. (`#197 <https://github.com/jaywink/socialhome/issues/197>`_)
 
+* Previously previews and oEmbed's for content used to only pick up "orphan" links from the content text. This meant that if there was a Markdown or HTML link, there would be no link preview or oEmbed fetched. This has now been changed. All links found in the content will be considered for preview and oEmbed. The first link to return a preview or oEmbed will be used.
+
 0.4.0 (2017-08-31)
 ------------------
 
