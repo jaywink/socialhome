@@ -23,11 +23,19 @@ describe("Stream", () => {
                 target.instance().$store.state.streamName = "followed"
                 target.instance().stampedElement.should.eq("FollowedStampedElement")
             })
+
             it("should render the PublicStampedElement when stream name is 'public'", () => {
                 let target = mount(Stream, {})
                 target.instance().$store.state.streamName = "public"
                 target.instance().stampedElement.should.eq("PublicStampedElement")
             })
+
+            it("should render the TagStampedElement when stream name is 'tag'", () => {
+                let target = mount(Stream, {})
+                target.instance().$store.state.streamName = "tag"
+                target.instance().stampedElement.should.eq("TagStampedElement")
+            })
+
             it("should display an error when stream name is unknown", () => {
                 let target = mount(Stream, {})
                 Sinon.spy(console, "error")

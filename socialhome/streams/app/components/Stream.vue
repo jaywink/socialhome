@@ -33,6 +33,7 @@ import imagesLoaded from "vue-images-loaded"
 import "streams/app/components/StreamElement.vue"
 import PublicStampedElement from "streams/app/components/PublicStampedElement.vue"
 import FollowedStampedElement from "streams/app/components/FollowedStampedElement.vue"
+import TagStampedElement from "streams/app/components/TagStampedElement.vue"
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import globalStore from "streams/app/stores/applicationStore"
 
@@ -40,7 +41,7 @@ import globalStore from "streams/app/stores/applicationStore"
 export default Vue.component("stream", {
     store: newStreamStore(),
     directives: {imagesLoaded},
-    components: {FollowedStampedElement, PublicStampedElement},
+    components: {FollowedStampedElement, PublicStampedElement, TagStampedElement},
     data() {
         return {
             masonryOptions: {
@@ -56,10 +57,12 @@ export default Vue.component("stream", {
     },
     computed: {
         stampedElement() {
-            if (this.$store.state.streamName.match(/followed/)) {
+            if (this.$store.state.streamName.match(/^followed/)) {
                 return "FollowedStampedElement"
-            } else if (this.$store.state.streamName.match(/public/)) {
+            } else if (this.$store.state.streamName.match(/^public/)) {
                 return "PublicStampedElement"
+            } else if (this.$store.state.streamName.match(/^tag/)) {
+                return "TagStampedElement"
             } else {
                 console.error(`Unsupported stream name ${this.$store.state.streamName}`)
             }

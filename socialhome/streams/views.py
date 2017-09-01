@@ -88,6 +88,8 @@ class TagStreamView(BaseStreamView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["tag_name"] = self.tag.name
+        if self.vue:  # pragma: no cover
+            context["json_context"]["tagName"] = self.tag.name
         return context
 
 
