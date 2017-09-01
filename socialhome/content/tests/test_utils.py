@@ -90,12 +90,13 @@ class TestFindUrlsInText(TestCase):
         cls.starts_with_url = "https://example.com/foobar"
         cls.http_starts_with_url = "http://example.com/foobar"
         cls.numbers = "http://foo123.633.com"
-        cls.special_chars = "https://example.com/~:[]@!$()*,;_%20+wat.wot?foo=bar&bar=foo#rokkenroll"
+        cls.special_chars = "https://example.com/~@!$()*,;_%20+wat.wot?foo=bar&bar=foo#rokkenroll"
         cls.urls_in_text = "fewfe https://example1.com grheiugheriu\nhttps://example2.com " \
                            "fhuiwehfui https://example-3.com\nfwfefewjuio"
         cls.href_and_markdown = "foo <a href='https://example.com'>bar</a> " \
-                                "<a href=\"https://example.com\">bar</a>" \
-                                "[waat](https://example.com)"
+                                "<a href=\"https://example.net\">bar</a>" \
+                                "[waat](https://example.org)"
+        cls.without_protocol = "example.org"
 
     def test_starts_with_url(self):
         urls = find_urls_in_text(self.starts_with_url)
@@ -117,9 +118,13 @@ class TestFindUrlsInText(TestCase):
             "https://example1.com", "https://example2.com", "https://example-3.com"
         ])
 
-    def test_href_markdown_etc_skipped(self):
+    def test_href_markdown(self):
         urls = find_urls_in_text(self.href_and_markdown)
-        self.assertEqual(urls, [])
+        self.assertEqual(urls, ["https://example.com", "https://example.net", "https://example.org"])
+
+    def test_without_protocol(self):
+        urls = find_urls_in_text(self.without_protocol)
+        self.assertEqual(urls, ["http://example.org"])
 
 
 class TestProcessTextLinks(TestCase):
