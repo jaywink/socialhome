@@ -19,5 +19,6 @@ export default function () {
         hasNewContent: false,
         newContentLengh: 0,
         streamName,
+        tagName: _get(window, ["context", "tagName"], ""),
     }
 }

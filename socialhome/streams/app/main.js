@@ -7,12 +7,14 @@ import Axios from "axios"
 import "streams/app/components/Stream.vue"
 
 
-Vue.use(VueMasonryPlugin)
 Vue.use(BootstrapVue)
+Vue.use(VueMasonryPlugin)
 
 Vue.prototype.$http = Axios.create({
     xsrfCookieName: "csrftoken",
     xsrfHeaderName: "X-CSRFToken",
 })
 
-export default new Vue({el: "#app"})
+const main = new Vue({el: "#app"})
+
+export default main

@@ -12,7 +12,7 @@
 
 {% block javascript %}
     {% json_context %}
+    {{ block.super }}
     <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
     <script src="{% static 'js/webpack.stream.js' %}"></script>
-    {{ block.super }}
 {% endblock %}

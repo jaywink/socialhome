@@ -9,12 +9,6 @@ Vue.use(Vuex)
 function newApplicationStore() {
     return new Vuex.Store({
         state: {
-            translations: {
-                stampedContent: {
-                    h2: _get(window, ["context", "translations", "stampedContent", "h2"], ""),
-                    p: _get(window, ["context", "translations", "stampedContent", "p"], ""),
-                },
-            },
             isUserAuthenticated: _get(window, ["context", "isUserAuthenticated"], false),
             currentBrowsingProfileId: (_isNumber(_get(window, ["context", "currentBrowsingProfileId"], undefined))
                 ? `${window.context.currentBrowsingProfileId}` : undefined),
