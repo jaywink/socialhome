@@ -20,9 +20,9 @@
                 </b-button>
             </div>
         </div>
-        <div v-if="showSharesBox" class="content-actions">
+        <div v-if="canShare && showSharesBox" class="content-actions">
             <b-button v-if="content.hasShared" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
-            <b-button v-if="!content.hasShared" variant="secondary" @click.prevent.stop="share">Share</b-button>
+            <b-button v-else variant="secondary" @click.prevent.stop="share">Share</b-button>
         </div>
         <div class="replies-container"></div>
         <div v-if="showRepliesBox">
@@ -45,7 +45,6 @@ export default Vue.component("reactions-bar", {
         return {
             showSharesBox: false,
             showRepliesBox: false,
-            repliesCount$: this.repliesCount,
         }
     },
     computed: {
@@ -56,10 +55,14 @@ export default Vue.component("reactions-bar", {
             return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
         },
         showShares() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
+            return this.canShare &&
+                (this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0)
         },
         replyUrl() {
             return Urls["content:reply"]({pk: this.contentId})
+        },
+        canShare() {
+            return !this.content.isUserAuthor
         },
     },
     methods: {
@@ -70,6 +73,10 @@ export default Vue.component("reactions-bar", {
             this.showSharesBox = !this.showSharesBox
         },
         share() {
+            if (!this.canShare) {
+                console.error("Unable to share own post")
+                return
+            }
             if (!this.$store.state.applicationStore.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
@@ -83,6 +90,10 @@ export default Vue.component("reactions-bar", {
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
         unshare() {
+            if (!this.canShare) {
+                console.error("Unable to unshare own post")
+                return
+            }
             if (!this.$store.state.applicationStore.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
