@@ -1,22 +1,24 @@
 <template>
-    <div class="grid-item-bar d-flex justify-content-start">
-        <slot />
-        <div class="ml-auto grid-item-reactions mt-1">
-            <b-button
-                v-if="showShares"
-                :class="{'item-reaction-shared': hasShared$}"
-                class="item-reaction"
-                @click.stop.prevent="expandShares"
-            >
-                <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                <span class="item-reaction-counter">{{ sharesCount$ }}</span>
-            </b-button>
-            <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
-                <span class="item-open-replies-action">
-                    <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
-                    <span class="item-reaction-counter">{{ repliesCount$ }}</span>
-                </span>
-            </b-button>
+    <div>
+        <div class="grid-item-bar d-flex justify-content-start">
+            <slot />
+            <div class="ml-auto grid-item-reactions mt-1">
+                <b-button
+                    v-if="showShares"
+                    :class="{'item-reaction-shared': hasShared$}"
+                    class="item-reaction"
+                    @click.stop.prevent="expandShares"
+                >
+                    <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
+                    <span class="item-reaction-counter">{{ sharesCount$ }}</span>
+                </b-button>
+                <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
+                    <span class="item-open-replies-action">
+                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
+                        <span class="item-reaction-counter">{{ repliesCount$ }}</span>
+                    </span>
+                </b-button>
+            </div>
         </div>
         <div v-if="showSharesBox" class="content-actions">
             <b-button v-if="hasShared$" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>

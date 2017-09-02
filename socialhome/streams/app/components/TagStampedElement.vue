@@ -13,7 +13,7 @@ export default Vue.component("tag-stamped-element", {
             return `#${this.$store.state.tagName}`
         },
         helpText() {
-            return interpolate(gettext("All content tagged with %s"), [`#${this.$store.state.tagName}`])
+            return interpolate(gettext("All content tagged with %s."), [`#${this.$store.state.tagName}`])
         },
     },
 })
