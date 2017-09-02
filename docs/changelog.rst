@@ -6,6 +6,11 @@ Changelog
 [unreleased]
 ------------
 
+Added
+.....
+
+* GIF uploads are now possible when creating content or replies. (`#125 <https://github.com/jaywink/socialhome/issues/125>`_)
+
 Changed
 .......
 

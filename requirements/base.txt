@@ -59,7 +59,11 @@ django-memoize==2.1.0
 git+https://github.com/jaywink/federation.git@bcc779e006bc0af192db08a1ff8ed245c0fbd7c9#egg=federation==0.14.1.1
 
 # Content
-django-markdownx==2.0.21
+#django-markdownx==2.0.21
+# Own markdownx fork for some tweaks:
+# - disabling the hotkeys, see https://github.com/neutronX/django-markdownx/issues/66
+# - GIF upload
+git+https://github.com/jaywink/django-markdownx.git@e42748b9e411550ba4a70287cc006824a7199887#egg=django-markdownx==2.0.21.1
 CommonMark==0.7.3
 bleach==2.0.0
 beautifulsoup4==4.6.0
