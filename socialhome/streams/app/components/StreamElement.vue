@@ -1,22 +1,11 @@
 <template>
     <div>
-        <div v-html="htmlSafe"></div>
-        <author-bar
-            v-if="showAuthorBar"
-            v-bind="author"
-            :is-user-author="isUserAuthor"
-            :is-user-local="isUserLocal"
-        >
-        </author-bar>
-        <reactions-bar
-            :id="id"
-            :replies-count="repliesCount"
-            :shares-count="sharesCount"
-            :has-shared="hasShared"
-        >
+        <div v-html="content.htmlSafe"></div>
+        <author-bar v-if="showAuthorBar" :content-id="contentId" />
+        <reactions-bar :content-id="contentId">
             <div class="mt-1">
-                <a :href="contentUrl" :title="timestamp" class="unstyled-link">
-                    {{ humanizedTimestamp }}<span v-if="edited"> {{ editedText }}</span>
+                <a :href="content.contentUrl" :title="content.timestamp" class="unstyled-link">
+                    {{ editedText }}
                 </a>
                 &nbsp;
                 <template v-if="isUserAuthor">
@@ -41,31 +30,27 @@ import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
-    store,
     props: {
-        id: {type: Number, required: true},
-        author: {type: Object, required: true},
-        timestamp: {type: String, required: true},
-        humanizedTimestamp: {type: String, required: true},
-        htmlSafe: {type: String, required: true},
-        contentUrl: {type: String, required: true},
-        repliesCount: {type: Number, required: true},
-        sharesCount: {type: Number, required: true},
-        edited: {type: Boolean, required: true},
-        isUserLocal: {type: Boolean, required: true},
-        isUserAuthor: {type: Boolean, required: true},
-        showAuthorBar: {type: Boolean, required: true},
-        hasShared: {type: Boolean, required: true},
+        contentId: {type: Number, required: true},
     },
     computed: {
-        editedText() {
-            return this.edited ? " (edited)" : ""
+        content(){
+            return this.$store.state.contents[this.contentId]
         },
         deleteUrl() {
-            return Urls["content:delete"]({pk: this.id})
+            return Urls["content:delete"]({pk: this.contentId})
+        },
+        editedText() {
+            return this.content.edited ? `${this.content.humanizedTimestamp} (edited)` : this.content.humanizedTimestamp
+        },
+        isUserAuthor(){
+            return this.$store.state.applicationStore.currentBrowsingProfileId === this.content.author.guid
+        },
+        showAuthorBar() {
+            return this.$store.state.showAuthorBar
         },
         updateUrl() {
-            return Urls["content:update"]({pk: this.id})
+            return Urls["content:update"]({pk: this.contentId})
         },
     },
     updated() {
