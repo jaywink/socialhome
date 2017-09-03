@@ -8,7 +8,7 @@
                     {{ editedText }}
                 </a>
                 &nbsp;
-                <template v-if="isUserAuthor">
+                <template v-if="content.isUserAuthor">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
                     </a>
@@ -42,9 +42,6 @@ export default Vue.component("stream-element", {
         },
         editedText() {
             return this.content.edited ? `${this.content.humanizedTimestamp} (edited)` : this.content.humanizedTimestamp
-        },
-        isUserAuthor(){
-            return this.$store.state.applicationStore.currentBrowsingProfileId === this.content.author.guid
         },
         showAuthorBar() {
             return this.$store.state.showAuthorBar

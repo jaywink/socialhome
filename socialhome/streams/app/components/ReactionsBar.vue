@@ -52,11 +52,10 @@ export default Vue.component("reactions-bar", {
             return this.$store.state.contents[this.contentId]
         },
         showReplies() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.repliesCount > 0
         },
         showShares() {
-            return this.canShare &&
-                (this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0)
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
         },
         replyUrl() {
             return Urls["content:reply"]({pk: this.contentId})

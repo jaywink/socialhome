@@ -65,7 +65,7 @@ export default Vue.component("author-bar", {
             return this.$store.state.contents[this.contentId].author
         },
         isUserRemote() {
-            return !this.isUserLocal
+            return !this.$store.state.contents[this.contentId].isUserLocal
         },
         showFollowBtn() {
             return this.canFollow && !this.author.isUserFollowingAuthor
@@ -94,9 +94,7 @@ export default Vue.component("author-bar", {
                 return
             }
             this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.author.guid})
-                .then(() => {
-                    this.author.isUserFollowingAuthor = false
-                })
+                .then(() => { this.author.isUserFollowingAuthor = false })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
         follow() {
@@ -105,9 +103,7 @@ export default Vue.component("author-bar", {
                 return
             }
             this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.author.guid})
-                .then(() => {
-                    this.author.isUserFollowingAuthor = true
-                })
+                .then(() => { this.author.isUserFollowingAuthor = true })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
     },
