@@ -18,6 +18,11 @@ Changed
 
 * Previously previews and oEmbed's for content used to only pick up "orphan" links from the content text. This meant that if there was a Markdown or HTML link, there would be no link preview or oEmbed fetched. This has now been changed. All links found in the content will be considered for preview and oEmbed. The first link to return a preview or oEmbed will be used.
 
+Fixed
+.....
+
+* Cycling browser tabs with CTRL-TAB when focused on the editor no longer inserts a TAB character in the editor.
+
 0.4.0 (2017-08-31)
 ------------------
 
