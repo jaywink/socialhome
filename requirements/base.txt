@@ -59,7 +59,11 @@ django-memoize==2.1.0
 git+https://github.com/jaywink/federation.git@bcc779e006bc0af192db08a1ff8ed245c0fbd7c9#egg=federation==0.14.1.1
 
 # Content
-django-markdownx==2.0.21
+#django-markdownx==2.0.21
+# Own markdownx fork for some tweaks:
+# - disable tab when ctrl down
+# - GIF upload
+git+https://github.com/jaywink/django-markdownx.git@0f7b8c01906edd5ad590bb31f04685f859d6fab1#egg=django-markdownx==2.0.21.1
 CommonMark==0.7.3
 bleach==2.0.0
 beautifulsoup4==4.6.0
