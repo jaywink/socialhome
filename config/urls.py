@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.views import defaults as default_views
 from django.views.i18n import javascript_catalog
 from rest_framework.authtoken.views import obtain_auth_token
@@ -37,7 +36,6 @@ urlpatterns = [
     url(r"", include("socialhome.streams.urls", namespace="streams")),
 
     url(r"^$", HomeView.as_view(), name="home"),
-    url(r"^about/$", TemplateView.as_view(template_name="pages/about.html"), name="about"),
 
     # User management
     url(r"", include("socialhome.users.urls", namespace="users")),
