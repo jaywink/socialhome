@@ -73,11 +73,11 @@ class TestStreamConsumerReceive(ChannelTestCase):
         self.assertEqual(text["contents"], [self.child_content.dict_for_view(AnonymousUser())])
 
     @patch("socialhome.streams.consumers.Content.objects.public", return_value=Content.objects.none())
-    @patch("socialhome.streams.consumers.Content.objects.tags", return_value=Content.objects.none())
+    @patch("socialhome.streams.consumers.Content.objects.tag", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.profile_by_id", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.profile_pinned", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.followed", return_value=Content.objects.none())
-    def test_get_stream_qs_per_stream(self, mock_followed, mock_pinned, mock_profile, mock_tags, mock_public):
+    def test_get_stream_qs_per_stream(self, mock_followed, mock_pinned, mock_profile, mock_tag, mock_public):
         self.client.send_and_consume(
             "websocket.receive",
             {
@@ -89,12 +89,12 @@ class TestStreamConsumerReceive(ChannelTestCase):
         self.client.send_and_consume(
             "websocket.receive",
             {
-                "path": "/ch/streams/tags__%s_%s/" % (self.tag.id, self.tag.name),
+                "path": "/ch/streams/tag__%s_%s/" % (self.tag.id, self.tag.name),
                 "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
             },
         )
-        self.assertEqual(mock_tags.call_count, 1)
-        self.assertEqual(mock_tags.call_args[0][0], self.tag)
+        self.assertEqual(mock_tag.call_count, 1)
+        self.assertEqual(mock_tag.call_args[0][0], self.tag)
         self.client.send_and_consume(
             "websocket.receive",
             {

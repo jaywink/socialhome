@@ -13,14 +13,14 @@ class TestContentQuerySet(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.public_content = ContentFactory(pinned=True)
-        cls.public_tags_content = ContentFactory(text="#foobar")
+        cls.public_tag_content = ContentFactory(text="#foobar")
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
         cls.tag = Tag.objects.get(name="foobar")
         cls.site_content = ContentFactory(visibility=Visibility.SITE, pinned=True)
-        cls.site_tags_content = ContentFactory(visibility=Visibility.SITE, text="#foobar")
+        cls.site_tag_content = ContentFactory(visibility=Visibility.SITE, text="#foobar")
         cls.self_user = UserFactory()
         cls.self_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, pinned=True)
-        cls.self_tags_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, text="#foobar")
+        cls.self_tag_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, text="#foobar")
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
         cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
@@ -39,37 +39,37 @@ class TestContentQuerySet(SocialhomeTestCase):
 
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
-        self.assertEqual(contents, {self.public_content, self.public_tags_content, self.public_reply,
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.public_reply,
                                     self.public_share, self.public_share_reply})
         contents = set(Content.objects.visible_for_user(self.other_user))
-        self.assertEqual(contents, {self.public_content, self.public_tags_content, self.site_content,
-                                    self.site_tags_content, self.public_reply, self.site_reply, self.public_share,
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
+                                    self.site_tag_content, self.public_reply, self.site_reply, self.public_share,
                                     self.site_share, self.public_share_reply, self.share_site_reply})
         contents = set(Content.objects.visible_for_user(self.self_content.author.user))
-        self.assertEqual(contents, {self.public_content, self.public_tags_content, self.site_content,
-                                    self.site_tags_content, self.self_content, self.self_tags_content,
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
+                                    self.site_tag_content, self.self_content, self.self_tag_content,
                                     self.public_reply, self.site_reply, self.public_share,
                                     self.site_share, self.public_share_reply, self.share_site_reply})
 
     def test_public(self):
         contents = set(Content.objects.public())
-        self.assertEqual(contents, {self.public_content, self.public_tags_content})
+        self.assertEqual(contents, {self.public_content, self.public_tag_content})
 
-    def test_tags_by_name(self):
-        contents = set(Content.objects.tags_by_name("foobar", self.anonymous_user))
-        self.assertEqual(contents, {self.public_tags_content})
-        contents = set(Content.objects.tags_by_name("foobar", self.other_user))
-        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content})
-        contents = set(Content.objects.tags_by_name("foobar", self.self_content.author.user))
-        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content, self.self_tags_content})
+    def test_tag_by_name(self):
+        contents = set(Content.objects.tag_by_name("foobar", self.anonymous_user))
+        self.assertEqual(contents, {self.public_tag_content})
+        contents = set(Content.objects.tag_by_name("foobar", self.other_user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content})
+        contents = set(Content.objects.tag_by_name("foobar", self.self_content.author.user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.self_tag_content})
 
-    def test_tags(self):
-        contents = set(Content.objects.tags(self.tag, self.anonymous_user))
-        self.assertEqual(contents, {self.public_tags_content})
-        contents = set(Content.objects.tags(self.tag, self.other_user))
-        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content})
-        contents = set(Content.objects.tags(self.tag, self.self_content.author.user))
-        self.assertEqual(contents, {self.public_tags_content, self.site_tags_content, self.self_tags_content})
+    def test_tag(self):
+        contents = set(Content.objects.tag(self.tag, self.anonymous_user))
+        self.assertEqual(contents, {self.public_tag_content})
+        contents = set(Content.objects.tag(self.tag, self.other_user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content})
+        contents = set(Content.objects.tag(self.tag, self.self_content.author.user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.self_tag_content})
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
@@ -100,7 +100,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile(self.site_content.author.guid, self.self_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.profile(self.self_content.author.guid, self.self_user))
-        self.assertEqual(contents, {self.self_content, self.self_tags_content})
+        self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
         self._set_profiles_public()
         contents = set(Content.objects.profile(self.public_content.author.guid, self.anonymous_user))
@@ -120,7 +120,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile(self.site_content.author.guid, self.self_user))
         self.assertEqual(contents, {self.site_content})
         contents = set(Content.objects.profile(self.self_content.author.guid, self.self_user))
-        self.assertEqual(contents, {self.self_content, self.self_tags_content})
+        self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
     def test_profile_by_id(self):
         contents = set(Content.objects.profile_by_id(self.public_content.author.id, self.anonymous_user))
@@ -140,7 +140,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile_by_id(self.site_content.author.id, self.self_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.profile_by_id(self.self_content.author.id, self.self_user))
-        self.assertEqual(contents, {self.self_content, self.self_tags_content})
+        self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
         self._set_profiles_public()
         contents = set(Content.objects.profile_by_id(self.public_content.author.id, self.anonymous_user))
@@ -160,7 +160,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile_by_id(self.site_content.author.id, self.self_user))
         self.assertEqual(contents, {self.site_content})
         contents = set(Content.objects.profile_by_id(self.self_content.author.id, self.self_user))
-        self.assertEqual(contents, {self.self_content, self.self_tags_content})
+        self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
     def test_profile_pinned(self):
         contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.anonymous_user))

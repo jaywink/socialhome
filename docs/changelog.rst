@@ -18,6 +18,12 @@ Changed
 
 * Previously previews and oEmbed's for content used to only pick up "orphan" links from the content text. This meant that if there was a Markdown or HTML link, there would be no link preview or oEmbed fetched. This has now been changed. All links found in the content will be considered for preview and oEmbed. The first link to return a preview or oEmbed will be used.
 
+* Streams URL changes:
+    * All streams will now be under `/streams/` for a cleaner URL layout. So for example `/public/` is now `/streams/public/`.
+    * Tag stream URL has been changed from `/streams/tags/<tag>/` to `/streams/tag/<tag>/`. This small change allows us to later map `/stream/tags/` to the tags the user is following.
+
+  Since lots of old content will point to the old URL's, there will be support for the legacy URL's until they are needed for something else in the future.
+
 Fixed
 .....
 

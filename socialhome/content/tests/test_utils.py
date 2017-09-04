@@ -156,6 +156,6 @@ class TestProcessTextLinks(TestCase):
 
     def test_does_not_add_target_blank_if_link_is_internal(self):
         self.assertEqual(
-            process_text_links('<a href="/tags/foobar">#foobar</a>'),
-            '<a href="/tags/foobar">#foobar</a>',
+            process_text_links('<a href="/streams/tag/foobar">#foobar</a>'),
+            '<a href="/streams/tag/foobar">#foobar</a>',
         )

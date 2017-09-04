@@ -344,7 +344,7 @@ class Content(models.Model):
                                 "#%s" % candidate,
                                 "[#%s](%s)" % (
                                     candidate,
-                                    reverse("streams:tags", kwargs={"name": candidate.lower()})
+                                    reverse("streams:tag", kwargs={"name": candidate.lower()})
                                 )
                             )
                             final_words.append(tag_word)

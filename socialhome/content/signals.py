@@ -73,7 +73,7 @@ def notify_listeners(content):
             StreamConsumer.group_send("streams_public", data)
         # Tag streams
         for tag in content.tags.all():
-            StreamConsumer.group_send("streams_tags__%s" % tag.channel_group_name, data)
+            StreamConsumer.group_send("streams_tag__%s" % tag.channel_group_name, data)
         # Profile streams
         StreamConsumer.group_send("streams_profile__%s" % content.author.id, data)
         StreamConsumer.group_send("streams_profile_all__%s" % content.author.id, data)

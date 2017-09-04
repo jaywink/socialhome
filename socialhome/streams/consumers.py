@@ -31,10 +31,10 @@ class StreamConsumer(WebsocketConsumer):
             return Content.objects.public()
         elif stream_info[0] == "followed":
             return Content.objects.followed(self.message.user)
-        elif stream_info[0] == "tags":
+        elif stream_info[0] == "tag":
             tag_id = stream_info[1].split("_")[0]
             tag = Tag.objects.get(id=tag_id)
-            return Content.objects.tags(tag, self.message.user)
+            return Content.objects.tag(tag, self.message.user)
         elif stream_info[0] == "profile":
             return Content.objects.profile_pinned(stream_info[1], self.message.user)
         elif stream_info[0] == "profile_all":

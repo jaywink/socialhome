@@ -5,5 +5,5 @@ from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedSt
 urlpatterns = [
     url(r"^followed/$", FollowedStreamView.as_view(), name="followed"),
     url(r"^public/$", PublicStreamView.as_view(), name="public"),
-    url(r"^tags/(?P<name>[\w-]+)/$", TagStreamView.as_view(), name="tags"),
+    url(r"^tag/(?P<name>[\w-]+)/$", TagStreamView.as_view(), name="tag"),
 ]

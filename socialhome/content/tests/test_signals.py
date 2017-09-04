@@ -31,8 +31,8 @@ class TestNotifyListeners(SocialhomeTestCase):
         content = ContentFactory(visibility=Visibility.LIMITED, text="#foobar #barfoo")
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
-            call("streams_tags__%s_foobar" % Tag.objects.get(name="foobar").id, data),
-            call("streams_tags__%s_barfoo" % Tag.objects.get(name="barfoo").id, data),
+            call("streams_tag__%s_foobar" % Tag.objects.get(name="foobar").id, data),
+            call("streams_tag__%s_barfoo" % Tag.objects.get(name="barfoo").id, data),
             call("streams_profile__%s" % content.author.id, data),
             call("streams_profile_all__%s" % content.author.id, data),
         ]
