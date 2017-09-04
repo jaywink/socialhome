@@ -5,7 +5,7 @@
         <reactions-bar :content-id="contentId">
             <div class="mt-1">
                 <a :href="content.contentUrl" :title="content.timestamp" class="unstyled-link">
-                    {{ editedText }}
+                    {{ timestampText }}
                 </a>
                 &nbsp;
                 <template v-if="content.isUserAuthor">
@@ -40,7 +40,7 @@ export default Vue.component("stream-element", {
         deleteUrl() {
             return Urls["content:delete"]({pk: this.contentId})
         },
-        editedText() {
+        timestampText() {
             return this.content.edited ? `${this.content.humanizedTimestamp} (edited)` : this.content.humanizedTimestamp
         },
         showAuthorBar() {
