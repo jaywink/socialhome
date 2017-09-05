@@ -4,8 +4,8 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 
 import Stream from "streams/app/components/Stream.vue"
-import PublicStampedElement from "streams/app/components/PublicStampedElement.vue"
-import FollowedStampedElement from "streams/app/components/FollowedStampedElement.vue"
+import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
+import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
 import {streamStoreOperations} from "streams/app/stores/streamStore"
 
 

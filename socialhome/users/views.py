@@ -37,6 +37,7 @@ class ProfileViewMixin(AccessMixin, DetailView):
     template_name = "streams/profile.html"
     target_profile = None
     content_list = None
+    vue = False
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -44,6 +45,12 @@ class ProfileViewMixin(AccessMixin, DetailView):
         Redirect to login if not allowed to see profile.
         """
         self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
+
+        use_new_stream = (
+            hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
+        )
+        self.vue = bool(request.GET.get("vue", False)) or use_new_stream
+
         if self.target_profile.visible_to_user(self.request.user):
             return super().dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
@@ -54,6 +61,29 @@ class ProfileViewMixin(AccessMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["followers_count"] = Profile.objects.followers(self.object).count()
         return context
+
+    def get_template_names(self):
+        return ["streams/vue.html"] if self.vue else super().get_template_names()
+
+    def _get_json_context(self, context):
+        if self.vue:  # pragma: no cover
+            return {
+                "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+                "streamName": context["stream_name"],
+                "isUserAuthenticated": bool(self.request.user.is_authenticated),
+                "profile": {
+                    "id": self.target_profile.id,
+                    "guid": self.target_profile.guid,
+                    "followersCount": context["followers_count"],
+                    "followingCount": str(self.target_profile.following.count()),
+                    "handle": self.target_profile.handle,
+                    "saferImageUrlLarge": self.target_profile.safer_image_url_large,
+                    "streamType": context["profile_stream_type"],
+                    "pinnedContentExists": context["pinned_content_exists"]
+                }
+            }
+
+        return {}
 
 
 class ProfileDetailView(ProfileViewMixin):
@@ -70,6 +100,9 @@ class ProfileDetailView(ProfileViewMixin):
         context["pinned_content_exists"] = True
         context["stream_name"] = "%s__%s" % (StreamType.PROFILE_PINNED.value, self.object.id)
         context["profile_stream_type"] = "pinned"
+
+        context["json_context"] = self._get_json_context(context)
+
         return context
 
     def _get_contents_queryset(self):
@@ -87,6 +120,9 @@ class ProfileAllContentView(ProfileViewMixin):
             context["pinned_content_exists"] = False
         context["stream_name"] = "%s__%s" % (StreamType.PROFILE_ALL.value, self.object.id)
         context["profile_stream_type"] = "all_content"
+
+        context["json_context"] = self._get_json_context(context)
+
         return context
 
     def _get_contents_queryset(self):

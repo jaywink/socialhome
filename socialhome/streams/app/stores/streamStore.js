@@ -1,5 +1,6 @@
 import Vue from "vue"
 import Vuex from "vuex"
+import Vapi from "vuex-rest-api"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
@@ -10,15 +11,65 @@ import {actions, mutations, streamStoreOperations, getters} from "streams/app/st
 
 Vue.use(Vuex)
 
+function newRestAPI(options) {
+    const opts = _defaults({}, options, {
+        baseURL: "",
+        axios: Vue.prototype.$http,
+    })
+
+    const onSuccess = (state, payload) => {
+        payload.data.forEach(item => {
+            Vue.set(state.contents, item.id, item)
+            state.contentIds.push(item.id)
+        })
+    }
+
+    const onError = (state, error) => {
+        /* TODO: Proper error handling */
+        console.error(`An error happened while fetching post: ${error}`)
+    }
+
+    return new Vapi(opts)
+        .get({
+            action: "getPublicStream",
+            path: Urls["api-streams:public"](),
+            property: "contents",
+            onSuccess,
+            onError,
+        })
+        .get({
+            action: "getFollowedStream",
+            path: Urls["api-streams:followed"](),
+            property: "contents",
+            onSuccess,
+            onError,
+        })
+        .get({
+            action: "getTagStream",
+            path: ({name}) => Urls["api-streams:tag"]({name}),
+            property: "contents",
+            onSuccess,
+            onError,
+        })
+        .get({
+            action: "getProfileStream",
+            path: ({guid}) => Urls["api:streams-profile-all"]({guid}),
+            property: "contents",
+            onSuccess,
+            onError,
+        })
+        .getStore()
+}
+
 function newStreamStore(options) {
     const state = getState()
-    const opts = _defaults({}, {state, mutations, actions, getters}, options)
+    const opts = _defaults({}, options)
 
     // This exists for test puposes
     const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
     delete opts.WebSocketImpl
 
-    const store = new Vuex.Store(opts)
+    const store = new Vuex.Store(_defaults({getters}, newRestAPI({state, mutations, actions}), opts))
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"
     const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.streamName}/`
     const ws = new WebSocketImpl(wsPath)

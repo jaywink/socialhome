@@ -13,5 +13,8 @@
     "object-curly-spacing": ["error", "never"],
     "quotes": ["warn", "double"],
     "semi": ["error", "never"]
+  },
+  "globals": {
+    "Urls": true
   }
 }
