@@ -33,7 +33,9 @@ urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
 
     # Streams
-    url(r"", include("socialhome.streams.urls", namespace="streams")),
+    url(r"^streams/", include("socialhome.streams.urls", namespace="streams")),
+    # Legacy streams urls support
+    url(r"", include("socialhome.streams.urls_legacy", namespace="streams-legacy")),
 
     url(r"^$", HomeView.as_view(), name="home"),
 

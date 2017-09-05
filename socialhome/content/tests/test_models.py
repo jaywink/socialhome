@@ -410,7 +410,8 @@ class TestContentRendered(SocialhomeTestCase):
         content = Content.objects.create(
             text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
         )
-        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> <a href="/tags/nsfw/">#nsfw</a></p>')
+        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> '
+                                           '<a href="/streams/tag/nsfw/">#nsfw</a></p>')
 
     def test_renders_with_oembed(self):
         content = Content.objects.create(
@@ -429,7 +430,8 @@ class TestContentRendered(SocialhomeTestCase):
 
     def test_renders_linkified_tags(self):
         content = ContentFactory(text="#tag #MiXeD")
-        self.assertEqual(content.rendered, '<p><a href="/tags/tag/">#tag</a> <a href="/tags/mixed/">#MiXeD</a></p>')
+        self.assertEqual(content.rendered, '<p><a href="/streams/tag/tag/">#tag</a> '
+                                           '<a href="/streams/tag/mixed/">#MiXeD</a></p>')
 
 
 class TestContentSaveTags(SocialhomeTestCase):

@@ -45,7 +45,7 @@ class TestPublicStreamView(TestCase):
         assert response.status_code == 200
 
 
-class TestTagsStreamView(TestCase):
+class TestTagStreamView(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -54,22 +54,22 @@ class TestTagsStreamView(TestCase):
         cls.client = Client()
 
     def test_context_data_is_ok(self):
-        response = self.client.get(reverse("streams:tags", kwargs={"name": "tagnocontent"}))
+        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         assert response.context["tag_name"] == "tagnocontent"
 
     def test_renders_without_content(self):
-        response = self.client.get(reverse("streams:tags", kwargs={"name": "tagnocontent"}))
+        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         assert "#%s" % self.tag_no_content.name in str(response.content)
         assert not response.context["content_list"]
         assert response.status_code == 200
 
     def test_renders_with_content(self):
-        response = self.client.get(reverse("streams:tags", kwargs={"name": "tag"}))
+        response = self.client.get(reverse("streams:tag", kwargs={"name": "tag"}))
         assert response.status_code == 200
         assert self.content.rendered in str(response.content)
 
     def test_uses_correct_template(self):
-        response = self.client.get(reverse("streams:tags", kwargs={"name": "tagnocontent"}))
+        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         template_names = [template.name for template in response.templates]
         assert "streams/tag.html" in template_names
 
@@ -78,7 +78,7 @@ class TestTagsStreamView(TestCase):
         site = ContentFactory(text="#tag site", visibility=Visibility.SITE)
         selff = ContentFactory(text="#tag self", visibility=Visibility.SELF)
         limited = ContentFactory(text="#tag limited", visibility=Visibility.LIMITED)
-        response = self.client.get(reverse("streams:tags", kwargs={"name": "tag"}))
+        response = self.client.get(reverse("streams:tag", kwargs={"name": "tag"}))
         assert content.rendered in str(response.content)
         assert site.rendered not in str(response.content)
         assert selff.rendered not in str(response.content)

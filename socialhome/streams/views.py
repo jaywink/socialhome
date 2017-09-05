@@ -1,8 +1,6 @@
 from braces.views import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext
 from django.views.generic import ListView
-from django.urls import reverse
 
 from socialhome.content.models import Content, Tag
 
@@ -78,12 +76,12 @@ class TagStreamView(BaseStreamView):
 
     def dispatch(self, request, *args, **kwargs):
         self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
-        self.stream_name = "tags__%s" % self.tag.channel_group_name
+        self.stream_name = "tag__%s" % self.tag.channel_group_name
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         """Restrict to a tag."""
-        return Content.objects.tags(self.tag, self.request.user)
+        return Content.objects.tag(self.tag, self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
