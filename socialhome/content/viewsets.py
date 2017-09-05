@@ -72,7 +72,7 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
     def _unshare(self):
         content = self.get_object()
         try:
-            share = content.unshare(self.request.user.profile)
+            content.unshare(self.request.user.profile)
         except ValidationError as e:
             raise exceptions.ValidationError(e.message)
         except Exception:

@@ -33,9 +33,9 @@ urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
 
     # Streams
-    url(r"^streams/", include("socialhome.streams.urls", namespace="streams")),
+    url(r"^streams/", include("socialhome.streams.urls.views", namespace="streams")),
     # Legacy streams urls support
-    url(r"", include("socialhome.streams.urls_legacy", namespace="streams-legacy")),
+    url(r"", include("socialhome.streams.urls.legacy", namespace="streams-legacy")),
 
     url(r"^$", HomeView.as_view(), name="home"),
 
@@ -67,6 +67,7 @@ urlpatterns = [
     url(r"^api/$", schema_view, name="api-docs"),
     url(r"^api/", include(router.urls, namespace="api")),
     url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
+    url(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", obtain_auth_token),
 

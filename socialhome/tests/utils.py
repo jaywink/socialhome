@@ -8,6 +8,8 @@ from test_plus import TestCase
 from test_plus.test import CBVTestCase
 
 import socialhome.tests.environment  # Set some environment tweaks
+from socialhome.content.tests.factories import (
+    PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
@@ -19,6 +21,15 @@ class SocialhomeTestBase(TestCase):
         cls.user = UserFactory()
         cls.profile = cls.user.profile
         cls.remote_profile = ProfileFactory()
+
+    @classmethod
+    def create_content_set(cls, author=None):
+        if not author:
+            author = ProfileFactory()
+        cls.public_content = PublicContentFactory(author=author)
+        cls.site_content = SiteContentFactory(author=author)
+        cls.self_content = SelfContentFactory(author=author)
+        cls.limited_content = LimitedContentFactory(author=author)
 
     @staticmethod
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
