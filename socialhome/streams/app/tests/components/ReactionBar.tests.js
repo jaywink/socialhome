@@ -3,51 +3,88 @@ import moxios from "moxios"
 import Vue from "vue"
 import {mount} from "avoriaz"
 
-import StreamElementReactionsBar from "streams/app/components/ReactionsBar.vue"
-import {getReactionsBarPropsData} from "streams/app/tests/fixtures/ReactionsBar.fixtures"
+import BootstrapVue from "bootstrap-vue"
+import VueMasonryPlugin from "vue-masonry"
 
+import ReactionsBar from "streams/app/components/ReactionsBar.vue"
+import {getContextWithFakePosts, getFakePost} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {newStreamStore} from "streams/app/stores/streamStore"
+import applicationStore from "streams/app/stores/applicationStore"
+
+
+Vue.use(BootstrapVue)
+Vue.use(VueMasonryPlugin)
 
 describe("ReactionsBar", () => {
+    let store
+
     beforeEach(() => {
         Sinon.restore()
+
+        let contentList = [getFakePost({id: 1})]
+        window.context = getContextWithFakePosts({contentList}, 0)
+        store = newStreamStore({modules: {applicationStore}})
     })
 
     describe("computed", () => {
         describe("showReplies", () => {
-            it("should be true if authenticated or has children", () => {
-                let propsData = getReactionsBarPropsData({repliesCount: 0})
-                let target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = true
-                target.showReplies.should.be.true
+            it("should be true if user is authenticated or content has replies", () => {
+                let target = mount(ReactionsBar, {
+                    propsData: {contentId: 1},
+                    store,
+                })
 
-                propsData = getReactionsBarPropsData({repliesCount: 1})
-                target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = false
-                target.showReplies.should.be.true
+                target.instance().$store.state.contents[1].repliesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().showReplies.should.be.true
 
-                propsData = getReactionsBarPropsData({repliesCount: 0})
-                target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = false
-                target.showReplies.should.be.false
+                target.instance().$store.state.contents[1].repliesCount = 1
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showReplies.should.be.true
+
+                target.instance().$store.state.contents[1].repliesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showReplies.should.be.false
             })
         })
 
         describe("showShares", () => {
-            it("should be true if authenticated or has shares", () => {
-                let propsData = getReactionsBarPropsData({sharesCount: 0})
-                let target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = true
-                target.showShares.should.be.true
+            it("should be true if user is authenticated or content has shares", () => {
+                let target = mount(ReactionsBar, {
+                    propsData: {contentId: 1},
+                    store,
+                })
 
-                propsData = getReactionsBarPropsData({sharesCount: 1})
-                target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = false
-                target.showShares.should.be.true
+                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().showShares.should.be.true
 
-                propsData = getReactionsBarPropsData({sharesCount: 0})
-                target = new StreamElementReactionsBar({propsData})
-                target.$store.state.isUserAuthenticated = false
-                target.showShares.should.be.false
+                target.instance().$store.state.contents[1].sharesCount = 1
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showShares.should.be.true
+
+                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showShares.should.be.false
+            })
+
+            it("should be fa if user is authenticated or content has shares", () => {
+                let target = mount(ReactionsBar, {
+                    propsData: {contentId: 1},
+                    store,
+                })
+
+                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().showShares.should.be.true
+
+                target.instance().$store.state.contents[1].sharesCount = 1
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showShares.should.be.true
+
+                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().showShares.should.be.false
             })
         })
     })
@@ -67,8 +104,7 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                let propsData = getReactionsBarPropsData()
-                let target = new StreamElementReactionsBar({propsData})
+                let target = new ReactionsBar({contentId: 1})
                 target.expandShares()
                 target.showSharesBox.should.be.true
                 target.expandShares()
@@ -78,9 +114,9 @@ describe("ReactionsBar", () => {
 
         describe("share", () => {
             it("should show the reshare bow", () => {
-                let propsData = getReactionsBarPropsData()
-                let target = mount(StreamElementReactionsBar, {propsData})
-                target.instance().$store.state.isUserAuthenticated = true
+                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].isUserAuthor = false
                 target.instance().$data.showRepliesBox = true
 
                 target.instance().expandShares()
@@ -88,26 +124,27 @@ describe("ReactionsBar", () => {
             })
 
             it("should create share on server", (done) => {
-                let propsData = getReactionsBarPropsData({hasShared: false})
-                let target = mount(StreamElementReactionsBar, {propsData})
-                target.instance().$store.state.isUserAuthenticated = true
+                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].hasShared = false
+                target.instance().$store.state.contents[1].isUserAuthor = false
 
                 // Ensure data
                 target.instance().expandShares()
                 target.instance().showSharesBox.should.be.true
-                target.instance().hasShared$.should.be.false
+                target.instance().$store.state.contents[1].hasShared.should.be.false
+                target.instance().$store.state.contents[1].sharesCount = 12
 
                 target.instance().share()
 
                 moxios.wait(() => {
-                    let request = moxios.requests.mostRecent()
-                    request.respondWith({
+                    moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: {status: "ok", content_id: 123},
                     }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$data.hasShared$.should.be.true
-                        target.instance().$data.sharesCount$.should.eq(propsData.sharesCount + 1)
+                        target.instance().$store.state.contents[1].hasShared.should.be.true
+                        target.instance().$store.state.contents[1].sharesCount.should.eq(13)
                         done()
                     })
                 })
@@ -116,14 +153,16 @@ describe("ReactionsBar", () => {
 
         describe("unshare", () => {
             it("should removes share on server", (done) => {
-                let propsData = getReactionsBarPropsData({hasShared: true})
-                let target = mount(StreamElementReactionsBar, {propsData})
-                target.instance().$store.state.isUserAuthenticated = true
+                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].hasShared = true
+                target.instance().$store.state.contents[1].isUserAuthor = false
 
                 // Ensure data
                 target.instance().expandShares()
                 target.instance().showSharesBox.should.be.true
-                target.instance().hasShared$.should.be.true
+                target.instance().$store.state.contents[1].hasShared.should.be.true
+                target.instance().$store.state.contents[1].sharesCount = 12
 
                 // Actual thing we are testing - the unshare
                 target.instance().unshare()
@@ -131,11 +170,11 @@ describe("ReactionsBar", () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: {status: "ok"}
+                        response: {status: "ok"},
                     }).then(() => {
                         target.instance().showSharesBox.should.be.false
-                        target.instance().sharesCount$.should.eq(propsData.sharesCount - 1)
-                        target.instance().hasShared$.should.be.false
+                        target.instance().$store.state.contents[1].sharesCount.should.eq(11)
+                        target.instance().$store.state.contents[1].hasShared.should.be.false
                         done()
                     })
                 })

@@ -16,11 +16,10 @@
                 <div class="gutter-sizer"></div>
                 <stream-element
                     class="grid-item"
-                    v-for="content in $store.getters.contentList"
-                    v-bind="content"
                     v-masonry-tile
+                    v-for="content in $store.getters.contentList"
+                    :content-id="content.id"
                     :key="content.id"
-                    :show-author-bar="$store.state.showAuthorBar"
                 />
             </div>
         </div>
@@ -35,11 +34,11 @@ import PublicStampedElement from "streams/app/components/PublicStampedElement.vu
 import FollowedStampedElement from "streams/app/components/FollowedStampedElement.vue"
 import TagStampedElement from "streams/app/components/TagStampedElement.vue"
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
-import globalStore from "streams/app/stores/applicationStore"
+import applicationStore from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream", {
-    store: newStreamStore(),
+    store: newStreamStore({modules: {applicationStore}}),
     directives: {imagesLoaded},
     components: {FollowedStampedElement, PublicStampedElement, TagStampedElement},
     data() {

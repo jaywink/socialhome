@@ -5,28 +5,28 @@
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
                     v-if="showShares"
-                    :class="{'item-reaction-shared': hasShared$}"
+                    :class="{'item-reaction-shared': content.hasShared}"
                     class="item-reaction"
                     @click.stop.prevent="expandShares"
                 >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                    <span class="item-reaction-counter">{{ sharesCount$ }}</span>
+                    <span class="item-reaction-counter">{{ content.sharesCount }}</span>
                 </b-button>
                 <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
                     <span class="item-open-replies-action">
                         <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
-                        <span class="item-reaction-counter">{{ repliesCount$ }}</span>
+                        <span class="item-reaction-counter">{{ content.repliesCount }}</span>
                     </span>
                 </b-button>
             </div>
         </div>
-        <div v-if="showSharesBox" class="content-actions">
-            <b-button v-if="hasShared$" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
-            <b-button v-if="!hasShared$" variant="secondary" @click.prevent.stop="share">Share</b-button>
+        <div v-if="canShare && showSharesBox" class="content-actions">
+            <b-button v-if="content.hasShared" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
+            <b-button v-else variant="secondary" @click.prevent.stop="share">Share</b-button>
         </div>
         <div class="replies-container"></div>
         <div v-if="showRepliesBox">
-            <div v-if="$store.state.isUserAuthenticated" class="content-actions">
+            <div v-if="$store.state.applicationStore.isUserAuthenticated" class="content-actions">
                 <b-button :href="replyUrl" variant="secondary">Reply</b-button>
             </div>
         </div>
@@ -35,35 +35,33 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("reactions-bar", {
-    store,
     props: {
-        id: {type: Number, required: true},
-        repliesCount: {type: Number, required: true},
-        sharesCount: {type: Number, required: true},
-        hasShared: {type: Boolean, required: true},
+        contentId: {type: Number, required: true},
     },
     data() {
         return {
             showSharesBox: false,
             showRepliesBox: false,
-            sharesCount$: this.sharesCount,
-            repliesCount$: this.repliesCount,
-            hasShared$: this.hasShared,
         }
     },
     computed: {
+        content() {
+            return this.$store.state.contents[this.contentId]
+        },
         showReplies() {
-            return this.$store.state.isUserAuthenticated || this.repliesCount$ > 0
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.repliesCount > 0
         },
         showShares() {
-            return this.$store.state.isUserAuthenticated || this.sharesCount$ > 0
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
         },
         replyUrl() {
-            return Urls["content:reply"]({pk: this.id})
+            return Urls["content:reply"]({pk: this.contentId})
+        },
+        canShare() {
+            return !this.content.isUserAuthor
         },
     },
     methods: {
@@ -74,28 +72,36 @@ export default Vue.component("reactions-bar", {
             this.showSharesBox = !this.showSharesBox
         },
         share() {
-            if (!this.$store.state.isUserAuthenticated) {
+            if (!this.canShare) {
+                console.error("Unable to share own post")
+                return
+            }
+            if (!this.$store.state.applicationStore.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
             }
-            this.$http.post(`/api/content/${this.id}/share/`)
+            this.$http.post(`/api/content/${this.contentId}/share/`)
                 .then(() => {
                     this.showSharesBox = false
-                    this.sharesCount$ += 1
-                    this.hasShared$ = true
+                    this.content.sharesCount += 1
+                    this.content.hasShared = true
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
         unshare() {
-            if (!this.$store.state.isUserAuthenticated) {
+            if (!this.canShare) {
+                console.error("Unable to unshare own post")
+                return
+            }
+            if (!this.$store.state.applicationStore.isUserAuthenticated) {
                 console.error("Not logged in")
                 return
             }
-            this.$http.delete(`/api/content/${this.id}/share/`)
+            this.$http.delete(`/api/content/${this.contentId}/share/`)
                 .then(() => {
                     this.showSharesBox = false
-                    this.sharesCount$ -= 1
-                    this.hasShared$ = false
+                    this.content.sharesCount -= 1
+                    this.content.hasShared = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },

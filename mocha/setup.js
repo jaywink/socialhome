@@ -29,4 +29,7 @@ require("chai/register-should")
 
 // Noop function to make the tests pass
 global.WebSocket = function () {} // eslint-disable-line func-names
+// Absence of WebSocket.prototype.close can cause tests to randomly fail
+// when components using websocket try to close socket
+global.WebSocket.prototype.close = function () {} // eslint-disable-line func-names
 global.Sinon = require("sinon").sandbox.create()

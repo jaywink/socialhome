@@ -2,16 +2,22 @@
     <div>
         <div class="grid-item-author-bar mt-1">
             <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
-                <img :src="imageUrlSmall" class="grid-item-author-bar-pic" />
-                {{ name }}
+                <img :src="author.imageUrlSmall" class="grid-item-author-bar-pic" />
+                {{ author.name }}
             </div>
             <div v-show="showProfileBox" class="profile-box">
-                {{ handle }}
+                {{ author.handle }}
                 <div class="pull-right">
-                    <b-button :href="absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
+                    <b-button :href="author.absoluteUrl" variant="secondary" title="Profile" aria-label="Profile">
                         <i class="fa fa-user"></i>
                     </b-button>
-                    <b-button v-if="isUserRemote" :href="homeUrl" variant="secondary" title="Home" aria-label="Home">
+                    <b-button
+                        v-if="isUserRemote"
+                        :href="author.homeUrl"
+                        variant="secondary"
+                        title="Home"
+                        aria-label="Home"
+                    >
                         <i class="fa fa-home"></i>
                     </b-button>
                     <b-button
@@ -43,46 +49,39 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("author-bar", {
-    store,
     props: {
-        handle: {type: String, required: true},
-        name: {type: String, required: true},
-        guid: {type: String, required: true},
-        homeUrl: {type: String, required: true},
-        absoluteUrl: {type: String, required: true},
-        imageUrlSmall: {type: String, required: true},
-        isUserAuthor: {type: Boolean, required: true},
-        isUserLocal: {type: Boolean, required: true},
-        isUserFollowingAuthor: {type: Boolean, required: true},
+        contentId: {type: Number, required: true},
     },
     data() {
         return {
             showProfileBox: false,
-            _isUserFollowingAuthor: this.isUserFollowingAuthor,
         }
     },
     computed: {
+        author() {
+            return this.$store.state.contents[this.contentId].author
+        },
         isUserRemote() {
-            return !this.isUserLocal
+            return !this.$store.state.contents[this.contentId].isUserLocal
         },
         showFollowBtn() {
-            return this.canFollow && !this.$data._isUserFollowingAuthor
+            return this.canFollow && !this.author.isUserFollowingAuthor
         },
         showUnfollowBtn() {
-            return this.canFollow && this.$data._isUserFollowingAuthor
+            return this.canFollow && this.author.isUserFollowingAuthor
         },
         canFollow() {
-            return this.isUserAuthenticated && !this.isUserAuthor
+            return this.$store.state.applicationStore.isUserAuthenticated
+                && !this.$store.state.contents[this.contentId].isUserAuthor
         },
-        isUserAuthenticated(){
-            return this.$store.state.isUserAuthenticated
+        isUserAuthenticated() {
+            return this.$store.state.applicationStore.isUserAuthenticated
         },
         currentBrowsingProfileId() {
-            return this.$store.state.currentBrowsingProfileId
+            return this.$store.state.applicationStore.currentBrowsingProfileId
         },
     },
     methods: {
@@ -94,8 +93,8 @@ export default Vue.component("author-bar", {
                 console.error("Not logged in")
                 return
             }
-            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.guid})
-                .then(() => { this.$data._isUserFollowingAuthor = false })
+            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.author.guid})
+                .then(() => { this.author.isUserFollowingAuthor = false })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
         follow() {
@@ -103,8 +102,8 @@ export default Vue.component("author-bar", {
                 console.error("Not logged in")
                 return
             }
-            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.guid})
-                .then(() => { this.$data._isUserFollowingAuthor = true })
+            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.author.guid})
+                .then(() => { this.author.isUserFollowingAuthor = true })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
     },
