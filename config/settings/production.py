@@ -55,15 +55,6 @@ if OPBEAT_ENABLE:
         'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     ) + MIDDLEWARE_CLASSES
 
-# STORAGE CONFIGURATION
-# ------------------------------------------------------------------------------
-# Uploaded Media Files
-# ------------------------
-# See: http://django-storages.readthedocs.org/en/latest/index.html
-INSTALLED_APPS += (
-    'storages',
-)
-
 # Static Assets
 # ------------------------
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
