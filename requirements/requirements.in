@@ -1,0 +1,51 @@
+arrow
+asgi_redis
+backports-abc  # Required by circus->tornado IF on python 3.4
+beautifulsoup4
+bleach
+channels
+circus
+CommonMark
+django-allauth
+django-autoslug
+django-braces
+django-crispy-forms
+django-dynamic-preferences==1.2
+django-enumfields
+django-environ
+django-extensions
+django-floppyforms
+django-haystack
+django-js-reverse
+django-memoize
+django-model-utils
+django-redis
+django-rest-swagger
+django-rq
+django-secure
+django-settings-export
+django-tables2
+django-versatileimagefield
+django==1.10.8
+djangorestframework
+ipython
+lxml
+opbeat
+Pillow
+psycopg2
+pyembed
+python-opengraph
+pytz
+redis
+rq
+unicode-slugify
+uwsgi
+whitenoise
+whoosh
+
+# Own markdownx fork for some tweaks:
+# - disable tab when ctrl down
+# - GIF upload
+-e git+https://github.com/jaywink/django-markdownx.git@0f7b8c01906edd5ad590bb31f04685f859d6fab1#egg=django-markdownx==2.0.21.1
+
+-e git+https://github.com/jaywink/federation.git@bcc779e006bc0af192db08a1ff8ed245c0fbd7c9#egg=federation==0.14.1.1

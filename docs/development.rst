@@ -28,13 +28,10 @@ Python 3.4, 3.5 and 3.6 are officially tested against. Ensure the following are 
 
 The file ``requirements.apt`` contains other various dependencies. You can use the ``install_os_dependencies.sh`` script to help installing these.
 
-Install requirements
-....................
+Install Python dependencies
+...........................
 
-::
-
-    pip install -U setuptools pip
-    pip install -U -r requirements/local.txt -r requirements/test.txt
+.. include:: includes/pip_tools.rst
 
 Do NPM, Bower
 .............

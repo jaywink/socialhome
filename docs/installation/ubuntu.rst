@@ -236,7 +236,16 @@ Update pip and setuptools
 
 ::
 
-    pip install -U pip setuptools
+    pip install -U pip setuptools==30.4
+
+Install pip-tools
+'''''''''''''''''
+
+``pip-tools`` is a handy tool to keep environments clean and all dependencies nicely pinned.
+
+::
+
+    pip install -U pip-tools
 
 Get Socialhome code
 '''''''''''''''''''
