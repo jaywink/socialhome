@@ -12,6 +12,7 @@ asgiref==1.1.2            # via asgi-redis, channels, daphne
 attrs==17.2.0             # via automat
 autobahn==17.9.1          # via daphne
 automat==0.6.0            # via twisted
+backports-abc==0.5
 beautifulsoup4==4.6.0
 bleach==2.0.0
 certifi==2017.7.27.1      # via opbeat, requests
