@@ -8,8 +8,8 @@ services:
   - redis-server
   - postgresql
 install:
-  - pip install -U pip
-  - pip install -U -r requirements/test.txt
+  - pip install -U pip setuptools==30.4 pip-tools
+  - pip-sync dev-requirements.txt
   - pip freeze
 cache:
   directories:

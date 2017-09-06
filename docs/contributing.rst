@@ -63,3 +63,8 @@ As a general rule, for Python code follow PEP8, except with a 120 character line
 ``.editorconfig`` in the repository root.
 
 There is an ``.eslintrc`` configuration provided as well. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
+
+Python dependencies
+-------------------
+
+.. include:: includes/pip_tools.rst

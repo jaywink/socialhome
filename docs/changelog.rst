@@ -6,6 +6,29 @@ Changelog
 [unreleased]
 ------------
 
+Python dependencies
+...................
+
+Switched to ``pip-tools`` as the recommended way to install Python dependencies and cleaned the requirements files a bit. Now all the "base" dependencies, including production deployment dependencies are locked in ``requirements.txt``. The new file ``dev-requirements.txt`` includes both the base and the extra development/testing related dependencies.
+
+To use ``pip-tools``, first install it:
+
+::
+
+    pip install -U pip-tools
+
+Then install dependencies:
+
+::
+
+    # Production environment
+    pip-sync
+
+    # Development environment
+    pip-sync dev-requirements.txt
+
+It is not mandatory to use ``pip-tools`` for running a production installation. For development it is mandatory. All dependencies should be placed (unlocked) in either ``requirements/requirements.in`` (base) or ``requirements/requirements-dev.in`` (development extras). Then execute ``./compile-requirements.sh`` to update the locked dependency files after each change to the ``.in`` files. See `pip-tools <https://github.com/jazzband/pip-tools>`_ for more information.
+
 Added
 .....
 
@@ -19,6 +42,7 @@ Changed
 * Previously previews and oEmbed's for content used to only pick up "orphan" links from the content text. This meant that if there was a Markdown or HTML link, there would be no link preview or oEmbed fetched. This has now been changed. All links found in the content will be considered for preview and oEmbed. The first link to return a preview or oEmbed will be used.
 
 * Streams URL changes:
+
     * All streams will now be under `/streams/` for a cleaner URL layout. So for example `/public/` is now `/streams/public/`.
     * Tag stream URL has been changed from `/streams/tags/<tag>/` to `/streams/tag/<tag>/`. This small change allows us to later map `/stream/tags/` to the tags the user is following.
 

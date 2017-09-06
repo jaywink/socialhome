@@ -1,0 +1,23 @@
+codecov
+coverage
+django-debug-toolbar
+django-debug-toolbar-user-panel
+django-test-plus
+django_coverage_plugin
+django==1.10.8
+factory_boy
+Faker
+flake8
+freezegun
+ipdb
+pytest
+pytest-cov
+pytest-django
+pytest-env
+pytest-sugar
+Sphinx
+sphinx-autobuild
+Werkzeug
+
+# Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet
+-e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
