@@ -43,7 +43,7 @@ class BaseStreamView(ListView):
                     "isUserFollowingAuthor": (content.author.id in getattr(request_user_profile, "following_ids", []))
                 },
                 "id": content.id,
-                "timestamp": content.formatted_timestamp,
+                "timestamp": content.timestamp,
                 "humanizedTimestamp": content.humanized_timestamp,
                 "edited": bool(content.edited),
                 "repliesCount": content.reply_count,

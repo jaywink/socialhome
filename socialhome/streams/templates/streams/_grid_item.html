@@ -27,7 +27,7 @@
     {% endif %}
     <div class="grid-item-bar d-flex justify-content-start">
         <div class="mt-1">
-            <a class="unstyled-link" href="{{ content.get_absolute_url }}" title="{{ content.formatted_timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</a>
+            <a class="unstyled-link" href="{{ content.get_absolute_url }}" title="{{ content.timestamp }}">{{ content.humanized_timestamp }}{% if content.edited %} ({% trans "edited" %}){% endif %}</a>
             {% if content.author == request.user.profile %}
                 &nbsp;
                 <a href="{% url "content:update" content.id %}"><i class="fa fa-pencil" title="{% trans "Update" %}" aria-label="{% trans "Update" %}"></i></a>

@@ -257,7 +257,7 @@ class TestContentView(SocialhomeTestCase):
         self.assertContains(response, self.content.author.handle)
         self.assertContains(response, self.content.rendered)
         self.assertContains(response, self.content.humanized_timestamp)
-        self.assertContains(response, self.content.formatted_timestamp)
+        self.assertContains(response, self.content.timestamp)
         self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.channel_group_name)
 
 

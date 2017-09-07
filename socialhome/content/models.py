@@ -158,6 +158,11 @@ class Content(models.Model):
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
         return reverse("content:view", kwargs={"pk": self.id})
 
+    @property
+    def humanized_timestamp(self):
+        """Human readable timestamp ie '2 hours ago'."""
+        return arrow.get(self.modified).humanize()
+
     @cached_property
     def root(self):
         """Get root content if a reply or share."""
@@ -167,6 +172,14 @@ class Content(models.Model):
             return self.parent.root
         elif self.content_type == ContentType.SHARE:
             return self.share_of.root
+
+    @property
+    def timestamp(self):
+        return arrow.get(self.modified).format()
+
+    @property
+    def url(self):
+        return "%s%s" % (settings.SOCIALHOME_URL, self.get_absolute_url())
 
     @staticmethod
     @memoize(timeout=604800)  # a week
@@ -263,15 +276,6 @@ class Content(models.Model):
         TODO: it would make sense to store an "edited" flag on the model itself.
         """
         return self.modified > self.created + datetime.timedelta(minutes=15)
-
-    @property
-    def humanized_timestamp(self):
-        """Human readable timestamp ie '2 hours ago'."""
-        return arrow.get(self.modified).humanize()
-
-    @property
-    def formatted_timestamp(self):
-        return arrow.get(self.modified).format()
 
     @cached_property
     def short_text(self):
@@ -399,7 +403,7 @@ class Content(models.Model):
             "content_type": self.content_type.string_value,
             "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
             "detail_url": self.get_absolute_url(),
-            "formatted_timestamp": self.formatted_timestamp,
+            "formatted_timestamp": self.timestamp,
             "guid": self.guid,
             "has_shared": Content.has_shared(self.id, profile_id) if profile_id else False,
             "humanized_timestamp": humanized_timestamp,

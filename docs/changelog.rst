@@ -57,10 +57,26 @@ Changed
         * ``is_local`` (Boolean, is user local)
         * ``visibility`` (Profile visibility setting, either ``public``, ``limited``, ``site`` or ``self``. Editable to self)
 
-    * Removed:
+    * Removed (internal attributes unnecessary for frontend rendering):
 
         * ``user``
         * ``rsa_public_key``
+
+* **Breaking change**. Content API field changes:
+
+    * Added:
+
+        * ``timestamp`` (ISO 8601 formatted timestamp of last save)
+        * ``humanized_timestamp`` (For example "2 hours ago")
+        * ``url`` (Full URL to content detail)
+        * ``edited`` (Boolean whether content has been edited since creation)
+
+    * Removed (internal attributes unnecessary for frontend rendering):
+
+        * ``created``
+        * ``modified``
+        * ``oembed``
+        * ``opengraph``
 
 Fixed
 .....
