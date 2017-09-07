@@ -13,23 +13,41 @@ from socialhome.content.tests.factories import (
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
-class SocialhomeTestBase(TestCase):
+class CreateDataMixin:
+    user = None
+    profile = None
+    remote_profile = None
+    public_content = None
+    site_content = None
+    self_content = None
+    limited_content = None
+
+    @staticmethod
+    def create_local_and_remote_user(target):
+        target.user = UserFactory()
+        target.profile = target.user.profile
+        target.remote_profile = ProfileFactory()
+
+    @staticmethod
+    def create_content_set(target, author=None):
+        if not author:
+            author = ProfileFactory()
+        target.public_content = PublicContentFactory(author=author)
+        target.site_content = SiteContentFactory(author=author)
+        target.self_content = SelfContentFactory(author=author)
+        target.limited_content = LimitedContentFactory(author=author)
+
+
+class SocialhomeTestBase(CreateDataMixin, TestCase):
     maxDiff = None
 
     @classmethod
     def create_local_and_remote_user(cls):
-        cls.user = UserFactory()
-        cls.profile = cls.user.profile
-        cls.remote_profile = ProfileFactory()
+        CreateDataMixin.create_local_and_remote_user(cls)
 
     @classmethod
     def create_content_set(cls, author=None):
-        if not author:
-            author = ProfileFactory()
-        cls.public_content = PublicContentFactory(author=author)
-        cls.site_content = SiteContentFactory(author=author)
-        cls.self_content = SelfContentFactory(author=author)
-        cls.limited_content = LimitedContentFactory(author=author)
+        CreateDataMixin.create_content_set(cls, author=author)
 
     @staticmethod
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())
@@ -53,13 +71,14 @@ class SocialhomeAPITestCase(APITestCase, SocialhomeTestBase):
     pass
 
 
-class SocialhomeTransactionTestCase(TransactionTestCase):
+class SocialhomeTransactionTestCase(CreateDataMixin, TransactionTestCase):
     maxDiff = None
 
     def create_local_and_remote_user(self):
-        self.user = UserFactory()
-        self.profile = self.user.profile
-        self.remote_profile = ProfileFactory()
+        CreateDataMixin.create_local_and_remote_user(self)
+
+    def create_content_set(self, author=None):
+        CreateDataMixin.create_content_set(self, author=author)
 
 
 # py.test monkeypatches while we still have two kinds of tests
