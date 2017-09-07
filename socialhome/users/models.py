@@ -2,6 +2,7 @@ import logging
 import os
 
 from Crypto.PublicKey import RSA
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -138,8 +139,19 @@ class Profile(TimeStampedModel):
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
     @property
+    def home_url(self):
+        if not self.user:
+            # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
+            return self.remote_url
+        return self.url
+
+    @property
     def name_or_handle(self):
         return self.name or self.handle
+
+    @property
+    def remote_url(self):
+        return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
 
     def save(self, *args, **kwargs):
         # Protect against empty guids which the search indexing would crash on
@@ -154,15 +166,8 @@ class Profile(TimeStampedModel):
         super().save(*args, **kwargs)
 
     @property
-    def home_url(self):
-        if not self.user:
-            # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
-            return self.remote_url
-        return self.get_absolute_url()
-
-    @property
-    def remote_url(self):
-        return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
+    def url(self):
+        return "%s%s" % (settings.SOCIALHOME_URL, self.get_absolute_url())
 
     def generate_new_rsa_key(self):
         """Generate a new RSA private key

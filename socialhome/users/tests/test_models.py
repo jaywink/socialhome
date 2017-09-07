@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
 
 import factory
+from django.conf import settings
 from django.test import override_settings
 from federation.entities import base
 
@@ -86,7 +87,9 @@ class TestProfile(SocialhomeTestCase):
 
     def test_home_url(self):
         self.assertEqual(self.profile.home_url, self.profile.remote_url)
-        self.assertEqual(self.user.profile.home_url, self.user.profile.get_absolute_url())
+        self.assertEqual(
+            self.user.profile.home_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.profile.get_absolute_url()),
+        )
 
     def test_name_or_handle(self):
         self.assertEqual(self.profile.name_or_handle, self.profile.name)
