@@ -134,17 +134,23 @@ class TestProfileViewSet(SocialhomeAPITestCase):
 
     def test_read_only_fields(self):
         self.client.login(username=self.user.username, password="password")
-        for field in ("id", "user", "guid", "handle", "rsa_public_key", "image_url_large",
-                      "image_url_medium", "image_url_small"):
+        for field in ("id", "guid", "handle", "image_url_large", "image_url_medium", "image_url_small", "is_local",
+                      "url", "home_url"):
             response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {field: "82"})
-            self.assertEqual(response.data.get(field), getattr(self.profile, field if field != "user" else "user_id"))
-        for field in ("name", "location", "nsfw"):
+            self.assertEqual(response.data.get(field), getattr(self.profile, field))
+        for field in ("name", "location", "nsfw", "visibility"):
+            if field == "nsfw":
+                value = not self.profile.nsfw
+            elif field == "visibility":
+                value = "public" if self.profile.visibility != Visibility.PUBLIC else "limited"
+            else:
+                value = "82"
             response = self.client.patch(
                 reverse("api:profile-detail", kwargs={"pk": self.profile.id}),
-                {field: "82" if field != "nsfw" else not getattr(self.profile, "nsfw")}
+                {field: value}
             )
             self.assertEqual(
-                str(response.data.get(field)), "82" if field != "nsfw" else str(not getattr(self.profile, "nsfw"))
+                response.data.get(field), value
             )
 
     def test_user_add_follower(self):

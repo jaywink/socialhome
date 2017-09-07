@@ -48,6 +48,20 @@ Changed
 
   Since lots of old content will point to the old URL's, there will be support for the legacy URL's until they are needed for something else in the future.
 
+* **Breaking change**. Profile API field changes:
+
+    * Added:
+
+        * ``url`` (Full URL of local profile)
+        * ``home_url`` (Full URL of remote profile, if remote user)
+        * ``is_local`` (Boolean, is user local)
+        * ``visibility`` (Profile visibility setting, either ``public``, ``limited``, ``site`` or ``self``. Editable to self)
+
+    * Removed:
+
+        * ``user``
+        * ``rsa_public_key``
+
 Fixed
 .....
 

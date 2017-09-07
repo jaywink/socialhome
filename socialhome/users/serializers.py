@@ -1,15 +1,41 @@
+from enumfields.drf import EnumField
 from rest_framework.serializers import ModelSerializer
 
+from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 
 
 class ProfileSerializer(ModelSerializer):
+    visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
+
     class Meta:
         model = Profile
-        fields = ("id", "name", "user", "guid", "handle", "rsa_public_key", "image_url_large",
-                  "image_url_medium", "image_url_small", "location", "nsfw")
-        read_only_fields = ("id", "user", "guid", "handle", "rsa_public_key", "image_url_large",
-                            "image_url_medium", "image_url_small")
+        fields = (
+            "guid",
+            "handle",
+            "home_url",
+            "id",
+            "image_url_large",
+            "image_url_medium",
+            "image_url_small",
+            "is_local",
+            "location",
+            "name",
+            "nsfw",
+            "url",
+            "visibility",
+        )
+        read_only_fields = (
+            "guid",
+            "handle",
+            "home_url",
+            "id",
+            "image_url_large",
+            "image_url_medium",
+            "image_url_small",
+            "is_local",
+            "url",
+        )
 
 
 class UserSerializer(ModelSerializer):
