@@ -1,23 +1,19 @@
-from test_plus import TestCase
-
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
 
 
-class TestContentViewSet(SocialhomeAPITestCase, TestCase):
+class TestContentViewSet(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
         cls.staff_user = AdminUserFactory()
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC)
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
-        cls.site_content = ContentFactory(visibility=Visibility.SITE)
-        cls.self_content = ContentFactory(visibility=Visibility.SELF)
+        cls.create_content_set()
         cls.other_profile = ProfileFactory()
+        cls.reply = PublicContentFactory(parent=cls.public_content)
 
     def setUp(self):
         super().setUp()
@@ -29,6 +25,36 @@ class TestContentViewSet(SocialhomeAPITestCase, TestCase):
     def _check_result_ids(self, expected):
         ids = {result["id"] for result in self.last_response.data["results"]}
         self.assertEqual(ids, expected)
+
+    def _detail_access_tests(self, url):
+        self.get(url, pk=self.public_content.id)
+        self.response_200()
+        self.get(url, pk=self.limited_content.id)
+        self.response_404()
+        self.get(url, pk=self.site_content.id)
+        self.response_404()
+        self.get(url, pk=self.self_content.id)
+        self.response_404()
+
+        with self.login(self.user):
+            self.get(url, pk=self.public_content.id)
+            self.response_200()
+            self.get(url, pk=self.limited_content.id)
+            self.response_404()
+            self.get(url, pk=self.site_content.id)
+            self.response_200()
+            self.get(url, pk=self.self_content.id)
+            self.response_404()
+
+        with self.login(self.staff_user):
+            self.get(url, pk=self.public_content.id)
+            self.response_200()
+            self.get(url, pk=self.limited_content.id)
+            self.response_200()
+            self.get(url, pk=self.site_content.id)
+            self.response_200()
+            self.get(url, pk=self.self_content.id)
+            self.response_200()
 
     def test_list_content(self):
         self.get("api:content-list")
@@ -43,34 +69,7 @@ class TestContentViewSet(SocialhomeAPITestCase, TestCase):
             self.response_405()
 
     def test_detail(self):
-        self.get("api:content-detail", pk=self.public_content.id)
-        self.response_200()
-        self.get("api:content-detail", pk=self.limited_content.id)
-        self.response_404()
-        self.get("api:content-detail", pk=self.site_content.id)
-        self.response_404()
-        self.get("api:content-detail", pk=self.self_content.id)
-        self.response_404()
-
-        with self.login(self.user):
-            self.get("api:content-detail", pk=self.public_content.id)
-            self.response_200()
-            self.get("api:content-detail", pk=self.limited_content.id)
-            self.response_404()
-            self.get("api:content-detail", pk=self.site_content.id)
-            self.response_200()
-            self.get("api:content-detail", pk=self.self_content.id)
-            self.response_404()
-
-        with self.login(self.staff_user):
-            self.get("api:content-detail", pk=self.public_content.id)
-            self.response_200()
-            self.get("api:content-detail", pk=self.limited_content.id)
-            self.response_200()
-            self.get("api:content-detail", pk=self.site_content.id)
-            self.response_200()
-            self.get("api:content-detail", pk=self.self_content.id)
-            self.response_200()
+        self._detail_access_tests("api:content-detail")
 
     def test_update(self):
         self.patch("api:content-detail", data={"text": "Foobar"}, pk=self.public_content.id)
@@ -192,6 +191,14 @@ class TestContentViewSet(SocialhomeAPITestCase, TestCase):
             self.post("api:content-list", data=data)
             content = Content.objects.get(id=self.last_response.data["id"])
             self.assertEqual(content.author_id, self.staff_user.profile.id)
+
+    def test_replies_access(self):
+        self._detail_access_tests("api:content-replies")
+
+    def test_replies_results(self):
+        self.get("api:content-replies", pk=self.public_content.id)
+        self.assertEquals(len(self.last_response.data), 1)
+        self.assertEquals(self.last_response.data[0].get("id"), self.reply.id)
 
     def test_share(self):
         self.post("api:content-share", pk=self.public_content.id)

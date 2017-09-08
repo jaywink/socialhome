@@ -47,6 +47,11 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
 
         `visibility` should be one of: `public`, `site`, `limited`, `self`.
 
+    replies:
+        Get list of replies
+
+        Returns all the replies for this content ordered by their creation time.
+
     share:
         Content sharing
 
@@ -79,13 +84,24 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             raise exceptions.APIException("Unknown error when creating share.")
         return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
 
-    def get_queryset(self):
+    def get_queryset(self, parent=None):
         if self.request.user.is_staff:
-            return Content.objects.all()
-        return Content.objects.visible_for_user(self.request.user)
+            qs = Content.objects.all()
+        else:
+            qs = Content.objects.visible_for_user(self.request.user)
+        if parent:
+            qs = qs.filter(parent=parent)
+        return qs
+
+    @detail_route(methods=["get"])
+    def replies(self, request, *args, **kwargs):
+        parent = self.get_object()
+        queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @detail_route(methods=["delete", "post"])
-    def share(self, request, pk=None):
+    def share(self, request, *args, **kwargs):
         if request.method == "POST":
             return self._share()
         elif request.method == "DELETE":
