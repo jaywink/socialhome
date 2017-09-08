@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
 from socialhome.content.models import Content, Tag
+from socialhome.streams.enums import StreamType
 
 
 class BaseStreamView(ListView):
@@ -68,7 +69,7 @@ class BaseStreamView(ListView):
 class PublicStreamView(BaseStreamView):
     template_name = "streams/public.html"
     queryset = Content.objects.public()
-    stream_name = "public"
+    stream_name = StreamType.PUBLIC.value
 
 
 class TagStreamView(BaseStreamView):
@@ -76,7 +77,7 @@ class TagStreamView(BaseStreamView):
 
     def dispatch(self, request, *args, **kwargs):
         self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
-        self.stream_name = "tag__%s" % self.tag.channel_group_name
+        self.stream_name = "%s__%s" % (StreamType.TAG.value, self.tag.channel_group_name)
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -95,7 +96,7 @@ class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
     template_name = "streams/followed.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.stream_name = "followed__%s" % request.user.username
+        self.stream_name = "%s__%s" % (StreamType.FOLLOWED.value, request.user.username)
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):

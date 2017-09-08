@@ -3,6 +3,7 @@ from django.test import Client, TestCase
 
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.enums import Visibility
+from socialhome.streams.enums import StreamType
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
 
@@ -98,7 +99,7 @@ class TestFollowedStreamView(SocialhomeTestCase):
     def test_context_data_is_ok(self):
         with self.login(self.user):
             self.get("streams:followed")
-        self.assertContext("stream_name", "followed__%s" % self.user.username)
+        self.assertContext("stream_name", "%s__%s" % (StreamType.FOLLOWED.value, self.user.username))
 
     def test_renders_without_content(self):
         with self.login(self.user2):
