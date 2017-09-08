@@ -76,6 +76,12 @@ Changed
         * ``user_is_author`` (Boolean whether current user is the author of the content)
         * ``user_has_shared`` (Boolean whether current user has shared the content)
 
+    * Changed:
+
+        * ``author`` is now a limited serialization of the author profile, containing the following keys: "guid", "handle", "home_url", "id", "image_url_small", "is_local", "name", "url".
+
+          The reason for serializing the author information to content is related to privacy controls. A user who maintains a limited profile can still create public content, for example. A user who is able to view the content created by the user should also see some limited information about the creating profile. To get the full profile, the user needs to fetch the profile object by ID, which is subject to the visibility set by the profile owner.
+
     * Removed (internal attributes unnecessary for frontend rendering):
 
         * ``created``

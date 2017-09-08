@@ -5,6 +5,35 @@ from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 
 
+class LimitedProfileSerializer(ModelSerializer):
+    """Read only Profile serializer with less information.
+
+    For example for adding to serialized Content.
+    """
+    class Meta:
+        model = Profile
+        fields = (
+            "guid",
+            "handle",
+            "home_url",
+            "id",
+            "image_url_small",
+            "is_local",
+            "name",
+            "url",
+        )
+        read_only_fields = (
+            "guid",
+            "handle",
+            "home_url",
+            "id",
+            "image_url_small",
+            "is_local",
+            "name",
+            "url",
+        )
+
+
 class ProfileSerializer(ModelSerializer):
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 

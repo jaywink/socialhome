@@ -5,9 +5,11 @@ from rest_framework.serializers import ModelSerializer
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
+from socialhome.users.serializers import LimitedProfileSerializer
 
 
 class ContentSerializer(ModelSerializer):
+    author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
     user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
