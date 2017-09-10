@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 from django.conf import settings
+from test_plus import TestCase
 
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.utils import get_full_media_url
+from socialhome.utils import get_full_media_url, get_redis_connection
 
 
 class TestGetFullMediaUrl(SocialhomeTestCase):
@@ -10,3 +13,10 @@ class TestGetFullMediaUrl(SocialhomeTestCase):
             get_full_media_url("foobar"),
             "%s%s%s" % (settings.SOCIALHOME_URL, settings.MEDIA_URL, "foobar"),
         )
+
+
+class TestGetRedisConnection(TestCase):
+    @patch("socialhome.utils.redis.StrictRedis")
+    def test_get_redis_connection(self, mock_redis):
+        get_redis_connection()
+        self.assertTrue(mock_redis.called)

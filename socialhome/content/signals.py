@@ -13,6 +13,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
 from socialhome.notifications.tasks import send_reply_notifications, send_share_notification
 from socialhome.streams.consumers import StreamConsumer
+from socialhome.streams.streams import update_streams_with_content
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")
@@ -28,6 +29,7 @@ def content_post_save(instance, **kwargs):
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: django_rq.enqueue(send_share_notification, instance.id))
+        transaction.on_commit(lambda: update_streams_with_content(instance))
     if instance.local:
         transaction.on_commit(lambda: federate_content(instance))
 

@@ -89,6 +89,12 @@ Changed
         * ``oembed``
         * ``opengraph``
 
+* Refactoring for streams views to use new Stream classes which support pre-caching of content ID's. No visible changes to user experience except a faster "Followed users" stream.
+
+  A stream class that is set as cached will store into Redis a list of content ID's for each user who would normally see that content in the stream. This allows pulling content out of the database very fast. If the stream is not cached or does not have cached content ID's, normal database lookups will be used.
+
+  This refactoring enables creating more complex streams which require heavier calculations to decide whether a content item should be in a stream or not.
+
 Fixed
 .....
 
