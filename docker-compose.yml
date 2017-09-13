@@ -1,0 +1,82 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.6
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - pg_backups:/pg_backups
+    environment:
+      - POSTGRES_USER=socialhome
+      - POSTGRES_PASSWORD=socialhome
+      - POSTGRES_DB=socialhome
+    ports:
+      - 5432
+  web:
+    build:
+      context: .
+      dockerfile: docker/django/Dockerfile
+    env_file:
+      - ./env.local
+    ports:
+      - 8000
+    depends_on:
+      - db
+#  worker:
+#    build:
+#      context: .
+#      dockerfile: docker/worker/Dockerfile
+#      args:
+#        - DATABASE_URL=${DATABASE_URL}
+#        - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+#        - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+#        - DJANGO_SECURE_SSL_REDIRECT=${DJANGO_SECURE_SSL_REDIRECT}
+#        - DJANGO_ACCOUNT_ALLOW_REGISTRATION=${DJANGO_ACCOUNT_ALLOW_REGISTRATION}
+#        - SOCIALHOME_DOMAIN=${SOCIALHOME_DOMAIN}
+#        - SOCIALHOME_HTTPS=${SOCIALHOME_HTTPS}
+#        - SOCIALHOME_LOGFILE=${SOCIALHOME_LOGFILE}
+#        - SOCIALHOME_LOGFILE_FEDERATION=${SOCIALHOME_LOGFILE_FEDERATION}
+#        - DJANGO_ADMIN_NAME=${DJANGO_ADMIN_NAME}
+#        - DJANGO_ADMIN_MAIL=${DJANGO_ADMIN_MAIL}
+#        - DJANGO_SERVER_EMAIL=${DJANGO_SERVER_EMAIL}
+#        - DJANGO_OPBEAT_ORGANIZATION_ID=${DJANGO_OPBEAT_ORGANIZATION_ID}
+#        - DJANGO_OPBEAT_APP_ID=${DJANGO_OPBEAT_APP_ID}
+#        - DJANGO_OPBEAT_SECRET_TOKEN=${DJANGO_OPBEAT_SECRET_TOKEN}
+#        - DJANGO_AWS_ACCESS_KEY_ID=${DJANGO_AWS_ACCESS_KEY_ID}
+#        - SOCIALHOME_STATISTICS=${SOCIALHOME_STATISTICS}
+#        - DJANGO_DEBUG_TOOLBAR=${DJANGO_DEBUG_TOOLBAR}
+#        - MOCHA_TESTS=${MOCHA_TESTS}
+#        - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+#    depends_on:
+#      - web
+#  daphne:
+#    build:
+#      context: .
+#      dockerfile: docker/daphne/Dockerfile
+#      args:
+#        - DATABASE_URL=${DATABASE_URL}
+#        - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+#        - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+#        - DJANGO_SECURE_SSL_REDIRECT=${DJANGO_SECURE_SSL_REDIRECT}
+#        - DJANGO_ACCOUNT_ALLOW_REGISTRATION=${DJANGO_ACCOUNT_ALLOW_REGISTRATION}
+#        - SOCIALHOME_DOMAIN=${SOCIALHOME_DOMAIN}
+#        - SOCIALHOME_HTTPS=${SOCIALHOME_HTTPS}
+#        - SOCIALHOME_LOGFILE=${SOCIALHOME_LOGFILE}
+#        - SOCIALHOME_LOGFILE_FEDERATION=${SOCIALHOME_LOGFILE_FEDERATION}
+#        - DJANGO_ADMIN_NAME=${DJANGO_ADMIN_NAME}
+#        - DJANGO_ADMIN_MAIL=${DJANGO_ADMIN_MAIL}
+#        - DJANGO_SERVER_EMAIL=${DJANGO_SERVER_EMAIL}
+#        - DJANGO_OPBEAT_ORGANIZATION_ID=${DJANGO_OPBEAT_ORGANIZATION_ID}
+#        - DJANGO_OPBEAT_APP_ID=${DJANGO_OPBEAT_APP_ID}
+#        - DJANGO_OPBEAT_SECRET_TOKEN=${DJANGO_OPBEAT_SECRET_TOKEN}
+#        - DJANGO_AWS_ACCESS_KEY_ID=${DJANGO_AWS_ACCESS_KEY_ID}
+#        - SOCIALHOME_STATISTICS=${SOCIALHOME_STATISTICS}
+#        - DJANGO_DEBUG_TOOLBAR=${DJANGO_DEBUG_TOOLBAR}
+#        - MOCHA_TESTS=${MOCHA_TESTS}
+#        - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+#    depends_on:
+#      - web
+
+volumes:
+  pg_data: {}
+  pg_backups: {}

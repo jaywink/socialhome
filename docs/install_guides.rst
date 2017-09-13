@@ -11,6 +11,7 @@ Available guides:
 
 * :ref:`installation-ubuntu`
 * :ref:`installation-ubuntu-ansible`
+* :ref:`installation-docker`
 
 .. include:: installation/ubuntu.rst
 
@@ -20,6 +21,8 @@ Ubuntu (14.04, Ansible)
 -----------------------
 
 See this `Ansible role <https://github.com/jaywink/ansible-socialhome>`_.
+
+.. include:: installation/docker.rst
 
 Other platforms
 ---------------

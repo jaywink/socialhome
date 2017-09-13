@@ -158,6 +158,13 @@ There is an ``.eslintrc`` provided. We follow the Airbnb and Vue guidelines with
 
     npm run lint
 
+Contact for help
+----------------
+
+See our communication channels in the :ref:`community` page.
+
+You can also ask questions or give feedback via issues.
+
 Building local documentation
 ----------------------------
 
@@ -187,9 +194,13 @@ Then execute the following and copy the markdown version for pasting to GitHub r
 
     pandoc --from rst --to markdown_github docs/changelog.rst | less
 
-Contact for help
-----------------
+Development using Docker
+------------------------
 
-See our communication channels in the :ref:`community` page.
+TBD
 
-You can also ask questions or give feedback via issues.
+
+Building new Docker images
+--------------------------
+
+TBD
