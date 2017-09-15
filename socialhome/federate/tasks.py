@@ -136,11 +136,10 @@ def send_share(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [
+        recipients = _get_remote_followers(content.author)
+        if not content.share_of.local:
             # Send to original author
-            (content.share_of.author.handle, None),
-        ]
-        recipients.extend(_get_remote_followers(content.author))
+            recipients.append((content.share_of.author.handle, None))
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("send_share - No entity for %s", content)
