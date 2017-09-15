@@ -93,6 +93,7 @@ Fixed
 .....
 
 * Cycling browser tabs with CTRL-TAB when focused on the editor no longer inserts a TAB character in the editor.
+* Don't federate shares to shared content local author. This caused unnecessary deliveries between the same host.
 
 0.4.0 (2017-08-31)
 ------------------

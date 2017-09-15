@@ -7,7 +7,7 @@ from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply,
@@ -145,6 +145,8 @@ class TestSendShare(SocialhomeTestCase):
         cls.limited_share = ContentFactory(
             share_of=cls.limited_content, author=cls.profile, visibility=Visibility.LIMITED
         )
+        cls.local_content = LocalContentFactory(visibility=Visibility.PUBLIC)
+        cls.local_share = ContentFactory(share_of=cls.local_content, author=cls.profile, visibility=Visibility.PUBLIC)
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     def test_only_public_share_calls_make_federable_content(self, mock_maker):
@@ -170,6 +172,12 @@ class TestSendShare(SocialhomeTestCase):
     def test_content_not_sent_in_debug_mode(self, mock_send):
         send_share(self.share.id)
         mock_send.assert_not_called()
+
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    def test_doesnt_send_to_local_share_author(self, mock_maker, mock_send):
+        send_share(self.local_share.id)
+        mock_send.assert_called_once_with("entity", self.local_share.author, [])
 
 
 class TestForwardRelayable(TestCase):
