@@ -1,9 +1,7 @@
 from unittest.mock import patch, Mock, call
 from uuid import uuid4
 
-import pytest
 from django.db import IntegrityError
-from django.test import TransactionTestCase
 from federation.entities import base
 from federation.tests.factories import entities
 
@@ -378,11 +376,17 @@ class TestProcessEntityShare(SocialhomeTestCase):
         self.assertEqual(self.local_content2.text, current_text)
 
 
-@pytest.mark.usefixtures("db")
-class TestGetSenderProfile:
+class TestGetSenderProfile(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+
     def test_returns_existing_profile(self):
-        profile = ProfileFactory(handle="foo@example.com")
-        assert get_sender_profile("foo@example.com") == profile
+        self.assertEqual(get_sender_profile(self.remote_profile.handle), self.remote_profile)
+
+    def test_returns_none_on_existing_local_profile(self):
+        self.assertIsNone(get_sender_profile(self.profile.handle))
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_fetches_remote_profile_if_not_found(self, mock_retrieve):
@@ -541,15 +545,22 @@ class TestMakeFederableProfile(SocialhomeTestCase):
 
 
 class TestSenderKeyFetcher(SocialhomeTestCase):
-    def test_local_profile_public_key_is_returned(self):
-        profile = ProfileFactory()
-        self.assertEqual(sender_key_fetcher(profile.handle), profile.rsa_public_key)
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+
+    def test_existing_remote_profile_public_key_is_returned(self):
+        self.assertEqual(sender_key_fetcher(self.remote_profile.handle), self.remote_profile.rsa_public_key)
+
+    def test_local_profile_is_skipped(self):
+        self.assertIsNone(sender_key_fetcher(self.profile.handle), self.profile.rsa_public_key)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
     def test_remote_profile_public_key_is_returned(self, mock_from_remote, mock_retrieve):
-        remote_profile = Mock(public_key="foo")
-        mock_retrieve.return_value = remote_profile
+        remote_profile = Mock(rsa_public_key="foo")
+        mock_retrieve.return_value = mock_from_remote.return_value = remote_profile
         self.assertEqual(sender_key_fetcher("bar"), "foo")
         mock_retrieve.assert_called_once_with("bar")
         mock_from_remote.assert_called_once_with(remote_profile)
@@ -558,4 +569,5 @@ class TestSenderKeyFetcher(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
         self.assertEqual(sender_key_fetcher("bar"), None)
-        mock_logger.assert_called_once_with("Remote profile %s for sender key not found locally or remotely.", "bar")
+        mock_logger.assert_called_once_with("get_sender_profile - Remote profile %s not found locally "
+                                            "or remotely.", "bar")

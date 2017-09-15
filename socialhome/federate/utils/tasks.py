@@ -22,11 +22,16 @@ def get_sender_profile(sender):
     try:
         sender_profile = Profile.objects.exclude(rsa_public_key="").get(handle=sender)
     except Profile.DoesNotExist:
+        logger.debug("get_sender_profile - Handle %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
-            logger.warning("Remote profile %s not found locally or remotely.", sender)
+            logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
             return
         sender_profile = Profile.from_remote_profile(remote_profile)
+    else:
+        if sender_profile.is_local:
+            logger.warning("get_sender_profile - Handle %s is local! Skip.", sender)
+            return
     return sender_profile
 
 
@@ -359,18 +364,7 @@ def sender_key_fetcher(handle):
     :rtype: str
     """
     logger.debug("sender_key_fetcher - Checking for handle '%s'", handle)
-    try:
-        profile = Profile.objects.get(handle=handle, user__isnull=True)
-        logger.debug("sender_key_fetcher - Handle %s already exists as a profile", handle)
-    except Profile.DoesNotExist:
-        logger.debug("sender_key_fetcher - Handle %s was not found, fetching from remote", handle)
-        remote_profile = retrieve_remote_profile(handle)
-        if not remote_profile:
-            logger.warning("Remote profile %s for sender key not found locally or remotely.", handle)
-            return None
-        # We might as well create the profile locally here since we'll need it again soon
-        logger.debug("sender_key_fetcher - Creating %s from remote profile", handle)
-        Profile.from_remote_profile(remote_profile)
-        return remote_profile.public_key
-    else:
-        return profile.rsa_public_key
+    profile = get_sender_profile(handle)
+    if not profile:
+        return
+    return profile.rsa_public_key
