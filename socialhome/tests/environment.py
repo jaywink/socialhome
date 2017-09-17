@@ -5,6 +5,9 @@ import requests
 
 
 class MockRedis(Mock):
+    def zrank(self, *args, **kwargs):
+        return None
+
     def zrevrange(self, *args, **kwargs):
         return []
 

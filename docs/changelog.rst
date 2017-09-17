@@ -36,6 +36,10 @@ Added
 
 * Content API has a new endpoint ``/api/content/<id>/replies/``. This returns all the replies for the given content.
 
+* Shares made by followed contacts are now pulled up to the "Followed" stream.
+
+  This happens only if the user has not already seen this content in their "Followed" stream. Each content should only appear once, either directly by following the author or a followed contact sharing the content. Multiple shares do not raise the content in the stream again.
+
 Changed
 .......
 

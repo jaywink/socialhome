@@ -3,6 +3,7 @@ import time
 
 import django_rq
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import Case, When
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -24,7 +25,10 @@ def add_to_redis(content, keys):
     r = get_redis_connection()
     content_id = str(content.id)
     for key in keys:
-        r.zadd(key, int(time.time()), content_id)
+        # Only add if not in the set already
+        # This stops shares popping up more than once, for example
+        if not r.zrank(key, content_id):
+            r.zadd(key, int(time.time()), content_id)
 
 
 def add_to_stream_for_users(content_id, stream_cls_name):
@@ -75,12 +79,16 @@ def update_streams_with_content(content):
     if content.content_type == ContentType.REPLY:
         # No need to do these just now
         return
+    # Store author here just in case we switch content to the shared content
+    author = content.author
+    if content.content_type == ContentType.SHARE:
+        # If this is a share we want to cache the shared content, not the original
+        content = content.share_of
     # Do author immediately
-    if content.author.is_local:
-        user = content.author.user
+    if author.is_local:
         keys = []
         for stream_cls in CACHED_STREAM_CLASSES:
-            keys = check_and_add_to_keys(stream_cls, user, content, keys)
+            keys = check_and_add_to_keys(stream_cls, author.user, content, keys)
         add_to_redis(content, keys)
     # Queue rest to RQ
     for stream_cls in CACHED_STREAM_CLASSES:
@@ -113,9 +121,15 @@ class BaseStream:
         return r.zrevrange(key, index, index + self.paginate_by)
 
     def get_content(self):
-        """Get queryset of Content objects."""
-        return Content.objects.filter(id__in=self.get_content_ids())\
-            .select_related("author__user", "share_of").prefetch_related("tags").order_by(self.ordering)
+        """Get queryset of Content objects.
+
+        Keep ordering as returned by the list of content id's.
+        """
+        content_ids = self.get_content_ids()
+        # Case/When tip thanks to https://stackoverflow.com/a/37648265/1489738
+        preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(content_ids)])
+        return Content.objects.filter(id__in=content_ids)\
+            .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
 
     def get_content_ids(self):
         """Get a list of content ID's."""

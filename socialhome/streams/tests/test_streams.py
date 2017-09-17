@@ -22,7 +22,7 @@ from socialhome.users.tests.factories import UserFactory
 class TestAddToRedis(SocialhomeTestCase):
     def test_adds_each_key(self, mock_time, mock_get):
         mock_zadd = Mock()
-        mock_get.return_value = Mock(zadd=mock_zadd)
+        mock_get.return_value = Mock(zadd=mock_zadd, zrank=Mock(return_value=None))
         add_to_redis(Mock(id=1), ["spam", "eggs"])
         calls = [
             call("spam", 123, "1"),
@@ -32,7 +32,7 @@ class TestAddToRedis(SocialhomeTestCase):
 
     def test_returns_on_no_keys(self, mock_time, mock_get):
         mock_zadd = Mock()
-        mock_get.return_value = Mock(zadd=mock_zadd)
+        mock_get.return_value = Mock(zadd=mock_zadd, zrank=Mock(return_value=None))
         add_to_redis(Mock(), [])
 
 
