@@ -170,6 +170,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
+                "socialhome.context_processors.enums",
             ],
         },
     },
@@ -247,7 +248,7 @@ AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
 REDIS_HOST = env("REDIS_HOST", default="localhost")
 REDIS_PORT = env("REDIS_PORT", default=6379)
 REDIS_DB = env("REDIS_DB", default=0)
-REDIS_PASSWORD = env("REDIS_PASSWORD", default="")
+REDIS_PASSWORD = env("REDIS_PASSWORD", default=None)
 
 # RQ
 # --

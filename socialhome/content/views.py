@@ -9,6 +9,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
+from socialhome.streams.enums import StreamType
 
 
 class ContentVisibleForUserMixin(UserPassesTestMixin):
@@ -149,5 +150,5 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["stream_name"] = "content__%s" % self.object.channel_group_name
+        context["stream_name"] = "%s__%s" % (StreamType.CONTENT.value, self.object.channel_group_name)
         return context

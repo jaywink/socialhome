@@ -1,13 +1,15 @@
 from django.core.urlresolvers import reverse
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory
 
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.enums import Visibility
-from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.streams.enums import StreamType
+from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView
+from socialhome.tests.utils import SocialhomeCBVTestCase
 from socialhome.users.tests.factories import UserFactory
 
 
-class TestPublicStreamView(TestCase):
+class TestPublicStreamView(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -27,6 +29,14 @@ class TestPublicStreamView(TestCase):
         assert response.status_code == 200
         assert self.content.text in str(response.content)
 
+    def test_stream_name(self):
+        view = self.get_instance(PublicStreamView)
+        self.assertEqual(view.stream_name, StreamType.PUBLIC.value)
+
+    def test_stream_type_value(self):
+        view = self.get_instance(PublicStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.PUBLIC.value)
+
     def test_uses_correct_template(self):
         response = self.client.get(reverse("streams:public"))
         template_names = [template.name for template in response.templates]
@@ -45,7 +55,7 @@ class TestPublicStreamView(TestCase):
         assert response.status_code == 200
 
 
-class TestTagStreamView(TestCase):
+class TestTagStreamView(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -68,6 +78,17 @@ class TestTagStreamView(TestCase):
         assert response.status_code == 200
         assert self.content.rendered in str(response.content)
 
+    def test_stream_name(self):
+        view = self.get_instance(TagStreamView)
+        view.tag = self.content.tags.first()
+        self.assertEqual(
+            view.stream_name, "%s__%s" % (StreamType.TAG.value, view.tag.channel_group_name)
+        )
+
+    def test_stream_type_value(self):
+        view = self.get_instance(TagStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.TAG.value)
+
     def test_uses_correct_template(self):
         response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         template_names = [template.name for template in response.templates]
@@ -85,7 +106,7 @@ class TestTagStreamView(TestCase):
         assert limited.rendered not in str(response.content)
 
 
-class TestFollowedStreamView(SocialhomeTestCase):
+class TestFollowedStreamView(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -95,29 +116,37 @@ class TestFollowedStreamView(SocialhomeTestCase):
         cls.other_content = ContentFactory(visibility=Visibility.PUBLIC)
         cls.user.profile.following.add(cls.content.author)
 
-    def test_context_data_is_ok(self):
-        with self.login(self.user):
-            self.get("streams:followed")
-        self.assertContext("stream_name", "followed__%s" % self.user.username)
+    @staticmethod
+    def get_request(user):
+        request = RequestFactory().get("/")
+        request.user = user
+        return request
 
     def test_renders_without_content(self):
-        with self.login(self.user2):
-            response = self.get("streams:followed")
-        self.assertContains(response, "Followed")
-        self.assertEquals(len(response.context["content_list"]), 0)
-        self.assertEquals(response.status_code, 200)
+        self.get(FollowedStreamView, request=self.get_request(self.user2))
+        self.assertContains(self.last_response, "Followed")
+        self.assertEquals(len(self.context["content_list"]), 0)
+        self.response_200()
 
     def test_renders_with_content(self):
-        with self.login(self.user):
-            response = self.get("streams:followed")
+        response = self.get(FollowedStreamView, request=self.get_request(self.user))
         self.assertContains(response, "Followed")
         self.assertIsNotNone(response.context["content_list"])
         self.assertEquals(set(response.context["content_list"]), {self.content})
         self.assertEquals(response.status_code, 200)
 
+    def test_stream_name(self):
+        view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.stream_name, "%s__%s" % (StreamType.FOLLOWED.value, self.user.username)
+        )
+
+    def test_stream_type_value(self):
+        view = self.get_instance(FollowedStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.FOLLOWED.value)
+
     def test_uses_correct_template(self):
-        with self.login(self.user):
-            response = self.get("streams:followed")
+        response = self.get(FollowedStreamView, request=self.get_request(self.user))
         template_names = [template.name for template in response.templates]
         assert "streams/followed.html" in template_names
 

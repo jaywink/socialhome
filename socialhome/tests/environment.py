@@ -1,5 +1,12 @@
-import requests
 from unittest.mock import Mock
+
+import redis
+import requests
+
+
+class MockRedis(Mock):
+    def zrevrange(self, *args, **kwargs):
+        return []
 
 
 class MockResponse(str):
@@ -18,3 +25,7 @@ requests.post = Mock()
 requests.patch = Mock()
 requests.delete = Mock()
 requests.put = Mock()
+
+
+# Disable redis connection
+redis.StrictRedis = Mock(return_value=MockRedis())

@@ -3,13 +3,15 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
 from socialhome.content.models import Content, Tag
+from socialhome.streams.streams import PublicStream, FollowedStream, TagStream
 
 
 class BaseStreamView(ListView):
+    last_id = None
     model = Content
     ordering = "-created"
-    paginate_by = 30
-    stream_name = ""
+    paginate_by = 15
+    stream_class = None
     vue = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -17,6 +19,7 @@ class BaseStreamView(ListView):
             hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
         )
         self.vue = bool(request.GET.get("vue", False)) or use_new_stream
+        self.last_id = request.GET.get("last_id")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -61,27 +64,38 @@ class BaseStreamView(ListView):
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
         }
 
+    def get_queryset(self):
+        stream = self.stream_class(last_id=self.last_id, user=self.request.user)
+        return stream.get_content()
+
     def get_template_names(self):
         return ["streams/vue.html"] if self.vue else super().get_template_names()
+
+    @property
+    def stream_name(self):
+        return self.stream_type_value
+
+    @property
+    def stream_type_value(self):
+        return self.stream_class.stream_type.value
 
 
 class PublicStreamView(BaseStreamView):
     template_name = "streams/public.html"
-    queryset = Content.objects.public()
-    stream_name = "public"
+    stream_class = PublicStream
 
 
 class TagStreamView(BaseStreamView):
+    stream_class = TagStream
     template_name = "streams/tag.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
-        self.stream_name = "tag__%s" % self.tag.channel_group_name
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        """Restrict to a tag."""
-        return Content.objects.tag(self.tag, self.request.user)
+        stream = self.stream_class(last_id=self.last_id, user=self.request.user, tag=self.tag)
+        return stream.get_content()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -90,13 +104,15 @@ class TagStreamView(BaseStreamView):
             context["json_context"]["tagName"] = self.tag.name
         return context
 
+    @property
+    def stream_name(self):
+        return "%s__%s" % (self.stream_type_value, self.tag.channel_group_name)
+
 
 class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
+    stream_class = FollowedStream
     template_name = "streams/followed.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.stream_name = "followed__%s" % request.user.username
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return Content.objects.followed(self.request.user)
+    @property
+    def stream_name(self):
+        return "%s__%s" % (self.stream_type_value, self.request.user.username)

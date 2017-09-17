@@ -2,12 +2,12 @@
 {% load i18n %}
 {% load string_utils %}
 
-<div class="grid-item {% if stream_name|startswith:"content_" %}grid-item-full{% endif %}" data-content-id="{{ content.id }}">
+<div class="grid-item {% if stream_name|startswith:ENUMS.StreamType.CONTENT %}grid-item-full{% endif %}" data-content-id="{{ content.id }}">
     {{ content.rendered|safe }}
-    {% if not stream_name|startswith:"profile_" %}
+    {% if not stream_name|startswith:ENUMS.StreamType.PROFILE_PINNED %}
         <div class="grid-item-author-bar mt-1">
             <div class="profile-box-trigger">
-                <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic {% if stream_name|startswith:"content_" %}grid-item-author-bar-pic-large{% endif %}"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
+                <img src="{{ content.author.safer_image_url_small }}" class="grid-item-author-bar-pic {% if stream_name|startswith:ENUMS.StreamType.CONTENT %}grid-item-author-bar-pic-large{% endif %}"> {% if content.author.name %}{{ content.author.name }}{% else %}{{ content.author.handle }}{% endif %}
             </div>
             <div class="profile-box hidden">
                 {{ content.author.handle }}
@@ -59,7 +59,7 @@
     {% endif %}
     <div class="replies-container" data-content-id="{{ content.id }}"></div>
     {% if request.user.is_authenticated and content.content_type.string_value == "content" %}
-        <div class="content-actions reply-action {% if not stream_name|startswith:"content_" %}hidden{% endif %}" data-content-id="{{ content.id }}">
+        <div class="content-actions reply-action {% if not stream_name|startswith:ENUMS.StreamType.CONTENT %}hidden{% endif %}" data-content-id="{{ content.id }}">
             <a class="btn btn-secondary" href="{% url "content:reply" pk=content.id %}">{% trans "Reply" %}</a>
         </div>
     {% endif %}
