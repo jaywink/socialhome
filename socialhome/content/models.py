@@ -296,7 +296,7 @@ class Content(models.Model):
         ASCII or hyphens or periods only.
         Prefix with ID as we have to cut long guids due to asgi library group name restriction.
         """
-        return ("%s%s" % (self.id, slugify(self.guid)))[:80]
+        return ("%s_%s" % (self.id, slugify(self.guid)))[:80]
 
     def render(self):
         """Pre-render text to Content.rendered."""
