@@ -330,20 +330,26 @@ class Content(models.Model):
         for line in lines:
             if line[0:3] == "```":
                 code_block = not code_block
+            # noinspection PyTypeChecker
             if line.find("#") == -1 or line[0:4] == "    " or code_block:
                 # Just add the whole line
                 final_words.append(line)
                 continue
             # Check each word separately
+            # noinspection PyTypeChecker
             words = line.split(" ")
             for word in words:
+                # noinspection PyTypeChecker
                 candidate = word.strip().strip("([]),.!?:")
+                # noinspection PyTypeChecker
                 if candidate.startswith("#"):
+                    # noinspection PyTypeChecker
                     candidate = candidate.strip("#")
                     if test_tag(candidate.lower()):
                         # Tag
                         found_tags.add(candidate.lower())
                         try:
+                            # noinspection PyTypeChecker
                             tag_word = word.replace(
                                 "#%s" % candidate,
                                 "[#%s](%s)" % (
@@ -366,10 +372,17 @@ class Content(models.Model):
         return text
 
     @staticmethod
-    def get_rendered_contents(qs, user):
+    def get_rendered_contents(qs, user, throughs=None):
+        """Get JSON serialized contents.
+
+        :param qs: QuerySet
+        :param user: User object
+        :param throughs: Optional dict containing through id's
+        """
         rendered = []
         for content in qs:
-            rendered.append(content.dict_for_view(user))
+            through = throughs.get(content.id) if throughs else None
+            rendered.append(content.dict_for_view(user, through=through))
         return rendered
 
     def fix_local_uploads(self):
@@ -385,7 +398,9 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/uploads/", "![](%s/media/uploads/" % settings.SOCIALHOME_URL, self.text)
 
-    def dict_for_view(self, user):
+    def dict_for_view(self, user, through=None):
+        if not through:
+            through = self.id
         humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
         is_author = bool(user.is_authenticated and self.author == user.profile)
         is_following_author = bool(user.is_authenticated and self.author_id in user.profile.following_ids)
@@ -417,6 +432,7 @@ class Content(models.Model):
             "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
             "shares_count": self.shares_count,
             "slug": self.slug,
+            "through": through,
             "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
         }
 

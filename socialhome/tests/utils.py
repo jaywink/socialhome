@@ -2,6 +2,7 @@ import tempfile
 from unittest.mock import Mock
 
 from PIL import Image
+from channels.test import ChannelTestCase
 from django.test import override_settings, TransactionTestCase
 from rest_framework.test import APITestCase
 from test_plus import TestCase
@@ -38,7 +39,7 @@ class CreateDataMixin:
         target.limited_content = LimitedContentFactory(author=author)
 
 
-class SocialhomeTestBase(CreateDataMixin, TestCase):
+class SocialhomeTestBase(CreateDataMixin):
     maxDiff = None
 
     @classmethod
@@ -59,15 +60,19 @@ class SocialhomeTestBase(CreateDataMixin, TestCase):
         return tmp_file
 
 
-class SocialhomeTestCase(SocialhomeTestBase):
+class SocialhomeTestCase(SocialhomeTestBase, TestCase):
     pass
 
 
-class SocialhomeCBVTestCase(CBVTestCase, SocialhomeTestBase):
+class SocialhomeCBVTestCase(SocialhomeTestBase, CBVTestCase):
     pass
 
 
-class SocialhomeAPITestCase(APITestCase, SocialhomeTestBase):
+class SocialhomeAPITestCase(SocialhomeTestBase, APITestCase, TestCase):
+    pass
+
+
+class SocialhomeChannelTestCase(SocialhomeTestBase, ChannelTestCase):
     pass
 
 

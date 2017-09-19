@@ -25,6 +25,18 @@ class StreamConsumer(WebsocketConsumer):
         elif action == "load_children":
             self.handle_load_children(data)
 
+    def _get_base_qs(self):
+        stream = self._get_stream_instance()
+        if stream:
+            return stream.get_queryset()
+        stream_name, stream_info = self._get_stream_info()
+        # TODO implement profile streams here too once done
+        if stream_name == "profile":
+            return Content.objects.profile_pinned(stream_info, self.message.user)
+        elif stream_name == "profile_all":
+            return Content.objects.profile_by_id(stream_info, self.message.user)
+        return Content.objects.none()
+
     def _get_stream_class(self):
         stream_name, _stream_info = self._get_stream_info()
         return {
@@ -54,28 +66,34 @@ class StreamConsumer(WebsocketConsumer):
             tag = Tag.objects.get(id=tag_id)
             return self._get_stream_class()(last_id=last_id, user=self.message.user, tag=tag)
 
-    def _get_stream_qs(self, last_id=None, base_qs=False):
-        """Using the stream info, get correct queryset to use for content."""
+    def _get_stream_qs(self, last_id=None):
+        """Using the stream info, get correct queryset to use for content.
+
+        :returns: tuple of (QuerySet, list). The list is a list of "throughs" id's for the ordered content qs.
+        """
         stream = self._get_stream_instance(last_id=last_id)
         if stream:
-            if base_qs:
-                return stream.get_queryset()
-            else:
-                return stream.get_content()
+            return stream.get_content()
         stream_name, stream_info = self._get_stream_info()
         # TODO implement profile streams here too once done
+        qs = None
         if stream_name == "profile":
-            return Content.objects.profile_pinned(stream_info, self.message.user)
+            qs = Content.objects.profile_pinned(stream_info, self.message.user)
         elif stream_name == "profile_all":
-            return Content.objects.profile_by_id(stream_info, self.message.user)
-        return Content.objects.none()
+            qs = Content.objects.profile_by_id(stream_info, self.message.user)
+        if qs:
+            qs = qs.filter(id__lt=last_id)[:15]
+            ids = qs.values_list("id", flat=True)
+            throughs = zip(ids, ids)
+            return qs, throughs
+        return Content.objects.none(), None
 
     def handle_load_content(self, data):
         """Send back the requested content."""
         ids = data.get("ids")
         if not ids:
             return
-        qs = self._get_stream_qs(base_qs=True)
+        qs = self._get_base_qs()
         qs = qs.filter(id__in=ids)
         contents = Content.get_rendered_contents(qs, self.message.user)
         payload = self.make_payload(contents, "prepended")
@@ -86,12 +104,8 @@ class StreamConsumer(WebsocketConsumer):
         last_id = data.get("last_id")
         if not last_id:
             return
-        qs = self._get_stream_qs(last_id=last_id)
-        stream_name, _stream_info = self._get_stream_info()
-        if stream_name not in ("public", "followed", "tag"):
-            # TODO profile streams need to be filtered and sliced
-            qs = qs.filter(id__lt=last_id)[:15]
-        contents = Content.get_rendered_contents(qs, self.message.user)
+        qs, throughs = self._get_stream_qs(last_id=last_id)
+        contents = Content.get_rendered_contents(qs, self.message.user, throughs=throughs)
         payload = self.make_payload(contents, "appended")
         self.send_payload(payload)
 

@@ -1,8 +1,7 @@
 import json
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
-import pytest
-from channels.tests import ChannelTestCase, Client
+from channels.tests import Client
 from django.contrib.auth.models import AnonymousUser
 from django.test import SimpleTestCase
 from freezegun import freeze_time
@@ -10,24 +9,73 @@ from freezegun import freeze_time
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.streams.consumers import StreamConsumer
+from socialhome.streams.streams import PublicStream, FollowedStream, TagStream
+from socialhome.tests.utils import SocialhomeChannelTestCase
+from socialhome.users.tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures("db")
 @freeze_time("2017-03-11")
-class TestStreamConsumerReceive(ChannelTestCase):
-    maxDiff = None
-
+class TestStreamConsumer(SocialhomeChannelTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestStreamConsumerReceive, cls).setUpTestData()
+        super().setUpTestData()
+        cls.user = UserFactory()
         cls.content = ContentFactory()
         cls.content2 = ContentFactory()
         cls.child_content = ContentFactory(parent=cls.content)
         cls.tag = TagFactory()
 
     def setUp(self):
-        super(TestStreamConsumerReceive, self).setUp()
+        super().setUp()
         self.client = Client()
+
+    @patch.object(StreamConsumer, "__init__", return_value=None)
+    @patch("socialhome.streams.consumers.PublicStream.get_queryset", return_value="spam")
+    def test__get_base_qs(self, mock_qs, mock_consumer):
+        consumer = StreamConsumer()
+        consumer.kwargs = {"stream": "public"}
+        self.assertEqual(consumer._get_base_qs(), "spam")
+
+    @patch.object(StreamConsumer, "__init__", return_value=None)
+    def test__get_stream_class(self, mock_consumer):
+        consumer = StreamConsumer()
+        with patch.object(consumer, "_get_stream_info", return_value=("public", None)):
+            self.assertEqual(consumer._get_stream_class(), PublicStream)
+        with patch.object(consumer, "_get_stream_info", return_value=("followed", None)):
+            self.assertEqual(consumer._get_stream_class(), FollowedStream)
+        with patch.object(consumer, "_get_stream_info", return_value=("tag", None)):
+            self.assertEqual(consumer._get_stream_class(), TagStream)
+
+    @patch.object(StreamConsumer, "__init__", return_value=None)
+    def test__get_stream_info(self, mock_consumer):
+        consumer = StreamConsumer()
+        consumer.kwargs = {"stream": "spam"}
+        self.assertEqual(consumer._get_stream_info(), ("spam", None))
+        consumer.kwargs = {"stream": "spam__eggs"}
+        self.assertEqual(consumer._get_stream_info(), ("spam", "eggs"))
+
+    @patch.object(StreamConsumer, "__init__", return_value=None)
+    def test__get_stream_instance(self, mock_consumer):
+        consumer = StreamConsumer()
+        consumer.kwargs = {"stream": "public"}
+        instance = consumer._get_stream_instance()
+        self.assertTrue(isinstance(instance, PublicStream))
+        consumer.kwargs = {"stream": "followed"}
+        consumer.message = Mock(user=self.user)
+        instance = consumer._get_stream_instance()
+        self.assertTrue(isinstance(instance, FollowedStream))
+        self.assertTrue(instance.user, self.user)
+        consumer.kwargs = {"stream": "tag__%s" % self.tag.id}
+        instance = consumer._get_stream_instance()
+        self.assertTrue(isinstance(instance, TagStream))
+        self.assertEqual(instance.tag, self.tag)
+
+    @patch.object(StreamConsumer, "__init__", return_value=None)
+    @patch("socialhome.streams.consumers.PublicStream.get_content", return_value="spam")
+    def test__get_stream_qs(self, mock_qs, mock_consumer):
+        consumer = StreamConsumer()
+        consumer.kwargs = {"stream": "public"}
+        self.assertEqual(consumer._get_stream_qs(), "spam")
 
     def test_receive_load_content_sends_reply_content(self):
         self.client.send_and_consume(

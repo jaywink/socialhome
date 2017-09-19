@@ -4,6 +4,7 @@ import time
 import django_rq
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Case, When
+from django.utils.functional import cached_property
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -14,24 +15,25 @@ from socialhome.utils import get_redis_connection
 logger = logging.getLogger("socialhome")
 
 
-def add_to_redis(content, keys):
+def add_to_redis(content, through, keys):
     """Add content to a list of Redis ordered sets.
 
     :param content: Content object to add
+    :param through: Content through object. For example on shares, this is the linked share content object
     :param keys: List of keys to add to
     """
     if not keys:
         return
     r = get_redis_connection()
-    content_id = str(content.id)
     for key in keys:
         # Only add if not in the set already
         # This stops shares popping up more than once, for example
-        if not r.zrank(key, content_id):
-            r.zadd(key, int(time.time()), content_id)
+        if not r.zrank(key, content.id):
+            r.zadd(key, int(time.time()), content.id)
+            r.hset(BaseStream.get_throughs_key(key), content.id, through.id)
 
 
-def add_to_stream_for_users(content_id, stream_cls_name):
+def add_to_stream_for_users(content_id, through_id, stream_cls_name):
     """Add content to all user streams of one type.
 
     Excludes author of content.
@@ -46,6 +48,11 @@ def add_to_stream_for_users(content_id, stream_cls_name):
     except Content.DoesNotExist:
         logger.warning("Stream.add_to_stream_for_users - content %s does not exist!", content_id)
         return
+    try:
+        through = Content.objects.exclude(content_type=ContentType.REPLY).get(id=through_id)
+    except Content.DoesNotExist:
+        logger.warning("Stream.add_to_stream_for_users - through content %s does not exist!", through_id)
+        return
     qs = User.objects.filter(is_active=True)
     if content.author.is_local:
         qs = qs.exclude(id=content.author.user.id)
@@ -56,7 +63,7 @@ def add_to_stream_for_users(content_id, stream_cls_name):
     # Cache also as anonymous user
     if stream_cls in CACHED_ANONYMOUS_STREAM_CLASSES:
         keys = check_and_add_to_keys(stream_cls, AnonymousUser(), content, keys)
-    add_to_redis(content, keys)
+    add_to_redis(content, through, keys)
 
 
 def check_and_add_to_keys(stream_cls, user, content, keys):
@@ -67,7 +74,7 @@ def check_and_add_to_keys(stream_cls, user, content, keys):
     # noinspection PyCallingNonCallable
     stream = stream_cls(user=user)
     if stream.should_cache_content(content):
-        keys.append(stream.get_key())
+        keys.append(stream.key)
     return keys
 
 
@@ -81,6 +88,8 @@ def update_streams_with_content(content):
         return
     # Store author here just in case we switch content to the shared content
     author = content.author
+    # The original is the "through" always, has importance in shares
+    through = content
     if content.content_type == ContentType.SHARE:
         # If this is a share we want to cache the shared content, not the original
         content = content.share_of
@@ -89,16 +98,17 @@ def update_streams_with_content(content):
         keys = []
         for stream_cls in CACHED_STREAM_CLASSES:
             keys = check_and_add_to_keys(stream_cls, author.user, content, keys)
-        add_to_redis(content, keys)
+        add_to_redis(content, through, keys)
     # Queue rest to RQ
     for stream_cls in CACHED_STREAM_CLASSES:
-        django_rq.enqueue(add_to_stream_for_users, content.id, stream_cls.__name__)
+        django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__)
 
 
 class BaseStream:
     last_id = None
     ordering = "-created"
     paginate_by = 15
+    redis = None
     stream_type = None
 
     def __init__(self, last_id=None, user=None, **kwargs):
@@ -109,35 +119,51 @@ class BaseStream:
         return "%s (%s)" % (self.__class__.__name__, self.user)
 
     def get_cached_content_ids(self):
-        key = self.get_key()
-        r = get_redis_connection()
+        self.init_redis_connection()
         index = 0
         if self.last_id:
-            last_index = r.zrevrank(key, self.last_id)
+            last_index = self.redis.zrevrank(self.key, self.last_id)
             if not last_index:
                 # This item is outside our cached ids, abort
-                return []
+                return [], {}
             index = last_index + 1
-        return r.zrevrange(key, index, index + self.paginate_by)
+        return self.get_cached_range(index)
+
+    def get_cached_range(self, index):
+        self.init_redis_connection()
+        raw_ids = self.redis.zrevrange(self.key, index, index + self.paginate_by)
+        if not raw_ids:
+            return [], {}
+        ids = [int(x) for x in raw_ids]
+        # Get throughs and make it a dict
+        throughs = self.redis.hmget(self.get_throughs_key(self.key), keys=ids)
+        throughs = {id: int(through) for id, through in zip(ids, throughs)}
+        return ids, throughs
+
+    def init_redis_connection(self):
+        if not self.redis:
+            self.redis = get_redis_connection()
 
     def get_content(self):
         """Get queryset of Content objects.
 
         Keep ordering as returned by the list of content id's.
         """
-        content_ids = self.get_content_ids()
+        ids, throughs = self.get_content_ids()
         # Case/When tip thanks to https://stackoverflow.com/a/37648265/1489738
-        preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(content_ids)])
-        return Content.objects.filter(id__in=content_ids)\
+        preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
+        content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
+        return content, throughs
 
     def get_content_ids(self):
         """Get a list of content ID's."""
         ids = []
+        throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
-            ids = self.get_cached_content_ids()
+            ids, throughs = self.get_cached_content_ids()
             if len(ids) >= self.paginate_by:
-                return ids
+                return ids, throughs
         remaining = self.paginate_by - len(ids)
         qs = self.get_queryset()
         if self.last_id:
@@ -146,15 +172,24 @@ class BaseStream:
             else:
                 qs = qs.filter(id__gt=self.last_id)
         ids.extend(qs.values_list("id", flat=True).order_by(self.ordering)[:remaining])
-        return ids
+        # Fill remaining throughs
+        for id in ids:
+            if not throughs.get(id):
+                throughs[id] = id
+        return ids, throughs
 
     def get_queryset(self):
         raise NotImplemented
 
-    def get_key(self):
+    @staticmethod
+    def get_throughs_key(key):
+        return "%s:throughs" % key
+
+    @cached_property
+    def key(self):
         if isinstance(self.user, AnonymousUser):
-            return "socialhome:streams:%s:anonymous" % self.stream_type.value
-        return "socialhome:streams:%s:%s" % (self.stream_type.value, self.user.id)
+            return "sh:streams:%s:anonymous" % self.stream_type.value
+        return "sh:streams:%s:%s" % (self.stream_type.value, self.user.id)
 
     def should_cache_content(self, content):
         return self.get_queryset().filter(id=content.id).exists()

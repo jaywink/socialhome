@@ -1,8 +1,9 @@
 {% load content %}
 {% load i18n %}
+{% load data_utils %}
 {% load string_utils %}
 
-<div class="grid-item {% if stream_name|startswith:ENUMS.StreamType.CONTENT %}grid-item-full{% endif %}" data-content-id="{{ content.id }}">
+<div class="grid-item {% if stream_name|startswith:ENUMS.StreamType.CONTENT %}grid-item-full{% endif %}" data-content-id="{{ content.id }}" data-through-id="{{ throughs|dict_value:content.id }}">
     {{ content.rendered|safe }}
     {% if not stream_name|startswith:ENUMS.StreamType.PROFILE_PINNED %}
         <div class="grid-item-author-bar mt-1">

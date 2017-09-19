@@ -11,6 +11,7 @@ class BaseStreamView(ListView):
     model = Content
     ordering = "-created"
     paginate_by = 15
+    throughs = None
     stream_class = None
     vue = False
 
@@ -25,6 +26,7 @@ class BaseStreamView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["stream_name"] = self.stream_name
+        context["throughs"] = self.throughs
         if self.vue:  # pragma: no cover
             context["json_context"] = self._define_context_json(self.stream_name)
         return context
@@ -66,7 +68,8 @@ class BaseStreamView(ListView):
 
     def get_queryset(self):
         stream = self.stream_class(last_id=self.last_id, user=self.request.user)
-        return stream.get_content()
+        qs, self.throughs = stream.get_content()
+        return qs
 
     def get_template_names(self):
         return ["streams/vue.html"] if self.vue else super().get_template_names()
@@ -95,7 +98,8 @@ class TagStreamView(BaseStreamView):
 
     def get_queryset(self):
         stream = self.stream_class(last_id=self.last_id, user=self.request.user, tag=self.tag)
-        return stream.get_content()
+        qs, self.throughs = stream.get_content()
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

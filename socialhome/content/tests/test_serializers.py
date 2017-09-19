@@ -34,6 +34,12 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.assertEqual(data["name"], self.remote_profile.name)
         self.assertEqual(data["url"], self.remote_profile.url)
 
+    def test_serializes_through(self):
+        serializer = ContentSerializer(self.content)
+        self.assertEqual(serializer.data["through"], self.content.id)
+        serializer = ContentSerializer(self.content, context={"throughs": {self.content.id: 666}})
+        self.assertEqual(serializer.data["through"], 666)
+
     def test_user_following_author_false_if_no_request(self):
         serializer = ContentSerializer()
         self.assertFalse(serializer.get_user_following_author(None))

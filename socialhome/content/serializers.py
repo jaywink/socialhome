@@ -14,6 +14,7 @@ class ContentSerializer(ModelSerializer):
     user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
+    through = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
     class Meta:
@@ -36,6 +37,7 @@ class ContentSerializer(ModelSerializer):
             "shares_count",
             "tags",
             "text",
+            "through",
             "timestamp",
             "url",
             "user_following_author",
@@ -57,12 +59,20 @@ class ContentSerializer(ModelSerializer):
             "reply_count",
             "shares_count",
             "tags",
+            "through",
             "timestamp",
             "url",
             "user_following_author",
             "user_is_author",
             "user_has_shared",
         )
+
+    def get_through(self, obj):
+        """Through is generally required only for serializing content for streams."""
+        throughs = self.context.get("throughs")
+        if not throughs:
+            return obj.id
+        return throughs.get(obj.id, obj.id)
 
     def get_user_following_author(self, obj):
         request = self.context.get("request")

@@ -74,7 +74,7 @@ class TestContentQuerySet(SocialhomeTestCase):
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
-        # public_content comes direclty by following the author, site_content via share of a follower
+        # public_content comes directly by following the author, site_content via share of a follower
         self.assertEqual(contents, {self.public_content, self.site_content})
         contents = set(Content.objects.followed(self.self_user))
         self.assertEqual(contents, set())

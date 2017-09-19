@@ -14,8 +14,8 @@ class StreamsAPIBaseView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, **kwargs):
-        content = self.get_content()
-        serializer = ContentSerializer(content, many=True)
+        qs, throughs = self.get_content()
+        serializer = ContentSerializer(qs, many=True, context={"throughs": throughs})
         return Response(serializer.data)
 
     def get_content(self):
