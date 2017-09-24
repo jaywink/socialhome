@@ -83,7 +83,7 @@ export default Vue.component("author-bar", {
             },
         },
         isUserRemote() {
-            return !this.$store.state.contents[this.contentId].local
+            return !this.$store.state.contents[this.contentId].author.is_local
         },
         showFollowBtn() {
             return this.canFollow && !this.isUserFollowingAuthor

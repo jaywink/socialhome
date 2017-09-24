@@ -29,7 +29,7 @@ function newRestAPI(options) {
         console.error(`An error happened while fetching post: ${error}`)
     }
 
-    return new Vapi(opts)
+    const result = new Vapi(opts)
         .get({
             action: "getPublicStream",
             path: Urls["api-streams:public"](),
@@ -59,6 +59,12 @@ function newRestAPI(options) {
             onError,
         })
         .getStore()
+
+    result.mutations = _defaults({}, opts.mutations, result.mutations)
+    result.actions = _defaults({}, opts.actions, result.actions)
+    result.getters = _defaults({}, opts.getters, result.getters)
+
+    return result
 }
 
 function newStreamStore(options) {
@@ -69,7 +75,7 @@ function newStreamStore(options) {
     const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
     delete opts.WebSocketImpl
 
-    const store = new Vuex.Store(_defaults({getters}, newRestAPI({state, mutations, actions}), opts))
+    const store = new Vuex.Store(_defaults({}, newRestAPI({state, mutations, actions, getters}), opts))
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"
     const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.streamName}/`
     const ws = new WebSocketImpl(wsPath)

@@ -7,7 +7,7 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import AuthorBar from "streams/app/components/AuthorBar.vue"
-import {getContextWithFakePosts, getFakePost, getFakeAuthor} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {getContext, getFakePost, getFakeAuthor} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "streams/app/stores/streamStore"
 import {newApplicationStore} from "streams/app/stores/applicationStore"
 
@@ -25,18 +25,20 @@ describe("AuthorBar", () => {
             id: 1,
             author: getFakeAuthor({guid: "42"})
         })
-        window.context = getContextWithFakePosts({contentList: [fakePost], currentBrowsingProfileId: 26}, 0)
+        window.context = getContext({currentBrowsingProfileId: 26}, 0)
         store = newStreamStore({modules: {applicationStore: newApplicationStore()}})
+        store.state.contentIds.push(fakePost.id)
+        Vue.set(store.state.contents, fakePost.id, fakePost)
     })
 
     describe("computed", () => {
         describe("isUserRemote", () => {
             it("should be the opposite of property isUserLocal", () => {
                 let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
-                target.instance().$store.state.contents[1].isUserLocal = true
+                target.instance().$store.state.contents[1].author.is_local = true
                 target.instance().isUserRemote.should.be.false
 
-                target.instance().$store.state.contents[1].isUserLocal = false
+                target.instance().$store.state.contents[1].author.is_local = false
                 target.instance().isUserRemote.should.be.true
             })
         })
@@ -44,15 +46,15 @@ describe("AuthorBar", () => {
         describe("canFollow", () => {
             it("should be true if user is authenticated and not the author", () => {
                 let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
-                target.instance().$store.state.contents[1].isUserAuthor = true
+                target.instance().$store.state.contents[1].user_is_author = true
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().canFollow.should.be.false
 
-                target.instance().$store.state.contents[1].isUserAuthor = false
+                target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().canFollow.should.be.false
 
-                target.instance().$store.state.contents[1].isUserAuthor = false
+                target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().canFollow.should.be.true
             })

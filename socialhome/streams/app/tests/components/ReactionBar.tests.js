@@ -7,7 +7,7 @@ import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import ReactionsBar from "streams/app/components/ReactionsBar.vue"
-import {getContextWithFakePosts, getFakePost} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {getContext, getFakePost} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 
@@ -21,9 +21,11 @@ describe("ReactionsBar", () => {
     beforeEach(() => {
         Sinon.restore()
 
-        let contentList = [getFakePost({id: 1})]
-        window.context = getContextWithFakePosts({contentList}, 0)
+        let fakePost = getFakePost({id: 1})
+        window.context = getContext()
         store = newStreamStore({modules: {applicationStore}})
+        store.state.contentIds.push(fakePost.id)
+        Vue.set(store.state.contents, fakePost.id, fakePost)
     })
 
     describe("computed", () => {
@@ -34,15 +36,15 @@ describe("ReactionsBar", () => {
                     store,
                 })
 
-                target.instance().$store.state.contents[1].repliesCount = 0
+                target.instance().$store.state.contents[1].reply_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().showReplies.should.be.true
 
-                target.instance().$store.state.contents[1].repliesCount = 1
+                target.instance().$store.state.contents[1].reply_count = 1
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showReplies.should.be.true
 
-                target.instance().$store.state.contents[1].repliesCount = 0
+                target.instance().$store.state.contents[1].reply_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showReplies.should.be.false
             })
@@ -55,34 +57,15 @@ describe("ReactionsBar", () => {
                     store,
                 })
 
-                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.contents[1].shares_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().showShares.should.be.true
 
-                target.instance().$store.state.contents[1].sharesCount = 1
+                target.instance().$store.state.contents[1].shares_count = 1
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showShares.should.be.true
 
-                target.instance().$store.state.contents[1].sharesCount = 0
-                target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showShares.should.be.false
-            })
-
-            it("should be fa if user is authenticated or content has shares", () => {
-                let target = mount(ReactionsBar, {
-                    propsData: {contentId: 1},
-                    store,
-                })
-
-                target.instance().$store.state.contents[1].sharesCount = 0
-                target.instance().$store.state.applicationStore.isUserAuthenticated = true
-                target.instance().showShares.should.be.true
-
-                target.instance().$store.state.contents[1].sharesCount = 1
-                target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showShares.should.be.true
-
-                target.instance().$store.state.contents[1].sharesCount = 0
+                target.instance().$store.state.contents[1].shares_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showShares.should.be.false
             })
@@ -126,14 +109,14 @@ describe("ReactionsBar", () => {
             it("should create share on server", (done) => {
                 let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
-                target.instance().$store.state.contents[1].hasShared = false
-                target.instance().$store.state.contents[1].isUserAuthor = false
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = false
 
                 // Ensure data
                 target.instance().expandShares()
                 target.instance().showSharesBox.should.be.true
-                target.instance().$store.state.contents[1].hasShared.should.be.false
-                target.instance().$store.state.contents[1].sharesCount = 12
+                target.instance().$store.state.contents[1].user_has_shared.should.be.false
+                target.instance().$store.state.contents[1].shares_count = 12
 
                 target.instance().share()
 
@@ -143,8 +126,8 @@ describe("ReactionsBar", () => {
                         response: {status: "ok", content_id: 123},
                     }).then(() => {
                         target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$store.state.contents[1].hasShared.should.be.true
-                        target.instance().$store.state.contents[1].sharesCount.should.eq(13)
+                        target.instance().$store.state.contents[1].user_has_shared.should.be.true
+                        target.instance().$store.state.contents[1].shares_count.should.eq(13)
                         done()
                     })
                 })
@@ -155,14 +138,14 @@ describe("ReactionsBar", () => {
             it("should removes share on server", (done) => {
                 let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
-                target.instance().$store.state.contents[1].hasShared = true
-                target.instance().$store.state.contents[1].isUserAuthor = false
+                target.instance().$store.state.contents[1].user_has_shared = true
+                target.instance().$store.state.contents[1].user_is_author = false
 
                 // Ensure data
                 target.instance().expandShares()
                 target.instance().showSharesBox.should.be.true
-                target.instance().$store.state.contents[1].hasShared.should.be.true
-                target.instance().$store.state.contents[1].sharesCount = 12
+                target.instance().$store.state.contents[1].user_has_shared.should.be.true
+                target.instance().$store.state.contents[1].shares_count = 12
 
                 // Actual thing we are testing - the unshare
                 target.instance().unshare()
@@ -173,8 +156,8 @@ describe("ReactionsBar", () => {
                         response: {status: "ok"},
                     }).then(() => {
                         target.instance().showSharesBox.should.be.false
-                        target.instance().$store.state.contents[1].sharesCount.should.eq(11)
-                        target.instance().$store.state.contents[1].hasShared.should.be.false
+                        target.instance().$store.state.contents[1].shares_count.should.eq(11)
+                        target.instance().$store.state.contents[1].user_has_shared.should.be.false
                         done()
                     })
                 })
