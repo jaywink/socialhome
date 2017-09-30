@@ -5,8 +5,20 @@ import requests
 
 
 class MockRedis(Mock):
+    def hmget(self, *args, **kwargs):
+        return []
+
+    def hset(self, *args, **kwargs):
+        return 1
+
+    def zrank(self, *args, **kwargs):
+        return None
+
     def zrevrange(self, *args, **kwargs):
         return []
+
+    def zrevrank(self, *args, **kwargs):
+        return 1
 
 
 class MockResponse(str):

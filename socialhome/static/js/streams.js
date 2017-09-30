@@ -8,6 +8,7 @@ $(function () {
      */
     var view = {
         contentIds: [],
+        contentThroughIds: [],
 
         showNewLabel: function() {
             $("#new-content-container").show(100);
@@ -107,11 +108,12 @@ $(function () {
         initContentIds: function() {
             $(".grid-item").each(function() {
                 view.contentIds.push($(this).data("content-id"));
+                view.contentThroughIds.push($(this).data("through-id"));
             });
         },
 
         getSmallestContentId: function() {
-            return Math.min.apply(Math, view.contentIds);
+            return Math.min.apply(Math, view.contentThroughIds);
         },
     };
 
@@ -169,13 +171,15 @@ $(function () {
                 view.showNewLabel();
 
             } else if (data.event === "content") {
-                var $contents = undefined,
-                    ids = [];
+                var $contents = undefined;
+                var ids = [];
+                var throughs = [];
 
                 _.each(data.contents, function (content) {
                     var $elem = view.createContentElem(content);
                     $contents = $contents ? $contents.add($elem) : $elem;
                     ids.push(content.id);
+                    throughs.push(content.through);
                 });
 
                 controller.availableContent = _.difference(controller.availableContent, ids);
@@ -194,6 +198,7 @@ $(function () {
                     window.SocialhomeContacts.addFollowUnfollowTriggers();
                 });
                 view.contentIds = _.union(view.contentIds, ids);
+                view.contentThroughIds = _.union(view.contentThroughIds, ids);
             }
         },
 

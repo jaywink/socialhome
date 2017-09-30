@@ -37,6 +37,10 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
         view = self.get_instance(PublicStreamView)
         self.assertEqual(view.stream_type_value, StreamType.PUBLIC.value)
 
+    def test_throughs_in_context(self):
+        response = self.client.get(reverse("streams:public"))
+        self.assertEqual(response.context["throughs"], {self.content.id: self.content.id})
+
     def test_uses_correct_template(self):
         response = self.client.get(reverse("streams:public"))
         template_names = [template.name for template in response.templates]

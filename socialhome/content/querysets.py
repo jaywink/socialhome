@@ -47,8 +47,14 @@ class ContentQuerySet(models.QuerySet):
         return self.tag(tag, user)
 
     def followed(self, user):
-        qs = self.top_level()._select_related().visible_for_user(user)
-        qs = qs.filter(author_id__in=user.profile.following.values_list("id", flat=True))
+        """Get content from followed users.
+
+        This includes content shared by the followed users.
+        """
+        following_ids = user.profile.following.values_list("id", flat=True)
+        qs = self.top_level().filter(Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids))
+        qs = qs._select_related().visible_for_user(user)
+        # TODO remove order by from here once everything uses the stream classes, consumers don't yet
         return qs.order_by("-created")
 
     def profile(self, guid, user):

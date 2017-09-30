@@ -64,69 +64,77 @@ class TestContentModel(SocialhomeTestCase):
         content = Content.objects.create(text="foobar", author=ProfileFactory())
         assert content.guid
 
-    def test_get_rendered_contents_for_user(self):
+    def test_get_rendered_contents(self):
         qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
         contents = Content.get_rendered_contents(qs, self.user2)
         self.assertEqual(contents, [
             {
-                "id": self.public_content.id,
-                "guid": self.public_content.guid,
                 "author": self.public_content.author_id,
                 "author_guid": self.public_content.author.guid,
+                "author_handle": self.public_content.author.handle,
+                "author_home_url": self.public_content.author.home_url,
                 "author_image": self.public_content.author.safer_image_url_small,
+                "author_is_local": bool(self.public_content.author.user),
                 "author_name": self.public_content.author.handle,
                 "author_profile_url": self.public_content.author.get_absolute_url(),
-                "author_home_url": self.public_content.author.home_url,
-                "author_is_local": bool(self.public_content.author.user),
-                "rendered": "<p><strong>Foobar</strong></p>",
-                "humanized_timestamp": self.public_content.humanized_timestamp,
+                "content_type": self.public_content.content_type.string_value,
+                "delete_url": "",
+                "detail_url": self.public_content.get_absolute_url(),
                 "formatted_timestamp": self.public_content.timestamp,
-                "author_handle": self.public_content.author.handle,
+                "guid": self.public_content.guid,
+                "has_shared": False,
+                "humanized_timestamp": self.public_content.humanized_timestamp,
+                "id": self.public_content.id,
+                "is_authenticated": False,
                 "is_author": False,
                 "is_following_author": False,
-                "slug": self.public_content.slug,
-                "detail_url": self.public_content.get_absolute_url(),
-                "update_url": "",
-                "delete_url": "",
-                "reply_url": "",
-                "reply_count": 0,
-                "shares_count": 0,
-                "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
-                "content_type": self.public_content.content_type.string_value,
-                "has_shared": False,
+                "rendered": "<p><strong>Foobar</strong></p>",
+                "reply_count": 0,
+                "reply_url": "",
+                "shares_count": 0,
+                "slug": self.public_content.slug,
+                "through": self.public_content.id,
+                "update_url": "",
             },
             {
-                "id": self.site_content.id,
-                "guid": self.site_content.guid,
                 "author": self.site_content.author_id,
                 "author_guid": self.site_content.author.guid,
+                "author_handle": self.site_content.author.handle,
+                "author_home_url": self.site_content.author.home_url,
                 "author_image": self.site_content.author.safer_image_url_small,
+                "author_is_local": bool(self.site_content.author.user),
                 "author_name": self.site_content.author.name,
                 "author_profile_url": self.site_content.author.get_absolute_url(),
-                "author_home_url": self.site_content.author.home_url,
-                "author_is_local": bool(self.site_content.author.user),
-                "rendered": "<p><em>Foobar</em></p>",
-                "humanized_timestamp": self.site_content.humanized_timestamp,
+                "content_type": self.site_content.content_type.string_value,
+                "delete_url": "",
+                "detail_url": self.site_content.get_absolute_url(),
                 "formatted_timestamp": self.site_content.timestamp,
-                "author_handle": self.site_content.author.handle,
+                "guid": self.site_content.guid,
+                "has_shared": False,
+                "humanized_timestamp": self.site_content.humanized_timestamp,
+                "id": self.site_content.id,
+                "is_authenticated": False,
                 "is_author": False,
                 "is_following_author": False,
-                "slug": self.site_content.slug,
-                "detail_url": self.site_content.get_absolute_url(),
-                "update_url": "",
-                "delete_url": "",
-                "reply_url": "",
-                "reply_count": 0,
-                "shares_count": 0,
-                "is_authenticated": False,
                 "parent": "",
                 "profile_id": "",
-                "content_type": self.site_content.content_type.string_value,
-                "has_shared": False,
+                "rendered": "<p><em>Foobar</em></p>",
+                "reply_count": 0,
+                "reply_url": "",
+                "shares_count": 0,
+                "slug": self.site_content.slug,
+                "through": self.site_content.id,
+                "update_url": "",
             }
         ])
+
+    def test_get_rendered_contents__with_throughs(self):
+        qs = Content.objects.filter(id__in=[self.public_content.id, self.site_content.id])
+        contents = Content.get_rendered_contents(qs, self.user2, throughs={self.site_content.id: 123})
+        self.assertEqual(contents[0].get("through"), self.public_content.id)
+        self.assertEqual(contents[1].get("through"), 123)
 
     def test_has_shared(self):
         self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))
@@ -228,33 +236,34 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_dict_for_view(self):
         self.assertEqual(self.public_content.dict_for_view(self.user2), {
-            "id": self.public_content.id,
-            "guid": self.public_content.guid,
-            "rendered": self.public_content.rendered,
             "author": self.public_content.author_id,
             "author_guid": self.public_content.author.guid,
-            "author_name": self.public_content.author.handle,
             "author_handle": self.public_content.author.handle,
-            "author_image": self.public_content.author.safer_image_url_small,
-            "author_profile_url": self.public_content.author.get_absolute_url(),
             "author_home_url": self.public_content.author.home_url,
+            "author_image": self.public_content.author.safer_image_url_small,
             "author_is_local": bool(self.public_content.author.user),
-            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "author_name": self.public_content.author.handle,
+            "author_profile_url": self.public_content.author.get_absolute_url(),
+            "content_type": self.public_content.content_type.string_value,
+            "delete_url": "",
+            "detail_url": self.public_content.get_absolute_url(),
             "formatted_timestamp": self.public_content.timestamp,
+            "guid": self.public_content.guid,
+            "has_shared": False,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "id": self.public_content.id,
+            "is_authenticated": False,
             "is_author": False,
             "is_following_author": False,
-            "slug": self.public_content.slug,
-            "detail_url": self.public_content.get_absolute_url(),
-            "update_url": "",
-            "delete_url": "",
-            "reply_url": "",
-            "reply_count": 0,
-            "shares_count": 0,
-            "is_authenticated": False,
             "parent": "",
             "profile_id": "",
-            "content_type": self.public_content.content_type.string_value,
-            "has_shared": False,
+            "rendered": self.public_content.rendered,
+            "reply_count": 0,
+            "reply_url": "",
+            "shares_count": 0,
+            "slug": self.public_content.slug,
+            "through": self.public_content.id,
+            "update_url": "",
         })
 
         # Add a share
@@ -265,66 +274,68 @@ class TestContentModel(SocialhomeTestCase):
     def test_dict_for_view_for_author(self):
         Profile.objects.filter(id=self.profile.id).update(name="Foo Bar")
         self.assertEqual(self.public_content.dict_for_view(self.user), {
-            "id": self.public_content.id,
-            "guid": self.public_content.guid,
-            "rendered": self.public_content.rendered,
             "author": self.public_content.author_id,
             "author_guid": self.public_content.author.guid,
-            "author_name": self.public_content.author.handle,
             "author_handle": self.public_content.author.handle,
-            "author_image": self.public_content.author.safer_image_url_small,
-            "author_profile_url": self.public_content.author.get_absolute_url(),
             "author_home_url": self.public_content.author.home_url,
+            "author_image": self.public_content.author.safer_image_url_small,
             "author_is_local": bool(self.public_content.author.user),
-            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "author_name": self.public_content.author.handle,
+            "author_profile_url": self.public_content.author.get_absolute_url(),
+            "content_type": self.public_content.content_type.string_value,
+            "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
+            "detail_url": self.public_content.get_absolute_url(),
             "formatted_timestamp": self.public_content.timestamp,
+            "guid": self.public_content.guid,
+            "has_shared": False,
+            "humanized_timestamp": self.public_content.humanized_timestamp,
+            "id": self.public_content.id,
+            "is_authenticated": True,
             "is_author": True,
             "is_following_author": False,
-            "slug": self.public_content.slug,
-            "detail_url": self.public_content.get_absolute_url(),
-            "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
-            "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
-            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-            "reply_count": 0,
-            "shares_count": 0,
-            "is_authenticated": True,
             "parent": "",
             "profile_id": self.public_content.author.id,
-            "content_type": self.public_content.content_type.string_value,
-            "has_shared": False,
+            "rendered": self.public_content.rendered,
+            "reply_count": 0,
+            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+            "shares_count": 0,
+            "slug": self.public_content.slug,
+            "through": self.public_content.id,
+            "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
         })
 
     def test_dict_for_view_edited_post(self):
         with freeze_time(self.public_content.created + datetime.timedelta(minutes=16)):
             self.public_content.save()
             self.assertEqual(self.public_content.dict_for_view(self.user), {
-                "id": self.public_content.id,
-                "guid": self.public_content.guid,
-                "rendered": self.public_content.rendered,
                 "author": self.public_content.author_id,
                 "author_guid": self.public_content.author.guid,
-                "author_name": self.public_content.author.handle,
                 "author_handle": self.public_content.author.handle,
-                "author_image": self.public_content.author.safer_image_url_small,
-                "author_profile_url": self.public_content.author.get_absolute_url(),
                 "author_home_url": self.public_content.author.home_url,
+                "author_image": self.public_content.author.safer_image_url_small,
                 "author_is_local": bool(self.public_content.author.user),
-                "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
+                "author_name": self.public_content.author.handle,
+                "author_profile_url": self.public_content.author.get_absolute_url(),
+                "content_type": self.public_content.content_type.string_value,
+                "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
+                "detail_url": self.public_content.get_absolute_url(),
                 "formatted_timestamp": self.public_content.timestamp,
+                "guid": self.public_content.guid,
+                "has_shared": False,
+                "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
+                "id": self.public_content.id,
+                "is_authenticated": True,
                 "is_author": True,
                 "is_following_author": False,
-                "slug": self.public_content.slug,
-                "detail_url": self.public_content.get_absolute_url(),
-                "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
-                "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
-                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-                "reply_count": 0,
-                "shares_count": 0,
-                "is_authenticated": True,
                 "parent": "",
                 "profile_id": self.public_content.author.id,
-                "content_type": self.public_content.content_type.string_value,
-                "has_shared": False,
+                "rendered": self.public_content.rendered,
+                "reply_count": 0,
+                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
+                "shares_count": 0,
+                "slug": self.public_content.slug,
+                "through": self.public_content.id,
+                "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
             })
 
     def test_short_text(self):
@@ -365,12 +376,13 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_channel_group_name(self):
         self.assertEquals(
-            self.public_content.channel_group_name, "%s%s" % (self.public_content.id, slugify(self.public_content.guid))
+            self.public_content.channel_group_name,
+            "%s_%s" % (self.public_content.id, slugify(self.public_content.guid)),
         )
         long_non_ascii_guid_content = ContentFactory(guid="ä"*150)
         self.assertEquals(
-            long_non_ascii_guid_content.channel_group_name, "%s%s" % (
-                long_non_ascii_guid_content.id, "a"*(80-len(str(long_non_ascii_guid_content.id)))
+            long_non_ascii_guid_content.channel_group_name, "%s_%s" % (
+                long_non_ascii_guid_content.id, "a"*(79-len(str(long_non_ascii_guid_content.id)))
             )
         )
 

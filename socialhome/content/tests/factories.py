@@ -23,18 +23,22 @@ class ContentFactory(factory.DjangoModelFactory):
 
 
 class PublicContentFactory(ContentFactory):
+    text = fuzzy.FuzzyText(prefix="Public ")
     visibility = Visibility.PUBLIC
 
 
 class LimitedContentFactory(ContentFactory):
+    text = fuzzy.FuzzyText(prefix="Limited ")
     visibility = Visibility.LIMITED
 
 
 class SiteContentFactory(ContentFactory):
+    text = fuzzy.FuzzyText(prefix="Site ")
     visibility = Visibility.SITE
 
 
 class SelfContentFactory(ContentFactory):
+    text = fuzzy.FuzzyText(prefix="Self ")
     visibility = Visibility.SELF
 
 

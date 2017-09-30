@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AnonymousUser
 
 from socialhome.content.models import Content, Tag
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import (
+    ContentFactory, PublicContentFactory, LimitedContentFactory, SelfContentFactory, SiteContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
@@ -14,28 +15,28 @@ class TestContentQuerySet(SocialhomeTestCase):
         super().setUpTestData()
         cls.public_content = ContentFactory(pinned=True)
         cls.public_tag_content = ContentFactory(text="#foobar")
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED)
+        cls.limited_content = LimitedContentFactory()
         cls.tag = Tag.objects.get(name="foobar")
-        cls.site_content = ContentFactory(visibility=Visibility.SITE, pinned=True)
-        cls.site_tag_content = ContentFactory(visibility=Visibility.SITE, text="#foobar")
+        cls.site_content = SiteContentFactory(pinned=True)
+        cls.site_tag_content = SiteContentFactory(text="#foobar")
         cls.self_user = UserFactory()
-        cls.self_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, pinned=True)
-        cls.self_tag_content = ContentFactory(visibility=Visibility.SELF, author=cls.self_user.profile, text="#foobar")
+        cls.self_content = SelfContentFactory(author=cls.self_user.profile, pinned=True)
+        cls.self_tag_content = SelfContentFactory(author=cls.self_user.profile, text="#foobar")
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
         cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
-        cls.public_reply = ContentFactory(visibility=Visibility.PUBLIC, parent=cls.public_content)
-        cls.limited_reply = ContentFactory(visibility=Visibility.LIMITED, parent=cls.limited_content)
-        cls.self_reply = ContentFactory(visibility=Visibility.SELF, parent=cls.self_content)
-        cls.site_reply = ContentFactory(visibility=Visibility.SITE, parent=cls.site_content)
-        cls.public_share = ContentFactory(visibility=Visibility.PUBLIC, share_of=cls.public_content)
-        cls.limited_share = ContentFactory(visibility=Visibility.LIMITED, share_of=cls.limited_content)
-        cls.self_share = ContentFactory(visibility=Visibility.SELF, share_of=cls.self_content)
-        cls.site_share = ContentFactory(visibility=Visibility.SITE, share_of=cls.site_content)
-        cls.public_share_reply = ContentFactory(visibility=Visibility.PUBLIC, parent=cls.public_share)
-        cls.share_limited_reply = ContentFactory(visibility=Visibility.LIMITED, parent=cls.limited_share)
-        cls.share_self_reply = ContentFactory(visibility=Visibility.SELF, parent=cls.self_share)
-        cls.share_site_reply = ContentFactory(visibility=Visibility.SITE, parent=cls.site_share)
+        cls.public_reply = PublicContentFactory(parent=cls.public_content)
+        cls.limited_reply = LimitedContentFactory(parent=cls.limited_content)
+        cls.self_reply = SelfContentFactory(parent=cls.self_content)
+        cls.site_reply = SiteContentFactory(parent=cls.site_content)
+        cls.public_share = PublicContentFactory(share_of=cls.public_content, author=cls.self_user.profile)
+        cls.limited_share = LimitedContentFactory(share_of=cls.limited_content, author=cls.self_user.profile)
+        cls.self_share = SelfContentFactory(share_of=cls.self_content, author=cls.self_user.profile)
+        cls.site_share = SiteContentFactory(share_of=cls.site_content, author=cls.self_user.profile)
+        cls.public_share_reply = PublicContentFactory(parent=cls.public_share)
+        cls.share_limited_reply = LimitedContentFactory(parent=cls.limited_share)
+        cls.share_self_reply = SelfContentFactory(parent=cls.self_share)
+        cls.share_site_reply = SiteContentFactory(parent=cls.site_share)
 
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
@@ -48,8 +49,8 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.visible_for_user(self.self_content.author.user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
                                     self.site_tag_content, self.self_content, self.self_tag_content,
-                                    self.public_reply, self.site_reply, self.public_share,
-                                    self.site_share, self.public_share_reply, self.share_site_reply})
+                                    self.public_reply, self.site_reply, self.public_share, self.limited_share,
+                                    self.site_share, self.self_share, self.public_share_reply, self.share_site_reply})
 
     def test_public(self):
         contents = set(Content.objects.public())
@@ -73,7 +74,8 @@ class TestContentQuerySet(SocialhomeTestCase):
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
-        self.assertEqual(contents, {self.public_content})
+        # public_content comes directly by following the author, site_content via share of a follower
+        self.assertEqual(contents, {self.public_content, self.site_content})
         contents = set(Content.objects.followed(self.self_user))
         self.assertEqual(contents, set())
 

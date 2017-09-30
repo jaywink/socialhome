@@ -126,6 +126,8 @@ This basic design should be kept in mind when touching stream related code.
 Stream templates
 ::::::::::::::::
 
+.. note:: This section relates to the old Django templates + jQuery stream. For the Vue.js streams, see above.
+
 Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code.
 
 There are a few locations to modify when changing how content is rendered in streams or the content detail view:
@@ -136,4 +138,25 @@ There are a few locations to modify when changing how content is rendered in str
 
 All these templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
 
-NOTE! The Vue.js streams rewrite will change templates mentioned here but shouldn't change the actual way streams work.
+Precaching
+::::::::::
+
+To make complex streams load fast, we precache them in Redis. The precache streams are updated on content save time.
+
+Each stream has an Ordered Set for each user with the following data:
+
+::
+
+    key = sh:streams:<stream_name>:<user_id>
+    score = <time>
+    value = <content.id>
+
+Additionally, each stream has a Hash for each user with the "through ID's". A through ID is the content which caused the cached content to be added into the stream. Normally this would be the cached content itself, but for shares, this would be the share content ID. The Hash is as follows:
+
+::
+
+    key = sh:streams:<stream_name>:<user_id>:throughs
+    field = <content.id>
+    value = <through content.id>
+
+Only expensive streams are precached. This includes any stream which will pull up shares (for example "Followed" and "My content (all)"). Additinally any custom streams should always be precached for fast reads. An example of a stream which is not precached is the "Public" stream.

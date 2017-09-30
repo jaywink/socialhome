@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from socialhome.content.tests.factories import (
     PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
+from socialhome.streams.tests.utils import MockStream
 from socialhome.tests.utils import SocialhomeAPITestCase
 
 
@@ -28,6 +29,7 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
 
     @patch("socialhome.streams.viewsets.FollowedStream")
     def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:followed")
         mock_stream.assert_called_once_with(last_id=None, user=self.user)
@@ -56,6 +58,7 @@ class TestPublicStreamAPIView(SocialhomeAPITestCase):
 
     @patch("socialhome.streams.viewsets.PublicStream")
     def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
         self.get("api-streams:public")
         mock_stream.assert_called_once_with(last_id=None)
 
@@ -74,6 +77,7 @@ class TestTagStreamAPIView(SocialhomeAPITestCase):
 
     @patch("socialhome.streams.viewsets.TagStream")
     def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:tag", name="foobar")
         mock_stream.assert_called_once_with(last_id=None, tag=self.content.tags.first(), user=self.user)
