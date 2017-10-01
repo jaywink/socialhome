@@ -6,7 +6,8 @@ import BootstrapVue from "bootstrap-vue"
 import Stream from "streams/app/components/Stream.vue"
 import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
 import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
-import {streamStoreOperations} from "streams/app/stores/streamStore"
+import {streamStoreOperations, newStreamStore} from "streams/app/stores/streamStore"
+import applicationStore from "streams/app/stores/applicationStore"
 
 
 Vue.use(BootstrapVue)
@@ -36,6 +37,12 @@ describe("Stream", () => {
                 target.instance().stampedElement.should.eq("TagStampedElement")
             })
 
+            it("should render the ProfileStampedElement when stream name is 'profile'", () => {
+                let target = mount(Stream, {})
+                target.instance().$store.state.streamName = "profile"
+                target.instance().stampedElement.should.eq("ProfileStampedElement")
+            })
+
             it("should display an error when stream name is unknown", () => {
                 let target = mount(Stream, {})
                 Sinon.spy(console, "error")
@@ -54,6 +61,7 @@ describe("Stream", () => {
                 target.onImageLoad()
             })
         })
+
         describe("onNewContentClick", () => {
             it("should show the new content button when the user receives new content", (done) => {
                 let target = mount(Stream, {})
@@ -83,6 +91,60 @@ describe("Stream", () => {
                 target.find(".grid-item").length.should.eq(0)
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.find(".grid-item").length.should.eq(0)
+            })
+        })
+
+        describe("mounted", () => {
+            it("should fetch followed stream when stream name is 'followed'", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "followed"
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().$nextTick(() => {
+                    store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream])
+                    done()
+                })
+            })
+
+            it("should fetch public stream when stream name is 'public'", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "public"
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().$nextTick(() => {
+                    store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream])
+                    done()
+                })
+            })
+
+            it("should fetch tag stream when stream name is 'tag'", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "tag"
+                store.state.tagName = "#yolo"
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().$nextTick(() => {
+                    store.dispatch.getCall(0).args
+                        .should.eql([streamStoreOperations.getTagStream, {params: {name: "#yolo"}, data: {}}])
+                    done()
+                })
+            })
+
+            it("should fetch profile stream when stream name is 'profile'", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "profile"
+                store.state.applicationStore.currentBrowsingProfileId = 26
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().$nextTick(() => {
+                    store.dispatch.getCall(0).args
+                        .should.eql([streamStoreOperations.getProfileStream, {params: {id: 26}, data: {}}])
+                    done()
+                })
             })
         })
     })

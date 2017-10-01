@@ -51,12 +51,26 @@ const getFakePostList = function (args = {}, nbPosts = 1) {
     return {contents, contentIds}
 }
 
+const getProfile = function (args = {}) {
+    return _.defaults({}, args, {
+        id: faker.random.number(),
+        guid: faker.random.uuid(),
+        followersCount: faker.random.number(),
+        followingCount: faker.random.number(),
+        handle: faker.internet.exampleEmail(),
+        saferImageUrlLarge:  "https://127.0.0.1/image.png",
+        streamType: "all_content",
+        pinnedContentExists: faker.random.boolean(),
+    })
+}
+
 const getContext = function (args = {}) {
     return _.defaults({}, args, {
         currentBrowsingProfileId: faker.random.number(),
         streamName: "public",
         isUserAuthenticated: faker.random.boolean(),
+        profile: getProfile()
     })
 }
 
-export {getFakeAuthor, getFakePost, getContext}
+export {getFakeAuthor, getFakePost, getProfile, getContext}

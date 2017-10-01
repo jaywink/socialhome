@@ -1,8 +1,12 @@
 import Vue from "vue"
 
 const streamStoreOperations = {
-    receivedNewContent: "receivedNewContent",
+    getFollowedStream: "getFollowedStream",
+    getProfileStream: "getProfileStream",
+    getPublicStream: "getPublicStream",
+    getTagStream: "getTagStream",
     newContentAck: "newContentAck",
+    receivedNewContent: "receivedNewContent",
 }
 
 // This is the Vuex way

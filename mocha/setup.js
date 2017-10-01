@@ -48,3 +48,5 @@ try {
     })
 }
 /* eslint-enable global-require, import/no-dynamic-require */
+
+global.gettext = key => key

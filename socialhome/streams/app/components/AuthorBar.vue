@@ -8,7 +8,7 @@
             <div v-show="showProfileBox" class="profile-box">
                 {{ author.handle }}
                 <div class="pull-right">
-                    <b-button :href="author.absolute_url" variant="secondary" title="Profile" aria-label="Profile">
+                    <b-button :href="author.url" variant="secondary" title="Profile" aria-label="Profile">
                         <i class="fa fa-user"></i>
                     </b-button>
                     <b-button
@@ -62,6 +62,7 @@ export default Vue.component("author-bar", {
     },
     computed: {
         author() {
+            console.log(this.$store.state.contents[this.contentId].user_is_author)
             return this.$store.state.contents[this.contentId].author
         },
         canFollow() {

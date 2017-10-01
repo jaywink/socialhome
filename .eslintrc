@@ -15,6 +15,7 @@
     "semi": ["error", "never"]
   },
   "globals": {
-    "Urls": true
+    "Urls": true,
+    "gettext": true
   }
 }

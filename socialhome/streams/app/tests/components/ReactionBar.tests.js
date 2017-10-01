@@ -1,5 +1,5 @@
 import Axios from "axios"
-import moxios from "moxios"
+import Moxios from "moxios"
 import Vue from "vue"
 import {mount} from "avoriaz"
 
@@ -78,11 +78,11 @@ describe("ReactionsBar", () => {
                 xsrfCookieName: "csrftoken",
                 xsrfHeaderName: "X-CSRFToken",
             })
-            moxios.install(Vue.prototype.$http)
+            Moxios.install(Vue.prototype.$http)
         })
 
         afterEach(() => {
-            moxios.uninstall()
+            Moxios.uninstall()
         })
 
         describe("expandShares", () => {
@@ -120,8 +120,8 @@ describe("ReactionsBar", () => {
 
                 target.instance().share()
 
-                moxios.wait(() => {
-                    moxios.requests.mostRecent().respondWith({
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: {status: "ok", content_id: 123},
                     }).then(() => {
@@ -150,8 +150,8 @@ describe("ReactionsBar", () => {
                 // Actual thing we are testing - the unshare
                 target.instance().unshare()
 
-                moxios.wait(() => {
-                    moxios.requests.mostRecent().respondWith({
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: {status: "ok"},
                     }).then(() => {

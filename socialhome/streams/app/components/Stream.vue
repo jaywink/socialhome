@@ -85,13 +85,13 @@ export default Vue.component("stream", {
     },
     mounted() {
         if (this.$store.state.streamName.match(/^followed/)) {
-            this.$store.dispatch("getFollowedStream")
+            this.$store.dispatch(streamStoreOperations.getFollowedStream)
         } else if (this.$store.state.streamName.match(/^public/)) {
-            this.$store.dispatch("getPublicStream")
+            this.$store.dispatch(streamStoreOperations.getPublicStream)
         } else if (this.$store.state.streamName.match(/^tag/)) {
-            this.$store.dispatch("getTagStream", {params: {name: this.$store.state.tagName}})
+            this.$store.dispatch(streamStoreOperations.getTagStream, {params: {name: this.$store.state.tagName}})
         } else if (this.$store.state.streamName.match(/^profile/)) {
-            this.$store.dispatch("getProfileStream", {params: {id: this.currentBrowsingProfileId}})
+            this.$store.dispatch(streamStoreOperations.getProfileStream, {params: {id: this.currentBrowsingProfileId}})
         }
     },
     beforeDestroy() {

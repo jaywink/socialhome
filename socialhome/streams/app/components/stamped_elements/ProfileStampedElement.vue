@@ -2,7 +2,7 @@
     <div>
         <div v-if="showProfileButtons" class="pull-right">
             <div class="dropdown text-right">
-                <b-dropdown>
+                <b-dropdown right>
                     <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
                     <b-dropdown-item
                         :href="urls.updateProfile"

@@ -62,8 +62,9 @@ class ProfileViewMixin(AccessMixin, DetailView):
         context["followers_count"] = Profile.objects.followers(self.object).count()
         return context
 
-    def get_template_names(self):
-        return ["streams/vue.html"] if self.vue else super().get_template_names()
+    # Disabled until profile API is done
+    # def get_template_names(self):
+    #     return ["streams/vue.html"] if self.vue else super().get_template_names()
 
     def _get_json_context(self, context):
         if self.vue:  # pragma: no cover
