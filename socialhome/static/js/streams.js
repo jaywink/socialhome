@@ -198,7 +198,7 @@ $(function () {
                     window.SocialhomeContacts.addFollowUnfollowTriggers();
                 });
                 view.contentIds = _.union(view.contentIds, ids);
-                view.contentThroughIds = _.union(view.contentThroughIds, ids);
+                view.contentThroughIds = _.union(view.contentThroughIds, throughs);
             }
         },
 
