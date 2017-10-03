@@ -7,16 +7,16 @@
 -e git+https://github.com/jaywink/django-markdownx.git@0f7b8c01906edd5ad590bb31f04685f859d6fab1#egg=django-markdownx==2.0.21.1
 -e git+https://github.com/jaywink/federation.git@bcc779e006bc0af192db08a1ff8ed245c0fbd7c9#egg=federation==0.14.1.1
 arrow==0.10.0
-asgi-redis==1.4.2
+asgi-redis==1.4.3
 asgiref==1.1.2            # via asgi-redis, channels, daphne
 attrs==17.2.0             # via automat
-autobahn==17.9.1          # via daphne
+autobahn==17.9.3          # via daphne
 automat==0.6.0            # via twisted
 backports-abc==0.5
 beautifulsoup4==4.6.0
-bleach==2.0.0
+bleach==2.1.1
 certifi==2017.7.27.1      # via opbeat, requests
-channels==1.1.6
+channels==1.1.8
 chardet==3.0.4            # via requests
 circus==0.14.0
 click==6.7                # via rq
@@ -36,7 +36,7 @@ django-crispy-forms==1.6.1
 django-dynamic-preferences==1.2
 django-enumfields==0.9.0
 django-environ==0.4.4
-django-extensions==1.9.0
+django-extensions==1.9.1
 django-floppyforms==1.7.0
 django-haystack==2.6.1
 django-js-reverse==0.7.3
@@ -47,37 +47,38 @@ django-rest-swagger==2.1.2
 django-rq==0.9.6
 django-secure==1.0.1
 django-settings-export==1.2.1
-django-tables2==1.10.0
+django-tables2==1.11.0
 django-versatileimagefield==1.7.1
 django==1.10.8
 djangorestframework==3.6.4
 future==0.16.0            # via commonmark
-html5lib==0.999999999     # via bleach
+html5lib==1.0b10          # via bleach
 hyperlink==17.3.1         # via twisted
 idna==2.6                 # via requests
 incremental==17.5.0       # via twisted
 iowait==0.2               # via circus
 ipython-genutils==0.2.0   # via traitlets
-ipython==6.1.0
+ipython==6.2.1
 isodate==0.5.4            # via python-xrd
 itypes==1.1.0             # via coreapi
-jedi==0.10.2              # via ipython
+jedi==0.11.0              # via ipython
 jinja2==2.9.6             # via coreschema
 jsonschema==2.6.0
-lxml==3.8.0
+lxml==4.0.0
 markdown==2.6.9
 markupsafe==1.0           # via jinja2
 msgpack-python==0.4.8     # via asgi-redis
-oauthlib==2.0.2           # via requests-oauthlib
+oauthlib==2.0.4           # via requests-oauthlib
 olefile==0.44             # via pillow
 opbeat==3.5.2
 openapi-codec==1.3.2      # via django-rest-swagger
+parso==0.1.0              # via jedi
 persisting_theory==0.2.1  # via django-dynamic-preferences
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
-pillow==4.0.0
+pillow==4.0.0             # via django-versatileimagefield
 prompt-toolkit==1.0.15    # via ipython
-psutil==5.3.0             # via circus
+psutil==5.3.1             # via circus
 psycopg2==2.7.3.1
 ptyprocess==0.5.2         # via pexpect
 pycrypto==2.6.1
@@ -95,10 +96,10 @@ requests==2.18.4          # via coreapi, django-allauth, pyembed, python-opengra
 rq==0.8.2
 simplegeneric==0.8.1      # via ipython
 simplejson==3.11.1        # via django-rest-swagger
-six==1.10.0               # via asgi-redis, asgiref, autobahn, automat, bleach, django-dynamic-preferences, django-environ, django-extensions, html5lib, prompt-toolkit, python-dateutil, traitlets, txaio, unicode-slugify
+six==1.11.0               # via asgi-redis, asgiref, autobahn, automat, bleach, django-dynamic-preferences, django-environ, django-extensions, html5lib, prompt-toolkit, python-dateutil, traitlets, txaio, unicode-slugify
 tornado==4.5.2            # via circus
 traitlets==4.3.2          # via ipython
-twisted==17.5.0           # via daphne
+twisted==17.9.0           # via daphne
 txaio==2.8.2              # via autobahn
 unicode-slugify==0.1.3
 unidecode==0.4.21         # via unicode-slugify
@@ -107,6 +108,6 @@ urllib3==1.22             # via opbeat, requests
 uwsgi==2.0.15
 wcwidth==0.1.7            # via prompt-toolkit
 webencodings==0.5.1       # via html5lib
-whitenoise==3.3.0
+whitenoise==3.3.1
 whoosh==2.7.4
-zope.interface==4.4.2     # via twisted
+zope.interface==4.4.3     # via twisted
