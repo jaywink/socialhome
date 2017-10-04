@@ -19,7 +19,7 @@ def safe_text_for_markdown(text):
     text = re.sub(r"(^> )", "%%safe_quote_in_start%%", text)
     text = re.sub(r"(\n> )", "%%safe_quote_in_new_line%%", text, flags=re.DOTALL)
     # Nuke all html, scripts, etc
-    text = bleach.clean(text)
+    text = bleach.clean(text or "")
     # Return quotes
     text = text.replace("%%safe_quote_in_start%%", "> ")
     text = text.replace("%%safe_quote_in_new_line%%", "\n> ")
@@ -53,7 +53,7 @@ def code_blocks_restore(code_blocks, text):
 
 def safe_text(text):
     """Clean text, stripping all tags, attributes and styles."""
-    return bleach.clean(text, tags=[], attributes=[], styles=[], strip=True)
+    return bleach.clean(text or "", tags=[], attributes=[], styles=[], strip=True)
 
 
 def make_nsfw_safe(text):
