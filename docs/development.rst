@@ -14,7 +14,7 @@ For guidelines how to contribute, please first read the :ref:`contributing` guid
 Environment setup
 -----------------
 
-Instructions are for Ubuntu 16.04+. Please contribute via PR's if you notice anything missing or want to contribute instructions for another platform.
+Instructions are for Ubuntu 16.04+ (+ simple Alpine 3.6 dependencies script). Please contribute via PR's if you notice anything missing or want to contribute instructions for another platform.
 
 Python Virtualenv
 .................
@@ -27,6 +27,8 @@ Python 3.4, 3.5 and 3.6 are officially tested against. Ensure the following are 
 * Redis
 
 The file ``requirements.apt`` contains other various dependencies. You can use the ``install_os_dependencies.sh`` script to help installing these.
+
+You can use the ``install_alpine_dependencies.sh`` script to install required dependencies (including Python, NodeJS, PostgreSQL and Redis) on Alpine.
 
 Install Python dependencies
 ...........................
