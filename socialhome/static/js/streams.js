@@ -197,8 +197,11 @@ $(function () {
                     controller.initProfileBoxTriggers();
                     window.SocialhomeContacts.addFollowUnfollowTriggers();
                 });
-                view.contentIds = _.union(view.contentIds, ids);
-                view.contentThroughIds = _.union(view.contentThroughIds, throughs);
+                if (data.placement !== "children") {
+                    // If content is not replies, update known content ID's
+                    view.contentIds = _.union(view.contentIds, ids);
+                    view.contentThroughIds = _.union(view.contentThroughIds, throughs);
+                }
             }
         },
 
