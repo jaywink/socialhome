@@ -56,7 +56,7 @@ Install system packages
 Install Node.js
 '''''''''''''''
 
-Node.js is needed for statics management. Install a version of choice by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
+Node.js version 6+ is needed for statics management. Install it by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
 
 Install PostgreSQL
 ''''''''''''''''''

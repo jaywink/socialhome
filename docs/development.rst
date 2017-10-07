@@ -22,7 +22,7 @@ Python Virtualenv
 Python 3.4, 3.5 and 3.6 are officially tested against. Ensure the following are installed:
 
 * Python system dependencies
-* NodeJS
+* NodeJS (version 6+)
 * PostgreSQL server
 * Redis
 
