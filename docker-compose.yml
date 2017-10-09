@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  db:
+  postgres:
     image: postgres:9.6
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -10,18 +10,23 @@ services:
       - POSTGRES_USER=socialhome
       - POSTGRES_PASSWORD=socialhome
       - POSTGRES_DB=socialhome
-    ports:
-      - 5432
-  web:
+  redis:
+    image: redis
+    volumes:
+      - redis_data:/data
+  app:
     build:
       context: .
+      # Should we call this django-dev?
       dockerfile: docker/django/Dockerfile
-    env_file:
-      - ./env.local
+    environment:
+      # These should all be set by default for a dev environment
+      - DJANGO_SECRET_KEY=ChangeMePlease
+      - DEBUG=True
     ports:
-      - 8000
-    depends_on:
-      - db
+      - 8000:8000
+
+
 #  worker:
 #    build:
 #      context: .
@@ -80,3 +85,4 @@ services:
 volumes:
   pg_data: {}
   pg_backups: {}
+  redis_data: {}
