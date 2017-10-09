@@ -281,7 +281,6 @@ You must change or add the following values:
     SOCIALHOME_DOMAIN=yourdomain.tld
     SOCIALHOME_HTTPS=True
     SOCIALHOME_LOGFILE=/home/socialhome/logs/socialhome.log
-    SOCIALHOME_LOGFILE_FEDERATION=/home/socialhome/logs/socialhome-federation.log
 
 For further configuration tips, see :ref:`running`.
 

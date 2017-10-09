@@ -217,19 +217,22 @@ Default: ``True``
 
 Force HTTPS. There should be no reason to turn this off.
 
+SOCIALHOME_LOG_TARGET
+.....................
+
+Default: ``file``
+
+Define target for Django and application logs. Possible options:
+
+* ``file``, logs will go to a file defined in ``SOCIALHOME_LOGFILE``. Note, due to multiple processes logging to the same file, this file log is only really useful for tailing or if running different processes on separate containers or machines.
+* ``syslog``, logs to syslog, to the ``local7`` facility.
+
 SOCIALHOME_LOGFILE
 ..................
 
 Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
-
-SOCIALHOME_LOGFILE_FEDERATION
-.............................
-
-Default: ``/tmp/socialhome-federation.log``
-
-Where to write the federation layer log.
 
 SOCIALHOME_RELAY_DOMAIN
 .......................
@@ -253,3 +256,10 @@ SOCIALHOME_STATISTICS
 Default: ``False``
 
 Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts. User counts include 30 day and 6 month active users.
+
+SOCIALHOME_SYSLOG_LEVEL
+.......................
+
+Default: ``INFO``
+
+Define the logging level of syslog logging, if ``SOCIALHOME_LOG_TARGET`` is set to ``syslog``. Possible options: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``.
