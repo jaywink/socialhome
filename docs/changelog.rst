@@ -14,6 +14,11 @@ Changed
   * Removed separate logfile for the federation loggers. Now all logs go to one place. Setting ``SOCIALHOME_LOGFILE_FEDERATION`` has been removed.
   * Added possibility to direct Django and application logs using a defined level to syslog. Adds two settings, ``SOCIALHOME_LOG_TARGET`` to define whether to log to file or syslog and ``SOCIALHOME_SYSLOG_LEVEL`` to define the level of syslog logging. See `configuration <https://socialhome.readthedocs.io/en/latest/running.html#configuration>`_ documentation.
 
+Fixed
+.....
+
+* Fix various issues with OpenGraph tags parsing by switching to self-maintained fork of ``python-opengraph``.
+
 0.5.0 (2017-10-01)
 ------------------
 
