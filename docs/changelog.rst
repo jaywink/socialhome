@@ -3,8 +3,8 @@
 Changelog
 =========
 
-[unreleased]
-------------
+0.6.0-dev (unreleased)
+----------------------
 
 Changed
 .......
