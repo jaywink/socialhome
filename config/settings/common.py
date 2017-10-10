@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from datetime import datetime
 
 import environ
-import os
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("socialhome")
@@ -328,6 +327,10 @@ MARKDOWNX_UPLOAD_MAX_SIZE = 20 * 1024 * 1024
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
+log_target = env("SOCIALHOME_LOG_TARGET", default="file")
+if log_target not in ("file", "syslog"):
+    raise environ.ImproperlyConfigured("If set, SOCIALHOME_LOG_TARGET must be either 'file' or 'syslog'.")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -353,7 +356,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
-        "application_file": {
+        "file": {
             "filename": env("SOCIALHOME_LOGFILE", default="/tmp/socialhome.log"),
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
@@ -361,34 +364,33 @@ LOGGING = {
             "maxBytes": 10485760,  # 10mb
             "backupCount": 10,
         },
-        "federation_file": {
-            "filename": env("SOCIALHOME_LOGFILE_FEDERATION", default="/tmp/socialhome-federation.log"),
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "verbose",
-            "maxBytes": 10485760,  # 10mb
-            "backupCount": 10,
+        'syslog': {
+            'level': env("SOCIALHOME_SYSLOG_LEVEL", default="INFO"),
+            'class': 'logging.handlers.SysLogHandler',
+            'facility': 'local7',
+            'formatter': 'verbose',
+            'address' : '/dev/log',
         },
     },
     "loggers": {
         "django.request": {
-            "handlers": ["application_file"],
+            "handlers": [log_target],
             "level": "ERROR",
-            "propagate": True
+            "propagate": True,
         },
         "django.security.DisallowedHost": {
             "level": "ERROR",
-            "handlers": ["console", "application_file"],
+            "handlers": ["console", log_target],
             "propagate": True
         },
         "socialhome": {
             "level": "DEBUG",
-            "handlers": ["application_file"],
-            "propagate": True
+            "handlers": [log_target],
+            "propagate": False,
         },
         "federation": {
             "level": "DEBUG",
-            "handlers": ["federation_file"],
+            "handlers": [log_target],
             "propagate": False,
         },
     }

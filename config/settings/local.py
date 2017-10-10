@@ -2,6 +2,7 @@
 """
 Local settings for development environments
 """
+import os
 import sys
 
 from .common import *  # noqa
