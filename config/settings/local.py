@@ -99,3 +99,5 @@ if env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in
             "PATH": "/tmp/socialhome-haystack-test-index",
         },
     }
+
+ALLOWED_HOSTS = []
