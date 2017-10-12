@@ -189,6 +189,8 @@ Then execute the following and copy the markdown version for pasting to GitHub r
 
     pandoc --from rst --to markdown_github docs/changelog.rst | less
 
+After the release commit has been pushed and a release has been tagged, set a development version in the same above files. This is basically the next minor release postfixed by ``-dev``.
+
 Contact for help
 ----------------
 
