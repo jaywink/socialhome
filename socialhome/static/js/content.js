@@ -53,7 +53,7 @@
                     '<% } %>' +
                 '</div>' +
             '</div>' +
-            '<% if (!content.is_author) { %>' +
+            '<% if (!content.is_author && content.is_authenticated) { %>' +
                 '<div class="content-actions share-action hidden" data-content-id="<%= content.id %>">' +
                     '<button class="btn btn-secondary <% if (!content.has_shared) { %>hidden<% } %>" data-action="unshare" aria-label="' + gettext("Unshare") + '" type="button">' + gettext("Unshare") + '</button>' +
                     '<button class="btn btn-secondary <% if (content.has_shared) { %>hidden<% } %>" data-action="share" aria-label="' + gettext("Share") + '" type="button">' + gettext("Share") + '</button>' +

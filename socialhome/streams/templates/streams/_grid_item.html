@@ -52,7 +52,7 @@
             {% endif %}
         </div>
     </div>
-    {% if content.author != request.user.profile %}
+    {% if request.user.is_authenticated and content.author != request.user.profile %}
         <div class="content-actions share-action hidden" data-content-id="{{ content.id }}">
             <button class="btn btn-secondary {% if not content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="unshare" aria-label="{% trans "Unshare" %}">{% trans "Unshare" %}</button>
             <button class="btn btn-secondary {% if content|has_shared:request.user %}hidden{% endif %}" type="button" data-action="share" aria-label="{% trans "Share" %}">{% trans "Share" %}</button>
