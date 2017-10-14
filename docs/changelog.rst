@@ -18,6 +18,7 @@ Fixed
 .....
 
 * Fix various issues with OpenGraph tags parsing by switching to self-maintained fork of ``python-opengraph``.
+* Share button is no longer visible if not signed in (`#325 <https://github.com/jaywink/socialhome/issues/325>`_)
 
 0.5.0 (2017-10-01)
 ------------------
