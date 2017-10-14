@@ -76,7 +76,7 @@ parso==0.1.0              # via jedi
 persisting_theory==0.2.1  # via django-dynamic-preferences
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
-pillow==4.0.0             # via django-versatileimagefield
+pillow==4.0.0
 prompt-toolkit==1.0.15    # via ipython
 psutil==5.3.1             # via circus
 psycopg2==2.7.3.1
@@ -85,14 +85,14 @@ pycrypto==2.6.1
 pyembed==1.3.3
 pygments==2.2.0           # via ipython
 python-dateutil==2.6.1    # via arrow
-python-opengraph==0.0.2
+python-opengraph-jaywink==0.1.0
 python-xrd==0.1
 python3-openid==3.1.0     # via django-allauth
 pytz==2017.2
 pyzmq==16.0.2             # via circus
 redis==2.10.6
 requests-oauthlib==0.8.0  # via django-allauth
-requests==2.18.4          # via coreapi, django-allauth, pyembed, python-opengraph, requests-oauthlib
+requests==2.18.4          # via coreapi, django-allauth, pyembed, python-opengraph-jaywink, requests-oauthlib
 rq==0.8.2
 simplegeneric==0.8.1      # via ipython
 simplejson==3.11.1        # via django-rest-swagger

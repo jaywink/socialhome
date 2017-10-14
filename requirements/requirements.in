@@ -34,7 +34,7 @@ opbeat
 Pillow
 psycopg2
 pyembed
-python-opengraph
+python-opengraph-jaywink
 pytz
 redis
 rq

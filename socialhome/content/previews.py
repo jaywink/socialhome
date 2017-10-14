@@ -2,7 +2,6 @@ import datetime
 import os
 import re
 
-import requests
 from django.db import DataError
 from django.db import IntegrityError
 from django.db import transaction
@@ -43,11 +42,9 @@ def fetch_og_preview(content, urls):
             opengraph = OpenGraphCache.objects.get(url=url)
             Content.objects.filter(id=content.id).update(opengraph=opengraph)
             return opengraph
-        # OpenGraph is kinda broken - make sure we destroy any old data before fetching
-        OpenGraph.__data__ = {}
         try:
-            og = OpenGraph(url=url)
-        except (requests.exceptions.ConnectionError, AttributeError):
+            og = OpenGraph(url=url, parser="lxml")
+        except AttributeError:
             continue
         if not og or ("title" not in og and "site_name" not in og and "description" not in og and "image" not in og):
             continue
