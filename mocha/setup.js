@@ -35,18 +35,7 @@ global.WebSocket.prototype.close = function () {} // eslint-disable-line func-na
 global.Sinon = require("sinon").sandbox.create()
 
 // Trap calls to global library `Urls`
-const file = "staticfiles/django_js_reverse/js/reverse"
-
-/* eslint-disable global-require, import/no-dynamic-require */
-try {
-    global.Urls = require(`../${file}`).Urls
-} catch (_) {
-    global.Urls = new Proxy({}, {
-        get() {
-            throw new Error(`'${require("path").resolve(__dirname, file)}.js' doesn't exist; please run 'python manage.py collectstatic_js_reverse'`) // eslint-disable-line max-len
-        },
-    })
-}
-/* eslint-enable global-require, import/no-dynamic-require */
+const file = "socialhome/streams/app/tests/fixtures/Url"
+global.Urls = require(`../${file}`).Urls // eslint-disable-line global-require, import/no-dynamic-require
 
 global.gettext = key => key
