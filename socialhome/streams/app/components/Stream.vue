@@ -22,6 +22,7 @@
                     :key="content.id"
                 />
             </div>
+            <loading-element v-show="$store.state.pending.contents" />
         </div>
     </div>
 </template>
@@ -30,9 +31,11 @@
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 import "streams/app/components/StreamElement.vue"
-import PublicStampedElement from "streams/app/components/PublicStampedElement.vue"
-import FollowedStampedElement from "streams/app/components/FollowedStampedElement.vue"
-import TagStampedElement from "streams/app/components/TagStampedElement.vue"
+import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
+import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
+import TagStampedElement from "streams/app/components/stamped_elements/TagStampedElement.vue"
+import ProfileStampedElement from "streams/app/components/stamped_elements/ProfileStampedElement.vue"
+import "streams/app/components/LoadingElement.vue"
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 
@@ -40,7 +43,7 @@ import applicationStore from "streams/app/stores/applicationStore"
 export default Vue.component("stream", {
     store: newStreamStore({modules: {applicationStore}}),
     directives: {imagesLoaded},
-    components: {FollowedStampedElement, PublicStampedElement, TagStampedElement},
+    components: {FollowedStampedElement, PublicStampedElement, ProfileStampedElement, TagStampedElement},
     data() {
         return {
             masonryOptions: {
@@ -62,9 +65,14 @@ export default Vue.component("stream", {
                 return "PublicStampedElement"
             } else if (this.$store.state.streamName.match(/^tag/)) {
                 return "TagStampedElement"
+            } else if (this.$store.state.streamName.match(/^profile/)) {
+                return "ProfileStampedElement"
             } else {
                 console.error(`Unsupported stream name ${this.$store.state.streamName}`)
             }
+        },
+        currentBrowsingProfileId() {
+            return this.$store.state.applicationStore.currentBrowsingProfileId
         },
     },
     methods: {
@@ -74,6 +82,17 @@ export default Vue.component("stream", {
         onNewContentClick() {
             this.$store.dispatch(streamStoreOperations.newContentAck)
         },
+    },
+    mounted() {
+        if (this.$store.state.streamName.match(/^followed/)) {
+            this.$store.dispatch(streamStoreOperations.getFollowedStream)
+        } else if (this.$store.state.streamName.match(/^public/)) {
+            this.$store.dispatch(streamStoreOperations.getPublicStream)
+        } else if (this.$store.state.streamName.match(/^tag/)) {
+            this.$store.dispatch(streamStoreOperations.getTagStream, {params: {name: this.$store.state.tagName}})
+        } else if (this.$store.state.streamName.match(/^profile/)) {
+            this.$store.dispatch(streamStoreOperations.getProfileStream, {params: {id: this.currentBrowsingProfileId}})
+        }
     },
     beforeDestroy() {
         this.$store.$websocket.close()

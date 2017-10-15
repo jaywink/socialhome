@@ -10,8 +10,8 @@ function newApplicationStore() {
     return new Vuex.Store({
         state: {
             isUserAuthenticated: _get(window, ["context", "isUserAuthenticated"], false),
-            currentBrowsingProfileId: (_isNumber(_get(window, ["context", "currentBrowsingProfileId"], undefined))
-                ? `${window.context.currentBrowsingProfileId}` : undefined),
+            currentBrowsingProfileId: _get(window, ["context", "currentBrowsingProfileId"]),
+            profile: _get(window, ["context", "profile"]),
         },
     })
 }

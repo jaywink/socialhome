@@ -5,29 +5,31 @@
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
                     v-if="showShares"
-                    :class="{'item-reaction-shared': content.hasShared}"
+                    :class="{'item-reaction-shared': content.user_has_shared}"
                     class="item-reaction"
                     @click.stop.prevent="expandShares"
                 >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
-                    <span class="item-reaction-counter">{{ content.sharesCount }}</span>
+                    <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </b-button>
                 <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
                     <span class="item-open-replies-action">
                         <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
-                        <span class="item-reaction-counter">{{ content.repliesCount }}</span>
+                        <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
             </div>
         </div>
         <div v-if="canShare && showSharesBox" class="content-actions">
-            <b-button v-if="content.hasShared" variant="secondary" @click.prevent.stop="unshare">Unshare</b-button>
-            <b-button v-else variant="secondary" @click.prevent.stop="share">Share</b-button>
+            <b-button v-if="content.user_has_shared" variant="secondary" @click.prevent.stop="unshare">
+                {{ translations.unshare }}
+            </b-button>
+            <b-button v-else variant="secondary" @click.prevent.stop="share">{{ translations.share }}</b-button>
         </div>
         <div class="replies-container"></div>
         <div v-if="showRepliesBox">
             <div v-if="$store.state.applicationStore.isUserAuthenticated" class="content-actions">
-                <b-button :href="replyUrl" variant="secondary">Reply</b-button>
+                <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
             </div>
         </div>
     </div>
@@ -52,16 +54,23 @@ export default Vue.component("reactions-bar", {
             return this.$store.state.contents[this.contentId]
         },
         showReplies() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.repliesCount > 0
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
         },
         showShares() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.sharesCount > 0
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
         },
         replyUrl() {
             return Urls["content:reply"]({pk: this.contentId})
         },
         canShare() {
-            return !this.content.isUserAuthor
+            return !this.content.user_is_author
+        },
+        translations() {
+            return {
+                reply: gettext("Reply"),
+                share: gettext("Share"),
+                unshare: gettext("Unshare"),
+            }
         },
     },
     methods: {
@@ -83,8 +92,8 @@ export default Vue.component("reactions-bar", {
             this.$http.post(`/api/content/${this.contentId}/share/`)
                 .then(() => {
                     this.showSharesBox = false
-                    this.content.sharesCount += 1
-                    this.content.hasShared = true
+                    this.content.shares_count += 1
+                    this.content.user_has_shared = true
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
@@ -100,8 +109,8 @@ export default Vue.component("reactions-bar", {
             this.$http.delete(`/api/content/${this.contentId}/share/`)
                 .then(() => {
                     this.showSharesBox = false
-                    this.content.sharesCount -= 1
-                    this.content.hasShared = false
+                    this.content.shares_count -= 1
+                    this.content.user_has_shared = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },

@@ -1,9 +1,12 @@
-import _forEach from "lodash/forEach"
-
+import Vue from "vue"
 
 const streamStoreOperations = {
-    receivedNewContent: "receivedNewContent",
+    getFollowedStream: "getFollowedStream",
+    getProfileStream: "getProfileStream",
+    getPublicStream: "getPublicStream",
+    getTagStream: "getTagStream",
     newContentAck: "newContentAck",
+    receivedNewContent: "receivedNewContent",
 }
 
 // This is the Vuex way
@@ -13,7 +16,7 @@ const mutations = {
         state.hasNewContent = true
         state.newContentLengh += 1
         state.contentIds.unshift(contentId)
-        state.contents[contentId] = undefined
+        Vue.set(state.contents, contentId, undefined)
     },
     [streamStoreOperations.newContentAck](state) {
         state.hasNewContent = false
@@ -34,7 +37,7 @@ const actions = {
 const getters = {
     contentList(state) {
         const contents = []
-        _forEach(state.contentIds, id => {
+        state.contentIds.forEach(id => {
             if (state.contents[id] !== undefined) {
                 contents.push(state.contents[id])
             }
