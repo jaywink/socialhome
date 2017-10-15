@@ -72,9 +72,10 @@ def check_and_add_to_keys(stream_cls, user, content, keys):
     :returns: Existing keys with key added
     """
     # noinspection PyCallingNonCallable
-    stream = stream_cls(user=user)
-    if stream.should_cache_content(content):
-        keys.append(stream.key)
+    streams = stream_cls.get_possible_instances(content, user)
+    for stream in streams:
+        if stream.should_cache_content(content):
+            keys.append(stream.key)
     return keys
 
 
@@ -179,6 +180,10 @@ class BaseStream:
                 throughs[id] = id
         return ids, throughs
 
+    @classmethod
+    def get_possible_instances(cls, content, user):
+        return [cls(user=user)]
+
     def get_queryset(self):
         raise NotImplemented
 
@@ -215,6 +220,10 @@ class ProfileStreamBase(BaseStream):
         super().__init__(**kwargs)
         self.profile = profile
 
+    @classmethod
+    def get_possible_instances(cls, content, user):
+        return [cls(user=user, profile=content.author)]
+
     @property
     def key_extra(self):
         return str(self.profile.id)
@@ -250,6 +259,10 @@ class TagStream(BaseStream):
         super().__init__(**kwargs)
         self.tag = tag
 
+    @classmethod
+    def get_possible_instances(cls, content, user):
+        return [cls(user=user, tag=tag) for tag in content.tags.all()]
+
     def get_queryset(self):
         if not self.tag:
             raise AttributeError("TagStream is missing tag.")
@@ -262,11 +275,9 @@ class TagStream(BaseStream):
 
 CACHED_STREAM_CLASSES = (
     FollowedStream,
-    # TODO
-    # ProfileAllStream,
+    ProfileAllStream,
 )
 
 CACHED_ANONYMOUS_STREAM_CLASSES = (
-    # TODO
-    # ProfileAllStream,
+    ProfileAllStream,
 )

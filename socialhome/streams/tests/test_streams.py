@@ -1,5 +1,4 @@
 import random
-from unittest import skip
 from unittest.mock import patch, Mock, call
 
 from django.contrib.auth.models import AnonymousUser
@@ -64,12 +63,10 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream")
         mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [])
 
-    @skip("Add when anonymous user cached streams exist")
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
         add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream")
-        anon_call = mock_check.call_args_list[1]
-        self.assertTrue(isinstance(anon_call[1], AnonymousUser))
+        self.assertTrue(isinstance(mock_check.call_args_list[1][0][1], AnonymousUser))
 
     @patch("socialhome.streams.streams.Content.objects.filter")
     def test_returns_on_no_content_or_reply(self, mock_filter):
@@ -129,16 +126,20 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
     @patch("socialhome.streams.streams.django_rq.enqueue")
     def test_enqueues_each_stream_to_rq(self, mock_enqueue):
         update_streams_with_content(self.content)
-        mock_enqueue.assert_called_once_with(
-            add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream",
-        )
+        calls = [
+            call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream"),
+            call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream"),
+        ]
+        self.assertEqual(mock_enqueue.call_args_list, calls)
 
     @patch("socialhome.streams.streams.django_rq.enqueue")
     def test_enqueues_each_stream_to_rq__share(self, mock_enqueue):
         update_streams_with_content(self.share)
-        mock_enqueue.assert_called_once_with(
-            add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream",
-        )
+        calls = [
+            call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream"),
+            call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream"),
+        ]
+        self.assertEqual(mock_enqueue.call_args_list, calls)
 
     def test_returns_if_reply(self):
         self.assertIsNone(update_streams_with_content(Mock(content_type=ContentType.REPLY)))
