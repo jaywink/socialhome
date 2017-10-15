@@ -407,9 +407,9 @@ class TestTagStream(SocialhomeTestCase):
             self.assertFalse(mock_cached.called)
 
     def test_key(self):
-        self.assertEqual(self.stream.key, "sh:streams:tag:%s" % self.user.id)
-        stream = PublicStream(user=AnonymousUser())
-        self.assertEqual(stream.key, "sh:streams:public:anonymous")
+        self.assertEqual(self.stream.key, "sh:streams:tag:%s:%s" % (self.tag.id, self.user.id))
+        stream = TagStream(tag=self.tag, user=AnonymousUser())
+        self.assertEqual(stream.key, "sh:streams:tag:%s:anonymous" % self.tag.id)
 
     def test_only_tagged_content_returned(self):
         qs, _throughs = self.anon_stream.get_content()

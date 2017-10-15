@@ -106,6 +106,7 @@ def update_streams_with_content(content):
 
 class BaseStream:
     last_id = None
+    key_base = ["sh", "streams"]
     ordering = "-created"
     paginate_by = 15
     redis = None
@@ -187,9 +188,16 @@ class BaseStream:
 
     @cached_property
     def key(self):
+        parts = self.key_base + [self.stream_type.value]
+        if self.key_extra:
+            parts.append(self.key_extra)
         if isinstance(self.user, AnonymousUser):
-            return "sh:streams:%s:anonymous" % self.stream_type.value
-        return "sh:streams:%s:%s" % (self.stream_type.value, self.user.id)
+            return ":".join(parts + ["anonymous"])
+        return ":".join(parts + [str(self.user.id)])
+
+    @property
+    def key_extra(self):
+        return None
 
     def should_cache_content(self, content):
         return self.get_queryset().filter(id=content.id).exists()
@@ -200,6 +208,32 @@ class FollowedStream(BaseStream):
 
     def get_queryset(self):
         return Content.objects.followed(self.user)
+
+
+class ProfileStreamBase(BaseStream):
+    def __init__(self, profile, **kwargs):
+        super().__init__(**kwargs)
+        self.profile = profile
+
+    @property
+    def key_extra(self):
+        return str(self.profile.id)
+
+
+class ProfileAllStream(ProfileStreamBase):
+    stream_type = StreamType.PROFILE_ALL
+
+    def get_queryset(self):
+        return Content.objects.profile(self.profile, self.user)
+
+
+class ProfilePinnedStream(ProfileStreamBase):
+    ordering = "order"
+    paginate_by = 100  # The limit of pinned content visible
+    stream_type = StreamType.PROFILE_PINNED
+
+    def get_queryset(self):
+        return Content.objects.profile_pinned(self.profile, self.user)
 
 
 class PublicStream(BaseStream):
@@ -220,6 +254,10 @@ class TagStream(BaseStream):
         if not self.tag:
             raise AttributeError("TagStream is missing tag.")
         return Content.objects.tag(self.tag, self.user)
+
+    @property
+    def key_extra(self):
+        return str(self.tag.id)
 
 
 CACHED_STREAM_CLASSES = (

@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from rest_framework.authtoken.models import Token
@@ -88,22 +87,12 @@ class TestProfileDetailView(SocialhomeTestCase):
 
     def test_get_context_data_contains_content_objects(self):
         request, view, contents, profile = self._get_request_view_and_content()
-        view.content_list = view._get_contents_queryset()
+        view.content_list = view.get_queryset()
         context = view.get_context_data()
         assert context["content_list"].count() == 3
         context_objs = {content for content in context["content_list"]}
         objs = set(contents)
         assert context_objs == objs
-
-    def test_get_context_data_does_not_contain_content_for_other_users(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        user = UserFactory()
-        ContentFactory(author=user.profile, pinned=True)
-        user = UserFactory()
-        ContentFactory(author=user.profile, pinned=True)
-        view.content_list = view._get_contents_queryset()
-        context = view.get_context_data()
-        assert len(context["content_list"]) == 0
 
     def test_detail_view_renders(self):
         request, view, contents, profile = self._get_request_view_and_content()
@@ -123,45 +112,6 @@ class TestProfileDetailView(SocialhomeTestCase):
         with self.login(username=self.admin_user.username):
             response = self.client.get(admin_profile.get_absolute_url())
         assert str(response.content).find("Organize profile content") > -1
-
-    def test_contents_queryset_returns_public_only_for_unauthenticated(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        request.user = AnonymousUser()
-        qs = view._get_contents_queryset()
-        assert qs.count() == 1
-        assert qs.first() == public
-
-    def test_contents_queryset_returns_public_or_site_only_for_authenticated(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        request.user = User.objects.get(username="admin")
-        qs = view._get_contents_queryset()
-        assert qs.count() == 2
-        assert set(qs) == {public, site}
-
-    def test_contents_queryset_returns_all_for_self(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        selff = ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        limited = ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        qs = view._get_contents_queryset()
-        assert qs.count() == 4
-        assert set(qs) == {public, site, selff, limited}
-
-    def test_contents_queryset_returns_content_in_correct_order(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        qs = view._get_contents_queryset()
-        assert qs[0].id == contents[2].id
-        assert qs[1].id == contents[1].id
-        assert qs[2].id == contents[0].id
 
 
 class TestOrganizeContentUserDetailView(SocialhomeTestCase):
@@ -198,13 +148,13 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
 
     def test_save_sort_order_updates_order(self):
         request, view, contents, profile = self._get_request_view_and_content()
-        qs = view._get_contents_queryset()
+        qs = view.get_queryset()
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[0].id
         # Run id's via str() because request.POST gives them like that
         view._save_sort_order([str(contents[0].id), str(contents[1].id), str(contents[2].id)])
-        qs = view._get_contents_queryset()
+        qs = view.get_queryset()
         assert qs[0].id == contents[0].id
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[2].id

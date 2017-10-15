@@ -6,7 +6,8 @@ from django.views.generic import DetailView, ListView, UpdateView, TemplateView
 from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
-from socialhome.streams.enums import StreamType
+from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
+from socialhome.streams.views import StreamMixin
 from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.tables import FollowedTable
@@ -30,14 +31,15 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, guid=profile.guid)
 
 
-class ProfileViewMixin(AccessMixin, DetailView):
+class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
     model = Profile
+    pinned_content_exists = None
+    profile_stream_type = None  # TODO: refactor to use stream type value directly
     slug_field = "guid"
     slug_url_kwarg = "guid"
     template_name = "streams/profile.html"
     target_profile = None
     content_list = None
-    vue = False
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
@@ -46,12 +48,8 @@ class ProfileViewMixin(AccessMixin, DetailView):
         """
         if not self.target_profile:
             self.target_profile = self.get_target_profile(kwargs.get("guid"))
-
-        use_new_stream = (
-            hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
-        )
-        self.vue = bool(request.GET.get("vue", False)) or use_new_stream
-
+        if not self.content_list:
+            self.content_list = self.get_queryset()
         if self.target_profile.visible_to_user(self.request.user):
             return super().dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
@@ -60,79 +58,70 @@ class ProfileViewMixin(AccessMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["followers_count"] = Profile.objects.followers(self.object).count()
+        self.followers_count = Profile.objects.followers(self.object).count()
+        context["content_list"] = self.content_list
+        context["followers_count"] = self.followers_count
+        context["profile_stream_type"] = self.profile_stream_type
+        context["pinned_content_exists"] = self.pinned_content_exists
         return context
+
+    def get_json_context(self):
+        json_context = super().get_json_context()
+        json_context.update({
+            "profile": {
+                "id": self.target_profile.id,
+                "guid": self.target_profile.guid,
+                "followersCount": self.followers_count,
+                "followingCount": str(self.target_profile.following.count()),
+                "handle": self.target_profile.handle,
+                "saferImageUrlLarge": self.target_profile.safer_image_url_large,
+                "streamType": self.profile_stream_type,
+                "pinnedContentExists": self.pinned_content_exists,
+            },
+        })
+        return json_context
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset=Profile.objects.all())
+
+    def get_queryset(self):
+        stream = self.stream_class(last_id=self.last_id, user=self.request.user, profile=self.target_profile)
+        qs, self.throughs = stream.get_content()
+        return qs
 
     def get_target_profile(self, guid):
         return get_object_or_404(Profile, guid=guid)
 
-    # Disabled until profile API is done
-    # def get_template_names(self):
-    #     return ["streams/vue.html"] if self.vue else super().get_template_names()
-
-    def _get_json_context(self, context):
-        if self.vue:  # pragma: no cover
-            return {
-                "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
-                "streamName": context["stream_name"],
-                "isUserAuthenticated": bool(self.request.user.is_authenticated),
-                "profile": {
-                    "id": self.target_profile.id,
-                    "guid": self.target_profile.guid,
-                    "followersCount": context["followers_count"],
-                    "followingCount": str(self.target_profile.following.count()),
-                    "handle": self.target_profile.handle,
-                    "saferImageUrlLarge": self.target_profile.safer_image_url_large,
-                    "streamType": context["profile_stream_type"],
-                    "pinnedContentExists": context["pinned_content_exists"]
-                }
-            }
-
-        return {}
+    @property
+    def stream_name(self):
+        return "%s__%s" % (self.stream_type_value, self.object.id)
 
 
 class ProfileDetailView(ProfileViewMixin):
+    pinned_content_exists = True
+    profile_stream_type = "pinned"
+    stream_class = ProfilePinnedStream
+
     def dispatch(self, request, *args, **kwargs):
         """Ensure we have pinned content. If not, render all content instead."""
         self.target_profile = self.get_target_profile(kwargs.get("guid"))
-        self.content_list = self._get_contents_queryset()
+        self.content_list = self.get_queryset()
         if not self.content_list.exists():
             return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["content_list"] = self.content_list
-        context["pinned_content_exists"] = True
-        context["stream_name"] = "%s__%s" % (StreamType.PROFILE_PINNED.value, self.object.id)
-        context["profile_stream_type"] = "pinned"
-
-        context["json_context"] = self._get_json_context(context)
-
-        return context
-
-    def _get_contents_queryset(self):
-        return Content.objects.profile_pinned(self.target_profile, self.request.user)
-
 
 class ProfileAllContentView(ProfileViewMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        qs = self._get_contents_queryset()
-        context["content_list"] = qs[:30]
-        if self.object.user:
-            context["pinned_content_exists"] = qs.filter(pinned=True).exists()
-        else:
-            context["pinned_content_exists"] = False
-        context["stream_name"] = "%s__%s" % (StreamType.PROFILE_ALL.value, self.object.id)
-        context["profile_stream_type"] = "all_content"
+    profile_stream_type = "all_content"
+    stream_class = ProfileAllStream
 
-        context["json_context"] = self._get_json_context(context)
-
-        return context
-
-    def _get_contents_queryset(self):
-        return Content.objects.profile(self.target_profile, self.request.user)
+    def dispatch(self, request, *args, **kwargs):
+        """Ensure we have pinned content. If not, render all content instead."""
+        self.target_profile = self.get_target_profile(kwargs.get("guid"))
+        qs = Content.objects.profile_pinned(self.target_profile, request.user)
+        if qs.filter(pinned=True).exists():
+            self.pinned_content_exists = True
+        return super().dispatch(request, *args, **kwargs)
 
 
 class OrganizeContentProfileDetailView(ProfileDetailView):
@@ -156,7 +145,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
 
     def _save_sort_order(self, card_ids):
         """Update Content `order` values according to sort order."""
-        qs_ids = self._get_contents_queryset().values_list("id", flat=True)
+        qs_ids = self.get_queryset().values_list("id", flat=True)
         for i in range(0, len(card_ids)):
             # Only allow updating cards that are in our qs
             card_id = int(card_ids[i])
