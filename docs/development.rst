@@ -148,6 +148,16 @@ Execute the following to run the new frontend JavaScript tests.
 
     npm run test
 
+API routes
+----------
+
+There is a dependency in the API route URL configurations with the new Vue based frontend tests. If you change or add new API routes during development, you must also do the following:
+
+    python manage.py collectstatic_js_reverse
+    mv staticfiles/django_js_reverse/js/reverse.js socialhome/streams/app/tests/fixtures/Url.js
+
+This updates the JavaScript fixtures with the new URL configuration.
+
 Linters
 -------
 
