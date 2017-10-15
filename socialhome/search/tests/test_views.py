@@ -11,7 +11,7 @@ from socialhome.enums import Visibility
 from socialhome.search.views import GlobalSearchView
 from socialhome.tests.utils import SocialhomeCBVTestCase, SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory
 from socialhome.users.views import ProfileAllContentView
 
 
@@ -61,7 +61,7 @@ class TestGlobalSearchView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.public_profile = ProfileFactory(name="Foobar", visibility=Visibility.PUBLIC)
+        cls.public_profile = PublicProfileFactory(name="Foobar")
 
     def test_view_renders(self):
         self.get("search:global")

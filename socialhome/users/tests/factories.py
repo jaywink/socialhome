@@ -4,6 +4,7 @@ from factory import fuzzy
 from federation.entities import base
 
 from socialhome.enums import Visibility
+from socialhome.users.models import Profile
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -13,6 +14,14 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.User"
+
+
+class PublicUserFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        Profile.objects.filter(user=user.id).update(visibility=Visibility.PUBLIC)
+        return user
 
 
 class AdminUserFactory(UserFactory):

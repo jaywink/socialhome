@@ -44,7 +44,8 @@ class ProfileViewMixin(AccessMixin, DetailView):
 
         Redirect to login if not allowed to see profile.
         """
-        self.target_profile = get_object_or_404(Profile, guid=self.kwargs.get("guid"))
+        if not self.target_profile:
+            self.target_profile = self.get_target_profile(kwargs.get("guid"))
 
         use_new_stream = (
             hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
@@ -61,6 +62,9 @@ class ProfileViewMixin(AccessMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["followers_count"] = Profile.objects.followers(self.object).count()
         return context
+
+    def get_target_profile(self, guid):
+        return get_object_or_404(Profile, guid=guid)
 
     # Disabled until profile API is done
     # def get_template_names(self):
@@ -90,6 +94,7 @@ class ProfileViewMixin(AccessMixin, DetailView):
 class ProfileDetailView(ProfileViewMixin):
     def dispatch(self, request, *args, **kwargs):
         """Ensure we have pinned content. If not, render all content instead."""
+        self.target_profile = self.get_target_profile(kwargs.get("guid"))
         self.content_list = self._get_contents_queryset()
         if not self.content_list.exists():
             return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
@@ -107,7 +112,7 @@ class ProfileDetailView(ProfileViewMixin):
         return context
 
     def _get_contents_queryset(self):
-        return Content.objects.profile_pinned(self.kwargs.get("guid"), self.request.user)
+        return Content.objects.profile_pinned(self.target_profile, self.request.user)
 
 
 class ProfileAllContentView(ProfileViewMixin):
@@ -127,7 +132,7 @@ class ProfileAllContentView(ProfileViewMixin):
         return context
 
     def _get_contents_queryset(self):
-        return Content.objects.profile_by_attr("guid", self.kwargs.get("guid"), self.request.user)
+        return Content.objects.profile(self.target_profile, self.request.user)
 
 
 class OrganizeContentProfileDetailView(ProfileDetailView):
@@ -138,7 +143,8 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
         return Profile.objects.get(user=self.request.user)
 
     def dispatch(self, request, *args, **kwargs):
-        """User current user."""
+        """Use current user."""
+        kwargs.update({"guid": request.user.profile.guid})
         self.kwargs.update({"guid": request.user.profile.guid})
         return super().dispatch(request, *args, **kwargs)
 

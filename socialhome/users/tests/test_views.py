@@ -11,7 +11,7 @@ from socialhome.streams.enums import StreamType
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
 from socialhome.users.tables import FollowedTable
-from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory, PublicUserFactory
 from socialhome.users.views import (
     ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView, ProfileAllContentView)
 
@@ -164,14 +164,16 @@ class TestProfileDetailView(SocialhomeTestCase):
         assert qs[2].id == contents[0].id
 
 
-@pytest.mark.usefixtures("admin_client", "rf")
-class TestOrganizeContentUserDetailView:
-    def _get_request_view_and_content(self, rf, create_content=True):
-        request = rf.get("/")
-        request.user = UserFactory()
-        profile = request.user.profile
-        profile.visibility = Visibility.PUBLIC
-        profile.save()
+class TestOrganizeContentUserDetailView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = PublicUserFactory()
+
+    def _get_request_view_and_content(self, create_content=True):
+        request = RequestFactory().get("/")
+        request.user = self.user
+        profile = self.user.profile
 
         contents = []
         if create_content:
@@ -189,12 +191,13 @@ class TestOrganizeContentUserDetailView:
         view.kwargs = {"guid": profile.guid}
         return request, view, contents, profile
 
-    def test_view_renders(self, admin_client, rf):
-        response = admin_client.get(reverse("users:profile-organize"))
-        assert response.status_code == 200
+    def test_view_renders(self):
+        with self.login(self.user):
+            self.get("users:profile-organize")
+        self.response_200()
 
-    def test_save_sort_order_updates_order(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
+    def test_save_sort_order_updates_order(self):
+        request, view, contents, profile = self._get_request_view_and_content()
         qs = view._get_contents_queryset()
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
@@ -206,8 +209,8 @@ class TestOrganizeContentUserDetailView:
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[2].id
 
-    def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
+    def test_save_sort_order_skips_non_qs_contents(self):
+        request, view, contents, profile = self._get_request_view_and_content()
         other_user = UserFactory()
         other_content = ContentFactory(author=other_user.profile, pinned=True)
         Content.objects.filter(id=other_content.id).update(order=100)
@@ -215,8 +218,8 @@ class TestOrganizeContentUserDetailView:
         other_content.refresh_from_db()
         assert other_content.order == 100
 
-    def test_get_success_url(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
+    def test_get_success_url(self):
+        request, view, contents, profile = self._get_request_view_and_content()
         assert view.get_success_url() == "/"
 
 

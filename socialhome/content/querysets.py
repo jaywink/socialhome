@@ -41,6 +41,9 @@ class ContentQuerySet(models.QuerySet):
         # TODO remove order by from here once everything uses the stream classes, consumers don't yet
         return qs.order_by("-created")
 
+    def pinned(self):
+        return self.filter(pinned=True).order_by("order")
+
     def profile(self, profile, user):
         """Filter for a user profile.
 
@@ -65,9 +68,13 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         return self.profile(profile, user)
 
-    def profile_pinned(self, guid, user):
+    def profile_pinned(self, profile, user):
         """Get profile content user has chosen to pin on profile."""
-        return self.profile_by_attr("guid", guid, user).filter(pinned=True).order_by("order")
+        return self.profile(profile, user).pinned()
+
+    def profile_pinned_by_attr(self, attr, value, user):
+        """Get profile content user has chosen to pin on profile."""
+        return self.profile_by_attr(attr, value, user).pinned()
 
     def public(self):
         return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")

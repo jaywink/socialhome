@@ -32,7 +32,7 @@ class StreamConsumer(WebsocketConsumer):
         stream_name, stream_info = self._get_stream_info()
         # TODO implement profile streams here too once done
         if stream_name == "profile":
-            return Content.objects.profile_pinned(stream_info, self.message.user)
+            return Content.objects.profile_pinned_by_attr("guid", stream_info, self.message.user)
         elif stream_name == "profile_all":
             return Content.objects.profile_by_attr("id", stream_info, self.message.user)
         return Content.objects.none()
@@ -78,7 +78,7 @@ class StreamConsumer(WebsocketConsumer):
         # TODO implement profile streams here too once done
         qs = None
         if stream_name == "profile":
-            qs = Content.objects.profile_pinned(stream_info, self.message.user)
+            qs = Content.objects.profile_pinned_by_attr("guid", stream_info, self.message.user)
         elif stream_name == "profile_all":
             qs = Content.objects.profile_by_attr("id", stream_info, self.message.user)
         if qs:

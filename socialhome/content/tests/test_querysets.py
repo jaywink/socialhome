@@ -37,6 +37,12 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.share_self_reply = SelfContentFactory(parent=cls.self_share)
         cls.share_site_reply = SiteContentFactory(parent=cls.site_share)
 
+    def setUp(self):
+        super().setUp()
+        self.public_content.author.refresh_from_db()
+        self.self_content.author.refresh_from_db()
+        self.site_content.author.refresh_from_db()
+
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.public_reply,
@@ -164,43 +170,95 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
     def test_profile_pinned(self):
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.self_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.self_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.self_user))
         self.assertEqual(contents, {self.self_content})
 
         self._set_profiles_public()
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.anonymous_user))
         self.assertEqual(contents, {self.public_content})
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.anonymous_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.other_user))
         self.assertEqual(contents, {self.public_content})
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.other_user))
         self.assertEqual(contents, {self.site_content})
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.other_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.profile_pinned(self.public_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.public_content.author, self.self_user))
         self.assertEqual(contents, {self.public_content})
-        contents = set(Content.objects.profile_pinned(self.site_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.site_content.author, self.self_user))
         self.assertEqual(contents, {self.site_content})
-        contents = set(Content.objects.profile_pinned(self.self_content.author.guid, self.self_user))
+        contents = set(Content.objects.profile_pinned(self.self_content.author, self.self_user))
+        self.assertEqual(contents, {self.self_content})
+
+    def test_profile_pinned_by_attr(self):
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, set())
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, set())
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.other_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.other_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.other_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.self_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.self_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.self_user))
+        self.assertEqual(contents, {self.self_content})
+
+        self._set_profiles_public()
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, {self.public_content})
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, set())
+        contents = set(
+            Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.anonymous_user),
+        )
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.other_user))
+        self.assertEqual(contents, {self.public_content})
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.other_user))
+        self.assertEqual(contents, {self.site_content})
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.other_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.public_content.author.guid, self.self_user))
+        self.assertEqual(contents, {self.public_content})
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.site_content.author.guid, self.self_user))
+        self.assertEqual(contents, {self.site_content})
+        contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.self_user))
         self.assertEqual(contents, {self.self_content})
 
     def test_children(self):
