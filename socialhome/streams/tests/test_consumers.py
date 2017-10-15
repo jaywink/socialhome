@@ -122,7 +122,7 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
 
     @patch("socialhome.streams.consumers.Content.objects.public", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.tag", return_value=Content.objects.none())
-    @patch("socialhome.streams.consumers.Content.objects.profile_by_id", return_value=Content.objects.none())
+    @patch("socialhome.streams.consumers.Content.objects.profile_by_attr", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.profile_pinned", return_value=Content.objects.none())
     @patch("socialhome.streams.consumers.Content.objects.followed", return_value=Content.objects.none())
     def test_get_stream_qs_per_stream(self, mock_followed, mock_pinned, mock_profile, mock_tag, mock_public):
@@ -160,7 +160,8 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
             },
         )
         self.assertEqual(mock_profile.call_count, 1)
-        self.assertEqual(mock_profile.call_args[0][0], "1234")
+        self.assertEqual(mock_profile.call_args[0][0], "id")
+        self.assertEqual(mock_profile.call_args[0][1], "1234")
         self.client.send_and_consume(
             "websocket.receive",
             {

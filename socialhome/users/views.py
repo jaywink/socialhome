@@ -127,7 +127,7 @@ class ProfileAllContentView(ProfileViewMixin):
         return context
 
     def _get_contents_queryset(self):
-        return Content.objects.profile(self.kwargs.get("guid"), self.request.user)
+        return Content.objects.profile_by_attr("guid", self.kwargs.get("guid"), self.request.user)
 
 
 class OrganizeContentProfileDetailView(ProfileDetailView):
