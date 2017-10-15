@@ -257,6 +257,13 @@ Default: ``False``
 
 Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts. User counts include 30 day and 6 month active users.
 
+SOCIALHOME_SYSLOG_FACILITY
+..........................
+
+Default: ``local7``
+
+Define the logging facility for syslog, if ``SOCIALHOME_LOG_TARGET`` is set to ``syslog``.
+
 SOCIALHOME_SYSLOG_LEVEL
 .......................
 

@@ -367,7 +367,7 @@ LOGGING = {
         'syslog': {
             'level': env("SOCIALHOME_SYSLOG_LEVEL", default="INFO"),
             'class': 'logging.handlers.SysLogHandler',
-            'facility': 'local7',
+            'facility': env("SOCIALHOME_SYSLOG_FACILITY", default="local7"),
             'formatter': 'verbose',
             'address' : '/dev/log',
         },
