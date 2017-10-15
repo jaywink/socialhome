@@ -37,12 +37,10 @@ class ContentQuerySet(models.QuerySet):
         """
         following_ids = user.profile.following.values_list("id", flat=True)
         qs = self.top_level().filter(Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids))
-        qs = qs._select_related().visible_for_user(user)
-        # TODO remove order by from here once everything uses the stream classes, consumers don't yet
-        return qs.order_by("-created")
+        return qs._select_related().visible_for_user(user)
 
     def pinned(self):
-        return self.filter(pinned=True).order_by("order")
+        return self.filter(pinned=True)
 
     def profile(self, profile, user):
         """Filter for a user profile.
@@ -52,8 +50,8 @@ class ContentQuerySet(models.QuerySet):
         from socialhome.content.models import Content
         if not profile.visible_to_user(user):
             return Content.objects.none()
-        qs = self.top_level()._select_related().visible_for_user(user).filter(author=profile)
-        return qs.order_by("-created")
+        qs = self.top_level().filter(Q(shares__author=profile) | Q(author=profile))
+        return qs._select_related().visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user):
         """Filter for a user profile by GUID.
@@ -77,10 +75,10 @@ class ContentQuerySet(models.QuerySet):
         return self.profile_by_attr(attr, value, user).pinned()
 
     def public(self):
-        return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC).order_by("-created")
+        return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC)
 
     def tag(self, tag, user):
-        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag).order_by("-created")
+        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag)
 
     def tag_by_name(self, tag, user):
         from socialhome.content.models import Tag, Content
