@@ -53,33 +53,35 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
 
     @patch("socialhome.streams.streams.add_to_redis")
     def test_calls_add_to_redis(self, mock_add):
-        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
         stream = FollowedStream(user=self.user)
         mock_add.assert_called_once_with(self.content, self.content, [stream.key])
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
-        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream")
-        mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [])
+        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
+        mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [], self.content.author)
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
-        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
         self.assertTrue(isinstance(mock_check.call_args_list[1][0][1], AnonymousUser))
 
     @patch("socialhome.streams.streams.Content.objects.filter")
     def test_returns_on_no_content_or_reply(self, mock_filter):
-        add_to_stream_for_users(Content.objects.aggregate(max_id=Max("id")).get("max_id") + 1, Mock(), PublicStream)
+        add_to_stream_for_users(
+            Content.objects.aggregate(max_id=Max("id")).get("max_id") + 1, Mock(), PublicStream, self.content.author.id,
+        )
         self.assertFalse(mock_filter.called)
-        add_to_stream_for_users(self.reply.id, self.reply.id, PublicStream)
+        add_to_stream_for_users(self.reply.id, self.reply.id, PublicStream, self.reply.author.id)
         self.assertFalse(mock_filter.called)
 
     @patch("socialhome.streams.streams.check_and_add_to_keys", return_value=True)
     def test_skips_if_not_cached_stream(self, mock_get):
-        add_to_stream_for_users(self.content.id, self.content.id, "SpamStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "SpamStream", self.content.author.id)
         self.assertFalse(mock_get.called)
-        add_to_stream_for_users(self.content.id, self.content.id, "PublicStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "PublicStream", self.content.author.id)
         self.assertFalse(mock_get.called)
 
 
@@ -97,13 +99,13 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
 
     def test_adds_if_should_cache(self):
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, []),
+            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, [], self.remote_profile),
             ["sh:streams:followed:%s" % self.user.id],
         )
 
     def test_adds_to_multiple_stream_instances(self):
         self.assertEqual(
-            set(check_and_add_to_keys(TagStream, self.user, self.tagged_content, [])),
+            set(check_and_add_to_keys(TagStream, self.user, self.tagged_content, [], self.tagged_content.author)),
             {
                 "sh:streams:tag:%s:%s" % (self.spam_tag.id, self.user.id),
                 "sh:streams:tag:%s:%s" % (self.eggs_tag.id, self.user.id),
@@ -112,7 +114,7 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
 
     def test_does_not_add_if_shouldnt_cache(self):
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.content, []),
+            check_and_add_to_keys(FollowedStream, self.user, self.content, [], self.content.author),
             [],
         )
 
@@ -139,8 +141,8 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
     def test_enqueues_each_stream_to_rq(self, mock_enqueue):
         update_streams_with_content(self.content)
         calls = [
-            call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream"),
-            call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream"),
+            call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream", self.content.author.id),
+            call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream", self.content.author.id),
         ]
         self.assertEqual(mock_enqueue.call_args_list, calls)
 
@@ -148,8 +150,8 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
     def test_enqueues_each_stream_to_rq__share(self, mock_enqueue):
         update_streams_with_content(self.share)
         calls = [
-            call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream"),
-            call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream"),
+            call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream", self.share.author.id),
+            call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream", self.share.author.id),
         ]
         self.assertEqual(mock_enqueue.call_args_list, calls)
 
@@ -333,7 +335,9 @@ class TestFollowedStream(SocialhomeTestCase):
             self.assertEqual(set(self.stream.get_content_ids()[0]), all_ids)
 
     def test_get_target_streams(self):
-        self.assertEqual(len(FollowedStream.get_target_streams(self.public_content, self.user)), 1)
+        self.assertEqual(
+            len(FollowedStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
 
     def test_get_throughs_key(self):
         self.assertEqual(
@@ -385,7 +389,9 @@ class TestProfileAllStream(SocialhomeTestCase):
         self.assertEqual(set(qs), {self.remote_profile_content})
 
     def test_get_target_streams(self):
-        self.assertEqual(len(ProfileAllStream.get_target_streams(self.public_content, self.user)), 1)
+        self.assertEqual(
+            len(ProfileAllStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:profile_all:%s:%s" % (self.remote_profile.id, self.user.id))
@@ -414,7 +420,9 @@ class TestProfilePinnedStream(SocialhomeTestCase):
         self.assertEqual(set(qs), {self.pinned_content})
 
     def test_get_target_streams(self):
-        self.assertEqual(len(ProfilePinnedStream.get_target_streams(self.pinned_content, self.user)), 1)
+        self.assertEqual(
+            len(ProfilePinnedStream.get_target_streams(self.pinned_content, self.user, self.pinned_content.author)), 1,
+        )
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:profile_pinned:%s:%s" % (self.profile.id, self.user.id))
@@ -437,7 +445,9 @@ class TestPublicStream(SocialhomeTestCase):
             self.assertFalse(mock_cached.called)
 
     def test_get_target_streams(self):
-        self.assertEqual(len(PublicStream.get_target_streams(self.public_content, self.user)), 1)
+        self.assertEqual(
+            len(PublicStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:public:%s" % self.user.id)
@@ -483,7 +493,9 @@ class TestTagStream(SocialhomeTestCase):
             self.assertFalse(mock_cached.called)
 
     def test_get_target_streams(self):
-        self.assertEqual(len(TagStream.get_target_streams(self.limited_tagged, self.user)), 3)
+        self.assertEqual(
+            len(TagStream.get_target_streams(self.limited_tagged, self.user, self.limited_tagged.author)), 3,
+        )
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:tag:%s:%s" % (self.tag.id, self.user.id))
