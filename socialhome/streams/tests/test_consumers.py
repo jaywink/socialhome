@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.streams.consumers import StreamConsumer
-from socialhome.streams.streams import PublicStream, FollowedStream, TagStream
+from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream
 from socialhome.tests.utils import SocialhomeChannelTestCase
 from socialhome.users.tests.factories import UserFactory
 
@@ -20,6 +20,7 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
+        cls.profile = cls.user.profile
         cls.content = ContentFactory()
         cls.content2 = ContentFactory()
         cls.child_content = ContentFactory(parent=cls.content)
@@ -45,6 +46,10 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
         self.assertEqual(consumer._get_stream_class(), FollowedStream)
         consumer.stream_name = "tag"
         self.assertEqual(consumer._get_stream_class(), TagStream)
+        consumer.stream_name = "profile_all"
+        self.assertEqual(consumer._get_stream_class(), ProfileAllStream)
+        consumer.stream_name = "profile_pinned"
+        self.assertEqual(consumer._get_stream_class(), ProfilePinnedStream)
 
     @patch.object(StreamConsumer, "__init__", return_value=None)
     def test__get_stream_info(self, mock_consumer):
@@ -60,16 +65,30 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
         consumer.stream_name = "public"
         instance = consumer._get_stream_instance()
         self.assertTrue(isinstance(instance, PublicStream))
+
         consumer.stream_name = "followed"
         consumer.message = Mock(user=self.user)
         instance = consumer._get_stream_instance()
         self.assertTrue(isinstance(instance, FollowedStream))
         self.assertTrue(instance.user, self.user)
+
         consumer.stream_name = "tag"
         consumer.stream_info = str(self.tag.id)
         instance = consumer._get_stream_instance()
         self.assertTrue(isinstance(instance, TagStream))
         self.assertEqual(instance.tag, self.tag)
+
+        consumer.stream_name = "profile_all"
+        consumer.stream_info = str(self.profile.id)
+        instance = consumer._get_stream_instance()
+        self.assertTrue(isinstance(instance, ProfileAllStream))
+        self.assertEqual(instance.profile, self.profile)
+
+        consumer.stream_name = "profile_pinned"
+        consumer.stream_info = str(self.profile.id)
+        instance = consumer._get_stream_instance()
+        self.assertTrue(isinstance(instance, ProfilePinnedStream))
+        self.assertEqual(instance.profile, self.profile)
 
     @patch.object(StreamConsumer, "__init__", return_value=None)
     @patch("socialhome.streams.consumers.PublicStream.get_content", return_value="spam")
@@ -92,7 +111,7 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
         self.assertEqual(text["placement"], "prepended")
         self.assertEqual(text["contents"], [self.content.dict_for_view(AnonymousUser())])
 
-    def test_receive_load_more_sends_more_content(self):
+    def test_receive_load_more__sends_more_content(self):
         self.client.send_and_consume(
             "websocket.receive",
             {
@@ -105,6 +124,17 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
         self.assertEqual(text["event"], "content")
         self.assertEqual(text["placement"], "appended")
         self.assertEqual(text["contents"], [self.content.dict_for_view(AnonymousUser())])
+
+    def test_receive_load_more__does_not_send_more_on_profile_pinned_stream(self):
+        self.client.send_and_consume(
+            "websocket.receive",
+            {
+                "path": "/ch/streams/profile_pinned__%s/" % self.profile.id,
+                "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
+            },
+        )
+        receive = self.client.receive()
+        self.assertIsNone(receive)
 
     def test_receive_load_children_sends_reply_content(self):
         self.client.send_and_consume(
@@ -146,12 +176,12 @@ class TestStreamConsumer(SocialhomeChannelTestCase):
         self.client.send_and_consume(
             "websocket.receive",
             {
-                "path": "/ch/streams/profile_all__%s/" % self.user.profile.id,
+                "path": "/ch/streams/profile_all__%s/" % self.profile.id,
                 "text": '{"action": "load_more", "last_id": %s}' % self.content2.id,
             },
         )
         self.assertEqual(mock_profile.call_count, 1)
-        self.assertEqual(mock_profile.call_args[0][0], self.user.profile)
+        self.assertEqual(mock_profile.call_args[0][0], self.profile)
         self.client.send_and_consume(
             "websocket.receive",
             {

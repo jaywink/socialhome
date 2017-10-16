@@ -82,6 +82,11 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
         return json_context
 
     def get_object(self, queryset=None):
+        """Ensure DetailView operates on the right queryset when fetching object.
+
+        Since this is a StreamMixin view, we must override get_queryset which is for the content. To ensure
+        DetailView works, we override get_object to pass a Profile queryset to get_object up in super.
+        """
         return super().get_object(queryset=Profile.objects.all())
 
     def get_queryset(self):

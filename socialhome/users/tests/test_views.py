@@ -94,6 +94,10 @@ class TestProfileDetailView(SocialhomeTestCase):
         objs = set(contents)
         assert context_objs == objs
 
+    def test_get_object__uses_a_profile_queryset(self):
+        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        self.assertTrue(isinstance(view.get_object(), Profile))
+
     def test_detail_view_renders(self):
         request, view, contents, profile = self._get_request_view_and_content()
         with self.login(username=self.admin_user.username):
@@ -112,6 +116,10 @@ class TestProfileDetailView(SocialhomeTestCase):
         with self.login(username=self.admin_user.username):
             response = self.client.get(admin_profile.get_absolute_url())
         assert str(response.content).find("Organize profile content") > -1
+
+    def test_stream_name(self):
+        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        self.assertEqual(view.stream_type_value, StreamType.PROFILE_PINNED.value)
 
 
 class TestOrganizeContentUserDetailView(SocialhomeTestCase):
@@ -307,6 +315,10 @@ class TestProfileAllContentView(SocialhomeTestCase):
             response.context_data.get("stream_name"), "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id),
         )
         self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
+
+    def test_stream_name(self):
+        self.get("users:profile-all-content", guid=self.profile.guid)
+        self.assertContext("stream_name", "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
 
 
 class TestContactsFollowedView(SocialhomeTestCase):

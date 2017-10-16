@@ -11,7 +11,7 @@ from test_plus.test import CBVTestCase
 import socialhome.tests.environment  # Set some environment tweaks
 from socialhome.content.tests.factories import (
     PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import PublicProfileFactory, PublicUserFactory
 
 
 class CreateDataMixin:
@@ -25,14 +25,14 @@ class CreateDataMixin:
 
     @staticmethod
     def create_local_and_remote_user(target):
-        target.user = UserFactory()
+        target.user = PublicUserFactory()
         target.profile = target.user.profile
-        target.remote_profile = ProfileFactory()
+        target.remote_profile = PublicProfileFactory()
 
     @staticmethod
     def create_content_set(target, author=None):
         if not author:
-            author = ProfileFactory()
+            author = PublicProfileFactory()
         target.public_content = PublicContentFactory(author=author)
         target.site_content = SiteContentFactory(author=author)
         target.self_content = SelfContentFactory(author=author)

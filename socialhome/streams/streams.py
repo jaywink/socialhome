@@ -72,7 +72,7 @@ def check_and_add_to_keys(stream_cls, user, content, keys):
     :returns: Existing keys with key added
     """
     # noinspection PyCallingNonCallable
-    streams = stream_cls.get_possible_instances(content, user)
+    streams = stream_cls.get_target_streams(content, user)
     for stream in streams:
         if stream.should_cache_content(content):
             keys.append(stream.key)
@@ -180,12 +180,18 @@ class BaseStream:
                 throughs[id] = id
         return ids, throughs
 
-    @classmethod
-    def get_possible_instances(cls, content, user):
-        return [cls(user=user)]
-
     def get_queryset(self):
         raise NotImplemented
+
+    @classmethod
+    def get_target_streams(cls, content, user):
+        """Get a list of target instances of this class.
+
+        Given a Content and User, this method defines the stream instances that this content should be
+        cached for. Some streams have multiple versions, for example a Content can have many tags which all have
+        their own stream instance of TagStream.
+        """
+        return [cls(user=user)]
 
     @staticmethod
     def get_throughs_key(key):
@@ -221,7 +227,7 @@ class ProfileStreamBase(BaseStream):
         self.profile = profile
 
     @classmethod
-    def get_possible_instances(cls, content, user):
+    def get_target_streams(cls, content, user):
         return [cls(user=user, profile=content.author)]
 
     @property
@@ -259,14 +265,14 @@ class TagStream(BaseStream):
         super().__init__(**kwargs)
         self.tag = tag
 
-    @classmethod
-    def get_possible_instances(cls, content, user):
-        return [cls(user=user, tag=tag) for tag in content.tags.all()]
-
     def get_queryset(self):
         if not self.tag:
             raise AttributeError("TagStream is missing tag.")
         return Content.objects.tag(self.tag, self.user)
+
+    @classmethod
+    def get_target_streams(cls, content, user):
+        return [cls(user=user, tag=tag) for tag in content.tags.all()]
 
     @property
     def key_extra(self):

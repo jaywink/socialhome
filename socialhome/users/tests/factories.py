@@ -20,7 +20,8 @@ class PublicUserFactory(UserFactory):
     @classmethod
     def _generate(cls, create, attrs):
         user = super(UserFactory, cls)._generate(create, attrs)
-        Profile.objects.filter(user=user.id).update(visibility=Visibility.PUBLIC)
+        user.profile.visibility = Visibility.PUBLIC
+        user.profile.save(update_fields=["visibility"])
         return user
 
 
