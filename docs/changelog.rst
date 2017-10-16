@@ -6,6 +6,11 @@ Changelog
 0.6.0-dev (unreleased)
 ----------------------
 
+Added
+.....
+
+* Profile "All content" streams now include the shares the profile has done. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 Changed
 .......
 
