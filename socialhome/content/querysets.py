@@ -42,7 +42,7 @@ class ContentQuerySet(models.QuerySet):
     def pinned(self):
         return self.filter(pinned=True)
 
-    def profile(self, profile, user):
+    def profile(self, profile, user, include_shares=True):
         """Filter for a user profile.
 
         Ensures if the profile is not visible to the user, no content will be returned.
@@ -50,10 +50,14 @@ class ContentQuerySet(models.QuerySet):
         from socialhome.content.models import Content
         if not profile.visible_to_user(user):
             return Content.objects.none()
-        qs = self.top_level().filter(Q(shares__author=profile) | Q(author=profile))
+        qs = self.top_level()
+        if include_shares:
+            qs = qs.filter(Q(shares__author=profile) | Q(author=profile))
+        else:
+            qs = qs.filter(author=profile)
         return qs._select_related().visible_for_user(user)
 
-    def profile_by_attr(self, attr, value, user):
+    def profile_by_attr(self, attr, value, user, include_shares=True):
         """Filter for a user profile by GUID.
 
         Ensures if the profile is not visible to the user, no content will be returned.
@@ -64,15 +68,15 @@ class ContentQuerySet(models.QuerySet):
             profile = Profile.objects.get(**get_by)
         except Profile.DoesNotExist:
             return Content.objects.none()
-        return self.profile(profile, user)
+        return self.profile(profile, user, include_shares=include_shares)
 
     def profile_pinned(self, profile, user):
         """Get profile content user has chosen to pin on profile."""
-        return self.profile(profile, user).pinned()
+        return self.profile(profile, user, include_shares=False).pinned()
 
     def profile_pinned_by_attr(self, attr, value, user):
         """Get profile content user has chosen to pin on profile."""
-        return self.profile_by_attr(attr, value, user).pinned()
+        return self.profile_by_attr(attr, value, user, include_shares=False).pinned()
 
     def public(self):
         return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC)
