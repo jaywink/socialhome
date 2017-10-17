@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from PIL import Image
 from channels.test import ChannelTestCase
-from django.test import override_settings, TransactionTestCase
+from django.test import override_settings, TransactionTestCase, RequestFactory
 from rest_framework.test import APITestCase
 from test_plus import TestCase
 from test_plus.test import CBVTestCase
@@ -49,6 +49,12 @@ class SocialhomeTestBase(CreateDataMixin):
     @classmethod
     def create_content_set(cls, author=None):
         CreateDataMixin.create_content_set(cls, author=author)
+
+    @staticmethod
+    def get_request(user):
+        request = RequestFactory().get("/")
+        request.user = user
+        return request
 
     @staticmethod
     @override_settings(MEDIA_ROOT=tempfile.gettempdir())

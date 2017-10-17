@@ -26,7 +26,7 @@ class StreamMixin(View):
         context = super().get_context_data(**kwargs)
         context["stream_name"] = self.stream_name
         context["throughs"] = self.throughs
-        if self.vue:  # pragma: no cover
+        if self.vue:
             context["json_context"] = self.get_json_context()
 
         return context
@@ -34,8 +34,8 @@ class StreamMixin(View):
     def get_json_context(self):
         return {
             "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
-            "streamName": self.stream_name,
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
+            "streamName": self.stream_name,
         }
 
     def get_queryset(self):
@@ -81,7 +81,7 @@ class TagStreamView(BaseStreamView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["tag_name"] = self.tag.name
-        if self.vue:  # pragma: no cover
+        if self.vue:
             context["json_context"]["tagName"] = self.tag.name
         return context
 
