@@ -27,6 +27,10 @@ Changed
 
   This is a more standard file name for environment variables than the previous ``env.local``. For now we'll still load from the old file too, but a warning will be displayed to rename the file.
 
+* **Breaking change**
+
+  Content API now returns Content list of tags as *name of tag*, not ID as before. The name does not contain the character "#".
+
 Fixed
 .....
 

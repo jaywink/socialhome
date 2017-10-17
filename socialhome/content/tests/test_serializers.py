@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import AnonymousUser
 
 from socialhome.content.serializers import ContentSerializer
-from socialhome.content.tests.factories import PublicContentFactory
+from socialhome.content.tests.factories import PublicContentFactory, TagFactory
 from socialhome.tests.utils import SocialhomeTestCase
 
 
@@ -89,3 +89,15 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.content.share(self.profile)
         serializer = ContentSerializer(context={"request": Mock(user=self.user)})
         self.assertTrue(serializer.get_user_has_shared(self.content))
+
+    def test_tags_if_no_tag(self):
+        self.content.tags.clear()
+        serializer = ContentSerializer(self.content, context={"request": Mock(user=self.user)})
+        self.assertEquals(serializer.data["tags"], [])
+
+    def test_tags_with_tag(self):
+        tag = TagFactory(name="yolo")
+        self.content.tags.clear()
+        self.content.tags.add(tag)
+        serializer = ContentSerializer(self.content, context={"request": Mock(user=self.user)})
+        self.assertEquals(serializer.data["tags"], ["yolo"])

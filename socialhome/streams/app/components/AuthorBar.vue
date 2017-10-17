@@ -62,7 +62,6 @@ export default Vue.component("author-bar", {
     },
     computed: {
         author() {
-            console.log(this.$store.state.contents[this.contentId].user_is_author)
             return this.$store.state.contents[this.contentId].author
         },
         canFollow() {

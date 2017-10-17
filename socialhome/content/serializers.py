@@ -1,6 +1,6 @@
 from enumfields.drf import EnumField
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SlugRelatedField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -14,6 +14,7 @@ class ContentSerializer(ModelSerializer):
     user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
+    tags = SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
@@ -26,6 +27,7 @@ class ContentSerializer(ModelSerializer):
             "guid",
             "humanized_timestamp",
             "id",
+            "is_nsfw",
             "local",
             "order",
             "parent",
@@ -52,6 +54,7 @@ class ContentSerializer(ModelSerializer):
             "guid",
             "humanized_timestamp",
             "id",
+            "is_nsfw",
             "local",
             "parent",
             "remote_created",
