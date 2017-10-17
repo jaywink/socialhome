@@ -10,6 +10,10 @@ Added
 .....
 
 * Profile "All content" streams now include the shares the profile has done. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+* Streams API now has endpoints for profile streams to match the profile streams in the UI. (`#194 <https://github.com/jaywink/socialhome/issues/194>`_)
+
+  * ``/api/streams/profile-all/{id}/`` - fetches all content by the given profile (including shares), ordered by created date in reverse order (= new stuff first).
+  * ``/api/streams/profile-pinned/{id}/`` - fetches pinned content by the given profile, ordered as set by the profile owner.
 
 Changed
 .......

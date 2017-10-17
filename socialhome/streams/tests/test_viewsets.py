@@ -35,6 +35,53 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.assert_called_once_with(last_id=None, user=self.user)
 
 
+class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.content = PublicContentFactory(author=cls.remote_profile)
+        SiteContentFactory(author=cls.profile)
+        SelfContentFactory(author=cls.profile)
+        LimitedContentFactory(author=cls.profile)
+
+    def test_profile_content_returned(self):
+        self.get("api-streams:profile-all", id=self.content.author.id)
+        self.assertEqual(len(self.last_response.data), 1)
+        self.assertEqual(self.last_response.data[0]["id"], self.content.id)
+
+    @patch("socialhome.streams.viewsets.ProfileAllStream")
+    def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
+        with self.login(self.user):
+            self.get("api-streams:profile-all", id=self.content.author.id)
+        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
+
+
+class TestProfilePinnedStreamAPIView(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.content = PublicContentFactory(author=cls.remote_profile, pinned=True)
+        PublicContentFactory(author=cls.remote_profile)
+        SiteContentFactory(author=cls.profile, pinned=True)
+        SelfContentFactory(author=cls.profile, pinned=True)
+        LimitedContentFactory(author=cls.profile, pinned=True)
+
+    def test_profile_content_returned(self):
+        self.get("api-streams:profile-pinned", id=self.content.author.id)
+        self.assertEqual(len(self.last_response.data), 1)
+        self.assertEqual(self.last_response.data[0]["id"], self.content.id)
+
+    @patch("socialhome.streams.viewsets.ProfilePinnedStream")
+    def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
+        with self.login(self.user):
+            self.get("api-streams:profile-pinned", id=self.content.author.id)
+        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
+
+
 class TestPublicStreamAPIView(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -69,6 +116,9 @@ class TestTagStreamAPIView(SocialhomeAPITestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
         cls.content = PublicContentFactory(text="#foobar")
+        SiteContentFactory(text="#foobar")
+        SelfContentFactory(text="#foobar")
+        LimitedContentFactory(text="#foobar")
 
     def test_public_content_returned(self):
         self.get("api-streams:tag", name="foobar")
