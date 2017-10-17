@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - pg_backups:/pg_backups
+    environment:
+      - POSTGRES_USER=socialhome
+      - POSTGRES_PASSWORD=socialhome
+      - POSTGRES_DB=socialhome
+
+  redis:
+    image: redis
+    volumes:
+      - redis_data:/data
+  npm:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile.npm
+    volumes:
+      - ./socialhome:/code/socialhome
+  django:
+    depends_on:
+      - postgres
+      - redis
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile.django
+    environment:
+      - DATABASE_URL=postgres://socialhome:socialhome@postgres:5432/socialhome
+      - DEBUG=True
+      - DJANGO_SECRET_KEY=ForDevelopmentEyesOnly
+    volumes:
+      - ./socialhome:/code/socialhome
+    ports:
+      - 8000:8000
+
+volumes:
+  pg_data: {}
+  pg_backups: {}
+  redis_data: {}

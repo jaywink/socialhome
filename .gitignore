@@ -89,3 +89,7 @@ socialhome/static/mocha/
 /docs/_build/
 /yarn.lock
 /staticfiles/
+
+# Docker
+docker-compose.yml
+
