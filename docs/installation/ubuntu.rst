@@ -263,7 +263,7 @@ Install Python dependencies
 Create configuration
 ''''''''''''''''''''
 
-Create the file ``env.local`` with the following contents, replacing values as needed.
+Create the file ``.env`` with the following contents, replacing values as needed.
 
 You must change or add the following values:
 
@@ -288,7 +288,7 @@ Make the env file a bit less readable.
 
 ::
 
-    chmod 0600 env.local
+    chmod 0600 .env
 
 Configure email sending
 '''''''''''''''''''''''
