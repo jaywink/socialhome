@@ -1,12 +1,66 @@
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import Client, RequestFactory
+from django.test import Client
 
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
 from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase
-from socialhome.users.tests.factories import UserFactory
+from socialhome.users.tests.factories import UserFactory, PublicUserFactory
+
+
+class TestFollowedStreamView(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.user2 = UserFactory()
+        cls.content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.other_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.user.profile.following.add(cls.content.author)
+
+    def test_get_json_context(self):
+        view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+            }
+        )
+
+    def test_renders_without_content(self):
+        self.get(FollowedStreamView, request=self.get_request(self.user2))
+        self.assertContains(self.last_response, "Followed")
+        self.assertEquals(len(self.context["content_list"]), 0)
+        self.response_200()
+
+    def test_renders_with_content(self):
+        response = self.get(FollowedStreamView, request=self.get_request(self.user))
+        self.assertContains(response, "Followed")
+        self.assertIsNotNone(response.context["content_list"])
+        self.assertEquals(set(response.context["content_list"]), {self.content})
+        self.assertEquals(response.status_code, 200)
+
+    def test_stream_name(self):
+        view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.stream_name, "%s__%s" % (StreamType.FOLLOWED.value, self.user.username)
+        )
+
+    def test_stream_type_value(self):
+        view = self.get_instance(FollowedStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.FOLLOWED.value)
+
+    def test_uses_correct_template(self):
+        response = self.get(FollowedStreamView, request=self.get_request(self.user))
+        template_names = [template.name for template in response.templates]
+        assert "streams/followed.html" in template_names
+
+    def test_redirects_to_login_if_not_authenticated(self):
+        self.assertLoginRequired("streams:followed")
 
 
 class TestPublicStreamView(SocialhomeCBVTestCase):
@@ -19,6 +73,26 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
         cls.limited = ContentFactory(visibility=Visibility.LIMITED)
         cls.user = UserFactory()
         cls.client = Client()
+
+    def test_get_json_context(self):
+        view = self.get_instance(PublicStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+            }
+        )
+        view = self.get_instance(PublicStreamView, request=self.get_request(AnonymousUser()))
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": None,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": False,
+            }
+        )
 
     def test_renders_without_content(self):
         response = self.client.get(reverse("streams:public"))
@@ -63,6 +137,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.user = PublicUserFactory()
         cls.content = ContentFactory(text="#tag")
         cls.tag_no_content = TagFactory(name="tagnocontent")
         cls.client = Client()
@@ -70,6 +145,28 @@ class TestTagStreamView(SocialhomeCBVTestCase):
     def test_context_data_is_ok(self):
         response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         assert response.context["tag_name"] == "tagnocontent"
+
+    def test_get_json_context(self):
+        view = self.get_instance(TagStreamView, request=self.get_request(self.user))
+        view.tag = self.tag_no_content
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+            }
+        )
+        view = self.get_instance(TagStreamView, request=self.get_request(AnonymousUser()))
+        view.tag = self.tag_no_content
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": None,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": False,
+            }
+        )
 
     def test_renders_without_content(self):
         response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
@@ -108,51 +205,3 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         assert site.rendered not in str(response.content)
         assert selff.rendered not in str(response.content)
         assert limited.rendered not in str(response.content)
-
-
-class TestFollowedStreamView(SocialhomeCBVTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.user = UserFactory()
-        cls.user2 = UserFactory()
-        cls.content = ContentFactory(visibility=Visibility.PUBLIC)
-        cls.other_content = ContentFactory(visibility=Visibility.PUBLIC)
-        cls.user.profile.following.add(cls.content.author)
-
-    @staticmethod
-    def get_request(user):
-        request = RequestFactory().get("/")
-        request.user = user
-        return request
-
-    def test_renders_without_content(self):
-        self.get(FollowedStreamView, request=self.get_request(self.user2))
-        self.assertContains(self.last_response, "Followed")
-        self.assertEquals(len(self.context["content_list"]), 0)
-        self.response_200()
-
-    def test_renders_with_content(self):
-        response = self.get(FollowedStreamView, request=self.get_request(self.user))
-        self.assertContains(response, "Followed")
-        self.assertIsNotNone(response.context["content_list"])
-        self.assertEquals(set(response.context["content_list"]), {self.content})
-        self.assertEquals(response.status_code, 200)
-
-    def test_stream_name(self):
-        view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
-        self.assertEqual(
-            view.stream_name, "%s__%s" % (StreamType.FOLLOWED.value, self.user.username)
-        )
-
-    def test_stream_type_value(self):
-        view = self.get_instance(FollowedStreamView)
-        self.assertEqual(view.stream_type_value, StreamType.FOLLOWED.value)
-
-    def test_uses_correct_template(self):
-        response = self.get(FollowedStreamView, request=self.get_request(self.user))
-        template_names = [template.name for template in response.templates]
-        assert "streams/followed.html" in template_names
-
-    def test_redirects_to_login_if_not_authenticated(self):
-        self.assertLoginRequired("streams:followed")

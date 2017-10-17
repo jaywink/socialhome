@@ -64,6 +64,11 @@ As a general rule, for Python code follow PEP8, except with a 120 character line
 
 There is an ``.eslintrc`` configuration provided as well. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
 
+Alphabetical ordering
+.....................
+
+When possible, try to always make all list items, dict keys, class methods, classes / functions in file, etc, everything alphabetically organized. This helps finding things when files grow and classes get a lot of methods. Sometimes this is not possible, for example when classes subclass another class in the same file. In this case for example, alphabetical ordering can be forgotten for logical placement.
+
 Python dependencies
 -------------------
 

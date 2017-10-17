@@ -3,6 +3,9 @@ from factory import fuzzy
 
 from federation.entities import base
 
+from socialhome.enums import Visibility
+from socialhome.users.models import Profile
+
 
 class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: "user-{0}".format(n))
@@ -11,6 +14,15 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.User"
+
+
+class PublicUserFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        user.profile.visibility = Visibility.PUBLIC
+        user.profile.save(update_fields=["visibility"])
+        return user
 
 
 class AdminUserFactory(UserFactory):
@@ -37,6 +49,10 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.Profile"
+
+
+class PublicProfileFactory(ProfileFactory):
+    visibility = Visibility.PUBLIC
 
 
 class BaseProfileFactory(factory.Factory):

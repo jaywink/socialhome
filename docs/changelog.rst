@@ -6,6 +6,11 @@ Changelog
 0.6.0-dev (unreleased)
 ----------------------
 
+Added
+.....
+
+* Profile "All content" streams now include the shares the profile has done. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 Changed
 .......
 
@@ -13,6 +18,10 @@ Changed
 
   * Removed separate logfile for the federation loggers. Now all logs go to one place. Setting ``SOCIALHOME_LOGFILE_FEDERATION`` has been removed.
   * Added possibility to direct Django and application logs using a defined level to syslog. Adds three settings, ``SOCIALHOME_LOG_TARGET`` to define whether to log to file or syslog, ``SOCIALHOME_SYSLOG_LEVEL`` to define the level of syslog logging and ``SOCIALHOME_SYSLOG_FACILITY`` to define the syslog logging facility. See `configuration <https://socialhome.readthedocs.io/en/latest/running.html#configuration>`_ documentation.
+
+* **Important!** The file to place configuration environment variables has changed to ``.env``.
+
+  This is a more standard file name for environment variables than the previous ``env.local``. For now we'll still load from the old file too, but a warning will be displayed to rename the file.
 
 Fixed
 .....
