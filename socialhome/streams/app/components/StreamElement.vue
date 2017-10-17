@@ -1,14 +1,14 @@
 <template>
     <div>
-        <div v-html="content.htmlSafe"></div>
+        <div v-html="content.rendered"></div>
         <author-bar v-if="showAuthorBar" :content-id="contentId" />
         <reactions-bar :content-id="contentId">
             <div class="mt-1">
-                <a :href="content.contentUrl" :title="content.timestamp" class="unstyled-link">
+                <a :href="content.url" :title="content.timestamp" class="unstyled-link">
                     {{ timestampText }}
                 </a>
                 &nbsp;
-                <template v-if="content.isUserAuthor">
+                <template v-if="content.user_is_author">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
                     </a>
@@ -34,14 +34,16 @@ export default Vue.component("stream-element", {
         contentId: {type: Number, required: true},
     },
     computed: {
-        content(){
+        content() {
             return this.$store.state.contents[this.contentId]
         },
         deleteUrl() {
             return Urls["content:delete"]({pk: this.contentId})
         },
         timestampText() {
-            return this.content.edited ? `${this.content.humanizedTimestamp} (edited)` : this.content.humanizedTimestamp
+            return this.content.edited
+                ? `${this.content.humanized_timestamp} (${gettext("edited")})`
+                : this.content.humanized_timestamp
         },
         showAuthorBar() {
             return this.$store.state.showAuthorBar

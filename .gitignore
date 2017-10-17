@@ -88,3 +88,4 @@ socialhome/static/mocha/
 # DOcs
 /docs/_build/
 /yarn.lock
+/staticfiles/

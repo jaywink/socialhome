@@ -28,43 +28,13 @@ class BaseStreamView(ListView):
         context["stream_name"] = self.stream_name
         context["throughs"] = self.throughs
         if self.vue:  # pragma: no cover
-            context["json_context"] = self._define_context_json(self.stream_name)
-        return context
-
-    def _define_context_json(self, stream_name):  # pragma: no cover
-        request_user_profile = getattr(self.request.user, "profile", None)
-
-        def dump_content(content):
-            is_user_author = (content.author == request_user_profile)
-            return {
-                "htmlSafe": content.rendered,
-                "author": {
-                    "guid": content.author.guid,
-                    "name": content.author.name if content.author.name else content.author.handle,
-                    "handle": content.author.handle,
-                    "imageUrlSmall": content.author.safer_image_url_small,
-                    "absoluteUrl": content.author.get_absolute_url(),
-                    "homeUrl": content.author.home_url,
-                    "isUserFollowingAuthor": (content.author.id in getattr(request_user_profile, "following_ids", []))
-                },
-                "id": content.id,
-                "timestamp": content.timestamp,
-                "humanizedTimestamp": content.humanized_timestamp,
-                "edited": bool(content.edited),
-                "repliesCount": content.reply_count,
-                "sharesCount": content.shares_count,
-                "isUserLocal": bool(content.author.user),
-                "contentUrl": content.get_absolute_url(),
-                "isUserAuthor": is_user_author,
-                "hasShared": Content.has_shared(content.id, request_user_profile.id) if request_user_profile else False,
+            context["json_context"] = {
+                "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+                "streamName": self.stream_name,
+                "isUserAuthenticated": bool(self.request.user.is_authenticated),
             }
 
-        return {
-            "contentList": [dump_content(content) for content in self.get_queryset()[:self.paginate_by]],
-            "currentBrowsingProfileId": getattr(request_user_profile, "id", None),
-            "streamName": stream_name,
-            "isUserAuthenticated": bool(self.request.user.is_authenticated),
-        }
+        return context
 
     def get_queryset(self):
         stream = self.stream_class(last_id=self.last_id, user=self.request.user)

@@ -33,3 +33,9 @@ global.WebSocket = function () {} // eslint-disable-line func-names
 // when components using websocket try to close socket
 global.WebSocket.prototype.close = function () {} // eslint-disable-line func-names
 global.Sinon = require("sinon").sandbox.create()
+
+// Trap calls to global library `Urls`
+const file = "socialhome/streams/app/tests/fixtures/Url"
+global.Urls = require(`../${file}`).Urls // eslint-disable-line global-require, import/no-dynamic-require
+
+global.gettext = key => key

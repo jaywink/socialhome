@@ -1,10 +1,8 @@
 import datetime
 from unittest.mock import patch
 
-import requests
 from django.db import DataError
 from freezegun import freeze_time
-from opengraph import OpenGraph
 from pyembed.core import PyEmbedError
 from pyembed.core.consumer import PyEmbedConsumerError
 from pyembed.core.discovery import PyEmbedDiscoveryError
@@ -45,23 +43,12 @@ class TestFetchOgPreview(SocialhomeTestCase):
         with freeze_time(datetime.date.today() - datetime.timedelta(days=8)):
             OpenGraphCacheFactory(url=self.urls[0])
         fetch_og_preview(self.content, self.urls)
-        og.assert_called_once_with(url=self.urls[0])
-
-    @patch("socialhome.content.previews.OpenGraph._parse")
-    def test_opengraph_data_cleared_before_fetching(self, og_parse):
-        OpenGraph.__data__ = {"foo": "bar"}
-        fetch_og_preview(self.content, self.urls)
-        self.assertEqual(OpenGraph.__data__, {})
+        og.assert_called_once_with(url=self.urls[0], parser="lxml")
 
     @patch("socialhome.content.previews.OpenGraph")
     def test_opengraph_fetch_called(self, og):
         fetch_og_preview(self.content, self.urls)
-        og.assert_called_once_with(url=self.urls[0])
-
-    @patch("socialhome.content.previews.OpenGraph", side_effect=requests.exceptions.ConnectionError)
-    def test_opengraph_connection_error_is_passed(self, og):
-        result = fetch_og_preview(self.content, self.urls)
-        self.assertFalse(result)
+        og.assert_called_once_with(url=self.urls[0], parser="lxml")
 
     @patch("socialhome.content.previews.OpenGraph")
     def test_opengraph_ignored_if_not_enough_attributes(self, og):

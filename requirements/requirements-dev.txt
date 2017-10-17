@@ -21,7 +21,7 @@ django-test-plus==1.0.18
 django==1.10.8
 docutils==0.14            # via sphinx
 factory-boy==2.9.2
-faker==0.8.4              # via factory-boy
+faker==0.8.4
 flake8==3.4.1
 freezegun==0.3.9
 future==0.16.0            # via commonmark
