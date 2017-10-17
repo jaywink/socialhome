@@ -9,7 +9,7 @@ from django.utils.functional import cached_property
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.streams.enums import StreamType
-from socialhome.users.models import User
+from socialhome.users.models import User, Profile
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -33,7 +33,7 @@ def add_to_redis(content, through, keys):
             r.hset(BaseStream.get_throughs_key(key), content.id, through.id)
 
 
-def add_to_stream_for_users(content_id, through_id, stream_cls_name):
+def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_profile_id):
     """Add content to all user streams of one type.
 
     Excludes author of content.
@@ -53,28 +53,40 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name):
     except Content.DoesNotExist:
         logger.warning("Stream.add_to_stream_for_users - through content %s does not exist!", through_id)
         return
+    try:
+        acting_profile = Profile.objects.select_related("user").get(id=acting_profile_id)
+    except Profile.DoesNotExist:
+        logger.warning("Stream.add_to_stream_for_users - acting profile %s does not exist!", acting_profile_id)
+        return
     qs = User.objects.filter(is_active=True)
-    if content.author.is_local:
-        qs = qs.exclude(id=content.author.user.id)
+    if acting_profile.is_local:
+        qs = qs.exclude(id=acting_profile.user.id)
     keys = []
     # Cache for each active user
     for user in qs.iterator():
-        keys = check_and_add_to_keys(stream_cls, user, content, keys)
+        keys = check_and_add_to_keys(stream_cls, user, content, keys, acting_profile)
     # Cache also as anonymous user
     if stream_cls in CACHED_ANONYMOUS_STREAM_CLASSES:
-        keys = check_and_add_to_keys(stream_cls, AnonymousUser(), content, keys)
+        keys = check_and_add_to_keys(stream_cls, AnonymousUser(), content, keys, acting_profile)
     add_to_redis(content, through, keys)
 
 
-def check_and_add_to_keys(stream_cls, user, content, keys):
+def check_and_add_to_keys(stream_cls, user, content, keys, acting_profile):
     """Check if content should be added to this user stream and add to the keys if so.
 
-    :returns: Existing keys with key added
+    :param stream_cls: Stream class to check against.
+    :param user: User who to check with. This is the user who we're caching for, ie future stream viewing user.
+    :param content: The Content object that we're checking for.
+    :param keys: List of existing stream keys to add to.
+    :param acting_profile: The Profile object that caused this check. This could be either the one for the Content
+        or a Profile doing a share.
+    :returns: List of stream keys
     """
     # noinspection PyCallingNonCallable
-    stream = stream_cls(user=user)
-    if stream.should_cache_content(content):
-        keys.append(stream.key)
+    streams = stream_cls.get_target_streams(content, user, acting_profile)
+    for stream in streams:
+        if stream.should_cache_content(content):
+            keys.append(stream.key)
     return keys
 
 
@@ -86,26 +98,27 @@ def update_streams_with_content(content):
     if content.content_type == ContentType.REPLY:
         # No need to do these just now
         return
-    # Store author here just in case we switch content to the shared content
-    author = content.author
+    # Store current acting profile
+    acting_profile = content.author
     # The original is the "through" always, has importance in shares
     through = content
     if content.content_type == ContentType.SHARE:
         # If this is a share we want to cache the shared content, not the original
         content = content.share_of
     # Do author immediately
-    if author.is_local:
+    if acting_profile.is_local:
         keys = []
         for stream_cls in CACHED_STREAM_CLASSES:
-            keys = check_and_add_to_keys(stream_cls, author.user, content, keys)
+            keys = check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile)
         add_to_redis(content, through, keys)
     # Queue rest to RQ
     for stream_cls in CACHED_STREAM_CLASSES:
-        django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__)
+        django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__, acting_profile.id)
 
 
 class BaseStream:
     last_id = None
+    key_base = ["sh", "streams"]
     ordering = "-created"
     paginate_by = 15
     redis = None
@@ -181,15 +194,32 @@ class BaseStream:
     def get_queryset(self):
         raise NotImplemented
 
+    @classmethod
+    def get_target_streams(cls, content, user, acting_profile):
+        """Get a list of target instances of this class.
+
+        Given a Content and User, this method defines the stream instances that this content should be
+        cached for. Some streams have multiple versions, for example a Content can have many tags which all have
+        their own stream instance of TagStream.
+        """
+        return [cls(user=user)]
+
     @staticmethod
     def get_throughs_key(key):
         return "%s:throughs" % key
 
     @cached_property
     def key(self):
+        parts = self.key_base + [self.stream_type.value]
+        if self.key_extra:
+            parts.append(self.key_extra)
         if isinstance(self.user, AnonymousUser):
-            return "sh:streams:%s:anonymous" % self.stream_type.value
-        return "sh:streams:%s:%s" % (self.stream_type.value, self.user.id)
+            return ":".join(parts + ["anonymous"])
+        return ":".join(parts + [str(self.user.id)])
+
+    @property
+    def key_extra(self):
+        return None
 
     def should_cache_content(self, content):
         return self.get_queryset().filter(id=content.id).exists()
@@ -200,6 +230,36 @@ class FollowedStream(BaseStream):
 
     def get_queryset(self):
         return Content.objects.followed(self.user)
+
+
+class ProfileStreamBase(BaseStream):
+    def __init__(self, profile, **kwargs):
+        super().__init__(**kwargs)
+        self.profile = profile
+
+    @classmethod
+    def get_target_streams(cls, content, user, acting_profile):
+        return [cls(user=user, profile=acting_profile)]
+
+    @property
+    def key_extra(self):
+        return str(self.profile.id)
+
+
+class ProfileAllStream(ProfileStreamBase):
+    stream_type = StreamType.PROFILE_ALL
+
+    def get_queryset(self):
+        return Content.objects.profile(self.profile, self.user)
+
+
+class ProfilePinnedStream(ProfileStreamBase):
+    ordering = "order"
+    paginate_by = 100  # The limit of pinned content visible
+    stream_type = StreamType.PROFILE_PINNED
+
+    def get_queryset(self):
+        return Content.objects.profile_pinned(self.profile, self.user)
 
 
 class PublicStream(BaseStream):
@@ -221,14 +281,20 @@ class TagStream(BaseStream):
             raise AttributeError("TagStream is missing tag.")
         return Content.objects.tag(self.tag, self.user)
 
+    @classmethod
+    def get_target_streams(cls, content, user, acting_profile):
+        return [cls(user=user, tag=tag) for tag in content.tags.all()]
+
+    @property
+    def key_extra(self):
+        return str(self.tag.id)
+
 
 CACHED_STREAM_CLASSES = (
     FollowedStream,
-    # TODO
-    # ProfileAllStream,
+    ProfileAllStream,
 )
 
 CACHED_ANONYMOUS_STREAM_CLASSES = (
-    # TODO
-    # ProfileAllStream,
+    ProfileAllStream,
 )

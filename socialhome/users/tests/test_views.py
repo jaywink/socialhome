@@ -5,13 +5,14 @@ from django.test import RequestFactory
 from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory
+from socialhome.content.tests.factories import ContentFactory, PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
 from socialhome.users.tables import FollowedTable
-from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
+from socialhome.users.tests.factories import (
+    UserFactory, AdminUserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory)
 from socialhome.users.views import (
     ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView, ProfileAllContentView)
 
@@ -63,14 +64,17 @@ class TestProfileDetailView(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.admin_user = AdminUserFactory()
-        cls.user = UserFactory()
+        cls.user = PublicUserFactory()
+        cls.profile = PublicProfileFactory()
 
-    def _get_request_view_and_content(self, create_content=True):
+    def _get_request_view_and_content(self, create_content=True, anonymous_user=False):
         request = self.client.get("/")
-        request.user = self.user
-        profile = request.user.profile
-        profile.visibility = Visibility.PUBLIC
-        profile.save()
+        if anonymous_user:
+            request.user = AnonymousUser()
+            profile = self.profile
+        else:
+            request.user = self.user
+            profile = self.user.profile
         contents = []
         if create_content:
             contents.extend([
@@ -88,22 +92,58 @@ class TestProfileDetailView(SocialhomeTestCase):
 
     def test_get_context_data_contains_content_objects(self):
         request, view, contents, profile = self._get_request_view_and_content()
-        view.content_list = view._get_contents_queryset()
+        view.content_list = view.get_queryset()
         context = view.get_context_data()
         assert context["content_list"].count() == 3
         context_objs = {content for content in context["content_list"]}
         objs = set(contents)
         assert context_objs == objs
 
-    def test_get_context_data_does_not_contain_content_for_other_users(self):
+    def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        user = UserFactory()
-        ContentFactory(author=user.profile, pinned=True)
-        user = UserFactory()
-        ContentFactory(author=user.profile, pinned=True)
-        view.content_list = view._get_contents_queryset()
-        context = view.get_context_data()
-        assert len(context["content_list"]) == 0
+        view.followers_count = 3
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+                "profile": {
+                    "id": profile.id,
+                    "guid": profile.guid,
+                    "followersCount": 3,
+                    "followingCount": str(profile.following.count()),
+                    "handle": profile.handle,
+                    "saferImageUrlLarge": profile.safer_image_url_large,
+                    "streamType": view.profile_stream_type,
+                    "pinnedContentExists": view.pinned_content_exists,
+                },
+            },
+        )
+        request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
+        view.followers_count = 3
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": None,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": False,
+                "profile": {
+                    "id": profile.id,
+                    "guid": profile.guid,
+                    "followersCount": 3,
+                    "followingCount": str(profile.following.count()),
+                    "handle": profile.handle,
+                    "saferImageUrlLarge": profile.safer_image_url_large,
+                    "streamType": view.profile_stream_type,
+                    "pinnedContentExists": view.pinned_content_exists,
+                },
+            },
+        )
+
+    def test_get_object__uses_a_profile_queryset(self):
+        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        self.assertTrue(isinstance(view.get_object(), Profile))
 
     def test_detail_view_renders(self):
         request, view, contents, profile = self._get_request_view_and_content()
@@ -124,54 +164,21 @@ class TestProfileDetailView(SocialhomeTestCase):
             response = self.client.get(admin_profile.get_absolute_url())
         assert str(response.content).find("Organize profile content") > -1
 
-    def test_contents_queryset_returns_public_only_for_unauthenticated(self):
+    def test_stream_name(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        request.user = AnonymousUser()
-        qs = view._get_contents_queryset()
-        assert qs.count() == 1
-        assert qs.first() == public
-
-    def test_contents_queryset_returns_public_or_site_only_for_authenticated(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        request.user = User.objects.get(username="admin")
-        qs = view._get_contents_queryset()
-        assert qs.count() == 2
-        assert set(qs) == {public, site}
-
-    def test_contents_queryset_returns_all_for_self(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        site = ContentFactory(author=profile, visibility=Visibility.SITE, pinned=True)
-        selff = ContentFactory(author=profile, visibility=Visibility.SELF, pinned=True)
-        limited = ContentFactory(author=profile, visibility=Visibility.LIMITED, pinned=True)
-        public = ContentFactory(author=profile, visibility=Visibility.PUBLIC, pinned=True)
-        qs = view._get_contents_queryset()
-        assert qs.count() == 4
-        assert set(qs) == {public, site, selff, limited}
-
-    def test_contents_queryset_returns_content_in_correct_order(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        qs = view._get_contents_queryset()
-        assert qs[0].id == contents[2].id
-        assert qs[1].id == contents[1].id
-        assert qs[2].id == contents[0].id
+        self.assertEqual(view.stream_type_value, StreamType.PROFILE_PINNED.value)
 
 
-@pytest.mark.usefixtures("admin_client", "rf")
-class TestOrganizeContentUserDetailView:
-    def _get_request_view_and_content(self, rf, create_content=True):
-        request = rf.get("/")
-        request.user = UserFactory()
-        profile = request.user.profile
-        profile.visibility = Visibility.PUBLIC
-        profile.save()
+class TestOrganizeContentUserDetailView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = PublicUserFactory()
+
+    def _get_request_view_and_content(self, create_content=True):
+        request = RequestFactory().get("/")
+        request.user = self.user
+        profile = self.user.profile
 
         contents = []
         if create_content:
@@ -189,25 +196,26 @@ class TestOrganizeContentUserDetailView:
         view.kwargs = {"guid": profile.guid}
         return request, view, contents, profile
 
-    def test_view_renders(self, admin_client, rf):
-        response = admin_client.get(reverse("users:profile-organize"))
-        assert response.status_code == 200
+    def test_view_renders(self):
+        with self.login(self.user):
+            self.get("users:profile-organize")
+        self.response_200()
 
-    def test_save_sort_order_updates_order(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
-        qs = view._get_contents_queryset()
+    def test_save_sort_order_updates_order(self):
+        request, view, contents, profile = self._get_request_view_and_content()
+        qs = view.get_queryset()
         assert qs[0].id == contents[2].id
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[0].id
         # Run id's via str() because request.POST gives them like that
         view._save_sort_order([str(contents[0].id), str(contents[1].id), str(contents[2].id)])
-        qs = view._get_contents_queryset()
+        qs = view.get_queryset()
         assert qs[0].id == contents[0].id
         assert qs[1].id == contents[1].id
         assert qs[2].id == contents[2].id
 
-    def test_save_sort_order_skips_non_qs_contents(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
+    def test_save_sort_order_skips_non_qs_contents(self):
+        request, view, contents, profile = self._get_request_view_and_content()
         other_user = UserFactory()
         other_content = ContentFactory(author=other_user.profile, pinned=True)
         Content.objects.filter(id=other_content.id).update(order=100)
@@ -215,8 +223,8 @@ class TestOrganizeContentUserDetailView:
         other_content.refresh_from_db()
         assert other_content.order == 100
 
-    def test_get_success_url(self, admin_client, rf):
-        request, view, contents, profile = self._get_request_view_and_content(rf)
+    def test_get_success_url(self):
+        request, view, contents, profile = self._get_request_view_and_content()
         assert view.get_success_url() == "/"
 
 
@@ -328,11 +336,75 @@ class TestProfileAllContentView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = UserFactory()
-        Profile.objects.filter(user__username=cls.user.username).update(visibility=Visibility.PUBLIC)
-        cls.user_content = ContentFactory(author=cls.user.profile, visibility=Visibility.PUBLIC)
-        cls.profile = ProfileFactory(visibility=Visibility.PUBLIC)
-        cls.profile_content = ContentFactory(author=cls.profile, visibility=Visibility.PUBLIC)
+        cls.user = PublicUserFactory()
+        cls.user_content = PublicContentFactory(author=cls.user.profile)
+        cls.profile = PublicProfileFactory()
+        cls.profile_content = PublicContentFactory(author=cls.profile)
+
+    def _get_request_view_and_content(self, create_content=True, anonymous_user=False):
+        request = self.client.get("/")
+        if anonymous_user:
+            request.user = AnonymousUser()
+            profile = self.profile
+        else:
+            request.user = self.user
+            profile = self.user.profile
+        contents = []
+        if create_content:
+            contents.extend([
+                ContentFactory(author=profile, order=3, pinned=True),
+                ContentFactory(author=profile, order=2, pinned=True),
+                ContentFactory(author=profile, order=1, pinned=True),
+            ])
+            Content.objects.filter(id=contents[0].id).update(order=3)
+            Content.objects.filter(id=contents[1].id).update(order=2)
+            Content.objects.filter(id=contents[2].id).update(order=1)
+        view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
+        view.object = profile
+        view.target_profile = profile
+        return request, view, contents, profile
+
+    def test_get_json_context(self):
+        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        view.followers_count = 3
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+                "profile": {
+                    "id": profile.id,
+                    "guid": profile.guid,
+                    "followersCount": 3,
+                    "followingCount": str(profile.following.count()),
+                    "handle": profile.handle,
+                    "saferImageUrlLarge": profile.safer_image_url_large,
+                    "streamType": view.profile_stream_type,
+                    "pinnedContentExists": view.pinned_content_exists,
+                },
+            },
+        )
+        request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
+        view.followers_count = 3
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": None,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": False,
+                "profile": {
+                    "id": profile.id,
+                    "guid": profile.guid,
+                    "followersCount": 3,
+                    "followingCount": str(profile.following.count()),
+                    "handle": profile.handle,
+                    "saferImageUrlLarge": profile.safer_image_url_large,
+                    "streamType": view.profile_stream_type,
+                    "pinnedContentExists": view.pinned_content_exists,
+                },
+            },
+        )
 
     def test_renders_for_user(self):
         response = self.get("users:profile-all-content", guid=self.user.profile.guid)
@@ -354,6 +426,10 @@ class TestProfileAllContentView(SocialhomeTestCase):
             response.context_data.get("stream_name"), "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id),
         )
         self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
+
+    def test_stream_name(self):
+        self.get("users:profile-all-content", guid=self.profile.guid)
+        self.assertContext("stream_name", "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
 
 
 class TestContactsFollowedView(SocialhomeTestCase):

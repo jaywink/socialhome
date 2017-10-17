@@ -1,18 +1,17 @@
 import random
-from unittest import skip
 from unittest.mock import patch, Mock, call
 
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Max
 
 from socialhome.content.enums import ContentType
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 from socialhome.content.tests.factories import (
     ContentFactory, PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
 from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
     BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_stream_for_users,
-    update_streams_with_content, check_and_add_to_keys)
+    update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
 
@@ -54,35 +53,35 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
 
     @patch("socialhome.streams.streams.add_to_redis")
     def test_calls_add_to_redis(self, mock_add):
-        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
         stream = FollowedStream(user=self.user)
         mock_add.assert_called_once_with(self.content, self.content, [stream.key])
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
-        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream")
-        mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [])
+        add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
+        mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [], self.content.author)
 
-    @skip("Add when anonymous user cached streams exist")
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
-        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream")
-        anon_call = mock_check.call_args_list[1]
-        self.assertTrue(isinstance(anon_call[1], AnonymousUser))
+        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
+        self.assertTrue(isinstance(mock_check.call_args_list[1][0][1], AnonymousUser))
 
     @patch("socialhome.streams.streams.Content.objects.filter")
     def test_returns_on_no_content_or_reply(self, mock_filter):
-        add_to_stream_for_users(Content.objects.aggregate(max_id=Max("id")).get("max_id") + 1, Mock(), PublicStream)
+        add_to_stream_for_users(
+            Content.objects.aggregate(max_id=Max("id")).get("max_id") + 1, Mock(), PublicStream, self.content.author.id,
+        )
         self.assertFalse(mock_filter.called)
-        add_to_stream_for_users(self.reply.id, self.reply.id, PublicStream)
+        add_to_stream_for_users(self.reply.id, self.reply.id, PublicStream, self.reply.author.id)
         self.assertFalse(mock_filter.called)
 
     @patch("socialhome.streams.streams.check_and_add_to_keys", return_value=True)
     def test_skips_if_not_cached_stream(self, mock_get):
-        add_to_stream_for_users(self.content.id, self.content.id, "SpamStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "SpamStream", self.content.author.id)
         self.assertFalse(mock_get.called)
-        add_to_stream_for_users(self.content.id, self.content.id, "PublicStream")
+        add_to_stream_for_users(self.content.id, self.content.id, "PublicStream", self.content.author.id)
         self.assertFalse(mock_get.called)
 
 
@@ -94,16 +93,28 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
         cls.profile.following.add(cls.remote_profile)
         cls.content = PublicContentFactory()
         cls.remote_content = PublicContentFactory(author=cls.remote_profile)
+        cls.tagged_content = PublicContentFactory(text="#spam #eggs")
+        cls.spam_tag = Tag.objects.get(name="spam")
+        cls.eggs_tag = Tag.objects.get(name="eggs")
 
     def test_adds_if_should_cache(self):
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, []),
+            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, [], self.remote_profile),
             ["sh:streams:followed:%s" % self.user.id],
+        )
+
+    def test_adds_to_multiple_stream_instances(self):
+        self.assertEqual(
+            set(check_and_add_to_keys(TagStream, self.user, self.tagged_content, [], self.tagged_content.author)),
+            {
+                "sh:streams:tag:%s:%s" % (self.spam_tag.id, self.user.id),
+                "sh:streams:tag:%s:%s" % (self.eggs_tag.id, self.user.id),
+            },
         )
 
     def test_does_not_add_if_shouldnt_cache(self):
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.content, []),
+            check_and_add_to_keys(FollowedStream, self.user, self.content, [], self.content.author),
             [],
         )
 
@@ -129,16 +140,20 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
     @patch("socialhome.streams.streams.django_rq.enqueue")
     def test_enqueues_each_stream_to_rq(self, mock_enqueue):
         update_streams_with_content(self.content)
-        mock_enqueue.assert_called_once_with(
-            add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream",
-        )
+        calls = [
+            call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream", self.content.author.id),
+            call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream", self.content.author.id),
+        ]
+        self.assertEqual(mock_enqueue.call_args_list, calls)
 
     @patch("socialhome.streams.streams.django_rq.enqueue")
     def test_enqueues_each_stream_to_rq__share(self, mock_enqueue):
         update_streams_with_content(self.share)
-        mock_enqueue.assert_called_once_with(
-            add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream",
-        )
+        calls = [
+            call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream", self.share.author.id),
+            call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream", self.share.author.id),
+        ]
+        self.assertEqual(mock_enqueue.call_args_list, calls)
 
     def test_returns_if_reply(self):
         self.assertIsNone(update_streams_with_content(Mock(content_type=ContentType.REPLY)))
@@ -319,6 +334,11 @@ class TestFollowedStream(SocialhomeTestCase):
             all_ids = set(cached_ids + [self.site_content.id])
             self.assertEqual(set(self.stream.get_content_ids()[0]), all_ids)
 
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(FollowedStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
+
     def test_get_throughs_key(self):
         self.assertEqual(
             self.stream.get_throughs_key(self.stream.key), "sh:streams:followed:%s:throughs" % self.user.id,
@@ -347,6 +367,67 @@ class TestFollowedStream(SocialhomeTestCase):
         self.assertFalse(self.stream.should_cache_content(self.other_public_content))
 
 
+class TestProfileAllStream(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.create_content_set()
+        cls.remote_profile_content = PublicContentFactory(author=cls.remote_profile)
+
+    def setUp(self):
+        super().setUp()
+        self.stream = ProfileAllStream(user=self.user, profile=self.remote_profile)
+
+    def test_get_content_ids__uses_cached_ids(self):
+        with patch.object(self.stream, "get_cached_content_ids", return_value=([], {})) as mock_cached:
+            self.stream.get_content_ids()
+            mock_cached.assert_called_once_with()
+
+    def test_get_queryset(self):
+        qs = self.stream.get_queryset()
+        self.assertEqual(set(qs), {self.remote_profile_content})
+
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(ProfileAllStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
+
+    def test_key(self):
+        self.assertEqual(self.stream.key, "sh:streams:profile_all:%s:%s" % (self.remote_profile.id, self.user.id))
+
+
+class TestProfilePinnedStream(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.create_content_set()
+        cls.pinned_content = PublicContentFactory(author=cls.profile, pinned=True)
+        cls.non_pinned_content = PublicContentFactory(author=cls.profile)
+
+    def setUp(self):
+        super().setUp()
+        self.stream = ProfilePinnedStream(user=self.user, profile=self.profile)
+
+    def test_get_content_ids__does_not_use_cached_ids(self):
+        with patch.object(self.stream, "get_cached_content_ids") as mock_cached:
+            self.stream.get_content_ids()
+            self.assertFalse(mock_cached.called)
+
+    def test_get_queryset(self):
+        qs = self.stream.get_queryset()
+        self.assertEqual(set(qs), {self.pinned_content})
+
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(ProfilePinnedStream.get_target_streams(self.pinned_content, self.user, self.pinned_content.author)), 1,
+        )
+
+    def test_key(self):
+        self.assertEqual(self.stream.key, "sh:streams:profile_pinned:%s:%s" % (self.profile.id, self.user.id))
+
+
 class TestPublicStream(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -362,6 +443,11 @@ class TestPublicStream(SocialhomeTestCase):
         with patch.object(self.stream, "get_cached_content_ids") as mock_cached:
             self.stream.get_content_ids()
             self.assertFalse(mock_cached.called)
+
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(PublicStream.get_target_streams(self.public_content, self.user, self.public_content.author)), 1,
+        )
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:public:%s" % self.user.id)
@@ -392,7 +478,7 @@ class TestTagStream(SocialhomeTestCase):
         cls.public_tagged = PublicContentFactory(text="#foobar", author=cls.profile)
         cls.site_tagged = SiteContentFactory(text="#foobar", author=cls.profile)
         cls.self_tagged = SelfContentFactory(text="#foobar", author=cls.profile)
-        cls.limited_tagged = LimitedContentFactory(text="#foobar", author=cls.profile)
+        cls.limited_tagged = LimitedContentFactory(text="#foobar #spam #eggs", author=cls.profile)
         cls.tag = cls.public_tagged.tags.first()
 
     def setUp(self):
@@ -406,10 +492,15 @@ class TestTagStream(SocialhomeTestCase):
             self.stream.get_content_ids()
             self.assertFalse(mock_cached.called)
 
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(TagStream.get_target_streams(self.limited_tagged, self.user, self.limited_tagged.author)), 3,
+        )
+
     def test_key(self):
-        self.assertEqual(self.stream.key, "sh:streams:tag:%s" % self.user.id)
-        stream = PublicStream(user=AnonymousUser())
-        self.assertEqual(stream.key, "sh:streams:public:anonymous")
+        self.assertEqual(self.stream.key, "sh:streams:tag:%s:%s" % (self.tag.id, self.user.id))
+        stream = TagStream(tag=self.tag, user=AnonymousUser())
+        self.assertEqual(stream.key, "sh:streams:tag:%s:anonymous" % self.tag.id)
 
     def test_only_tagged_content_returned(self):
         qs, _throughs = self.anon_stream.get_content()
