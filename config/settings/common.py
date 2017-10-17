@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from datetime import datetime
 
 import environ
+import os
+import warnings
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("socialhome")
@@ -18,7 +20,15 @@ APPS_DIR = ROOT_DIR.path("socialhome")
 # Local environment
 # -----------------
 env = environ.Env()
-env.read_env("env.local")
+
+if os.path.isfile(".env"):
+    env.read_env(".env")
+else:
+    if os.path.isfile("env.local"):
+        warnings.warn("!!! 'env.local' file has been replaced by '.env'. Please rename the file!")
+        env.read_env("env.local")
+    else:
+        warnings.warn("!!! No .env file found!")
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------

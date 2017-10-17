@@ -54,7 +54,7 @@ Backups
 Three places should be backed up from the Socialhome instance to ensure recovery in the event of a disaster.
 
 * The database
-* Local settings in ``env.local`` (assuming you are using this way to configure the application)
+* Local settings in ``.env`` (assuming you are using this way to configure the application)
 * The path ``socialhome/media/`` which contains for example image uploads
 
 Give your instance some visibility
@@ -70,7 +70,7 @@ Why not also contribute to the numbers of the federated social web? Turn on :ref
 Configuration
 -------------
 
-Configuration mainly happens through environment variables. Those are passed to Django via the file ``env.local`` in the repository root. The following items of note can be changed.
+Configuration mainly happens through environment variables. Those are passed to Django via the file ``.env`` in the repository root. The following items of note can be changed.
 
 After making changes to this file, don't forget to reload the app with ``sudo service socialhome restart``.
 
