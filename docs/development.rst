@@ -63,11 +63,11 @@ To watch files and build bundles automatically, use this.
 Configure
 .........
 
-Configuration is done via environment variables. For the meaning of them, look them up under files in ``config/settings``. Values in the file ``.env`` will be used automatically.
+Configuration is done via environment variables. For the meaning of them, look them up under files in ``config/settings``. Values in ``env.local`` will be used automatically.
 
 ::
 
-    cp .env.example .env
+    cp env.example env.local
 
 Edit any values necessary. By default the ``SECRET_KEY`` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
 
@@ -148,16 +148,6 @@ Execute the following to run the new frontend JavaScript tests.
 
     npm run test
 
-API routes
-----------
-
-There is a dependency in the API route URL configurations with the new Vue based frontend tests. If you change or add new API routes during development, you must also do the following:
-
-    python manage.py collectstatic_js_reverse
-    mv staticfiles/django_js_reverse/js/reverse.js socialhome/streams/app/tests/fixtures/Url.js
-
-This updates the JavaScript fixtures with the new URL configuration.
-
 Linters
 -------
 
@@ -200,6 +190,42 @@ Then execute the following and copy the markdown version for pasting to GitHub r
     pandoc --from rst --to markdown_github docs/changelog.rst | less
 
 After the release commit has been pushed and a release has been tagged, set a development version in the same above files. This is basically the next minor release postfixed by ``-dev``.
+
+Developing with Docker
+------------------------
+
+If you choose, you may develop Socialhome using Docker, rather than installing Postfix and Redis manually on your computer.
+
+
+Supported versions
+..................
+
+This guide assumes you are running Docker on a GNU/Linux based system such as Ubuntu, Debian or Fedora Linux. It may be possible to run this on other platforms where Docker is supported, but those are untested.
+
+The docker development installation was tested on Docker version 17.09 and docker-compose 1.16.1.
+
+Steps
+......
+
+The first step is to copy the ``docker/dev/docker-compose.yml`` file to the root of the project. eg
+
+``cp docker/dev/docker-compose.yml .``
+
+You also need to set an .env file as per the above instructions. Use the ``.env.example`` as a starting point.
+
+From there, you can build the images:
+
+``docker-compose build``
+
+And then the steps you would normally do, but throught he django image, ala:
+
+``docker-compose run django manage migrate``
+and
+``docker-compose run django manage createsuperuser``
+
+And then just
+
+``docker-compose up``
 
 Contact for help
 ----------------

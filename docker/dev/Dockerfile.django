@@ -1,0 +1,32 @@
+# We use the official Python images. This may need to get locked in, or back to Ubuntu at some point
+FROM python:3
+
+RUN apt-get update
+RUN apt-get install -y lib32z1-dev lib32z1 libpq-dev
+RUN pip install --no-cache-dir -U pip setuptools
+
+RUN mkdir /code
+
+WORKDIR /code
+COPY . .
+
+# Ensure pip and setuptools are up to date as well
+# We need a slightly older setuptools due to a bug in pip-tools
+RUN pip install -U pip setuptools==30.4 pip-tools
+
+# Development environment
+RUN pip-sync dev-requirements.txt
+
+## # We need Node for Javascript. Install it and then grab the latest version
+## RUN apt-get install -y npm
+## RUN npm cache clean -f
+## RUN npm install -g n
+## RUN n stable
+
+# This file needs to be outside the /code dir as it's mounted  durin development
+RUN cp docker/dev/docker-entrypoint.sh ./docker-entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["runserver"]
