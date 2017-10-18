@@ -56,6 +56,7 @@ Three places should be backed up from the Socialhome instance to ensure recovery
 * The database
 * Local settings in ``.env`` (assuming you are using this way to configure the application)
 * The path ``socialhome/media/`` which contains for example image uploads
+* The Redis database (`example instructions <https://www.digitalocean.com/community/tutorials/how-to-back-up-and-restore-your-redis-data-on-ubuntu-14-04>`_)
 
 Give your instance some visibility
 ----------------------------------
