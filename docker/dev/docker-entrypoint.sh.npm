@@ -20,12 +20,15 @@ help           : Show this message
 # Run
 case "$1" in
     npm)
+        echo "Running npm:" "${@:2}"
         npm "${@:2}"
     ;;
     watch)
+        echo "Running npm run watch"
         npm run watch
     ;;
     bash)
+        echo "Running bash" "${@:2}"
         /bin/bash "${@:2}"
     ;;
     *)

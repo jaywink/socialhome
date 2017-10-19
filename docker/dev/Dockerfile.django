@@ -1,12 +1,6 @@
-# We use the official Python images. This may need to get locked in, or back to Ubuntu at some point
 FROM python:3
 
-RUN apt-get update
-RUN apt-get install -y lib32z1-dev lib32z1 libpq-dev
-RUN pip install --no-cache-dir -U pip setuptools
-
 RUN mkdir /code
-
 WORKDIR /code
 COPY . .
 

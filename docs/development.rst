@@ -63,7 +63,7 @@ To watch files and build bundles automatically, use this.
 Configure
 .........
 
-Configuration is done via environment variables. For the meaning of them, look them up under files in ``config/settings``. Values in ``env.local`` will be used automatically.
+Configuration is done via environment variables. For the meaning of them, look them up under files in ``config/settings``. Values in the file ``.env`` will be used automatically.
 
 ::
 
