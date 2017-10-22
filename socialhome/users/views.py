@@ -57,8 +57,8 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
         return self.handle_no_permission()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         self.followers_count = Profile.objects.followers(self.object).count()
+        context = super().get_context_data(**kwargs)
         context["content_list"] = self.content_list
         context["followers_count"] = self.followers_count
         context["profile_stream_type"] = self.profile_stream_type

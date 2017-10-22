@@ -90,8 +90,10 @@ export default Vue.component("stream", {
             this.$store.dispatch(streamStoreOperations.getPublicStream)
         } else if (this.$store.state.streamName.match(/^tag/)) {
             this.$store.dispatch(streamStoreOperations.getTagStream, {params: {name: this.$store.state.tagName}})
-        } else if (this.$store.state.streamName.match(/^profile/)) {
-            this.$store.dispatch(streamStoreOperations.getProfileStream, {params: {id: this.currentBrowsingProfileId}})
+        } else if (this.$store.state.streamName.match(/^profile_all/)) {
+            this.$store.dispatch(streamStoreOperations.getProfileAll, {params: {id: this.currentBrowsingProfileId}})
+        } else if (this.$store.state.streamName.match(/^profile_pinned/)) {
+            this.$store.dispatch(streamStoreOperations.getProfilePinned, {params: {id: this.currentBrowsingProfileId}})
         }
     },
     beforeDestroy() {
