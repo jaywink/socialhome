@@ -1,6 +1,10 @@
 <template>
     <div>
-        <div v-html="content.rendered"></div>
+        <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
+            <div v-html="content.rendered" />
+        </nsfw-shield>
+        <div v-else v-html="content.rendered" />
+
         <author-bar v-if="showAuthorBar" :content-id="contentId" />
         <reactions-bar :content-id="contentId">
             <div class="mt-1">
@@ -26,6 +30,7 @@
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
+import "streams/app/components/NsfwShield.vue"
 import store from "streams/app/stores/applicationStore"
 
 
