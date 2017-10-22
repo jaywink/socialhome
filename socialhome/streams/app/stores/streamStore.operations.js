@@ -2,7 +2,8 @@ import Vue from "vue"
 
 const streamStoreOperations = {
     getFollowedStream: "getFollowedStream",
-    getProfileStream: "getProfileStream",
+    getProfileAll: "getProfileAll",
+    getProfilePinned: "getProfilePinned",
     getPublicStream: "getPublicStream",
     getTagStream: "getTagStream",
     newContentAck: "newContentAck",

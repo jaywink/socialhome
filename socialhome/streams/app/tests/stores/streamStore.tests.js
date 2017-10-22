@@ -269,9 +269,8 @@ describe("streamStore", () => {
             })
         })
 
-        // Do not execute these tests as the feature does not exists yet
-        context.skip("when requesting profile stream", () => {
-            it("should handle profile stream request", () => {
+        context("when requesting profile all stream", () => {
+            it("should handle profile stream request", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
                 let onSuccess = Sinon.spy()
@@ -284,28 +283,72 @@ describe("streamStore", () => {
                 }
                 let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
 
-                Moxios.stubRequest("", response)
+                Moxios.stubRequest("/api/streams/profile-all/26/", response)
 
-                target.dispatch(streamStoreOperations.getPublicStream)
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[0].should.eql(response)
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
                 })
             })
 
-            it("should handle profile stream request error", () => {
+            it("should handle profile stream request error", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
                 let onSuccess = Sinon.spy()
                 let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
 
-                Moxios.stubRequest("", {status: 500})
+                Moxios.stubRequest("/api/streams/profile-all/26/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getPublicStream)
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onError.calledOnce(0).should.be.true
+                    onError.calledOnce.should.be.true
                     target.state.error.contents.should.exist
+                    done()
+                })
+            })
+        })
+
+        context("when requesting profile pinned stream", () => {
+            it("should handle profile stream request", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar"},
+                        {id: "7", text: "blablabla"},
+                    ],
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/profile-pinned/26/", response)
+
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
+            it("should handle profile stream request error", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/profile-pinned/26/", {status: 500})
+
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
+
+                Moxios.wait(() => {
+                    onError.calledOnce.should.be.true
+                    target.state.error.contents.should.exist
+                    done()
                 })
             })
         })
@@ -317,7 +360,8 @@ describe("streamStore", () => {
             let target = exportsForTests.getStructure(getState(), {modules: {applicationStore: {}}})
 
             target.actions[streamStoreOperations.getFollowedStream].should.exist
-            target.actions[streamStoreOperations.getProfileStream].should.exist
+            target.actions[streamStoreOperations.getProfileAll].should.exist
+            target.actions[streamStoreOperations.getProfilePinned].should.exist
             target.actions[streamStoreOperations.getPublicStream].should.exist
             target.actions[streamStoreOperations.getTagStream].should.exist
             target.actions[streamStoreOperations.newContentAck].should.exist

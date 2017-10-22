@@ -51,8 +51,15 @@ function newRestAPI(options) {
             onError: options.onError,
         })
         .get({
-            action: streamStoreOperations.getProfileStream,
-            path: ({guid}) => Urls["api:streams-profile-all"]({guid}),
+            action: streamStoreOperations.getProfileAll,
+            path: ({id}) => Urls["api-streams:profile-all"]({id}),
+            property: "contents",
+            onSuccess: options.onSuccess,
+            onError: options.onError,
+        })
+        .get({
+            action: streamStoreOperations.getProfilePinned,
+            path: ({id}) => Urls["api-streams:profile-pinned"]({id}),
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,

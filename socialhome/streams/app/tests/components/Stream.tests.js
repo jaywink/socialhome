@@ -133,16 +133,30 @@ describe("Stream", () => {
                 })
             })
 
-            it("should fetch profile stream when stream name is 'profile'", (done) => {
+            it("should fetch profile stream when stream name is 'profile_all'", (done) => {
                 let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "profile"
+                store.state.streamName = "profile_all"
                 store.state.applicationStore.currentBrowsingProfileId = 26
                 Sinon.spy(store, "dispatch")
 
                 let target = mount(Stream, {store})
                 target.instance().$nextTick(() => {
                     store.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.getProfileStream, {params: {id: 26}, data: {}}])
+                        .should.eql([streamStoreOperations.getProfileAll, {params: {id: 26}, data: {}}])
+                    done()
+                })
+            })
+
+            it("should fetch profile stream when stream name is 'profile_pinned'", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "profile_pinned"
+                store.state.applicationStore.currentBrowsingProfileId = 26
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().$nextTick(() => {
+                    store.dispatch.getCall(0).args
+                        .should.eql([streamStoreOperations.getProfilePinned, {params: {id: 26}, data: {}}])
                     done()
                 })
             })
