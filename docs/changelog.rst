@@ -15,6 +15,8 @@ Added
   * ``/api/streams/profile-all/{id}/`` - fetches all content by the given profile (including shares), ordered by created date in reverse order (= new stuff first).
   * ``/api/streams/profile-pinned/{id}/`` - fetches pinned content by the given profile, ordered as set by the profile owner.
 
+* API ``Content`` serialization now includes an ``is_nsfw`` boolean. This is ``true`` if the content text has the tag ``#nsfw`` in it.
+
 Changed
 .......
 
@@ -27,9 +29,7 @@ Changed
 
   This is a more standard file name for environment variables than the previous ``env.local``. For now we'll still load from the old file too, but a warning will be displayed to rename the file.
 
-* **Breaking change**
-
-  Content API now returns Content list of tags as *name of tag*, not ID as before. The name does not contain the character "#".
+* **Breaking change**. API ``Content`` serialization now returns list of tags as *name of tag*, not ID as before. The names do not contain the character "#".
 
 Fixed
 .....
