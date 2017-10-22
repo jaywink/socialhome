@@ -17,6 +17,8 @@ Added
 
 * API ``Content`` serialization now includes an ``is_nsfw`` boolean. This is ``true`` if the content text has the tag ``#nsfw`` in it.
 
+* If an incoming share references a remote target that doesn't yet exist locally, it and the author profile will be fetched and imported over the network. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 Changed
 .......
 

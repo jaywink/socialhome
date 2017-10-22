@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from federation.entities import base
 from federation.tests.factories import entities
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
 from socialhome.enums import Visibility
@@ -12,12 +13,13 @@ from socialhome.federate.tasks import forward_relayable
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
-    process_entity_relationship,
-    make_federable_profile, process_entity_share)
+    process_entity_relationship, make_federable_profile, process_entity_share)
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory
+from socialhome.users.tests.factories import (
+    ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory, PublicProfileFactory,
+)
 
 
 class TestProcessEntities(SocialhomeTestCase):
@@ -326,6 +328,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
         cls.create_local_and_remote_user()
         cls.local_content = LocalContentFactory()
         cls.local_content2 = LocalContentFactory(guid=str(uuid4()))
+        cls.remote_profile2 = PublicProfileFactory()
 
     def test_share_is_created(self):
         entity = base.Share(
@@ -346,7 +349,8 @@ class TestProcessEntityShare(SocialhomeTestCase):
         share.refresh_from_db()
         self.assertEqual(share.text, "now we have text")
 
-    def test_share_is_not_created_if_no_target_found(self):
+    @patch("socialhome.federate.utils.tasks.retrieve_remote_content", autospec=True, return_value=None)
+    def test_share_is_not_created_if_no_target_found(self, mock_retrieve):
         entity = base.Share(
             guid=str(uuid4()), handle=self.remote_profile.handle, target_guid="notexistingguid",
             target_handle=self.local_content.author.handle, public=True,
@@ -374,6 +378,24 @@ class TestProcessEntityShare(SocialhomeTestCase):
         self.local_content2.refresh_from_db()
         self.assertIsNone(self.local_content2.share_of)
         self.assertEqual(self.local_content2.text, current_text)
+
+    @patch("socialhome.federate.utils.tasks.retrieve_remote_content", autospec=True)
+    def test_share_target_is_fetched_if_no_target_found(self, mock_retrieve):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid="notexistingguid",
+            target_handle=self.remote_profile2.handle, public=True,
+        )
+        mock_retrieve.return_value = entities.PostFactory(
+            guid=entity.target_guid, handle=self.remote_profile2.handle,
+        )
+        process_entity_share(entity, self.remote_profile)
+        mock_retrieve.assert_called_once_with(entity.target_id, sender_key_fetcher=sender_key_fetcher)
+        self.assertTrue(Content.objects.filter(guid=entity.target_guid, content_type=ContentType.CONTENT).exists())
+        self.assertTrue(
+            Content.objects.filter(
+                guid=entity.guid, share_of__guid=entity.target_guid, content_type=ContentType.SHARE
+            ).exists()
+        )
 
 
 class TestGetSenderProfile(SocialhomeTestCase):

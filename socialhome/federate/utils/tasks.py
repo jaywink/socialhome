@@ -2,7 +2,7 @@ import logging
 
 import django_rq
 from federation.entities import base
-from federation.fetchers import retrieve_remote_profile
+from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -233,10 +233,19 @@ def process_entity_share(entity, profile):
     try:
         target_content = Content.objects.get(guid=entity.target_guid, share_of__isnull=True)
     except Content.DoesNotExist:
-        # Try fetching
-        # TODO federation library fetch util, for now just return
-        logger.warning("No target found for share even after fetching from remote: %s", entity)
-        return
+        # Try fetching. If found, process and then try again
+        remote_target = retrieve_remote_content(entity.target_id, sender_key_fetcher=sender_key_fetcher)
+        if remote_target:
+            process_entities([remote_target])
+            try:
+                target_content = Content.objects.get(guid=entity.target_guid, share_of__isnull=True)
+            except Content.DoesNotExist:
+                logger.warning("Share target was fetched from remote, but it is still missing locally! Share: %s",
+                               entity)
+                return
+        else:
+            logger.warning("No target found for share even after fetching from remote: %s", entity)
+            return
     if not target_content.author.handle == entity.target_handle:
         logger.warning("Share target handle is different from the author of locally known shared content!")
         return
