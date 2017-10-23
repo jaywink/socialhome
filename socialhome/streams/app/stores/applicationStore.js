@@ -1,6 +1,5 @@
 import Vue from "vue"
 import Vuex from "vuex"
-import _isNumber from "lodash/isNumber"
 import _get from "lodash/get"
 
 
