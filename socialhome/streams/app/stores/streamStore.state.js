@@ -1,5 +1,4 @@
 import _get from "lodash/get"
-import _forEach from "lodash/forEach"
 
 
 export default function () {
@@ -11,6 +10,7 @@ export default function () {
         contents,
         contentIds,
         hasNewContent: false,
+        loadMore: true,
         newContentLengh: 0,
         showAuthorBar: streamName.length > 0 ? !streamName.startsWith("profile_") : false,
         streamName,

@@ -54,6 +54,194 @@ describe("Stream", () => {
     })
 
     describe("methods", () => {
+        describe("loadMore", () => {
+            it("should load more content if content list is not empty", () => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "followed"
+                store.state.contentIds = [1, 2, 3, 4, 5]
+                store.state.contents = {5: {through: 12}}
+                let target = mount(Stream, {store})
+                Sinon.spy(target.instance(), "loadStream")
+
+
+                target.instance().loadMore()
+                target.instance().loadStream.getCall(0).args.should.eql([12])
+            })
+
+            it("should not load more content if content list is empty", () => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "followed"
+                store.state.contentIds = []
+                let target = mount(Stream, {store})
+                Sinon.spy(target.instance(), "loadStream")
+
+
+                target.instance().loadMore()
+                target.instance().loadStream.called.should.be.false
+            })
+        })
+
+        describe("loadStream", () => {
+            context("when 'lastId' parameter is undefined", () => {
+                it("should fetch followed stream when stream name is 'followed'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "followed"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {}, data: {}}
+                        store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch public stream when stream name is 'public'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "public"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {}, data: {}}
+                        store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch tag stream when stream name is 'tag'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "tag"
+                    store.state.tagName = "#yolo"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {name: "#yolo"}, data: {}}
+                        store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getTagStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch profile stream when stream name is 'profile_all'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "profile_all"
+                    store.state.applicationStore.currentBrowsingProfileId = 26
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {id: 26}, data: {}}
+                        store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch profile stream when stream name is 'profile_pinned'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "profile_pinned"
+                    store.state.applicationStore.currentBrowsingProfileId = 26
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {id: 26}, data: {}}
+                        store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, expected])
+                        done()
+                    })
+                })
+            })
+
+            context("when 'lastId' parameter is set", () => {
+                it("should fetch followed stream when stream name is 'followed'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "followed"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().loadStream(1)
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {lastId: 1}, data: {}}
+                        store.dispatch.getCall(1).args.should.eql([streamStoreOperations.getFollowedStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch public stream when stream name is 'public'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "public"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().loadStream(1)
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {lastId: 1}, data: {}}
+                        store.dispatch.getCall(1).args.should.eql([streamStoreOperations.getPublicStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch tag stream when stream name is 'tag'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "tag"
+                    store.state.tagName = "#yolo"
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().loadStream(1)
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {name: "#yolo", lastId: 1}, data: {}}
+                        store.dispatch.getCall(1).args.should.eql([streamStoreOperations.getTagStream, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch profile stream when stream name is 'profile_all'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "profile_all"
+                    store.state.applicationStore.currentBrowsingProfileId = 26
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().loadStream(1)
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {id: 26, lastId: 1}, data: {}}
+                        store.dispatch.getCall(1).args.should.eql([streamStoreOperations.getProfileAll, expected])
+                        done()
+                    })
+                })
+
+                it("should fetch profile stream when stream name is 'profile_pinned'", (done) => {
+                    let store = newStreamStore({modules: {applicationStore}})
+                    store.state.streamName = "profile_pinned"
+                    store.state.applicationStore.currentBrowsingProfileId = 26
+                    Sinon.spy(store, "dispatch")
+
+                    let target = mount(Stream, {store})
+                    target.instance().loadStream(1)
+                    target.instance().$nextTick(() => {
+                        let expected = {params: {id: 26, lastId: 1}, data: {}}
+                        store.dispatch.getCall(1).args.should.eql([streamStoreOperations.getProfilePinned, expected])
+                        done()
+                    })
+                })
+            })
+
+            it("should not load more content if '$store.state.loadMore' is false", (done) => {
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.streamName = "followed"
+                store.state.loadMore = false
+                Sinon.spy(store, "dispatch")
+
+                let target = mount(Stream, {store})
+                target.instance().loadStream()
+                target.instance().$nextTick(() => {
+                    store.dispatch.called.should.be.false
+                    done()
+                })
+            })
+        })
+
         describe("onImageLoad", () => {
             it("should call Vue.redrawVueMasonry", () => {
                 let target = new Stream({})
@@ -91,74 +279,6 @@ describe("Stream", () => {
                 target.find(".grid-item").length.should.eq(0)
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.find(".grid-item").length.should.eq(0)
-            })
-        })
-
-        describe("mounted", () => {
-            it("should fetch followed stream when stream name is 'followed'", (done) => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "followed"
-                Sinon.spy(store, "dispatch")
-
-                let target = mount(Stream, {store})
-                target.instance().$nextTick(() => {
-                    store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream])
-                    done()
-                })
-            })
-
-            it("should fetch public stream when stream name is 'public'", (done) => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "public"
-                Sinon.spy(store, "dispatch")
-
-                let target = mount(Stream, {store})
-                target.instance().$nextTick(() => {
-                    store.dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream])
-                    done()
-                })
-            })
-
-            it("should fetch tag stream when stream name is 'tag'", (done) => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "tag"
-                store.state.tagName = "#yolo"
-                Sinon.spy(store, "dispatch")
-
-                let target = mount(Stream, {store})
-                target.instance().$nextTick(() => {
-                    store.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.getTagStream, {params: {name: "#yolo"}, data: {}}])
-                    done()
-                })
-            })
-
-            it("should fetch profile stream when stream name is 'profile_all'", (done) => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "profile_all"
-                store.state.applicationStore.currentBrowsingProfileId = 26
-                Sinon.spy(store, "dispatch")
-
-                let target = mount(Stream, {store})
-                target.instance().$nextTick(() => {
-                    store.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.getProfileAll, {params: {id: 26}, data: {}}])
-                    done()
-                })
-            })
-
-            it("should fetch profile stream when stream name is 'profile_pinned'", (done) => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.streamName = "profile_pinned"
-                store.state.applicationStore.currentBrowsingProfileId = 26
-                Sinon.spy(store, "dispatch")
-
-                let target = mount(Stream, {store})
-                target.instance().$nextTick(() => {
-                    store.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.getProfilePinned, {params: {id: 26}, data: {}}])
-                    done()
-                })
             })
         })
     })
