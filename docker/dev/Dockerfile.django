@@ -17,8 +17,10 @@ RUN pip-sync dev-requirements.txt
 ## RUN npm install -g n
 ## RUN n stable
 
+RUN cp .env.example .env
+
 # This file needs to be outside the /code dir as it's mounted  durin development
-RUN cp docker/dev/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN cp docker/dev/docker-entrypoint.sh.django ./docker-entrypoint.sh
 
 EXPOSE 8000
 
