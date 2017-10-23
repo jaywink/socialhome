@@ -1,5 +1,10 @@
 <template>
     <div>
+        <div
+            v-if="isFifthLast"
+            v-infinite-scroll="emitLoadMore"
+            infinite-scroll-disabled="infiniteScrollDisabled"
+        />
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <div v-html="content.rendered" />
         </nsfw-shield>
@@ -28,22 +33,30 @@
 
 <script>
 import Vue from "vue"
+import infiniteScroll from "vue-infinite-scroll"
+
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
 import "streams/app/components/NsfwShield.vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
     props: {
         contentId: {type: Number, required: true},
     },
+    directives: {infiniteScroll},
     computed: {
         content() {
             return this.$store.state.contents[this.contentId]
         },
         deleteUrl() {
             return Urls["content:delete"]({pk: this.contentId})
+        },
+        infiniteScrollDisabled(){
+            return this.$store.state.pending.contents || !this.$store.state.loadMore
+        },
+        isFifthLast() {
+            return this.$store.state.contentIds[this.$store.state.contentIds.length - 5] === this.contentId
         },
         timestampText() {
             return this.content.edited
@@ -55,6 +68,15 @@ export default Vue.component("stream-element", {
         },
         updateUrl() {
             return Urls["content:update"]({pk: this.contentId})
+        },
+    },
+    methods: {
+        emitLoadMore() {
+            // Weirdly, this safeguard is necessary to prevent the infinite scroll
+            // to load more content multiple times before the UI is refreshed
+            if(this.isFifthLast){
+                this.$emit("load-more")
+            }
         },
     },
     updated() {
