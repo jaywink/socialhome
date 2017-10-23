@@ -374,13 +374,6 @@ LOGGING = {
             "maxBytes": 10485760,  # 10mb
             "backupCount": 10,
         },
-        'syslog': {
-            'level': env("SOCIALHOME_SYSLOG_LEVEL", default="INFO"),
-            'class': 'logging.handlers.SysLogHandler',
-            'facility': env("SOCIALHOME_SYSLOG_FACILITY", default="local7"),
-            'formatter': 'verbose',
-            'address' : '/dev/log',
-        },
     },
     "loggers": {
         "django.request": {
@@ -405,6 +398,15 @@ LOGGING = {
         },
     }
 }
+
+if log_target == "syslog":
+    LOGGING["handlers"]["syslog"] = {
+        "level": env("SOCIALHOME_SYSLOG_LEVEL", default="INFO"),
+        "class": "logging.handlers.SysLogHandler",
+        "facility": env("SOCIALHOME_SYSLOG_FACILITY", default="local7"),
+        "formatter": "verbose",
+        "address" : "/dev/log",
+    }
 
 # REST FRAMEWORK
 # --------------
