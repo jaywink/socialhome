@@ -227,6 +227,11 @@ And then just
 
 ``docker-compose up``
 
+Defaults
+..........
+
+The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postfix will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
+
 Contact for help
 ----------------
 
