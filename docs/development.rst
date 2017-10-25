@@ -194,7 +194,7 @@ After the release commit has been pushed and a release has been tagged, set a de
 Developing with Docker
 ------------------------
 
-If you choose, you may develop Socialhome using Docker, rather than installing Postfix and Redis manually on your computer.
+If you choose, you may develop Socialhome using Docker, rather than installing Postgres and Redis manually on your computer.
 
 
 Supported versions
@@ -230,7 +230,7 @@ And then just
 Defaults
 ..........
 
-The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postfix will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
+The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postgres will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
 
 Contact for help
 ----------------
