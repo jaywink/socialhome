@@ -207,9 +207,9 @@ The docker development installation was tested on Docker version 17.09 and docke
 Steps
 ......
 
-The first step is to copy the ``docker/dev/docker-compose.yml`` file to the root of the project. eg
+The first step is to copy the example docker-compose file ``docker/dev/docker-compose.yml.example`` file to the root of the project. eg
 
-``cp docker/dev/docker-compose.yml .``
+``cp docker/dev/docker-compose.yml.example ./docker-compose.yml``
 
 You also need to set an .env file as per the above instructions. Use the ``.env.example`` as a starting point.
 
