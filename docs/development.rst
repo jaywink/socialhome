@@ -67,7 +67,7 @@ Configuration is done via environment variables. For the meaning of them, look t
 
 ::
 
-    cp env.example .env
+    cp .env.example .env
 
 Edit any values necessary. By default the ``SECRET_KEY`` is empty. You MUST set something to it. We don't supply a default to force you to make it unique in your production app.
 
