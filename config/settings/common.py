@@ -304,6 +304,13 @@ SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoa
 # Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts
 # User counts include 30 day and 6 month active users
 SOCIALHOME_STATISTICS = env.bool("SOCIALHOME_STATISTICS", default=False)
+# Allow to use additional third-party apps
+SOCIALHOME_ADDITIONAL_APPS = env("SOCIALHOME_ADDITIONAL_APPS", default=None)
+if SOCIALHOME_ADDITIONAL_APPS:
+    INSTALLED_APPS += tuple(SOCIALHOME_ADDITIONAL_APPS.split(','))
+SOCIALHOME_ADDITIONAL_APPS_URLS = env("SOCIALHOME_ADDITIONAL_APPS_URLS", default=None)
+# Allow to use on main page custom view from third-party app
+SOCIALHOME_HOME_VIEW = env("SOCIALHOME_HOME_VIEW", default=None)
 
 # CHANNELS
 # --------
