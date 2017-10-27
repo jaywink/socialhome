@@ -19,6 +19,14 @@ Added
 
 * If an incoming share references a remote target that doesn't yet exist locally, it and the author profile will be fetched and imported over the network. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
+* There are now Docker files for doing development work for Socialhome. See the docs `here <https://socialhome.readthedocs.io/en/latest/development.html#developing-with-docker>`_.
+
+* Third-party applications can now be added to enhance Socialhome or replace some of the core functionality, using configuration. The following new settings are available:
+
+  * ``SOCIALHOME_ADDITIONAL_APPS`` - List of additional applications to use in Django settings.
+  * ``SOCIALHOME_ADDITIONAL_APPS_URLS`` - Additional third-party URL's to add to core url configuration.
+  * ``SOCIALHOME_HOME_VIEW`` - Override the home view with another view defined with this setting.
+
 Changed
 .......
 
