@@ -87,6 +87,20 @@ class TestHomeViewLandingPagePreference(SocialhomeTestCase):
         self.assertEqual(self.context["view"].__class__, ProfileDetailView)
 
 
+class TestCustomHomeViewLandingPage(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        ContentFactory(pinned=True, author=cls.user.profile) 
+        
+    @override_settings(SOCIALHOME_HOME_VIEW="socialhome.streams.views.PublicStreamView")
+    def test_renders_custom_view(self):
+        with self.login(self.user):
+            self.get("home")
+        self.assertEqual(self.context["view"].__class__, PublicStreamView)        
+
+
 class TestMarkdownXImageUploadViewMethods(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):

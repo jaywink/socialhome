@@ -1,3 +1,5 @@
+from importlib import import_module
+
 from braces.views import LoginRequiredMixin
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -15,6 +17,11 @@ class HomeView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         """Redirect to user detail view if root page is a profile or if the user is logged in"""
+
+        if settings.SOCIALHOME_HOME_VIEW:
+            p, m = settings.SOCIALHOME_HOME_VIEW.rsplit('.', 1)
+            return getattr(import_module(p), m).as_view()(request)
+
         if request.user.is_authenticated:
             landing_page = request.user.preferences.get("generic__landing_page")
             if landing_page == "profile":

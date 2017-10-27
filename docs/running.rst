@@ -204,12 +204,34 @@ REDIS_PORT
 
 Default: ``6379``
 
+SOCIALHOME_ADDITIONAL_APPS
+.....................
+
+Default: ``None``
+
+Allows to plug in additional third-party apps, string with comma-separated values, for example ``django.contrib.gis,myapp``.
+
+SOCIALHOME_ADDITIONAL_APPS_URLS
+.....................
+
+Default: ``None``
+
+Allows to use additional third-party app url-conf, string with two comma-separated values, url prefix and path to urlpatterns, for example ``myapp/,myapp.urls``.
+If you need to include urls from more than one app, this could be done by creating intermediary app which aggregates urls.
+
 SOCIALHOME_DOMAIN
 .................
 
 Default: ``socialhome.local``
 
 Must be set to your Socialhome instance domain. Used for example to generate outbound links.
+
+SOCIALHOME_HOME_VIEW
+.....................
+
+Default: ``None``
+
+Allows to use on main page custom view from third-party app, string with path to view, for example ``myapp.views.AwesomeHomeView``.
 
 SOCIALHOME_HTTPS
 ................
