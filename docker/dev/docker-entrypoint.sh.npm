@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Socialhome Docker Development entrpypoint
+#
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# Define help message
+show_help() {
+    echo """
+Usage: docker run <imagename> COMMAND
+Commands
+npm            : Run an NPM command
+watch          : Run npm watch 
+bash           : Start a bash shell
+help           : Show this message
+"""
+}
+
+# Run
+case "$1" in
+    npm)
+        echo "Running npm:" "${@:2}"
+        npm "${@:2}"
+    ;;
+    watch)
+        echo "Running npm run watch"
+        npm run watch
+    ;;
+    bash)
+        echo "Running bash" "${@:2}"
+        /bin/bash "${@:2}"
+    ;;
+    *)
+        show_help
+    ;;
+esac

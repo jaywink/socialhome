@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Socialhome Docker Development entrypoint
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+PORT=8000
+CODE_DIR=/code
+
+cd $CODE_DIR
+
+# Define help message
+show_help() {
+    echo """
+Usage: docker run <imagename> COMMAND
+Commands
+runserver      : Run Django development server
+bash           : Start a bash shell
+manage         : Run a Django management command
+python         : Run a python command
+shell          : Start a Django Python shell
+help           : Show this message
+"""
+}
+
+# Run
+case "$1" in
+    runserver)
+        echo "Running Development Server..."
+        python manage.py runserver 0.0.0.0:${PORT}
+    ;;
+    bash)
+        /bin/bash "${@:2}"
+    ;;
+    manage)
+        pwd
+        echo "Running manage:" "${@:2}"
+        python manage.py "${@:2}"
+    ;;
+    python)
+        echo "Running python command..." "${@:2}"
+        python "${@:2}"
+    ;;
+    shell)
+        echo "Running shell_plus..."
+        python manage.py shell_plus
+    ;;
+    *)
+        show_help
+    ;;
+esac

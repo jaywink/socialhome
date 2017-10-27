@@ -148,8 +148,8 @@ Execute the following to run the new frontend JavaScript tests.
 
     npm run test
 
-API routes
-----------
+API Routes
+-----------
 
 There is a dependency in the API route URL configurations with the new Vue based frontend tests. If you change or add new API routes during development, you must also do the following:
 
@@ -202,6 +202,47 @@ Then execute the following and copy the markdown version for pasting to GitHub r
     pandoc --from rst --to markdown_github docs/changelog.rst | less
 
 After the release commit has been pushed and a release has been tagged, set a development version in the same above files. This is basically the next minor release postfixed by ``-dev``.
+
+Developing with Docker
+------------------------
+
+If you choose, you may develop Socialhome using Docker, rather than installing Postgres and Redis manually on your computer.
+
+
+Supported versions
+..................
+
+This guide assumes you are running Docker on a GNU/Linux based system such as Ubuntu, Debian or Fedora Linux. It may be possible to run this on other platforms where Docker is supported, but those are untested.
+
+The docker development installation was tested on Docker version 17.09 and docker-compose 1.16.1.
+
+Steps
+......
+
+The first step is to copy the example docker-compose file ``docker/dev/docker-compose.yml.example`` file to the root of the project. eg
+
+``cp docker/dev/docker-compose.yml.example ./docker-compose.yml``
+
+You also need to set an .env file as per the above instructions. Use the ``.env.example`` as a starting point.
+
+From there, you can build the images:
+
+``docker-compose build``
+
+And then the steps you would normally do, but throught he django image, ala:
+
+``docker-compose run django manage migrate``
+and
+``docker-compose run django manage createsuperuser``
+
+And then just
+
+``docker-compose up``
+
+Defaults
+..........
+
+The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postgres will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
 
 Contact for help
 ----------------
