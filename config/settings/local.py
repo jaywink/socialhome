@@ -100,3 +100,6 @@ if env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in
             "PATH": "/tmp/socialhome-haystack-test-index",
         },
     }
+
+# Extra tools for development
+MIDDLEWARE_CLASSES += ("querycount.middleware.QueryCountMiddleware",)

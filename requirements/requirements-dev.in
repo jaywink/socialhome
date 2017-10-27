@@ -2,6 +2,7 @@ codecov
 coverage
 django-debug-toolbar
 django-debug-toolbar-user-panel
+django-querycount
 django-test-plus
 django_coverage_plugin
 django==1.10.8
