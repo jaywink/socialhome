@@ -153,6 +153,28 @@ class TestProfile(SocialhomeTestCase):
         self.assertTrue(self.user.profile.is_local)
         self.assertFalse(self.profile.is_local)
 
+    def test_from_remote_profile_relative_image_url(self):
+        remote_profile = BaseProfileFactory(public=False)
+        remote_profile.handle = "foo@localhost"
+        remote_profile.image_urls["small"] = "/sm"
+        remote_profile.image_urls["medium"] = "/me"
+        remote_profile.image_urls["large"] = "/lg"
+        profile = Profile.from_remote_profile(remote_profile)
+        self.assertEqual(profile.image_url_small, "https://localhost/sm")
+        self.assertEqual(profile.image_url_medium, "https://localhost/me")
+        self.assertEqual(profile.image_url_large, "https://localhost/lg")
+
+    def test_from_remote_profile_absolute_image_url(self):
+        remote_profile = BaseProfileFactory(public=False)
+        remote_profile.handle = "foo@localhost"
+        remote_profile.image_urls["small"] = "https://example1.com/sm"
+        remote_profile.image_urls["medium"] = "https://example2.com/me"
+        remote_profile.image_urls["large"] = "https://example3.com/lg"
+        profile = Profile.from_remote_profile(remote_profile)
+        self.assertEqual(profile.image_url_small, "https://example1.com/sm")
+        self.assertEqual(profile.image_url_medium, "https://example2.com/me")
+        self.assertEqual(profile.image_url_large, "https://example3.com/lg")
+
     def test_from_remote_profile(self):
         remote_profile = BaseProfileFactory(public=False)
         profile = Profile.from_remote_profile(remote_profile)
