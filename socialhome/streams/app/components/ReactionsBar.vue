@@ -5,14 +5,22 @@
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
                     v-if="showShares"
-                    :class="{'item-reaction-shared': content.user_has_shared}"
+                    :class="{
+                        'item-reaction-shared': content.user_has_shared,
+                        'item-reaction-counter-positive': content.shares_count,
+                    }"
                     class="item-reaction"
                     @click.stop.prevent="expandShares"
                 >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares"></i>
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </b-button>
-                <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
+                <b-button
+                    v-if="showReplies"
+                    :class="{'item-reaction-counter-positive': content.reply_count}"
+                    class="item-reaction"
+                    @click.stop.prevent="expandComments"
+                >
                     <span class="item-open-replies-action">
                         <i class="fa fa-comments" title="Replies" aria-label="Replies"></i>
                         <span class="item-reaction-counter">{{ content.reply_count }}</span>
