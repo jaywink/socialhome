@@ -272,15 +272,26 @@ class Profile(TimeStampedModel):
         return ""
 
     @staticmethod
+    def absolute_image_url(profile, image_name):
+        """Returns absolute version of image URL of given size if they wasn't absolute"""
+        url = safe_text(profile.image_urls[image_name])
+
+        if url.startswith("/"):
+            return "https://%s%s" % (
+                profile.handle.split("@")[1], url,
+            )
+        return url
+
+    @staticmethod
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
         defaults = {
             "name": safe_text(remote_profile.name),
             "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
-            "image_url_large": safe_text(remote_profile.image_urls["large"]),
-            "image_url_medium": safe_text(remote_profile.image_urls["medium"]),
-            "image_url_small": safe_text(remote_profile.image_urls["small"]),
+            "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
+            "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
+            "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
         }
