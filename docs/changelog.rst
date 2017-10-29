@@ -46,6 +46,7 @@ Fixed
 
 * Fix various issues with OpenGraph tags parsing by switching to self-maintained fork of ``python-opengraph``.
 * Share button is no longer visible if not signed in (`#325 <https://github.com/jaywink/socialhome/issues/325>`_)
+* Remote profile image urls that are relative are now fixed to be absolute when importing the profile from remote (`#327 <https://github.com/jaywink/socialhome/issues/327>`_)
 
 0.5.0 (2017-10-01)
 ------------------
