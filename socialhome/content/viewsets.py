@@ -58,6 +58,11 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         No additional required values. Create or remove a share of this content.
 
         Successful create share returns content ID as `content_id`.
+
+    shares:
+        Get list of shares
+
+        Returns all the shares for this content ordered by their creation time.
     """
     queryset = Content.objects.none()
     serializer_class = ContentSerializer
@@ -84,14 +89,18 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             raise exceptions.APIException("Unknown error when creating share.")
         return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
 
-    def get_queryset(self, parent=None):
-        if self.request.user.is_staff:
-            qs = Content.objects.all()
-        else:
-            qs = Content.objects.visible_for_user(self.request.user)
+    def get_queryset(self, parent=None, share_of=None):
         if parent:
-            qs = qs.filter(parent=parent)
-        return qs
+            return Content.objects.children(parent.id, self.request.user)
+        elif share_of:
+            return Content.objects.shares(share_of.id, self.request.user)
+        if self.request.user.is_staff:
+            return Content.objects.all()
+        else:
+            return Content.objects.visible_for_user(self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user.profile)
 
     @detail_route(methods=["get"])
     def replies(self, request, *args, **kwargs):
@@ -107,5 +116,9 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         elif request.method == "DELETE":
             return self._unshare()
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user.profile)
+    @detail_route(methods=["get"])
+    def shares(self, request, *args, **kwargs):
+        content = self.get_object()
+        queryset = self.filter_queryset(self.get_queryset(share_of=content)).order_by("created")
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

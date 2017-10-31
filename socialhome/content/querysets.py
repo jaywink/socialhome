@@ -80,6 +80,10 @@ class ContentQuerySet(models.QuerySet):
     def public(self):
         return self.top_level().filter(visibility=Visibility.PUBLIC)
 
+    def shares(self, share_of_id, user):
+        qs = self.visible_for_user(user).filter(share_of_id=share_of_id)
+        return qs.order_by("created")
+
     def tag(self, tag, user):
         return self.top_level().visible_for_user(user).filter(tags=tag)
 

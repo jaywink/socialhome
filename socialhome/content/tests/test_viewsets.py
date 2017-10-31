@@ -14,6 +14,8 @@ class TestContentViewSet(SocialhomeAPITestCase):
         cls.create_content_set()
         cls.other_profile = ProfileFactory()
         cls.reply = PublicContentFactory(parent=cls.public_content)
+        cls.share = PublicContentFactory(share_of=cls.public_content)
+        cls.share_reply = PublicContentFactory(parent=cls.share)
 
     def setUp(self):
         super().setUp()
@@ -197,8 +199,9 @@ class TestContentViewSet(SocialhomeAPITestCase):
 
     def test_replies_results(self):
         self.get("api:content-replies", pk=self.public_content.id)
-        self.assertEquals(len(self.last_response.data), 1)
+        self.assertEquals(len(self.last_response.data), 2)
         self.assertEquals(self.last_response.data[0].get("id"), self.reply.id)
+        self.assertEquals(self.last_response.data[1].get("id"), self.share_reply.id)
 
     def test_share(self):
         self.post("api:content-share", pk=self.public_content.id)
