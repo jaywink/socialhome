@@ -47,6 +47,9 @@ Fixed
 * Fix various issues with OpenGraph tags parsing by switching to self-maintained fork of ``python-opengraph``.
 * Share button is no longer visible if not signed in (`#325 <https://github.com/jaywink/socialhome/issues/325>`_)
 * Remote profile image urls that are relative are now fixed to be absolute when importing the profile from remote (`#327 <https://github.com/jaywink/socialhome/issues/327>`_)
+* Fix poor performance of fetching replies.
+
+  When adding replies of shares to the collection of replies fetched when clicking the reply icon in the UI, a serious performance regression was also added. Database queries have now been optimized to fetch replies faster again.
 
 0.5.0 (2017-10-01)
 ------------------
