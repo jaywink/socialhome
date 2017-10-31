@@ -31,7 +31,6 @@ import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
 import "streams/app/components/NsfwShield.vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
@@ -51,6 +50,9 @@ export default Vue.component("stream-element", {
                 : this.content.humanized_timestamp
         },
         showAuthorBar() {
+            if (this.content.content_type === "reply") {
+                return true
+            }
             return this.$store.state.showAuthorBar
         },
         updateUrl() {
@@ -58,7 +60,9 @@ export default Vue.component("stream-element", {
         },
     },
     updated() {
-        Vue.redrawVueMasonry()
+        if (this.content.content_type === "content") {
+            Vue.redrawVueMasonry()
+        }
     },
 })
 </script>

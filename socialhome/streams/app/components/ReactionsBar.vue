@@ -34,17 +34,16 @@
             </b-button>
             <b-button v-else variant="secondary" @click.prevent.stop="share">{{ translations.share }}</b-button>
         </div>
-        <div class="replies-container"></div>
         <div v-if="showRepliesBox">
-            <div v-if="$store.state.applicationStore.isUserAuthenticated" class="content-actions">
-                <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
-            </div>
+            <replies-container :content-id="content.id" />
         </div>
     </div>
 </template>
 
 <script>
 import Vue from "vue"
+
+import "streams/app/components/RepliesContainer.vue"
 
 
 export default Vue.component("reactions-bar", {
@@ -67,15 +66,11 @@ export default Vue.component("reactions-bar", {
         showShares() {
             return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
         },
-        replyUrl() {
-            return Urls["content:reply"]({pk: this.contentId})
-        },
         canShare() {
             return !this.content.user_is_author
         },
         translations() {
             return {
-                reply: gettext("Reply"),
                 share: gettext("Share"),
                 unshare: gettext("Unshare"),
             }
@@ -124,7 +119,9 @@ export default Vue.component("reactions-bar", {
         },
     },
     updated() {
-        Vue.redrawVueMasonry()
+        if (this.content.content_type === "content") {
+            Vue.redrawVueMasonry()
+        }
     },
 })
 </script>

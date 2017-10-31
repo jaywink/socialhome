@@ -13,7 +13,23 @@ Vue.use(Vuex)
 function onSuccess(state, payload) {
     payload.data.forEach(item => {
         Vue.set(state.contents, item.id, item)
-        state.contentIds.push(item.id)
+        Vue.set(state.replyIds, item.id, [])
+        Vue.set(state.shareIds, item.id, [])
+        if (item.content_type === "content") {
+            state.contentIds.push(item.id)
+        } else if (item.content_type === "reply") {
+            if (state.replyIds[item.parent] === undefined) {
+                Vue.state(state.replyIds, item.parent, [item.id])
+            } else if (!state.replyIds[item.parent].includes(item.id)) {
+                state.replyIds[item.parent].push(item.id)
+            }
+        } else if (item.content_type === "share") {
+            if (state.shareIds[item.share_of] === undefined) {
+                Vue.set(state.shareIds, item.share_of, [item.id])
+            } else if (!state.shareIds[item.share_of].includes(item.id)) {
+                state.shareIds[item.share_of].push(item.id)
+            }
+        }
     })
 }
 
@@ -60,6 +76,20 @@ function newRestAPI(options) {
         .get({
             action: streamStoreOperations.getProfilePinned,
             path: ({id}) => Urls["api-streams:profile-pinned"]({id}),
+            property: "contents",
+            onSuccess: options.onSuccess,
+            onError: options.onError,
+        })
+        .get({
+            action: streamStoreOperations.getReplies,
+            path: ({ id }) => Urls["api:content-replies"]({ pk: id }),
+            property: "contents",
+            onSuccess: options.onSuccess,
+            onError: options.onError,
+        })
+        .get({
+            action: streamStoreOperations.getShares,
+            path: ({ id }) => Urls["api:content-shares"]({ pk: id }),
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,

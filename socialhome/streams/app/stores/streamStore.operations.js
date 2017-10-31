@@ -5,6 +5,8 @@ const streamStoreOperations = {
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",
     getPublicStream: "getPublicStream",
+    getReplies: "getReplies",
+    getShares: "getShares",
     getTagStream: "getTagStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
@@ -44,6 +46,24 @@ const getters = {
             }
         })
         return contents
+    },
+    replies: state => contentId => {
+        const replies = []
+        state.replyIds[contentId].forEach(id => {
+            if (state.contents[id] !== undefined) {
+                replies.push(state.contents[id])
+            }
+        })
+        return replies
+    },
+    shares: state => contentId => {
+        const shares = []
+        state.shareIds[contentId].forEach(id => {
+            if (state.contents[id] !== undefined) {
+                shares.push(state.contents[id])
+            }
+        })
+        return shares
     },
 }
 
