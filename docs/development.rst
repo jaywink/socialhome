@@ -120,6 +120,15 @@ Search index
 Running tests
 -------------
 
+The user needs right to create databases:
+
+::
+
+    # On some distributions, regular users are not sudoers; you may need to type:
+    #    su -
+    su - postgres
+    psql -c "ALTER USER socialhome CREATEDB;"
+
 Python tests
 ............
 
