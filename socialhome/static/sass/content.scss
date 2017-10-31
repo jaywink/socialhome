@@ -41,9 +41,7 @@ a.opengraph-card {
 }
 
 .replies-container {
-  padding: 0 15px;
-
-  font-size: 0.95em;
+  padding-left: 10px;
 
   img {
     max-width: 100%;
@@ -53,4 +51,5 @@ a.opengraph-card {
 .reply {
   border-top: solid 1px $darkopacity;
   margin-top: 7px;
+  padding-top: 6px;
 }
