@@ -48,4 +48,4 @@ whoosh
 # - GIF upload
 -e git+https://github.com/jaywink/django-markdownx.git@0f7b8c01906edd5ad590bb31f04685f859d6fab1#egg=django-markdownx==2.0.21.1
 
--e git+https://github.com/jaywink/federation.git@a65b04096914ac8a329dbc0e1b992872e67485fd#egg=federation==0.14.1.1
+-e git+https://github.com/jaywink/federation.git@d0a816d7ff4ded46472e42a3f369e009d4f93978#egg=federation==0.14.1.1

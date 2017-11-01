@@ -51,6 +51,11 @@ Fixed
 
   When adding replies of shares to the collection of replies fetched when clicking the reply icon in the UI, a serious performance regression was also added. Database queries have now been optimized to fetch replies faster again.
 * When editing a reply, the user is now redirected back to the parent content detail view instead of going to the reply detail view. (`#315 <https://github.com/jaywink/socialhome/issues/315>`_)
+* Fix regression on visibility of remote replies on shares.
+
+  Replies inherit the parent object visibility and share visibility defaults to non-public in the federation library. Diaspora protocol removed the ``public`` property from shares in a recent release, which meant that we started getting all shares as non-public from the federation layer. This meant that all comments on the shares were processed as non-public too.
+
+  With a change in the federation layer, Diaspora protocol shares are now public by default.
 
 0.5.0 (2017-10-01)
 ------------------
