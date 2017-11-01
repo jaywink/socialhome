@@ -50,6 +50,7 @@ Fixed
 * Fix poor performance of fetching replies.
 
   When adding replies of shares to the collection of replies fetched when clicking the reply icon in the UI, a serious performance regression was also added. Database queries have now been optimized to fetch replies faster again.
+* When editing a reply, the user is now redirected back to the parent content detail view instead of going to the reply detail view. (`#315 <https://github.com/jaywink/socialhome/issues/315>`_)
 
 0.5.0 (2017-10-01)
 ------------------
