@@ -93,17 +93,19 @@ describe("streamStore", () => {
         it("should append payload to state", () => {
             let payload = {
                 data: [
-                    {id: "6", text: "foobar"},
-                    {id: "7", text: "blablabla"},
+                    {id: "6", text: "foobar", content_type: "content"},
+                    {id: "7", text: "blablabla", content_type: "content"},
                 ],
             }
 
             let state = {
                 contentIds: ["1", "2"],
                 contents: {
-                    "1": {id: "1", text: "Plop"},
-                    "2": {id: "2", text: "Hello!"},
+                    "1": {id: "1", text: "Plop", content_type: "content"},
+                    "2": {id: "2", text: "Hello!", content_type: "content"},
                 },
+                replyIds: {"1": [], "2": []},
+                shareIds: {"1": [], "2": []},
             }
 
             exportsForTests.onSuccess(state, payload)
@@ -111,11 +113,13 @@ describe("streamStore", () => {
             state.should.eql({
                 contentIds: ["1", "2", "6", "7"],
                 contents: {
-                    "1": {id: "1", text: "Plop"},
-                    "2": {id: "2", text: "Hello!"},
-                    "6": {id: "6", text: "foobar"},
-                    "7": {id: "7", text: "blablabla"},
+                    "1": {id: "1", text: "Plop", content_type: "content"},
+                    "2": {id: "2", text: "Hello!", content_type: "content"},
+                    "6": {id: "6", text: "foobar", content_type: "content"},
+                    "7": {id: "7", text: "blablabla", content_type: "content"},
                 },
+                replyIds: {"1": [], "2": [], "6": [], "7": []},
+                shareIds: {"1": [], "2": [], "6": [], "7": []},
             })
         })
     })
