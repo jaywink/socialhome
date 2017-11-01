@@ -138,6 +138,15 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
     model = Content
     template_name = "content/detail.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        """If share or reply, redirect."""
+        self.object = self.get_object()
+        if self.object.content_type == ContentType.SHARE:
+            return HttpResponseRedirect(self.object.share_of.get_absolute_url())
+        elif self.object.content_type == ContentType.REPLY:
+            return HttpResponseRedirect(self.object.parent.get_absolute_url())
+        return super().dispatch(request, *args, **kwargs)
+
     def get_object(self, queryset=None):
         guid = self.kwargs.get("guid")
         if guid:
