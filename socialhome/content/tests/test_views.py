@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.test.client import Client, RequestFactory
 
+from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
@@ -141,6 +142,17 @@ class TestContentUpdateView:
         )
         form.full_clean()
         assert form.cleaned_data["text"] == "&lt;script&gt;console.log&lt;/script&gt;"
+
+    def test_get_success_url_content_is_not_reply(self, rf):
+        _, view, _ = self._get_request_view_and_content(rf)
+        view.object.content_type = ContentType.CONTENT
+        assert view.get_success_url() == view.object.get_absolute_url()
+
+    def test_get_success_url_content_is_reply(self, rf):
+        _, view, content = self._get_request_view_and_content(rf)
+        view.object.content_type = ContentType.REPLY
+        view.object.parent = ContentFactory(author=content.author)
+        assert view.get_success_url() == view.object.parent.get_absolute_url()
 
 
 @pytest.mark.usefixtures("admin_client", "rf")

@@ -111,7 +111,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
         return kwargs
 
     def get_success_url(self):
-        return self.object.get_absolute_url()
+        return self.object.parent.get_absolute_url() if self.is_reply else self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
