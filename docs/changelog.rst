@@ -15,7 +15,9 @@ Added
   * ``/api/streams/profile-all/{id}/`` - fetches all content by the given profile (including shares), ordered by created date in reverse order (= new stuff first).
   * ``/api/streams/profile-pinned/{id}/`` - fetches pinned content by the given profile, ordered as set by the profile owner.
 
-* API ``Content`` serialization now includes an ``is_nsfw`` boolean. This is ``true`` if the content text has the tag ``#nsfw`` in it.
+* New fields added to Content API:
+  * ``is_nsfw``, boolean value, ``true`` if the content text has the tag ``#nsfw`` in it.
+  * ``share_of``, if the ``content_type`` is ``share``, this will contain the ID of the shared Content.
 
 * If an incoming share references a remote target that doesn't yet exist locally, it and the author profile will be fetched and imported over the network. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
@@ -26,6 +28,10 @@ Added
   * ``SOCIALHOME_ADDITIONAL_APPS`` - List of additional applications to use in Django settings.
   * ``SOCIALHOME_ADDITIONAL_APPS_URLS`` - Additional third-party URL's to add to core url configuration.
   * ``SOCIALHOME_HOME_VIEW`` - Override the home view with another view defined with this setting.
+
+* Content API now has a new ``shares`` endpoint. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
+  This allows retrieving all the shares done on a Content.
 
 Changed
 .......
@@ -40,6 +46,8 @@ Changed
   This is a more standard file name for environment variables than the previous ``env.local``. For now we'll still load from the old file too, but a warning will be displayed to rename the file.
 
 * **Breaking change**. API ``Content`` serialization now returns list of tags as *name of tag*, not ID as before. The names do not contain the character "#".
+
+* Content API ``replies`` endpoint now includes all the replies on the shares of the Content too.
 
 * Use modified timestamp for created timestamp when federating out to remote nodes. (`#314 <https://github.com/jaywink/socialhome/issues/314>`_)
 
