@@ -260,10 +260,10 @@ class Content(models.Model):
         return self.text.lower().find("#nsfw") > -1
 
     @property
-    def effective_created(self):
-        if self.remote_created:
+    def effective_modified(self):
+            if self.remote_created:
             return self.remote_created
-        return self.created
+        return self.modified
 
     @property
     def edited(self):

@@ -470,7 +470,7 @@ class TestMakeFederableContent(SocialhomeTestCase):
         self.assertEqual(entity.handle, self.content.author.handle)
         self.assertEqual(entity.public, True)
         self.assertEqual(entity.provider_display_name, "Socialhome")
-        self.assertEqual(entity.created_at, self.content.effective_created)
+        self.assertEqual(entity.created_at, self.content.effective_modified)
 
         self.content.visibility = Visibility.LIMITED
         entity = make_federable_content(self.content)
@@ -491,7 +491,7 @@ class TestMakeFederableContent(SocialhomeTestCase):
         self.assertEqual(entity.guid, self.reply.guid)
         self.assertEqual(entity.target_guid, self.reply.parent.guid)
         self.assertEqual(entity.handle, self.reply.author.handle)
-        self.assertEqual(entity.created_at, self.reply.effective_created)
+        self.assertEqual(entity.created_at, self.reply.effective_modified)
 
     def test_share_returns_entity(self):
         entity = make_federable_content(self.share)
@@ -503,7 +503,7 @@ class TestMakeFederableContent(SocialhomeTestCase):
         self.assertEqual(entity.target_handle, self.share.share_of.author.handle)
         self.assertEqual(entity.public, True)
         self.assertEqual(entity.provider_display_name, "Socialhome")
-        self.assertEqual(entity.created_at, self.share.effective_created)
+        self.assertEqual(entity.created_at, self.share.effective_modified)
 
         self.content.visibility = Visibility.LIMITED
         entity = make_federable_content(self.content)

@@ -276,7 +276,7 @@ def _make_post(content):
             handle=content.author.handle,
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
-            created_at=content.effective_created,
+            created_at=content.effective_modified,
         )
     except Exception as ex:
         logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
