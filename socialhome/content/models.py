@@ -261,7 +261,7 @@ class Content(models.Model):
 
     @property
     def effective_modified(self):
-            if self.remote_created:
+        if self.remote_created:
             return self.remote_created
         return self.modified
 
