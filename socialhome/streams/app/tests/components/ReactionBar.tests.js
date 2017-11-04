@@ -26,6 +26,9 @@ describe("ReactionsBar", () => {
         store = newStreamStore({modules: {applicationStore}})
         store.state.contentIds.push(fakePost.id)
         Vue.set(store.state.contents, fakePost.id, fakePost)
+        Vue.set(store.state.replyIds, fakePost.id, [])
+        Vue.set(store.state.shareIds, fakePost.id, [])
+        return store
     })
 
     describe("computed", () => {
@@ -96,7 +99,7 @@ describe("ReactionsBar", () => {
         })
 
         describe("share", () => {
-            it("should show the reshare bow", () => {
+            it("should show the reshare box", () => {
                 let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].isUserAuthor = false

@@ -256,3 +256,11 @@ class TestContentViewSet(SocialhomeAPITestCase):
             self.response_400()
             self.delete("api:content-share", pk=self.self_content.id)
             self.response_400()
+
+    def test_shares_access(self):
+        self._detail_access_tests("api:content-shares")
+
+    def test_shares_results(self):
+        self.get("api:content-shares", pk=self.public_content.id)
+        self.assertEquals(len(self.last_response.data), 1)
+        self.assertEquals(self.last_response.data[0].get("id"), self.share.id)
