@@ -4,6 +4,7 @@ import Vapi from "vuex-rest-api"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
+import _pullAll from "lodash/pullAll"
 
 import getState from "streams/app/stores/streamStore.state"
 import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
@@ -20,6 +21,14 @@ function onSuccess(state, payload) {
             state.contentIds.push(item.id)
         })
     }
+}
+
+function onFetchNewContentSuccess(state, payload) {
+    // It's important content is added before it's id is appended to `contentIds`
+    // to prevent it to be rendered when it's not defined yet
+    Vue.set(state.contents, payload.data.id, payload.data)
+    state.contentIds.unshift(payload.data.id)
+    _pullAll(state.unfetchedContentIds, payload.data.id)
 }
 
 function onError(state, error) {
@@ -71,11 +80,18 @@ function newRestAPI(options) {
             onSuccess: options.onSuccess,
             onError: options.onError,
         })
+        .get({
+            action: streamStoreOperations.getNewContent,
+            path: ({pk}) => Urls["api:content-detail"]({pk}),
+            property: "contents",
+            onSuccess: options.onFetchNewContentSuccess,
+            onError: options.onError,
+        })
         .getStore()
 }
 
 function getStructure(state, options) {
-    const result = newRestAPI({state, onError, onSuccess})
+    const result = newRestAPI({state, onError, onSuccess, onFetchNewContentSuccess})
 
     result.mutations = _defaults({}, mutations, result.mutations)
     result.actions = _defaults({}, actions, result.actions)
@@ -102,7 +118,7 @@ function newStreamStore(options = {}) {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(streamStoreOperations.receivedNewContent, 1)
+            store.dispatch(streamStoreOperations.receivedNewContent, data.id)
         }
     }
 

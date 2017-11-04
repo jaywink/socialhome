@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="container-flex">
-            <div v-show="$store.state.hasNewContent" class="new-content-container">
+            <div v-show="$store.getters.hasNewContent" class="new-content-container">
                 <b-button @click.prenvent.stop="onNewContentClick" variant="link" class="new-content-load-link">
                     <b-badge pill variant="primary">
-                        {{ $store.state.newContentLengh }} new posts available
+                        {{ translations.newPostsAvailables }}
                     </b-badge>
                 </b-button>
             </div>
@@ -16,10 +16,10 @@
                 <div class="gutter-sizer"></div>
                 <stream-element
                     v-masonry-tile
-                    v-for="content in $store.getters.contentList"
+                    v-for="id in $store.state.contentIds"
                     @load-more="loadMore"
-                    :content-id="content.id"
-                    :key="content.id"
+                    :content-id="id"
+                    :key="id"
                     class="grid-item"
                 />
             </div>
@@ -74,6 +74,16 @@ export default Vue.component("stream", {
         },
         currentBrowsingProfileId() {
             return this.$store.state.applicationStore.currentBrowsingProfileId
+        },
+        translations() {
+            return {
+                newPostsAvailables: interpolate(
+                    ngettext("%s new post available", "%s new posts available", this.unfetchedContentIds.length),
+                    [this.unfetchedContentIds.length]),
+            }
+        },
+        unfetchedContentIds() {
+            return this.$store.state.unfetchedContentIds
         },
     },
     methods: {

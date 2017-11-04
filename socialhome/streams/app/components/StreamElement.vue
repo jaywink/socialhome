@@ -69,7 +69,6 @@ export default Vue.component("stream-element", {
     methods: {
         emitLoadMore() {
             let isFifthLast = (this.$store.state.contentIds.slice(-5)[0] === this.contentId)
-            console.log(this.$store.state.contentIds.slice(-5)[0])
             if (isFifthLast) {
                 this.$emit("load-more")
             }

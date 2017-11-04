@@ -503,7 +503,7 @@ describe("streamStore", () => {
             target.mutations[streamStoreOperations.newContentAck].should.exist
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
 
-            target.getters.contentList.should.exist
+            target.getters.hasNewContent.should.exist
 
             target.modules.applicationStore.should.exist
         })
@@ -511,36 +511,16 @@ describe("streamStore", () => {
 
     describe("mutations", () => {
         describe("receivedNewContent", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.hasNewContent.should.be.true
-            })
-
-            it("should increment state.stream.newContentLengh by 1", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.newContentLengh.should.equal(1)
-            })
-
-            it("should add the new post id to the content list with undefined value", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
+            it("should add the new post id to the unfetched content list with undefined value", () => {
+                let state = {contents: {}, contentIds: [], unfetchedContentIds: []}
                 mutations[streamStoreOperations.receivedNewContent](state, 42)
                 state.contentIds.should.eql([42])
                 state.contents.should.eql({42: undefined})
             })
         })
-        describe("newContentAck", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: true, newContentLengh: 0}
-                mutations[streamStoreOperations.newContentAck](state)
-                state.hasNewContent.should.be.false
-            })
 
-            it("should set state.stream.newContentLengh to 0", () => {
-                let state = {hasNewContent: true, newContentLengh: 10}
-                mutations[streamStoreOperations.newContentAck](state)
-                state.newContentLengh.should.equal(0)
+        describe("newContentAck", () => {
+            it("should dispatch `streamStoreOperations.getNewContent` for every unfetched id", () => {
             })
         })
     })
@@ -563,18 +543,8 @@ describe("streamStore", () => {
     })
 
     describe("getters", () => {
-        describe("contentList", () => {
-            it("should only return existing posts", () => {
-                let state = {
-                    contentIds: ["1", "2", "3", "4", "5"],
-                    contents: {
-                        "1": {id: "1"},
-                        "3": {id: "3"},
-                        "5": {id: "5"},
-                    },
-                }
-                getters.contentList(state).should.eql([{id: "1"}, {id: "3"}, {id: "5"}])
-            })
+        describe("hasNewContent", () => {
+
         })
     })
 })
