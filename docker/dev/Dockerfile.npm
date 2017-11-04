@@ -12,4 +12,4 @@ RUN node_modules/.bin/grunt dev
 RUN cp docker/dev/docker-entrypoint.sh.npm ./docker-entrypoint.sh
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["npm", "watch"]
+CMD ["watch"]
