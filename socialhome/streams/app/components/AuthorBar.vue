@@ -53,7 +53,7 @@ import Vue from "vue"
 
 export default Vue.component("author-bar", {
     props: {
-        contentId: {type: Number, required: true},
+        content: {type: Object, required: true},
     },
     data() {
         return {
@@ -62,11 +62,11 @@ export default Vue.component("author-bar", {
     },
     computed: {
         author() {
-            return this.$store.state.contents[this.contentId].author
+            return this.content.author
         },
         canFollow() {
             return this.$store.state.applicationStore.isUserAuthenticated
-                && !this.$store.state.contents[this.contentId].user_is_author
+                && !this.content.user_is_author
         },
         currentBrowsingProfileId() {
             return this.$store.state.applicationStore.currentBrowsingProfileId
@@ -76,14 +76,14 @@ export default Vue.component("author-bar", {
         },
         isUserFollowingAuthor: {
             get: function () {
-                return this.$store.state.contents[this.contentId].user_following_author
+                return this.content.user_following_author
             },
             set: function (value) {
-                this.$store.state.contents[this.contentId].user_following_author = value
+                this.content.user_following_author = value
             },
         },
         isUserRemote() {
-            return !this.$store.state.contents[this.contentId].author.is_local
+            return !this.content.author.is_local
         },
         showFollowBtn() {
             return this.canFollow && !this.isUserFollowingAuthor

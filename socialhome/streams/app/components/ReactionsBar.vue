@@ -35,7 +35,7 @@
             <b-button v-else variant="secondary" @click.prevent.stop="share">{{ translations.share }}</b-button>
         </div>
         <div v-if="showRepliesBox">
-            <replies-container :content-id="content.id" />
+            <replies-container :content="content" />
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@ import "streams/app/components/RepliesContainer.vue"
 
 export default Vue.component("reactions-bar", {
     props: {
-        contentId: {type: Number, required: true},
+        content: {type: Object, required: true},
     },
     data() {
         return {
@@ -57,9 +57,6 @@ export default Vue.component("reactions-bar", {
         }
     },
     computed: {
-        content() {
-            return this.$store.state.contents[this.contentId]
-        },
         showReplies() {
             return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
         },
@@ -92,7 +89,7 @@ export default Vue.component("reactions-bar", {
                 console.error("Not logged in")
                 return
             }
-            this.$http.post(`/api/content/${this.contentId}/share/`)
+            this.$http.post(`/api/content/${this.content.id}/share/`)
                 .then(() => {
                     this.showSharesBox = false
                     this.content.shares_count += 1
@@ -109,7 +106,7 @@ export default Vue.component("reactions-bar", {
                 console.error("Not logged in")
                 return
             }
-            this.$http.delete(`/api/content/${this.contentId}/share/`)
+            this.$http.delete(`/api/content/${this.content.id}/share/`)
                 .then(() => {
                     this.showSharesBox = false
                     this.content.shares_count -= 1

@@ -1,5 +1,6 @@
 import Vue from "vue"
 
+
 const streamStoreOperations = {
     getFollowedStream: "getFollowedStream",
     getProfileAll: "getProfileAll",
@@ -47,21 +48,23 @@ const getters = {
         })
         return contents
     },
-    replies: state => contentId => {
+    replies: state => content => {
         const replies = []
-        state.replyIds[contentId].forEach(id => {
-            if (state.contents[id] !== undefined) {
-                replies.push(state.contents[id])
-            }
-        })
+        if (content.content_type === "content") {
+            state.contents[content.id].replyIds.forEach(id => {
+                replies.push(state.replies[id])
+            })
+        } else if (content.content_type === "share") {
+            state.shares[content.id].replyIds.forEach(id => {
+                replies.push(state.replies[id])
+            })
+        }
         return replies
     },
     shares: state => contentId => {
         const shares = []
-        state.shareIds[contentId].forEach(id => {
-            if (state.contents[id] !== undefined) {
-                shares.push(state.contents[id])
-            }
+        state.contents[contentId].shareIds.forEach(id => {
+            shares.push(state.shares[id])
         })
         return shares
     },

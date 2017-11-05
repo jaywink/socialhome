@@ -4,24 +4,16 @@
             <stream-element
                 class="reply"
                 v-for="reply in replies"
-                :content-id="reply.id"
+                :content="reply"
                 :key="reply.id"
             />
         </div>
         <div v-if="isUserAuthenticated" class="content-actions">
             <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
         </div>
-        <div v-for="share in shares" :key="share.id">
-            <div class="replies-container">
-                <stream-element
-                    class="reply"
-                    v-for="reply in $store.getters.replies(share.id)"
-                    :content-id="reply.id"
-                    :key="reply.id"
-                />
-            </div>
-            <div v-if="isUserAuthenticated" class="content-actions">
-                <b-button :href="shareReplyUrl(share.id)" variant="secondary">{{ translations.shareReply }}</b-button>
+        <div v-if="isContent">
+            <div v-for="share in shares" :key="share.id">
+                <replies-container :content="share" />
             </div>
         </div>
     </div>
@@ -36,36 +28,38 @@ import {streamStoreOperations} from "streams/app/stores/streamStore.operations";
 
 export default Vue.component("replies-container", {
     props: {
-        contentId: {type: Number, required: true},
+        content: {type: Object, required: true},
     },
     computed: {
+        isContent() {
+            return this.content.content_type === "content"
+        },
         isUserAuthenticated() {
             return this.$store.state.applicationStore.isUserAuthenticated
         },
         replies() {
-            return this.$store.getters.replies(this.contentId)
+            return this.$store.getters.replies(this.content)
         },
         replyUrl() {
-            return Urls["content:reply"]({pk: this.contentId})
+            return Urls["content:reply"]({pk: this.content.id})
         },
         shares() {
-            return this.$store.getters.shares(this.contentId)
+            return this.$store.getters.shares(this.content.id)
         },
         translations() {
             return {
-                reply: gettext("Reply"),
-                shareReply: gettext("Reply to share"),
+                reply: this.isContent ? gettext("Reply") : gettext("Reply to share"),
             }
         },
     },
-    methods: {
-        shareReplyUrl: function(id) {
-            return Urls["content:reply"]({pk: id})
-        },
-    },
     mounted() {
-        this.$store.dispatch(streamStoreOperations.getReplies, {params: {id: this.contentId}})
-        this.$store.dispatch(streamStoreOperations.getShares, {params: {id: this.contentId}})
+        if (this.isContent) {
+            this.$store.dispatch(streamStoreOperations.getReplies, { params: { id: this.content.id } })
+            this.$store.dispatch(streamStoreOperations.getShares, { params: { id: this.content.id } })
+        }
+    },
+    updated() {
+        Vue.redrawVueMasonry()
     },
 })
 </script>

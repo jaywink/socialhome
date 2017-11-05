@@ -89,7 +89,7 @@ describe("streamStore", () => {
         })
     })
 
-    describe("onSuccess", () => {
+    describe("fetchContentsSuccess", () => {
         it("should append payload to state", () => {
             let payload = {
                 data: [
@@ -101,25 +101,97 @@ describe("streamStore", () => {
             let state = {
                 contentIds: ["1", "2"],
                 contents: {
-                    "1": {id: "1", text: "Plop", content_type: "content"},
-                    "2": {id: "2", text: "Hello!", content_type: "content"},
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
                 },
-                replyIds: {"1": [], "2": []},
-                shareIds: {"1": [], "2": []},
+                replies: {},
+                shares: {},
             }
 
-            exportsForTests.onSuccess(state, payload)
+            exportsForTests.fetchContentsSuccess(state, payload)
 
             state.should.eql({
                 contentIds: ["1", "2", "6", "7"],
                 contents: {
-                    "1": {id: "1", text: "Plop", content_type: "content"},
-                    "2": {id: "2", text: "Hello!", content_type: "content"},
-                    "6": {id: "6", text: "foobar", content_type: "content"},
-                    "7": {id: "7", text: "blablabla", content_type: "content"},
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    "6": {id: "6", text: "foobar", content_type: "content", replyIds: [], shareIds: []},
+                    "7": {id: "7", text: "blablabla", content_type: "content", replyIds: [], shareIds: []},
                 },
-                replyIds: {"1": [], "2": [], "6": [], "7": []},
-                shareIds: {"1": [], "2": [], "6": [], "7": []},
+                replies: {},
+                shares: {},
+            })
+        })
+    })
+
+    describe("fetchRepliesSuccess", () => {
+        it("should append payload to state", () => {
+            let payload = {
+                data: [
+                    {id: "6", text: "foobar", content_type: "reply", parent: "1"},
+                    {id: "7", text: "blablabla", content_type: "reply", parent: "3"},
+                ],
+            }
+
+            let state = {
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"]},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                },
+                replies: {},
+                shares: {
+                    "3": {id: "3", content_type: "share", share_of: "1", replyIds: []},
+                },
+            }
+
+            exportsForTests.fetchRepliesSuccess(state, payload)
+
+            state.should.eql({
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"]},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                },
+                replies: {
+                    "6": {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
+                    "7": {id: "7", text: "blablabla", content_type: "reply", parent: "3", replyIds: [], shareIds: []},
+                },
+                shares: {
+                    "3": {id: "3", content_type: "share", share_of: "1", replyIds: ["7"]},
+                },
+            })
+        })
+    })
+
+    describe("fetchSharesSuccess", () => {
+        it("should append payload to state", () => {
+            let payload = {
+                data: [
+                    {id: "6", content_type: "share", share_of: "1"},
+                    {id: "7", content_type: "share", share_of: "2"},
+                ],
+            }
+
+            let state = {
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                },
+                replies: {},
+                shares: {},
+            }
+
+            exportsForTests.fetchSharesSuccess(state, payload)
+
+            state.should.eql({
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["6"]},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: ["7"]},
+                },
+                replies: {},
+                shares: {
+                    "6": {id: "6", content_type: "share", share_of: "1", replyIds: []},
+                    "7": {id: "7", content_type: "share", share_of: "2", replyIds: []},
+                },
             })
         })
     })
@@ -133,12 +205,25 @@ describe("streamStore", () => {
     })
 
     describe("newRestAPI", () => {
+        let response
+        let state
+        let target
+
         beforeEach(() => {
             Vue.prototype.$http = Axios.create({
                 xsrfCookieName: "csrftoken",
                 xsrfHeaderName: "X-CSRFToken",
             })
             Moxios.install(Vue.prototype.$http)
+            state = getState()
+            response = {
+                status: 200,
+                response: [
+                    {id: "6", text: "foobar"},
+                    {id: "7", text: "blablabla"},
+                ],
+            }
+            target = new Vuex.Store(exportsForTests.newRestAPI({state}))
         })
 
         afterEach(() => {
@@ -147,41 +232,27 @@ describe("streamStore", () => {
 
         context("when requesting public stream", () => {
             it("should handle public stream request", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let response = {
-                    status: 200,
-                    response: [
-                        {id: "6", text: "foobar"},
-                        {id: "7", text: "blablabla"},
-                    ],
-                }
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/public/", response)
 
                 target.dispatch(streamStoreOperations.getPublicStream)
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
                     done()
                 })
             })
 
             it("should handle public stream request error", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/public/", {status: 500})
 
                 target.dispatch(streamStoreOperations.getPublicStream)
 
                 Moxios.wait(() => {
-                    onError.called.should.be.true
                     target.state.error.contents.should.exist
+                    target.state.contents.should.eql({})
                     done()
                 })
             })
@@ -189,43 +260,27 @@ describe("streamStore", () => {
 
         context("when requesting followed stream", () => {
             it("should handle followed stream request", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let response = {
-                    status: 200,
-                    response: {
-                        data: [
-                            {id: "6", text: "foobar"},
-                            {id: "7", text: "blablabla"},
-                        ],
-                    },
-                }
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/followed/", response)
 
                 target.dispatch(streamStoreOperations.getFollowedStream)
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
                     done()
                 })
             })
 
             it("should handle followed stream request error", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/followed/", {status: 500})
 
                 target.dispatch(streamStoreOperations.getFollowedStream)
 
                 Moxios.wait(() => {
-                    onError.calledOnce.should.be.true
                     target.state.error.contents.should.exist
+                    target.state.contents.should.eql({})
                     done()
                 })
             })
@@ -233,41 +288,27 @@ describe("streamStore", () => {
 
         context("when requesting tag stream", () => {
             it("should handle tag stream request", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let response = {
-                    status: 200,
-                    response: [
-                        {id: "6", text: "foobar"},
-                        {id: "7", text: "blablabla"},
-                    ],
-                }
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/tag/#yolo/", response)
 
                 target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo"}})
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
                     done()
                 })
             })
 
             it("should handle tag stream request error", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/tag/#yolo/", {status: 500})
 
                 target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo"}})
 
                 Moxios.wait(() => {
-                    onError.calledOnce.should.be.true
                     target.state.error.contents.should.exist
+                    target.state.contents.should.eql({})
                     done()
                 })
             })
@@ -275,41 +316,27 @@ describe("streamStore", () => {
 
         context("when requesting profile all stream", () => {
             it("should handle profile stream request", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let response = {
-                    status: 200,
-                    response: [
-                        {id: "6", text: "foobar"},
-                        {id: "7", text: "blablabla"},
-                    ],
-                }
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/profile-all/26/", response)
 
                 target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
                     done()
                 })
             })
 
             it("should handle profile stream request error", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/profile-all/26/", {status: 500})
 
                 target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onError.calledOnce.should.be.true
                     target.state.error.contents.should.exist
+                    target.state.contents.should.eql({})
                     done()
                 })
             })
@@ -317,46 +344,109 @@ describe("streamStore", () => {
 
         context("when requesting profile pinned stream", () => {
             it("should handle profile stream request", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let response = {
-                    status: 200,
-                    response: [
-                        {id: "6", text: "foobar"},
-                        {id: "7", text: "blablabla"},
-                    ],
-                }
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/profile-pinned/26/", response)
 
                 target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
                     done()
                 })
             })
 
             it("should handle profile stream request error", (done) => {
-                let state = getState()
-                let onError = Sinon.spy()
-                let onSuccess = Sinon.spy()
-                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
-
                 Moxios.stubRequest("/api/streams/profile-pinned/26/", {status: 500})
 
                 target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
 
                 Moxios.wait(() => {
-                    onError.calledOnce.should.be.true
                     target.state.error.contents.should.exist
+                    target.state.contents.should.eql({})
                     done()
                 })
             })
         })
 
+        context("when requesting replies", () => {
+            it("should handle request", (done) => {
+                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Moxios.stubRequest("/api/content/1/replies/", {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar", content_type: "reply", parent: "1"},
+                        {id: "7", text: "blablabla", content_type: "reply", parent: "1"},
+                    ],
+                })
+
+                target.dispatch(streamStoreOperations.getReplies, {params: {id: 1}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "1": {id: "1", text: "content", replyIds: ["6", "7"], shareIds: []},
+                    })
+                    target.state.replies.should.eql({
+                        "6": {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
+                        "7": {
+                            id: "7", text: "blablabla", content_type: "reply", parent: "1", replyIds: [], shareIds: [],
+                        },
+                    })
+                    done()
+                })
+            })
+
+            it("should handle error", (done) => {
+                Moxios.stubRequest("/api/content/1/replies/", {status: 500})
+
+                target.dispatch(streamStoreOperations.getReplies, {params: {id: 1}})
+
+                Moxios.wait(() => {
+                    target.state.error.replies.should.exist
+                    target.state.replies.should.eql({})
+                    done()
+                })
+            })
+        })
+
+        context("when requesting shares", () => {
+            it("should handle request", (done) => {
+                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Moxios.stubRequest("/api/content/1/shares/", {
+                    status: 200,
+                    response: [
+                        {id: "6", content_type: "share", share_of: "1"},
+                        {id: "7", content_type: "share", share_of: "1"},
+                    ],
+                })
+
+                target.dispatch(streamStoreOperations.getShares, {params: {id: 1}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "1": {id: "1", text: "content", replyIds: [], shareIds: ["6", "7"]},
+                    })
+                    target.state.shares.should.eql({
+                        "6": {id: "6", content_type: "share", share_of: "1", replyIds: []},
+                        "7": {id: "7", content_type: "share", share_of: "1", replyIds: []},
+                    })
+                    done()
+                })
+            })
+
+            it("should handle error", (done) => {
+                Moxios.stubRequest("/api/content/1/shares/", {status: 500})
+
+                target.dispatch(streamStoreOperations.getShares, {params: {id: 1}})
+
+                Moxios.wait(() => {
+                    target.state.error.shares.should.exist
+                    target.state.shares.should.eql({})
+                    done()
+                })
+            })
+        })
     })
 
     describe("getStructure", () => {
@@ -367,6 +457,8 @@ describe("streamStore", () => {
             target.actions[streamStoreOperations.getProfileAll].should.exist
             target.actions[streamStoreOperations.getProfilePinned].should.exist
             target.actions[streamStoreOperations.getPublicStream].should.exist
+            target.actions[streamStoreOperations.getReplies].should.exist
+            target.actions[streamStoreOperations.getShares].should.exist
             target.actions[streamStoreOperations.getTagStream].should.exist
             target.actions[streamStoreOperations.newContentAck].should.exist
             target.actions[streamStoreOperations.receivedNewContent].should.exist
@@ -445,6 +537,48 @@ describe("streamStore", () => {
                     },
                 }
                 getters.contentList(state).should.eql([{id: "1"}, {id: "3"}, {id: "5"}])
+            })
+        })
+
+        describe("replies", () => {
+            it("returns replies for correct content", () => {
+                let state = {
+                    contents: {
+                        "1": {id: "1", replyIds: ["2", "4"]},
+                        "3": {id: "3", replyIds: ["5"]},
+                    },
+                    replies: {
+                        "2": {id: "2"},
+                        "4": {id: "4"},
+                        "5": {id: "5"},
+                        "7": {id: "7"}
+                    },
+                    shares: {
+                        "6": {id: "6", replyIds: ["7"]},
+                    },
+                }
+                getters.replies(state)({id: "1", content_type: "content"}).should.eql([{id: "2"}, {id: "4"}])
+                getters.replies(state)({id: "3", content_type: "content"}).should.eql([{id: "5"}])
+                getters.replies(state)({id: "6", content_type: "share"}).should.eql([{id: "7"}])
+            })
+        })
+
+        describe("shares", () => {
+            it("returns shares for correct content", () => {
+                let state = {
+                    contents: {
+                        "1": {id: "1", shareIds: ["2", "4"]},
+                        "3": {id: "3", shareIds: ["5"]},
+                    },
+                    shares: {
+                        "2": {id: "2"},
+                        "4": {id: "4"},
+                        "5": {id: "5"},
+                        "7": {id: "7"}
+                    },
+                }
+                getters.shares(state)(1).should.eql([{id: "2"}, {id: "4"}])
+                getters.shares(state)(3).should.eql([{id: "5"}])
             })
         })
     })

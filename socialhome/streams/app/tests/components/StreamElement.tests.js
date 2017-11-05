@@ -15,9 +15,9 @@ describe("StreamElement", () => {
         store = getStore()
     })
 
-    describe("computer", () => {
+    describe("computed", () => {
         it("showAuthorBar with content", () => {
-            let target = mount(StreamElement, {propsData: {contentId: store.content.id}, store})
+            let target = mount(StreamElement, {propsData: {content: store.content}, store})
             store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.false
             store.state.showAuthorBar = true
@@ -25,7 +25,7 @@ describe("StreamElement", () => {
         })
 
         it("showAuthorBar with reply", () => {
-            let target = mount(StreamElement, {propsData: {contentId: store.reply.id}, store})
+            let target = mount(StreamElement, {propsData: {content: store.reply}, store})
             store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.true
             store.state.showAuthorBar = true
@@ -35,7 +35,7 @@ describe("StreamElement", () => {
 
     describe("updated", () => {
         it("redraws masonry", done => {
-            let target = mount(StreamElement, {propsData: {contentId: store.content.id}, store})
+            let target = mount(StreamElement, {propsData: {content: store.content}, store})
             Sinon.spy(Vue, "redrawVueMasonry")
             target.update()
             target.instance().$nextTick(() => {
@@ -43,9 +43,5 @@ describe("StreamElement", () => {
                 done()
             })
         })
-    })
-
-    describe("mounted", () => {
-
     })
 })

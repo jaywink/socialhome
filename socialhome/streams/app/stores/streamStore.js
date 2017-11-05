@@ -8,27 +8,41 @@ import _get from "lodash/get"
 import getState from "streams/app/stores/streamStore.state"
 import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
 
+
 Vue.use(Vuex)
 
-function onSuccess(state, payload) {
+function fetchContentsSuccess(state, payload) {
     payload.data.forEach(item => {
-        Vue.set(state.contents, item.id, item)
-        Vue.set(state.replyIds, item.id, [])
-        Vue.set(state.shareIds, item.id, [])
-        if (item.content_type === "content") {
-            state.contentIds.push(item.id)
-        } else if (item.content_type === "reply") {
-            if (state.replyIds[item.parent] === undefined) {
-                Vue.state(state.replyIds, item.parent, [item.id])
-            } else if (!state.replyIds[item.parent].includes(item.id)) {
-                state.replyIds[item.parent].push(item.id)
+        const content = Object.assign({}, item, {replyIds: [], shareIds: []})
+        Vue.set(state.contents, content.id, content)
+        if (state.contentIds.indexOf(content.id) === -1) {
+            state.contentIds.push(content.id)
+        }
+    })
+}
+
+function fetchRepliesSuccess(state, payload) {
+    payload.data.forEach(item => {
+        const reply = Object.assign({}, item, {replyIds: [], shareIds: []})
+        Vue.set(state.replies, reply.id, reply)
+        if (state.contents[reply.parent] !== undefined) {
+            if (state.contents[reply.parent].replyIds.indexOf(reply.id) === -1) {
+                state.contents[reply.parent].replyIds.push(reply.id)
             }
-        } else if (item.content_type === "share") {
-            if (state.shareIds[item.share_of] === undefined) {
-                Vue.set(state.shareIds, item.share_of, [item.id])
-            } else if (!state.shareIds[item.share_of].includes(item.id)) {
-                state.shareIds[item.share_of].push(item.id)
+        } else if (state.shares[reply.parent] !== undefined) {
+            if (state.shares[reply.parent].replyIds.indexOf(reply.id) === -1) {
+                state.shares[reply.parent].replyIds.push(reply.id)
             }
+        }
+    })
+}
+
+function fetchSharesSuccess(state, payload) {
+    payload.data.forEach(item => {
+        const share = Object.assign({}, item, {replyIds: []})
+        Vue.set(state.shares, share.id, share)
+        if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
+            state.contents[share.share_of].shareIds.push(share.id)
         }
     })
 }
@@ -49,56 +63,56 @@ function newRestAPI(options) {
             action: streamStoreOperations.getPublicStream,
             path: Urls["api-streams:public"](),
             property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            onSuccess: fetchContentsSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getFollowedStream,
             path: Urls["api-streams:followed"](),
             property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            onSuccess: fetchContentsSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getTagStream,
             path: ({name}) => Urls["api-streams:tag"]({name}),
             property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            onSuccess: fetchContentsSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getProfileAll,
             path: ({id}) => Urls["api-streams:profile-all"]({id}),
             property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            onSuccess: fetchContentsSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getProfilePinned,
             path: ({id}) => Urls["api-streams:profile-pinned"]({id}),
             property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            onSuccess: fetchContentsSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getReplies,
-            path: ({ id }) => Urls["api:content-replies"]({ pk: id }),
-            property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            path: ({id}) => Urls["api:content-replies"]({pk: id}),
+            property: "replies",
+            onSuccess: fetchRepliesSuccess,
+            onError,
         })
         .get({
             action: streamStoreOperations.getShares,
-            path: ({ id }) => Urls["api:content-shares"]({ pk: id }),
-            property: "contents",
-            onSuccess: options.onSuccess,
-            onError: options.onError,
+            path: ({id}) => Urls["api:content-shares"]({pk: id}),
+            property: "shares",
+            onSuccess: fetchSharesSuccess,
+            onError,
         })
         .getStore()
 }
 
 function getStructure(state, options) {
-    const result = newRestAPI({state, onError, onSuccess})
+    const result = newRestAPI({state})
 
     result.mutations = _defaults({}, mutations, result.mutations)
     result.actions = _defaults({}, actions, result.actions)
@@ -134,5 +148,7 @@ function newStreamStore(options = {}) {
     return store
 }
 
-const exportsForTests = {getStructure, onError, onSuccess, newRestAPI}
+const exportsForTests = {
+    getStructure, onError, fetchContentsSuccess, fetchRepliesSuccess, fetchSharesSuccess, newRestAPI,
+}
 export {streamStoreOperations, newStreamStore, exportsForTests}

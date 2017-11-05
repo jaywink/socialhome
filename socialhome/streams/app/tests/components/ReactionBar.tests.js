@@ -15,19 +15,18 @@ import applicationStore from "streams/app/stores/applicationStore"
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 
-describe("ReactionsBar", () => {
+describe("ReactionBar", () => {
+    let content
     let store
 
     beforeEach(() => {
         Sinon.restore()
 
-        let fakePost = getFakeContent({id: 1})
+        content = getFakeContent({id: 1})
         window.context = getContext()
         store = newStreamStore({modules: {applicationStore}})
-        store.state.contentIds.push(fakePost.id)
-        Vue.set(store.state.contents, fakePost.id, fakePost)
-        Vue.set(store.state.replyIds, fakePost.id, [])
-        Vue.set(store.state.shareIds, fakePost.id, [])
+        store.state.contentIds.push(content.id)
+        Vue.set(store.state.contents, content.id, content)
         return store
     })
 
@@ -35,7 +34,7 @@ describe("ReactionsBar", () => {
         describe("showReplies", () => {
             it("should be true if user is authenticated or content has replies", () => {
                 let target = mount(ReactionsBar, {
-                    propsData: {contentId: 1},
+                    propsData: {content},
                     store,
                 })
 
@@ -56,7 +55,7 @@ describe("ReactionsBar", () => {
         describe("showShares", () => {
             it("should be true if user is authenticated or content has shares", () => {
                 let target = mount(ReactionsBar, {
-                    propsData: {contentId: 1},
+                    propsData: {content},
                     store,
                 })
 
@@ -90,7 +89,7 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                let target = new ReactionsBar({contentId: 1})
+                let target = new ReactionsBar({content})
                 target.expandShares()
                 target.showSharesBox.should.be.true
                 target.expandShares()
@@ -100,7 +99,7 @@ describe("ReactionsBar", () => {
 
         describe("share", () => {
             it("should show the reshare box", () => {
-                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                let target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].isUserAuthor = false
                 target.instance().$data.showRepliesBox = true
@@ -110,7 +109,7 @@ describe("ReactionsBar", () => {
             })
 
             it("should create share on server", (done) => {
-                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                let target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_has_shared = false
                 target.instance().$store.state.contents[1].user_is_author = false
@@ -139,7 +138,7 @@ describe("ReactionsBar", () => {
 
         describe("unshare", () => {
             it("should removes share on server", (done) => {
-                let target = mount(ReactionsBar, {propsData: {contentId: 1}, store})
+                let target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_has_shared = true
                 target.instance().$store.state.contents[1].user_is_author = false

@@ -5,8 +5,8 @@
         </nsfw-shield>
         <div v-else v-html="content.rendered" />
 
-        <author-bar v-if="showAuthorBar" :content-id="contentId" />
-        <reactions-bar :content-id="contentId">
+        <author-bar v-if="showAuthorBar" :content="content" />
+        <reactions-bar :content="content">
             <div class="mt-1">
                 <a :href="content.url" :title="content.timestamp" class="unstyled-link">
                     {{ timestampText }}
@@ -35,14 +35,11 @@ import "streams/app/components/NsfwShield.vue"
 
 export default Vue.component("stream-element", {
     props: {
-        contentId: {type: Number, required: true},
+        content: {type: Object, required: true},
     },
     computed: {
-        content() {
-            return this.$store.state.contents[this.contentId]
-        },
         deleteUrl() {
-            return Urls["content:delete"]({pk: this.contentId})
+            return Urls["content:delete"]({pk: this.content.id})
         },
         timestampText() {
             return this.content.edited
@@ -56,7 +53,7 @@ export default Vue.component("stream-element", {
             return this.$store.state.showAuthorBar
         },
         updateUrl() {
-            return Urls["content:update"]({pk: this.contentId})
+            return Urls["content:update"]({pk: this.content.id})
         },
     },
     updated() {

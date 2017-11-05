@@ -16,25 +16,26 @@ Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 
 describe("AuthorBar", () => {
+    let content
     let store
 
     beforeEach(() => {
         Sinon.restore()
 
-        let fakePost = getFakeContent({
+        content = getFakeContent({
             id: 1,
             author: getFakeAuthor({guid: "42"}),
         })
         window.context = getContext({currentBrowsingProfileId: 26}, 0)
         store = newStreamStore({modules: {applicationStore: newApplicationStore()}})
-        store.state.contentIds.push(fakePost.id)
-        Vue.set(store.state.contents, fakePost.id, fakePost)
+        store.state.contentIds.push(content.id)
+        Vue.set(store.state.contents, content.id, content)
     })
 
     describe("computed", () => {
         describe("isUserRemote", () => {
             it("should be the opposite of property isUserLocal", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.contents[1].author.is_local = true
                 target.instance().isUserRemote.should.be.false
 
@@ -45,7 +46,7 @@ describe("AuthorBar", () => {
 
         describe("canFollow", () => {
             it("should be true if user is authenticated and not the author", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.contents[1].user_is_author = true
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().canFollow.should.be.false
@@ -62,7 +63,7 @@ describe("AuthorBar", () => {
 
         describe("showFollowBtn and showUnfollowBtn", () => {
             it("should show the follow button when the user can and is not following the author", (done) => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_following_author = false
@@ -76,7 +77,7 @@ describe("AuthorBar", () => {
             })
 
             it("should show the unfollow button when the user can and is not following the author", (done) => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_following_author = true
@@ -92,7 +93,7 @@ describe("AuthorBar", () => {
 
         describe("isUserFollowingAuthor", () => {
             it("should set value", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.contents[1].user_following_author = true
                 target.instance().isUserFollowingAuthor.should.be.true
                 target.instance().isUserFollowingAuthor = false
@@ -117,13 +118,13 @@ describe("AuthorBar", () => {
 
         describe("profileBoxTrigger", () => {
             it("should hide profilebox by default", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().showProfileBox.should.be.false
                 target.find(".profile-box")[0].hasStyle("display", "none").should.be.true
             })
 
             it("should show profilebox when the author's name is clicked", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 Sinon.spy(target.instance(), "profileBoxTrigger")
                 target.find(".profilebox-trigger")[0].trigger("click")
                 target.instance().profileBoxTrigger.calledOnce.should.be.true
@@ -134,7 +135,7 @@ describe("AuthorBar", () => {
 
         describe("unfollow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 Sinon.spy(console, "error")
                 target.instance().unfollow()
@@ -142,7 +143,7 @@ describe("AuthorBar", () => {
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
@@ -150,7 +151,7 @@ describe("AuthorBar", () => {
             })
 
             it("should send an HTTP request with the right parameters when user is logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
 
                 Sinon.spy(target.instance().$http, "post")
@@ -163,7 +164,7 @@ describe("AuthorBar", () => {
                 store.state.applicationStore.isUserAuthenticated = true
                 store.state.contents[1].user_is_author = false
                 store.state.contents[1].author.user_following_author = true
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
 
                 target.instance().unfollow()
 
@@ -179,7 +180,7 @@ describe("AuthorBar", () => {
             })
 
             it("should show an error message when the HTTP request fails", (done) => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.contents[1].author.user_following_author = true
@@ -198,7 +199,7 @@ describe("AuthorBar", () => {
 
         describe("follow", () => {
             it("should display an error message if the user is not logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 Sinon.spy(console, "error")
                 target.instance().follow()
@@ -206,7 +207,7 @@ describe("AuthorBar", () => {
             })
 
             it("should not send an HTTP request if the user is not logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
@@ -214,7 +215,7 @@ describe("AuthorBar", () => {
             })
 
             it("should send an HTTP request with the right parameters when user is logged in", () => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.contents[1].author.user_following_author = false
@@ -228,7 +229,7 @@ describe("AuthorBar", () => {
                 store.state.applicationStore.isUserAuthenticated = true
                 store.state.contents[1].user_is_author = false
                 store.state.contents[1].author.user_following_author = false
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
 
                 target.instance().follow()
 
@@ -244,7 +245,7 @@ describe("AuthorBar", () => {
             })
 
             it("should show an error message when the HTTP request fails", (done) => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_is_author = false
                 target.instance().$store.state.contents[1].author.user_following_author = false
@@ -265,7 +266,7 @@ describe("AuthorBar", () => {
     describe("lifecycle", () => {
         describe("updated", () => {
             it("should redraw VueMasonry", (done) => {
-                let target = mount(AuthorBar, {propsData: {contentId: 1}, store})
+                let target = mount(AuthorBar, {propsData: {content}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
                 target.vm.$nextTick(() => {
