@@ -7,7 +7,7 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import AuthorBar from "streams/app/components/AuthorBar.vue"
-import {getContext, getFakePost, getFakeAuthor} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {getContext, getFakeContent, getFakeAuthor} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "streams/app/stores/streamStore"
 import {newApplicationStore} from "streams/app/stores/applicationStore"
 
@@ -21,7 +21,7 @@ describe("AuthorBar", () => {
     beforeEach(() => {
         Sinon.restore()
 
-        let fakePost = getFakePost({
+        let fakePost = getFakeContent({
             id: 1,
             author: getFakeAuthor({guid: "42"}),
         })

@@ -60,9 +60,7 @@ export default Vue.component("stream-element", {
         },
     },
     updated() {
-        if (this.content.content_type === "content") {
-            Vue.redrawVueMasonry()
-        }
+        Vue.redrawVueMasonry()
     },
 })
 </script>

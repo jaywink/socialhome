@@ -7,7 +7,7 @@ import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import ReactionsBar from "streams/app/components/ReactionsBar.vue"
-import {getContext, getFakePost} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {getContext, getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 
@@ -21,7 +21,7 @@ describe("ReactionsBar", () => {
     beforeEach(() => {
         Sinon.restore()
 
-        let fakePost = getFakePost({id: 1})
+        let fakePost = getFakeContent({id: 1})
         window.context = getContext()
         store = newStreamStore({modules: {applicationStore}})
         store.state.contentIds.push(fakePost.id)

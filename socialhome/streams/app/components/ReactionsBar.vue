@@ -119,9 +119,7 @@ export default Vue.component("reactions-bar", {
         },
     },
     updated() {
-        if (this.content.content_type === "content") {
-            Vue.redrawVueMasonry()
-        }
+        Vue.redrawVueMasonry()
     },
 })
 </script>
