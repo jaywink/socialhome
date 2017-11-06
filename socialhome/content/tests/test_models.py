@@ -207,10 +207,10 @@ class TestContentModel(SocialhomeTestCase):
             "foobar ![](http://127.0.0.1:8000/media/uploads/12345.jpg) barfoo"
         )
 
-    def test_effective_created(self):
-        self.assertEqual(self.public_content.effective_created, self.public_content.created)
+    def test_effective_modified(self):
+        self.assertEqual(self.public_content.effective_modified, self.public_content.created)
         self.assertIsNone(self.public_content.remote_created)
-        self.assertEqual(self.remote_content.effective_created, self.remote_content.remote_created)
+        self.assertEqual(self.remote_content.effective_modified, self.remote_content.remote_created)
         self.assertIsNotNone(self.remote_content.remote_created)
 
     def test_content_saved_in_correct_order(self):

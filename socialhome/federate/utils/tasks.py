@@ -276,7 +276,7 @@ def _make_post(content):
             handle=content.author.handle,
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
-            created_at=content.effective_created,
+            created_at=content.effective_modified,
         )
     except Exception as ex:
         logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
@@ -290,7 +290,7 @@ def _make_comment(content):
             guid=str(content.guid),
             target_guid=str(content.parent.guid),
             handle=content.author.handle,
-            created_at=content.effective_created,
+            created_at=content.effective_modified,
         )
     except Exception as ex:
         logger.exception("_make_comment - Failed to convert %s: %s", content.guid, ex)
@@ -305,7 +305,7 @@ def _make_share(content):
             target_guid=str(content.share_of.guid),
             handle=content.author.handle,
             target_handle=content.share_of.author.handle,
-            created_at=content.effective_created,
+            created_at=content.effective_modified,
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
         )
