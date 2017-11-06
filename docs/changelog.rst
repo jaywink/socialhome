@@ -41,6 +41,10 @@ Changed
 
 * **Breaking change**. API ``Content`` serialization now returns list of tags as *name of tag*, not ID as before. The names do not contain the character "#".
 
+* Use modified timestamp for created timestamp when federating out to remote nodes. (`#314 <https://github.com/jaywink/socialhome/issues/314>`_)
+
+  This makes edits federate more reliably to some remote platforms that support edits.
+
 Fixed
 .....
 
