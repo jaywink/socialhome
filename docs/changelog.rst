@@ -45,10 +45,8 @@ Changed
 
   This makes edits federate more reliably to some remote platforms that support edits.
 
-* Replaced fa-envelope with fa-comments on Replies
+* Stream grid item reply icon changed from "envelope" to "comments". (`#339 <https://github.com/jaywink/socialhome/issues/339>`_
 
-  Replies are what many systems call "comments" so using the corresponding icon.
-  
 Fixed
 .....
 
