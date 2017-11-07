@@ -45,6 +45,10 @@ Changed
 
   This makes edits federate more reliably to some remote platforms that support edits.
 
+* Replaced fa-envelope with fa-comments on Replies
+
+  Replies are what many systems call "comments" so using the corresponding icon.
+  
 Fixed
 .....
 

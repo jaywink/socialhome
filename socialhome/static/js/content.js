@@ -46,7 +46,7 @@
                     '<% if (! content.parent && (content.is_authenticated || content.reply_count)) { %>' +
                         '<div class="item-reaction ml-1 <% if (content.reply_count) { %>item-reaction-counter-positive<% } %>">' +
                             '<span class="item-open-replies-action" data-content-id="<%= content.id %>">' +
-                                '<i class="fa fa-envelope" title="' + gettext("Replies") +'" aria-label="' + gettext("Replies") +'"></i>&nbsp;' +
+                                '<i class="fa fa-comments" title="' + gettext("Replies") +'" aria-label="' + gettext("Replies") +'"></i>&nbsp;' +
                                 '<span class="item-reaction-counter"><%= content.reply_count %></span>' +
                             '</span>&nbsp;' +
                         '</div>' +
