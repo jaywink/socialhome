@@ -14,7 +14,7 @@
                 </b-button>
                 <b-button v-if="showReplies" class="item-reaction" @click.stop.prevent="expandComments">
                     <span class="item-open-replies-action">
-                        <i class="fa fa-envelope" title="Replies" aria-label="Replies"></i>
+                        <i class="fa fa-comments" title="Replies" aria-label="Replies"></i>
                         <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>

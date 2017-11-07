@@ -45,7 +45,7 @@
             {% if request.user.is_authenticated or content.reply_count %}
                 <div class="item-reaction {% if content.reply_count %}item-reaction-counter-positive{% endif %}">
                     <span class="item-open-replies-action" data-content-id="{{ content.id }}">
-                        <i class="fa fa-envelope" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
+                        <i class="fa fa-comments" title="{% trans "Replies" %}" aria-label="{% trans "Replies" %}"></i>
                         <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </div>
