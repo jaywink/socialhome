@@ -26,6 +26,7 @@ Added
   * ``SOCIALHOME_ADDITIONAL_APPS`` - List of additional applications to use in Django settings.
   * ``SOCIALHOME_ADDITIONAL_APPS_URLS`` - Additional third-party URL's to add to core url configuration.
   * ``SOCIALHOME_HOME_VIEW`` - Override the home view with another view defined with this setting.
+* Vue streams: streams load more content on scroll (`#346 <https://github.com/jaywink/socialhome/pull/346>`_)
 
 Changed
 .......
@@ -52,16 +53,6 @@ Fixed
 
 * Fix various issues with OpenGraph tags parsing by switching to self-maintained fork of ``python-opengraph``.
 * Share button is no longer visible if not signed in (`#325 <https://github.com/jaywink/socialhome/issues/325>`_)
-* Remote profile image urls that are relative are now fixed to be absolute when importing the profile from remote (`#327 <https://github.com/jaywink/socialhome/issues/327>`_)
-* Fix poor performance of fetching replies.
-
-  When adding replies of shares to the collection of replies fetched when clicking the reply icon in the UI, a serious performance regression was also added. Database queries have now been optimized to fetch replies faster again.
-* When editing a reply, the user is now redirected back to the parent content detail view instead of going to the reply detail view. (`#315 <https://github.com/jaywink/socialhome/issues/315>`_)
-* Fix regression on visibility of remote replies on shares.
-
-  Replies inherit the parent object visibility and share visibility defaults to non-public in the federation library. Diaspora protocol removed the ``public`` property from shares in a recent release, which meant that we started getting all shares as non-public from the federation layer. This meant that all comments on the shares were processed as non-public too.
-
-  With a change in the federation layer, Diaspora protocol shares are now public by default.
 
 0.5.0 (2017-10-01)
 ------------------
