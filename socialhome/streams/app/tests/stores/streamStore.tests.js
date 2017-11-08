@@ -118,6 +118,22 @@ describe("streamStore", () => {
                 },
             })
         })
+
+        it("should prevent from loading more when server returns an empty array", () => {
+            let payload = {data: []}
+
+            let state = {
+                loadMore: true,
+                contentIds: ["1", "2"],
+                contents: {
+                    "1": {id: "1", text: "Plop"},
+                    "2": {id: "2", text: "Hello!"},
+                },
+            }
+
+            exportsForTests.onSuccess(state, payload)
+            state.loadMore.should.be.false
+        })
     })
 
     describe("onError", () => {
@@ -165,6 +181,29 @@ describe("streamStore", () => {
                 })
             })
 
+            it("should handle public stream request with last id", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar"},
+                        {id: "7", text: "blablabla"},
+                    ],
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/public/?last_id=12", response)
+
+                target.dispatch(streamStoreOperations.getPublicStream, {params: {lastId: 12}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
             it("should handle public stream request error", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
@@ -184,7 +223,7 @@ describe("streamStore", () => {
         })
 
         context("when requesting followed stream", () => {
-            it("should handle followed stream request", (done) => {
+            it("should handle followed stream request ", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
                 let onSuccess = Sinon.spy()
@@ -199,9 +238,34 @@ describe("streamStore", () => {
                 }
                 let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
 
-                Moxios.stubRequest("/api/streams/followed/", response)
+                Moxios.stubRequest("/api/streams/followed/?last_id=12", response)
 
-                target.dispatch(streamStoreOperations.getFollowedStream)
+                target.dispatch(streamStoreOperations.getFollowedStream, {params: {lastId: 12}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
+            it("should handle followed stream request with last id", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: {
+                        data: [
+                            {id: "6", text: "foobar"},
+                            {id: "7", text: "blablabla"},
+                        ],
+                    },
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/followed/?last_id=12", response)
+
+                target.dispatch(streamStoreOperations.getFollowedStream, {params: {lastId: 12}})
 
                 Moxios.wait(() => {
                     onSuccess.getCall(0).args[1].data.should.eql(response.response)
@@ -251,6 +315,29 @@ describe("streamStore", () => {
                 })
             })
 
+            it("should handle tag stream request with last id", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar"},
+                        {id: "7", text: "blablabla"},
+                    ],
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/tag/#yolo/?last_id=12", response)
+
+                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo", lastId: 12}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
             it("should handle tag stream request error", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
@@ -286,6 +373,29 @@ describe("streamStore", () => {
                 Moxios.stubRequest("/api/streams/profile-all/26/", response)
 
                 target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
+            it("should handle profile stream request with last id", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar"},
+                        {id: "7", text: "blablabla"},
+                    ],
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/profile-all/26/?last_id=12", response)
+
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26, lastId: 12}})
 
                 Moxios.wait(() => {
                     onSuccess.getCall(0).args[1].data.should.eql(response.response)
@@ -335,6 +445,29 @@ describe("streamStore", () => {
                 })
             })
 
+            it("should handle profile stream request with last id", (done) => {
+                let state = getState()
+                let onError = Sinon.spy()
+                let onSuccess = Sinon.spy()
+                let response = {
+                    status: 200,
+                    response: [
+                        {id: "6", text: "foobar"},
+                        {id: "7", text: "blablabla"},
+                    ],
+                }
+                let target = new Vuex.Store(exportsForTests.newRestAPI({state, onError, onSuccess}))
+
+                Moxios.stubRequest("/api/streams/profile-pinned/26/?last_id=12", response)
+
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26, lastId: 12}})
+
+                Moxios.wait(() => {
+                    onSuccess.getCall(0).args[1].data.should.eql(response.response)
+                    done()
+                })
+            })
+
             it("should handle profile stream request error", (done) => {
                 let state = getState()
                 let onError = Sinon.spy()
@@ -370,7 +503,7 @@ describe("streamStore", () => {
             target.mutations[streamStoreOperations.newContentAck].should.exist
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
 
-            target.getters.contentList.should.exist
+            target.getters.hasNewContent.should.exist
 
             target.modules.applicationStore.should.exist
         })
@@ -378,36 +511,16 @@ describe("streamStore", () => {
 
     describe("mutations", () => {
         describe("receivedNewContent", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.hasNewContent.should.be.true
-            })
-
-            it("should increment state.stream.newContentLengh by 1", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.newContentLengh.should.equal(1)
-            })
-
-            it("should add the new post id to the content list with undefined value", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
+            it("should add the new post id to the unfetched content list with undefined value", () => {
+                let state = {contents: {}, contentIds: [], unfetchedContentIds: []}
                 mutations[streamStoreOperations.receivedNewContent](state, 42)
                 state.contentIds.should.eql([42])
                 state.contents.should.eql({42: undefined})
             })
         })
-        describe("newContentAck", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: true, newContentLengh: 0}
-                mutations[streamStoreOperations.newContentAck](state)
-                state.hasNewContent.should.be.false
-            })
 
-            it("should set state.stream.newContentLengh to 0", () => {
-                let state = {hasNewContent: true, newContentLengh: 10}
-                mutations[streamStoreOperations.newContentAck](state)
-                state.newContentLengh.should.equal(0)
+        describe("newContentAck", () => {
+            it("should dispatch `streamStoreOperations.getNewContent` for every unfetched id", () => {
             })
         })
     })
@@ -430,18 +543,8 @@ describe("streamStore", () => {
     })
 
     describe("getters", () => {
-        describe("contentList", () => {
-            it("should only return existing posts", () => {
-                let state = {
-                    contentIds: ["1", "2", "3", "4", "5"],
-                    contents: {
-                        "1": {id: "1"},
-                        "3": {id: "3"},
-                        "5": {id: "5"},
-                    },
-                }
-                getters.contentList(state).should.eql([{id: "1"}, {id: "3"}, {id: "5"}])
-            })
+        describe("hasNewContent", () => {
+
         })
     })
 })

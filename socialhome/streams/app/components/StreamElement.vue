@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-infinite-scroll="emitLoadMore" v-bind="infiniteScrollOptions">
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <div v-html="content.rendered" />
         </nsfw-shield>
@@ -28,13 +28,14 @@
 
 <script>
 import Vue from "vue"
+import infiniteScroll from "vue-infinite-scroll"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
 import "streams/app/components/NsfwShield.vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
+    directives: {infiniteScroll},
     props: {
         contentId: {type: Number, required: true},
     },
@@ -44,6 +45,14 @@ export default Vue.component("stream-element", {
         },
         deleteUrl() {
             return Urls["content:delete"]({pk: this.contentId})
+        },
+        infiniteScrollOptions() {
+            return {
+                "infinite-scroll-disabled": this.$store.state.pending.contents,
+                "infinite-scroll-distance": 0,
+                "infinite-scroll-throttle-delay": 1000,
+            }
+
         },
         timestampText() {
             return this.content.edited
@@ -55,6 +64,14 @@ export default Vue.component("stream-element", {
         },
         updateUrl() {
             return Urls["content:update"]({pk: this.contentId})
+        },
+    },
+    methods: {
+        emitLoadMore() {
+            let isFifthLast = (this.$store.state.contentIds.slice(-5)[0] === this.contentId)
+            if (isFifthLast) {
+                this.$emit("load-more")
+            }
         },
     },
     updated() {

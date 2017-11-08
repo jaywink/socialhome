@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="container-flex">
-            <div v-show="$store.state.hasNewContent" class="new-content-container">
+            <div v-show="$store.getters.hasNewContent" class="new-content-container">
                 <b-button @click.prenvent.stop="onNewContentClick" variant="link" class="new-content-load-link">
                     <b-badge pill variant="primary">
-                        {{ $store.state.newContentLengh }} new posts available
+                        {{ translations.newPostsAvailables }}
                     </b-badge>
                 </b-button>
             </div>
@@ -15,11 +15,12 @@
                 <div class="grid-sizer"></div>
                 <div class="gutter-sizer"></div>
                 <stream-element
-                    class="grid-item"
                     v-masonry-tile
-                    v-for="content in $store.getters.contentList"
-                    :content-id="content.id"
-                    :key="content.id"
+                    v-for="id in $store.state.contentIds"
+                    @load-more="loadMore"
+                    :content-id="id"
+                    :key="id"
+                    class="grid-item"
                 />
             </div>
             <loading-element v-show="$store.state.pending.contents" />
@@ -74,8 +75,46 @@ export default Vue.component("stream", {
         currentBrowsingProfileId() {
             return this.$store.state.applicationStore.currentBrowsingProfileId
         },
+        translations() {
+            return {
+                newPostsAvailables: interpolate(
+                    ngettext("%s new post available", "%s new posts available", this.unfetchedContentIds.length),
+                    [this.unfetchedContentIds.length]),
+            }
+        },
+        unfetchedContentIds() {
+            return this.$store.state.unfetchedContentIds
+        },
     },
     methods: {
+        loadMore() {
+            let contentId = this.$store.state.contentIds.slice(-1)[0]
+            if (contentId) {
+                this.loadStream(this.$store.state.contents[contentId].through)
+            }
+        },
+        loadStream(lastId = undefined) {
+            if (!this.$store.state.loadMore) {
+                return
+            }
+
+            let options = lastId ? {params: {lastId}} : {params: {}}
+
+            if (this.$store.state.streamName.match(/^followed/)) {
+                this.$store.dispatch(streamStoreOperations.getFollowedStream, options)
+            } else if (this.$store.state.streamName.match(/^public/)) {
+                this.$store.dispatch(streamStoreOperations.getPublicStream, options)
+            } else if (this.$store.state.streamName.match(/^tag/)) {
+                options.params.name = this.$store.state.tagName
+                this.$store.dispatch(streamStoreOperations.getTagStream, options)
+            } else if (this.$store.state.streamName.match(/^profile_all/)) {
+                options.params.id = this.currentBrowsingProfileId
+                this.$store.dispatch(streamStoreOperations.getProfileAll, options)
+            } else if (this.$store.state.streamName.match(/^profile_pinned/)) {
+                options.params.id = this.currentBrowsingProfileId
+                this.$store.dispatch(streamStoreOperations.getProfilePinned, options)
+            }
+        },
         onImageLoad() {
             Vue.redrawVueMasonry()
         },
@@ -83,18 +122,8 @@ export default Vue.component("stream", {
             this.$store.dispatch(streamStoreOperations.newContentAck)
         },
     },
-    mounted() {
-        if (this.$store.state.streamName.match(/^followed/)) {
-            this.$store.dispatch(streamStoreOperations.getFollowedStream)
-        } else if (this.$store.state.streamName.match(/^public/)) {
-            this.$store.dispatch(streamStoreOperations.getPublicStream)
-        } else if (this.$store.state.streamName.match(/^tag/)) {
-            this.$store.dispatch(streamStoreOperations.getTagStream, {params: {name: this.$store.state.tagName}})
-        } else if (this.$store.state.streamName.match(/^profile_all/)) {
-            this.$store.dispatch(streamStoreOperations.getProfileAll, {params: {id: this.currentBrowsingProfileId}})
-        } else if (this.$store.state.streamName.match(/^profile_pinned/)) {
-            this.$store.dispatch(streamStoreOperations.getProfilePinned, {params: {id: this.currentBrowsingProfileId}})
-        }
+    created() {
+        this.loadStream()
     },
     beforeDestroy() {
         this.$store.$websocket.close()

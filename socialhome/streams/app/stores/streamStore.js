@@ -4,17 +4,31 @@ import Vapi from "vuex-rest-api"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
+import _pullAll from "lodash/pullAll"
 
 import getState from "streams/app/stores/streamStore.state"
 import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
 
+
 Vue.use(Vuex)
 
 function onSuccess(state, payload) {
-    payload.data.forEach(item => {
-        Vue.set(state.contents, item.id, item)
-        state.contentIds.push(item.id)
-    })
+    if (payload.data.length === 0) {
+        Vue.set(state, "loadMore", false)
+    } else {
+        payload.data.forEach(item => {
+            Vue.set(state.contents, item.id, item)
+            state.contentIds.push(item.id)
+        })
+    }
+}
+
+function onFetchNewContentSuccess(state, payload) {
+    // It's important content is added before it's id is appended to `contentIds`
+    // to prevent it to be rendered when it's not defined yet
+    Vue.set(state.contents, payload.data.id, payload.data)
+    state.contentIds.unshift(payload.data.id)
+    _pullAll(state.unfetchedContentIds, payload.data.id)
 }
 
 function onError(state, error) {
@@ -28,47 +42,56 @@ function newRestAPI(options) {
         axios: Vue.prototype.$http,
     })
 
+    const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
+
     return new Vapi(opts)
         .get({
             action: streamStoreOperations.getPublicStream,
-            path: Urls["api-streams:public"](),
+            path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,
         })
         .get({
             action: streamStoreOperations.getFollowedStream,
-            path: Urls["api-streams:followed"](),
+            path: ({lastId = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,
         })
         .get({
             action: streamStoreOperations.getTagStream,
-            path: ({name}) => Urls["api-streams:tag"]({name}),
+            path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,
         })
         .get({
             action: streamStoreOperations.getProfileAll,
-            path: ({id}) => Urls["api-streams:profile-all"]({id}),
+            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-all"]({id})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: options.onSuccess,
             onError: options.onError,
         })
         .get({
             action: streamStoreOperations.getProfilePinned,
-            path: ({id}) => Urls["api-streams:profile-pinned"]({id}),
+            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({id})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: options.onSuccess,
+            onError: options.onError,
+        })
+        .get({
+            action: streamStoreOperations.getNewContent,
+            path: ({pk}) => Urls["api:content-detail"]({pk}),
+            property: "contents",
+            onSuccess: options.onFetchNewContentSuccess,
             onError: options.onError,
         })
         .getStore()
 }
 
 function getStructure(state, options) {
-    const result = newRestAPI({state, onError, onSuccess})
+    const result = newRestAPI({state, onError, onSuccess, onFetchNewContentSuccess})
 
     result.mutations = _defaults({}, mutations, result.mutations)
     result.actions = _defaults({}, actions, result.actions)
@@ -95,7 +118,7 @@ function newStreamStore(options = {}) {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(streamStoreOperations.receivedNewContent, 1)
+            store.dispatch(streamStoreOperations.receivedNewContent, data.id)
         }
     }
 
