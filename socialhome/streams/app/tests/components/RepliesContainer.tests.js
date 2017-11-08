@@ -2,6 +2,7 @@ import {mount} from "avoriaz"
 import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
+import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
 import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import RepliesContainer from "streams/app/components/RepliesContainer.vue"
@@ -51,6 +52,23 @@ describe("RepliesContainer", () => {
         it("shares", () => {
             let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
             target.instance().shares.should.eql([store.share])
+        })
+
+        it("showReplyButton", () => {
+            let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+            target.instance().showReplyButton.should.be.true
+
+            store.share2 = getFakeContent({share_of: store.content.id, content_type: "share", reply_count: 0})
+            Vue.set(store.state.shares, store.share2.id, store.share2)
+            target = mount(RepliesContainer, {propsData: {content: store.share2}, store})
+            target.instance().showReplyButton.should.be.false
+
+            store.share2.reply_count = 1
+            target = mount(RepliesContainer, {propsData: {content: store.share2}, store})
+            target.instance().showReplyButton.should.be.true
+
+            target = mount(RepliesContainer, {propsData: {content: store.reply}, store})
+            target.instance().showReplyButton.should.be.false
         })
     })
 

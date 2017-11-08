@@ -8,7 +8,7 @@
                 :key="reply.id"
             />
         </div>
-        <div v-if="isUserAuthenticated" class="content-actions">
+        <div v-if="isUserAuthenticated && showReplyButton" class="content-actions">
             <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
         </div>
         <div v-if="isContent">
@@ -45,6 +45,14 @@ export default Vue.component("replies-container", {
         },
         shares() {
             return this.$store.getters.shares(this.content.id)
+        },
+        showReplyButton() {
+            if (this.content.content_type === "content") {
+                return true
+            } else if (this.content.content_type === "share" && this.content.reply_count > 0 ) {
+                return true
+            }
+            return false
         },
         translations() {
             return {
