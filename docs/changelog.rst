@@ -16,6 +16,7 @@ Added
   * ``/api/streams/profile-pinned/{id}/`` - fetches pinned content by the given profile, ordered as set by the profile owner.
 
 * New fields added to Content API:
+
   * ``is_nsfw``, boolean value, ``true`` if the content text has the tag ``#nsfw`` in it.
   * ``share_of``, if the ``content_type`` is ``share``, this will contain the ID of the shared Content.
 
@@ -53,7 +54,7 @@ Changed
 
   This makes edits federate more reliably to some remote platforms that support edits.
 
-* Stream grid item reply icon changed from "envelope" to "comments". (`#339 <https://github.com/jaywink/socialhome/issues/339>`_
+* Stream grid item reply icon changed from "envelope" to "comments". (`#339 <https://github.com/jaywink/socialhome/issues/339>`_)
 
 Fixed
 .....
@@ -71,7 +72,7 @@ Fixed
 
   With a change in the federation layer, Diaspora protocol shares are now public by default.
 
-* Fixed Streams API content `user_is_author` value always having `false` value.
+* Fixed Streams API content ``user_is_author`` value always having ``false`` value.
 
 0.5.0 (2017-10-01)
 ------------------
