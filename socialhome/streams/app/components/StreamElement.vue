@@ -48,8 +48,13 @@ export default Vue.component("stream-element", {
         },
         showAuthorBar() {
             if (this.content.content_type === "reply") {
+                // Always show author bar for replies
+                return true
+            } else if (this.$store.state.applicationStore.isUserAuthenticated && !this.content.user_is_author) {
+                // Always show if authenticated and not own content
                 return true
             }
+            // Fall back to central state
             return this.$store.state.showAuthorBar
         },
         updateUrl() {

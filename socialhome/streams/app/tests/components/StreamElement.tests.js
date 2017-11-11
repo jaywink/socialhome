@@ -17,11 +17,13 @@ describe("StreamElement", () => {
 
     describe("computed", () => {
         it("showAuthorBar with content", () => {
+            store.state.applicationStore.isUserAuthenticated = false
             let target = mount(StreamElement, {propsData: {content: store.content}, store})
             store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.false
             store.state.showAuthorBar = true
             target.instance().showAuthorBar.should.be.true
+            store.state.applicationStore.isUserAuthenticated = true
         })
 
         it("showAuthorBar with reply", () => {
@@ -29,6 +31,14 @@ describe("StreamElement", () => {
             store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.true
             store.state.showAuthorBar = true
+            target.instance().showAuthorBar.should.be.true
+        })
+
+        it("showAuthorBar with other author", () => {
+            let otherContent = Object.assign({}, store.content)
+            otherContent.user_is_author = false
+            let target = mount(StreamElement, {propsData: {content: otherContent}, store})
+            store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.true
         })
     })
