@@ -20,31 +20,41 @@ describe("Stream", () => {
     describe("computed", () => {
         describe("stampedElement", () => {
             it("should render the FollowedStampedElement when stream name is 'followed'", () => {
-                let target = mount(Stream, {})
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.applicationStore.profile = {id: 26}
+                let target = mount(Stream, {store})
                 target.instance().$store.state.streamName = "followed"
                 target.instance().stampedElement.should.eq("FollowedStampedElement")
             })
 
             it("should render the PublicStampedElement when stream name is 'public'", () => {
-                let target = mount(Stream, {})
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.applicationStore.profile = {id: 26}
+                let target = mount(Stream, {store})
                 target.instance().$store.state.streamName = "public"
                 target.instance().stampedElement.should.eq("PublicStampedElement")
             })
 
             it("should render the TagStampedElement when stream name is 'tag'", () => {
-                let target = mount(Stream, {})
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.applicationStore.profile = {id: 26}
+                let target = mount(Stream, {store})
                 target.instance().$store.state.streamName = "tag"
                 target.instance().stampedElement.should.eq("TagStampedElement")
             })
 
             it("should render the ProfileStampedElement when stream name is 'profile'", () => {
-                let target = mount(Stream, {})
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.applicationStore.profile = {id: 26}
+                let target = mount(Stream, {store})
                 target.instance().$store.state.streamName = "profile"
                 target.instance().stampedElement.should.eq("ProfileStampedElement")
             })
 
             it("should display an error when stream name is unknown", () => {
-                let target = mount(Stream, {})
+                let store = newStreamStore({modules: {applicationStore}})
+                store.state.applicationStore.profile = {id: 26}
+                let target = mount(Stream, {store})
                 Sinon.spy(console, "error")
                 target.instance().$store.state.streamName = "Yolo stream"
                 target.instance().stampedElement
@@ -137,6 +147,7 @@ describe("Stream", () => {
                 let store = newStreamStore({modules: {applicationStore}})
                 store.state.streamName = "profile_all"
                 store.state.applicationStore.currentBrowsingProfileId = 26
+                store.state.applicationStore.profile = {id: 26}
                 Sinon.spy(store, "dispatch")
 
                 let target = mount(Stream, {store})
@@ -151,6 +162,7 @@ describe("Stream", () => {
                 let store = newStreamStore({modules: {applicationStore}})
                 store.state.streamName = "profile_pinned"
                 store.state.applicationStore.currentBrowsingProfileId = 26
+                store.state.applicationStore.profile = {id: 26}
                 Sinon.spy(store, "dispatch")
 
                 let target = mount(Stream, {store})

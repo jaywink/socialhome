@@ -14,6 +14,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         cls.create_local_and_remote_user()
         cls.content = PublicContentFactory(author=cls.remote_profile)
         cls.user_content = PublicContentFactory(author=cls.profile)
+        cls.share = PublicContentFactory(share_of=cls.content)
 
     def setUp(self):
         super().setUp()
@@ -39,6 +40,12 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.assertEqual(serializer.data["through"], self.content.id)
         serializer = ContentSerializer(self.content, context={"throughs": {self.content.id: 666}})
         self.assertEqual(serializer.data["through"], 666)
+
+    def test_serializes_share_of(self):
+        serializer = ContentSerializer(self.content)
+        self.assertIsNone(serializer.data["share_of"])
+        serializer = ContentSerializer(self.share)
+        self.assertEqual(serializer.data["share_of"], self.content.id)
 
     def test_user_following_author_false_if_no_request(self):
         serializer = ContentSerializer()

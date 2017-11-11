@@ -15,21 +15,25 @@ const getFakeAuthor = function (args = {}) {
     })
 }
 
-const getFakePost = function (args = {}) {
+const getFakeContent = function (args = {}) {
     return _.defaults({}, args, {
         author: getFakeAuthor(),
+        content_type: "content",
         edited: faker.random.boolean(),
         humanized_timestamp: faker.random.number(),
         id: faker.random.number(),
+        parent: null,
         rendered: `<p>${faker.lorem.paragraphs()}</p>`,
         reply_count: faker.random.number(),
-        timestamp: faker.date.recent().toString(),
+        replyIds: [],
+        share_of: null,
+        shareIds: [],
         shares_count: faker.random.number(),
+        timestamp: faker.date.recent().toString(),
         url: "https://127.0.0.1",
         user_following_author: faker.random.boolean(),
         user_is_author: faker.random.boolean(),
         user_has_shared: faker.random.boolean(),
-
     })
 }
 
@@ -37,7 +41,7 @@ const getFakePostList = function (args = {}, nbPosts = 1) {
     let contents = {}
     let contentIds = []
     for (let n = 0; ++n <= nbPosts;) {
-        let post = getFakePost()
+        let post = getFakeContent()
         contentIds.push(post.id)
         contents[post.id] = post
     }
@@ -73,4 +77,4 @@ const getContext = function (args = {}) {
     })
 }
 
-export {getFakeAuthor, getFakePost, getProfile, getContext}
+export {getFakeAuthor, getFakeContent, getProfile, getContext}

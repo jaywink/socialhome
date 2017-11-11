@@ -19,9 +19,6 @@ class TagQuerySet(models.QuerySet):
 
 
 class ContentQuerySet(models.QuerySet):
-    def _select_related(self):
-        return self.select_related("oembed", "opengraph")
-
     def children(self, parent_id, user):
         """Return replies for a Content visible to user..
 
@@ -39,7 +36,7 @@ class ContentQuerySet(models.QuerySet):
         """
         following_ids = user.profile.following.values_list("id", flat=True)
         qs = self.top_level().filter(Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids))
-        return qs._select_related().visible_for_user(user)
+        return qs.visible_for_user(user)
 
     def pinned(self):
         return self.filter(pinned=True)
@@ -57,7 +54,7 @@ class ContentQuerySet(models.QuerySet):
             qs = qs.filter(Q(shares__author=profile) | Q(author=profile))
         else:
             qs = qs.filter(author=profile)
-        return qs._select_related().visible_for_user(user)
+        return qs.visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user, include_shares=True):
         """Filter for a user profile by GUID.
@@ -81,10 +78,14 @@ class ContentQuerySet(models.QuerySet):
         return self.profile_by_attr(attr, value, user, include_shares=False).pinned()
 
     def public(self):
-        return self.top_level()._select_related().filter(visibility=Visibility.PUBLIC)
+        return self.top_level().filter(visibility=Visibility.PUBLIC)
+
+    def shares(self, share_of_id, user):
+        qs = self.visible_for_user(user).filter(share_of_id=share_of_id)
+        return qs.order_by("created")
 
     def tag(self, tag, user):
-        return self.top_level()._select_related().visible_for_user(user).filter(tags=tag)
+        return self.top_level().visible_for_user(user).filter(tags=tag)
 
     def tag_by_name(self, tag, user):
         from socialhome.content.models import Tag, Content

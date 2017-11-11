@@ -18,7 +18,7 @@
                     class="grid-item"
                     v-masonry-tile
                     v-for="content in $store.getters.contentList"
-                    :content-id="content.id"
+                    :content="content"
                     :key="content.id"
                 />
             </div>

@@ -16,11 +16,11 @@ class StreamsAPIBaseView(APIView):
 
     def get(self, request, **kwargs):
         qs, throughs = self.get_content()
-        serializer = ContentSerializer(qs, many=True, context={"throughs": throughs})
+        serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
         return Response(serializer.data)
 
     def get_content(self):
-        raise NotImplemented
+        return [], {}
 
 
 class FollowedStreamAPIView(StreamsAPIBaseView):

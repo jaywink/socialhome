@@ -4,6 +4,7 @@
 
 <script>
 import Vue from "vue"
+
 import "streams/app/components/stamped_elements/BaseStampedElement.vue"
 
 
@@ -13,7 +14,7 @@ export default Vue.component("tag-stamped-element", {
             return `#${this.$store.state.tagName}`
         },
         helpText() {
-            return interpolate(gettext("All content tagged with %s."), [`#${this.$store.state.tagName}`])
+            return `${gettext("All content tagged with")} #${this.$store.state.tagName}.`
         },
     },
 })

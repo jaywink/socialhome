@@ -1,10 +1,13 @@
 import Vue from "vue"
 
+
 const streamStoreOperations = {
     getFollowedStream: "getFollowedStream",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",
     getPublicStream: "getPublicStream",
+    getReplies: "getReplies",
+    getShares: "getShares",
     getTagStream: "getTagStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
@@ -44,6 +47,26 @@ const getters = {
             }
         })
         return contents
+    },
+    replies: state => content => {
+        const replies = []
+        if (content.content_type === "content") {
+            state.contents[content.id].replyIds.forEach(id => {
+                replies.push(state.replies[id])
+            })
+        } else if (content.content_type === "share") {
+            state.shares[content.id].replyIds.forEach(id => {
+                replies.push(state.replies[id])
+            })
+        }
+        return replies
+    },
+    shares: state => contentId => {
+        const shares = []
+        state.contents[contentId].shareIds.forEach(id => {
+            shares.push(state.shares[id])
+        })
+        return shares
     },
 }
 

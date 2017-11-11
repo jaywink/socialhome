@@ -7,7 +7,7 @@ from django.test.client import Client, RequestFactory
 from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeCBVTestCase
@@ -203,6 +203,8 @@ class TestContentView(SocialhomeTestCase):
         cls.content = LocalContentFactory(visibility=Visibility.PUBLIC)
         cls.private_content = LocalContentFactory(visibility=Visibility.LIMITED)
         cls.client = Client()
+        cls.reply = PublicContentFactory(parent=cls.content)
+        cls.share = PublicContentFactory(share_of=cls.content)
 
     def test_content_view_renders_json_result(self):
         response = self.client.get(
@@ -271,6 +273,14 @@ class TestContentView(SocialhomeTestCase):
         self.assertContains(response, self.content.humanized_timestamp)
         self.assertContains(response, self.content.timestamp)
         self.assertContains(response, 'var socialhomeStream = "content__%s' % self.content.channel_group_name)
+
+    def test_redirects_by_content_type(self):
+        self.get("content:view", pk=self.content.id)
+        self.response_200()
+        self.get("content:view", pk=self.reply.id)
+        self.response_302()
+        self.get("content:view", pk=self.share.id)
+        self.response_302()
 
 
 class TestContentReplyView(SocialhomeTestCase):

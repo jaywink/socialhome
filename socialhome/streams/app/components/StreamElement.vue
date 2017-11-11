@@ -5,8 +5,8 @@
         </nsfw-shield>
         <div v-else v-html="content.rendered" />
 
-        <author-bar v-if="showAuthorBar" :content-id="contentId" />
-        <reactions-bar :content-id="contentId">
+        <author-bar v-if="showAuthorBar" :content="content" />
+        <reactions-bar :content="content">
             <div class="mt-1">
                 <a :href="content.url" :title="content.timestamp" class="unstyled-link">
                     {{ timestampText }}
@@ -31,19 +31,15 @@ import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
 import "streams/app/components/NsfwShield.vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("stream-element", {
     props: {
-        contentId: {type: Number, required: true},
+        content: {type: Object, required: true},
     },
     computed: {
-        content() {
-            return this.$store.state.contents[this.contentId]
-        },
         deleteUrl() {
-            return Urls["content:delete"]({pk: this.contentId})
+            return Urls["content:delete"]({pk: this.content.id})
         },
         timestampText() {
             return this.content.edited
@@ -51,10 +47,18 @@ export default Vue.component("stream-element", {
                 : this.content.humanized_timestamp
         },
         showAuthorBar() {
+            if (this.content.content_type === "reply") {
+                // Always show author bar for replies
+                return true
+            } else if (this.$store.state.applicationStore.isUserAuthenticated && !this.content.user_is_author) {
+                // Always show if authenticated and not own content
+                return true
+            }
+            // Fall back to central state
             return this.$store.state.showAuthorBar
         },
         updateUrl() {
-            return Urls["content:update"]({pk: this.contentId})
+            return Urls["content:update"]({pk: this.content.id})
         },
     },
     updated() {
