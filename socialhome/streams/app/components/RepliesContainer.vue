@@ -8,7 +8,10 @@
                 :key="reply.id"
             />
         </div>
-        <div v-if="isUserAuthenticated && showReplyButton" class="content-actions">
+        <div v-show="showSpinner" class="replies-spinner text-center">
+            <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
+        </div>
+        <div v-if="showReplyButton" class="content-actions">
             <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
         </div>
         <div v-if="isContent">
@@ -47,12 +50,18 @@ export default Vue.component("replies-container", {
             return this.$store.getters.shares(this.content.id)
         },
         showReplyButton() {
+            if (!this.isUserAuthenticated || (this.$store.state.pending.replies && this.content.reply_count > 0)) {
+                return false
+            }
             if (this.content.content_type === "content") {
                 return true
             } else if (this.content.content_type === "share" && this.content.reply_count > 0 ) {
                 return true
             }
             return false
+        },
+        showSpinner() {
+            return this.isContent && this.$store.state.pending.replies && this.content.reply_count > 0
         },
         translations() {
             return {
@@ -71,3 +80,10 @@ export default Vue.component("replies-container", {
     },
 })
 </script>
+
+
+<style scoped>
+    .replies-spinner {
+        height: 42px;
+    }
+</style>
