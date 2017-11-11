@@ -1,10 +1,12 @@
 from unittest.mock import patch
 
+from django.test import RequestFactory
 from django.urls import reverse
 
 from socialhome.content.tests.factories import (
     PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
 from socialhome.streams.tests.utils import MockStream
+from socialhome.streams.viewsets import StreamsAPIBaseView
 from socialhome.tests.utils import SocialhomeAPITestCase
 
 
@@ -26,6 +28,13 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
     def test_login_required(self):
         self.get("api-streams:followed")
         self.response_403()
+
+    @patch("socialhome.streams.viewsets.ContentSerializer", autospec=True)
+    def test_serializer_context(self, mock_serializer):
+        request = RequestFactory().get("/")
+        view = StreamsAPIBaseView()
+        view.get(request)
+        mock_serializer.assert_called_once_with([], many=True, context={"throughs": {}, "request": request})
 
     @patch("socialhome.streams.viewsets.FollowedStream")
     def test_users_correct_stream_class(self, mock_stream):

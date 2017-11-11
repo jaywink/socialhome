@@ -71,6 +71,8 @@ Fixed
 
   With a change in the federation layer, Diaspora protocol shares are now public by default.
 
+* Fixed Streams API content `user_is_author` value always having `false` value.
+
 0.5.0 (2017-10-01)
 ------------------
 
