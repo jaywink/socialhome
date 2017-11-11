@@ -2,6 +2,7 @@ import Vue from "vue"
 
 
 const streamStoreOperations = {
+    disableLoadMore: "disableLoadMore",
     getFollowedStream: "getFollowedStream",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",
@@ -16,6 +17,9 @@ const streamStoreOperations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
+    [streamStoreOperations.disableLoadMore](state, contentId) {
+        Vue.set(state.contents[contentId], "hasLoadMore", false)
+    },
     [streamStoreOperations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
         state.newContentLengh += 1
@@ -30,6 +34,9 @@ const mutations = {
 /* eslint-enable no-param-reassign */
 
 const actions = {
+    [streamStoreOperations.disableLoadMore]({commit}, contentId) {
+        commit(streamStoreOperations.disableLoadMore, contentId)
+    },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
     },

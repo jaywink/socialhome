@@ -11,6 +11,13 @@ import {actions, mutations, streamStoreOperations, getters} from "streams/app/st
 
 Vue.use(Vuex)
 
+function addHasLoadMore(state) {
+    const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
+    if (loadMoreContentId) {
+        Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
+    }
+}
+
 function fetchContentsSuccess(state, payload) {
     payload.data.forEach(item => {
         const content = Object.assign({}, item, {replyIds: [], shareIds: []})
@@ -19,6 +26,9 @@ function fetchContentsSuccess(state, payload) {
             state.contentIds.push(content.id)
         }
     })
+    if (payload.data.length) {
+        addHasLoadMore(state)
+    }
 }
 
 function fetchRepliesSuccess(state, payload) {
