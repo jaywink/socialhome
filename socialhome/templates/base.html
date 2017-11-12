@@ -3,17 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{{ request.site.name }}{% endblock title %}</title>
     {% block ogtags %}
-        <meta property="og:title" content="{{ request.site.name }}" />
+        <meta property="og:title" content='{{ request.site.name|addslashes }}' />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://{{ request.site.domain }}" />
-        {# TODO fix logo #}
-        <meta property="og:image" content="https://socialhome.network/media/markdownx/74b37fa1-88d0-4e29-9fdc-8d07ba216f63.png" />
+        <meta property="og:image" content="https://{{ request.site.domain }}{% static "images/logo/Socialhome-dark-300.png" %}" />
     {% endblock %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content='{{ request.site.name|addslashes }}'>
+
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static "images/logo/Socialhome-dark-16.png" %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static "images/logo/Socialhome-dark-32.png" %}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% static "images/logo/Socialhome-dark-96.png" %}">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -32,7 +34,7 @@
             <button type="button" class="navbar-toggler navbar-toggler-right" data-toggle="collapse" data-target="#top-navbar" aria-controls="top-navbar" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fa fa-bars"></i>
             </button>
-            <a class="navbar-brand" href="/">{{ request.site.name }}</a>
+            <a class="navbar-brand" href="/"><img src="{% static "images/logo/Socialhome-light-24.png" %}" class="mr-2"><span class="align-middle">{{ request.site.name }}</span></a>
             <div class="collapse navbar-collapse mx-auto" id="top-navbar">
                 <ul class="navbar-nav mx-auto w-100 justify-content-end text-center">
                     <li class="nav-item dropdown">

@@ -34,6 +34,12 @@ Added
 
   This allows retrieving all the shares done on a Content.
 
+* We now have a logo ✌
+
+  .. image:: _static/brand/Socialhome-dark-300.png
+
+  The logo also comes in a light version, for dark backgrounds. See :ref:`brand` for details.
+
 Changed
 .......
 
