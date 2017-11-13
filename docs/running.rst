@@ -205,14 +205,14 @@ REDIS_PORT
 Default: ``6379``
 
 SOCIALHOME_ADDITIONAL_APPS
-.....................
+..........................
 
 Default: ``None``
 
 Allows to plug in additional third-party apps, string with comma-separated values, for example ``django.contrib.gis,myapp``.
 
 SOCIALHOME_ADDITIONAL_APPS_URLS
-.....................
+...............................
 
 Default: ``None``
 
