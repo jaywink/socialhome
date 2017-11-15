@@ -445,6 +445,13 @@ class TestContentRendered(SocialhomeTestCase):
         self.assertEqual(content.rendered, '<p><a href="/streams/tag/tag/">#tag</a> '
                                            '<a href="/streams/tag/mixed/">#MiXeD</a></p>')
 
+    def test_renders_without_previews_with_show_preview_false(self):
+        content = Content.objects.create(
+            text="foobar", guid="barfoo", author=ProfileFactory(),
+            oembed=OEmbedCacheFactory(), opengraph=OpenGraphCacheFactory(),
+            show_preview=False,
+        )
+        self.assertEqual(content.rendered, "<p>foobar</p>")
 
 class TestContentSaveTags(SocialhomeTestCase):
     @classmethod

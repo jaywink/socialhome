@@ -10,9 +10,10 @@
         </small>
         <div id="image-upload-progress-container" class="pt-2"></div>
     </div>
-    {% if not is_reply %}
-        <div class="row">
-            <div class="col-6">
+
+    <div class="row">
+        <div class="col-6">
+            {% if not is_reply %}
                 <div class="form-group">
                     <label for="{{ form.visibility.id }}">{{ form.visibility.label }}</label>
                     {{ form.visibility }}
@@ -27,8 +28,10 @@
                         <p>{% trans "Tip: You can use the 'Self' visibility to create draft content and then change the visibility to for example 'Public' when you want to publish it." %}</p>
                     </small>
                 </div>
-            </div>
-            <div class="col-6">
+            {% endif %}
+        </div>
+        <div class="col-6">
+            {% if not is_reply %}
                 <div class="form-group form-check-inline">
                     <label for="{{ form.pinned.id }}">{{ form.pinned.label }}</label>
                     {{ form.pinned }}
@@ -36,9 +39,17 @@
                         {% trans "Pinned content will be shown on your personal profile in the order you want. Reorder pinned content from the profile menu. Pinned content will federate and otherwise function as any other content." %}
                     </small>
                 </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="{{ form.show_preview.id }}">{{ form.show_preview.label }}</label>
+                {{ form.show_preview }}
+                <small class="form-text">
+                    {{ form.show_preview.help_text }}
+                </small>
             </div>
         </div>
-    {% endif %}
+    </div>
+
     <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
 </form>
 {# "Hidden" form for image upload input #}

@@ -8,7 +8,7 @@ from socialhome.content.utils import safe_text_for_markdown
 class ContentForm(ModelForm):
     class Meta:
         model = Content
-        fields = ["text", "visibility", "pinned"]
+        fields = ["text", "visibility", "pinned", "show_preview"]
         widgets = {
             "text": MarkdownxWidget()
         }
@@ -23,6 +23,7 @@ class ContentForm(ModelForm):
         else:
             self.fields["visibility"].widget.attrs = {"class": "form-control"}
             self.fields["pinned"].widget.attrs = {"class": "form-check"}
+        self.fields["show_preview"].widget.attrs = {"class": "form-check"}
         self.fields["text"].widget.attrs = {"class": "form-control"}
 
     def clean_text(self):
