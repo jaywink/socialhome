@@ -6,6 +6,13 @@ Changelog
 0.7.0-dev (unreleased)
 ----------------------
 
+Added
+.....
+
+* Possibility to skip adding an OEmbed or OpenGraph preview to content. (`#364 <https://github.com/jaywink/socialhome/issues/364>`_)
+
+  There is a new checkbox on content create that allows skipping adding a link preview to the content.
+
 0.6.0 (2017-11-13)
 ------------------
 

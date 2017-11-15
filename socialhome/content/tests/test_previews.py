@@ -123,6 +123,16 @@ class TestFetchContentPreview(SocialhomeTestCase):
         fetch_content_preview(self.content)
         fetch_og.assert_called_once_with(self.content, ["example.com"])
 
+    @patch("socialhome.content.previews.find_urls_in_text", autospec=True)
+    @patch("socialhome.content.previews.fetch_oembed_preview", autospec=True)
+    @patch("socialhome.content.previews.fetch_og_preview", autospec=True)
+    def test_no_fetch_if_show_preview_false(self, fetch_og, fetch_oembed, find_urls):
+        self.content.show_preview = False
+        fetch_content_preview(self.content)
+        assert not fetch_og.called
+        assert not fetch_oembed.called
+        assert not find_urls.called
+
 
 class TestOEmbedDiscoverer:
     def test_oembed_discoverer_inits(self):

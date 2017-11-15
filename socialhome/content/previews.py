@@ -26,6 +26,8 @@ def fetch_content_preview(content):
     Will first try to fetch oEmbed for each found url.
     If not available, generate a preview from the OG tags.
     """
+    if not content.show_preview:
+        return
     urls = find_urls_in_text(content.text)
     if not urls:
         return

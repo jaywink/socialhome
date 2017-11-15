@@ -94,6 +94,11 @@ class Content(models.Model):
     service_label = models.CharField(_("Service label"), blank=True, max_length=32)
 
     # oEmbed or preview based on OG tags
+    show_preview = models.BooleanField(
+        _("Show OEmbed or OpenGraph preview"), default=True,
+        help_text=_("Disable to turn off fetching and showing an OEmbed or OpenGraph preview using the links in "
+                    "the text."),
+    )
     oembed = models.ForeignKey(
         OEmbedCache, verbose_name=_("OEmbed cache"), on_delete=models.SET_NULL, null=True
     )
@@ -305,15 +310,16 @@ class Content(models.Model):
         rendered = process_text_links(rendered)
         if self.is_nsfw:
             rendered = make_nsfw_safe(rendered)
-        if self.oembed:
-            rendered = "%s<br>%s" % (
-                rendered, self.oembed.oembed
-            )
-        if self.opengraph:
-            rendered = "%s%s" % (
-                rendered,
-                render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
-            )
+        if self.show_preview:
+            if self.oembed:
+                rendered = "%s<br>%s" % (
+                    rendered, self.oembed.oembed
+                )
+            if self.opengraph:
+                rendered = "%s%s" % (
+                    rendered,
+                    render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
+                )
         self.rendered = rendered
         Content.objects.filter(id=self.id).update(rendered=rendered)
 
