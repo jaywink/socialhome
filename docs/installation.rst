@@ -18,6 +18,7 @@ Socialhome isn't particularly heavy, though obviously that depends on the amount
 * Daphne (~60mb)
 * Circus (~25mb)
 * 5x RQ workers (~75mb each == 375mb)
+* RQ scheduler (~75mb)
 
 Memory values are taken from a running production instance. This gives a total of 745mb of RAM used by the application. Additionally, you need to allocate for PostgreSQL and Redis. A few gigabytes of available memory should easily be enough to run a node with medium activity.
 

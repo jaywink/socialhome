@@ -138,6 +138,8 @@ There are a few locations to modify when changing how content is rendered in str
 
 All these templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
 
+.. _precaching:
+
 Precaching
 ::::::::::
 

@@ -280,6 +280,13 @@ Default: ``False``
 
 Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts. User counts include 30 day and 6 month active users.
 
+SOCIALHOME_STREAMS_PRECACHE_SIZE
+................................
+
+Default: ``100``
+
+Amount of items to store in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting. See :ref:`precaching`.
+
 SOCIALHOME_SYSLOG_FACILITY
 ..........................
 

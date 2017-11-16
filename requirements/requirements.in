@@ -38,6 +38,7 @@ python-opengraph-jaywink
 pytz
 redis
 rq
+rq-scheduler
 unicode-slugify
 uwsgi
 whitenoise

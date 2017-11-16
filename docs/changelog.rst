@@ -13,6 +13,14 @@ Added
 
   There is a new checkbox on content create that allows skipping adding a link preview to the content.
 
+* Add maintenance job to groom precache information from Redis. This ensures Redis memory usage stays stable.
+
+  **Important for server admins**. There is a new process to run that is responsible for scheduling these maintenance jobs. The process is executed as a Django management command ie ``python manage.py rqscheduler``.
+    * If you already use the `provided Circus configuration <https://socialhome.readthedocs.io/en/latest/installation/ubuntu.html#set-up-circus>`_ to run Socialhome, you **don't need to do anything**. When you restart Socialhome, the updated Circus configuration will automatically be used and the scheduler process started by Circus.
+    * If you have a custom setup, preferring to run all processes manually, ensure one ``rqscheduler`` process is running at all times to ensure maintenance jobs and other future scheduled jobs are executed.
+
+   A new configuration item ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` is available to set the maximum size of precached stream items per user, per stream. This defaults to 100 items. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting if Redis memory usage climbs up too high.
+
 0.6.0 (2017-11-13)
 ------------------
 
