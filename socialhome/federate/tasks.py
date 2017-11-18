@@ -185,10 +185,7 @@ def forward_relayable(entity, parent_id):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    recipients = [
-        (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-    ]
-    recipients.extend(_get_remote_participants_for_parent(parent, exclude=entity.handle))
+    recipients = _get_remote_participants_for_parent(parent, exclude=entity.handle)
     recipients.extend(_get_remote_followers(parent.author, exclude=entity.handle))
     handle_send(entity, content.author, recipients, parent_user=parent.author)
 
