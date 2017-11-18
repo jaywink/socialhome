@@ -1,17 +1,15 @@
 from unittest.mock import patch, call
 
 import pytest
-from django.conf import settings
 from django.test import override_settings
 from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
-from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
-    receive_task, send_content, send_content_retraction, send_reply,
-    forward_relayable, _get_remote_followers,
+    receive_task, send_content, send_content_retraction, send_reply, forward_entity, _get_remote_followers,
     send_follow_change, send_profile, send_share)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
@@ -115,7 +113,7 @@ class TestSendReply(SocialhomeTestCase):
         cls.reply2 = ContentFactory(parent=cls.remote_content, author=author.profile)
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.forward_relayable")
+    @patch("socialhome.federate.tasks.forward_entity")
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_send_reply_relaying_via_local_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply.id)
@@ -123,7 +121,7 @@ class TestSendReply(SocialhomeTestCase):
         assert mock_sender.called == 0
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.forward_relayable")
+    @patch("socialhome.federate.tasks.forward_entity")
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
@@ -187,16 +185,20 @@ class TestForwardRelayable(TestCase):
         author = UserFactory()
         author.profile.rsa_private_key = get_dummy_private_key().exportKey()
         author.profile.save()
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
-        cls.remote_reply = ContentFactory(parent=cls.public_content, author=ProfileFactory())
-        cls.reply = ContentFactory(parent=cls.public_content)
+        cls.public_content = PublicContentFactory(author=author.profile)
+        cls.remote_reply = PublicContentFactory(parent=cls.public_content, author=ProfileFactory())
+        cls.reply = PublicContentFactory(parent=cls.public_content)
+        cls.share = PublicContentFactory(share_of=cls.public_content)
+        cls.share_reply = PublicContentFactory(parent=cls.share)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_forward_relayable(self, mock_send):
         entity = Comment(handle=self.reply.author.handle, guid=self.reply.guid)
-        forward_relayable(entity, self.public_content.id)
+        forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author, [
             (self.remote_reply.author.handle, None),
+            (self.share.author.handle, None),
+            (self.share_reply.author.handle, None),
         ], parent_user=self.public_content.author)
 
 

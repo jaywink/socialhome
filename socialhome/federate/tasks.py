@@ -71,15 +71,28 @@ def send_content(content_id):
         logger.warning("send_content - No entity for %s", content)
 
 
-def _get_remote_participants_for_parent(parent, exclude=None):
-    """Get remote participants for a parent."""
-    participants = []
-    if not parent.local:
-        participants.append((parent.author.handle, None))
-    replies = Content.objects.filter(parent_id=parent.id, visibility=Visibility.PUBLIC, local=False)
+def _get_remote_participants_for_content(target_content, participants=None, exclude=None, include_remote=False):
+    """Get remote participants for a target content.
+
+    Look at both replies and shares of target local content. Does a recursive call to get also replies of shares,
+    even if those shares are remote.
+    """
+    if not participants:
+        participants = []
+    if not include_remote and not target_content.local:
+        return participants
+    replies = Content.objects.filter(parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
     for reply in replies:
         if reply.author.handle != exclude:
             participants.append((reply.author.handle, None))
+    if target_content.content_type == ContentType.CONTENT:
+        shares = Content.objects.filter(share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
+        for share in shares:
+            if share.author.handle != exclude:
+                participants.append((share.author.handle, None))
+            participants = _get_remote_participants_for_content(
+                share, participants, exclude=exclude, include_remote=True
+            )
     return participants
 
 
@@ -111,7 +124,7 @@ def send_reply(content_id):
         return
     # Send directly (remote parent) or as a relayable (local parent)
     if content.parent.local:
-        forward_relayable(entity, content.parent.id)
+        forward_entity(entity, content.parent.id)
     else:
         # We only need to send to the original author
         recipients = [
@@ -167,27 +180,29 @@ def send_content_retraction(content, author_id):
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 
 
-def forward_relayable(entity, parent_id):
-    """Handle forwarding of a relayable object.
+def forward_entity(entity, target_content_id):
+    """Handle forwarding of an entity related to a target content.
+
+    For example: remote replies on local content, remote shares on local content.
 
     Currently only for public content.
     """
     try:
-        parent = Content.objects.get(id=parent_id, visibility=Visibility.PUBLIC)
+        target_content = Content.objects.get(id=target_content_id, visibility=Visibility.PUBLIC, local=True)
     except Content.DoesNotExist:
-        logger.warning("No public content found with id %s", parent_id)
+        logger.warning("forward_entity - No public local content found with id %s", target_content_id)
         return
     try:
         content = Content.objects.get(guid=entity.guid, visibility=Visibility.PUBLIC)
     except Content.DoesNotExist:
-        logger.warning("forward_relayable - No content found with guid %s", entity.guid)
+        logger.warning("forward_entity - No content found with guid %s", entity.guid)
         return
     if settings.DEBUG:
         # Don't send in development mode
         return
-    recipients = _get_remote_participants_for_parent(parent, exclude=entity.handle)
-    recipients.extend(_get_remote_followers(parent.author, exclude=entity.handle))
-    handle_send(entity, content.author, recipients, parent_user=parent.author)
+    recipients = _get_remote_participants_for_content(target_content, exclude=entity.handle)
+    recipients.extend(_get_remote_followers(target_content.author, exclude=entity.handle))
+    handle_send(entity, content.author, recipients, parent_user=target_content.author)
 
 
 def send_follow_change(profile_id, followed_id, follow):
