@@ -10,6 +10,7 @@ const streamStoreOperations = {
     getReplies: "getReplies",
     getShares: "getShares",
     getTagStream: "getTagStream",
+    loadStream: "loadStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
 }
@@ -36,6 +37,28 @@ const mutations = {
 const actions = {
     [streamStoreOperations.disableLoadMore]({commit}, contentId) {
         commit(streamStoreOperations.disableLoadMore, contentId)
+    },
+    [streamStoreOperations.loadStream]({dispatch, state}) {
+        const options = {params: {}}
+        const lastContentId = state.contentIds[state.contentIds.length - 1]
+        if (lastContentId) {
+            options.params.lastId = state.contents[lastContentId].through
+        }
+
+        if (state.streamName.match(/^followed/)) {
+            dispatch(streamStoreOperations.getFollowedStream, options)
+        } else if (state.streamName.match(/^public/)) {
+            dispatch(streamStoreOperations.getPublicStream, options)
+        } else if (state.streamName.match(/^tag/)) {
+            options.params.name = state.tagName
+            dispatch(streamStoreOperations.getTagStream, options)
+        } else if (state.streamName.match(/^profile_all/)) {
+            options.params.id = this.currentBrowsingProfileId
+            dispatch(streamStoreOperations.getProfileAll, options)
+        } else if (state.streamName.match(/^profile_pinned/)) {
+            options.params.id = this.currentBrowsingProfileId
+            dispatch(streamStoreOperations.getProfilePinned, options)
+        }
     },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
