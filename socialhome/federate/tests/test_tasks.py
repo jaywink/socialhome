@@ -196,7 +196,6 @@ class TestForwardRelayable(TestCase):
         entity = Comment(handle=self.reply.author.handle, guid=self.reply.guid)
         forward_relayable(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author, [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
             (self.remote_reply.author.handle, None),
         ], parent_user=self.public_content.author)
 
