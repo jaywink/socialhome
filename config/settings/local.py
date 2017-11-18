@@ -7,6 +7,8 @@ import sys
 
 from .common import *  # noqa
 
+testing = env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in sys.argv
+
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
@@ -91,7 +93,7 @@ SOCIALHOME_HTTPS = False
 # HAYSTACK
 # --------
 # Use a separate index if testing
-if env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in sys.argv:
+if testing:
     if not os.path.isdir("/tmp/socialhome-haystack-test-index"):
         os.mkdir("/tmp/socialhome-haystack-test-index")
     HAYSTACK_CONNECTIONS = {
@@ -103,3 +105,8 @@ if env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in
 
 # Extra tools for development
 MIDDLEWARE_CLASSES += ("querycount.middleware.QueryCountMiddleware",)
+
+# Tests
+if testing:
+    # Possibly wont conflict with anything..
+    REDIS_DB = 15

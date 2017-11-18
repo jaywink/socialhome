@@ -69,6 +69,7 @@ LOCAL_APPS = (
     "socialhome.notifications",
     "socialhome.streams",
     "socialhome.search",
+    "socialhome.tasks",
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -311,6 +312,10 @@ if SOCIALHOME_ADDITIONAL_APPS:
 SOCIALHOME_ADDITIONAL_APPS_URLS = env("SOCIALHOME_ADDITIONAL_APPS_URLS", default=None)
 # Allow to use on main page custom view from third-party app
 SOCIALHOME_HOME_VIEW = env("SOCIALHOME_HOME_VIEW", default=None)
+
+# Streams
+# Trim precached streams to this maximum size
+SOCIALHOME_STREAMS_PRECACHE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE_SIZE", default=100)
 
 # CHANNELS
 # --------

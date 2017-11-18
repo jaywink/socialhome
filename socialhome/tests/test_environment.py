@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-import redis
 import requests
 
 from socialhome.tests.utils import SocialhomeTestCase
@@ -13,6 +12,3 @@ class TestEnvironment(SocialhomeTestCase):
         self.assertTrue(isinstance(requests.post, Mock))
         self.assertTrue(isinstance(requests.patch, Mock))
         self.assertTrue(isinstance(requests.delete, Mock))
-
-    def test_redis(self):
-        self.assertTrue(isinstance(redis.StrictRedis, Mock))
