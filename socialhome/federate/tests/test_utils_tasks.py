@@ -7,9 +7,9 @@ from federation.tests.factories import entities
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory, LocalContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import forward_relayable
+from socialhome.federate.tasks import forward_entity
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
@@ -208,7 +208,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
         process_entity_comment(self.comment, ProfileFactory())
         Content.objects.get(guid=self.comment.guid, parent=self.content)
         call_args = [
-            call(forward_relayable, self.comment, self.content.id),
+            call(forward_entity, self.comment, self.content.id),
         ]
         self.assertEqual(mock_rq.call_args_list, call_args)
 
@@ -328,7 +328,26 @@ class TestProcessEntityShare(SocialhomeTestCase):
         cls.create_local_and_remote_user()
         cls.local_content = LocalContentFactory()
         cls.local_content2 = LocalContentFactory(guid=str(uuid4()))
+        cls.remote_content = PublicContentFactory()
         cls.remote_profile2 = PublicProfileFactory()
+
+    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
+    def test_does_not_forward_share_if_not_local_content(self, mock_rq):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.remote_content.guid,
+            target_handle=self.remote_content.author.handle, public=True,
+        )
+        process_entity_share(entity, self.remote_profile)
+        self.assertFalse(mock_rq.called)
+
+    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
+    def test_forwards_share_if_local_content(self, mock_rq):
+        entity = base.Share(
+            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
+            target_handle=self.local_content.author.handle, public=True,
+        )
+        process_entity_share(entity, self.remote_profile)
+        mock_rq.assert_called_once_with(forward_entity, entity, self.local_content.id)
 
     def test_share_is_created(self):
         entity = base.Share(

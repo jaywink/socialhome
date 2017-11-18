@@ -157,8 +157,8 @@ def process_entity_comment(entity, profile):
         logger.info("Updated Content from comment entity: %s", content)
     if parent.local:
         # We should relay this to participants we know of
-        from socialhome.federate.tasks import forward_relayable
-        django_rq.enqueue(forward_relayable, entity, parent.id)
+        from socialhome.federate.tasks import forward_entity
+        django_rq.enqueue(forward_entity, entity, parent.id)
 
 
 def _embed_entity_images_to_post(children, text):
@@ -266,6 +266,10 @@ def process_entity_share(entity, profile):
         logger.info("Updated share: %s", content)
     # TODO: send participation to the share from the author, if local
     # We probably want that to happen even though our shares are not separate in the stream?
+    if target_content.local:
+        # We should relay this share entity to participants we know of
+        from socialhome.federate.tasks import forward_entity
+        django_rq.enqueue(forward_entity, entity, target_content.id)
 
 
 def _make_post(content):

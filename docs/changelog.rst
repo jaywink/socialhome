@@ -21,6 +21,11 @@ Added
 
    A new configuration item ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` is available to set the maximum size of precached stream items per user, per stream. This defaults to 100 items. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting if Redis memory usage climbs up too high.
 
+Changed
+.......
+
+* When processing a remote share of local content, deliver it also to all participants in the original shared content and also to all personal followers. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
+
 0.6.0 (2017-11-13)
 ------------------
 
