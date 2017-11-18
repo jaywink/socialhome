@@ -1,24 +1,6 @@
 from unittest.mock import Mock
 
-import redis
 import requests
-
-
-class MockRedis(Mock):
-    def hmget(self, *args, **kwargs):
-        return []
-
-    def hset(self, *args, **kwargs):
-        return 1
-
-    def zrank(self, *args, **kwargs):
-        return None
-
-    def zrevrange(self, *args, **kwargs):
-        return []
-
-    def zrevrank(self, *args, **kwargs):
-        return 1
 
 
 class MockResponse(str):
@@ -37,7 +19,3 @@ requests.post = Mock()
 requests.patch = Mock()
 requests.delete = Mock()
 requests.put = Mock()
-
-
-# Disable redis connection
-redis.StrictRedis = Mock(return_value=MockRedis())
