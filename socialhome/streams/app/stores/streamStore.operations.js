@@ -41,7 +41,7 @@ const actions = {
     [streamStoreOperations.loadStream]({dispatch, state}) {
         const options = {params: {}}
         const lastContentId = state.contentIds[state.contentIds.length - 1]
-        if (lastContentId) {
+        if (lastContentId && state.contents[lastContentId]) {
             options.params.lastId = state.contents[lastContentId].through
         }
 
@@ -53,10 +53,10 @@ const actions = {
             options.params.name = state.tagName
             dispatch(streamStoreOperations.getTagStream, options)
         } else if (state.streamName.match(/^profile_all/)) {
-            options.params.id = this.currentBrowsingProfileId
+            options.params.id = state.applicationStore.currentBrowsingProfileId
             dispatch(streamStoreOperations.getProfileAll, options)
         } else if (state.streamName.match(/^profile_pinned/)) {
-            options.params.id = this.currentBrowsingProfileId
+            options.params.id = state.applicationStore.currentBrowsingProfileId
             dispatch(streamStoreOperations.getProfilePinned, options)
         }
     },

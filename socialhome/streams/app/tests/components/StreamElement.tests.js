@@ -3,6 +3,8 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
+import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import StreamElement from "streams/app/components/StreamElement.vue"
 
 
@@ -16,6 +18,20 @@ describe("StreamElement", () => {
     })
 
     describe("computed", () => {
+        it("disableLoadMore", () => {
+            let content = getFakeContent({hasLoadMore: true})
+            let target = mount(StreamElement, {propsData: {content}, store})
+            target.instance().disableLoadMore.should.be.false
+
+            target.instance().$store.state.pending.contents = true
+            target.instance().disableLoadMore.should.be.true
+            target.instance().$store.state.pending.contents = false
+
+            content = getFakeContent({hasLoadMore: false})
+            target = mount(StreamElement, {propsData: {content}, store})
+            target.instance().disableLoadMore.should.be.true
+        })
+
         it("showAuthorBar with content", () => {
             store.state.applicationStore.isUserAuthenticated = false
             let target = mount(StreamElement, {propsData: {content: store.content}, store})
@@ -40,6 +56,17 @@ describe("StreamElement", () => {
             let target = mount(StreamElement, {propsData: {content: otherContent}, store})
             store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.true
+        })
+    })
+
+    describe("methods", () => {
+        it("loadMore dispatches stream operations", () => {
+            let target = mount(StreamElement, {propsData: {content: store.content}, store})
+            Sinon.spy(target.instance().$store, "dispatch")
+            target.instance().loadMore()
+            target.instance().$store.dispatch.getCall(0).args[0].should.eql(streamStoreOperations.disableLoadMore)
+            target.instance().$store.dispatch.getCall(0).args[1].should.eql(store.content.id)
+            target.instance().$store.dispatch.getCall(1).args[0].should.eql(streamStoreOperations.loadStream)
         })
     })
 

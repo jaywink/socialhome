@@ -5,14 +5,44 @@ import Axios from "axios"
 import Vue from "vue"
 import Vuex from "vuex"
 
-import {newStreamStore, streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
 import {actions, mutations, getters} from "streams/app/stores/streamStore.operations"
+import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {newStreamStore, streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
 import getState from "streams/app/stores/streamStore.state"
 
 
 describe("streamStore", () => {
     afterEach(() => {
         Sinon.restore()
+    })
+
+    describe("addHasLoadMore", () => {
+        it("adds flag on fifth last content", () => {
+            const state = {contentIds: [...new Array(7).keys()].map(i => i), contents: {}}
+            state.contentIds.forEach(id => {
+                state.contents[id] = getFakeContent({id: id, hasLoadMore: false})
+            })
+            exportsForTests.addHasLoadMore(state)
+            state.contents[state.contentIds[0]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[1]].hasLoadMore.should.be.true
+            state.contents[state.contentIds[2]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[3]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[4]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[5]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[6]].hasLoadMore.should.be.false
+        })
+
+        it("does not add flag if under 5 contents", () => {
+            const state = {contentIds: [...new Array(4).keys()].map(i => i), contents: {}}
+            state.contentIds.forEach(id => {
+                state.contents[id] = getFakeContent({id: id, hasLoadMore: false})
+            })
+            exportsForTests.addHasLoadMore(state)
+            state.contents[state.contentIds[0]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[1]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[2]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[3]].hasLoadMore.should.be.false
+        })
     })
 
     describe("newStreamStore", () => {
@@ -234,7 +264,21 @@ describe("streamStore", () => {
             it("should handle public stream request", (done) => {
                 Moxios.stubRequest("/api/streams/public/", response)
 
-                target.dispatch(streamStoreOperations.getPublicStream)
+                target.dispatch(streamStoreOperations.getPublicStream, {params: {}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
+                    done()
+                })
+            })
+
+            it("should handle public stream request with lastId", (done) => {
+                Moxios.stubRequest("/api/streams/public/?last_id=8", response)
+
+                target.dispatch(streamStoreOperations.getPublicStream, {params: {lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -248,7 +292,7 @@ describe("streamStore", () => {
             it("should handle public stream request error", (done) => {
                 Moxios.stubRequest("/api/streams/public/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getPublicStream)
+                target.dispatch(streamStoreOperations.getPublicStream, {params: {}})
 
                 Moxios.wait(() => {
                     target.state.error.contents.should.exist
@@ -262,7 +306,21 @@ describe("streamStore", () => {
             it("should handle followed stream request", (done) => {
                 Moxios.stubRequest("/api/streams/followed/", response)
 
-                target.dispatch(streamStoreOperations.getFollowedStream)
+                target.dispatch(streamStoreOperations.getFollowedStream, {params: {}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
+                    done()
+                })
+            })
+
+            it("should handle followed stream request with lastId", (done) => {
+                Moxios.stubRequest("/api/streams/followed/?last_id=8", response)
+
+                target.dispatch(streamStoreOperations.getFollowedStream, {params: {lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -276,7 +334,7 @@ describe("streamStore", () => {
             it("should handle followed stream request error", (done) => {
                 Moxios.stubRequest("/api/streams/followed/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getFollowedStream)
+                target.dispatch(streamStoreOperations.getFollowedStream, {params: {}})
 
                 Moxios.wait(() => {
                     target.state.error.contents.should.exist
@@ -291,6 +349,20 @@ describe("streamStore", () => {
                 Moxios.stubRequest("/api/streams/tag/#yolo/", response)
 
                 target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo"}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
+                    done()
+                })
+            })
+
+            it("should handle tag stream request with lastId", (done) => {
+                Moxios.stubRequest("/api/streams/tag/#yolo/?last_id=8", response)
+
+                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo", lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -329,6 +401,20 @@ describe("streamStore", () => {
                 })
             })
 
+            it("should handle profile all stream request with lastId", (done) => {
+                Moxios.stubRequest("/api/streams/profile-all/26/?last_id=8", response)
+
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26, lastId: 8}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
+                    done()
+                })
+            })
+
             it("should handle profile stream request error", (done) => {
                 Moxios.stubRequest("/api/streams/profile-all/26/", {status: 500})
 
@@ -347,6 +433,20 @@ describe("streamStore", () => {
                 Moxios.stubRequest("/api/streams/profile-pinned/26/", response)
 
                 target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                    })
+                    done()
+                })
+            })
+
+            it("should handle profile pinned stream request with lastId", (done) => {
+                Moxios.stubRequest("/api/streams/profile-pinned/26/?last_id=8", response)
+
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26, lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -453,6 +553,7 @@ describe("streamStore", () => {
         it("should have actions, mutations and getters defined", () => {
             let target = exportsForTests.getStructure(getState(), {modules: {applicationStore: {}}})
 
+            target.actions[streamStoreOperations.disableLoadMore].should.exist
             target.actions[streamStoreOperations.getFollowedStream].should.exist
             target.actions[streamStoreOperations.getProfileAll].should.exist
             target.actions[streamStoreOperations.getProfilePinned].should.exist
@@ -460,19 +561,31 @@ describe("streamStore", () => {
             target.actions[streamStoreOperations.getReplies].should.exist
             target.actions[streamStoreOperations.getShares].should.exist
             target.actions[streamStoreOperations.getTagStream].should.exist
+            target.actions[streamStoreOperations.loadStream].should.exist
             target.actions[streamStoreOperations.newContentAck].should.exist
             target.actions[streamStoreOperations.receivedNewContent].should.exist
 
+            target.mutations[streamStoreOperations.disableLoadMore].should.exist
             target.mutations[streamStoreOperations.newContentAck].should.exist
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
 
             target.getters.contentList.should.exist
+            target.getters.replies.should.exist
+            target.getters.shares.should.exist
 
             target.modules.applicationStore.should.exist
         })
     })
 
     describe("mutations", () => {
+        describe("disableLoadMore", () => {
+            it("should turn off hasLoadMore flag", () => {
+                let state = {contents: {"1": {"id": getFakeContent({id: 1, hasLoadMore: true})}}}
+                mutations[streamStoreOperations.disableLoadMore](state, "1")
+                state.contents["1"].hasLoadMore.should.be.false
+            })
+        })
+
         describe("receivedNewContent", () => {
             it("should set state.stream.hasNewContent to true", () => {
                 let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
@@ -509,6 +622,120 @@ describe("streamStore", () => {
     })
 
     describe("actions", () => {
+        describe("disableLoadMore", () => {
+            it("should commit with the correct parameters", () => {
+                let commit = Sinon.spy()
+                actions[streamStoreOperations.disableLoadMore]({commit}, 10)
+                commit.getCall(0).args.should.eql([streamStoreOperations.disableLoadMore, 10])
+            })
+        })
+
+        describe("loadStream", () => {
+            let dispatch
+            let state
+
+            beforeEach(() => {
+                dispatch = Sinon.spy()
+            })
+
+            afterEach(() => {
+                dispatch.reset()
+            })
+
+            context("dispatch without contents", () => {
+                beforeEach(() => {
+                    state = {contentIds: [], applicationStore: {}}
+                })
+
+                it("followed stream with no contents", () => {
+                    state.streamName = "followed__spameater"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream, {params: {}}])
+                })
+
+                it("public stream with no contents", () => {
+                    state.streamName = "public"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream, {params: {}}])
+                })
+
+                it("tag stream with no contents", () => {
+                    state.streamName = "tag__1234"
+                    state.tagName = "eggs"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getTagStream, {params: {name: "eggs"}}])
+                })
+
+                it("profile all stream with no contents", () => {
+                    state.streamName = "profile_all__1234-5678"
+                    state.applicationStore.currentBrowsingProfileId = 3
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, {params: {id: 3}}])
+                })
+
+                it("profile pinned stream with no contents", () => {
+                    state.streamName = "profile_pinned__1234-5678"
+                    state.applicationStore.currentBrowsingProfileId = 3
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, {params: {id: 3}}])
+                })
+
+            })
+
+            context("dispatch with contents", () => {
+                beforeEach(() => {
+                    state = {
+                        contentIds: ["1", "2"],
+                        contents: {"1": {through: "3"}, "2": {through: "4"}},
+                        applicationStore: {},
+                    }
+                })
+
+                it("followed stream with contents", () => {
+                    state.streamName = "followed__spameater"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql(
+                        [streamStoreOperations.getFollowedStream, {params: {lastId: "4"}}]
+                    )
+                })
+
+                it("public stream with contents", () => {
+                    state.streamName = "public"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql(
+                        [streamStoreOperations.getPublicStream, {params: {lastId: "4"}}]
+                    )
+                })
+
+                it("tag stream with contents", () => {
+                    state.streamName = "tag__1234"
+                    state.tagName = "eggs"
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql(
+                        [streamStoreOperations.getTagStream, {params: {name: "eggs", lastId: "4"}}]
+                    )
+                })
+
+                it("profile all stream with contents", () => {
+                    state.streamName = "profile_all__1234-5678"
+                    state.applicationStore.currentBrowsingProfileId = 3
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql(
+                        [streamStoreOperations.getProfileAll, {params: {id: 3, lastId: "4"}}]
+                    )
+                })
+
+                it("profile pinned stream with contents", () => {
+                    state.streamName = "profile_pinned__1234-5678"
+                    state.applicationStore.currentBrowsingProfileId = 3
+                    actions[streamStoreOperations.loadStream]({dispatch, state})
+                    dispatch.getCall(0).args.should.eql(
+                        [streamStoreOperations.getProfilePinned, {params: {id: 3, lastId: "4"}}]
+                    )
+                })
+            })
+        })
+
         describe("receivedNewContent", () => {
             it("should commit with the correct parameters", () => {
                 let commit = Sinon.spy()
@@ -516,6 +743,7 @@ describe("streamStore", () => {
                 commit.getCall(0).args.should.eql([streamStoreOperations.receivedNewContent, 10])
             })
         })
+
         describe("newContentAck", () => {
             it("should commit with the correct parameters", () => {
                 let commit = Sinon.spy()

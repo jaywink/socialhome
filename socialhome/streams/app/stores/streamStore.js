@@ -160,6 +160,12 @@ function newStreamStore(options = {}) {
 }
 
 const exportsForTests = {
-    getStructure, onError, fetchContentsSuccess, fetchRepliesSuccess, fetchSharesSuccess, newRestAPI,
+    addHasLoadMore,
+    fetchContentsSuccess,
+    fetchRepliesSuccess,
+    fetchSharesSuccess,
+    getStructure,
+    newRestAPI,
+    onError,
 }
 export {streamStoreOperations, newStreamStore, exportsForTests}
