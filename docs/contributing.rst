@@ -43,6 +43,18 @@ will not be merged because it doesn't fit into the grand plan.
 
 Please don't be afraid to get in touch, see channels in the :ref:`community` pages.
 
+Creating pull requests
+----------------------
+
+Before submitting a pull request, please ensure you've read and understood the following checklist.
+
+.. include:: PULL_REQUEST_TEMPLATE.txt
+
+Reviewing code
+--------------
+
+Code review is a valuable way to contribute, and also to learn about the code base! Don't be afraid to give some comments to `open pull requests <https://github.com/jaywink/socialhome/pulls>`_! You don't have to be a veteran or know everything to be able to give opinions. Pull request reviews are not just for reviewing, they're a valuable opportunity for learning too.
+
 Tests
 -----
 
@@ -52,17 +64,31 @@ and for features always add a good enough coverage. PR's without sufficient test
 Testing tools
 .............
 
-We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own base class called ``SocialhomeTestCase`` which should be used as a base for all Django tests. Alternatively, to test Django class based views, you can use our ``SocialhomeCBVTestCase``. Both these base classes inherit from the powerful `django-test-plus <http://django-test-plus.readthedocs.io>`_ test classes. Some old tests are pure py.test function based tests, feel free to convert these.
+Django
+''''''
+
+We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own `base classes <https://github.com/jaywink/socialhome/blob/master/socialhome/tests/utils.py>`_ which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these to Django test classes.
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
+
+Vue
+'''
+
+The JS tests are using the `Avoriaz <https://eddyerburgh.gitbooks.io/avoriaz/content/>`_ Vue test utils and `Mocha <https://mochajs.org/>`_ test runner.
 
 Code style
 ----------
 
+Python
+......
+
 As a general rule, for Python code follow PEP8, except with a 120 character line length. We provide an
 ``.editorconfig`` in the repository root.
 
-There is an ``.eslintrc`` configuration provided as well. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
+JavaScript
+..........
+
+There is an ``.eslintrc`` configuration provided.
 
 Alphabetical ordering
 .....................

@@ -212,6 +212,23 @@ Then execute the following and copy the markdown version for pasting to GitHub r
 
 After the release commit has been pushed and a release has been tagged, set a development version in the same above files. This is basically the next minor release postfixed by ``-dev``.
 
+Commit and author stats
+.......................
+
+Some commands to get nice stats for release posts.
+
+**Authors**
+
+::
+
+    git shortlog -s -n -e <first release commit>..HEAD --no-merges
+
+**Changes**
+
+::
+
+    git diff --stat <first release commit>..HEAD
+
 Developing with Docker
 ------------------------
 
