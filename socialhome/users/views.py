@@ -10,6 +10,7 @@ from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
 from socialhome.streams.views import StreamMixin
 from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
+from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tables import FollowedTable
 
 
@@ -68,17 +69,9 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
     def get_json_context(self):
         json_context = super().get_json_context()
         json_context.update({
-            "profile": {
-                "id": self.target_profile.id,
-                "guid": self.target_profile.guid,
-                "followersCount": self.followers_count,
-                "followingCount": str(self.target_profile.following.count()),
-                "handle": self.target_profile.handle,
-                "saferImageUrlLarge": self.target_profile.safer_image_url_large,
-                "streamType": self.profile_stream_type,
-                "pinnedContentExists": self.pinned_content_exists,
-            },
+            "profile": ProfileSerializer(self.target_profile, context={'request': self.request}).data
         })
+        json_context["profile"].update({"stream_type": self.profile_stream_type})
         return json_context
 
     def get_object(self, queryset=None):

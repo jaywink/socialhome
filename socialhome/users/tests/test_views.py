@@ -101,7 +101,6 @@ class TestProfileDetailView(SocialhomeTestCase):
 
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        view.followers_count = 3
         self.assertEqual(
             view.get_json_context(),
             {
@@ -111,17 +110,25 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "profile": {
                     "id": profile.id,
                     "guid": profile.guid,
-                    "followersCount": 3,
-                    "followingCount": str(profile.following.count()),
+                    "followers_count": 0,
+                    "following_count": profile.following.count(),
                     "handle": profile.handle,
-                    "saferImageUrlLarge": profile.safer_image_url_large,
-                    "streamType": view.profile_stream_type,
-                    "pinnedContentExists": view.pinned_content_exists,
+                    "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
+                    "home_url": profile.home_url,
+                    "image_url_large": profile.image_url_large,
+                    "image_url_medium": profile.image_url_medium,
+                    "image_url_small": profile.image_url_small,
+                    "is_local": profile.is_local,
+                    "location": profile.location,
+                    "name": profile.name,
+                    "nsfw": profile.nsfw,
+                    "stream_type": view.profile_stream_type,
+                    "url": profile.url,
+                    "visibility": str(profile.visibility).lower(),
                 },
             },
         )
         request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
-        view.followers_count = 3
         self.assertEqual(
             view.get_json_context(),
             {
@@ -131,12 +138,21 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "profile": {
                     "id": profile.id,
                     "guid": profile.guid,
-                    "followersCount": 3,
-                    "followingCount": str(profile.following.count()),
+                    "followers_count": 0,
+                    "following_count": profile.following.count(),
                     "handle": profile.handle,
-                    "saferImageUrlLarge": profile.safer_image_url_large,
-                    "streamType": view.profile_stream_type,
-                    "pinnedContentExists": view.pinned_content_exists,
+                    "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
+                    "home_url": profile.home_url,
+                    "image_url_large": profile.image_url_large,
+                    "image_url_medium": profile.image_url_medium,
+                    "image_url_small": profile.image_url_small,
+                    "is_local": profile.is_local,
+                    "location": profile.location,
+                    "name": profile.name,
+                    "nsfw": profile.nsfw,
+                    "stream_type": view.profile_stream_type,
+                    "url": profile.url,
+                    "visibility": str(profile.visibility).lower(),
                 },
             },
         )
@@ -366,7 +382,6 @@ class TestProfileAllContentView(SocialhomeTestCase):
 
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        view.followers_count = 3
         self.assertEqual(
             view.get_json_context(),
             {
@@ -376,17 +391,25 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "profile": {
                     "id": profile.id,
                     "guid": profile.guid,
-                    "followersCount": 3,
-                    "followingCount": str(profile.following.count()),
+                    "followers_count": 0,
+                    "following_count": profile.following.count(),
                     "handle": profile.handle,
-                    "saferImageUrlLarge": profile.safer_image_url_large,
-                    "streamType": view.profile_stream_type,
-                    "pinnedContentExists": view.pinned_content_exists,
+                    "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
+                    "home_url": profile.home_url,
+                    "image_url_large": profile.image_url_large,
+                    "image_url_medium": profile.image_url_medium,
+                    "image_url_small": profile.image_url_small,
+                    "is_local": profile.is_local,
+                    "location": profile.location,
+                    "name": profile.name,
+                    "nsfw": profile.nsfw,
+                    "stream_type": view.profile_stream_type,
+                    "url": profile.url,
+                    "visibility": str(profile.visibility).lower(),
                 },
             },
         )
         request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
-        view.followers_count = 3
         self.assertEqual(
             view.get_json_context(),
             {
@@ -396,12 +419,21 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "profile": {
                     "id": profile.id,
                     "guid": profile.guid,
-                    "followersCount": 3,
-                    "followingCount": str(profile.following.count()),
+                    "followers_count": 0,
+                    "following_count": profile.following.count(),
                     "handle": profile.handle,
-                    "saferImageUrlLarge": profile.safer_image_url_large,
-                    "streamType": view.profile_stream_type,
-                    "pinnedContentExists": view.pinned_content_exists,
+                    "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
+                    "home_url": profile.home_url,
+                    "image_url_large": profile.image_url_large,
+                    "image_url_medium": profile.image_url_medium,
+                    "image_url_small": profile.image_url_small,
+                    "is_local": profile.is_local,
+                    "location": profile.location,
+                    "name": profile.name,
+                    "nsfw": profile.nsfw,
+                    "stream_type": view.profile_stream_type,
+                    "url": profile.url,
+                    "visibility": str(profile.visibility).lower(),
                 },
             },
         )
