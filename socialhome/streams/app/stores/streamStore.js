@@ -11,6 +11,13 @@ import {actions, mutations, streamStoreOperations, getters} from "streams/app/st
 
 Vue.use(Vuex)
 
+function addHasLoadMore(state) {
+    const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
+    if (loadMoreContentId) {
+        Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
+    }
+}
+
 function fetchContentsSuccess(state, payload) {
     payload.data.forEach(item => {
         const content = Object.assign({}, item, {replyIds: [], shareIds: []})
@@ -19,6 +26,9 @@ function fetchContentsSuccess(state, payload) {
             state.contentIds.push(content.id)
         }
     })
+    if (payload.data.length) {
+        addHasLoadMore(state)
+    }
 }
 
 function fetchRepliesSuccess(state, payload) {
@@ -57,39 +67,40 @@ function newRestAPI(options) {
         baseURL: "",
         axios: Vue.prototype.$http,
     })
+    const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 
     return new Vapi(opts)
         .get({
             action: streamStoreOperations.getPublicStream,
-            path: Urls["api-streams:public"](),
+            path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: streamStoreOperations.getFollowedStream,
-            path: Urls["api-streams:followed"](),
+            path: ({lastId = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: streamStoreOperations.getTagStream,
-            path: ({name}) => Urls["api-streams:tag"]({name}),
+            path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: streamStoreOperations.getProfileAll,
-            path: ({id}) => Urls["api-streams:profile-all"]({id}),
+            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-all"]({id})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: streamStoreOperations.getProfilePinned,
-            path: ({id}) => Urls["api-streams:profile-pinned"]({id}),
+            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({id})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -149,6 +160,12 @@ function newStreamStore(options = {}) {
 }
 
 const exportsForTests = {
-    getStructure, onError, fetchContentsSuccess, fetchRepliesSuccess, fetchSharesSuccess, newRestAPI,
+    addHasLoadMore,
+    fetchContentsSuccess,
+    fetchRepliesSuccess,
+    fetchSharesSuccess,
+    getStructure,
+    newRestAPI,
+    onError,
 }
 export {streamStoreOperations, newStreamStore, exportsForTests}

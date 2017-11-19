@@ -2,6 +2,7 @@ import Vue from "vue"
 
 
 const streamStoreOperations = {
+    disableLoadMore: "disableLoadMore",
     getFollowedStream: "getFollowedStream",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",
@@ -9,6 +10,7 @@ const streamStoreOperations = {
     getReplies: "getReplies",
     getShares: "getShares",
     getTagStream: "getTagStream",
+    loadStream: "loadStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
 }
@@ -16,6 +18,9 @@ const streamStoreOperations = {
 // This is the Vuex way
 /* eslint-disable no-param-reassign */
 const mutations = {
+    [streamStoreOperations.disableLoadMore](state, contentId) {
+        Vue.set(state.contents[contentId], "hasLoadMore", false)
+    },
     [streamStoreOperations.receivedNewContent](state, contentId) {
         state.hasNewContent = true
         state.newContentLengh += 1
@@ -30,6 +35,31 @@ const mutations = {
 /* eslint-enable no-param-reassign */
 
 const actions = {
+    [streamStoreOperations.disableLoadMore]({commit}, contentId) {
+        commit(streamStoreOperations.disableLoadMore, contentId)
+    },
+    [streamStoreOperations.loadStream]({dispatch, state}) {
+        const options = {params: {}}
+        const lastContentId = state.contentIds[state.contentIds.length - 1]
+        if (lastContentId && state.contents[lastContentId]) {
+            options.params.lastId = state.contents[lastContentId].through
+        }
+
+        if (state.streamName.match(/^followed/)) {
+            dispatch(streamStoreOperations.getFollowedStream, options)
+        } else if (state.streamName.match(/^public/)) {
+            dispatch(streamStoreOperations.getPublicStream, options)
+        } else if (state.streamName.match(/^tag/)) {
+            options.params.name = state.tagName
+            dispatch(streamStoreOperations.getTagStream, options)
+        } else if (state.streamName.match(/^profile_all/)) {
+            options.params.id = state.applicationStore.currentBrowsingProfileId
+            dispatch(streamStoreOperations.getProfileAll, options)
+        } else if (state.streamName.match(/^profile_pinned/)) {
+            options.params.id = state.applicationStore.currentBrowsingProfileId
+            dispatch(streamStoreOperations.getProfilePinned, options)
+        }
+    },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
     },

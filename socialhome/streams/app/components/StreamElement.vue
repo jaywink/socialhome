@@ -1,5 +1,9 @@
 <template>
     <div>
+        <div v-if="content.hasLoadMore">
+            <div v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore"></div>
+        </div>
+
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <div v-html="content.rendered" />
         </nsfw-shield>
@@ -28,6 +32,8 @@
 
 <script>
 import Vue from "vue"
+
+import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
 import "streams/app/components/NsfwShield.vue"
@@ -40,6 +46,9 @@ export default Vue.component("stream-element", {
     computed: {
         deleteUrl() {
             return Urls["content:delete"]({pk: this.content.id})
+        },
+        disableLoadMore() {
+            return this.$store.state.pending.contents || ! this.content.hasLoadMore
         },
         timestampText() {
             return this.content.edited
@@ -59,6 +68,12 @@ export default Vue.component("stream-element", {
         },
         updateUrl() {
             return Urls["content:update"]({pk: this.content.id})
+        },
+    },
+    methods: {
+        loadMore() {
+            this.$store.dispatch(streamStoreOperations.disableLoadMore, this.content.id)
+            this.$store.dispatch(streamStoreOperations.loadStream)
         },
     },
     updated() {

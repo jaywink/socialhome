@@ -13,7 +13,7 @@
             <a @click.stop.prevent="toggleNsfwShield" href="#">{{ nsfwBtnText }}</a>
         </div>
         <div v-show="!showNsfwContent">
-            <b-button v-for="tag in tags" :href="getTagUrl(tag)" variant="link">#{{tag}}</b-button>
+            <b-button v-for="tag in tags" :key="tag" :href="getTagUrl(tag)" variant="link">#{{tag}}</b-button>
         </div>
         <slot v-if="showNsfwContent" />
     </div>
