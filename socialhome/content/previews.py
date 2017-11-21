@@ -102,8 +102,13 @@ def fetch_oembed_preview(content, urls):
             Content.objects.filter(id=content.id).update(oembed=oembed)
             return oembed
         # Fetch oembed
+        options = {}
+        if url.startswith("https://twitter.com/"):
+            # This probably has little effect since we fetch these on the backend...
+            # But, DNT is always good to communicate if possible :)
+            options = {"dnt": "true"}
         try:
-            oembed = PyEmbed(discoverer=OEmbedDiscoverer()).embed(url)
+            oembed = PyEmbed(discoverer=OEmbedDiscoverer()).embed(url, **options)
         except (PyEmbedError, PyEmbedDiscoveryError, PyEmbedConsumerError, ValueError):
             continue
         if not oembed:

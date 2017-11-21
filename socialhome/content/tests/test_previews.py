@@ -146,6 +146,11 @@ class TestFetchOEmbedPreview(SocialhomeTestCase):
         cls.content = ContentFactory()
         cls.urls = ["https://example.com"]
 
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
+    def test_adds_dnt_flag_to_twitter_oembed(self, embed):
+        result = fetch_oembed_preview(self.content, ["https://twitter.com/foobar"])
+        embed.assert_called_once_with("https://twitter.com/foobar", dnt="true")
+
     def test_cache_not_updated_if_previous_found(self):
         OEmbedCacheFactory(url=self.urls[0])
         result = fetch_oembed_preview(self.content, self.urls)
