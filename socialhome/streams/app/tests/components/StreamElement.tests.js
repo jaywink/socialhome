@@ -1,4 +1,5 @@
 import {mount} from "avoriaz"
+import infiniteScroll from "vue-infinite-scroll"
 import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 
@@ -8,6 +9,7 @@ import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import StreamElement from "streams/app/components/StreamElement.vue"
 
 
+Vue.use(infiniteScroll)
 Vue.use(VueMasonryPlugin)
 
 describe("StreamElement", () => {
