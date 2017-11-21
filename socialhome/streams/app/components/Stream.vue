@@ -71,9 +71,6 @@ export default Vue.component("stream", {
                 console.error(`Unsupported stream name ${this.$store.state.streamName}`)
             }
         },
-        currentBrowsingProfileId() {
-            return this.$store.state.applicationStore.currentBrowsingProfileId
-        },
     },
     methods: {
         onImageLoad() {

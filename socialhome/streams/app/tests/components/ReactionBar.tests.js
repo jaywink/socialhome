@@ -89,7 +89,7 @@ describe("ReactionBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                let target = new ReactionsBar({content})
+                let target = new ReactionsBar({propsData: {content}})
                 target.expandShares()
                 target.showSharesBox.should.be.true
                 target.expandShares()

@@ -53,10 +53,10 @@ const actions = {
             options.params.name = state.tagName
             dispatch(streamStoreOperations.getTagStream, options)
         } else if (state.streamName.match(/^profile_all/)) {
-            options.params.id = state.applicationStore.currentBrowsingProfileId
+            options.params.id = state.applicationStore.profile.id
             dispatch(streamStoreOperations.getProfileAll, options)
         } else if (state.streamName.match(/^profile_pinned/)) {
-            options.params.id = state.applicationStore.currentBrowsingProfileId
+            options.params.id = state.applicationStore.profile.id
             dispatch(streamStoreOperations.getProfilePinned, options)
         }
     },
