@@ -644,7 +644,7 @@ describe("streamStore", () => {
 
             context("dispatch without contents", () => {
                 beforeEach(() => {
-                    state = {contentIds: [], applicationStore: {}}
+                    state = {contentIds: [], applicationStore: {profile: {id: 5}}}
                 })
 
                 it("followed stream with no contents", () => {
@@ -668,16 +668,14 @@ describe("streamStore", () => {
 
                 it("profile all stream with no contents", () => {
                     state.streamName = "profile_all__1234-5678"
-                    state.applicationStore.currentBrowsingProfileId = 3
                     actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, {params: {id: 3}}])
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, {params: {id: 5}}])
                 })
 
                 it("profile pinned stream with no contents", () => {
                     state.streamName = "profile_pinned__1234-5678"
-                    state.applicationStore.currentBrowsingProfileId = 3
                     actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, {params: {id: 3}}])
+                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, {params: {id: 5}}])
                 })
 
             })
@@ -687,7 +685,7 @@ describe("streamStore", () => {
                     state = {
                         contentIds: ["1", "2"],
                         contents: {"1": {through: "3"}, "2": {through: "4"}},
-                        applicationStore: {},
+                        applicationStore: {profile: {id: 5}},
                     }
                 })
 
@@ -718,19 +716,17 @@ describe("streamStore", () => {
 
                 it("profile all stream with contents", () => {
                     state.streamName = "profile_all__1234-5678"
-                    state.applicationStore.currentBrowsingProfileId = 3
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfileAll, {params: {id: 3, lastId: "4"}}]
+                        [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}}]
                     )
                 })
 
                 it("profile pinned stream with contents", () => {
                     state.streamName = "profile_pinned__1234-5678"
-                    state.applicationStore.currentBrowsingProfileId = 3
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfilePinned, {params: {id: 3, lastId: "4"}}]
+                        [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}}]
                     )
                 })
             })
