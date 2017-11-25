@@ -21,6 +21,8 @@ Added
 
    A new configuration item ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` is available to set the maximum size of precached stream items per user, per stream. This defaults to 100 items. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting if Redis memory usage climbs up too high.
 
+* It is now possible to use email for log-in. (`#377 <https://github.com/jaywink/socialhome/issues/377>`_)
+
 Changed
 .......
 
