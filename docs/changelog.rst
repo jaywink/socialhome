@@ -23,6 +23,10 @@ Added
 
 * It is now possible to use email for log-in. (`#377 <https://github.com/jaywink/socialhome/issues/377>`_)
 
+* Added a Code of Conduct document. All contributors to Socialhome are expected to honour these simple rules to ensure our project is a safe place to contribute to.
+
+  Read the Code of Conduct `here <https://github.com/jaywink/socialhome/blob/master/CODE_OF_CONDUCT.md>`_.
+
 Changed
 .......
 
