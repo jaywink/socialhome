@@ -1,6 +1,8 @@
 from enumfields.drf import EnumField
+from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
+from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 
@@ -35,13 +37,19 @@ class LimitedProfileSerializer(ModelSerializer):
 
 
 class ProfileSerializer(ModelSerializer):
+    followers_count = SerializerMethodField()
+    following_count = SerializerMethodField()
+    has_pinned_content = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
     class Meta:
         model = Profile
         fields = (
+            "followers_count",
+            "following_count",
             "guid",
             "handle",
+            "has_pinned_content",
             "home_url",
             "id",
             "image_url_large",
@@ -55,8 +63,11 @@ class ProfileSerializer(ModelSerializer):
             "visibility",
         )
         read_only_fields = (
+            "followers_count",
+            "following_count",
             "guid",
             "handle",
+            "has_pinned_content",
             "home_url",
             "id",
             "image_url_large",
@@ -65,6 +76,16 @@ class ProfileSerializer(ModelSerializer):
             "is_local",
             "url",
         )
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+    def get_followers_count(self, obj):
+        return Profile.objects.followers(obj).count()
+
+    def get_has_pinned_content(self, obj):
+        user = self.context.get("request").user
+        return Content.objects.profile_pinned(obj, user).exists()
 
 
 class UserSerializer(ModelSerializer):

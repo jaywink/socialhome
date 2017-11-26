@@ -59,7 +59,7 @@
                     <i class="fa fa-user" />
                     <i class="fa fa-arrow-right" />
                     <i class="fa fa-users" />
-                    &nbsp;{{ profile.followingCount }}
+                    &nbsp;{{ profile.following_count }}
                 </b-button>
             </div>
             <div class="mt-1">
@@ -72,15 +72,15 @@
                     <i class="fa fa-users" />
                     <i class="fa fa-arrow-right" />
                     <i class="fa fa-user" />
-                    &nbsp;{{ profile.followersCount }}
+                    &nbsp;{{ profile.followers_count }}
                 </b-button>
             </div>
         </div>
         <div class="d-inline-block">
             <img
-                v-if="profile.saferImageUrlLarge"
+                v-if="profile.image_url_large"
                 class="profile-stream-stamped-image"
-                :src="profile.saferImageUrlLarge"
+                :src="profile.image_url_large"
             />
         </div>
         <div class="d-inline-block ml-3 align-center stamped-profile-info">
@@ -88,7 +88,7 @@
             <h3><cite :title="translations.userHandle">{{ profile.handle }}</cite></h3>
         </div>
         <div class="text-center">
-            <b-button v-if="profile.pinnedContentExists" :variant="pinnedContentVariant" :href="urls.pinnedContent">
+            <b-button v-if="profile.has_pinned_content" :variant="pinnedContentVariant" :href="urls.pinnedContent">
                 {{ translations.pinnedContent }}
             </b-button>
             <b-button :variant="profileContentVariant" :href="urls.profileAllContent">
@@ -110,10 +110,10 @@ export default Vue.component("profile-stamped-element", {
             return this.profile.name ? this.profile.name : this.profile.guid
         },
         pinnedContentVariant() {
-            return this.profile.streamType === "pinned" ? "primary" : "secondary"
+            return this.profile.stream_type === "pinned" ? "primary" : "secondary"
         },
         profileContentVariant() {
-            return this.profile.streamType === "all_content" ? "primary" : "secondary"
+            return this.profile.stream_type === "all_content" ? "primary" : "secondary"
         },
         profile() {
             return this.$store.state.applicationStore.profile
