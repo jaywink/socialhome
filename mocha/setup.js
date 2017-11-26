@@ -39,3 +39,4 @@ const file = "socialhome/streams/app/tests/fixtures/Url"
 global.Urls = require(`../${file}`).Urls // eslint-disable-line global-require, import/no-dynamic-require
 
 global.gettext = key => key
+global.ngettext = (key1, key2, num) => (num > 1 ? key2 : key1)

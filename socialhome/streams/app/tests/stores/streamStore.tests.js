@@ -73,7 +73,7 @@ describe("streamStore", () => {
                 newStreamStore({WebSocketImpl: WebSocket})
                 setTimeout(() => {
                     Vuex.Store.prototype.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.receivedNewContent, 1])
+                        .should.eql([streamStoreOperations.receivedNewContent, 4])
                     done()
                 }, 200)
             })
@@ -254,6 +254,44 @@ describe("streamStore", () => {
                     "7": {id: "7", content_type: "share", share_of: "2", replyIds: []},
                 },
             })
+        })
+    })
+
+    describe("fetchNewContentSuccess", () => {
+        it("should append fetched content to contents", () => {
+            let payload = {data: {id: "6", text: "Yolo"}}
+
+            let state = {
+                contents: {
+                    "1": {id: "1", text: "Plop"},
+                    "2": {id: "2", text: "Hello!"},
+                },
+                unfetchedContentIds: ["6"]
+            }
+
+            exportsForTests.fetchNewContentSuccess(state, payload)
+
+            state.contents.should.eql({
+                    "1": {id: "1", text: "Plop"},
+                    "2": {id: "2", text: "Hello!"},
+                    "6": {id: "6", text: "Yolo"},
+            })
+        })
+
+        it("should remove fetched ids from unfetched ids list", () => {
+            let payload = {data: {id: "6", text: "Yolo"}}
+
+            let state = {
+                contents: {
+                    "1": {id: "1", text: "Plop"},
+                    "2": {id: "2", text: "Hello!"},
+                },
+                unfetchedContentIds: ["6"]
+            }
+
+            exportsForTests.fetchNewContentSuccess(state, payload)
+
+            state.unfetchedContentIds.should.eql([])
         })
     })
 
@@ -601,6 +639,26 @@ describe("streamStore", () => {
                 })
             })
         })
+
+        context("fetching new content", () => {
+            it("should handle request", (done) => {
+                Vue.set(target.state, "contents", {})
+                Vue.set(target.state, "unfetchedContentIds", ["6"])
+
+                Moxios.stubRequest("/api/content/6/", {
+                    status: 200,
+                    response: {id: "6", text: "Yolo"},
+                })
+
+                target.dispatch(streamStoreOperations.getNewContent, {params: {pk: "6"}})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({"6": {id: "6", text: "Yolo"}})
+                    target.state.unfetchedContentIds.should.eql([])
+                    done()
+                })
+            })
+        })
     })
 
     describe("getStructure", () => {
@@ -642,36 +700,22 @@ describe("streamStore", () => {
         })
 
         describe("receivedNewContent", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.hasNewContent.should.be.true
-            })
-
-            it("should increment state.stream.newContentLengh by 1", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.newContentLengh.should.equal(1)
-            })
-
-            it("should add the new post id to the content list with undefined value", () => {
-                let state = {hasNewContent: false, newContentLengh: 0, contents: {}, contentIds: []}
-                mutations[streamStoreOperations.receivedNewContent](state, 42)
-                state.contentIds.should.eql([42])
-                state.contents.should.eql({42: undefined})
+            it("should insert id to 'state.unfetchedContentIds'", () => {
+                let state = {unfetchedContentIds: []}
+                mutations[streamStoreOperations.receivedNewContent](state, "6")
+                state.unfetchedContentIds.should.eql(["6"])
             })
         })
         describe("newContentAck", () => {
-            it("should set state.stream.hasNewContent to true", () => {
-                let state = {hasNewContent: true, newContentLengh: 0}
+            it("should add all elements from 'state.unfetchedContentIds' to 'state.contentIds'", () => {
+                let state = {unfetchedContentIds: ["6"], contentIds: []}
                 mutations[streamStoreOperations.newContentAck](state)
-                state.hasNewContent.should.be.false
+                state.contentIds.should.eql(["6"])
             })
-
-            it("should set state.stream.newContentLengh to 0", () => {
-                let state = {hasNewContent: true, newContentLengh: 10}
+            it("should not create duplicates in 'state.contentIds'", () => {
+                let state = {unfetchedContentIds: ["6"], contentIds: ["6"]}
                 mutations[streamStoreOperations.newContentAck](state)
-                state.newContentLengh.should.equal(0)
+                state.contentIds.should.eql(["6"])
             })
         })
     })
@@ -797,9 +841,21 @@ describe("streamStore", () => {
 
         describe("newContentAck", () => {
             it("should commit with the correct parameters", () => {
+                let state = {unfetchedContentIds: []}
                 let commit = Sinon.spy()
-                actions[streamStoreOperations.newContentAck]({commit})
+                let dispatch = Sinon.spy()
+                actions[streamStoreOperations.newContentAck]({commit, state, dispatch})
                 commit.getCall(0).args[0].should.equal(streamStoreOperations.newContentAck)
+            })
+
+            it("should dispatch 'streamStoreOperations.getNewContent' for every unfetched ID", () => {
+                let state = {unfetchedContentIds: [1, 2, 3]}
+                let commit = Sinon.spy()
+                let dispatch = Sinon.spy()
+                actions[streamStoreOperations.newContentAck]({commit, state, dispatch})
+                dispatch.getCall(0).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 1}}])
+                dispatch.getCall(1).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 2}}])
+                dispatch.getCall(2).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 3}}])
             })
         })
     })
@@ -858,6 +914,27 @@ describe("streamStore", () => {
                 }
                 getters.shares(state)(1).should.eql([{id: "2"}, {id: "4"}])
                 getters.shares(state)(3).should.eql([{id: "5"}])
+            })
+        })
+
+        describe("hasNewContent", () => {
+            it("should be true if 'state.unfetchedContentIds' is not empty and content is not being fetched", () => {
+                let state = exportsForTests.newRestAPI({state: getState()}).state
+
+                state.pending.contents = false
+                state.unfetchedContentIds.push("6")
+
+                getters.hasNewContent(state).should.be.true
+
+                state.pending.contents = false
+                state.unfetchedContentIds.length = 0
+
+                getters.hasNewContent(state).should.be.false
+
+                state.pending.contents = true
+                state.unfetchedContentIds.push("6")
+
+                getters.hasNewContent(state).should.be.false
             })
         })
     })

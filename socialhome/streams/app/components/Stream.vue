@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="container-flex">
-            <div v-show="$store.state.hasNewContent" class="new-content-container">
+            <div v-show="$store.getters.hasNewContent" class="new-content-container">
                 <b-link @click.prevent.stop="onNewContentClick" class="new-content-load-link">
                     <b-badge pill variant="primary">
-                        {{ $store.state.newContentLengh }} new posts available
+                        {{ translations.newPostsAvailables }}
                     </b-badge>
                 </b-link>
             </div>
@@ -70,6 +70,15 @@ export default Vue.component("stream", {
             } else {
                 console.error(`Unsupported stream name ${this.$store.state.streamName}`)
             }
+        },
+        translations() {
+            const ln = this.unfetchedContentIds.length
+            return {
+                newPostsAvailables: ngettext(`${ln} new post available`, `${ln} new posts available`, ln),
+            }
+        },
+        unfetchedContentIds() {
+            return this.$store.state.unfetchedContentIds
         },
     },
     methods: {
