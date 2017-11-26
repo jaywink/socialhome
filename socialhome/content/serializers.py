@@ -1,6 +1,6 @@
 from enumfields.drf import EnumField
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -8,13 +8,13 @@ from socialhome.enums import Visibility
 from socialhome.users.serializers import LimitedProfileSerializer
 
 
-class ContentSerializer(ModelSerializer):
+class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
     user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
-    tags = SlugRelatedField(many=True, read_only=True, slug_field="name")
+    tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
@@ -57,7 +57,6 @@ class ContentSerializer(ModelSerializer):
             "id",
             "is_nsfw",
             "local",
-            "parent",
             "remote_created",
             "rendered",
             "reply_count",
@@ -71,6 +70,9 @@ class ContentSerializer(ModelSerializer):
             "user_is_author",
             "user_has_shared",
         )
+
+    # TODO validate visibility
+    # - if create and has parent -> set from parent
 
     def get_through(self, obj):
         """Through is generally required only for serializing content for streams."""
@@ -96,3 +98,10 @@ class ContentSerializer(ModelSerializer):
         if not request:
             return False
         return Content.has_shared(obj.id, request.user.profile.id) if hasattr(request.user, "profile") else False
+
+    def validate_parent(self, value):
+        """
+        Validate parent cannot be changed.
+        """
+        if self.instance and value != self.instance.parent:
+            raise serializers.ValidationError("Parent cannot be changed for an existing Content instance.")

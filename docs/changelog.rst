@@ -32,6 +32,10 @@ Changed
 
 * When processing a remote share of local content, deliver it also to all participants in the original shared content and also to all personal followers. (`#206 <https://github.com/jaywink/socialhome/issues/206>`_)
 
+* Allow creating replies via the Content API.
+
+  Replies are created by simply passing in a ``parent`` with the ID value of the target Content. It is not possible to change the ``parent`` value for an existing reply or root level Content object once created.
+
 0.6.0 (2017-11-13)
 ------------------
 
