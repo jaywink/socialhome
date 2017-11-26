@@ -13,6 +13,7 @@ const streamStoreOperations = {
     loadStream: "loadStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
+    saveReply: "saveReply",
 }
 
 // This is the Vuex way

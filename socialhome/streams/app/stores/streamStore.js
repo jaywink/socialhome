@@ -1,3 +1,4 @@
+import Axios from "axios"
 import Vue from "vue"
 import Vuex from "vuex"
 import Vapi from "vuex-rest-api"
@@ -32,7 +33,11 @@ function fetchContentsSuccess(state, payload) {
 }
 
 function fetchRepliesSuccess(state, payload) {
-    payload.data.forEach(item => {
+    let items = payload.data
+    if (!Array.isArray(payload.data)) {
+        items = [payload.data]
+    }
+    items.forEach(item => {
         const reply = Object.assign({}, item, {replyIds: [], shareIds: []})
         Vue.set(state.replies, reply.id, reply)
         if (state.contents[reply.parent] !== undefined) {
@@ -65,7 +70,10 @@ function onError(state, error) {
 function newRestAPI(options) {
     const opts = _defaults({}, options, {
         baseURL: "",
-        axios: Vue.prototype.$http,
+        axios: Axios.create({
+            xsrfCookieName: "csrftoken",
+            xsrfHeaderName: "X-CSRFToken",
+        }),
     })
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 
@@ -117,6 +125,13 @@ function newRestAPI(options) {
             path: ({id}) => Urls["api:content-shares"]({pk: id}),
             property: "shares",
             onSuccess: fetchSharesSuccess,
+            onError,
+        })
+        .post({
+            action: streamStoreOperations.saveReply,
+            path: Urls["api:content-list"],
+            property: "reply",
+            onSuccess: fetchRepliesSuccess,
             onError,
         })
         .getStore()

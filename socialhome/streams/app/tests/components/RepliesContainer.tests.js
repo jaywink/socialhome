@@ -46,11 +46,6 @@ describe("RepliesContainer", () => {
             target.instance().replies.should.eql([store.reply])
         })
 
-        it("replyUrl", () => {
-            let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
-            target.instance().replyUrl.should.eql(`/content/${store.content.id}/~reply/`)
-        })
-
         it("shares", () => {
             let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
             target.instance().shares.should.eql([store.share])
