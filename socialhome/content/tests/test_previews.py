@@ -26,7 +26,7 @@ class MockOpenGraph(dict):
 class TestFetchOgPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestFetchOgPreview, cls).setUpTestData()
+        super().setUpTestData()
         cls.content = ContentFactory()
         cls.nsfw_content = ContentFactory(text="foo #nsfw")
         cls.urls = ["https://example.com"]
@@ -96,7 +96,7 @@ class TestFetchOgPreview(SocialhomeTestCase):
 class TestFetchContentPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestFetchContentPreview, cls).setUpTestData()
+        super().setUpTestData()
         cls.content = ContentFactory()
 
     @patch("socialhome.content.previews.find_urls_in_text", return_value=[])
@@ -142,14 +142,14 @@ class TestOEmbedDiscoverer:
 class TestFetchOEmbedPreview(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestFetchOEmbedPreview, cls).setUpTestData()
+        super().setUpTestData()
         cls.content = ContentFactory()
         cls.urls = ["https://example.com"]
 
     @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
     def test_adds_dnt_flag_to_twitter_oembed(self, embed):
-        result = fetch_oembed_preview(self.content, ["https://twitter.com/foobar"])
-        embed.assert_called_once_with("https://twitter.com/foobar", dnt="true")
+        fetch_oembed_preview(self.content, ["https://twitter.com/foobar"])
+        embed.assert_called_once_with("https://twitter.com/foobar", dnt="true", omit_script="true")
 
     def test_cache_not_updated_if_previous_found(self):
         OEmbedCacheFactory(url=self.urls[0])

@@ -37,6 +37,10 @@ Changed
 
   This could drop federation compatibility with some really old servers in the fediverse, but adds compatibility to for example GangGo which is now able to receive Socialhome content.
 
+* Stop requesting Twitter widget script for each tweet OEmbed (`#202 <https://github.com/jaywink/socialhome/issues/202>`_)
+
+  Since Vue streams all tweets are initialized programmatically as they are rendered in the stream so we don't need to have the script tag on each oembed separately.
+
 Fixed
 .....
 
