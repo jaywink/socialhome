@@ -1,5 +1,6 @@
 import {mount} from "avoriaz"
 import Vue from "vue"
+import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
@@ -7,8 +8,9 @@ import {getStore} from "streams/app/tests/fixtures/store.fixtures"
 import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import RepliesContainer from "streams/app/components/RepliesContainer.vue"
 
-
+Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
+
 
 describe("RepliesContainer", () => {
     let store
@@ -69,6 +71,17 @@ describe("RepliesContainer", () => {
 
             target = mount(RepliesContainer, {propsData: {content: store.reply}, store})
             target.instance().showReplyButton.should.be.false
+        })
+    })
+
+    describe("methods", () => {
+        describe("onImageLoad", () => {
+            it("should call Vue.redrawVueMasonry", () => {
+                let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.instance().onImageLoad()
+                Vue.redrawVueMasonry.called.should.be.true
+            })
         })
     })
 

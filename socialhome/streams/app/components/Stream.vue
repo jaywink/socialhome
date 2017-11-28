@@ -8,7 +8,7 @@
                     </b-badge>
                 </b-button>
             </div>
-            <div v-images-loaded.on.done="onImageLoad" v-masonry v-bind="masonryOptions">
+            <div v-images-loaded.on.progress="onImageLoad" v-masonry v-bind="masonryOptions">
                 <div class="stamped">
                     <component :is="stampedElement" />
                 </div>

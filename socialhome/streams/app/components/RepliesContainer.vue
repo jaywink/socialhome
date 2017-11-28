@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-images-loaded.on.progress="onImageLoad">
         <div class="replies-container">
             <stream-element
                 class="reply"
@@ -24,12 +24,14 @@
 
 
 <script>
+import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
 
 import {streamStoreOperations} from "streams/app/stores/streamStore.operations";
 
 
 export default Vue.component("replies-container", {
+    directives: {imagesLoaded},
     props: {
         content: {type: Object, required: true},
     },
@@ -67,6 +69,11 @@ export default Vue.component("replies-container", {
             return {
                 reply: this.isContent ? gettext("Reply") : gettext("Reply to share"),
             }
+        },
+    },
+    methods: {
+        onImageLoad() {
+            Vue.redrawVueMasonry()
         },
     },
     mounted() {
