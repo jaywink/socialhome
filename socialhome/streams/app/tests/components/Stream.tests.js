@@ -2,6 +2,7 @@ import {mount} from "avoriaz"
 
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
+import VueMasonryPlugin from "vue-masonry"
 
 import Stream from "streams/app/components/Stream.vue"
 import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
@@ -11,6 +12,7 @@ import applicationStore from "streams/app/stores/applicationStore"
 
 
 Vue.use(BootstrapVue)
+Vue.use(VueMasonryPlugin)
 
 describe("Stream", () => {
     beforeEach(() => {
@@ -69,6 +71,7 @@ describe("Stream", () => {
                 let target = new Stream({})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.onImageLoad()
+                Vue.redrawVueMasonry.called.should.be.true
             })
         })
 
