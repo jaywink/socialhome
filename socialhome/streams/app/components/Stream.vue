@@ -2,11 +2,11 @@
     <div>
         <div class="container-flex">
             <div v-show="$store.state.hasNewContent" class="new-content-container">
-                <b-button @click.prenvent.stop="onNewContentClick" variant="link" class="new-content-load-link">
+                <b-link @click.prevent.stop="onNewContentClick" class="new-content-load-link">
                     <b-badge pill variant="primary">
                         {{ $store.state.newContentLengh }} new posts available
                     </b-badge>
-                </b-button>
+                </b-link>
             </div>
             <div v-images-loaded.on.progress="onImageLoad" v-masonry v-bind="masonryOptions">
                 <div class="stamped">

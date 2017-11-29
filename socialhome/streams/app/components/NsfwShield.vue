@@ -1,29 +1,30 @@
 <template>
-    <div>
-        <b-button
+    <div v-images-loaded.on.progress="onImageLoad">
+        <b-link
             v-if="!showNsfwContent"
             @click.stop.prevent="toggleNsfwShield"
             class="text-center nsfw-shield card card-block"
             href="#"
-            variant="link"
         >
             {{ nsfwBtnText }}
-        </b-button>
+        </b-link>
         <div v-else class="text-center nsfw-shield">
             <a @click.stop.prevent="toggleNsfwShield" href="#">{{ nsfwBtnText }}</a>
         </div>
-        <div v-show="!showNsfwContent">
-            <b-button v-for="tag in tags" :key="tag" :href="getTagUrl(tag)" variant="link">#{{tag}}</b-button>
+        <div v-show="!showNsfwContent" class="mt-2 mb-2">
+            <b-link v-for="tag in tags" :key="tag" :href="getTagUrl(tag)" class="mr-2">#{{ tag }}</b-link>
         </div>
         <slot v-if="showNsfwContent" />
     </div>
 </template>
 
 <script>
+import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
 
 
 export default Vue.component("nsfw-shield", {
+    directives: {imagesLoaded},
     props: {
         tags: {type: Array, required: true},
     },
@@ -38,6 +39,9 @@ export default Vue.component("nsfw-shield", {
         },
     },
     methods: {
+        onImageLoad() {
+            Vue.redrawVueMasonry()
+        },
         toggleNsfwShield() {
             this.showNsfwContent = !this.showNsfwContent
         },

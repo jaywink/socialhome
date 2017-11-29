@@ -16,3 +16,15 @@
     <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
     <script src="{% static 'js/webpack.stream.js' %}"></script>
 {% endblock %}
+
+
+{% block css %}
+    {{ block.super }}
+    {# TODO: remove this override once legacy streams are removed #}
+    {# Also change Content render to not add .nsfw class at all. #}
+    <style>
+        .nsfw {
+            display: unset;
+        }
+    </style>
+{% endblock %}
