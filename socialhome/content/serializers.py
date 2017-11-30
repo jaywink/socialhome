@@ -16,7 +16,7 @@ class ContentSerializer(serializers.ModelSerializer):
     user_has_shared = SerializerMethodField()
     tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
-    visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
+    visibility = EnumField(Visibility, lenient=True, ints_as_names=True, required=False)
 
     class Meta:
         model = Content
@@ -71,9 +71,6 @@ class ContentSerializer(serializers.ModelSerializer):
             "user_has_shared",
         )
 
-    # TODO validate visibility
-    # - if create and has parent -> set from parent
-
     def get_through(self, obj):
         """Through is generally required only for serializing content for streams."""
         throughs = self.context.get("throughs")
@@ -99,9 +96,30 @@ class ContentSerializer(serializers.ModelSerializer):
             return False
         return Content.has_shared(obj.id, request.user.profile.id) if hasattr(request.user, "profile") else False
 
+    def validate(self, data):
+        """
+        Validate visibility is not required for replies.
+
+        If given, make sure it is the same as parent. If not given, use parent visibility.
+        """
+        parent = data.get("parent")
+        if parent:
+            if data.get("visibility") and parent.visibility != data.get("visibility"):
+                raise serializers.ValidationError("Visibility was given but it doesn't match parent.")
+            data["visibility"] = parent.visibility
+        else:
+            if not data.get("visibility"):
+                raise serializers.ValidationError("Visibility is required")
+        return data
+
     def validate_parent(self, value):
-        """
-        Validate parent cannot be changed.
-        """
+        # Validate parent cannot be changed
         if self.instance and value != self.instance.parent:
             raise serializers.ValidationError("Parent cannot be changed for an existing Content instance.")
+        # Validate user can see parent
+        if value:
+            request = self.context.get("request")
+            if not value.visible_for_user(request.user):
+                raise serializers.ValidationError("Parent not found")
+        return value
+

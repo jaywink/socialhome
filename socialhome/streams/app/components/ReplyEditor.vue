@@ -49,7 +49,7 @@ export default Vue.component("reply-editor", {
         saveReply() {
             this.$store.dispatch(
                 streamStoreOperations.saveReply, {
-                    data: {parent: this.contentId, text: this.replyText, visibility: "public"},
+                    data: {parent: this.contentId, text: this.replyText},
                 }
             )
             this.replyText = ""

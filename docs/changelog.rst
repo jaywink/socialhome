@@ -34,7 +34,7 @@ Changed
 
 * Allow creating replies via the Content API.
 
-  Replies are created by simply passing in a ``parent`` with the ID value of the target Content. It is not possible to change the ``parent`` value for an existing reply or root level Content object once created.
+  Replies are created by simply passing in a ``parent`` with the ID value of the target Content. It is not possible to change the ``parent`` value for an existing reply or root level Content object once created. When creating a reply, you can omit ``visibility`` from the sent data. Visibility will be used from the parent Content item automatically.
 
 0.6.0 (2017-11-13)
 ------------------
