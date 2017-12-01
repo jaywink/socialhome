@@ -2,8 +2,10 @@ from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
 
+from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
-from socialhome.content.tests.factories import PublicContentFactory, TagFactory
+from socialhome.content.tests.factories import PublicContentFactory, TagFactory, LimitedContentFactory
+from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 
 
@@ -13,8 +15,12 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
         cls.content = PublicContentFactory(author=cls.remote_profile)
+        cls.content2 = PublicContentFactory(author=cls.remote_profile)
+        cls.limited_content = LimitedContentFactory(author=cls.remote_profile)
+        cls.limited_content2 = LimitedContentFactory(author=cls.profile)
         cls.user_content = PublicContentFactory(author=cls.profile)
         cls.share = PublicContentFactory(share_of=cls.content)
+        cls.reply = PublicContentFactory(parent=cls.content)
 
     def setUp(self):
         super().setUp()
@@ -22,6 +28,65 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             del self.profile.following_ids
         except AttributeError:
             pass
+
+    def test_create_with_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "With parent", "visibility": "public", "parent": self.content.id,
+        })
+        self.assertTrue(serializer.is_valid())
+        serializer.save(author=self.user.profile)
+        content = Content.objects.order_by("id").last()
+        self.assertEqual(content.text, "With parent")
+        self.assertEqual(content.parent, self.content)
+
+    def test_create_with_parent__user_cannot_see_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "With parent cannot seeee it", "visibility": "limited", "parent": self.limited_content.id,
+        })
+        self.assertFalse(serializer.is_valid())
+
+    def test_create_with_parent__visibility_does_not_match_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "With parent visibility mismatch", "visibility": "public", "parent": self.limited_content.id,
+        })
+        self.assertFalse(serializer.is_valid())
+
+    def test_create_with_visibility(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "With visibility", "visibility": "public",
+        })
+        self.assertTrue(serializer.is_valid())
+        serializer.save(author=self.user.profile)
+        content = Content.objects.order_by("id").last()
+        self.assertEqual(content.text, "With visibility")
+        self.assertEqual(content.visibility, Visibility.PUBLIC)
+
+    def test_create_without_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "Without parent", "visibility": "public",
+        })
+        self.assertTrue(serializer.is_valid())
+        serializer.save(author=self.user.profile)
+        content = Content.objects.order_by("id").last()
+        self.assertEqual(content.text, "Without parent")
+
+    def test_create_without_visibility(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "Without visibility",
+        })
+        self.assertFalse(serializer.is_valid())
+
+    def test_create_without_visibility__reply(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "Without visibility", "parent": self.limited_content2.id,
+        })
+        self.assertTrue(serializer.is_valid())
+        serializer.save(author=self.profile)
+        content = Content.objects.order_by("id").last()
+        self.assertEqual(content.text, "Without visibility")
+        # Inherits from parent
+        self.assertEqual(content.visibility, Visibility.LIMITED)
+        self.assertEqual(content.parent, self.limited_content2)
 
     def test_serializes_author(self):
         serializer = ContentSerializer(self.content)
@@ -108,3 +173,17 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.content.tags.add(tag)
         serializer = ContentSerializer(self.content, context={"request": Mock(user=self.user)})
         self.assertEquals(serializer.data["tags"], ["yolo"])
+
+    def test_update_doesnt_allow_changing_parent(self):
+        serializer = ContentSerializer(
+            instance=self.reply, partial=True, context={"request": Mock(user=self.user)}, data={
+                "parent": self.content.id,
+            },
+        )
+        self.assertTrue(serializer.is_valid())
+        serializer = ContentSerializer(
+            instance=self.reply, partial=True, context={"request": Mock(user=self.user)}, data={
+                "parent": self.content2.id,
+            },
+        )
+        self.assertFalse(serializer.is_valid())

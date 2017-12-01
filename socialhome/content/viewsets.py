@@ -41,11 +41,14 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
                      mixins.DestroyModelMixin, GenericViewSet):
     """
     create:
-        Create content
+        Create content or reply
 
-        Required values: `text` and `visibility`.
+        When creating top level content, required values are: `text` and `visibility`.
+        Value for `visibility` should be one of: `public`, `site`, `limited`, `self`.
 
-        `visibility` should be one of: `public`, `site`, `limited`, `self`.
+        When creating replies, required values are: `text` and `parent`. The `parent` value is the ID of the
+        content that is being replied on. A reply cannot have `visibility` set to anything else than the parent
+        content visibility.
 
     replies:
         Get list of replies

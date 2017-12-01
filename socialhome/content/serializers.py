@@ -1,6 +1,6 @@
 from enumfields.drf import EnumField
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -8,15 +8,15 @@ from socialhome.enums import Visibility
 from socialhome.users.serializers import LimitedProfileSerializer
 
 
-class ContentSerializer(ModelSerializer):
+class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
     user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
-    tags = SlugRelatedField(many=True, read_only=True, slug_field="name")
+    tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
-    visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
+    visibility = EnumField(Visibility, lenient=True, ints_as_names=True, required=False)
 
     class Meta:
         model = Content
@@ -57,7 +57,6 @@ class ContentSerializer(ModelSerializer):
             "id",
             "is_nsfw",
             "local",
-            "parent",
             "remote_created",
             "rendered",
             "reply_count",
@@ -96,3 +95,31 @@ class ContentSerializer(ModelSerializer):
         if not request:
             return False
         return Content.has_shared(obj.id, request.user.profile.id) if hasattr(request.user, "profile") else False
+
+    def validate(self, data):
+        """
+        Validate visibility is not required for replies.
+
+        If given, make sure it is the same as parent. If not given, use parent visibility.
+        """
+        parent = data.get("parent")
+        if parent:
+            if data.get("visibility") and parent.visibility != data.get("visibility"):
+                raise serializers.ValidationError("Visibility was given but it doesn't match parent.")
+            data["visibility"] = parent.visibility
+        else:
+            if not self.instance and not data.get("visibility"):
+                raise serializers.ValidationError("Visibility is required")
+        return data
+
+    def validate_parent(self, value):
+        # Validate parent cannot be changed
+        if self.instance and value != self.instance.parent:
+            raise serializers.ValidationError("Parent cannot be changed for an existing Content instance.")
+        # Validate user can see parent
+        if not self.instance and value:
+            request = self.context.get("request")
+            if not value.visible_for_user(request.user):
+                raise serializers.ValidationError("Parent not found")
+        return value
+

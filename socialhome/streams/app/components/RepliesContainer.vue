@@ -12,7 +12,10 @@
             <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
         </div>
         <div v-if="showReplyButton" class="content-actions">
-            <b-button :href="replyUrl" variant="secondary">{{ translations.reply }}</b-button>
+            <b-button @click.prevent.stop="showReplyEditor" variant="secondary">{{ translations.reply }}</b-button>
+        </div>
+        <div v-if="replyEditorActive">
+            <reply-editor :content-id="content.id" />
         </div>
         <div v-if="isContent">
             <div v-for="share in shares" :key="share.id">
@@ -28,12 +31,18 @@ import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
 
 import {streamStoreOperations} from "streams/app/stores/streamStore.operations";
+import "streams/app/components/ReplyEditor.vue"
 
 
 export default Vue.component("replies-container", {
     directives: {imagesLoaded},
     props: {
         content: {type: Object, required: true},
+    },
+    data() {
+        return {
+            replyEditorActive: false,
+        }
     },
     computed: {
         isContent() {
@@ -45,14 +54,12 @@ export default Vue.component("replies-container", {
         replies() {
             return this.$store.getters.replies(this.content)
         },
-        replyUrl() {
-            return Urls["content:reply"]({pk: this.content.id})
-        },
         shares() {
             return this.$store.getters.shares(this.content.id)
         },
         showReplyButton() {
-            if (!this.isUserAuthenticated || (this.$store.state.pending.replies && this.content.reply_count > 0)) {
+            if (!this.isUserAuthenticated || this.replyEditorActive || (
+                    this.$store.state.pending.replies && this.content.reply_count > 0)) {
                 return false
             }
             if (this.content.content_type === "content") {
@@ -74,6 +81,9 @@ export default Vue.component("replies-container", {
     methods: {
         onImageLoad() {
             Vue.redrawVueMasonry()
+        },
+        showReplyEditor() {
+            this.replyEditorActive = true
         },
     },
     mounted() {
