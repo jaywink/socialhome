@@ -7,6 +7,7 @@ import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
 import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import RepliesContainer from "streams/app/components/RepliesContainer.vue"
+import StreamElement from "streams/app/components/StreamElement.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
@@ -51,21 +52,36 @@ describe("RepliesContainer", () => {
             target.instance().shares.should.eql([store.share])
         })
 
-        it("showReplyButton", () => {
-            let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
-            target.instance().showReplyButton.should.be.true
+        context("showReplyButton", () => {
+            it("shows reply button on root content", () => {
+                let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+                target.instance().showReplyButton.should.be.true
+            })
 
-            store.share2 = getFakeContent({share_of: store.content.id, content_type: "share", reply_count: 0})
-            Vue.set(store.state.shares, store.share2.id, store.share2)
-            target = mount(RepliesContainer, {propsData: {content: store.share2}, store})
-            target.instance().showReplyButton.should.be.false
+            it("does not show reply button for a share without replies", () => {
+                store.share2 = getFakeContent({share_of: store.content.id, content_type: "share", reply_count: 0})
+                Vue.set(store.state.shares, store.share2.id, store.share2)
+                let target = mount(RepliesContainer, {propsData: {content: store.share2}, store})
+                target.instance().showReplyButton.should.be.false
+            })
 
-            store.share2.reply_count = 1
-            target = mount(RepliesContainer, {propsData: {content: store.share2}, store})
-            target.instance().showReplyButton.should.be.true
+            it("shows reply button for a share with replies", () => {
+                store.share3 = getFakeContent({share_of: store.content.id, content_type: "share", reply_count: 1})
+                Vue.set(store.state.shares, store.share3.id, store.share3)
+                let target = mount(RepliesContainer, {propsData: {content: store.share3}, store})
+                target.instance().showReplyButton.should.be.true
+            })
 
-            target = mount(RepliesContainer, {propsData: {content: store.reply}, store})
-            target.instance().showReplyButton.should.be.false
+            it("does not show reply button for a reply", () => {
+                let target = mount(RepliesContainer, {propsData: {content: store.reply}, store})
+                target.instance().showReplyButton.should.be.false
+            })
+
+            it("does not show reply button if reply editor is active", () => {
+                let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+                target.instance().showReplyEditor()
+                target.instance().showReplyButton.should.be.false
+            })
         })
     })
 
@@ -76,6 +92,15 @@ describe("RepliesContainer", () => {
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.instance().onImageLoad()
                 Vue.redrawVueMasonry.called.should.be.true
+            })
+        })
+
+        describe("showReplyEditor", () => {
+            it("toggles replyEditorActive", () => {
+                let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+                target.instance().replyEditorActive.should.be.false
+                target.instance().showReplyEditor()
+                target.instance().replyEditorActive.should.be.true
             })
         })
     })

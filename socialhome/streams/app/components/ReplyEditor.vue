@@ -47,12 +47,14 @@ export default Vue.component("reply-editor", {
     },
     methods: {
         saveReply() {
-            this.$store.dispatch(
-                streamStoreOperations.saveReply, {
-                    data: {parent: this.contentId, text: this.replyText},
-                }
-            )
-            this.replyText = ""
+            if (this.replyText) {
+                this.$store.dispatch(
+                    streamStoreOperations.saveReply, {
+                        data: {parent: this.contentId, text: this.replyText},
+                    }
+                )
+                this.replyText = ""
+            }
         },
     },
 })

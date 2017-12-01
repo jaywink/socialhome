@@ -108,7 +108,7 @@ class ContentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Visibility was given but it doesn't match parent.")
             data["visibility"] = parent.visibility
         else:
-            if not data.get("visibility"):
+            if not self.instance and not data.get("visibility"):
                 raise serializers.ValidationError("Visibility is required")
         return data
 
@@ -117,7 +117,7 @@ class ContentSerializer(serializers.ModelSerializer):
         if self.instance and value != self.instance.parent:
             raise serializers.ValidationError("Parent cannot be changed for an existing Content instance.")
         # Validate user can see parent
-        if value:
+        if not self.instance and value:
             request = self.context.get("request")
             if not value.visible_for_user(request.user):
                 raise serializers.ValidationError("Parent not found")

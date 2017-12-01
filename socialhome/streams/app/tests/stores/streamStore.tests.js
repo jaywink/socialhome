@@ -1,7 +1,6 @@
 import {Server, WebSocket} from "mock-socket"
 import Moxios from "moxios"
 
-import Axios from "axios"
 import Vue from "vue"
 import Vuex from "vuex"
 
@@ -155,7 +154,7 @@ describe("streamStore", () => {
     })
 
     describe("fetchRepliesSuccess", () => {
-        it("should append payload to state", () => {
+        it("should append array payload to state", () => {
             let payload = {
                 data: [
                     {id: "6", text: "foobar", content_type: "reply", parent: "1"},
@@ -187,6 +186,38 @@ describe("streamStore", () => {
                 },
                 shares: {
                     "3": {id: "3", content_type: "share", share_of: "1", replyIds: ["7"]},
+                },
+            })
+        })
+
+        it("should append single item payload to state", () => {
+            let payload = {
+                data: {id: "6", text: "foobar", content_type: "reply", parent: "1"},
+            }
+
+            let state = {
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"]},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                },
+                replies: {},
+                shares: {
+                    "3": {id: "3", content_type: "share", share_of: "1", replyIds: []},
+                },
+            }
+
+            exportsForTests.fetchRepliesSuccess(state, payload)
+
+            state.should.eql({
+                contents: {
+                    "1": {id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"]},
+                    "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                },
+                replies: {
+                    "6": {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
+                },
+                shares: {
+                    "3": {id: "3", content_type: "share", share_of: "1", replyIds: []},
                 },
             })
         })
@@ -240,11 +271,7 @@ describe("streamStore", () => {
         let target
 
         beforeEach(() => {
-            Vue.prototype.$http = Axios.create({
-                xsrfCookieName: "csrftoken",
-                xsrfHeaderName: "X-CSRFToken",
-            })
-            Moxios.install(Vue.prototype.$http)
+            Moxios.install()
             state = getState()
             response = {
                 status: 200,
@@ -547,6 +574,33 @@ describe("streamStore", () => {
                 })
             })
         })
+
+        context("when posting reply", () => {
+            it("should handle request", (done) => {
+                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Moxios.stubRequest("/api/content/", {
+                    status: 200,
+                    response: {id: "6", content_type: "reply", parent: "1", text: "a cool reply"},
+                })
+
+                target.dispatch(streamStoreOperations.saveReply, {data: {
+                    contentId: 1, text: "a cool reply",
+                }})
+
+                Moxios.wait(() => {
+                    target.state.contents.should.eql({
+                        "1": {id: "1", text: "content", replyIds: ["6"], shareIds: []},
+                    })
+                    target.state.replies.should.eql({
+                        "6": {
+                            id: "6", content_type: "reply", parent: "1", text: "a cool reply", replyIds: [],
+                            shareIds: [],
+                        },
+                    })
+                    done()
+                })
+            })
+        })
     })
 
     describe("getStructure", () => {
@@ -564,6 +618,7 @@ describe("streamStore", () => {
             target.actions[streamStoreOperations.loadStream].should.exist
             target.actions[streamStoreOperations.newContentAck].should.exist
             target.actions[streamStoreOperations.receivedNewContent].should.exist
+            target.actions[streamStoreOperations.saveReply].should.exist
 
             target.mutations[streamStoreOperations.disableLoadMore].should.exist
             target.mutations[streamStoreOperations.newContentAck].should.exist

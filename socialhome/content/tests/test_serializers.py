@@ -29,16 +29,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         except AttributeError:
             pass
 
-    def test_create_with_parent__without(self):
-        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
-            "text": "Without parent", "visibility": "public",
-        })
-        self.assertTrue(serializer.is_valid())
-        serializer.save(author=self.user.profile)
-        content = Content.objects.order_by("id").last()
-        self.assertEqual(content.text, "Without parent")
-
-    def test_create_with_parent__with(self):
+    def test_create_with_parent(self):
         serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
             "text": "With parent", "visibility": "public", "parent": self.content.id,
         })
@@ -54,6 +45,12 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         })
         self.assertFalse(serializer.is_valid())
 
+    def test_create_with_parent__visibility_does_not_match_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "With parent visibility mismatch", "visibility": "public", "parent": self.limited_content.id,
+        })
+        self.assertFalse(serializer.is_valid())
+
     def test_create_with_visibility(self):
         serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
             "text": "With visibility", "visibility": "public",
@@ -63,6 +60,21 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         content = Content.objects.order_by("id").last()
         self.assertEqual(content.text, "With visibility")
         self.assertEqual(content.visibility, Visibility.PUBLIC)
+
+    def test_create_without_parent(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "Without parent", "visibility": "public",
+        })
+        self.assertTrue(serializer.is_valid())
+        serializer.save(author=self.user.profile)
+        content = Content.objects.order_by("id").last()
+        self.assertEqual(content.text, "Without parent")
+
+    def test_create_without_visibility(self):
+        serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
+            "text": "Without visibility",
+        })
+        self.assertFalse(serializer.is_valid())
 
     def test_create_without_visibility__reply(self):
         serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
