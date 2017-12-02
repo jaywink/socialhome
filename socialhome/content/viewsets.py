@@ -5,7 +5,6 @@ from rest_framework.decorators import detail_route
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
-from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content
@@ -31,10 +30,6 @@ class IsOwnContentOrReadOnly(BasePermission):
                 return True
 
         return False
-
-
-class CreateContentThrottle(UserRateThrottle):
-    scope = "content_create"
 
 
 class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
@@ -70,7 +65,6 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
     queryset = Content.objects.none()
     serializer_class = ContentSerializer
     permission_classes = (IsOwnContentOrReadOnly,)
-    throttle_classes = (CreateContentThrottle,)
 
     def _share(self):
         content = self.get_object()
@@ -101,6 +95,11 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             return Content.objects.all()
         else:
             return Content.objects.visible_for_user(self.request.user)
+
+    def get_throttles(self):
+        if self.action in ["create"]:
+            self.throttle_scope = "content_create"
+        return super().get_throttles()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.profile)
