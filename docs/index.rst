@@ -60,4 +60,5 @@ Table of contents
    architecture
    contributing
    brand
+   faq
    changelog

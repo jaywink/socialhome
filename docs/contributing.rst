@@ -32,6 +32,8 @@ Contributions are not just code. Please feel free to log not only bugs but also 
 For issues that have not been confirmed (= they don't have the label "ready"), triaging is important contribution
 also. Reproducing and supplying more information on these issues is valuable contributon to the project.
 
+:ref:`reporting-security-issues`
+
 Writing code
 ------------
 
