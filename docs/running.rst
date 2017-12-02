@@ -68,6 +68,21 @@ If you want some public visibility to your instance, consider registering it at 
 
 Why not also contribute to the numbers of the federated social web? Turn on :ref:`configuration-statistics` to expose some activity counts.
 
+Log files
+---------
+
+There are two main logs where Socialhome sends information during runtime.
+
+* Circus process log
+
+  Rotated log files in ``/var/log/upstart/socialhome-circus.log``. The location will differ if not using an Upstart based system.
+
+  This log contains the output of all the processes required to run Socialhome, if using the recommended way of running Socialhome using Circus. Any errors for example when starting uWSGI or the worker processes will be found here.
+
+* Application log
+
+  See :ref:`config-log-target` configuration value. This log contains logging entries from the application itself. Useful for debugging federation issues or other problems with the actual code.
+
 Configuration
 -------------
 
@@ -239,6 +254,8 @@ SOCIALHOME_HTTPS
 Default: ``True``
 
 Force HTTPS. There should be no reason to turn this off.
+
+.. _config-log-target:
 
 SOCIALHOME_LOG_TARGET
 .....................
