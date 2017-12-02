@@ -27,6 +27,12 @@ Added
 
   Read the Code of Conduct `here <https://github.com/jaywink/socialhome/blob/master/CODE_OF_CONDUCT.md>`_.
 
+* Profile API has 3 new read only fields:
+
+  * ``followers_count`` - Count of followers the given Profile has. For remote profiles this will contain only the count of followers on this server, not all the followers the profile has.
+  * ``following_count`` - Count of local and remote profiles this Profile is following. For remote profiles this will contain only the count of profiles following this profile on this particular server.
+  * ``has_pinned_content`` - Boolean indication whether the local profile has pinned any Content to their profile stream. Always false for remote profiles.
+
 Changed
 .......
 
