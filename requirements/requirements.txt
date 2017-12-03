@@ -75,7 +75,7 @@ olefile==0.44             # via pillow
 opbeat==3.5.2
 openapi-codec==1.3.2      # via django-rest-swagger
 parso==0.1.0              # via jedi
-persisting_theory==0.2.1  # via django-dynamic-preferences
+persisting-theory==0.2.1  # via django-dynamic-preferences
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pillow==4.0.0

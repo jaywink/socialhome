@@ -10,6 +10,7 @@ argh==0.26.2              # via sphinx-autobuild, watchdog
 babel==2.5.1              # via sphinx
 certifi==2017.7.27.1      # via requests
 chardet==3.0.4            # via requests
+click==6.7                # via pip-tools
 codecov==2.0.9
 commonmark==0.7.4
 coverage==4.4.1
@@ -23,6 +24,7 @@ django==1.10.8
 docutils==0.14            # via sphinx
 factory-boy==2.9.2
 faker==0.8.4
+first==2.0.1              # via pip-tools
 flake8==3.4.1
 freezegun==0.3.9
 future==0.16.0            # via commonmark
@@ -40,7 +42,8 @@ parso==0.1.0              # via jedi
 pathtools==0.1.2          # via sphinx-autobuild, watchdog
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
-port_for==0.3.1           # via sphinx-autobuild
+pip-tools==1.11.0
+port-for==0.3.1           # via sphinx-autobuild
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.5.2         # via pexpect
 py==1.4.34                # via pytest
@@ -57,7 +60,7 @@ pytz==2017.2              # via babel
 pyyaml==3.12              # via sphinx-autobuild, watchdog
 requests==2.18.4          # via codecov, sphinx
 simplegeneric==0.8.1      # via ipython
-six==1.11.0               # via django-coverage-plugin, faker, freezegun, livereload, prompt-toolkit, python-dateutil, sphinx, traitlets
+six==1.11.0               # via django-coverage-plugin, faker, freezegun, livereload, pip-tools, prompt-toolkit, python-dateutil, sphinx, traitlets
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autobuild==0.7.1
 sphinx==1.6.4
