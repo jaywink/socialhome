@@ -11,6 +11,7 @@ Faker
 flake8
 freezegun
 ipdb
+pip-tools
 pytest
 pytest-cov
 pytest-django
