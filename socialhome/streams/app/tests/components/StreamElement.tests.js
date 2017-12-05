@@ -18,6 +18,7 @@ describe("StreamElement", () => {
     let store
 
     beforeEach(() => {
+        Sinon.restore()
         store = getStore()
     })
 
@@ -72,17 +73,37 @@ describe("StreamElement", () => {
             target.instance().$store.dispatch.getCall(0).args[1].should.eql(store.content.id)
             target.instance().$store.dispatch.getCall(1).args[0].should.eql(streamStoreOperations.loadStream)
         })
-    })
 
-    describe("updated", () => {
-        it("redraws masonry", done => {
-            let target = mount(StreamElement, {propsData: {content: store.content}, store})
-            Sinon.spy(Vue, "redrawVueMasonry")
-            target.update()
-            target.instance().$nextTick(() => {
-            Vue.redrawVueMasonry.called.should.be.true
-                done()
+        describe("onImageLoad", () => {
+            it("should call Vue.redrawVueMasonry if not single stream", () => {
+                let target = mount(StreamElement, {propsData: {content: store.content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.instance().onImageLoad()
+                Vue.redrawVueMasonry.called.should.be.true
+            })
+
+            it("should not call Vue.redrawVueMasonry if single stream", () => {
+                store.state.stream.single = true
+                let target = mount(StreamElement, {propsData: {content: store.content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.instance().onImageLoad()
+                Vue.redrawVueMasonry.called.should.be.false
             })
         })
     })
+
+    describe("lifecycle", () => {
+        describe("updated", () => {
+            it("redraws masonry", done => {
+                let target = mount(StreamElement, {propsData: {content: store.content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.update()
+                target.instance().$nextTick(() => {
+                    Vue.redrawVueMasonry.called.should.be.true
+                    done()
+                })
+            })
+        })
+    })
+
 })

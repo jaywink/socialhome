@@ -15,7 +15,7 @@ import applicationStore from "streams/app/stores/applicationStore"
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 
-describe("ReactionBar", () => {
+describe("ReactionsBar", () => {
     let content
     let store
 
@@ -70,6 +70,31 @@ describe("ReactionBar", () => {
                 target.instance().$store.state.contents[1].shares_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showShares.should.be.false
+            })
+        })
+    })
+
+    describe("lifecycle", () => {
+        context("updated", () => {
+            it("redraws masonry if not single stream", (done) => {
+                let target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.update()
+                target.vm.$nextTick(() => {
+                    Vue.redrawVueMasonry.called.should.be.true
+                    done()
+                })
+            })
+
+            it("does not redraw masonry if single stream", (done) => {
+                store.state.stream.single = true
+                let target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.update()
+                target.vm.$nextTick(() => {
+                    Vue.redrawVueMasonry.called.should.be.false
+                    done()
+                })
             })
         })
     })

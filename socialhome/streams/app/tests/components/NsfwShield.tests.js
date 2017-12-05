@@ -19,13 +19,48 @@ describe("NsfwShield", () => {
         store = getStore()
     })
 
-    describe("methods", () => {
-        describe("onImageLoad", () => {
-            it("should call Vue.redrawVueMasonry", () => {
+    describe("lifecycle", () => {
+        context("updated", () => {
+            it("redraws masonry if not single stream", (done) => {
                 let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
-                target.instance().onImageLoad()
-                Vue.redrawVueMasonry.called.should.be.true
+                target.update()
+                target.vm.$nextTick(() => {
+                    Vue.redrawVueMasonry.called.should.be.true
+                    done()
+                })
+            })
+
+            it("does not redraw masonry if single stream", (done) => {
+                store.state.stream.single = true
+                let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.update()
+                target.vm.$nextTick(() => {
+                    Vue.redrawVueMasonry.called.should.be.false
+                    done()
+                })
+            })
+        })
+    })
+
+    describe("methods", () => {
+        describe("onImageLoad", () => {
+            context("call Vue.redrawVueMasonry", () => {
+                it("does if not single stream", () => {
+                    let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
+                    Sinon.spy(Vue, "redrawVueMasonry")
+                    target.instance().onImageLoad()
+                    Vue.redrawVueMasonry.called.should.be.true
+                })
+
+                it("does not if single stream", () => {
+                    store.state.stream.single = true
+                    let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
+                    Sinon.spy(Vue, "redrawVueMasonry")
+                    target.instance().onImageLoad()
+                    Vue.redrawVueMasonry.called.should.be.false
+                })
             })
         })
 

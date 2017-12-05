@@ -9,6 +9,7 @@ import PublicStampedElement from "streams/app/components/stamped_elements/Public
 import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
 import {streamStoreOperations} from "streams/app/stores/streamStore"
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
+import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 
 
 Vue.use(BootstrapVue)
@@ -85,6 +86,23 @@ describe("Stream", () => {
     })
 
     describe("Lifecycle", () => {
+        describe("beforeCreate", () => {
+            it("loads stream if not single stream", () => {
+                Sinon.spy(store, "dispatch")
+                let target = mount(Stream, {store})
+                target.instance().$store.dispatch.getCall(0).args[0].should.eql(streamStoreOperations.loadStream)
+            })
+
+            it("does not load stream if single stream", () => {
+                // This causes nasty traceback due to repliescontainer trying to fetch replies
+                // But shallow mount wont work for some reason with our Stream component
+                store.state.stream.single = true
+                Sinon.spy(store, "dispatch")
+                let target = mount(Stream, {store})
+                target.instance().$store.dispatch.called.should.be.false
+            })
+        })
+
         describe("render", () => {
             it("should not render unfetched content", () => {
                 let target = mount(Stream, {})
@@ -92,6 +110,30 @@ describe("Stream", () => {
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.find(".grid-item").length.should.eq(0)
             })
+        })
+    })
+
+    describe("template", () => {
+        it("renders single content if single stream", () => {
+            // Shallow mount fails with
+            // TypeError: key.charAt is not a function
+            // Meh :(
+            const secondContent = getFakeContent()
+            store.state.contents[secondContent.id] = secondContent
+            store.state.contentIds.push(secondContent.id)
+            let target = mount(Stream, {store})
+            target.find(".container").length.should.eql(0)
+            target.find(".grid-item-full").length.should.eql(0)
+            target.find(".grid-item").length.should.eql(2)
+
+            // Single content stream
+            store.state.stream.single = true
+            store.state.content = getFakeContent()
+            store.state.contents[store.state.content.id] = store.state.content
+            target = mount(Stream, {store})
+            target.find(".container").length.should.eql(1)
+            target.find(".grid-item-full").length.should.eql(1)
+            target.find(".grid-item").length.should.eql(1)
         })
     })
 })
