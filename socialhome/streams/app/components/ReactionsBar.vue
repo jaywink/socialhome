@@ -34,7 +34,7 @@
             </b-button>
             <b-button v-else variant="secondary" @click.prevent.stop="share">{{ translations.share }}</b-button>
         </div>
-        <div v-if="showRepliesBox">
+        <div v-if="showRepliesBox || $store.state.stream.single">
             <replies-container :content="content" />
         </div>
     </div>
@@ -116,7 +116,9 @@ export default Vue.component("reactions-bar", {
         },
     },
     updated() {
-        Vue.redrawVueMasonry()
+        if (!this.$store.state.stream.single) {
+            Vue.redrawVueMasonry()
+        }
     },
 })
 </script>

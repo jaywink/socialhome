@@ -1,6 +1,7 @@
 import {mount} from "avoriaz"
 import infiniteScroll from "vue-infinite-scroll"
 import Vue from "vue"
+import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
@@ -9,6 +10,7 @@ import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
 import StreamElement from "streams/app/components/StreamElement.vue"
 
 
+Vue.use(BootstrapVue)
 Vue.use(infiniteScroll)
 Vue.use(VueMasonryPlugin)
 

@@ -40,7 +40,9 @@ export default Vue.component("nsfw-shield", {
     },
     methods: {
         onImageLoad() {
-            Vue.redrawVueMasonry()
+            if (!this.$store.state.stream.single) {
+                Vue.redrawVueMasonry()
+            }
         },
         toggleNsfwShield() {
             this.showNsfwContent = !this.showNsfwContent
@@ -50,7 +52,9 @@ export default Vue.component("nsfw-shield", {
         },
     },
     updated() {
-        Vue.redrawVueMasonry()
+        if (!this.$store.state.stream.single) {
+            Vue.redrawVueMasonry()
+        }
     },
 })
 </script>

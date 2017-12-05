@@ -23,6 +23,11 @@ const getStore = function() {
     Vue.set(store.state.shares, store.share.id, store.share)
     Vue.set(store.state.replies, store.shareReply.id, store.shareReply)
 
+    Vue.set(store.state.stream, "id", "")
+    Vue.set(store.state.stream, "isProfile", false)
+    Vue.set(store.state.stream, "name", "public")
+    Vue.set(store.state.stream, "single", false)
+
     store.state.applicationStore.isUserAuthenticated = true
     store.state.applicationStore.profile = {id: store.content.author.id}
     return store
