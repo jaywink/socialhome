@@ -16,19 +16,19 @@ class TestJsonContext(SocialhomeTestCase):
                 "variable2": "value2"
             }.items()))
         })
-        result = '<script>window.context = {"variable1": true, "variable2": "value2"};</script>'
-        self.assertEqual(target, result)
+        result = b"<script>window.context = JSON.parse('{\u0022variable1\u0022: true, \u0022variable2\u0022: " \
+                 b"\u0022value2\u0022}');</script>"
+        self.assertEqual(bytes(target, encoding="utf-8"), result)
 
     def test_json_context_with_non_json_serializable_value(self):
         lambda_val = (lambda: "")
-        target = json_context({
+        # Should not raise
+        json_context({
             "json_context": OrderedDict(sorted({
                 "variable1": True,
                 "variable2": lambda_val
             }.items()))
         })
-        result = '<script>window.context = {"variable1": true, "variable2": "%s"};</script>' % lambda_val
-        self.assertEqual(target, result)
 
     def test_json_context_unsafe_raises_with_non_json_serializable_value(self):
         self.assertRaises(TypeError, json_context, {"json_context": {"variable1": lambda: ""}}, True)
