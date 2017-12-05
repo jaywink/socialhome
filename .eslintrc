@@ -5,7 +5,7 @@
   ],
   "rules": {
     "arrow-parens": ["error", "as-needed"],
-    "indent": ["error", 4],
+    "indent": ["error", 4, {"SwitchCase": 1}],
     "import/extensions": "off",
     "import/no-extraneous-dependencies": "off",
     "import/no-unresolved": "off",
