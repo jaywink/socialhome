@@ -26,6 +26,7 @@
 }())
 
 require("chai/register-should")
+require("chai").use(require("chai-as-promised"))
 
 // Noop function to make the tests pass
 global.WebSocket = function () {} // eslint-disable-line func-names

@@ -266,15 +266,15 @@ describe("streamStore", () => {
                     "1": {id: "1", text: "Plop"},
                     "2": {id: "2", text: "Hello!"},
                 },
-                unfetchedContentIds: ["6"]
+                unfetchedContentIds: ["6"],
             }
 
             exportsForTests.fetchNewContentSuccess(state, payload)
 
             state.contents.should.eql({
-                    "1": {id: "1", text: "Plop"},
-                    "2": {id: "2", text: "Hello!"},
-                    "6": {id: "6", text: "Yolo"},
+                "1": {id: "1", text: "Plop"},
+                "2": {id: "2", text: "Hello!"},
+                "6": {id: "6", text: "Yolo"},
             })
         })
 
@@ -286,7 +286,7 @@ describe("streamStore", () => {
                     "1": {id: "1", text: "Plop"},
                     "2": {id: "2", text: "Hello!"},
                 },
-                unfetchedContentIds: ["6"]
+                unfetchedContentIds: ["6"],
             }
 
             exportsForTests.fetchNewContentSuccess(state, payload)
@@ -621,9 +621,11 @@ describe("streamStore", () => {
                     response: {id: "6", content_type: "reply", parent: "1", text: "a cool reply"},
                 })
 
-                target.dispatch(streamStoreOperations.saveReply, {data: {
-                    contentId: 1, text: "a cool reply",
-                }})
+                target.dispatch(streamStoreOperations.saveReply, {
+                    data: {
+                        contentId: 1, text: "a cool reply",
+                    },
+                })
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -792,7 +794,7 @@ describe("streamStore", () => {
                     state.streamName = "followed__spameater"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getFollowedStream, {params: {lastId: "4"}}]
+                        [streamStoreOperations.getFollowedStream, {params: {lastId: "4"}}],
                     )
                 })
 
@@ -800,7 +802,7 @@ describe("streamStore", () => {
                     state.streamName = "public"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getPublicStream, {params: {lastId: "4"}}]
+                        [streamStoreOperations.getPublicStream, {params: {lastId: "4"}}],
                     )
                 })
 
@@ -809,7 +811,7 @@ describe("streamStore", () => {
                     state.tagName = "eggs"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getTagStream, {params: {name: "eggs", lastId: "4"}}]
+                        [streamStoreOperations.getTagStream, {params: {name: "eggs", lastId: "4"}}],
                     )
                 })
 
@@ -817,7 +819,7 @@ describe("streamStore", () => {
                     state.streamName = "profile_all__1234-5678"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}}]
+                        [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}}],
                     )
                 })
 
@@ -825,7 +827,7 @@ describe("streamStore", () => {
                     state.streamName = "profile_pinned__1234-5678"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}}]
+                        [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}}],
                     )
                 })
             })
@@ -851,11 +853,22 @@ describe("streamStore", () => {
             it("should dispatch 'streamStoreOperations.getNewContent' for every unfetched ID", () => {
                 let state = {unfetchedContentIds: [1, 2, 3]}
                 let commit = Sinon.spy()
-                let dispatch = Sinon.spy()
+                let dispatch = Sinon.stub().returns(new Promise(resolve => resolve()))
                 actions[streamStoreOperations.newContentAck]({commit, state, dispatch})
                 dispatch.getCall(0).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 1}}])
                 dispatch.getCall(1).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 2}}])
                 dispatch.getCall(2).args.should.eql([streamStoreOperations.getNewContent, {params: {pk: 3}}])
+            })
+
+            it("should always resolve even if one dispatch operation fails", (done) => {
+                let state = {unfetchedContentIds: [1, 2, 3]}
+                let commit = Sinon.spy()
+                let dispatch = Sinon.stub()
+                    .onCall(0).returns(Promise.resolve())
+                    .onCall(1).returns(Promise.reject("Fetch error"))
+                    .onCall(2).returns(Promise.resolve())
+
+                actions[streamStoreOperations.newContentAck]({commit, state, dispatch}).should.be.fulfilled.notify(done)
             })
         })
     })
@@ -886,7 +899,7 @@ describe("streamStore", () => {
                         "2": {id: "2"},
                         "4": {id: "4"},
                         "5": {id: "5"},
-                        "7": {id: "7"}
+                        "7": {id: "7"},
                     },
                     shares: {
                         "6": {id: "6", replyIds: ["7"]},
@@ -909,7 +922,7 @@ describe("streamStore", () => {
                         "2": {id: "2"},
                         "4": {id: "4"},
                         "5": {id: "5"},
-                        "7": {id: "7"}
+                        "7": {id: "7"},
                     },
                 }
                 getters.shares(state)(1).should.eql([{id: "2"}, {id: "4"}])

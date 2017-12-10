@@ -70,9 +70,15 @@ const actions = {
     },
     [streamStoreOperations.newContentAck]({commit, dispatch, state}) {
         commit(streamStoreOperations.newContentAck)
+        const promises = []
+        const resolve = () => Promise.resolve()
         state.unfetchedContentIds.forEach(pk => {
-            dispatch(streamStoreOperations.getNewContent, {params: {pk}})
+            // Force the promise to resolve in all cases
+            const promise = dispatch(streamStoreOperations.getNewContent, {params: {pk}})
+                .then(resolve, resolve)
+            promises.push(promise)
         })
+        return Promise.all(promises)
     },
 }
 

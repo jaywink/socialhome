@@ -30,15 +30,20 @@
 <script>
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
+import VueScrollTo from "vue-scrollto"
+
 import "streams/app/components/StreamElement.vue"
 import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
 import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
 import TagStampedElement from "streams/app/components/stamped_elements/TagStampedElement.vue"
 import ProfileStampedElement from "streams/app/components/stamped_elements/ProfileStampedElement.vue"
 import "streams/app/components/LoadingElement.vue"
+
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 
+
+Vue.use(VueScrollTo)
 
 export default Vue.component("stream", {
     store: newStreamStore({modules: {applicationStore}}),
@@ -86,7 +91,9 @@ export default Vue.component("stream", {
             Vue.redrawVueMasonry()
         },
         onNewContentClick() {
-            this.$store.dispatch(streamStoreOperations.newContentAck)
+            this.$store.dispatch(streamStoreOperations.newContentAck).then(
+                () => this.$nextTick( // Wait for new content to be rendered
+                    () => this.$scrollTo("body")))
         },
     },
     beforeCreate() {
