@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - pg_backups:/pg_backups
+    environment:
+      - POSTGRES_USER=socialhome
+      - POSTGRES_PASSWORD=socialhome
+      - POSTGRES_DB=socialhome
+
+  redis:
+    image: redis
+    volumes:
+      - redis_data:/data
+
+  django:
+    depends_on:
+      - postgres
+      - redis
+    build:
+      context: .
+      dockerfile: docker/ssl/Dockerfile.django
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgis://socialhome:socialhome@postgres:5432/socialhome
+      - DJANGO_SECRET_KEY=ForDevelopmentEyesOnly
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
+      - DJANGO_ALLOWED_HOSTS=localhost
+      - SOCIALHOME_DOMAIN=localhost
+
+    volumes:
+      - ./socialhome:/code/socialhome
+      - ./logs/gunicorn:/code/logs/gunicorn
+      - ./logs/socialhome:/tmp
+
+  nginx:
+    image: nginx:1.13.1-alpine
+    depends_on:
+      - django
+    volumes:
+      - ./docker/ssl/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/ssl/certs:/etc/nginx/ssl
+      - ./media:/socialhome/media
+      - ./logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  pg_data: {}
+  pg_backups: {}
+  redis_data: {}
