@@ -1,0 +1,23 @@
+FROM python:3
+
+RUN mkdir /code
+WORKDIR /code
+COPY . .
+
+# Ensure pip and setuptools are up to date as well
+# We need a slightly older setuptools due to a bug in pip-tools
+RUN pip install -U pip setuptools==30.4 pip-tools
+
+# Development environment
+RUN pip-sync dev-requirements.txt
+
+RUN pip install gunicorn
+
+# This file needs to be outside the /code dir as it's mounted  durin development
+RUN cp docker/ssl/docker-entrypoint.sh.django ./docker-entrypoint.sh
+RUN cp docker/ssl/.env.example .env
+
+EXPOSE 8000
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["ssl"]
