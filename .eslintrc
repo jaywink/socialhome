@@ -16,6 +16,8 @@
   },
   "globals": {
     "Urls": true,
-    "gettext": true
+    "gettext": true,
+    "interpolate": true,
+    "ngettext": true
   }
 }

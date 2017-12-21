@@ -1,9 +1,12 @@
 import Vue from "vue"
+import _concat from "lodash/concat"
+import _difference from "lodash/difference"
 
 
 const streamStoreOperations = {
     disableLoadMore: "disableLoadMore",
     getFollowedStream: "getFollowedStream",
+    getNewContent: "getNewContent",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",
     getPublicStream: "getPublicStream",
@@ -16,24 +19,25 @@ const streamStoreOperations = {
     saveReply: "saveReply",
 }
 
-// This is the Vuex way
-/* eslint-disable no-param-reassign */
 const mutations = {
     [streamStoreOperations.disableLoadMore](state, contentId) {
         Vue.set(state.contents[contentId], "hasLoadMore", false)
     },
     [streamStoreOperations.receivedNewContent](state, contentId) {
-        state.hasNewContent = true
-        state.newContentLengh += 1
-        state.contentIds.unshift(contentId)
-        Vue.set(state.contents, contentId, undefined)
+        state.unfetchedContentIds.push(contentId)
     },
     [streamStoreOperations.newContentAck](state) {
-        state.hasNewContent = false
-        state.newContentLengh = 0
+        /*
+         * First, get all IDs present in unfetchedContentIds and absent in contentIds
+         * This is neccessary since content ids that could not be fetched due to
+         * network errors are not removed from `state.unfetchedContentIds`. In this
+         * case, the next time unfetched content is fetched, these ids would be added
+         * twice and appear twice in the stream.
+         */
+        const diff = _difference(state.unfetchedContentIds, state.contentIds)
+        Vue.set(state, "contentIds", _concat(diff, state.contentIds))
     },
 }
-/* eslint-enable no-param-reassign */
 
 const actions = {
     [streamStoreOperations.disableLoadMore]({commit}, contentId) {
@@ -64,8 +68,17 @@ const actions = {
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
     },
-    [streamStoreOperations.newContentAck]({commit}) {
+    [streamStoreOperations.newContentAck]({commit, dispatch, state}) {
         commit(streamStoreOperations.newContentAck)
+        const promises = []
+        const resolve = () => Promise.resolve()
+        state.unfetchedContentIds.forEach(pk => {
+            // Force the promise to resolve in all cases
+            const promise = dispatch(streamStoreOperations.getNewContent, {params: {pk}})
+                .then(resolve, resolve)
+            promises.push(promise)
+        })
+        return Promise.all(promises)
     },
 }
 
@@ -98,6 +111,9 @@ const getters = {
             shares.push(state.shares[id])
         })
         return shares
+    },
+    hasNewContent(state) {
+        return state.unfetchedContentIds.length > 0 && !state.pending.contents
     },
 }
 

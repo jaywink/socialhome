@@ -5,6 +5,7 @@ import Vapi from "vuex-rest-api"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
+import _pullAll from "lodash/pullAll"
 
 import getState from "streams/app/stores/streamStore.state"
 import {actions, mutations, streamStoreOperations, getters} from "streams/app/stores/streamStore.operations"
@@ -60,6 +61,11 @@ function fetchSharesSuccess(state, payload) {
             state.contents[share.share_of].shareIds.push(share.id)
         }
     })
+}
+
+function fetchNewContentSuccess(state, payload) {
+    Vue.set(state.contents, payload.data.id, payload.data)
+    _pullAll(state.unfetchedContentIds, [payload.data.id])
 }
 
 function onError(state, error) {
@@ -134,6 +140,13 @@ function newRestAPI(options) {
             onSuccess: fetchRepliesSuccess,
             onError,
         })
+        .get({
+            action: streamStoreOperations.getNewContent,
+            path: ({pk}) => Urls["api:content-detail"]({pk}),
+            property: "contents",
+            onSuccess: fetchNewContentSuccess,
+            onError,
+        })
         .getStore()
 }
 
@@ -165,7 +178,7 @@ function newStreamStore(options = {}) {
         const data = JSON.parse(message.data)
 
         if (data.event === "new") {
-            store.dispatch(streamStoreOperations.receivedNewContent, 1)
+            store.dispatch(streamStoreOperations.receivedNewContent, data.id)
         }
     }
 
@@ -177,6 +190,7 @@ function newStreamStore(options = {}) {
 const exportsForTests = {
     addHasLoadMore,
     fetchContentsSuccess,
+    fetchNewContentSuccess,
     fetchRepliesSuccess,
     fetchSharesSuccess,
     getStructure,

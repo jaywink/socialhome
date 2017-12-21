@@ -57,11 +57,13 @@
     "ReconnectingWebSocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
     "axios": "~0.16.2",
     "bootstrap-vue": "~1.2.0",
+    "chai-as-promised": "^7.1.1",
     "lodash": "~4.17.4",
     "vue": "~2.4.1",
     "vue-images-loaded": "1.1.2",
     "vue-infinite-scroll": "^2.0.2",
     "vue-masonry": "=0.10.3",
+    "vue-scrollto": "^2.8.0",
     "vuex": "~2.3.1",
     "vuex-rest-api": "^2.2.1"
   },

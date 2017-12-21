@@ -82,7 +82,7 @@ describe("Stream", () => {
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.instance().$nextTick(() => {
                     target.find(".new-content-container")[0].hasStyle("display", "none").should.be.false
-                    target.find(".new-content-container .badge")[0].text().should.match(/1 new posts available/)
+                    target.find(".new-content-container .badge")[0].text().should.match(/1 new post available/)
                     done()
                 })
             })

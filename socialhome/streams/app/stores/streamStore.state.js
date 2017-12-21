@@ -3,6 +3,7 @@ import _get from "lodash/get"
 
 export default function () {
     const contentIds = []
+    const unfetchedContentIds = []
     const contents = {}
     const replies = {}
     const shares = {}
@@ -18,5 +19,6 @@ export default function () {
         showAuthorBar: streamName.length > 0 ? !streamName.startsWith("profile_") : false,
         streamName,
         tagName: _get(window, ["context", "tagName"], ""),
+        unfetchedContentIds,
     }
 }

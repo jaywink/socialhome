@@ -26,6 +26,7 @@
 }())
 
 require("chai/register-should")
+require("chai").use(require("chai-as-promised"))
 
 // Noop function to make the tests pass
 global.WebSocket = function () {} // eslint-disable-line func-names
@@ -39,3 +40,4 @@ const file = "socialhome/streams/app/tests/fixtures/Url"
 global.Urls = require(`../${file}`).Urls // eslint-disable-line global-require, import/no-dynamic-require
 
 global.gettext = key => key
+global.ngettext = (key1, key2, num) => (num > 1 ? key2 : key1)
