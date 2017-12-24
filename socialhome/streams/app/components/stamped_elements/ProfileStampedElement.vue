@@ -41,7 +41,7 @@
                     </b-dropdown-item>
                     <b-dropdown-item
                         v-if=""
-                        :href="urls.accountsEmail"
+                        :href="urls.organizeProfileUrl"
                         :title="translations.organizeProfileContent"
                         :aria-label="translations.organizeProfileContent"
                     >
