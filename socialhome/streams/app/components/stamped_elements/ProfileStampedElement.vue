@@ -1,54 +1,52 @@
 <template>
     <div>
         <div v-if="showProfileButtons" class="pull-right">
-            <div class="dropdown text-right">
-                <b-dropdown right>
-                    <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
-                    <b-dropdown-item
-                        :href="urls.updateProfile"
-                        :title="translations.updateProfile"
-                        :aria-label="translations.updateProfile"
-                    >
-                        <i class="fa fa-address-book" /> {{ translations.updateProfile }}
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                        :href="urls.pictureUpdate"
-                        :title="translations.changePicture"
-                        :aria-label="translations.changePicture"
-                    >
-                        <i class="fa fa-camera" /> {{ translations.changePicture }}
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                        :href="urls.preferences"
-                        :title="translations.preferences"
-                        :aria-label="translations.preferences"
-                    >
-                        <i class="fa fa-cog" /> {{ translations.preferences }}
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                        :href="urls.apiToken"
-                        :title="translations.apiToken"
-                        :aria-label="translations.apiToken"
-                    >
-                        <i class="fa fa-code" /> {{ translations.apiToken }}
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                        :href="urls.accountsEmail"
-                        :title="translations.email"
-                        :aria-label="translations.email"
-                    >
-                        <i class="fa fa-envelope"></i> {{ translations.email }}
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                        v-if=""
-                        :href="urls.organizeProfileUrl"
-                        :title="translations.organizeProfileContent"
-                        :aria-label="translations.organizeProfileContent"
-                    >
-                        <i class="fa fa-arrows-v"></i> {{ translations.organizeProfileContent }}
-                    </b-dropdown-item>
-                </b-dropdown>
-            </div>
+            <b-dropdown right>
+                <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
+                <b-dropdown-item
+                    :href="urls.updateProfile"
+                    :title="translations.updateProfile"
+                    :aria-label="translations.updateProfile"
+                >
+                    <i class="fa fa-address-book" /> {{ translations.updateProfile }}
+                </b-dropdown-item>
+                <b-dropdown-item
+                    :href="urls.pictureUpdate"
+                    :title="translations.changePicture"
+                    :aria-label="translations.changePicture"
+                >
+                    <i class="fa fa-camera" /> {{ translations.changePicture }}
+                </b-dropdown-item>
+                <b-dropdown-item
+                    :href="urls.preferences"
+                    :title="translations.preferences"
+                    :aria-label="translations.preferences"
+                >
+                    <i class="fa fa-cog" /> {{ translations.preferences }}
+                </b-dropdown-item>
+                <b-dropdown-item
+                    :href="urls.apiToken"
+                    :title="translations.apiToken"
+                    :aria-label="translations.apiToken"
+                >
+                    <i class="fa fa-code" /> {{ translations.apiToken }}
+                </b-dropdown-item>
+                <b-dropdown-item
+                    :href="urls.accountsEmail"
+                    :title="translations.email"
+                    :aria-label="translations.email"
+                >
+                    <i class="fa fa-envelope"></i> {{ translations.email }}
+                </b-dropdown-item>
+                <b-dropdown-item
+                    v-if=""
+                    :href="urls.organizeProfileUrl"
+                    :title="translations.organizeProfileContent"
+                    :aria-label="translations.organizeProfileContent"
+                >
+                    <i class="fa fa-arrows-v"></i> {{ translations.organizeProfileContent }}
+                </b-dropdown-item>
+            </b-dropdown>
             <div class="mt-1">
                 <b-button
                     variant="secondary"
@@ -153,3 +151,9 @@ export default Vue.component("profile-stamped-element", {
     },
 })
 </script>
+
+<style lang="scss">
+    .dropdown-menu-right {
+        right: auto;
+    }
+</style>
