@@ -120,6 +120,12 @@ const getters = {
         })
         return shares
     },
+    singleContent(state) {
+        if (!state.singleContentId) {
+            return null
+        }
+        return state.contents[state.singleContentId]
+    },
     hasNewContent(state) {
         return state.unfetchedContentIds.length > 0 && !state.pending.contents
     },

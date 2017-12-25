@@ -2,18 +2,23 @@ import _get from "lodash/get"
 
 
 export default function () {
-    const content = _get(window, ["context", "content"], undefined)
     const contentIds = []
     const unfetchedContentIds = []
     const contents = {}
+    const replies = {}
+    const shares = {}
+
+    // Handle single content if exists
+    const content = _get(window, ["context", "content"], undefined)
+    let singleContentId = null
     if (content) {
+        singleContentId = content.id
         content.replyIds = []
         content.shareIds = []
         contentIds.push(content.id)
         contents[content.id] = content
     }
-    const replies = {}
-    const shares = {}
+
     const streamName = _get(window, ["context", "streamName"], "")
     const streamSplits = streamName.split("__")
     const stream = {
@@ -24,7 +29,6 @@ export default function () {
     }
 
     return {
-        content,
         contents,
         contentIds,
         hasNewContent: false,
@@ -32,6 +36,7 @@ export default function () {
         replies,
         shares,
         showAuthorBar: !stream.isProfile,
+        singleContentId,
         stream,
         streamName,
         tagName: _get(window, ["context", "tagName"], ""),

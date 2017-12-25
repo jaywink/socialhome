@@ -128,8 +128,9 @@ describe("Stream", () => {
 
             // Single content stream
             store.state.stream.single = true
-            store.state.content = getFakeContent()
-            store.state.contents[store.state.content.id] = store.state.content
+            const content = getFakeContent()
+            store.state.singleContentId = content.id
+            store.state.contents[content.id] = content
             target = mount(Stream, {store})
             target.find(".container").length.should.eql(1)
             target.find(".grid-item-full").length.should.eql(1)

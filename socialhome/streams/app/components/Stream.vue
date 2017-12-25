@@ -10,8 +10,7 @@
         <div v-if="this.$store.state.stream.single">
             <stream-element
                 class="grid-item grid-item-full"
-                :content="$store.state.content"
-                :key="$store.state.content.id"
+                :content="$store.getters.singleContent"
             />
         </div>
         <div v-else v-masonry v-bind="masonryOptions">
