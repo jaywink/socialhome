@@ -270,6 +270,17 @@ Defaults
 
 The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postgres will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
 
+Generating dummy content
+------------------------
+
+There is a management command to generate a bunch of dummy ``Content`` objects. Please feel free to expand it with more configuration options and different types of content. To use it, run the following:
+
+::
+
+    python manage.py create_dummy_content
+
+``--help`` will give you available options.
+
 Contact for help
 ----------------
 

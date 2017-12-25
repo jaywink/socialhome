@@ -33,6 +33,8 @@ Added
   * ``following_count`` - Count of local and remote profiles this Profile is following. For remote profiles this will contain only the count of profiles following this profile on this particular server.
   * ``has_pinned_content`` - Boolean indication whether the local profile has pinned any Content to their profile stream. Always false for remote profiles.
 
+* There is now a management command to generate dummy content for development environment purposes. See :ref:`development` pages.
+
 Changed
 .......
 
