@@ -50,19 +50,27 @@ const actions = {
             options.params.lastId = state.contents[lastContentId].through
         }
 
-        if (state.streamName.match(/^followed/)) {
-            dispatch(streamStoreOperations.getFollowedStream, options)
-        } else if (state.streamName.match(/^public/)) {
-            dispatch(streamStoreOperations.getPublicStream, options)
-        } else if (state.streamName.match(/^tag/)) {
-            options.params.name = state.tagName
-            dispatch(streamStoreOperations.getTagStream, options)
-        } else if (state.streamName.match(/^profile_all/)) {
-            options.params.id = state.applicationStore.profile.id
-            dispatch(streamStoreOperations.getProfileAll, options)
-        } else if (state.streamName.match(/^profile_pinned/)) {
-            options.params.id = state.applicationStore.profile.id
-            dispatch(streamStoreOperations.getProfilePinned, options)
+        switch (state.stream.name) {
+            case "followed":
+                dispatch(streamStoreOperations.getFollowedStream, options)
+                break
+            case "public":
+                dispatch(streamStoreOperations.getPublicStream, options)
+                break
+            case "tag":
+                options.params.name = state.tagName
+                dispatch(streamStoreOperations.getTagStream, options)
+                break
+            case "profile_all":
+                options.params.id = state.applicationStore.profile.id
+                dispatch(streamStoreOperations.getProfileAll, options)
+                break
+            case "profile_pinned":
+                options.params.id = state.applicationStore.profile.id
+                dispatch(streamStoreOperations.getProfilePinned, options)
+                break
+            default:
+                console.log(`Unknown stream name ${state.stream.name}`)
         }
     },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
@@ -111,6 +119,12 @@ const getters = {
             shares.push(state.shares[id])
         })
         return shares
+    },
+    singleContent(state) {
+        if (!state.singleContentId) {
+            return null
+        }
+        return state.contents[state.singleContentId]
     },
     hasNewContent(state) {
         return state.unfetchedContentIds.length > 0 && !state.pending.contents

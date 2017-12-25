@@ -87,11 +87,19 @@ describe("RepliesContainer", () => {
 
     describe("methods", () => {
         describe("onImageLoad", () => {
-            it("should call Vue.redrawVueMasonry", () => {
+            it("should call Vue.redrawVueMasonry if not single stream", () => {
                 let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.instance().onImageLoad()
                 Vue.redrawVueMasonry.called.should.be.true
+            })
+
+            it("should not call Vue.redrawVueMasonry if single stream", () => {
+                store.state.stream.single = true
+                let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+                Sinon.spy(Vue, "redrawVueMasonry")
+                target.instance().onImageLoad()
+                Vue.redrawVueMasonry.called.should.be.false
             })
         })
 
@@ -142,12 +150,23 @@ describe("RepliesContainer", () => {
     })
 
     describe("updated", () => {
-        it("redraws masonry", done => {
+        it("redraws masonry if not single stream", done => {
             let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
             Sinon.spy(Vue, "redrawVueMasonry")
             target.update()
             target.instance().$nextTick(() => {
             Vue.redrawVueMasonry.called.should.be.true
+                done()
+            })
+        })
+
+        it("does not redraw masonry if single stream", done => {
+            store.state.stream.single = true
+            let target = mount(RepliesContainer, {propsData: {content: store.content}, store})
+            Sinon.spy(Vue, "redrawVueMasonry")
+            target.update()
+            target.instance().$nextTick(() => {
+            Vue.redrawVueMasonry.called.should.be.false
                 done()
             })
         })

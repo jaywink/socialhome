@@ -5,14 +5,14 @@ from socialhome.content.tests.factories import (
     PublicContentFactory, LimitedContentFactory, SelfContentFactory, SiteContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.tests.factories import UserFactory, PublicUserFactory
+from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
 
 
 class TestContentQuerySet(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.public_content = PublicContentFactory(pinned=True)
+        cls.public_content = PublicContentFactory(pinned=True, author=ProfileFactory())
         cls.public_tag_content = PublicContentFactory(text="#foobar")
         cls.limited_content = LimitedContentFactory()
         cls.tag = Tag.objects.get(name="foobar")

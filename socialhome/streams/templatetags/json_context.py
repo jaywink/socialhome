@@ -1,6 +1,8 @@
+import json
+
+from django.utils.html import escapejs
 from django.utils.safestring import mark_safe
 from django.template import Library
-import json
 
 register = Library()
 
@@ -18,7 +20,7 @@ def json_context(context, raise_error=False):
 
     :param context: Current view context
     :param raise_error: Control whether to raise an error on non-JSON serialisable values
-    :return: ``<script>window.context = {<context["json_context"]>}</script>``
+    :return: ``<script>window.context = JSON.parse('{<context["json_context"]>}');</script>``
     """
     if not context.get("json_context"):
         return ""
@@ -26,4 +28,4 @@ def json_context(context, raise_error=False):
     json_default = None if raise_error else lambda obj: str(obj)
 
     json_dump = json.dumps(context["json_context"], default=json_default)
-    return mark_safe("<script>window.context = %s;</script>" % json_dump)
+    return mark_safe("<script>window.context = JSON.parse('%s');</script>" % escapejs(json_dump))

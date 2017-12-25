@@ -129,7 +129,7 @@ describe("AuthorBar", () => {
                 target.find(".profilebox-trigger")[0].trigger("click")
                 target.instance().profileBoxTrigger.calledOnce.should.be.true
                 target.instance().showProfileBox.should.be.true
-                target.find(".profile-box")[0].hasAttribute("display", "none").should.be.false
+                target.find(".profile-box")[0].hasAttribute("display").should.be.false
             })
         })
 

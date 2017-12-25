@@ -80,7 +80,9 @@ export default Vue.component("replies-container", {
     },
     methods: {
         onImageLoad() {
-            Vue.redrawVueMasonry()
+            if (!this.$store.state.stream.single) {
+                Vue.redrawVueMasonry()
+            }
         },
         showReplyEditor() {
             this.replyEditorActive = true
@@ -93,7 +95,9 @@ export default Vue.component("replies-container", {
         }
     },
     updated() {
-        Vue.redrawVueMasonry()
+        if (!this.$store.state.stream.single) {
+            Vue.redrawVueMasonry()
+        }
     },
 })
 </script>

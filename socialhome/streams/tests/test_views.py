@@ -101,7 +101,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
     def test_renders_with_content(self):
         response = self.client.get(reverse("streams:public"))
         assert response.status_code == 200
-        assert self.content.text in str(response.content)
+        assert self.content.get_absolute_url() in str(response.content)
 
     def test_stream_name(self):
         view = self.get_instance(PublicStreamView)
@@ -122,10 +122,10 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
 
     def test_contains_only_public_content(self):
         response = self.client.get(reverse("streams:public"))
-        assert self.content.text in str(response.content)
-        assert self.site.text not in str(response.content)
-        assert self.selff.text not in str(response.content)
-        assert self.limited.text not in str(response.content)
+        assert self.content.get_absolute_url() in str(response.content)
+        assert self.site.get_absolute_url() not in str(response.content)
+        assert self.selff.get_absolute_url() not in str(response.content)
+        assert self.limited.get_absolute_url() not in str(response.content)
 
     def test_logged_in_user(self):
         self.client.force_login(self.user)

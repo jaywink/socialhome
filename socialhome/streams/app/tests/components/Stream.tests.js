@@ -7,58 +7,55 @@ import VueMasonryPlugin from "vue-masonry"
 import Stream from "streams/app/components/Stream.vue"
 import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
 import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
-import {streamStoreOperations, newStreamStore} from "streams/app/stores/streamStore"
-import applicationStore from "streams/app/stores/applicationStore"
+import {streamStoreOperations} from "streams/app/stores/streamStore"
+import {getStore} from "streams/app/tests/fixtures/store.fixtures"
+import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 
 describe("Stream", () => {
+    let store
+
     beforeEach(() => {
         Sinon.restore()
+        store = getStore()
     })
 
     describe("computed", () => {
         describe("stampedElement", () => {
             it("should render the FollowedStampedElement when stream name is 'followed'", () => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.applicationStore.profile = {id: 26}
+                store.state.stream.name = "followed"
                 let target = mount(Stream, {store})
-                target.instance().$store.state.streamName = "followed"
                 target.instance().stampedElement.should.eq("FollowedStampedElement")
             })
 
             it("should render the PublicStampedElement when stream name is 'public'", () => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.applicationStore.profile = {id: 26}
+                store.state.stream.name = "public"
                 let target = mount(Stream, {store})
-                target.instance().$store.state.streamName = "public"
                 target.instance().stampedElement.should.eq("PublicStampedElement")
             })
 
             it("should render the TagStampedElement when stream name is 'tag'", () => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.applicationStore.profile = {id: 26}
+                store.state.stream.name = "tag"
                 let target = mount(Stream, {store})
-                target.instance().$store.state.streamName = "tag"
                 target.instance().stampedElement.should.eq("TagStampedElement")
             })
 
             it("should render the ProfileStampedElement when stream name is 'profile'", () => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.applicationStore.profile = {id: 26}
+                store.state.stream.name = "profile_all"
                 let target = mount(Stream, {store})
-                target.instance().$store.state.streamName = "profile"
+                target.instance().stampedElement.should.eq("ProfileStampedElement")
+                store.state.stream.name = "profile_pinned"
+                target = mount(Stream, {store})
                 target.instance().stampedElement.should.eq("ProfileStampedElement")
             })
 
             it("should display an error when stream name is unknown", () => {
-                let store = newStreamStore({modules: {applicationStore}})
-                store.state.applicationStore.profile = {id: 26}
-                let target = mount(Stream, {store})
+                store.state.stream.name = "Yolo stream"
                 Sinon.spy(console, "error")
-                target.instance().$store.state.streamName = "Yolo stream"
+                let target = mount(Stream, {store})
                 target.instance().stampedElement
                 console.error.getCall(0).args[0].should.eq("Unsupported stream name Yolo stream")
             })
@@ -66,15 +63,6 @@ describe("Stream", () => {
     })
 
     describe("methods", () => {
-        describe("onImageLoad", () => {
-            it("should call Vue.redrawVueMasonry", () => {
-                let target = new Stream({})
-                Sinon.spy(Vue, "redrawVueMasonry")
-                target.onImageLoad()
-                Vue.redrawVueMasonry.called.should.be.true
-            })
-        })
-
         describe("onNewContentClick", () => {
             it("should show the new content button when the user receives new content", (done) => {
                 let target = mount(Stream, {})
@@ -98,6 +86,23 @@ describe("Stream", () => {
     })
 
     describe("Lifecycle", () => {
+        describe("beforeCreate", () => {
+            it("loads stream if not single stream", () => {
+                Sinon.spy(store, "dispatch")
+                let target = mount(Stream, {store})
+                target.instance().$store.dispatch.getCall(0).args[0].should.eql(streamStoreOperations.loadStream)
+            })
+
+            it("does not load stream if single stream", () => {
+                // This causes nasty traceback due to repliescontainer trying to fetch replies
+                // But shallow mount wont work for some reason with our Stream component
+                store.state.stream.single = true
+                Sinon.spy(store, "dispatch")
+                let target = mount(Stream, {store})
+                target.instance().$store.dispatch.called.should.be.false
+            })
+        })
+
         describe("render", () => {
             it("should not render unfetched content", () => {
                 let target = mount(Stream, {})
@@ -105,6 +110,31 @@ describe("Stream", () => {
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.find(".grid-item").length.should.eq(0)
             })
+        })
+    })
+
+    describe("template", () => {
+        it("renders single content if single stream", () => {
+            // Shallow mount fails with
+            // TypeError: key.charAt is not a function
+            // Meh :(
+            const secondContent = getFakeContent()
+            store.state.contents[secondContent.id] = secondContent
+            store.state.contentIds.push(secondContent.id)
+            let target = mount(Stream, {store})
+            target.find(".container").length.should.eql(0)
+            target.find(".grid-item-full").length.should.eql(0)
+            target.find(".grid-item").length.should.eql(2)
+
+            // Single content stream
+            store.state.stream.single = true
+            const content = getFakeContent()
+            store.state.singleContentId = content.id
+            store.state.contents[content.id] = content
+            target = mount(Stream, {store})
+            target.find(".container").length.should.eql(1)
+            target.find(".grid-item-full").length.should.eql(1)
+            target.find(".grid-item").length.should.eql(1)
         })
     })
 })

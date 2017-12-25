@@ -205,6 +205,8 @@ class TestContentView(SocialhomeTestCase):
         cls.client = Client()
         cls.reply = PublicContentFactory(parent=cls.content)
         cls.share = PublicContentFactory(share_of=cls.content)
+        cls.user = cls.content.author.user
+        cls.profile = cls.content.author
 
     def test_content_view_renders_json_result(self):
         response = self.client.get(
@@ -281,6 +283,40 @@ class TestContentView(SocialhomeTestCase):
         self.response_302()
         self.get("content:view", pk=self.share.id)
         self.response_302()
+
+    def test_has_json_context_if_vue(self):
+        # Not authenticated - no vue flag
+        self.get("content:view", pk=self.content.id)
+        self.assertFalse("json_context" in self.context)
+        # Not authenticated - vue flag
+        self.get("%s?vue=1" % reverse("content:view", kwargs={"pk": self.content.id}))
+        self.assertEqual(self.context["json_context"]["currentBrowsingProfileId"], None)
+        self.assertEqual(self.context["json_context"]["isUserAuthenticated"], False)
+        self.assertEqual(self.context["json_context"]["streamName"], "content__%s_%s" % (
+            self.content.id, self.content.guid.lower()))
+        self.assertEqual(self.context["json_context"]["content"]["id"], self.content.id)
+
+        # Authenticated
+        with self.login(self.user):
+            # Vue flag in url
+            self.get("%s?vue=1" % reverse("content:view", kwargs={"pk": self.content.id}))
+            self.assertEqual(self.context["json_context"]["currentBrowsingProfileId"], self.profile.id)
+            self.assertEqual(self.context["json_context"]["isUserAuthenticated"], True)
+            self.assertEqual(self.context["json_context"]["streamName"], "content__%s_%s" % (
+                self.content.id, self.content.guid.lower()))
+            self.assertEqual(self.context["json_context"]["content"]["id"], self.content.id)
+            # Vue setting enabled
+            self.user.preferences["streams__use_new_stream"] = True
+            self.get("content:view", pk=self.content.id)
+            self.assertEqual(self.context["json_context"]["currentBrowsingProfileId"], self.profile.id)
+            self.assertEqual(self.context["json_context"]["isUserAuthenticated"], True)
+            self.assertEqual(self.context["json_context"]["streamName"], "content__%s_%s" % (
+                self.content.id, self.content.guid.lower()))
+            self.assertEqual(self.context["json_context"]["content"]["id"], self.content.id)
+            # Vue setting disabled
+            self.user.preferences["streams__use_new_stream"] = False
+            self.get("content:view", pk=self.content.id)
+            self.assertFalse("json_context" in self.context)
 
 
 class TestContentReplyView(SocialhomeTestCase):

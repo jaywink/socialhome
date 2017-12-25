@@ -326,6 +326,10 @@ describe("streamStore", () => {
         })
 
         context("when requesting public stream", () => {
+            beforeEach(() => {
+                state.stream = {name: "public"}
+            })
+
             it("should handle public stream request", (done) => {
                 Moxios.stubRequest("/api/streams/public/", response)
 
@@ -368,6 +372,10 @@ describe("streamStore", () => {
         })
 
         context("when requesting followed stream", () => {
+            beforeEach(() => {
+                state.stream = {name: "followed"}
+            })
+
             it("should handle followed stream request", (done) => {
                 Moxios.stubRequest("/api/streams/followed/", response)
 
@@ -410,10 +418,14 @@ describe("streamStore", () => {
         })
 
         context("when requesting tag stream", () => {
-            it("should handle tag stream request", (done) => {
-                Moxios.stubRequest("/api/streams/tag/#yolo/", response)
+            beforeEach(() => {
+                state.stream = {name: "tag", id: "yolo"}
+            })
 
-                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo"}})
+            it("should handle tag stream request", (done) => {
+                Moxios.stubRequest("/api/streams/tag/yolo/", response)
+
+                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "yolo"}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -425,9 +437,9 @@ describe("streamStore", () => {
             })
 
             it("should handle tag stream request with lastId", (done) => {
-                Moxios.stubRequest("/api/streams/tag/#yolo/?last_id=8", response)
+                Moxios.stubRequest("/api/streams/tag/yolo/?last_id=8", response)
 
-                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo", lastId: 8}})
+                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "yolo", lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -439,9 +451,9 @@ describe("streamStore", () => {
             })
 
             it("should handle tag stream request error", (done) => {
-                Moxios.stubRequest("/api/streams/tag/#yolo/", {status: 500})
+                Moxios.stubRequest("/api/streams/tag/yolo/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "#yolo"}})
+                target.dispatch(streamStoreOperations.getTagStream, {params: {name: "yolo"}})
 
                 Moxios.wait(() => {
                     target.state.error.contents.should.exist
@@ -452,6 +464,10 @@ describe("streamStore", () => {
         })
 
         context("when requesting profile all stream", () => {
+            beforeEach(() => {
+                state.stream = {name: "profile_all"}
+            })
+
             it("should handle profile stream request", (done) => {
                 Moxios.stubRequest("/api/streams/profile-all/26/", response)
 
@@ -494,6 +510,10 @@ describe("streamStore", () => {
         })
 
         context("when requesting profile pinned stream", () => {
+            beforeEach(() => {
+                state.stream = {name: "profile_pinned"}
+            })
+
             it("should handle profile stream request", (done) => {
                 Moxios.stubRequest("/api/streams/profile-pinned/26/", response)
 
@@ -749,32 +769,32 @@ describe("streamStore", () => {
                 })
 
                 it("followed stream with no contents", () => {
-                    state.streamName = "followed__spameater"
+                    state.stream = {name: "followed"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream, {params: {}}])
                 })
 
                 it("public stream with no contents", () => {
-                    state.streamName = "public"
+                    state.stream = {name: "public"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream, {params: {}}])
                 })
 
                 it("tag stream with no contents", () => {
-                    state.streamName = "tag__1234"
+                    state.stream = {name: "tag"}
                     state.tagName = "eggs"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql([streamStoreOperations.getTagStream, {params: {name: "eggs"}}])
                 })
 
                 it("profile all stream with no contents", () => {
-                    state.streamName = "profile_all__1234-5678"
+                    state.stream = {name: "profile_all"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, {params: {id: 5}}])
                 })
 
                 it("profile pinned stream with no contents", () => {
-                    state.streamName = "profile_pinned__1234-5678"
+                    state.stream = {name: "profile_pinned"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, {params: {id: 5}}])
                 })
@@ -791,7 +811,7 @@ describe("streamStore", () => {
                 })
 
                 it("followed stream with contents", () => {
-                    state.streamName = "followed__spameater"
+                    state.stream = {name: "followed"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
                         [streamStoreOperations.getFollowedStream, {params: {lastId: "4"}}],
@@ -799,7 +819,7 @@ describe("streamStore", () => {
                 })
 
                 it("public stream with contents", () => {
-                    state.streamName = "public"
+                    state.stream = {name: "public"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
                         [streamStoreOperations.getPublicStream, {params: {lastId: "4"}}],
@@ -807,7 +827,7 @@ describe("streamStore", () => {
                 })
 
                 it("tag stream with contents", () => {
-                    state.streamName = "tag__1234"
+                    state.stream = {name: "tag"}
                     state.tagName = "eggs"
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
@@ -816,7 +836,7 @@ describe("streamStore", () => {
                 })
 
                 it("profile all stream with contents", () => {
-                    state.streamName = "profile_all__1234-5678"
+                    state.stream = {name: "profile_all"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
                         [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}}],
@@ -824,7 +844,7 @@ describe("streamStore", () => {
                 })
 
                 it("profile pinned stream with contents", () => {
-                    state.streamName = "profile_pinned__1234-5678"
+                    state.stream = {name: "profile_pinned"}
                     actions[streamStoreOperations.loadStream]({dispatch, state})
                     dispatch.getCall(0).args.should.eql(
                         [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}}],
