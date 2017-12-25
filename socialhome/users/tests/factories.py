@@ -34,9 +34,9 @@ class AdminUserFactory(UserFactory):
 
 class ProfileFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
-    email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
+    email = factory.Faker("safe_email")
     handle = factory.SelfAttribute("email")
-    guid = factory.Sequence(lambda n: "guid-{0}".format(n))
+    guid = factory.Faker("uuid4")
 
     # Dummy strings as keys since generating these is expensive
     rsa_private_key = fuzzy.FuzzyText()

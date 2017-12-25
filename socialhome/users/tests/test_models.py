@@ -97,7 +97,10 @@ class TestProfile(SocialhomeTestCase):
         self.assertEqual(self.profile.name_or_handle, self.profile.handle)
 
     def test_remote_url(self):
-        self.assertEqual(self.profile.remote_url, "https://example.com/people/1234")
+        self.assertEqual(
+            self.profile.remote_url,
+            "https://%s/people/%s" % (self.profile.handle.split("@")[1], self.profile.guid)
+        )
 
     def test_profile_image_urls_default_to_ponies(self):
         profile = ProfileFactory(image_url_small="", image_url_medium="", image_url_large="")

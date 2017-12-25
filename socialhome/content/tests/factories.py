@@ -1,9 +1,8 @@
 import factory
-from factory import fuzzy
 
 from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
 from socialhome.enums import Visibility
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory
 
 
 class TagFactory(factory.DjangoModelFactory):
@@ -17,28 +16,25 @@ class ContentFactory(factory.DjangoModelFactory):
     class Meta:
         model = Content
 
-    text = fuzzy.FuzzyText()
-    guid = fuzzy.FuzzyText()
+    text = factory.Faker("text")
+    guid = factory.Faker("uuid4")
     author = factory.SubFactory(ProfileFactory)
 
 
 class PublicContentFactory(ContentFactory):
-    text = fuzzy.FuzzyText(prefix="Public ")
     visibility = Visibility.PUBLIC
+    author = factory.SubFactory(PublicProfileFactory)
 
 
 class LimitedContentFactory(ContentFactory):
-    text = fuzzy.FuzzyText(prefix="Limited ")
     visibility = Visibility.LIMITED
 
 
 class SiteContentFactory(ContentFactory):
-    text = fuzzy.FuzzyText(prefix="Site ")
     visibility = Visibility.SITE
 
 
 class SelfContentFactory(ContentFactory):
-    text = fuzzy.FuzzyText(prefix="Self ")
     visibility = Visibility.SELF
 
 
