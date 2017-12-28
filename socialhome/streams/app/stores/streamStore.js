@@ -69,8 +69,9 @@ function fetchNewContentSuccess(state, payload) {
 }
 
 function onError(state, error) {
-    /* TODO: Proper error handling */
-    console.error(`An error happened while fetching post: ${error}`)
+    const message = gettext("An error happened while fetching new content")
+    Vue.snotify.error(message)
+    console.error(`${message} ; error met: ${error}`) // eslint-disable-line no-console
 }
 
 function newRestAPI(options) {

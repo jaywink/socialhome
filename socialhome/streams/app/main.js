@@ -44,6 +44,7 @@ const main = new Vue({
     created() {
         this.$websocket = new ReconnectingWebSocket(this.websocketPath())
         this.$websocket.onmessage = message => this.onWebsocketMessage(message)
+        Vue.snotify = this.$snotify
     },
     beforeDestroy() {
         this.$websocket.close()
