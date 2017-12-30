@@ -10,6 +10,8 @@ import FollowedStampedElement from "streams/app/components/stamped_elements/Foll
 import {streamStoreOperations} from "streams/app/stores/streamStore"
 import {getStore} from "streams/app/tests/fixtures/store.fixtures"
 import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import applicationStore from "../../stores/applicationStore"
+import {newStreamStore} from "../../stores/streamStore"
 
 
 Vue.use(BootstrapVue)
@@ -65,7 +67,8 @@ describe("Stream", () => {
     describe("methods", () => {
         describe("onNewContentClick", () => {
             it("should show the new content button when the user receives new content", (done) => {
-                let target = mount(Stream, {})
+                store.state.stream.name = "" // Deactivate posts fetching
+                let target = mount(Stream, {store})
                 target.find(".new-content-container")[0].hasStyle("display", "none").should.be.true
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.instance().$nextTick(() => {
@@ -76,7 +79,7 @@ describe("Stream", () => {
             })
 
             it("should acknowledge new content when the user clicks the button", () => {
-                let target = mount(Stream, {})
+                let target = mount(Stream, {store})
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 Sinon.spy(target.instance().$store, "dispatch")
                 target.find(".new-content-load-link")[0].trigger("click")
@@ -105,7 +108,9 @@ describe("Stream", () => {
 
         describe("render", () => {
             it("should not render unfetched content", () => {
-                let target = mount(Stream, {})
+                store = newStreamStore({modules: {applicationStore}})
+                store.state.stream.name = ""
+                let target = mount(Stream, {store})
                 target.find(".grid-item").length.should.eq(0)
                 target.instance().$store.commit(streamStoreOperations.receivedNewContent, 1)
                 target.find(".grid-item").length.should.eq(0)

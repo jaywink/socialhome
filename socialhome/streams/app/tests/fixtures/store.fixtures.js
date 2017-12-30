@@ -3,10 +3,18 @@ import Vue from "vue"
 import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
+import Axios from "axios"
 
 
-const getStore = function() {
-    let store = newStreamStore({ modules: { applicationStore } })
+const getStore = function () {
+    let store = newStreamStore({
+        modules: {applicationStore},
+        baseURL: "",
+        axios: Axios.create({
+            xsrfCookieName: "csrftoken",
+            xsrfHeaderName: "X-CSRFToken",
+        }),
+    })
     store.content = getFakeContent()
     store.reply = getFakeContent({parent: store.content.id, content_type: "reply"})
     store.share = getFakeContent({share_of: store.content.id, content_type: "share"})

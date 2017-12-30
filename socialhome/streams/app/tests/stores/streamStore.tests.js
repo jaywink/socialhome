@@ -8,6 +8,7 @@ import {actions, mutations, getters} from "streams/app/stores/streamStore.operat
 import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore, streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
 import getState from "streams/app/stores/streamStore.state"
+import Axios from "axios/index"
 
 
 describe("streamStore", () => {
@@ -41,80 +42,6 @@ describe("streamStore", () => {
             state.contents[state.contentIds[1]].hasLoadMore.should.be.false
             state.contents[state.contentIds[2]].hasLoadMore.should.be.false
             state.contents[state.contentIds[3]].hasLoadMore.should.be.false
-        })
-    })
-
-    describe("newStreamStore", () => {
-        context("when websocket connects", () => {
-            it("should connect with protocol wss:// when browser protocol is HTTPS", () => {
-                jsdom.reconfigure({url: "https://localhost"})
-                window.context = {streamName: "public"}
-                const mockWebSocket = Sinon.spy()
-                newStreamStore({WebSocketImpl: mockWebSocket})
-                mockWebSocket.getCall(0).args[0].should.equal("wss://localhost/ch/streams/public/")
-            })
-
-            it("should connect with protocol ws:// when browser protocol is HTTP", () => {
-                jsdom.reconfigure({url: "http://localhost"})
-                window.context = {streamName: "public"}
-                const mockWebSocket = Sinon.spy()
-                newStreamStore({WebSocketImpl: mockWebSocket})
-                mockWebSocket.getCall(0).args[0].should.equal("ws://localhost/ch/streams/public/")
-            })
-        })
-
-        context("when websocket receives a message", () => {
-            it("should dispatch receivedNewContent to store when serveur sends a next message", (done) => {
-                let mockserver = new Server("wss://localhost:8080/ch/streams/public/")
-                jsdom.reconfigure({url: "https://localhost:8080"})
-                window.context = {streamName: "public"}
-                Sinon.spy(Vuex.Store.prototype, "dispatch")
-                mockserver.on("connection", () => mockserver.send(JSON.stringify({event: "new", id: 4})))
-                newStreamStore({WebSocketImpl: WebSocket})
-                setTimeout(() => {
-                    Vuex.Store.prototype.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.receivedNewContent, 4])
-                    done()
-                }, 200)
-            })
-        })
-
-        context("when initializing the store", () => {
-            it("should call Vuex.Store with correct parameters when no option is passed", () => {
-                Sinon.spy(Vuex, "Store")
-                newStreamStore()
-                // Comparison by string. What matters is that the argument has the correct structure
-                JSON.stringify(Vuex.Store.getCall(0).args[0])
-                    .should.eql(JSON.stringify(exportsForTests.getStructure(getState(), {})))
-            })
-
-            it("should not attach the websocket implementation to the store", () => {
-                Sinon.spy(Vuex, "Store")
-                newStreamStore({WebSocketImpl: Sinon.stub().returns({})})
-                JSON.stringify(Vuex.Store.getCall(0).args[0])
-                    .should.eql(JSON.stringify(exportsForTests.getStructure(getState(), {})))
-            })
-
-            it("should attach any other option to the store", () => {
-                Sinon.spy(Vuex, "Store")
-                let modules = {modules: {applicationStore: {}}}
-                newStreamStore(modules)
-                Vuex.Store.getCall(0).args[0].modules.should.eq(modules.modules)
-            })
-
-            it("should return the result of `new Vuex.Store`", () => {
-                let result = {}
-                Sinon.stub(Vuex, "Store").returns(result)
-                newStreamStore().should.eq(result)
-            })
-
-            it("should attach the websocket instance to the store", () => {
-                let ws = {}
-                Sinon.stub(Vuex, "Store").returns({})
-                let WebSocketImpl = Sinon.stub()
-                WebSocketImpl.returns(ws)
-                newStreamStore({WebSocketImpl}).$websocket.should.eq(ws)
-            })
         })
     })
 
@@ -318,7 +245,7 @@ describe("streamStore", () => {
                     {id: "7", text: "blablabla"},
                 ],
             }
-            target = new Vuex.Store(exportsForTests.newRestAPI({state}))
+            target = new Vuex.Store(exportsForTests.newRestAPI({state, baseURL: "", axios: Axios}))
         })
 
         afterEach(() => {
@@ -684,8 +611,8 @@ describe("streamStore", () => {
     })
 
     describe("getStructure", () => {
-        it("should have actions, mutations and getters defined", () => {
-            let target = exportsForTests.getStructure(getState(), {modules: {applicationStore: {}}})
+        it("should have actions, mutations, getters and modules defined", () => {
+            let target = exportsForTests.getStructure({modules: {applicationStore: {}}})
 
             target.actions[streamStoreOperations.disableLoadMore].should.exist
             target.actions[streamStoreOperations.getFollowedStream].should.exist
@@ -704,9 +631,9 @@ describe("streamStore", () => {
             target.mutations[streamStoreOperations.newContentAck].should.exist
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
 
-            target.getters.contentList.should.exist
-            target.getters.replies.should.exist
-            target.getters.shares.should.exist
+            for(let getter in getters) {
+                target.getters[getter].should.exist
+            }
 
             target.modules.applicationStore.should.exist
         })

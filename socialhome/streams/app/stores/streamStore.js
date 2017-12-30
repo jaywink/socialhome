@@ -1,8 +1,6 @@
-import Axios from "axios"
 import Vue from "vue"
 import Vuex from "vuex"
 import Vapi from "vuex-rest-api"
-import ReconnectingWebSocket from "reconnecting-websocket"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
 import _pullAll from "lodash/pullAll"
@@ -74,16 +72,9 @@ function onError(state, error) {
 }
 
 function newRestAPI(options) {
-    const opts = _defaults({}, options, {
-        baseURL: "",
-        axios: Axios.create({
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-        }),
-    })
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 
-    return new Vapi(opts)
+    return new Vapi(options)
         .get({
             action: streamStoreOperations.getPublicStream,
             path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
@@ -150,41 +141,20 @@ function newRestAPI(options) {
         .getStore()
 }
 
-function getStructure(state, options) {
-    const result = newRestAPI({state})
+function getStructure(options) {
+    const storePrototype = newRestAPI(_defaults({}, {state: getState()}, options))
+    const modules = _get(options, "modules", {})
 
-    result.mutations = _defaults({}, mutations, result.mutations)
-    result.actions = _defaults({}, actions, result.actions)
-    result.getters = _defaults({}, getters, result.getters)
+    storePrototype.mutations = _defaults({}, mutations, storePrototype.mutations)
+    storePrototype.actions = _defaults({}, actions, storePrototype.actions)
+    storePrototype.getters = _defaults({}, getters, storePrototype.getters)
+    storePrototype.modules = _defaults({}, modules, storePrototype.modules)
 
-    return _defaults({}, result, options)
+    return storePrototype
 }
 
 function newStreamStore(options = {}) {
-    const state = getState()
-    const opts = _defaults({}, options)
-
-    // This exists for test puposes
-    const WebSocketImpl = _get(opts, ["WebSocketImpl"], ReconnectingWebSocket)
-    delete opts.WebSocketImpl
-
-    const store = new Vuex.Store(getStructure(state, opts))
-
-    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws"
-    const wsPath = `${wsProtocol}://${window.location.host}/ch/streams/${state.streamName}/`
-    const ws = new WebSocketImpl(wsPath)
-
-    ws.onmessage = message => {
-        const data = JSON.parse(message.data)
-
-        if (data.event === "new") {
-            store.dispatch(streamStoreOperations.receivedNewContent, data.id)
-        }
-    }
-
-    store.$websocket = ws
-
-    return store
+    return new Vuex.Store(getStructure(options))
 }
 
 const exportsForTests = {
