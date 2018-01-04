@@ -44,14 +44,12 @@ import TagStampedElement from "streams/app/components/stamped_elements/TagStampe
 import ProfileStampedElement from "streams/app/components/stamped_elements/ProfileStampedElement.vue"
 import "streams/app/components/LoadingElement.vue"
 
-import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
-import applicationStore from "streams/app/stores/applicationStore"
+import {streamStoreOperations} from "streams/app/stores/streamStore"
 
 
 Vue.use(VueScrollTo)
 
 export default Vue.component("stream", {
-    store: newStreamStore({modules: {applicationStore}}),
     components: {FollowedStampedElement, PublicStampedElement, ProfileStampedElement, TagStampedElement},
     data() {
         return {
@@ -103,9 +101,6 @@ export default Vue.component("stream", {
         if (!this.$store.state.stream.single) {
             this.$store.dispatch(streamStoreOperations.loadStream)
         }
-    },
-    beforeDestroy() {
-        this.$store.$websocket.close()
     },
 })
 </script>
