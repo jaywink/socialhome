@@ -2,19 +2,24 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueInfiniteScroll from "vue-infinite-scroll"
 import VueMasonryPlugin from "vue-masonry"
+import VueSnotify from "vue-snotify"
 
 import Axios from "axios"
+import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
 
 import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 
 import "streams/app/components/Stream.vue"
-import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
+
+// CSS
+import "streams/app/main.stylesheet"
 
 
 Vue.use(BootstrapVue)
 Vue.use(VueInfiniteScroll)
 Vue.use(VueMasonryPlugin)
+Vue.use(VueSnotify)
 
 Vue.prototype.$http = Axios.create({
     xsrfCookieName: "csrftoken",

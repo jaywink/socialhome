@@ -128,7 +128,6 @@ module.exports = function (grunt) {
                     "<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css",
                     "<%= paths.bower %>/tether/dist/css/tether.min.css",
                     "<%= paths.bower %>/bootstrap-markdown/css/bootstrap-markdown.min.css",
-                    "<%= paths.node %>/vue-snotify/styles/material.css",
                     "<%= paths.css %>/fontawesome.css",
                     "<%= paths.css %>/common.css",
                     "<%= paths.css %>/grids.css",

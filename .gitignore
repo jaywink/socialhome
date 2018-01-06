@@ -72,6 +72,7 @@ env.local
 
 # Collected statics
 socialhome/static/css/*.css
+socialhome/static/css/*.css.map
 socialhome/static/js/project.js
 socialhome/static/js/webpack.*.js
 socialhome/static/js/webpack.*.js.map

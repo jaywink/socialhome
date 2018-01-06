@@ -4,6 +4,7 @@ import Vue from "vue"
 import {mount} from "avoriaz"
 
 import BootstrapVue from "bootstrap-vue"
+import VueSnotify from "vue-snotify"
 import VueMasonryPlugin from "vue-masonry"
 
 import ReactionsBar from "streams/app/components/ReactionsBar.vue"
@@ -14,6 +15,7 @@ import applicationStore from "streams/app/stores/applicationStore"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
+Vue.use(VueSnotify)
 
 describe("ReactionsBar", () => {
     let content
@@ -177,6 +179,50 @@ describe("ReactionsBar", () => {
                     })
                 })
             })
+
+            it("should show an error to the user when share fails", done => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = false
+
+                target.instance().share()
+
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
+                        target.instance().$snotify.error.getCall(0).args[0]
+                            .should.eq("An error happened while resharing the content")
+                        done()
+                    })
+                })
+            })
+
+            it("should show an error to the user when user is not logged in", () => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = false
+
+                target.instance().share()
+
+                target.instance().$snotify.error.getCall(0).args[0]
+                    .should.eq("You must be logged in to reshare")
+            })
+
+            it("should show an error to the user when user tries to share own post", () => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = true
+
+                target.instance().share()
+
+                target.instance().$snotify.error.getCall(0).args[0]
+                    .should.eq("Unable to reshare own post")
+            })
         })
 
         describe("unshare", () => {
@@ -206,6 +252,50 @@ describe("ReactionsBar", () => {
                         done()
                     })
                 })
+            })
+
+            it("should show an error to the user when share fails", done => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = false
+
+                target.instance().unshare()
+
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
+                        target.instance().$snotify.error.getCall(0).args[0]
+                            .should.eq("An error happened while unsharing the content")
+                        done()
+                    })
+                })
+            })
+
+            it("should show an error to the user when user is not logged in", () => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = false
+
+                target.instance().unshare()
+
+                target.instance().$snotify.error.getCall(0).args[0]
+                    .should.eq("You must be logged in to unshare")
+            })
+
+            it("should show an error to the user when user tries to share own post", () => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().$store.state.applicationStore.isUserAuthenticated = true
+                target.instance().$store.state.contents[1].user_has_shared = false
+                target.instance().$store.state.contents[1].user_is_author = true
+
+                target.instance().unshare()
+
+                target.instance().$snotify.error.getCall(0).args[0]
+                    .should.eq("Unable to unshare own post")
             })
         })
     })
