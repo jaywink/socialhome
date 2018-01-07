@@ -35,6 +35,8 @@ Added
 
 * There is now a management command to generate dummy content for development environment purposes. See :ref:`development` pages.
 
+* Installation docs now have an example SystemD service configuration, see :ref:`installation-other-systemd`. (`#397 <https://github.com/jaywink/socialhome/issues/397>`_)
+
 Changed
 .......
 

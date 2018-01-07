@@ -1,14 +1,14 @@
 .. _installation-ubuntu:
 
-Ubuntu (14.04, manual)
-----------------------
+Ubuntu (14.04)
+--------------
 
 This guide is very opinionated and experienced sysadmins will most likely want to do things differently. This guide will give you a Socialhome production install on uWSGI using an Apache2 web server.
 
 Supported versions
 ..................
 
-This guide is written for **Ubuntu 14.04** (with Upstart). Guide for non-upstart Ubuntu versions coming soon!
+This guide is written for **Ubuntu 14.04** (with Upstart). For a SystemD config file, see :ref:`installation-other-systemd`.
 
 Steps
 .....
@@ -355,6 +355,8 @@ Start Circus. It will automatically start on system boot.
 ::
 
     sudo service socialhome start
+
+For a SystemD config file, see :ref:`installation-other-systemd`.
 
 Done!
 '''''
