@@ -74,6 +74,32 @@
                 </b-button>
             </div>
         </div>
+
+        <div v-else-if="profile.is_local" class="pull-right">
+            <div class="mt-1">
+                <span
+                    :title="translations.following"
+                    :aria-label="translations.following"
+                >
+                    <i class="fa fa-user" />
+                    <i class="fa fa-arrow-right" />
+                    <i class="fa fa-users" />
+                    &nbsp;{{ profile.following_count }}
+                </span>
+            </div>
+            <div class="mt-1">
+                <span
+                    :title="translations.followers"
+                    :aria-label="translations.followers"
+                >
+                    <i class="fa fa-users" />
+                    <i class="fa fa-arrow-right" />
+                    <i class="fa fa-user" />
+                    &nbsp;{{ profile.followers_count }}
+                </span>
+            </div>
+        </div>
+
         <div class="d-inline-block">
             <img
                 v-if="profile.image_url_large"
