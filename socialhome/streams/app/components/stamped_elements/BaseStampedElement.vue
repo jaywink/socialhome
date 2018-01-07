@@ -12,7 +12,6 @@
 
 <script>
 import Vue from "vue"
-import store from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("base-stamped-element", {

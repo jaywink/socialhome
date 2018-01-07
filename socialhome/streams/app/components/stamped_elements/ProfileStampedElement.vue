@@ -99,7 +99,6 @@
 
 <script>
 import Vue from "vue"
-import applicationStore from "streams/app/stores/applicationStore"
 
 
 export default Vue.component("profile-stamped-element", {
