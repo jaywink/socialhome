@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="showProfileButtons" class="pull-right">
+        <div v-if="showProfileButtons" class="pull-right text-right">
             <b-dropdown right>
                 <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
                 <b-dropdown-item
