@@ -36,42 +36,47 @@
 </template>
 
 <script>
-    export default {
-        name: "profile-reaction-buttons",
-        data() {
-            return {
-                followingAuthor: this.userFollowingAuthor,
-            }
+export default {
+    name: "profile-reaction-buttons",
+    data() {
+        return {
+            following: this.userFollowing,
+        }
+    },
+    props: {
+        userFollowing: {type: Boolean, default: false},
+        profile: {type: Object, required: true},
+        showProfileLink: {type: Boolean, default: true},
+    },
+    computed: {
+        currentBrowsingProfileId() {
+            return this.$store.state.applicationStore.currentBrowsingProfileId
         },
-        props: {
-            userFollowingAuthor: {type: Boolean, default: false},
-            profile: {type: Object, required: true},
-            showProfileLink: {type: Boolean, default: true},
+        showFollowBtn() {
+            return this.$store.state.applicationStore.isUserAuthenticated && !this.following
         },
-        computed: {
-            currentBrowsingProfileId() {
-                return this.$store.state.applicationStore.currentBrowsingProfileId
-            },
-            showFollowBtn() {
-                return this.$store.state.applicationStore.isUserAuthenticated && !this.followingAuthor
-            },
-            showUnfollowBtn() {
-                return this.$store.state.applicationStore.isUserAuthenticated && this.followingAuthor
-            },
+        showUnfollowBtn() {
+            return this.$store.state.applicationStore.isUserAuthenticated && this.following
         },
-        methods: {
-            unfollow() {
-                this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.profile.guid})
-                    .then(() => this.followingAuthor = false)
-                    .catch(err => console.error(err) /* TODO: Proper error handling */)
-            },
-            follow() {
-                this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.profile.guid})
-                    .then(() => this.followingAuthor = true)
-                    .catch(err => console.error(err) /* TODO: Proper error handling */)
-            },
+    },
+    methods: {
+        unfollow() {
+            this.$http.post(
+                `/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.profile.guid})
+                .then(() => {
+                    this.following = false
+                })
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
-    }
+        follow() {
+            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.profile.guid})
+                .then(() => {
+                    this.following = true
+                })
+                .catch(err => console.error(err) /* TODO: Proper error handling */)
+        },
+    },
+}
 </script>
 
 <style scoped lang="scss">

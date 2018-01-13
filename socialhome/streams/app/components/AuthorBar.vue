@@ -10,7 +10,7 @@
                 <div class="pull-right">
                     <ProfileReactionButtons
                         :profile="author"
-                        :user-following-author="content.user_following_author"
+                        :user-following="content.user_following_author"
                     />
                 </div>
                 <div class="clearfix"></div>

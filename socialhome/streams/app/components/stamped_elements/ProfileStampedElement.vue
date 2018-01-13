@@ -4,7 +4,7 @@
             <ProfileReactionButtons
                 :profile="profile"
                 :show-profile-link="false"
-                :user-following-author="profile.user_following"
+                :user-following="profile.user_following"
             />
         </div>
         <div class="clearfix"></div>

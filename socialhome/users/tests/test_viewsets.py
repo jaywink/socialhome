@@ -210,3 +210,18 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower removed.")
+
+    def test_user_following__false_when_not_logged_in(self):
+        self.get("api:profile-detail", pk=self.profile.id)
+        self.assertEqual(self.last_response.data['user_following'], False)
+
+    def test_user_following__false_when_not_following(self):
+        with self.login(self.staff_user):
+            self.get("api:profile-detail", pk=self.profile.id)
+        self.assertEqual(self.last_response.data['user_following'], False)
+
+    def test_user_following__true_when_following(self):
+        self.staff_user.profile.following.add(self.profile)
+        with self.login(self.staff_user):
+            self.get("api:profile-detail", pk=self.profile.id)
+        self.assertEqual(self.last_response.data['user_following'], True)
