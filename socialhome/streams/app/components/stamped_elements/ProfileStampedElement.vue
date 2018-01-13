@@ -1,5 +1,14 @@
 <template>
     <div>
+        <div v-if="showProfileReactionButtons" class="pull-right">
+            <ProfileReactionButtons
+                :profile="profile"
+                :show-profile-link="false"
+                :user-following-author="profile.user_following"
+            />
+        </div>
+        <div class="clearfix"></div>
+
         <div v-if="showProfileButtons" class="pull-right text-right">
             <b-dropdown right>
                 <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
@@ -126,8 +135,13 @@
 <script>
 import Vue from "vue"
 
+import ProfileReactionButtons from "../ProfileReactionButtons.vue"
+
 
 export default Vue.component("profile-stamped-element", {
+    components: {
+        ProfileReactionButtons,
+    },
     computed: {
         nameOrGuid() {
             return this.profile.name ? this.profile.name : this.profile.guid
@@ -144,6 +158,10 @@ export default Vue.component("profile-stamped-element", {
         showProfileButtons() {
             return this.$store.state.applicationStore.isUserAuthenticated &&
                 this.profile.id === this.$store.state.applicationStore.currentBrowsingProfileId
+        },
+        showProfileReactionButtons() {
+            return this.$store.state.applicationStore.isUserAuthenticated &&
+                this.profile.id !== this.$store.state.applicationStore.currentBrowsingProfileId
         },
         translations() {
             return {
