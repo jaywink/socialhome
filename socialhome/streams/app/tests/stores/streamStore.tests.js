@@ -6,7 +6,7 @@ import Vuex from "vuex"
 
 import {actions, mutations, getters} from "streams/app/stores/streamStore.operations"
 import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
-import {newStreamStore, streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
+import {streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
 import getState from "streams/app/stores/streamStore.state"
 import Axios from "axios/index"
 
@@ -42,6 +42,19 @@ describe("streamStore", () => {
             state.contents[state.contentIds[1]].hasLoadMore.should.be.false
             state.contents[state.contentIds[2]].hasLoadMore.should.be.false
             state.contents[state.contentIds[3]].hasLoadMore.should.be.false
+        })
+
+        it("sets layoutDoneAfterTwitterOEmbeds to false", () => {
+            const state = {
+                contentIds: [...new Array(7).keys()].map(i => i),
+                contents: {},
+                layoutDoneAfterTwitterOEmbeds: true,
+            }
+            state.contentIds.forEach(id => {
+                state.contents[id] = getFakeContent({id: id, hasLoadMore: false})
+            })
+            exportsForTests.addHasLoadMore(state)
+            state.layoutDoneAfterTwitterOEmbeds.should.be.false
         })
     })
 
@@ -626,10 +639,12 @@ describe("streamStore", () => {
             target.actions[streamStoreOperations.newContentAck].should.exist
             target.actions[streamStoreOperations.receivedNewContent].should.exist
             target.actions[streamStoreOperations.saveReply].should.exist
+            target.actions[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds].should.exist
 
             target.mutations[streamStoreOperations.disableLoadMore].should.exist
             target.mutations[streamStoreOperations.newContentAck].should.exist
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
+            target.mutations[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds].should.exist
 
             for(let getter in getters) {
                 target.getters[getter].should.exist
@@ -655,6 +670,7 @@ describe("streamStore", () => {
                 state.unfetchedContentIds.should.eql(["6"])
             })
         })
+
         describe("newContentAck", () => {
             it("should add all elements from 'state.unfetchedContentIds' to 'state.contentIds'", () => {
                 let state = {unfetchedContentIds: ["6"], contentIds: []}
@@ -665,6 +681,16 @@ describe("streamStore", () => {
                 let state = {unfetchedContentIds: ["6"], contentIds: ["6"]}
                 mutations[streamStoreOperations.newContentAck](state)
                 state.contentIds.should.eql(["6"])
+            })
+        })
+
+        describe("setLayoutDoneAfterTwitterOEmbeds", () => {
+            it("should set the state correctly", () => {
+                let state = {layoutDoneAfterTwitterOEmbeds: false}
+                mutations[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds](state, true)
+                state.layoutDoneAfterTwitterOEmbeds.should.be.true
+                mutations[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds](state, false)
+                state.layoutDoneAfterTwitterOEmbeds.should.be.false
             })
         })
     })
@@ -816,6 +842,17 @@ describe("streamStore", () => {
                     .onCall(2).returns(Promise.resolve())
 
                 actions[streamStoreOperations.newContentAck]({commit, state, dispatch}).should.be.fulfilled.notify(done)
+            })
+        })
+
+        describe("setLayoutDoneAfterTwitterOEmbeds", () => {
+            it("should commit mutation correctly", () => {
+                // let state = {layoutDoneAfterTwitterOEmbeds: false}
+                let commit = Sinon.spy()
+                // let dispatch = Sinon.spy()
+                actions[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds]({commit}, true)
+                commit.getCall(0).args[0].should.equal(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds)
+                commit.getCall(0).args[1].should.be.true
             })
         })
     })

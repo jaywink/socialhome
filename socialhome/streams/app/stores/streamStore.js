@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import Vue from "vue"
 import Vuex from "vuex"
 import Vapi from "vuex-rest-api"
@@ -15,6 +16,7 @@ function addHasLoadMore(state) {
     const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
+        state.layoutDoneAfterTwitterOEmbeds = false
     }
 }
 

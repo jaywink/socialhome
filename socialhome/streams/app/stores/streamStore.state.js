@@ -32,6 +32,7 @@ export default function () {
         contents,
         contentIds,
         hasNewContent: false,
+        layoutDoneAfterTwitterOEmbeds: false,
         newContentLengh: 0,
         replies,
         shares,
