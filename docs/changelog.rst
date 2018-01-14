@@ -38,6 +38,8 @@ Added
 
 * Installation docs now have an example SystemD service configuration, see :ref:`installation-other-systemd`. (`#397 <https://github.com/jaywink/socialhome/issues/397>`_)
 
+* Content API has a new read only field ``has_twitter_oembed``. This is ``true`` if the content text had a Tweet URL *and* a fetch for the OEmbed code has been successfully made.
+
 Changed
 .......
 

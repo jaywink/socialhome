@@ -88,6 +88,10 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.assertEqual(content.visibility, Visibility.LIMITED)
         self.assertEqual(content.parent, self.limited_content2)
 
+    def test_has_twitter_oembed(self):
+        serializer = ContentSerializer(self.content)
+        self.assertFalse(serializer.data["has_twitter_oembed"])
+
     def test_serializes_author(self):
         serializer = ContentSerializer(self.content)
         data = serializer.data["author"]

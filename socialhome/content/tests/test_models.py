@@ -46,6 +46,7 @@ class TestContentModel(SocialhomeTestCase):
         cls.set = {
             cls.public_content, cls.site_content, cls.limited_content, cls.self_content
         }
+        cls.content_with_twitter_oembed = ContentFactory(text='class="twitter-tweet"')
 
     def setUp(self):
         super().setUp()
@@ -141,6 +142,12 @@ class TestContentModel(SocialhomeTestCase):
         # Do a share
         self.public_content.share(self.local_user.profile)
         self.assertTrue(Content.has_shared(self.public_content.id, self.local_user.profile.id))
+
+    def test_has_twitter_oembed__no_oembed(self):
+        self.assertFalse(self.public_content.has_twitter_oembed)
+
+    def test_has_twitter_oembed__contains_oembed(self):
+        self.assertTrue(self.content_with_twitter_oembed.has_twitter_oembed)
 
     def test_is_local(self):
         self.assertFalse(self.site_content.local)

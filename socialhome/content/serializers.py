@@ -25,6 +25,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "content_type",
             "edited",
             "guid",
+            "has_twitter_oembed",
             "humanized_timestamp",
             "id",
             "is_nsfw",
@@ -53,6 +54,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "content_type"
             "edited",
             "guid",
+            "has_twitter_oembed",
             "humanized_timestamp",
             "id",
             "is_nsfw",
@@ -122,4 +124,3 @@ class ContentSerializer(serializers.ModelSerializer):
             if not value.visible_for_user(request.user):
                 raise serializers.ValidationError("Parent not found")
         return value
-

@@ -164,6 +164,10 @@ class Content(models.Model):
         return reverse("content:view", kwargs={"pk": self.id})
 
     @property
+    def has_twitter_oembed(self):
+        return self.rendered.find('class="twitter-tweet"') > -1
+
+    @property
     def humanized_timestamp(self):
         """Human readable timestamp ie '2 hours ago'."""
         return arrow.get(self.modified).humanize()
