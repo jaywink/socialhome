@@ -8,38 +8,10 @@
             <div v-show="showProfileBox" class="profile-box">
                 {{ author.handle }}
                 <div class="pull-right">
-                    <b-button :href="author.url" variant="secondary" title="Profile" aria-label="Profile">
-                        <i class="fa fa-user"></i>
-                    </b-button>
-                    <b-button
-                        v-if="isUserRemote"
-                        :href="author.home_url"
-                        variant="secondary"
-                        title="Home"
-                        aria-label="Home"
-                    >
-                        <i class="fa fa-home"></i>
-                    </b-button>
-                    <b-button
-                        @click.prevent.stop="unfollow"
-                        variant="secondary"
-                        v-if="showUnfollowBtn"
-                        class="unfollow-btn"
-                        title="Unfollow"
-                        aria-label="Unfollow"
-                    >
-                        <i class="fa fa-minus"></i>
-                    </b-button>
-                    <b-button
-                        @click.prevent.stop="follow"
-                        variant="secondary"
-                        v-if="showFollowBtn"
-                        class="follow-btn"
-                        title="Follow"
-                        aria-label="Follow"
-                    >
-                        <i class="fa fa-plus"></i>
-                    </b-button>
+                    <ProfileReactionButtons
+                        :profile="author"
+                        :user-following="content.user_following_author"
+                    />
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -50,8 +22,13 @@
 <script>
 import Vue from "vue"
 
+import ProfileReactionButtons from "./ProfileReactionButtons.vue"
+
 
 export default Vue.component("author-bar", {
+    components: {
+        ProfileReactionButtons,
+    },
     props: {
         content: {type: Object, required: true},
     },
@@ -64,55 +41,13 @@ export default Vue.component("author-bar", {
         author() {
             return this.content.author
         },
-        canFollow() {
-            return this.$store.state.applicationStore.isUserAuthenticated
-                && !this.content.user_is_author
-        },
-        currentBrowsingProfileId() {
-            return this.$store.state.applicationStore.currentBrowsingProfileId
-        },
         isUserAuthenticated() {
             return this.$store.state.applicationStore.isUserAuthenticated
-        },
-        isUserFollowingAuthor: {
-            get: function () {
-                return this.content.user_following_author
-            },
-            set: function (value) {
-                this.content.user_following_author = value
-            },
-        },
-        isUserRemote() {
-            return !this.content.author.is_local
-        },
-        showFollowBtn() {
-            return this.canFollow && !this.isUserFollowingAuthor
-        },
-        showUnfollowBtn() {
-            return this.canFollow && this.isUserFollowingAuthor
         },
     },
     methods: {
         profileBoxTrigger() {
             this.showProfileBox = !this.showProfileBox
-        },
-        unfollow() {
-            if (!this.isUserAuthenticated) {
-                console.error("Not logged in")
-                return
-            }
-            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.author.guid})
-                .then(() => this.isUserFollowingAuthor = false)
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
-        },
-        follow() {
-            if (!this.isUserAuthenticated) {
-                console.error("Not logged in")
-                return
-            }
-            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.author.guid})
-                .then(() => this.isUserFollowingAuthor = true)
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
     },
     updated() {
@@ -122,9 +57,7 @@ export default Vue.component("author-bar", {
 </script>
 
 <style scoped lang="scss">
-    .profilebox-trigger,
-    .follow-btn,
-    .unfollow-btn {
+    .profilebox-trigger {
         cursor: pointer;
     }
 </style>

@@ -1,6 +1,15 @@
 <template>
     <div>
-        <div v-if="showProfileButtons" class="pull-right">
+        <div v-if="showProfileReactionButtons" class="pull-right">
+            <ProfileReactionButtons
+                :profile="profile"
+                :show-profile-link="false"
+                :user-following="profile.user_following"
+            />
+        </div>
+        <div class="clearfix"></div>
+
+        <div v-if="showProfileButtons" class="pull-right text-right">
             <b-dropdown right>
                 <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
                 <b-dropdown-item
@@ -74,6 +83,32 @@
                 </b-button>
             </div>
         </div>
+
+        <div v-else-if="profile.is_local" class="pull-right">
+            <div class="mt-1">
+                <span
+                    :title="translations.following"
+                    :aria-label="translations.following"
+                >
+                    <i class="fa fa-user" />
+                    <i class="fa fa-arrow-right" />
+                    <i class="fa fa-users" />
+                    &nbsp;{{ profile.following_count }}
+                </span>
+            </div>
+            <div class="mt-1">
+                <span
+                    :title="translations.followers"
+                    :aria-label="translations.followers"
+                >
+                    <i class="fa fa-users" />
+                    <i class="fa fa-arrow-right" />
+                    <i class="fa fa-user" />
+                    &nbsp;{{ profile.followers_count }}
+                </span>
+            </div>
+        </div>
+
         <div class="d-inline-block">
             <img
                 v-if="profile.image_url_large"
@@ -99,10 +134,14 @@
 
 <script>
 import Vue from "vue"
-import applicationStore from "streams/app/stores/applicationStore"
+
+import ProfileReactionButtons from "../ProfileReactionButtons.vue"
 
 
 export default Vue.component("profile-stamped-element", {
+    components: {
+        ProfileReactionButtons,
+    },
     computed: {
         nameOrGuid() {
             return this.profile.name ? this.profile.name : this.profile.guid
@@ -119,6 +158,10 @@ export default Vue.component("profile-stamped-element", {
         showProfileButtons() {
             return this.$store.state.applicationStore.isUserAuthenticated &&
                 this.profile.id === this.$store.state.applicationStore.currentBrowsingProfileId
+        },
+        showProfileReactionButtons() {
+            return this.$store.state.applicationStore.isUserAuthenticated &&
+                this.profile.id !== this.$store.state.applicationStore.currentBrowsingProfileId
         },
         translations() {
             return {

@@ -1,13 +1,13 @@
-import Vue from "vue"
-
-import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
-import {newStreamStore} from "streams/app/stores/streamStore"
 import applicationStore from "streams/app/stores/applicationStore"
 import Axios from "axios"
+import Vue from "vue"
+
+import {getFakeContent, getProfile} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {newStreamStore} from "streams/app/stores/streamStore"
 
 
-const getStore = function () {
-    let store = newStreamStore({
+const getStore = () => {
+    const store = newStreamStore({
         modules: {applicationStore},
         baseURL: "",
         axios: Axios.create({
@@ -23,8 +23,9 @@ const getStore = function () {
     store.content.replyIds = [store.reply.id]
     store.share.replyIds = [store.shareReply.id]
     store.content.shareIds = [store.share.id]
-
     store.state.contentIds.push(store.content.id)
+
+    store.profile = getProfile()
 
     Vue.set(store.state.contents, store.content.id, store.content)
     Vue.set(store.state.replies, store.reply.id, store.reply)
@@ -36,8 +37,9 @@ const getStore = function () {
     Vue.set(store.state.stream, "name", "public")
     Vue.set(store.state.stream, "single", false)
 
+    store.state.applicationStore.currentBrowsingProfileId = store.profile.id
     store.state.applicationStore.isUserAuthenticated = true
-    store.state.applicationStore.profile = {id: store.content.author.id}
+    store.state.applicationStore.profile = store.profile
     return store
 }
 

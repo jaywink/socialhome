@@ -40,6 +40,7 @@ class ProfileSerializer(ModelSerializer):
     followers_count = SerializerMethodField()
     following_count = SerializerMethodField()
     has_pinned_content = SerializerMethodField()
+    user_following = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
 
     class Meta:
@@ -60,6 +61,7 @@ class ProfileSerializer(ModelSerializer):
             "name",
             "nsfw",
             "url",
+            "user_following",
             "visibility",
         )
         read_only_fields = (
@@ -75,6 +77,7 @@ class ProfileSerializer(ModelSerializer):
             "image_url_small",
             "is_local",
             "url",
+            "user_following",
         )
 
     def get_following_count(self, obj):
@@ -86,6 +89,12 @@ class ProfileSerializer(ModelSerializer):
     def get_has_pinned_content(self, obj):
         user = self.context.get("request").user
         return Content.objects.profile_pinned(obj, user).exists()
+
+    def get_user_following(self, obj):
+        request = self.context.get("request")
+        if not request:
+            return False
+        return bool(request.user.is_authenticated and obj.id in request.user.profile.following_ids)
 
 
 class UserSerializer(ModelSerializer):
