@@ -1,14 +1,20 @@
 <template>
     <div>
-        <b-button v-if="showProfileLink" :href="profile.url" variant="secondary" title="Profile" aria-label="Profile">
+        <b-button
+            v-if="showProfileLink"
+            :href="profile.url"
+            variant="secondary"
+            :title="translations.profile"
+            :aria-label="translations.profile"
+        >
             <i class="fa fa-user"></i>
         </b-button>
         <b-button
             v-if="!profile.is_local"
             :href="profile.home_url"
             variant="secondary"
-            title="Home"
-            aria-label="Home"
+            :title="translations.home"
+            :aria-label="translations.home"
         >
             <i class="fa fa-home"></i>
         </b-button>
@@ -17,8 +23,8 @@
             variant="secondary"
             v-if="showUnfollowBtn"
             class="unfollow-btn"
-            title="Unfollow"
-            aria-label="Unfollow"
+            :title="translations.unfollow"
+            :aria-label="translations.unfollow"
         >
             <i class="fa fa-minus"></i>
         </b-button>
@@ -27,8 +33,8 @@
             variant="secondary"
             v-if="showFollowBtn"
             class="follow-btn"
-            title="Follow"
-            aria-label="Follow"
+            :title="translations.follow"
+            :aria-label="translations.follow"
         >
             <i class="fa fa-plus"></i>
         </b-button>
@@ -58,20 +64,31 @@ export default {
         showUnfollowBtn() {
             return this.$store.state.applicationStore.isUserAuthenticated && this.following
         },
+        translations() {
+            return {
+                follow: gettext("Follow"),
+                home: gettext("Home"),
+                profile: gettext("Profile"),
+                unfollow: gettext("Unfollow"),
+            }
+        },
     },
     methods: {
-        unfollow() {
+        follow() {
             this.$http.post(
-                `/api/profiles/${this.currentBrowsingProfileId}/remove_follower/`, {guid: this.profile.guid})
+                Urls["api:profile-add-follower"]({pk: this.currentBrowsingProfileId}),
+                {guid: this.profile.guid})
                 .then(() => {
-                    this.following = false
+                    this.following = true
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
-        follow() {
-            this.$http.post(`/api/profiles/${this.currentBrowsingProfileId}/add_follower/`, {guid: this.profile.guid})
+        unfollow() {
+            this.$http.post(
+                Urls["api:profile-remove-follower"]({pk: this.currentBrowsingProfileId}),
+                {guid: this.profile.guid})
                 .then(() => {
-                    this.following = true
+                    this.following = false
                 })
                 .catch(err => console.error(err) /* TODO: Proper error handling */)
         },
