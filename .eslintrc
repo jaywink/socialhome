@@ -19,5 +19,8 @@
     "gettext": true,
     "interpolate": true,
     "ngettext": true
-  }
+  },
+  "plugins": [
+    "vue"
+  ]
 }
