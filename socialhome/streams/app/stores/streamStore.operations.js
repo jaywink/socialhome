@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import Vue from "vue"
 import _concat from "lodash/concat"
 import _difference from "lodash/difference"
@@ -17,6 +18,7 @@ const streamStoreOperations = {
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
     saveReply: "saveReply",
+    setLayoutDoneAfterTwitterOEmbeds: "setLayoutDoneAfterTwitterOEmbeds",
 }
 
 const mutations = {
@@ -25,6 +27,9 @@ const mutations = {
     },
     [streamStoreOperations.receivedNewContent](state, contentId) {
         state.unfetchedContentIds.push(contentId)
+    },
+    [streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds](state, status) {
+        state.layoutDoneAfterTwitterOEmbeds = status
     },
     [streamStoreOperations.newContentAck](state) {
         /*
@@ -75,6 +80,9 @@ const actions = {
     },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
+    },
+    [streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds]({commit}, status) {
+        commit(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds, status)
     },
     [streamStoreOperations.newContentAck]({commit, dispatch, state}) {
         commit(streamStoreOperations.newContentAck)

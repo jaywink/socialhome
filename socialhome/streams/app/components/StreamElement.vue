@@ -73,36 +73,31 @@ export default Vue.component("stream-element", {
         },
     },
     methods: {
-        initTwitterOEmbed() {
-            // Fetch Twitter script and init embed when updated.
-            // Adapted from: https://gist.github.com/fahrenq/0e815fef2bd296f2e9a061cc27e5a27b
-            (function (d, s, id, c) {
-                let js
-                let fjs = d.getElementsByTagName(s)[0]
-                if (fjs === undefined) return
-                let t = window.twttr || {}
-                if (d.getElementById(id) && t.widgets !== undefined) {
-                    if (t.events._handlers === undefined || t.events._handlers.loaded.length === 0) {
-                        // Bind a tweet loaded event for images loaded, but only once
-                        t.events.bind('loaded', () => {
-                            c.onImageLoad()
-                        })
-                    }
-                    // Init embeds
-                    return t.widgets.load();
+        layoutAfterTwitterOEmbeds() {
+            // Hackity hack a Masonry redraw after hopefully Twitter oembeds are loaded...
+            // Let's try only add these once even if we have many oembed's
+            // Trigger also the actual widget load method since it's possible on
+            // initial stream load it fires before Vue has time to render the widgets..
+            if (this.content.has_twitter_oembed) {
+                if (window.twttr.widgets !== undefined) {
+                    // Trigger load now
+                    window.twttr.widgets.load(document.getElementsByClassName(".streams-container")[0])
+                } else {
+                    // Wait a bit then!
+                    setTimeout(() => {
+                        window.twttr.widgets.load(document.getElementsByClassName(".streams-container")[0])
+                    }, 1000)
                 }
-                // Fetch script to window
-                js = d.createElement(s)
-                js.id = id
-                js.src = "https://platform.twitter.com/widgets.js"
-                if (d.getElementById(id)) return  // Try not to load JS more than once
-                fjs.parentNode.insertBefore(js, fjs)
-                t._e = []
-                t.ready = function (f) {
-                    t._e.push(f)
-                  }
-                return t;
-            }(document, "script", "twitter-wjs", this))
+                if (this.$store.state.layoutDoneAfterTwitterOEmbeds) return
+                this.$store.dispatch(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds, true)
+                const c = this
+                setTimeout(() => {
+                    c.onImageLoad()
+                }, 2000)
+                setTimeout(() => {
+                    c.onImageLoad()
+                }, 4000)
+            }
         },
         loadMore() {
             this.$store.dispatch(streamStoreOperations.disableLoadMore, this.content.id)
@@ -115,7 +110,7 @@ export default Vue.component("stream-element", {
         },
     },
     mounted() {
-        this.initTwitterOEmbed()
+        this.layoutAfterTwitterOEmbeds()
     },
     updated() {
         if (!this.$store.state.stream.single) {
