@@ -153,6 +153,10 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 
+    def get_template_names(self):
+        """Override to not render Vue template if that is active."""
+        return [self.template_name]
+
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
