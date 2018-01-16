@@ -151,7 +151,7 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
                 Content.objects.filter(id=card_id).update(order=i)
 
     def get_success_url(self):
-        return reverse("home")
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
