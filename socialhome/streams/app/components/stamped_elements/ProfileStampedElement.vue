@@ -48,7 +48,7 @@
                     <i class="fa fa-envelope"></i> {{ translations.email }}
                 </b-dropdown-item>
                 <b-dropdown-item
-                    v-if=""
+                    v-if="profile.has_pinned_content"
                     :href="urls.organizeProfileUrl"
                     :title="translations.organizeProfileContent"
                     :aria-label="translations.organizeProfileContent"

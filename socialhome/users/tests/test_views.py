@@ -243,7 +243,7 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
 
     def test_get_success_url(self):
         request, view, contents, profile = self._get_request_view_and_content()
-        assert view.get_success_url() == "/"
+        assert view.get_success_url() == "/u/%s/" % profile.user.username
 
 
 @pytest.mark.usefixtures("admin_user", "client")

@@ -49,6 +49,11 @@ Changed
 
   Replies are created by simply passing in a ``parent`` with the ID value of the target Content. It is not possible to change the ``parent`` value for an existing reply or root level Content object once created. When creating a reply, you can omit ``visibility`` from the sent data. Visibility will be used from the parent Content item automatically.
 
+Fixed
+.....
+
+* Redirect back to profile instead of home view after organize pinned content save action. (`#313 <https://github.com/jaywink/socialhome/issues/313>`_)
+
 0.6.0 (2017-11-13)
 ------------------
 

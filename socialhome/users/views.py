@@ -151,7 +151,11 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
                 Content.objects.filter(id=card_id).update(order=i)
 
     def get_success_url(self):
-        return reverse("home")
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
+
+    def get_template_names(self):
+        """Override to not render Vue template if that is active."""
+        return [self.template_name]
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
