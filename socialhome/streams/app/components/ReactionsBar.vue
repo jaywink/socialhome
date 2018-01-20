@@ -61,10 +61,16 @@ export default Vue.component("reactions-bar", {
             return this.showRepliesBox || this.$store.state.stream.single
         },
         showReplyReactionIcon() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
+            if (this.content.content_type === "content") {
+                return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
+            }
+            return false
         },
         showShareReactionIcon() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
+            if (this.content.content_type === "content") {
+                return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
+            }
+            return false
         },
         canShare() {
             return !this.content.user_is_author

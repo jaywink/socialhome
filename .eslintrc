@@ -18,6 +18,7 @@
   "globals": {
     "afterEach": true,
     "beforeEach": true,
+    "context": true,
     "describe": true,
     "gettext": true,
     "interpolate": true,

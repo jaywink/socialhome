@@ -33,7 +33,7 @@ describe("ReactionsBar", () => {
     describe("computed", () => {
         describe("showReplyReactionIcon", () => {
             it("should be true if user is authenticated or content has replies", () => {
-                let target = mount(ReactionsBar, {
+                const target = mount(ReactionsBar, {
                     propsData: {content},
                     store,
                 })
@@ -50,11 +50,20 @@ describe("ReactionsBar", () => {
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showReplyReactionIcon.should.be.false
             })
+
+            it("should be false if content is not of type content", () => {
+                content.content_type = "reply"
+                const target = mount(ReactionsBar, {
+                    propsData: {content},
+                    store,
+                })
+                target.instance().showReplyReactionIcon.should.be.false
+            })
         })
 
         describe("showShareReactionIcon", () => {
             it("should be true if user is authenticated or content has shares", () => {
-                let target = mount(ReactionsBar, {
+                const target = mount(ReactionsBar, {
                     propsData: {content},
                     store,
                 })
@@ -71,13 +80,22 @@ describe("ReactionsBar", () => {
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
                 target.instance().showShareReactionIcon.should.be.false
             })
+
+            it("should be false if content is not of type content", () => {
+                content.content_type = "reply"
+                const target = mount(ReactionsBar, {
+                    propsData: {content},
+                    store,
+                })
+                target.instance().showShareReactionIcon.should.be.false
+            })
         })
     })
 
     describe("lifecycle", () => {
         context("updated", () => {
-            it("redraws masonry if not single stream", (done) => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
+            it("redraws masonry if not single stream", done => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
                 target.vm.$nextTick(() => {
@@ -86,9 +104,9 @@ describe("ReactionsBar", () => {
                 })
             })
 
-            it("does not redraw masonry if single stream", (done) => {
+            it("does not redraw masonry if single stream", done => {
                 store.state.stream.single = true
-                let target = mount(ReactionsBar, {propsData: {content}, store})
+                const target = mount(ReactionsBar, {propsData: {content}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
                 target.vm.$nextTick(() => {
@@ -114,7 +132,7 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                let target = new ReactionsBar({propsData: {content}})
+                const target = new ReactionsBar({propsData: {content}})
                 target.expandShares()
                 target.showSharesBox.should.be.true
                 target.expandShares()
@@ -124,7 +142,7 @@ describe("ReactionsBar", () => {
 
         describe("share", () => {
             it("should show the reshare box", () => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
+                const target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].isUserAuthor = false
                 target.instance().$data.showRepliesBox = true
@@ -133,8 +151,8 @@ describe("ReactionsBar", () => {
                 target.instance().$data.showSharesBox.should.be.true
             })
 
-            it("should create share on server", (done) => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
+            it("should create share on server", done => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_has_shared = false
                 target.instance().$store.state.contents[1].user_is_author = false
@@ -162,8 +180,8 @@ describe("ReactionsBar", () => {
         })
 
         describe("unshare", () => {
-            it("should removes share on server", (done) => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
+            it("should removes share on server", done => {
+                const target = mount(ReactionsBar, {propsData: {content}, store})
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
                 target.instance().$store.state.contents[1].user_has_shared = true
                 target.instance().$store.state.contents[1].user_is_author = false
