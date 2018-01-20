@@ -54,6 +54,8 @@ Fixed
 
 * Redirect back to profile instead of home view after organize pinned content save action. (`#313 <https://github.com/jaywink/socialhome/issues/313>`_)
 
+* Fix searching of an unknown remote profile by handle using uppercase letters resulting in an invalid local profile creation.
+
 0.6.0 (2017-11-13)
 ------------------
 

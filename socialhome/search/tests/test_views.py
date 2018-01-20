@@ -11,7 +11,7 @@ from socialhome.enums import Visibility
 from socialhome.search.views import GlobalSearchView
 from socialhome.tests.utils import SocialhomeCBVTestCase, SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory, BaseProfileFactory
 from socialhome.users.views import ProfileAllContentView
 
 
@@ -100,3 +100,9 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertResponseNotContains("Results", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], profile)
+
+    @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
+    def test_search_by_handle_lowercases_before_fetching(self, mock_retrieve):
+        mock_retrieve.return_value = BaseProfileFactory()
+        self.get("%s?q=%s" % (reverse("search:global"), "i-dont-EXIST-locally@eXample.com"), follow=True)
+        mock_retrieve.assert_called_once_with("i-dont-exist-locally@example.com")
