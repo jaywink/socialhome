@@ -43,15 +43,6 @@ Do NPM, Bower
     npm install
     bower install
     sudo npm -g install grunt
-    grunt dev
-
-New Vue based frontend
-......................
-
-The new Vue based frontend builds the bundles with Webpack. Execute the following to build the bundle.
-
-::
-
     npm run dev
 
 To watch files and build bundles automatically, use this.

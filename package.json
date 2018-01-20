@@ -2,8 +2,9 @@
   "name": "socialhome",
   "version": "0.1.0",
   "scripts": {
-    "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js",
-    "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch",
+    "build": "./node_modules/grunt/bin/grunt build && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.prod.js",
+    "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.dev.js",
+    "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch --config config/webpack/webpack.dev.js",
     "test": "./node_modules/.bin/mocha-webpack --opts mocha/mocha.opts test socialhome/**/app/tests/**/*.tests.js",
     "lint": "./node_modules/.bin/eslint socialhome/streams/app/ --ext vue,js"
   },
@@ -45,10 +46,12 @@
     "sinon": "^4.1.2",
     "style-loader": "^0.18.2",
     "time-grunt": "~1.4.0",
+    "uglifyjs-webpack-plugin": "^1.1.6",
     "vue-loader": "~12.2.2",
     "vue-style-loader": "~3.0.1",
     "vue-template-compiler": "~2.4.1",
-    "webpack": "^3.2.0"
+    "webpack": "^3.2.0",
+    "webpack-merge": "^4.1.1"
   },
   "engines": {
     "node": ">=6"
