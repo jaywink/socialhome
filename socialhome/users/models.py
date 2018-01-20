@@ -163,6 +163,8 @@ class Profile(TimeStampedModel):
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
+        # Ensure handle is *always* lowercase
+        self.handle = self.handle.lower()
         super().save(*args, **kwargs)
 
     @property
