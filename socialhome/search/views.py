@@ -8,7 +8,6 @@ from haystack.generic_views import SearchView
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
-from socialhome.users.views import ProfileDetailView
 
 
 class GlobalSearchView(SearchView):
@@ -31,7 +30,7 @@ class GlobalSearchView(SearchView):
         try:
             q = safe_text(request.GET.get("q"))
             if q:
-                q = q.strip()
+                q = q.strip().lower()
             validate_email(q)
         except ValidationError:
             pass
