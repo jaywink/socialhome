@@ -1,4 +1,4 @@
 --recursive
---webpack-config webpack.config.js
+--webpack-config config/webpack/webpack.dev.js
 --require mocha/setup.js
 --timeout 4s

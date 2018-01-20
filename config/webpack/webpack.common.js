@@ -2,10 +2,10 @@ const path = require("path")
 
 module.exports = {
     entry: {
-        stream: path.resolve(__dirname, "socialhome/streams/app/main.js"),
+        stream: path.resolve(__dirname, "../../socialhome/streams/app/main.js"),
     },
     output: {
-        path: path.resolve(__dirname, "socialhome/static/js"),
+        path: path.resolve(__dirname, "../../socialhome/static/js"),
         filename: "webpack.[name].js",
     },
     module: {
@@ -14,10 +14,10 @@ module.exports = {
                 test: /\.js$/,
                 loader: "babel-loader",
                 include: [
-                    path.resolve(__dirname, "socialhome"),
-                    path.resolve(__dirname, "mocha"),
+                    path.resolve(__dirname, "../../socialhome"),
+                    path.resolve(__dirname, "../../mocha"),
                 ],
-                exclude: path.resolve(__dirname, "socialhome/static/js"),
+                exclude: path.resolve(__dirname, "../../socialhome/static/js"),
                 query: {presets: ["env"]},
             },
             {
@@ -38,8 +38,8 @@ module.exports = {
     },
     resolve: {
         modules: [
-            path.resolve(__dirname, "socialhome"),
-            path.resolve(__dirname, "node_modules"),
+            path.resolve(__dirname, "../../socialhome"),
+            path.resolve(__dirname, "../../node_modules"),
         ],
         alias: {
             "bootstrap-vue": "bootstrap-vue/dist/bootstrap-vue.esm.js",
@@ -50,5 +50,4 @@ module.exports = {
         extensions: [".webpack.js", ".js", ".vue"],
     },
     stats: {colors: true},
-    devtool: "cheap-module-source-map",
 }
