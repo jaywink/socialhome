@@ -4,7 +4,7 @@
             <slot />
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
-                    v-if="showShares"
+                    v-if="showShareReactionIcon"
                     :class="{
                         'item-reaction-shared': content.user_has_shared,
                         'item-reaction-counter-positive': content.shares_count,
@@ -16,7 +16,7 @@
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </b-button>
                 <b-button
-                    v-if="showReplies"
+                    v-if="showReplyReactionIcon"
                     :class="{'item-reaction-counter-positive': content.reply_count}"
                     class="item-reaction"
                     @click.stop.prevent="expandComments"
@@ -57,13 +57,13 @@ export default Vue.component("reactions-bar", {
         }
     },
     computed: {
-        showReplies() {
-            return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
-        },
         showRepliesContainer() {
             return this.showRepliesBox || this.$store.state.stream.single
         },
-        showShares() {
+        showReplyReactionIcon() {
+            return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
+        },
+        showShareReactionIcon() {
             return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
         },
         canShare() {

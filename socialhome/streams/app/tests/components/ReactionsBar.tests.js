@@ -31,7 +31,7 @@ describe("ReactionsBar", () => {
     })
 
     describe("computed", () => {
-        describe("showReplies", () => {
+        describe("showReplyReactionIcon", () => {
             it("should be true if user is authenticated or content has replies", () => {
                 let target = mount(ReactionsBar, {
                     propsData: {content},
@@ -40,19 +40,19 @@ describe("ReactionsBar", () => {
 
                 target.instance().$store.state.contents[1].reply_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
-                target.instance().showReplies.should.be.true
+                target.instance().showReplyReactionIcon.should.be.true
 
                 target.instance().$store.state.contents[1].reply_count = 1
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showReplies.should.be.true
+                target.instance().showReplyReactionIcon.should.be.true
 
                 target.instance().$store.state.contents[1].reply_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showReplies.should.be.false
+                target.instance().showReplyReactionIcon.should.be.false
             })
         })
 
-        describe("showShares", () => {
+        describe("showShareReactionIcon", () => {
             it("should be true if user is authenticated or content has shares", () => {
                 let target = mount(ReactionsBar, {
                     propsData: {content},
@@ -61,15 +61,15 @@ describe("ReactionsBar", () => {
 
                 target.instance().$store.state.contents[1].shares_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = true
-                target.instance().showShares.should.be.true
+                target.instance().showShareReactionIcon.should.be.true
 
                 target.instance().$store.state.contents[1].shares_count = 1
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showShares.should.be.true
+                target.instance().showShareReactionIcon.should.be.true
 
                 target.instance().$store.state.contents[1].shares_count = 0
                 target.instance().$store.state.applicationStore.isUserAuthenticated = false
-                target.instance().showShares.should.be.false
+                target.instance().showShareReactionIcon.should.be.false
             })
         })
     })
