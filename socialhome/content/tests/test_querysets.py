@@ -31,6 +31,10 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.self_content.author.refresh_from_db()
         self.site_content.author.refresh_from_db()
 
+    def test_base_queryset_has_through(self):
+        content = Content.objects.get(id=self.public_content.id)
+        self.assertEqual(content.through, content.id)
+
     def test_pinned(self):
         contents = set(Content.objects.pinned())
         self.assertEqual(contents, {self.public_content, self.site_content, self.self_content})
@@ -248,7 +252,6 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.self_user))
         self.assertEqual(contents, {self.self_content})
 
-
 class TestContentQuerySetChildren(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -300,6 +303,7 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         cls.other_user = PublicUserFactory()
         cls.create_content_set()
         cls.public_share = PublicContentFactory(share_of=cls.public_content, author=cls.other_user.profile)
+        cls.public_share2 = PublicContentFactory(share_of=cls.public_content)
         cls.limited_share = LimitedContentFactory(share_of=cls.limited_content, author=cls.other_user.profile)
         cls.self_share = SelfContentFactory(share_of=cls.self_content, author=cls.other_user.profile)
         cls.site_share = SiteContentFactory(share_of=cls.site_content, author=cls.other_user.profile)
@@ -347,7 +351,7 @@ class TestContentQuerySetShares(SocialhomeTestCase):
 
     def test_shares(self):
         contents = set(Content.objects.shares(self.public_content.id, self.anonymous_user))
-        self.assertEqual(contents, {self.public_share})
+        self.assertEqual(contents, {self.public_share, self.public_share2})
         contents = set(Content.objects.shares(self.site_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.shares(self.self_content.id, self.anonymous_user))
@@ -356,7 +360,7 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         self.assertEqual(contents, set())
 
         contents = set(Content.objects.shares(self.public_content.id, self.user))
-        self.assertEqual(contents, {self.public_share})
+        self.assertEqual(contents, {self.public_share, self.public_share2})
         contents = set(Content.objects.shares(self.site_content.id, self.user))
         self.assertEqual(contents, {self.site_share})
         contents = set(Content.objects.shares(self.self_content.id, self.user))
@@ -365,10 +369,14 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         self.assertEqual(contents, set())
 
         contents = set(Content.objects.shares(self.public_content.id, self.other_user))
-        self.assertEqual(contents, {self.public_share})
+        self.assertEqual(contents, {self.public_share, self.public_share2})
         contents = set(Content.objects.shares(self.site_content.id, self.other_user))
         self.assertEqual(contents, {self.site_share})
         contents = set(Content.objects.shares(self.self_content.id, self.other_user))
         self.assertEqual(contents, {self.self_share})
         contents = set(Content.objects.shares(self.limited_content.id, self.other_user))
         self.assertEqual(contents, {self.limited_share})
+
+    def test_shares__has_through(self):
+        content = Content.objects.shares(self.public_content.id, self.anonymous_user).first()
+        self.assertEqual(content.through, self.public_share.id)

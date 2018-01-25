@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Min, F
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
@@ -81,7 +81,7 @@ class ContentQuerySet(models.QuerySet):
         return self.top_level().filter(visibility=Visibility.PUBLIC)
 
     def shares(self, share_of_id, user):
-        qs = self.visible_for_user(user).filter(share_of_id=share_of_id)
+        qs = self.visible_for_user(user).filter(share_of_id=share_of_id).annotate(through=Min('id'))
         return qs.order_by("created")
 
     def tag(self, tag, user):
@@ -104,3 +104,9 @@ class ContentQuerySet(models.QuerySet):
             return self.filter(visibility=Visibility.PUBLIC)
         # TODO: handle also LIMITED when contacts implemented
         return self.filter(Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]))
+
+
+class ContentManager(models.Manager.from_queryset(ContentQuerySet)):
+    def get_queryset(self):
+        # Add a default 'through' to every object. QuerySets will override this when needed
+        return super().get_queryset().annotate(through=F("id"))

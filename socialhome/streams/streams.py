@@ -184,11 +184,11 @@ class BaseStream:
                 qs = qs.filter(id__lt=self.last_id)
             else:
                 qs = qs.filter(id__gt=self.last_id)
-        ids.extend(qs.values_list("id", flat=True).order_by(self.ordering)[:remaining])
-        # Fill remaining throughs
-        for id in ids:
-            if not throughs.get(id):
-                throughs[id] = id
+        # Get and fill remaining items
+        ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
+        for item in ids_throughs:
+            ids.append(item["id"])
+            throughs[item["id"]] = item["through"]
         return ids, throughs
 
     def get_queryset(self):
