@@ -21,7 +21,7 @@ from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.content.enums import ContentType
-from socialhome.content.querysets import TagQuerySet, ContentQuerySet
+from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
@@ -127,7 +127,7 @@ class Content(models.Model):
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
 
-    objects = ContentQuerySet.as_manager()
+    objects = ContentManager()
 
     def __str__(self):
         return "{text} ({guid})".format(
