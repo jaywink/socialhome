@@ -51,7 +51,7 @@ django-secure==1.0.1
 django-settings-export==1.2.1
 django-tables2==1.11.0
 django-versatileimagefield==1.7.1
-django==1.10.8
+django==1.11.9
 djangorestframework==3.6.4
 future==0.16.0            # via commonmark
 html5lib==1.0b10          # via bleach

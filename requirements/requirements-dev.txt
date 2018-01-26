@@ -20,7 +20,7 @@ django-debug-toolbar-user-panel==1.1.0
 django-debug-toolbar==1.8
 django-querycount==0.7.0
 django-test-plus==1.0.18
-django==1.10.8
+django==1.11.9
 docutils==0.14            # via sphinx
 factory-boy==2.9.2
 faker==0.8.4
@@ -56,7 +56,7 @@ pytest-env==0.6.2
 pytest-sugar==0.9.0
 pytest==3.2.2
 python-dateutil==2.6.1    # via faker, freezegun
-pytz==2017.2              # via babel
+pytz==2017.2              # via babel, django
 pyyaml==3.12              # via sphinx-autobuild, watchdog
 requests==2.18.4          # via codecov, sphinx
 simplegeneric==0.8.1      # via ipython
