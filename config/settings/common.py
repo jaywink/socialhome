@@ -40,6 +40,7 @@ DJANGO_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "django.forms",  # Required by FORM_RENDERER = TemplatesSetting
 )
 THIRD_PARTY_APPS = (
     "crispy_forms",
@@ -186,12 +187,16 @@ TEMPLATES = [
     },
 ]
 
+# Required by django-markdownx
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
+# Settings export
 SETTINGS_EXPORT = [
     "ACCOUNT_ALLOW_REGISTRATION",
 ]
 
 # See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = "bootstrap3"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
