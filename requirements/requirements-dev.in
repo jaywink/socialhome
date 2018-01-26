@@ -5,7 +5,7 @@ django-debug-toolbar-user-panel
 django-querycount
 django-test-plus
 django_coverage_plugin
-django==1.10.8
+django==1.11.9
 factory_boy
 Faker
 flake8
