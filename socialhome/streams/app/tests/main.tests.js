@@ -56,15 +56,19 @@ describe("Main", () => {
 
             it("should initialize `main.$websocket.onmessage`", () => {
                 Sinon.spy(main, "onWebsocketMessage")
-                let msg = {data: JSON.stringify({event: "new", id: 4})}
+                const msg = {data: JSON.stringify({event: "new", id: 4})}
                 main.$websocket.onmessage(msg)
                 main.onWebsocketMessage.getCall(0).args.should.eql([{data: JSON.stringify({event: "new", id: 4})}])
+            })
+
+            it("should initialize `Vue.snotify`", () => {
+                Vue.snotify.should.exist
             })
         })
 
         describe("beforeDestroy", () => {
             it("should call `main.$websocket.close`", () => {
-                let spy = Sinon.spy(main.$websocket, "close")
+                const spy = Sinon.spy(main.$websocket, "close")
                 main.$destroy()
                 spy.called.should.be.true
             })

@@ -6,6 +6,7 @@
 
 {% block content %}
     <div id="app" class="streams-container">
+        <vue-snotify></vue-snotify>
         <stream />
     </div>
 {% endblock %}
@@ -21,6 +22,7 @@
 
 {% block css %}
     {{ block.super }}
+    <link href="{% static "css/webpack.stream.css" %}" rel="stylesheet" >
     {# TODO: remove this override once legacy streams are removed #}
     {# Also change Content render to not add .nsfw class at all. #}
     <style>

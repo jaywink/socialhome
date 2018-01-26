@@ -9,6 +9,7 @@ import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
 import {streamStoreOperations, exportsForTests} from "streams/app/stores/streamStore"
 import getState from "streams/app/stores/streamStore.state"
 import Axios from "axios/index"
+import VueSnotify from "vue-snotify"
 
 
 describe("streamStore", () => {
@@ -236,10 +237,15 @@ describe("streamStore", () => {
     })
 
     describe("onError", () => {
+        beforeEach(() => {
+            Vue.use(VueSnotify)
+            Vue.snotify = new Vue({}).$snotify
+        })
+
         it("should log an error", () => {
-            Sinon.spy(console, "error")
+            Sinon.spy(Vue.snotify, "error")
             exportsForTests.onError({}, "unknown error")
-            console.error.getCall(0).args[0].should.eq("An error happened while fetching post: unknown error")
+            Vue.snotify.error.getCall(0).args[0].should.eq("An error happened while fetching new content")
         })
     })
 
@@ -646,7 +652,7 @@ describe("streamStore", () => {
             target.mutations[streamStoreOperations.receivedNewContent].should.exist
             target.mutations[streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds].should.exist
 
-            for(let getter in getters) {
+            for (let getter in getters) {
                 target.getters[getter].should.exist
             }
 

@@ -1,12 +1,13 @@
 const path = require("path")
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 module.exports = {
     entry: {
         stream: path.resolve(__dirname, "../../socialhome/streams/app/main.js"),
     },
     output: {
-        path: path.resolve(__dirname, "../../socialhome/static/js"),
-        filename: "webpack.[name].js",
+        path: path.resolve(__dirname, "../../socialhome/static"),
+        filename: "js/webpack.[name].js",
     },
     module: {
         loaders: [
@@ -22,20 +23,36 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loaders: ["css-loader", "sass-loader"],
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: ["css-loader", "sass-loader"],
+                }),
+            },
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader",
+                }),
             },
             {
                 test: /\.vue$/,
                 loader: "vue-loader",
                 options: {
                     loaders: {
-                        scss: ["vue-style-loader", "css-loader", "sass-loader"],
+                        scss: ExtractTextPlugin.extract({
+                            use: ["css-loader", "sass-loader"],
+                            fallback: "vue-style-loader",
+                        }),
                         js: "babel-loader",
                     },
                 },
             },
         ],
     },
+    plugins: [
+        new ExtractTextPlugin("css/webpack.[name].css"),
+    ],
     resolve: {
         modules: [
             path.resolve(__dirname, "../../socialhome"),

@@ -23,6 +23,7 @@
     "eslint-config-airbnb-base": "^11.3.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-vue": "^3.11.0",
+    "extract-text-webpack-plugin": "2.1.2",
     "faker": "^4.1.0",
     "grunt": "~1.0.1",
     "grunt-bg-shell": "~2.3.3",
@@ -67,6 +68,7 @@
     "vue-infinite-scroll": "^2.0.2",
     "vue-masonry": "=0.10.3",
     "vue-scrollto": "^2.8.0",
+    "vue-snotify": "^3.0.4",
     "vuex": "~2.3.1",
     "vuex-rest-api": "^2.2.1"
   },

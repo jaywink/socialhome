@@ -68,9 +68,8 @@ function fetchNewContentSuccess(state, payload) {
     _pullAll(state.unfetchedContentIds, [payload.data.id])
 }
 
-function onError(state, error) {
-    /* TODO: Proper error handling */
-    console.error(`An error happened while fetching post: ${error}`)
+function onError() {
+    Vue.snotify.error(gettext("An error happened while fetching new content"))
 }
 
 function newRestAPI(options) {

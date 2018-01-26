@@ -42,6 +42,9 @@
 </template>
 
 <script>
+import Vue from "vue"
+
+
 export default {
     name: "profile-reaction-buttons",
     data() {
@@ -58,6 +61,12 @@ export default {
         currentBrowsingProfileId() {
             return this.$store.state.applicationStore.currentBrowsingProfileId
         },
+        isUserAuthenticated() {
+            return this.$store.state.applicationStore.isUserAuthenticated
+        },
+        authorNameOrHandle() {
+            return this.profile.name ? this.profile.name : this.profile.handle
+        },
         showFollowBtn() {
             return this.$store.state.applicationStore.isUserAuthenticated && !this.following
         },
@@ -72,25 +81,33 @@ export default {
                 unfollow: gettext("Unfollow"),
             }
         },
+        urls() {
+            return {
+                followUrl: Urls["api:profile-add-follower"]({pk: this.currentBrowsingProfileId}),
+                unfollowUrl: Urls["api:profile-remove-follower"]({pk: this.currentBrowsingProfileId}),
+            }
+        },
     },
     methods: {
         follow() {
-            this.$http.post(
-                Urls["api:profile-add-follower"]({pk: this.currentBrowsingProfileId}),
-                {guid: this.profile.guid})
-                .then(() => {
-                    this.following = true
-                })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
+            if (!this.isUserAuthenticated) {
+                this.$snotify.error(gettext("You must be logged in to follow someone"))
+                return
+            }
+            this.$http.post(this.urls.followUrl, {guid: this.profile.guid})
+                .then(() => this.following = true)
+                .catch(_ => this.$snotify.error(
+                    `${gettext("An error happened while trying to follow")} ${this.authorNameOrHandle}`))
         },
         unfollow() {
-            this.$http.post(
-                Urls["api:profile-remove-follower"]({pk: this.currentBrowsingProfileId}),
-                {guid: this.profile.guid})
-                .then(() => {
-                    this.following = false
-                })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
+            if (!this.isUserAuthenticated) {
+                this.$snotify.error(gettext("You must be logged in to unfollow someone"))
+                return
+            }
+            this.$http.post(this.urls.unfollowUrl, {guid: this.profile.guid})
+                .then(() => this.following = false)
+                .catch(_ => this.$snotify.error(
+                    `${gettext("An error happened while trying to unfollow")} ${this.authorNameOrHandle}`))
         },
     },
 }

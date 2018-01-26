@@ -81,6 +81,11 @@ export default Vue.component("reactions-bar", {
                 unshare: gettext("Unshare"),
             }
         },
+        urls() {
+            return {
+                share: Urls["api:content-share"]({pk: this.content.id}),
+            }
+        },
     },
     methods: {
         expandComments() {
@@ -91,37 +96,39 @@ export default Vue.component("reactions-bar", {
         },
         share() {
             if (!this.canShare) {
-                console.error("Unable to share own post")
+                this.$snotify.error(gettext("Unable to reshare own post"))
                 return
             }
             if (!this.$store.state.applicationStore.isUserAuthenticated) {
-                console.error("Not logged in")
+                this.$snotify.error(gettext("You must be logged in to reshare"))
                 return
             }
-            this.$http.post(`/api/content/${this.content.id}/share/`)
+
+            this.$http.post(this.urls.share)
                 .then(() => {
                     this.showSharesBox = false
                     this.content.shares_count += 1
                     this.content.user_has_shared = true
                 })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
+                .catch(_ => this.$snotify.error(gettext("An error happened while resharing the content")))
         },
         unshare() {
             if (!this.canShare) {
-                console.error("Unable to unshare own post")
+                this.$snotify.error(gettext("Unable to unshare own post"))
                 return
             }
             if (!this.$store.state.applicationStore.isUserAuthenticated) {
-                console.error("Not logged in")
+                this.$snotify.error(gettext("You must be logged in to unshare"))
                 return
             }
-            this.$http.delete(`/api/content/${this.content.id}/share/`)
+
+            this.$http.delete(this.urls.share)
                 .then(() => {
                     this.showSharesBox = false
                     this.content.shares_count -= 1
                     this.content.user_has_shared = false
                 })
-                .catch(err => console.error(err) /* TODO: Proper error handling */)
+                .catch(_ => this.$snotify.error(gettext("An error happened while unsharing the content")))
         },
     },
     updated() {

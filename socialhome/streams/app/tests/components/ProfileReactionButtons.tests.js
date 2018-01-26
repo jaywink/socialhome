@@ -1,8 +1,9 @@
 import Axios from "axios"
-import BootstrapVue from "bootstrap-vue"
 import Moxios from "moxios"
 import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
+import VueSnotify from "vue-snotify"
+import BootstrapVue from "bootstrap-vue"
 import {mount} from "avoriaz"
 
 import ProfileReactionButtons from "streams/app/components/ProfileReactionButtons.vue"
@@ -11,6 +12,7 @@ import {getStore} from "streams/app/tests/fixtures/store.fixtures"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
+Vue.use(VueSnotify)
 
 describe("ProfileReactionButtons", () => {
     let store
@@ -104,6 +106,45 @@ describe("ProfileReactionButtons", () => {
                     })
                 })
             })
+
+            it("should show an error to the user if request fails", done => {
+                const target = mount(ProfileReactionButtons, {
+                    propsData: {
+                        profile: store.content.author,
+                        userFollowing: false,
+                    },
+                    store,
+                })
+
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().following.should.be.false
+                target.instance().follow()
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
+                        target.instance().$snotify.error.getCall(0).args[0]
+                            .should.eq(`An error happened while trying to follow ${store.content.author.name}`)
+                        done()
+                    })
+                })
+            })
+
+            it("should show an error to the user if not logged in", () => {
+                const target = mount(ProfileReactionButtons, {
+                    propsData: {
+                        profile: store.content.author,
+                        userFollowing: false,
+                    },
+                    store,
+                })
+
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().following.should.be.false
+                target.instance().follow()
+
+                target.instance().$snotify.error.getCall(0).args[0].should.eq("You must be logged in to follow someone")
+            })
         })
 
         describe("unfollow", () => {
@@ -142,6 +183,46 @@ describe("ProfileReactionButtons", () => {
                         done()
                     })
                 })
+            })
+
+            it("should show an error to the user if request fails", done => {
+                const target = mount(ProfileReactionButtons, {
+                    propsData: {
+                        profile: store.content.author,
+                        userFollowing: true,
+                    },
+                    store,
+                })
+
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().following.should.be.true
+                target.instance().unfollow()
+                Moxios.wait(() => {
+                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
+                        target.instance().$snotify.error.getCall(0).args[0]
+                            .should.eq(`An error happened while trying to unfollow ${store.content.author.name}`)
+                        done()
+                    })
+                })
+            })
+
+            it("should show an error to the user if not logged in", () => {
+                const target = mount(ProfileReactionButtons, {
+                    propsData: {
+                        profile: store.content.author,
+                        userFollowing: true,
+                    },
+                    store,
+                })
+
+                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+
+                Sinon.spy(target.instance().$snotify, "error")
+                target.instance().following.should.be.true
+                target.instance().unfollow()
+
+                target.instance().$snotify.error.getCall(0).args[0]
+                    .should.eq("You must be logged in to unfollow someone")
             })
         })
     })
