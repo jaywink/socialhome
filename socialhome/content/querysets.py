@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Min, F
+from django.db.models import Q, F, OuterRef, Subquery, Case, When
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
@@ -34,8 +34,21 @@ class ContentQuerySet(models.QuerySet):
 
         This includes content shared by the followed users.
         """
-        following_ids = user.profile.following.values_list("id", flat=True)
-        qs = self.top_level().filter(Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids))
+        from socialhome.content.models import Content
+        profile = user.profile
+        following_ids = profile.following.values_list("id", flat=True)
+        share = Content.objects.filter(share_of=OuterRef("id")).order_by('-id')
+        qs = self.top_level().filter(
+            Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids)
+        ).annotate(
+            through=Subquery(share.values("id")[:1])
+        ).annotate(
+            through=Case(
+                When(author_id__in=following_ids, then="id"),
+                When(through__isnull=False, then="through"),
+                default="id",
+            )
+        )
         return qs.visible_for_user(user)
 
     def pinned(self):
@@ -51,7 +64,18 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         qs = self.top_level()
         if include_shares:
-            qs = qs.filter(Q(shares__author=profile) | Q(author=profile))
+            # Get the right through for the content for shares
+            share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
+            qs = qs.filter(
+                Q(shares__author=profile) | Q(author=profile)
+            ).annotate(
+                through=Subquery(share.values("id")[:1])
+            ).annotate(
+                through=Case(
+                    When(through__isnull=False, then='through'),
+                    default='id',
+                )
+            )
         else:
             qs = qs.filter(author=profile)
         return qs.visible_for_user(user)
@@ -81,7 +105,7 @@ class ContentQuerySet(models.QuerySet):
         return self.top_level().filter(visibility=Visibility.PUBLIC)
 
     def shares(self, share_of_id, user):
-        qs = self.visible_for_user(user).filter(share_of_id=share_of_id).annotate(through=Min('id'))
+        qs = self.visible_for_user(user).filter(share_of_id=share_of_id)
         return qs.order_by("created")
 
     def tag(self, tag, user):
