@@ -16,8 +16,11 @@ function addHasLoadMore(state) {
     const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
-        state.layoutDoneAfterTwitterOEmbeds = false
+    } else {
+        // Add to the last to be sure we always add it
+        Vue.set(state.contents[state.contentIds[state.contentIds.length - 1]], "hasLoadMore", true)
     }
+    state.layoutDoneAfterTwitterOEmbeds = false
 }
 
 function fetchContentsSuccess(state, payload) {

@@ -33,7 +33,7 @@ describe("streamStore", () => {
             state.contents[state.contentIds[6]].hasLoadMore.should.be.false
         })
 
-        it("does not add flag if under 5 contents", () => {
+        it("adds flag to last if under 5 contents", () => {
             const state = {contentIds: [...new Array(4).keys()].map(i => i), contents: {}}
             state.contentIds.forEach(id => {
                 state.contents[id] = getFakeContent({id: id, hasLoadMore: false})
@@ -42,7 +42,7 @@ describe("streamStore", () => {
             state.contents[state.contentIds[0]].hasLoadMore.should.be.false
             state.contents[state.contentIds[1]].hasLoadMore.should.be.false
             state.contents[state.contentIds[2]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[3]].hasLoadMore.should.be.false
+            state.contents[state.contentIds[3]].hasLoadMore.should.be.true
         })
 
         it("sets layoutDoneAfterTwitterOEmbeds to false", () => {
@@ -86,10 +86,18 @@ describe("streamStore", () => {
                     "1": {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
                     "2": {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
                     "6": {id: "6", text: "foobar", content_type: "content", replyIds: [], shareIds: []},
-                    "7": {id: "7", text: "blablabla", content_type: "content", replyIds: [], shareIds: []},
+                    "7": {
+                        id: "7",
+                        text: "blablabla",
+                        content_type: "content",
+                        replyIds: [],
+                        shareIds: [],
+                        hasLoadMore: true,
+                    },
                 },
                 replies: {},
                 shares: {},
+                layoutDoneAfterTwitterOEmbeds: false,
             })
         })
     })
@@ -284,7 +292,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -298,7 +306,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -330,7 +338,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -344,7 +352,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -376,7 +384,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -390,7 +398,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -422,7 +430,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -436,7 +444,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -468,7 +476,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
@@ -482,7 +490,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         "6": {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: []},
+                        "7": {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
                     })
                     done()
                 })
