@@ -45,3 +45,16 @@ Light
 .. image:: _static/brand/Socialhome-light-32.png
 .. image:: _static/brand/Socialhome-light-24.png
 .. image:: _static/brand/Socialhome-light-16.png
+
+Stickers
+--------
+
+Feel free to print these out and spread the love!
+
+The stickers are contributed by `lostinlight <https://gitlab.com/distributopia/sticker-bay/tree/master/stickerpack-1>`_, licensed under CC-BY-4.0.
+
+.. image:: _static/brand/stickers/Socialhome.png
+.. image:: _static/brand/stickers/Socialhome-2.png
+.. image:: _static/brand/Sh-text-example.svg
+
+PDF's available `here <https://github.com/jaywink/socialhome/tree/master/docs/_static/brand/stickers>`_.
