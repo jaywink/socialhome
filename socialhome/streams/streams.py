@@ -181,9 +181,9 @@ class BaseStream:
         qs = self.get_queryset()
         if self.last_id:
             if self.ordering == "-created":
-                qs = qs.filter(id__lt=self.last_id)
+                qs = qs.filter(through__lt=self.last_id)
             else:
-                qs = qs.filter(id__gt=self.last_id)
+                qs = qs.filter(through__gt=self.last_id)
         # Get and fill remaining items
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
         for item in ids_throughs:
