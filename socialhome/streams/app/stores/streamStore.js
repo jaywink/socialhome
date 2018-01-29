@@ -16,19 +16,24 @@ function addHasLoadMore(state) {
     const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
-        state.layoutDoneAfterTwitterOEmbeds = false
+    } else {
+        // Add to the last to be sure we always add it
+        Vue.set(state.contents[state.contentIds[state.contentIds.length - 1]], "hasLoadMore", true)
     }
+    state.layoutDoneAfterTwitterOEmbeds = false
 }
 
 function fetchContentsSuccess(state, payload) {
+    let newItems = 0
     payload.data.forEach(item => {
         const content = Object.assign({}, item, {replyIds: [], shareIds: []})
         Vue.set(state.contents, content.id, content)
         if (state.contentIds.indexOf(content.id) === -1) {
             state.contentIds.push(content.id)
+            newItems += 1
         }
     })
-    if (payload.data.length) {
+    if (newItems > 0) {
         addHasLoadMore(state)
     }
 }

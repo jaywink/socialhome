@@ -56,6 +56,10 @@ Fixed
 
 * Fix searching of an unknown remote profile by handle using uppercase letters resulting in an invalid local profile creation.
 
+* Fix Content querysets not correctly including the 'through' information which tells what content caused a share to be added to a stream. (`#412 <https://github.com/jaywink/socialhome/issues/412>`_)
+
+  This information was already correctly added in the streams precalculation phase, but if the cache started cold or a viewing user cycled through all cached content ID's and wanted some more, the database queries did not return the right results.
+
 0.6.0 (2017-11-13)
 ------------------
 

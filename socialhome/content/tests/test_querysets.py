@@ -31,10 +31,6 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.self_content.author.refresh_from_db()
         self.site_content.author.refresh_from_db()
 
-    def test_base_queryset_has_through(self):
-        content = Content.objects.get(id=self.public_content.id)
-        self.assertEqual(content.through, content.id)
-
     def test_pinned(self):
         contents = set(Content.objects.pinned())
         self.assertEqual(contents, {self.public_content, self.site_content, self.self_content})
@@ -252,6 +248,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.profile_pinned_by_attr("guid", self.self_content.author.guid, self.self_user))
         self.assertEqual(contents, {self.self_content})
 
+
 class TestContentQuerySetChildren(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -377,6 +374,33 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         contents = set(Content.objects.shares(self.limited_content.id, self.other_user))
         self.assertEqual(contents, {self.limited_share})
 
-    def test_shares__has_through(self):
-        content = Content.objects.shares(self.public_content.id, self.anonymous_user).first()
-        self.assertEqual(content.through, self.public_share.id)
+
+class TestContentQuerySetThroughs(SocialhomeTestCase):
+    """Ensure throughs included correctly in querysets."""
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = PublicUserFactory()
+        cls.content = PublicContentFactory(author=cls.user.profile)
+        cls.content2 = PublicContentFactory()
+        cls.sharer_content = PublicContentFactory()
+        cls.sharer_content_share = PublicContentFactory(share_of=cls.sharer_content)
+        cls.share = PublicContentFactory(share_of=cls.content, author=cls.sharer_content.author)
+        cls.share2 = PublicContentFactory(share_of=cls.content2, author=cls.sharer_content.author)
+        cls.user.profile.following.add(cls.sharer_content.author)
+
+    def test_base_queryset_has_through(self):
+        content = Content.objects.get(id=self.content.id)
+        self.assertEqual(content.through, content.id)
+
+    def test_followed__has_through(self):
+        contents = Content.objects.followed(self.user).order_by('id')
+        self.assertEqual(contents[0].through, self.share.id)
+        self.assertEqual(contents[1].through, self.share2.id)
+        self.assertEqual(contents[2].through, self.sharer_content.id)
+
+    def test_profile__has_through(self):
+        contents = Content.objects.profile(self.sharer_content.author, AnonymousUser()).order_by('id')
+        self.assertEqual(contents[0].through, self.share.id)
+        self.assertEqual(contents[1].through, self.share2.id)
+        self.assertEqual(contents[2].through, self.sharer_content.id)
