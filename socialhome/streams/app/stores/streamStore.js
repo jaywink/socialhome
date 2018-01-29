@@ -24,14 +24,16 @@ function addHasLoadMore(state) {
 }
 
 function fetchContentsSuccess(state, payload) {
+    let newItems = 0
     payload.data.forEach(item => {
         const content = Object.assign({}, item, {replyIds: [], shareIds: []})
         Vue.set(state.contents, content.id, content)
         if (state.contentIds.indexOf(content.id) === -1) {
             state.contentIds.push(content.id)
+            newItems += 1
         }
     })
-    if (payload.data.length) {
+    if (newItems > 0) {
         addHasLoadMore(state)
     }
 }
