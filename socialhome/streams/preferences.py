@@ -9,7 +9,7 @@ streams = Section("streams")
 class UseNewStream(BooleanPreference):
     section = streams
     name = "use_new_stream"
-    default = False
+    default = True
     verbose_name = _("Use new stream")
     help_text = _("Set this to use the new alpha stream when possible. Warning! Not all functionality is available "
                   "in the new stream.")
