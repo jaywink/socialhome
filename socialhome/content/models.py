@@ -376,7 +376,6 @@ class Content(models.Model):
                             final_words.append(tag_word)
                         except NoReverseMatch:
                             # Don't linkify, seems we can't generate an url for it
-                            # TODO: throw to opbeat or just logger?
                             final_words.append(word)
                     else:
                         # Not tag

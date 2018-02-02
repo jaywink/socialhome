@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
 '''
 Production Configurations
-- Use opbeat for error reporting
-
 '''
-from __future__ import absolute_import, unicode_literals
-
 from .common import *  # noqa
 
 
@@ -40,20 +35,6 @@ SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
 # Make sure djangosecure.middleware.SecurityMiddleware is listed first
 MIDDLEWARE_CLASSES = PRODUCTION_MIDDLEWARE + MIDDLEWARE_CLASSES
-
-# opbeat integration
-# See https://opbeat.com/languages/django/
-OPBEAT_ENABLE = env("DJANGO_OPBEAT_ENABLE", default=False)
-if OPBEAT_ENABLE:
-    INSTALLED_APPS += ('opbeat.contrib.django',)
-    OPBEAT = {
-        'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
-        'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
-        'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
-    }
-    MIDDLEWARE_CLASSES = (
-        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-    ) + MIDDLEWARE_CLASSES
 
 # Static Assets
 # ------------------------

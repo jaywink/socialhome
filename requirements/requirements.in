@@ -30,7 +30,6 @@ django==1.11.9
 djangorestframework
 ipython
 lxml
-opbeat
 Pillow
 psycopg2
 python-opengraph-jaywink
