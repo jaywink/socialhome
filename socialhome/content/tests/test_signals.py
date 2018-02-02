@@ -85,6 +85,14 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.assert_not_called()
 
     @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.content.signals.update_streams_with_content")
+    def test_local_content_with_federate_false_does_not_get_sent(self, mock_update, mock_send):
+        user = UserFactory()
+        mock_send.reset_mock()
+        ContentFactory(author=user.profile, federate=False)
+        mock_send.assert_not_called()
+
+    @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
         parent = ContentFactory(author=user.profile)

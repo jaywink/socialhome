@@ -30,7 +30,7 @@ def content_post_save(instance, **kwargs):
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: django_rq.enqueue(send_share_notification, instance.id))
         transaction.on_commit(lambda: update_streams_with_content(instance))
-    if instance.local:
+    if instance.federate and instance.local:
         transaction.on_commit(lambda: federate_content(instance))
 
 

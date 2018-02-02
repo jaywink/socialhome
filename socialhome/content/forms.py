@@ -8,7 +8,7 @@ from socialhome.content.utils import safe_text_for_markdown
 class ContentForm(ModelForm):
     class Meta:
         model = Content
-        fields = ["text", "visibility", "pinned", "show_preview"]
+        fields = ["text", "visibility", "pinned", "show_preview", "federate"]
         widgets = {
             "text": MarkdownxWidget()
         }
@@ -20,9 +20,11 @@ class ContentForm(ModelForm):
         if is_reply:
             self.fields.pop("visibility")
             self.fields.pop("pinned")
+            self.fields.pop("federate")
         else:
             self.fields["visibility"].widget.attrs = {"class": "form-control"}
             self.fields["pinned"].widget.attrs = {"class": "form-check"}
+            self.fields["federate"].widget.attrs = {"class": "form-check"}
         self.fields["show_preview"].widget.attrs = {"class": "form-check"}
         self.fields["text"].widget.attrs = {"class": "form-control"}
 

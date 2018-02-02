@@ -116,6 +116,12 @@ class Content(models.Model):
         "self", on_delete=models.CASCADE, verbose_name=_("Share of"), related_name="shares", null=True, blank=True,
     )
 
+    federate = models.BooleanField(
+        _("Federate to remote servers"), default=True,
+        help_text=_("Disable to skip federating this version to remote servers. Note, saved content version"
+                    "will still be updated to local streams.")
+    )
+
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))

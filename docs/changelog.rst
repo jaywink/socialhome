@@ -40,6 +40,10 @@ Added
 
 * Content API has a new read only field ``has_twitter_oembed``. This is ``true`` if the content text had a Tweet URL *and* a fetch for the OEmbed code has been successfully made.
 
+* Content create page now has an option to disable federating to remote servers when saving the content. (`#296 <https://github.com/jaywink/socialhome/issues/296>`_)
+
+  The content will still update to local streams normally. Federating the content can be enabled on further saves.
+
 Changed
 .......
 
