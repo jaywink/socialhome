@@ -267,6 +267,13 @@ Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
 
+SOCIALHOME_NODE_LIST_URL
+........................
+
+Default: ``https://the-federation.info/socialhome``
+
+URL to make signup link go to in the case that signups are closed.
+
 SOCIALHOME_RELAY_DOMAIN
 .......................
 
