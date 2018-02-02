@@ -68,6 +68,10 @@ Fixed
 
   This information was already correctly added in the streams precalculation phase, but if the cache started cold or a viewing user cycled through all cached content ID's and wanted some more, the database queries did not return the right results.
 
+* Attempt to fetch OEmbed and OpenGraph previews of URL's in content in the order of the links found. (`#365 <https://github.com/jaywink/socialhome/issues/365>`_)
+
+  Previous behaviour lead to fetching previews of urls in random order, leading to a different url preview on different Socialhome servers.
+
 0.6.0 (2017-11-13)
 ------------------
 
