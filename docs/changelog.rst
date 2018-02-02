@@ -76,6 +76,10 @@ Fixed
 
   Previous behaviour lead to fetching previews of urls in random order, leading to a different url preview on different Socialhome servers.
 
+* Fix remote profile retrieval from remote servers which don't support legacy Diaspora protocol webfinger. (`#405 <https://github.com/jaywink/socialhome/issues/405>`_)
+
+  New version of federation library defaults to trying the new style webfinger with a fall back to legacy.
+
 0.6.0 (2017-11-13)
 ------------------
 
