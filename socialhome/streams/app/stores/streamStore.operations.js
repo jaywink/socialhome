@@ -41,6 +41,7 @@ const mutations = {
          */
         const diff = _difference(state.unfetchedContentIds, state.contentIds)
         Vue.set(state, "contentIds", _concat(diff, state.contentIds))
+        state.unfetchedContentIds.length = 0
     },
 }
 
@@ -85,13 +86,19 @@ const actions = {
         commit(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds, status)
     },
     [streamStoreOperations.newContentAck]({commit, dispatch, state}) {
-        commit(streamStoreOperations.newContentAck)
         const promises = []
-        const resolve = () => Promise.resolve()
-        state.unfetchedContentIds.forEach(pk => {
+        const unfetchedContentIds = _concat([], state.unfetchedContentIds)
+
+        commit(streamStoreOperations.newContentAck)
+
+        unfetchedContentIds.forEach(pk => {
             // Force the promise to resolve in all cases
+            const reAddAndResolve = () => {
+                state.unfetchedContentIds.push(pk)
+                return Promise.resolve()
+            }
             const promise = dispatch(streamStoreOperations.getNewContent, {params: {pk}})
-                .then(resolve, resolve)
+                .then(Promise.resolve(), reAddAndResolve)
             promises.push(promise)
         })
         return Promise.all(promises)

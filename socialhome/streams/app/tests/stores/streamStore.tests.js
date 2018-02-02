@@ -226,22 +226,6 @@ describe("streamStore", () => {
                 "6": {id: "6", text: "Yolo"},
             })
         })
-
-        it("should remove fetched ids from unfetched ids list", () => {
-            let payload = {data: {id: "6", text: "Yolo"}}
-
-            let state = {
-                contents: {
-                    "1": {id: "1", text: "Plop"},
-                    "2": {id: "2", text: "Hello!"},
-                },
-                unfetchedContentIds: ["6"],
-            }
-
-            exportsForTests.fetchNewContentSuccess(state, payload)
-
-            state.unfetchedContentIds.should.eql([])
-        })
     })
 
     describe("onError", () => {
@@ -630,7 +614,6 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({"6": {id: "6", text: "Yolo"}})
-                    target.state.unfetchedContentIds.should.eql([])
                     done()
                 })
             })
@@ -695,6 +678,12 @@ describe("streamStore", () => {
                 let state = {unfetchedContentIds: ["6"], contentIds: ["6"]}
                 mutations[streamStoreOperations.newContentAck](state)
                 state.contentIds.should.eql(["6"])
+            })
+
+            it("should remove all ids from unfetched ids content list", () => {
+                let state = {unfetchedContentIds: ["6", "7", "8"], contentIds: []}
+                mutations[streamStoreOperations.newContentAck](state)
+                state.unfetchedContentIds.should.eql([])
             })
         })
 
@@ -857,6 +846,21 @@ describe("streamStore", () => {
 
                 actions[streamStoreOperations.newContentAck]({commit, state, dispatch}).should.be.fulfilled.notify(done)
             })
+
+            it("should re-add ID if one dispatch operation fails", (done) => {
+                let state = {unfetchedContentIds: [1, 2, 3], contentIds: []}
+                let commit = (name) => mutations[name](state)
+                let dispatch = Sinon.stub()
+                    .onCall(0).returns(Promise.resolve())
+                    .onCall(1).returns(Promise.reject("Fetch error"))
+                    .onCall(2).returns(Promise.resolve())
+
+                actions[streamStoreOperations.newContentAck]({commit, state, dispatch}).then(() => {
+                    state.unfetchedContentIds.should.eql([2])
+                    done()
+                })
+            })
+
         })
 
         describe("setLayoutDoneAfterTwitterOEmbeds", () => {
