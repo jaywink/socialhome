@@ -157,13 +157,6 @@ The possible email related additional settings are as follows:
 
 Note, email *is* required for signing up. Users will **not** be able to sign up if the instance does not have working email sending.
 
-DJANGO_OPBEAT_ENABLE
-....................
-
-Default: ``False``
-
-If you wish to enable Opbeat integration, set this to ``True``. Also remember to set ``DJANGO_OPBEAT_ORGANIZATION_ID``, ``DJANGO_OPBEAT_APP_ID`` and ``DJANGO_OPBEAT_SECRET_TOKEN`` to the values from Opbeat.
-
 DJANGO_SECRET_KEY
 .................
 

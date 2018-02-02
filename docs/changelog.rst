@@ -53,6 +53,10 @@ Changed
 
   Replies are created by simply passing in a ``parent`` with the ID value of the target Content. It is not possible to change the ``parent`` value for an existing reply or root level Content object once created. When creating a reply, you can omit ``visibility`` from the sent data. Visibility will be used from the parent Content item automatically.
 
+* Removed Opbeat integration related configuration. The service is being ramped down. (`#393 <https://github.com/jaywink/socialhome/issues/393>`_)
+
+  If as a server administrator you have enabled Opbeat monitoring, it will stop working on this update.
+
 Fixed
 .....
 
