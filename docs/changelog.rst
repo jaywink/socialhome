@@ -44,6 +44,10 @@ Added
 
   The content will still update to local streams normally. Federating the content can be enabled on further saves.
 
+* If signups are closed, the signup link will now stay active but will point to a list of Socialhome nodes. (`#354 <https://github.com/jaywink/socialhome/issues/354>`_)
+
+  By default this URL is https://the-federation.info/socialhome, but can be configured by the server admin.
+
 Changed
 .......
 

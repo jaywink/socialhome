@@ -193,6 +193,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 # Settings export
 SETTINGS_EXPORT = [
     "ACCOUNT_ALLOW_REGISTRATION",
+    "SOCIALHOME_NODE_LIST_URL",
 ]
 
 # See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
@@ -317,6 +318,8 @@ if SOCIALHOME_ADDITIONAL_APPS:
 SOCIALHOME_ADDITIONAL_APPS_URLS = env("SOCIALHOME_ADDITIONAL_APPS_URLS", default=None)
 # Allow to use on main page custom view from third-party app
 SOCIALHOME_HOME_VIEW = env("SOCIALHOME_HOME_VIEW", default=None)
+# If signups are closed, make signup link point here
+SOCIALHOME_NODE_LIST_URL = env("SOCIALHOME_NODE_LIST_URL", default="https://the-federation.info/socialhome")
 
 # Streams
 # Trim precached streams to this maximum size
