@@ -97,34 +97,39 @@ class TestFindUrlsInText(TestCase):
                                 "<a href=\"https://example.net\">bar</a>" \
                                 "[waat](https://example.org)"
         cls.without_protocol = "example.org"
+        cls.many_for_ordered = "http://spam.com http://eggs.com http://spam.com"
+
+    def test_returns_in_order_without_duplicates(self):
+        urls = find_urls_in_text(self.many_for_ordered)
+        self.assertEqual(urls, ["http://spam.com", "http://eggs.com"])
 
     def test_starts_with_url(self):
         urls = find_urls_in_text(self.starts_with_url)
-        self.assertEqual(urls, {self.starts_with_url})
+        self.assertEqual(urls, [self.starts_with_url])
         urls = find_urls_in_text(self.http_starts_with_url)
-        self.assertEqual(urls, {self.http_starts_with_url})
+        self.assertEqual(urls, [self.http_starts_with_url])
 
     def test_numbers(self):
         urls = find_urls_in_text(self.numbers)
-        self.assertEqual(urls, {self.numbers})
+        self.assertEqual(urls, [self.numbers])
 
     def test_special_chars(self):
         urls = find_urls_in_text(self.special_chars)
-        self.assertEqual(urls, {self.special_chars})
+        self.assertEqual(urls, [self.special_chars])
 
     def test_urls_in_text(self):
         urls = find_urls_in_text(self.urls_in_text)
-        self.assertEqual(urls, {
+        self.assertEqual(urls, [
             "https://example1.com", "https://example2.com", "https://example-3.com"
-        })
+        ])
 
     def test_href_markdown(self):
         urls = find_urls_in_text(self.href_and_markdown)
-        self.assertEqual(urls, {"https://example.com", "https://example.net", "https://example.org"})
+        self.assertEqual(urls, ["https://example.com", "https://example.net", "https://example.org"])
 
     def test_without_protocol(self):
         urls = find_urls_in_text(self.without_protocol)
-        self.assertEqual(urls, {"http://example.org"})
+        self.assertEqual(urls, ["http://example.org"])
 
 
 class TestProcessTextLinks(TestCase):

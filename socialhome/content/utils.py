@@ -104,17 +104,19 @@ def find_urls_in_text(text):
     Bleach does the heavy lifting here by identifying the links.
 
     :param text: Text to search links from
-    :returns: set of urls
+    :returns: list of urls with duplicates removed
     """
     urls = []
 
     def link_collector(attrs, new=False):
         href_key = (None, "href")
-        urls.append(attrs.get(href_key))
+        url = attrs.get(href_key)
+        if url not in urls:
+            urls.append(url)
         return None
 
     bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
-    return set(urls)
+    return urls
 
 
 def test_tag(tag):
