@@ -70,7 +70,6 @@ function fetchSharesSuccess(state, payload) {
 
 function fetchNewContentSuccess(state, payload) {
     Vue.set(state.contents, payload.data.id, payload.data)
-    _pullAll(state.unfetchedContentIds, [payload.data.id])
 }
 
 function onError() {
