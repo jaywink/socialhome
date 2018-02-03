@@ -95,11 +95,11 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
         )
 
     def test_renders_without_content(self):
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         assert response.status_code == 200
 
     def test_renders_with_content(self):
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         assert response.status_code == 200
         assert self.content.get_absolute_url() in str(response.content)
 
@@ -112,16 +112,16 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
         self.assertEqual(view.stream_type_value, StreamType.PUBLIC.value)
 
     def test_throughs_in_context(self):
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         self.assertEqual(response.context["throughs"], {self.content.id: self.content.id})
 
     def test_uses_correct_template(self):
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         template_names = [template.name for template in response.templates]
         assert "streams/public.html" in template_names
 
     def test_contains_only_public_content(self):
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         assert self.content.get_absolute_url() in str(response.content)
         assert self.site.get_absolute_url() not in str(response.content)
         assert self.selff.get_absolute_url() not in str(response.content)
@@ -129,7 +129,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
 
     def test_logged_in_user(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse("streams:public"))
+        response = self.client.get("%s?vue=0" % reverse("streams:public"))
         assert response.status_code == 200
 
 
@@ -143,7 +143,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         cls.client = Client()
 
     def test_context_data_is_ok(self):
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
+        response = self.client.get("%s?vue=0" % reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         assert response.context["tag_name"] == "tagnocontent"
 
     def test_get_json_context(self):
@@ -169,13 +169,13 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         )
 
     def test_renders_without_content(self):
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
+        response = self.client.get("%s?vue=0" % reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         assert "#%s" % self.tag_no_content.name in str(response.content)
         assert not response.context["content_list"]
         assert response.status_code == 200
 
     def test_renders_with_content(self):
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tag"}))
+        response = self.client.get("%s?vue=0" % reverse("streams:tag", kwargs={"name": "tag"}))
         assert response.status_code == 200
         assert self.content.rendered in str(response.content)
 
@@ -191,7 +191,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         self.assertEqual(view.stream_type_value, StreamType.TAG.value)
 
     def test_uses_correct_template(self):
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
+        response = self.client.get("%s?vue=0" % reverse("streams:tag", kwargs={"name": "tagnocontent"}))
         template_names = [template.name for template in response.templates]
         assert "streams/tag.html" in template_names
 
@@ -200,7 +200,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         site = ContentFactory(text="#tag site", visibility=Visibility.SITE)
         selff = ContentFactory(text="#tag self", visibility=Visibility.SELF)
         limited = ContentFactory(text="#tag limited", visibility=Visibility.LIMITED)
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tag"}))
+        response = self.client.get("%s?vue=0" % reverse("streams:tag", kwargs={"name": "tag"}))
         assert content.rendered in str(response.content)
         assert site.rendered not in str(response.content)
         assert selff.rendered not in str(response.content)

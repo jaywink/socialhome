@@ -170,16 +170,16 @@ class TestProfileDetailView(SocialhomeTestCase):
         assert response.status_code == 200
 
     def test_detail_view_has_no_organize_content_button_if_no_content(self):
-        request = self.client.get("/")
+        request = self.client.get("/?vue=0")
         request.user = self.admin_user
         admin_profile = self.admin_user.profile
         Profile.objects.filter(id=admin_profile.id).update(visibility=Visibility.PUBLIC)
         with self.login(username=self.admin_user.username):
-            response = self.client.get(admin_profile.get_absolute_url())
+            response = self.client.get("%s?vue=0" % admin_profile.get_absolute_url())
         assert str(response.content).find("Organize profile content") == -1
         ContentFactory(author=admin_profile, pinned=True)
         with self.login(username=self.admin_user.username):
-            response = self.client.get(admin_profile.get_absolute_url())
+            response = self.client.get("%s?vue=0" % admin_profile.get_absolute_url())
         assert str(response.content).find("Organize profile content") > -1
 
     def test_stream_name(self):

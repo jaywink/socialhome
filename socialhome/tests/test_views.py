@@ -37,14 +37,14 @@ class TestRootProfile(SocialhomeTestCase):
     @override_settings(SOCIALHOME_ROOT_PROFILE=None)
     def test_logged_in_followed_stream_view_rendered_without_root_profile(self):
         with self.login(username=self.user.username):
-            response = self.client.get("/")
+            response = self.client.get("/?vue=0")
         assert response.templates[0].name == "streams/followed.html"
 
     @override_settings(SOCIALHOME_ROOT_PROFILE="admin")
     def test_home_view_rendered_with_root_profile(self):
         # Set admin profile visibility, otherwise it will just redirect to login
         Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
-        response = self.client.get("/")
+        response = self.client.get("/?vue=0")
         assert response.templates[0].name == "streams/profile.html"
         assert response.context["profile"].user.username == "admin"
 
@@ -92,13 +92,13 @@ class TestCustomHomeViewLandingPage(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
-        ContentFactory(pinned=True, author=cls.user.profile) 
-        
+        ContentFactory(pinned=True, author=cls.user.profile)
+
     @override_settings(SOCIALHOME_HOME_VIEW="socialhome.streams.views.PublicStreamView")
     def test_renders_custom_view(self):
         with self.login(self.user):
             self.get("home")
-        self.assertEqual(self.context["view"].__class__, PublicStreamView)        
+        self.assertEqual(self.context["view"].__class__, PublicStreamView)
 
 
 class TestMarkdownXImageUploadViewMethods(SocialhomeCBVTestCase):
