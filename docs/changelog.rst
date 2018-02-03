@@ -61,6 +61,10 @@ Changed
 
   If as a server administrator you have enabled Opbeat monitoring, it will stop working on this update.
 
+* New VueJS stream is now default \o/ (`#202 <https://github.com/jaywink/socialhome/issues/202>`_)
+
+  Old stream can still be accessed using the user preferences or by passing a `vue=0` parameter in the URL. All existing users have been migrated to use the new VueJS streams by default.
+
 Fixed
 .....
 

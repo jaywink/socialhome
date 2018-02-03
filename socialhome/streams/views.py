@@ -1,4 +1,5 @@
 from braces.views import LoginRequiredMixin
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import ListView
@@ -14,7 +15,7 @@ class StreamMixin(View):
     vue = False
 
     def dispatch(self, request, *args, **kwargs):
-        use_new_stream = (
+        use_new_stream = isinstance(request.user, AnonymousUser) or (
             hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
         )
         use_vue_preference = bool(request.GET.get("vue", None))
