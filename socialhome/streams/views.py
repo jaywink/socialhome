@@ -18,8 +18,8 @@ class StreamMixin(View):
         use_new_stream = isinstance(request.user, AnonymousUser) or (
             hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
         )
-        use_vue_preference = bool(request.GET.get("vue", None))
-        self.vue = use_vue_preference if use_vue_preference is not None else use_new_stream
+        use_vue_preference = bool(int(request.GET.get("vue", 1)))
+        self.vue = use_vue_preference if request.GET.get("vue") is not None else use_new_stream
         self.last_id = request.GET.get("last_id")
         return super().dispatch(request, *args, **kwargs)
 
