@@ -3,8 +3,15 @@
 Changelog
 =========
 
-0.7.0-dev (unreleased)
-----------------------
+0.7.0 (2018-02-04)
+------------------
+
+New Vue.js frontend
+...................
+
+The work that started at a small hackathon in Helsinki in July 2017 is finally finished! The old buggy and hard to maintain Django template + jQuery based frontend has been completely rewritten in Vue.js. This provides a modern frontend code base, making it possible to add new features faster and to spend less time fixing bugs in the spaghetti code.
+
+A huge thanks goes out to @christophehenry doing most of the work in pushing this rewrite through!
 
 Added
 .....
