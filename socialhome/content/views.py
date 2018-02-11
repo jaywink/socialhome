@@ -185,4 +185,4 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
 
     def get_template_names(self):
         # noinspection PyUnresolvedReferences
-        return ["streams/vue.html"] if self.vue else super().get_template_names()
+        return ["streams/base.html"] if self.vue else super().get_template_names()

@@ -119,7 +119,7 @@ Streams
 
 There are many streams in Socialhome. The main streams are user profiles, followed and the public stream, but basically each single content view is also a stream. Opening a reply in an individual window would also create a stream for that reply content. Additionally, we want users to be able to create custom streams according to rules. For example, a stream could be "followed profiles + tag #foobar + tag #barfoo".
 
-A stream should automatically subscribe the user using websockets and handle any incoming messages from the server (currently in ``socialhome/static/js/streams.js``), notifying the user of new content and adding it to the page on request (without a page load).
+A stream should automatically subscribe the user using websockets and handle any incoming messages from the server (currently in ``socialhome/stream/app/main.js``), notifying the user of new content and adding it to the page on request (without a page load).
 
 This basic design should be kept in mind when touching stream related code.
 
