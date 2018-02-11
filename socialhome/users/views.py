@@ -38,7 +38,7 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
     profile_stream_type = None  # TODO: refactor to use stream type value directly
     slug_field = "guid"
     slug_url_kwarg = "guid"
-    template_name = "streams/profile.html"
+    template_name = "streams/base.html"
     target_profile = None
     content_list = None
 

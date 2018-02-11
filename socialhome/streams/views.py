@@ -20,8 +20,6 @@ class StreamMixin(View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        context["stream_name"] = self.stream_name
-        context["throughs"] = self.throughs
         context["json_context"] = self.get_json_context()
 
         return context
@@ -59,7 +57,6 @@ class TagStreamView(BaseStreamView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tag_name"] = self.tag.name
         context["json_context"]["tagName"] = self.tag.name
         return context
 

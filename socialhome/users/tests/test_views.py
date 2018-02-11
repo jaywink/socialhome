@@ -169,19 +169,6 @@ class TestProfileDetailView(SocialhomeTestCase):
             response = self.client.get(profile.get_absolute_url())
         assert response.status_code == 200
 
-    def test_detail_view_has_no_organize_content_button_if_no_content(self):
-        request = self.client.get("/?vue=0")
-        request.user = self.admin_user
-        admin_profile = self.admin_user.profile
-        Profile.objects.filter(id=admin_profile.id).update(visibility=Visibility.PUBLIC)
-        with self.login(username=self.admin_user.username):
-            response = self.client.get("%s?vue=0" % admin_profile.get_absolute_url())
-        assert str(response.content).find("Organize profile content") == -1
-        ContentFactory(author=admin_profile, pinned=True)
-        with self.login(username=self.admin_user.username):
-            response = self.client.get("%s?vue=0" % admin_profile.get_absolute_url())
-        assert str(response.content).find("Organize profile content") > -1
-
     def test_stream_name(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
         self.assertEqual(view.stream_type_value, StreamType.PROFILE_PINNED.value)
@@ -445,27 +432,15 @@ class TestProfileAllContentView(SocialhomeTestCase):
     def test_renders_for_user(self):
         response = self.get("users:profile-all-content", guid=self.user.profile.guid)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context_data.get("pinned_content_exists"))
-        ContentFactory(author=self.user.profile, pinned=True, visibility=Visibility.PUBLIC)
-        response = self.get("users:profile-all-content", guid=self.user.profile.guid)
-        self.assertTrue(response.context_data.get("pinned_content_exists"))
-        self.assertEqual(
-            response.context_data.get("stream_name"), "%s__%s" % (StreamType.PROFILE_ALL.value, self.user.profile.id),
-        )
-        self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
 
     def test_renders_for_remote_profile(self):
         response = self.get("users:profile-all-content", guid=self.profile.guid)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context_data.get("pinned_content_exists"))
-        self.assertEqual(
-            response.context_data.get("stream_name"), "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id),
-        )
-        self.assertEqual(response.context_data.get("profile_stream_type"), "all_content")
 
     def test_stream_name(self):
         self.get("users:profile-all-content", guid=self.profile.guid)
-        self.assertContext("stream_name", "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
+        self.assertEqual(self.last_response.context["json_context"]["streamName"],
+                         "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
 
 
 class TestContactsFollowedView(SocialhomeTestCase):
