@@ -137,7 +137,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 
 class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
-    template_name = "content/detail.html"
+    template_name = "streams/base.html"
     vue = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -147,10 +147,6 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
             return HttpResponseRedirect(self.object.share_of.get_absolute_url())
         elif self.object.content_type == ContentType.REPLY:
             return HttpResponseRedirect(self.object.parent.get_absolute_url())
-        use_new_stream = (
-            hasattr(request.user, "preferences") and request.user.preferences.get("streams__use_new_stream")
-        )
-        self.vue = bool(request.GET.get("vue", False)) or use_new_stream
         return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -165,24 +161,17 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.stream_name = "%s__%s" % (StreamType.CONTENT.value, self.object.channel_group_name)
-        context["stream_name"] = self.stream_name
-        if self.vue:
-            context["json_context"] = self.get_json_context()
+        context["json_context"] = self.get_json_context()
         return context
 
     def get_json_context(self):
         return {
             "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
-            "streamName": self.stream_name,
+            "streamName": "%s__%s" % (StreamType.CONTENT.value, self.object.channel_group_name),
             "content": self.get_serialized_content(),
         }
 
     def get_serialized_content(self):
         serializer = ContentSerializer(instance=self.object, context={"request": self.request})
         return serializer.data
-
-    def get_template_names(self):
-        # noinspection PyUnresolvedReferences
-        return ["streams/vue.html"] if self.vue else super().get_template_names()
