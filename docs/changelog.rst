@@ -3,6 +3,16 @@
 Changelog
 =========
 
+0.8.0-dev (unreleased)
+----------------------
+
+Added
+.....
+
+* RFC3033 webfinger support for Diaspora protocol (`#405 <https://github.com/jaywink/socialhome/issues/405>`_)
+
+  This allows better profile discovery by remote non-Socialhome servers.
+
 0.7.0 (2018-02-04)
 ------------------
 

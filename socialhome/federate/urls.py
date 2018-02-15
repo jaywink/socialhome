@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.views.decorators.csrf import csrf_exempt
 
 from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
@@ -10,6 +10,9 @@ from socialhome.federate.views import (
 
 
 urlpatterns = [
+    # Federation provided urls
+    url(r"", include("federation.hostmeta.django.urls")),
+
     # Discovery
     url(r'^.well-known/host-meta$', host_meta_view, name="host-meta"),
     url(r'^webfinger$', webfinger_view, name="webfinger"),
