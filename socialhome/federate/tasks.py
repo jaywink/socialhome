@@ -62,9 +62,7 @@ def send_content(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-        ]
+        recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
@@ -171,9 +169,7 @@ def send_content_retraction(content, author_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-        ]
+        recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(author))
         handle_send(entity, author, recipients)
     else:

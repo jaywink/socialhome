@@ -274,12 +274,12 @@ Default: ``https://the-federation.info/socialhome``
 
 URL to make signup link go to in the case that signups are closed.
 
-SOCIALHOME_RELAY_DOMAIN
+SOCIALHOME_RELAY_ID
 .......................
 
-Default: ``relay.iliketoast.net``
+Default: ``diaspora://relay@relay.iliketoast.net/profile/``
 
-Which relay instance to send outgoing content to. Socialhome automatically integrates with the `relay system <https://github.com/jaywink/social-relay>`_.
+Which relay instance ID to send outgoing content to. Socialhome automatically integrates with the `relay system <https://github.com/jaywink/social-relay>`_.
 
 SOCIALHOME_ROOT_PROFILE
 .......................

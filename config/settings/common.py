@@ -306,7 +306,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     domain=SOCIALHOME_DOMAIN
 )
 # Relay to send public content to
-SOCIALHOME_RELAY_DOMAIN = env("SOCIALHOME_RELAY_DOMAIN", default="relay.iliketoast.net")
+SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="diaspora://relay@relay.iliketoast.net/profile/")
 # Statistics
 # Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts
 # User counts include 30 day and 6 month active users
