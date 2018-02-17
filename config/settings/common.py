@@ -489,3 +489,10 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
         ("large", "crop__300x300"),
     ],
 }
+
+# FEDERATION
+# ----------
+FEDERATION = {
+    "base_url": SOCIALHOME_URL,
+    "profile_id_function": "socialhome.federate.utils.generic.get_diaspora_profile_id_by_handle",
+}
