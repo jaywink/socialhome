@@ -4,13 +4,11 @@ from django.conf import settings
 from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
-from federation.outbound import handle_send, handle_create_payload
+from federation.outbound import handle_send
 from federation.utils.diaspora import generate_diaspora_profile_id
-from federation.utils.network import send_document
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
-
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
     process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher,
@@ -221,22 +219,19 @@ def send_follow_change(profile_id, followed_id, follow):
         # Don't send in development mode
         return
     entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle, following=follow)
-    # TODO: add high level method support to federation for private payload delivery
-    payload = handle_create_payload(entity, profile, to_user=remote_profile)
-    url = "https://%s/receive/users/%s" % (
-        remote_profile.handle.split("@")[1], remote_profile.guid,
-    )
-    send_document(url, payload)
+    recipients = [
+        (generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid), remote_profile.key),
+     ]
+    handle_send(entity, profile, recipients)
     # Also trigger a profile send
-    send_profile(profile_id, recipients=[(remote_profile.handle, None)])
+    send_profile(profile_id, recipients=[generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid)])
 
 
 def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
 
     :param profile_id: Profile.id of profile to send
-    :param recipients: Optional list of recipient tuples, in form tuple(handle, network), for example
-        ("foo@example.com", "diaspora"). Network can be None.
+    :param recipients: Optional list of recipients, see `federation.outbound.handle_send` parameters
     """
     try:
         profile = Profile.objects.get(id=profile_id, user__isnull=False)
@@ -250,18 +245,7 @@ def send_profile(profile_id, recipients=None):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    # From diaspora devs: "if the profile is private it needs to be encrypted, so to the private endpoint,
-    # starting with 0.7.0.0 diaspora starts sending public profiles to the public endpoint only once per pod".
-    # Let's just send everything to private endpoints as 0.7 isn't out yet.
-    # TODO: once 0.7 is out for longer, start sending public profiles to public endpoints
-    # TODO: add high level method support to federation for private payload delivery
     if not recipients:
         recipients = _get_remote_followers(profile)
-    for handle, _network in recipients:
-        try:
-            remote_profile = Profile.objects.get(handle=handle)
-        except Profile.DoesNotExist:
-            continue
-        payload = handle_create_payload(entity, profile, to_user=remote_profile)
-        url = "https://%s/receive/users/%s" % (handle.split("@")[1], remote_profile.guid)
-        send_document(url, payload)
+    if recipients:
+        handle_send(entity, profile, recipients)

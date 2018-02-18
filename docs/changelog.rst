@@ -20,6 +20,8 @@ Changed
 
   No action needed from server admins unless you have changed this setting, in which case it should be updated accordingly.
 
+* Start sending profile changes to remote nodes as public messages for better efficiency
+
 0.7.0 (2018-02-04)
 ------------------
 
