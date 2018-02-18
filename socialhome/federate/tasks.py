@@ -4,12 +4,11 @@ from django.conf import settings
 from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
-from federation.outbound import handle_send, handle_create_payload
-from federation.utils.network import send_document
+from federation.outbound import handle_send
+from federation.utils.diaspora import generate_diaspora_profile_id
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
-
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
     process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher,
@@ -62,9 +61,7 @@ def send_content(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-        ]
+        recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(content.author))
         handle_send(entity, content.author, recipients)
     else:
@@ -84,12 +81,12 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
     replies = Content.objects.filter(parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
     for reply in replies:
         if reply.author.handle != exclude:
-            participants.append((reply.author.handle, None))
+            participants.append(generate_diaspora_profile_id(reply.author.handle, reply.author.guid))
     if target_content.content_type == ContentType.CONTENT:
         shares = Content.objects.filter(share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
         for share in shares:
             if share.author.handle != exclude:
-                participants.append((share.author.handle, None))
+                participants.append(generate_diaspora_profile_id(share.author.handle, share.author.guid))
             participants = _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
@@ -101,7 +98,7 @@ def _get_remote_followers(profile, exclude=None):
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if follower.handle != exclude:
-            followers.append((follower.handle, None))
+            followers.append(generate_diaspora_profile_id(follower.handle, follower.guid))
     return followers
 
 
@@ -127,8 +124,9 @@ def send_reply(content_id):
         forward_entity(entity, content.parent.id)
     else:
         # We only need to send to the original author
+        parent_author = content.parent.author
         recipients = [
-            (content.parent.author.handle, None),
+            generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
         ]
         handle_send(entity, content.author, recipients)
 
@@ -152,7 +150,9 @@ def send_share(content_id):
         recipients = _get_remote_followers(content.author)
         if not content.share_of.local:
             # Send to original author
-            recipients.append((content.share_of.author.handle, None))
+            recipients.append(
+                generate_diaspora_profile_id(content.share_of.author.handle, content.share_of.author.guid),
+            )
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("send_share - No entity for %s", content)
@@ -171,9 +171,7 @@ def send_content_retraction(content, author_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [
-            (settings.SOCIALHOME_RELAY_DOMAIN, "diaspora"),
-        ]
+        recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(author))
         handle_send(entity, author, recipients)
     else:
@@ -221,22 +219,19 @@ def send_follow_change(profile_id, followed_id, follow):
         # Don't send in development mode
         return
     entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle, following=follow)
-    # TODO: add high level method support to federation for private payload delivery
-    payload = handle_create_payload(entity, profile, to_user=remote_profile)
-    url = "https://%s/receive/users/%s" % (
-        remote_profile.handle.split("@")[1], remote_profile.guid,
-    )
-    send_document(url, payload)
+    recipients = [
+        (generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid), remote_profile.key),
+     ]
+    handle_send(entity, profile, recipients)
     # Also trigger a profile send
-    send_profile(profile_id, recipients=[(remote_profile.handle, None)])
+    send_profile(profile_id, recipients=[generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid)])
 
 
 def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
 
     :param profile_id: Profile.id of profile to send
-    :param recipients: Optional list of recipient tuples, in form tuple(handle, network), for example
-        ("foo@example.com", "diaspora"). Network can be None.
+    :param recipients: Optional list of recipients, see `federation.outbound.handle_send` parameters
     """
     try:
         profile = Profile.objects.get(id=profile_id, user__isnull=False)
@@ -250,18 +245,7 @@ def send_profile(profile_id, recipients=None):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    # From diaspora devs: "if the profile is private it needs to be encrypted, so to the private endpoint,
-    # starting with 0.7.0.0 diaspora starts sending public profiles to the public endpoint only once per pod".
-    # Let's just send everything to private endpoints as 0.7 isn't out yet.
-    # TODO: once 0.7 is out for longer, start sending public profiles to public endpoints
-    # TODO: add high level method support to federation for private payload delivery
     if not recipients:
         recipients = _get_remote_followers(profile)
-    for handle, _network in recipients:
-        try:
-            remote_profile = Profile.objects.get(handle=handle)
-        except Profile.DoesNotExist:
-            continue
-        payload = handle_create_payload(entity, profile, to_user=remote_profile)
-        url = "https://%s/receive/users/%s" % (handle.split("@")[1], remote_profile.guid)
-        send_document(url, payload)
+    if recipients:
+        handle_send(entity, profile, recipients)

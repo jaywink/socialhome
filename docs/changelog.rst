@@ -13,6 +13,15 @@ Added
 
   This allows better profile discovery by remote non-Socialhome servers.
 
+Changed
+.......
+
+* Setting ``SOCIALHOME_RELAY_DOMAIN`` is now called ``SOCIALHOME_RELAY_ID``. We're slowly replacing all direct Diaspora handle references with Diaspora URI format profile ID's in preparation for ActivityPub protocol addition.
+
+  No action needed from server admins unless you have changed this setting, in which case it should be updated accordingly.
+
+* Start sending profile changes to remote nodes as public messages for better efficiency
+
 0.7.0 (2018-02-04)
 ------------------
 

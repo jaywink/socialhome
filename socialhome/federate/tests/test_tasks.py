@@ -1,9 +1,10 @@
-from unittest.mock import patch, call
+from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
 from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
+from federation.utils.diaspora import generate_diaspora_profile_id
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
@@ -49,7 +50,11 @@ class TestSendContent(TestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_handle_send_is_called(self, mock_maker, mock_send):
         send_content(self.public_content.id)
-        mock_send.assert_called_once_with("entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')])
+        mock_send.assert_called_once_with(
+            "entity",
+            self.public_content.author,
+            ["diaspora://relay@relay.iliketoast.net/profile/"],
+        )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -84,7 +89,7 @@ class TestSendContentRetraction(TestCase):
     def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_sender.assert_called_once_with(
-            "entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')]
+            "entity", self.public_content.author, ["diaspora://relay@relay.iliketoast.net/profile/"]
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
@@ -126,7 +131,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author, [
-            (self.remote_content.author.handle, None),
+            generate_diaspora_profile_id(self.remote_content.author.handle, self.remote_content.author.guid),
         ])
         assert mock_forward.called == 0
 
@@ -157,7 +162,11 @@ class TestSendShare(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_handle_send_is_called(self, mock_maker, mock_send):
         send_share(self.share.id)
-        mock_send.assert_called_once_with("entity", self.share.author, [(self.content.author.handle, None)])
+        mock_send.assert_called_once_with(
+            "entity",
+            self.share.author,
+            [generate_diaspora_profile_id(self.content.author.handle, self.content.author.guid)],
+        )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -196,13 +205,13 @@ class TestForwardRelayable(TestCase):
         entity = Comment(handle=self.reply.author.handle, guid=self.reply.guid)
         forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author, [
-            (self.remote_reply.author.handle, None),
-            (self.share.author.handle, None),
-            (self.share_reply.author.handle, None),
+            generate_diaspora_profile_id(self.remote_reply.author.handle, self.remote_reply.author.guid),
+            generate_diaspora_profile_id(self.share.author.handle, self.share.author.guid),
+            generate_diaspora_profile_id(self.share_reply.author.handle, self.share_reply.author.guid),
         ], parent_user=self.public_content.author)
 
 
-class TestGetRemoveFollowers(TestCase):
+class TestGetRemoteFollowers(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -219,8 +228,8 @@ class TestGetRemoveFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                (self.remote_follower.handle, None),
-                (self.remote_follower2.handle, None),
+                generate_diaspora_profile_id(self.remote_follower.handle, self.remote_follower.guid),
+                generate_diaspora_profile_id(self.remote_follower2.handle, self.remote_follower2.guid),
             }
         )
 
@@ -229,7 +238,7 @@ class TestGetRemoveFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                (self.remote_follower2.handle, None),
+                generate_diaspora_profile_id(self.remote_follower2.handle, self.remote_follower2.guid),
             }
         )
 
@@ -240,18 +249,25 @@ class TestSendFollow(TestCase):
         super().setUpTestData()
         cls.user = UserFactory()
         cls.profile = cls.user.profile
-        cls.remote_profile = ProfileFactory()
+        cls.remote_profile = ProfileFactory(
+            rsa_public_key=get_dummy_private_key().publickey().exportKey(),
+        )
 
-    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
-    @patch("socialhome.federate.tasks.send_document")
+    @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.send_profile")
-    def test_send_follow_change(self, mock_profile, mock_send, mock_payload):
+    @patch("socialhome.federate.tasks.base.Follow", return_value="entity")
+    def test_send_follow_change(self, mock_follow, mock_profile, mock_send):
         send_follow_change(self.profile.id, self.remote_profile.id, True)
         mock_send.assert_called_once_with(
-            "https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
-            "payload",
+            "entity",
+            self.profile,
+            [(generate_diaspora_profile_id(
+                self.remote_profile.handle, self.remote_profile.guid
+            ), self.remote_profile.key)],
         )
-        mock_profile.assert_called_once_with(self.profile.id, recipients=[(self.remote_profile.handle, None)])
+        mock_profile.assert_called_once_with(self.profile.id, recipients=[
+            generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid),
+        ])
 
 
 class TestSendProfile(SocialhomeTestCase):
@@ -263,42 +279,28 @@ class TestSendProfile(SocialhomeTestCase):
         cls.remote_profile = ProfileFactory()
         cls.remote_profile2 = ProfileFactory()
 
-    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
+    @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks._get_remote_followers")
-    @patch("socialhome.federate.tasks.send_document")
     @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
-    def test_send_local_profile(self, mock_federable, mock_send, mock_get, mock_payload):
-        mock_get.return_value = [(self.remote_profile.handle, None), (self.remote_profile2.handle, None)]
+    def test_send_local_profile(self, mock_federable, mock_get, mock_send):
+        recipients = [
+            generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid),
+            generate_diaspora_profile_id(self.remote_profile2.handle, self.remote_profile2.guid),
+        ]
+        mock_get.return_value = recipients
         send_profile(self.profile.id)
-        mock_payload_calls = [
-            call("profile", self.profile, to_user=self.remote_profile),
-            call("profile", self.profile, to_user=self.remote_profile2),
-        ]
-        self.assertEqual(mock_payload_calls, mock_payload.call_args_list)
-        mock_send_calls = [
-            call("https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
-                 "payload"),
-            call("https://%s/receive/users/%s" % (self.remote_profile2.handle.split("@")[1], self.remote_profile2.guid),
-                 "payload"),
-        ]
-        self.assertEqual(mock_send_calls, mock_send.call_args_list)
+        mock_send.assert_called_once_with(
+            "profile", self.profile, recipients,
+        )
 
     @patch("socialhome.federate.tasks.make_federable_profile")
     def test_skip_remote_profile(self, mock_make):
         send_profile(self.remote_profile.id)
         self.assertFalse(mock_make.called)
 
-    @patch("socialhome.federate.tasks.handle_create_payload", return_value="payload")
-    @patch("socialhome.federate.tasks.send_document")
+    @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
-    def test_send_to_given_recipients_only(self, mock_federable, mock_send, mock_payload):
-        send_profile(self.profile.id, recipients=[(self.remote_profile.handle, None)])
-        mock_payload_calls = [
-            call("profile", self.profile, to_user=self.remote_profile),
-        ]
-        self.assertEqual(mock_payload_calls, mock_payload.call_args_list)
-        mock_send_calls = [
-            call("https://%s/receive/users/%s" % (self.remote_profile.handle.split("@")[1], self.remote_profile.guid),
-                 "payload"),
-        ]
-        self.assertEqual(mock_send_calls, mock_send.call_args_list)
+    def test_send_to_given_recipients_only(self, mock_federable, mock_send):
+        recipients = [generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid)]
+        send_profile(self.profile.id, recipients=recipients)
+        mock_send.assert_called_once_with("profile", self.profile, recipients)
