@@ -4,6 +4,7 @@ import pytest
 from django.test import override_settings
 from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
+from federation.utils.diaspora import generate_diaspora_profile_id
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
@@ -49,7 +50,11 @@ class TestSendContent(TestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_handle_send_is_called(self, mock_maker, mock_send):
         send_content(self.public_content.id)
-        mock_send.assert_called_once_with("entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')])
+        mock_send.assert_called_once_with(
+            "entity",
+            self.public_content.author,
+            ["diaspora://relay@relay.iliketoast.net/profile/"],
+        )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -84,7 +89,7 @@ class TestSendContentRetraction(TestCase):
     def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_sender.assert_called_once_with(
-            "entity", self.public_content.author, [('relay.iliketoast.net', 'diaspora')]
+            "entity", self.public_content.author, ["diaspora://relay@relay.iliketoast.net/profile/"]
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
@@ -126,7 +131,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author, [
-            (self.remote_content.author.handle, None),
+            generate_diaspora_profile_id(self.remote_content.author.handle, self.remote_content.author.guid),
         ])
         assert mock_forward.called == 0
 
@@ -157,7 +162,11 @@ class TestSendShare(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
     def test_handle_send_is_called(self, mock_maker, mock_send):
         send_share(self.share.id)
-        mock_send.assert_called_once_with("entity", self.share.author, [(self.content.author.handle, None)])
+        mock_send.assert_called_once_with(
+            "entity",
+            self.share.author,
+            [generate_diaspora_profile_id(self.content.author.handle, self.content.author.guid)],
+        )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
@@ -196,13 +205,13 @@ class TestForwardRelayable(TestCase):
         entity = Comment(handle=self.reply.author.handle, guid=self.reply.guid)
         forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author, [
-            (self.remote_reply.author.handle, None),
-            (self.share.author.handle, None),
-            (self.share_reply.author.handle, None),
+            generate_diaspora_profile_id(self.remote_reply.author.handle, self.remote_reply.author.guid),
+            generate_diaspora_profile_id(self.share.author.handle, self.share.author.guid),
+            generate_diaspora_profile_id(self.share_reply.author.handle, self.share_reply.author.guid),
         ], parent_user=self.public_content.author)
 
 
-class TestGetRemoveFollowers(TestCase):
+class TestGetRemoteFollowers(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -219,8 +228,8 @@ class TestGetRemoveFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                (self.remote_follower.handle, None),
-                (self.remote_follower2.handle, None),
+                generate_diaspora_profile_id(self.remote_follower.handle, self.remote_follower.guid),
+                generate_diaspora_profile_id(self.remote_follower2.handle, self.remote_follower2.guid),
             }
         )
 
@@ -229,7 +238,7 @@ class TestGetRemoveFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                (self.remote_follower2.handle, None),
+                generate_diaspora_profile_id(self.remote_follower2.handle, self.remote_follower2.guid),
             }
         )
 

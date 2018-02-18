@@ -5,6 +5,7 @@ from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
 from federation.outbound import handle_send, handle_create_payload
+from federation.utils.diaspora import generate_diaspora_profile_id
 from federation.utils.network import send_document
 
 from socialhome.content.enums import ContentType
@@ -82,12 +83,12 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
     replies = Content.objects.filter(parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
     for reply in replies:
         if reply.author.handle != exclude:
-            participants.append((reply.author.handle, None))
+            participants.append(generate_diaspora_profile_id(reply.author.handle, reply.author.guid))
     if target_content.content_type == ContentType.CONTENT:
         shares = Content.objects.filter(share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
         for share in shares:
             if share.author.handle != exclude:
-                participants.append((share.author.handle, None))
+                participants.append(generate_diaspora_profile_id(share.author.handle, share.author.guid))
             participants = _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
@@ -99,7 +100,7 @@ def _get_remote_followers(profile, exclude=None):
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if follower.handle != exclude:
-            followers.append((follower.handle, None))
+            followers.append(generate_diaspora_profile_id(follower.handle, follower.guid))
     return followers
 
 
@@ -125,8 +126,9 @@ def send_reply(content_id):
         forward_entity(entity, content.parent.id)
     else:
         # We only need to send to the original author
+        parent_author = content.parent.author
         recipients = [
-            (content.parent.author.handle, None),
+            generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
         ]
         handle_send(entity, content.author, recipients)
 
@@ -150,7 +152,9 @@ def send_share(content_id):
         recipients = _get_remote_followers(content.author)
         if not content.share_of.local:
             # Send to original author
-            recipients.append((content.share_of.author.handle, None))
+            recipients.append(
+                generate_diaspora_profile_id(content.share_of.author.handle, content.share_of.author.guid),
+            )
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("send_share - No entity for %s", content)
