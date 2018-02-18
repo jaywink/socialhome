@@ -1,11 +1,6 @@
 <template>
     <div>
-        <h2>
-            {{ title }}
-            <a href="/preferences/user/">
-                <span class="badge badge-default pull-right rounded-0">alpha</span>
-            </a>
-        </h2>
+        <h2>{{ title }}</h2>
         <p>{{ helpText }}</p>
     </div>
 </template>
