@@ -63,6 +63,7 @@ def send_content(content_id):
             return
         recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(content.author))
+        logger.debug("send_content - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("send_content - No entity for %s", content)
@@ -128,6 +129,7 @@ def send_reply(content_id):
         recipients = [
             generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
         ]
+        logger.debug("send_reply - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
 
 
@@ -153,6 +155,7 @@ def send_share(content_id):
             recipients.append(
                 generate_diaspora_profile_id(content.share_of.author.handle, content.share_of.author.guid),
             )
+        logger.debug("send_share - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
     else:
         logger.warning("send_share - No entity for %s", content)
@@ -173,6 +176,7 @@ def send_content_retraction(content, author_id):
             return
         recipients = [settings.SOCIALHOME_RELAY_ID]
         recipients.extend(_get_remote_followers(author))
+        logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         handle_send(entity, author, recipients)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
@@ -200,6 +204,7 @@ def forward_entity(entity, target_content_id):
         return
     recipients = _get_remote_participants_for_content(target_content, exclude=entity.handle)
     recipients.extend(_get_remote_followers(target_content.author, exclude=entity.handle))
+    logger.debug("forward_entity - sending to recipients: %s", recipients)
     handle_send(entity, content.author, recipients, parent_user=target_content.author)
 
 
@@ -222,6 +227,7 @@ def send_follow_change(profile_id, followed_id, follow):
     recipients = [
         (generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid), remote_profile.key),
      ]
+    logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile, recipients)
     # Also trigger a profile send
     send_profile(profile_id, recipients=[generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid)])
@@ -247,5 +253,5 @@ def send_profile(profile_id, recipients=None):
         return
     if not recipients:
         recipients = _get_remote_followers(profile)
-    if recipients:
-        handle_send(entity, profile, recipients)
+    logger.debug("send_profile - sending to recipients: %s", recipients)
+    handle_send(entity, profile, recipients)
