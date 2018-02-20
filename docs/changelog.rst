@@ -22,6 +22,13 @@ Changed
 
 * Start sending profile changes to remote nodes as public messages for better efficiency
 
+Fixed
+.....
+
+* Fix precalculated streams maintenance job.
+
+  Due to mistake in regexp not all old precalculated stream items were pruned in maintenance. Now fixed which should ensure Redis memory usage does not suffer from unreasonable increase over time.
+
 0.7.0 (2018-02-04)
 ------------------
 

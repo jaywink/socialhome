@@ -8,8 +8,11 @@ from socialhome.utils import get_redis_connection
 def groom_redis_precaches():
     """Groom the Redis data for streams precaching."""
     r = get_redis_connection()
-    keys = r.keys("sh:streams:*[^:throughs]")
+    keys = r.keys("sh:streams:[a-z0-9_\-:]*")
     for key in keys:
+        if key.decode("utf-8").endswith(':throughs'):
+            # Skip throughs, we handle those separately below
+            continue
         # Make the ordered set X items length at most
         r.zremrangebyrank(key, 0, -settings.SOCIALHOME_STREAMS_PRECACHE_SIZE)
         # Remove now obsolete throughs ID's from the throughs hash
