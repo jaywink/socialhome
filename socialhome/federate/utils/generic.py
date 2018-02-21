@@ -4,6 +4,7 @@ import pytz
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
+from django.urls import reverse
 from django.utils.timezone import make_aware
 from federation.utils.diaspora import generate_diaspora_profile_id
 
@@ -14,13 +15,21 @@ def generate_rsa_private_key():
     return RSA.generate(4096, rand)
 
 
-def get_diaspora_profile_id_by_handle(handle):
+def get_diaspora_profile_by_handle(handle):
     """
-    Return a local Profile ID suitable for the federation library profile using Diaspora handle.
+    Return a local Profile suitable for the federation library profile using Diaspora handle.
     """
     from socialhome.users.models import Profile  # Circulars
-    profile = Profile.objects.only('guid').get(handle=handle)
-    return generate_diaspora_profile_id(handle, profile.guid)
+    profile = Profile.objects.select_related('user').only('guid', 'user__username').get(handle=handle)
+    profile_path = reverse("users:detail", kwargs={"username": profile.user.username})
+    return {
+        "id": generate_diaspora_profile_id(handle, profile.guid),
+        "profile_path": profile_path,
+        # We don't support atom feeds yet, but since diaspora has a bug currently (0.7.3.x),
+        # we need to specify something here. Let's use the profile url here too.
+        # TODO remove this once diaspora releases the bug fix
+        "atom_path": profile_path,
+    }
 
 
 def is_dst(zonename):
