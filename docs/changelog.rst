@@ -33,6 +33,8 @@ Fixed
 
   A bug in Diaspora caused Socialhome profile discovery to fail. Introduce some patches to our webfinger to work around the bug and make profiles available to latest Diaspora versions.
 
+* Fix receiving public content from GangGo (`federation #115 <https://github.com/jaywink/federation/issues/115>`_)
+
 0.7.0 (2018-02-04)
 ------------------
 
