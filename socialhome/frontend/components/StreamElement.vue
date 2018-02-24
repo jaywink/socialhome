@@ -34,10 +34,10 @@
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
-import "streams/app/components/AuthorBar.vue"
-import "streams/app/components/ReactionsBar.vue"
-import "streams/app/components/NsfwShield.vue"
+import {streamStoreOperations} from "frontend/stores/streamStore.operations"
+import "frontend/components/AuthorBar.vue"
+import "frontend/components/ReactionsBar.vue"
+import "frontend/components/NsfwShield.vue"
 
 
 export default Vue.component("stream-element", {

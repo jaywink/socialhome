@@ -1,4 +1,4 @@
-import main from "streams/app/main"
+import main from "frontend/main"
 
 import Vue from "vue"
 import Vuex from "vuex"

@@ -1,12 +1,12 @@
 import {mount} from "avoriaz"
-import {getContext} from "streams/app/tests/fixtures/jsonContext.fixtures"
+import {getContext} from "frontend/tests/fixtures/jsonContext.fixtures"
 
 import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
 import Vuex from "vuex"
 
-import ProfileStampedElement from "streams/app/components/stamped_elements/ProfileStampedElement.vue"
-import {newApplicationStore} from "streams/app/stores/applicationStore"
+import ProfileStampedElement from "frontend/components/stamped_elements/ProfileStampedElement.vue"
+import {newApplicationStore} from "frontend/stores/applicationStore"
 
 
 Vue.use(BootstrapVue)

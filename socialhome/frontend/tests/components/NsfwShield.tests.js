@@ -4,8 +4,8 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
-import NsfwShield from "streams/app/components/NsfwShield.vue"
-import {getStore} from "streams/app/tests/fixtures/store.fixtures"
+import NsfwShield from "frontend/components/NsfwShield.vue"
+import {getStore} from "frontend/tests/fixtures/store.fixtures"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)

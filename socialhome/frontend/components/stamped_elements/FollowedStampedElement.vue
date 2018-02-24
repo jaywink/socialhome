@@ -4,7 +4,7 @@
 
 <script>
 import Vue from "vue"
-import "streams/app/components/stamped_elements/BaseStampedElement.vue"
+import "frontend/components/stamped_elements/BaseStampedElement.vue"
 
 
 export default Vue.component("followed-stamped-element", {
