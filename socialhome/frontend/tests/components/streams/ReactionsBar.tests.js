@@ -7,7 +7,7 @@ import BootstrapVue from "bootstrap-vue"
 import VueSnotify from "vue-snotify"
 import VueMasonryPlugin from "vue-masonry"
 
-import ReactionsBar from "frontend/components/ReactionsBar.vue"
+import ReactionsBar from "frontend/components/streams/ReactionsBar.vue"
 import {getContext, getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
 import {newStreamStore} from "frontend/stores/streamStore"
 import applicationStore from "frontend/stores/applicationStore"

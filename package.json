@@ -65,6 +65,7 @@
     "vue-images-loaded": "1.1.2",
     "vue-infinite-scroll": "^2.0.2",
     "vue-masonry": "=0.10.3",
+    "vue-router": "^3.0.1",
     "vue-scrollto": "^2.8.0",
     "vue-snotify": "^3.0.4",
     "vuex": "~2.3.1",

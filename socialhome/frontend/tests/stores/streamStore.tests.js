@@ -3,13 +3,13 @@ import Moxios from "moxios"
 
 import Vue from "vue"
 import Vuex from "vuex"
+import Axios from "axios"
+import VueSnotify from "vue-snotify"
 
 import {actions, mutations, getters} from "frontend/stores/streamStore.operations"
 import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
 import {streamStoreOperations, exportsForTests} from "frontend/stores/streamStore"
 import getState from "frontend/stores/streamStore.state"
-import Axios from "axios/index"
-import VueSnotify from "vue-snotify"
 
 
 describe("streamStore", () => {
@@ -632,7 +632,6 @@ describe("streamStore", () => {
             target.actions[streamStoreOperations.getReplies].should.exist
             target.actions[streamStoreOperations.getShares].should.exist
             target.actions[streamStoreOperations.getTagStream].should.exist
-            target.actions[streamStoreOperations.loadStream].should.exist
             target.actions[streamStoreOperations.newContentAck].should.exist
             target.actions[streamStoreOperations.receivedNewContent].should.exist
             target.actions[streamStoreOperations.saveReply].should.exist
@@ -704,108 +703,6 @@ describe("streamStore", () => {
                 let commit = Sinon.spy()
                 actions[streamStoreOperations.disableLoadMore]({commit}, 10)
                 commit.getCall(0).args.should.eql([streamStoreOperations.disableLoadMore, 10])
-            })
-        })
-
-        describe("loadStream", () => {
-            let dispatch
-            let state
-
-            beforeEach(() => {
-                dispatch = Sinon.spy()
-            })
-
-            afterEach(() => {
-                dispatch.reset()
-            })
-
-            context("dispatch without contents", () => {
-                beforeEach(() => {
-                    state = {contentIds: [], applicationStore: {profile: {id: 5}}}
-                })
-
-                it("followed stream with no contents", () => {
-                    state.stream = {name: "followed"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getFollowedStream, {params: {}}])
-                })
-
-                it("public stream with no contents", () => {
-                    state.stream = {name: "public"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getPublicStream, {params: {}}])
-                })
-
-                it("tag stream with no contents", () => {
-                    state.stream = {name: "tag"}
-                    state.tagName = "eggs"
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getTagStream, {params: {name: "eggs"}}])
-                })
-
-                it("profile all stream with no contents", () => {
-                    state.stream = {name: "profile_all"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfileAll, {params: {id: 5}}])
-                })
-
-                it("profile pinned stream with no contents", () => {
-                    state.stream = {name: "profile_pinned"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql([streamStoreOperations.getProfilePinned, {params: {id: 5}}])
-                })
-
-            })
-
-            context("dispatch with contents", () => {
-                beforeEach(() => {
-                    state = {
-                        contentIds: ["1", "2"],
-                        contents: {"1": {through: "3"}, "2": {through: "4"}},
-                        applicationStore: {profile: {id: 5}},
-                    }
-                })
-
-                it("followed stream with contents", () => {
-                    state.stream = {name: "followed"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getFollowedStream, {params: {lastId: "4"}}],
-                    )
-                })
-
-                it("public stream with contents", () => {
-                    state.stream = {name: "public"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getPublicStream, {params: {lastId: "4"}}],
-                    )
-                })
-
-                it("tag stream with contents", () => {
-                    state.stream = {name: "tag"}
-                    state.tagName = "eggs"
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getTagStream, {params: {name: "eggs", lastId: "4"}}],
-                    )
-                })
-
-                it("profile all stream with contents", () => {
-                    state.stream = {name: "profile_all"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}}],
-                    )
-                })
-
-                it("profile pinned stream with contents", () => {
-                    state.stream = {name: "profile_pinned"}
-                    actions[streamStoreOperations.loadStream]({dispatch, state})
-                    dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}}],
-                    )
-                })
             })
         })
 

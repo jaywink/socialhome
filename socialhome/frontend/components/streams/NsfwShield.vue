@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
+import imagesLoaded from "vue-images-loaded"
 
 
 export default Vue.component("nsfw-shield", {

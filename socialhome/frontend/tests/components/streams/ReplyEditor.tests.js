@@ -5,7 +5,7 @@ import VueMasonryPlugin from "vue-masonry"
 
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
 import {streamStoreOperations} from "frontend/stores/streamStore.operations"
-import ReplyEditor from "frontend/components/ReplyEditor.vue"
+import ReplyEditor from "frontend/components/streams/ReplyEditor.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)

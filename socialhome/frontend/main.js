@@ -2,15 +2,18 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueInfiniteScroll from "vue-infinite-scroll"
 import VueMasonryPlugin from "vue-masonry"
+import VueRouter from "vue-router"
 import VueSnotify from "vue-snotify"
 
 import Axios from "axios"
 import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
 
+import router from "frontend/routes"
+
 import {newStreamStore, streamStoreOperations} from "frontend/stores/streamStore"
 import applicationStore from "frontend/stores/applicationStore"
 
-import "frontend/components/Stream.vue"
+import "frontend/components/streams/Stream.vue"
 
 // CSS
 import "frontend/main.stylesheet"
@@ -19,6 +22,7 @@ import "frontend/main.stylesheet"
 Vue.use(BootstrapVue)
 Vue.use(VueInfiniteScroll)
 Vue.use(VueMasonryPlugin)
+Vue.use(VueRouter)
 Vue.use(VueSnotify)
 
 Vue.prototype.$http = Axios.create({
@@ -26,13 +30,16 @@ Vue.prototype.$http = Axios.create({
     xsrfHeaderName: "X-CSRFToken",
 })
 
+const store = newStreamStore({
+    modules: {applicationStore},
+    baseURL: "",
+    axios: Vue.prototype.$http,
+})
+
 const main = new Vue({
     el: "#app",
-    store: newStreamStore({
-        modules: {applicationStore},
-        baseURL: "",
-        axios: Vue.prototype.$http,
-    }),
+    store,
+    router,
     methods: {
         onWebsocketMessage(message) {
             const data = JSON.parse(message.data)

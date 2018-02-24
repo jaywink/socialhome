@@ -4,7 +4,8 @@
 
 <script>
 import Vue from "vue"
-import "frontend/components/stamped_elements/BaseStampedElement.vue"
+
+import "frontend/components/streams/stamped_elements/BaseStampedElement.vue"
 
 
 export default Vue.component("public-stamped-element", {

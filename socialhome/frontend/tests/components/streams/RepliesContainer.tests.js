@@ -6,8 +6,7 @@ import VueMasonryPlugin from "vue-masonry"
 import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
 import {streamStoreOperations} from "frontend/stores/streamStore.operations"
-import RepliesContainer from "frontend/components/RepliesContainer.vue"
-import StreamElement from "frontend/components/StreamElement.vue"
+import RepliesContainer from "frontend/components/streams/RepliesContainer.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
