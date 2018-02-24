@@ -22,6 +22,10 @@ Changed
 
 * Start sending profile changes to remote nodes as public messages for better efficiency
 
+* Start sending federation payloads in new format (`federation #59 <https://github.com/jaywink/federation/issues/59>`_)
+
+  This could drop federation compatibility with some really old servers in the fediverse, but adds compatibility to for example GangGo which is now able to receive Socialhome content.
+
 Fixed
 .....
 
