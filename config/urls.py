@@ -24,7 +24,7 @@ js_translations = {
 # NOTE! If changing or adding API urls, don't forget to update the JS tests URL config fixtures as follows:
 #
 #    python manage.py collectstatic_js_reverse
-#    mv staticfiles/django_js_reverse/js/reverse.js socialhome/streams/app/tests/fixtures/Url.js
+#    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/fixtures/Url.js
 #
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)

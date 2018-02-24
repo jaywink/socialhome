@@ -4,10 +4,10 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
-import {getStore} from "streams/app/tests/fixtures/store.fixtures"
-import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
-import StreamElement from "streams/app/components/StreamElement.vue"
+import {getStore} from "frontend/tests/fixtures/store.fixtures"
+import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
+import {streamStoreOperations} from "frontend/stores/streamStore.operations"
+import StreamElement from "frontend/components/StreamElement.vue"
 
 
 Vue.use(BootstrapVue)

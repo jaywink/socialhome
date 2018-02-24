@@ -5,8 +5,8 @@
     "build": "./node_modules/grunt/bin/grunt build && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.prod.js",
     "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.dev.js",
     "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch --config config/webpack/webpack.dev.js",
-    "test": "./node_modules/.bin/mocha-webpack --opts mocha/mocha.opts test socialhome/**/app/tests/**/*.tests.js",
-    "lint": "./node_modules/.bin/eslint socialhome/streams/app/ --ext vue,js"
+    "test": "./node_modules/.bin/mocha-webpack --opts mocha/mocha.opts test socialhome/frontend/**/tests/**/*.tests.js",
+    "lint": "./node_modules/.bin/eslint socialhome/frontend/ --ext vue,js"
   },
   "devDependencies": {
     "autoprefixer-core": "~6.0.1",

@@ -43,7 +43,7 @@
 <script>
 import Vue from "vue"
 
-import "streams/app/components/RepliesContainer.vue"
+import "frontend/components/RepliesContainer.vue"
 
 
 export default Vue.component("reactions-bar", {

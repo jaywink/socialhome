@@ -37,14 +37,14 @@ import Vue from "vue"
 
 import VueScrollTo from "vue-scrollto"
 
-import "streams/app/components/StreamElement.vue"
-import PublicStampedElement from "streams/app/components/stamped_elements/PublicStampedElement.vue"
-import FollowedStampedElement from "streams/app/components/stamped_elements/FollowedStampedElement.vue"
-import TagStampedElement from "streams/app/components/stamped_elements/TagStampedElement.vue"
-import ProfileStampedElement from "streams/app/components/stamped_elements/ProfileStampedElement.vue"
-import "streams/app/components/LoadingElement.vue"
+import "frontend/components/StreamElement.vue"
+import PublicStampedElement from "frontend/components/stamped_elements/PublicStampedElement.vue"
+import FollowedStampedElement from "frontend/components/stamped_elements/FollowedStampedElement.vue"
+import TagStampedElement from "frontend/components/stamped_elements/TagStampedElement.vue"
+import ProfileStampedElement from "frontend/components/stamped_elements/ProfileStampedElement.vue"
+import "frontend/components/LoadingElement.vue"
 
-import {streamStoreOperations} from "streams/app/stores/streamStore"
+import {streamStoreOperations} from "frontend/stores/streamStore"
 
 
 Vue.use(VueScrollTo)

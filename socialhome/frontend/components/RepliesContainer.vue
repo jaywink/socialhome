@@ -30,8 +30,8 @@
 import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
 
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations";
-import "streams/app/components/ReplyEditor.vue"
+import {streamStoreOperations} from "frontend/stores/streamStore.operations";
+import "frontend/components/ReplyEditor.vue"
 
 
 export default Vue.component("replies-container", {

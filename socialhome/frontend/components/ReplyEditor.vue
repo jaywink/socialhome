@@ -21,7 +21,7 @@
 <script>
 import Vue from "vue"
 
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations";
+import {streamStoreOperations} from "frontend/stores/streamStore.operations";
 
 
 export default Vue.component("reply-editor", {

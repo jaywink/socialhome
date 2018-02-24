@@ -7,13 +7,13 @@ import VueSnotify from "vue-snotify"
 import Axios from "axios"
 import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
 
-import {newStreamStore, streamStoreOperations} from "streams/app/stores/streamStore"
-import applicationStore from "streams/app/stores/applicationStore"
+import {newStreamStore, streamStoreOperations} from "frontend/stores/streamStore"
+import applicationStore from "frontend/stores/applicationStore"
 
-import "streams/app/components/Stream.vue"
+import "frontend/components/Stream.vue"
 
 // CSS
-import "streams/app/main.stylesheet"
+import "frontend/main.stylesheet"
 
 
 Vue.use(BootstrapVue)

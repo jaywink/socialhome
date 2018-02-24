@@ -3,11 +3,11 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
-import {getFakeContent} from "streams/app/tests/fixtures/jsonContext.fixtures"
-import {getStore} from "streams/app/tests/fixtures/store.fixtures"
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
-import RepliesContainer from "streams/app/components/RepliesContainer.vue"
-import StreamElement from "streams/app/components/StreamElement.vue"
+import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
+import {getStore} from "frontend/tests/fixtures/store.fixtures"
+import {streamStoreOperations} from "frontend/stores/streamStore.operations"
+import RepliesContainer from "frontend/components/RepliesContainer.vue"
+import StreamElement from "frontend/components/StreamElement.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)

@@ -3,10 +3,10 @@ import Vue from "vue"
 import VueMasonryPlugin from "vue-masonry"
 import {mount} from "avoriaz"
 
-import AuthorBar from "streams/app/components/AuthorBar.vue"
-import {getContext, getFakeContent, getFakeAuthor} from "streams/app/tests/fixtures/jsonContext.fixtures"
-import {newApplicationStore} from "streams/app/stores/applicationStore"
-import {newStreamStore} from "streams/app/stores/streamStore"
+import AuthorBar from "frontend/components/AuthorBar.vue"
+import {getContext, getFakeContent, getFakeAuthor} from "frontend/tests/fixtures/jsonContext.fixtures"
+import {newApplicationStore} from "frontend/stores/applicationStore"
+import {newStreamStore} from "frontend/stores/streamStore"
 
 
 Vue.use(BootstrapVue)

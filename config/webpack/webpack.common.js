@@ -2,12 +2,10 @@ const path = require("path")
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 module.exports = {
-    entry: {
-        stream: path.resolve(__dirname, "../../socialhome/streams/app/main.js"),
-    },
+    entry: path.resolve(__dirname, "../../socialhome/frontend/main.js"),
     output: {
         path: path.resolve(__dirname, "../../socialhome/static"),
-        filename: "js/webpack.[name].js",
+        filename: "js/webpack.bundle.js",
     },
     module: {
         loaders: [
@@ -51,7 +49,7 @@ module.exports = {
         ],
     },
     plugins: [
-        new ExtractTextPlugin("css/webpack.[name].css"),
+        new ExtractTextPlugin("css/webpack.bundle.css"),
     ],
     resolve: {
         modules: [

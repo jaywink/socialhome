@@ -3,9 +3,9 @@ import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
-import {getStore} from "streams/app/tests/fixtures/store.fixtures"
-import {streamStoreOperations} from "streams/app/stores/streamStore.operations"
-import ReplyEditor from "streams/app/components/ReplyEditor.vue"
+import {getStore} from "frontend/tests/fixtures/store.fixtures"
+import {streamStoreOperations} from "frontend/stores/streamStore.operations"
+import ReplyEditor from "frontend/components/ReplyEditor.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
