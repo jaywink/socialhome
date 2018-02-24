@@ -25,9 +25,13 @@ Changed
 Fixed
 .....
 
-* Fix precalculated streams maintenance job.
+* Fix precalculated streams maintenance job. (`#436 <https://github.com/jaywink/socialhome/issues/436>`_)
 
   Due to mistake in regexp not all old precalculated stream items were pruned in maintenance. Now fixed which should ensure Redis memory usage does not suffer from unreasonable increase over time.
+
+* Fix profile discovery from current stable Diaspora (`#413 <https://github.com/jaywink/socialhome/issues/413>`_)
+
+  A bug in Diaspora caused Socialhome profile discovery to fail. Introduce some patches to our webfinger to work around the bug and make profiles available to latest Diaspora versions.
 
 0.7.0 (2018-02-04)
 ------------------
