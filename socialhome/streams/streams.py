@@ -210,12 +210,36 @@ class BaseStream:
 
     @cached_property
     def key(self):
+        """
+        Get stream instance key.
+
+        Format: ``<keybase>:<streamtype>:<keyextra>:<user_id>|anonymous``
+
+        :return: str
+        """
         parts = self.key_base + [self.stream_type.value]
         if self.key_extra:
             parts.append(self.key_extra)
         if isinstance(self.user, AnonymousUser):
             return ":".join(parts + ["anonymous"])
         return ":".join(parts + [str(self.user.id)])
+
+    @staticmethod
+    def get_key_user_id(key):
+        """
+        Return the key user ID part.
+
+        This is always the last item in the key parts.
+
+        :return: int or None if anonymous user key
+        """
+        value = key
+        if value.endswith(':throughs'):
+            value = value[:-9]
+        user_id = value.split(':')[-1]
+        if user_id == 'anonymous':
+            return None
+        return int(user_id)
 
     @property
     def key_extra(self):
