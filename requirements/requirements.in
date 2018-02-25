@@ -3,7 +3,7 @@ asgi_redis
 backports-abc  # Required by circus->tornado IF on python 3.4
 beautifulsoup4
 bleach
-channels
+channels<2.0
 circus
 CommonMark
 django-allauth
@@ -26,7 +26,7 @@ django-secure
 django-settings-export
 django-tables2
 django-versatileimagefield
-django==1.11.9
+django<2.0
 djangorestframework
 ipython
 lxml
