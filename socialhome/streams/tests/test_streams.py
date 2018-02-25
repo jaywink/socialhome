@@ -280,6 +280,14 @@ class TestBaseStream(SocialhomeTestCase):
             stream.get_content_ids()
             self.assertEqual(mock_queryset.call_count, 0)
 
+    def test_get_key_user_id(self, mock_queryset):
+        self.assertEqual(BaseStream.get_key_user_id("spam:eggs:1"), 1)
+        self.assertEqual(BaseStream.get_key_user_id("spam:eggs:1:throughs"), 1)
+        self.assertEqual(BaseStream.get_key_user_id("spam:eggs:1:2"), 2)
+        self.assertEqual(BaseStream.get_key_user_id("spam:eggs:1:2:throughs"), 2)
+        self.assertIsNone(BaseStream.get_key_user_id("spam:eggs:anonymous"))
+        self.assertIsNone(BaseStream.get_key_user_id("spam:eggs:anonymous:throughs"))
+
     def test_init(self, mock_queryset):
         stream = BaseStream(last_id=333, user="user")
         self.assertEqual(stream.last_id, 333)

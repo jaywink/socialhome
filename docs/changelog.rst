@@ -13,6 +13,17 @@ Added
 
   This allows better profile discovery by remote non-Socialhome servers.
 
+* Added better streams precache maintenance in regards to inactive users (`#436 <https://github.com/jaywink/socialhome/issues/436>`_)
+
+  Two new settings have been added:
+
+  * ``SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS`` (default 90)
+  * ``SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE`` (default 0)
+
+  If a user has been more than the set days without logging in, when trimming the precaches for that user, the inactive setting will be used instead. By default this means that precaches for users that haven't logged in for 90 days are removed. This is done to ensure Redis memory usage is predictable and stable in relation to active users.
+
+  Users who have been inactive for longer than the X days will still get their stream content normally but instead of getting a fast stream render from the cache, the items will be calculated using databse queries, which produces a slower stream load experience.
+
 Changed
 .......
 
@@ -29,9 +40,9 @@ Changed
 Fixed
 .....
 
-* Fix precalculated streams maintenance job. (`#436 <https://github.com/jaywink/socialhome/issues/436>`_)
+* Fix precached streams maintenance job. (`#436 <https://github.com/jaywink/socialhome/issues/436>`_)
 
-  Due to mistake in regexp not all old precalculated stream items were pruned in maintenance. Now fixed which should ensure Redis memory usage does not suffer from unreasonable increase over time.
+  Due to mistake in regexp not all old precached stream items were pruned in maintenance. Now fixed which should ensure Redis memory usage does not suffer from unreasonable increase over time.
 
 * Fix profile discovery from current stable Diaspora (`#413 <https://github.com/jaywink/socialhome/issues/413>`_)
 

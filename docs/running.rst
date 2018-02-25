@@ -302,7 +302,23 @@ SOCIALHOME_STREAMS_PRECACHE_SIZE
 
 Default: ``100``
 
-Amount of items to store in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting. See :ref:`precaching`.
+Amount of items to keep in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting. See :ref:`precaching`.
+
+Note the amount actually stored can temporarily go over the limit. Cache trimming is done as a daily job, not every time a new item needs to be added to the cache.
+
+SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS
+.........................................
+
+Default: ``90``
+
+Amount of days since user has logged in to be considered inactive for streams precaching. See notes about ``SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE`'.
+
+SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE
+.........................................
+
+Default: ``0``
+
+Amount of items to keep in stream precaches, per user, per stream, for inactive and anonymous users. By default maintenance will always clear the cache for inactive and anonymous users daily. See notes about ``SOCIALHOME_STREAMS_PRECACHE_SIZE`'.
 
 SOCIALHOME_SYSLOG_FACILITY
 ..........................
