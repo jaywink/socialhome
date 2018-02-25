@@ -106,7 +106,7 @@ def fetch_oembed_preview(content, urls):
         if url.startswith("https://twitter.com/"):
             # This probably has little effect since we fetch these on the backend...
             # But, DNT is always good to communicate if possible :)
-            options = {"dnt": "true"}
+            options = {"dnt": "true", "omit_script": "true"}
         try:
             oembed = PyEmbed(discoverer=OEmbedDiscoverer()).embed(url, **options)
         except (PyEmbedError, PyEmbedDiscoveryError, PyEmbedConsumerError, ValueError):
