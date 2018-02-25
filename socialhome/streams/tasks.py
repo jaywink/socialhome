@@ -32,7 +32,8 @@ def get_precache_trim_size(user_activities, key):
     except User.DoesNotExist:
         # Trim all
         return 0
-    user_active = user.last_login >= now() - timedelta(days=settings.SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS)
+    check_time = user.last_login if user.last_login else user.date_joined
+    user_active = check_time >= now() - timedelta(days=settings.SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS)
     user_activities[user_id] = user_active
     # Trim according to activity
     return (
