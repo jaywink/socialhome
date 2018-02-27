@@ -1,4 +1,5 @@
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
 
 from socialhome.models import ImageUpload
 from socialhome.tests.utils import SocialhomeAPITestCase
@@ -25,3 +26,40 @@ class TestImageUploadView(SocialhomeAPITestCase):
         self.assertIn("http://127.0.0.1:8000/media/uploads/", url)
         image_upload = ImageUpload.objects.filter(user=self.user).first()
         self.assertEqual(image_upload.image.name, url.replace("http://127.0.0.1:8000/media/", ""))
+
+
+class TestObtainSocialhomeAuthToken(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_user_missing(self):
+        response = self.post(reverse("api-token-auth"))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["username"], ["This field is required."])
+
+    def test_password_missing(self):
+        response = self.post(reverse("api-token-auth"))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["password"], ["This field is required."])
+
+    def test_unable_to_login(self):
+        response = self.post(reverse("api-token-auth"),
+                             data={"username": self.user.username, "password": "lol"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'non_field_errors': ['Unable to log in with provided credentials.']})
+
+    def test_authentication(self):
+        response = self.post(reverse("api-token-auth"),
+                             data={"username": self.user.username, "password": "password"})
+        self.assertEqual(response.data,
+                         {"guid": self.user.profile.guid,
+                          "handle": self.user.profile.handle,
+                          "home_url": self.user.profile.home_url,
+                          "id": self.user.profile.id,
+                          "image_url_small": self.user.profile.safer_image_url_small,
+                          "is_local": self.user.profile.is_local,
+                          "name": self.user.profile.name,
+                          "url": self.user.profile.url,
+                          "token": Token.objects.get(user=self.user).key})

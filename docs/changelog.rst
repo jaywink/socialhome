@@ -443,6 +443,7 @@ Changed
 
 * Create and update content will now redirect to the content created or updated. Previous behaviour was user preferred landing page.
 * Delete content will now redirect back to the page where the delete was triggered from. Previous behaviour was user preferred landing page. If the content delete is triggered from the content detail page, redirect will happen to user preferred landing page as before. (`#204 <https://github.com/jaywink/socialhome/issues/204>`_)
+* ``/api-token-auth/`` endpoint now returns limited profile information in addition to token
 
 Fixed
 .....

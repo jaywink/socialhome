@@ -31,11 +31,21 @@ API authentication can happen by setting the required HTTP header as follows:
 
     Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 
-Your client can obtain a token for the user by posting ``username`` and ``password`` as form data or JSON to the view ``/api-token-auth/``. This will return a token as follows:
+Your client can obtain a token for the user by posting ``username`` and ``password`` as form data or JSON to the view ``/api-token-auth/``. This will return a token and limited user profile informations as follows:
 
 ::
 
-    { 'token' : '9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' }
+    {
+      "url": "http://127.0.0.1:8000/p/68f61327-1305-4354-b56c-6549d196a325/",
+      "image_url_small": "http://127.0.0.1:8000/static/images/pony50.png",
+      "guid": "68f61327-1305-4354-b56c-6549d196a325",
+      "is_local": true,
+      "handle": "user-0@127.0.0.1:8000",
+      "home_url": "http://127.0.0.1:8000/p/68f61327-1305-4354-b56c-6549d196a325/",
+      "name": "",
+      "token": "2a37e74f235b044b275141b2d4605ca900617d13",
+      "id": 1
+    }
 
 Users can also retrieve and regenerate tokens from the UI from their profile menu.
 
