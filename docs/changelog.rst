@@ -54,6 +54,10 @@ Fixed
 
 * Fix receiving public content from GangGo (`federation #115 <https://github.com/jaywink/federation/issues/115>`_)
 
+* Fix various errors in search for remote profiles
+
+  For example GNU Social implements webfinger but the necessary attributes we need are not present and were causing errors.
+
 0.7.0 (2018-02-04)
 ------------------
 
