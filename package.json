@@ -5,7 +5,7 @@
     "build": "./node_modules/grunt/bin/grunt build && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.prod.js",
     "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.dev.js",
     "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch --config config/webpack/webpack.dev.js",
-    "test": "./node_modules/.bin/mocha-webpack --opts mocha/mocha.opts test socialhome/frontend/**/tests/**/*.tests.js",
+    "test": "./node_modules/.bin/mocha-webpack --opts config/mocha/mocha.opts test socialhome/frontend/**/tests/**/*.tests.js",
     "lint": "./node_modules/.bin/eslint socialhome/frontend/ --ext vue,js"
   },
   "devDependencies": {
@@ -26,12 +26,10 @@
     "extract-text-webpack-plugin": "2.1.2",
     "faker": "^4.1.0",
     "grunt": "~1.0.1",
-    "grunt-bg-shell": "~2.3.3",
     "grunt-cli": "~1.2.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-watch": "~1.0.0",
-    "grunt-mocha": "^1.0.2",
     "grunt-postcss": "~0.8.0",
     "grunt-sass": "~2.0.0",
     "jsdom": "^11.1.0",

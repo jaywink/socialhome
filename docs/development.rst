@@ -130,19 +130,7 @@ Python tests
 JavaScript tests
 ................
 
-Legacy frontend
-'''''''''''''''
-
-This will launch a separate ``runserver`` on port 8181 and execute the tests against that. The separate ``runserver`` instance will be killed after the tests have been executed.
-
-::
-
-    grunt test
-
-New Vue based frontend
-''''''''''''''''''''''
-
-Execute the following to run the new frontend JavaScript tests.
+Execute the following to run the frontend JavaScript tests.
 
 ::
 

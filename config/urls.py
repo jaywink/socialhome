@@ -99,11 +99,6 @@ if settings.DEBUG:
             url(r"^__debug__/", include(debug_toolbar.urls)),
         ]
 
-if settings.MOCHA_TESTS:
-    urlpatterns += [
-        url(r"mocha/", include("mocha.urls")),
-    ]
-
 if settings.SOCIALHOME_ADDITIONAL_APPS_URLS:
     url_prefix, url_path = settings.SOCIALHOME_ADDITIONAL_APPS_URLS.split(',')
     urlpatterns += [
