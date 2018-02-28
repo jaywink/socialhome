@@ -342,10 +342,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-# MOCHA
-# -----
-MOCHA_TESTS = False
-
 # MARKDOWN
 # --------
 MARKDOWNX_MARKDOWNIFY_FUNCTION = "CommonMark.commonmark"

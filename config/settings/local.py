@@ -72,14 +72,6 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
 # ------------------------------------------------------------------------------
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
-# Mocha JS testing
-# ------------------------------------------------------------------------------
-MOCHA_TESTS = env.bool("MOCHA_TESTS", default=False)
-if MOCHA_TESTS:
-    INSTALLED_APPS += ("mocha",)
-    MIDDLEWARE_CLASSES += ("whitenoise.middleware.WhiteNoiseMiddleware",)
-    MOCHA_RUNSERVER_PORT = env.int("MOCHA_RUNSERVER_PORT", default=8000)
-
 # RQ
 # --
 RQ_QUEUES["default"]["ASYNC"] = False

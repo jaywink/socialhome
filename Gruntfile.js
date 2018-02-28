@@ -21,8 +21,6 @@ module.exports = function (grunt) {
             fonts: this.app + '/static/fonts',
             images: this.app + '/static/images',
             js: this.app + '/static/js',
-            mocha: this.app + '/static/mocha',
-            manageScript: 'manage.py',
             bower: "bower_components",
             node: "node_modules",
         }
@@ -174,91 +172,8 @@ module.exports = function (grunt) {
                 src: ['<%= paths.bower %>/fontawesome/fonts/*'],
                 dest: '<%= paths.fonts %>'
             },
-            mocha: {
-                expand: true,
-                flatten: true,
-                src: [
-                    "<%= paths.node %>/mocha/mocha.js",
-                    "<%= paths.node %>/mocha/mocha.css",
-                    "<%= paths.node %>/chai/chai.js",
-                    "<%= paths.bower %>/mock-socket/dist/mock-socket.js",
-                ],
-                dest: "<%= paths.mocha %>/",
-            },
-            sinon: {
-                src: "<%= paths.bower %>/sinon/index.js",
-                dest: "<%= paths.mocha %>/sinon.js",
-            },
-        },
-
-        // see: https://npmjs.org/package/grunt-bg-shell
-        bgShell: {
-            _defaults: {
-                bg: true,
-            },
-            runDjango: {
-                cmd: 'python <%= paths.manageScript %> runserver',
-            },
-            runDjangoTest: {
-                cmd: 'MOCHA_RUNSERVER_PORT=8181 python <%= paths.manageScript %> runserver 8181',
-            },
-            killDjangoTest: {
-                cmd: 'kill `pgrep -f "runserver 8181"`',
-            },
-            sleep: {
-                cmd: 'sleep 5',
-                bg: false,
-            },
-        },
-        mocha: {
-            'socialhome.streams': {
-                options: {
-                    urls: ['http://127.0.0.1:8181/mocha/streams/'],
-                    run: true,
-                    logErrors: true,
-                    log: true,
-                    reporter: "nyan",
-                }
-            },
-            'socialhome.content': {
-                options: {
-                    urls: ['http://127.0.0.1:8181/mocha/content/'],
-                    run: true,
-                    logErrors: true,
-                    log: true,
-                    reporter: "nyan",
-                }
-            },
         },
     });
-
-    // Tip from http://stackoverflow.com/a/19673597/1489738
-    var previous_force_state = grunt.option("force");
-    grunt.registerTask("force", function(set) {
-        if (set === "on") {
-            grunt.option("force", true);
-        }
-        else if (set === "off") {
-            grunt.option("force", false);
-        }
-        else if (set === "restore") {
-            grunt.option("force", previous_force_state);
-        }
-    });
-
-    grunt.registerTask('test', [
-        'bgShell:runDjangoTest',
-        'bgShell:sleep',
-        'force:on',
-        'mocha',
-        'force:off',
-        'bgShell:killDjangoTest',
-    ]);
-
-    grunt.registerTask('serve', [
-        'bgShell:runDjango',
-        'watch'
-    ]);
 
     grunt.registerTask('build', [
         'sass:dist',
@@ -276,6 +191,4 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'dev'
     ]);
-
-    grunt.loadNpmTasks('grunt-mocha');
 };
