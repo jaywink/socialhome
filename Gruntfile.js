@@ -116,7 +116,6 @@ module.exports = function (grunt) {
                     "<%= paths.js %>/contacts.js",
                     "<%= paths.js %>/content.js",
                     "<%= paths.js %>/grids.js",
-                    "<%= paths.js %>/streams.js",
                     "<%= paths.js %>/publisher.js",
                     "<%= paths.js %>/search.js",
                 ],
