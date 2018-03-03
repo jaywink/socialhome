@@ -83,6 +83,35 @@ There are two main logs where Socialhome sends information during runtime.
 
   See :ref:`config-log-target` configuration value. This log contains logging entries from the application itself. Useful for debugging federation issues or other problems with the actual code.
 
+.. _delete-user-or-profile:
+
+Deleting users and locking remote profiles
+------------------------------------------
+
+Currently users cannot delete their own account (coming soon, sorry!). Thus to delete users and their content, a Django management command has been provided. This command can also be used to delete local content of remote profiles and optionally lock the profile so any new content is rejected. This makes it possible to lock out spam accounts for example. For locally created content, an automatic retraction will be sent to remotes.
+
+NOTE! Any deletion is **permanent**. There is no possibility to get the data back, except by restoring database and uploaded file backups. Be sure before using the command and be extra sure about the GUID's passed in!
+
+To delete a local user, run the command as follows:
+
+::
+
+   python manage.py delete_users_and_profiles --users <guid>
+
+To delete a remote profile, run the command as follows:
+
+::
+
+   python manage.py delete_users_and_profiles --profiles <guid>
+
+To only delete remote profile content and then lock the profile, run as follows:
+
+::
+
+   python manage.py delete_users_and_profiles --profiles <guid> --lock-remote-profiles
+
+Multiple ``guid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
+
 Configuration
 -------------
 
@@ -311,14 +340,14 @@ SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS
 
 Default: ``90``
 
-Amount of days since user has logged in to be considered inactive for streams precaching. See notes about ``SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE`'.
+Amount of days since user has logged in to be considered inactive for streams precaching. See notes about ``SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE``.
 
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE
 .........................................
 
 Default: ``0``
 
-Amount of items to keep in stream precaches, per user, per stream, for inactive and anonymous users. By default maintenance will always clear the cache for inactive and anonymous users daily. See notes about ``SOCIALHOME_STREAMS_PRECACHE_SIZE`'.
+Amount of items to keep in stream precaches, per user, per stream, for inactive and anonymous users. By default maintenance will always clear the cache for inactive and anonymous users daily. See notes about ``SOCIALHOME_STREAMS_PRECACHE_SIZE``.
 
 SOCIALHOME_SYSLOG_FACILITY
 ..........................

@@ -24,6 +24,10 @@ Added
 
   Users who have been inactive for longer than the X days will still get their stream content normally but instead of getting a fast stream render from the cache, the items will be calculated using databse queries, which produces a slower stream load experience.
 
+* Added management command to delete local users and remote profiles
+
+  This allows removing users who want their account to be deleted (coming to UI soon, sorry) and also deleting content and locking remote spam accounts. See `documentation <https://socialhome.readthedocs.io/en/latest/running.html>`_ for details.
+
 Changed
 .......
 
