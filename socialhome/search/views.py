@@ -1,3 +1,5 @@
+import xml
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.shortcuts import redirect
@@ -40,7 +42,11 @@ class GlobalSearchView(SearchView):
                 profile = Profile.objects.visible_for_user(request.user).get(handle=q)
             except Profile.DoesNotExist:
                 # Try a remote search
-                remote_profile = retrieve_remote_profile(q)
+                try:
+                    remote_profile = retrieve_remote_profile(q)
+                except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
+                    # Catch various errors parsing the remote profile
+                    return super().get(request, *args, **kwargs)
                 if remote_profile:
                     profile = Profile.from_remote_profile(remote_profile)
             if profile:
