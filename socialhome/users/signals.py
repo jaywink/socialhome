@@ -61,6 +61,6 @@ def profile_post_save(instance, **kwargs):
 def federate_profile(profile):
     """Send out local profiles to the federation layer."""
     try:
-        django_rq.enqueue(send_profile, profile.id)
+        transaction.on_commit(lambda: django_rq.enqueue(send_profile, profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
