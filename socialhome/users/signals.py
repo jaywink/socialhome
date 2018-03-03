@@ -4,7 +4,7 @@ import django_rq
 import logging
 from django.conf import settings
 from django.db import transaction
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.dispatch import receiver
 
 from socialhome.federate.tasks import send_follow_change, send_profile
@@ -64,3 +64,19 @@ def federate_profile(profile):
         transaction.on_commit(lambda: django_rq.enqueue(send_profile, profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
+
+
+@receiver(post_delete, sender=User, dispatch_uid='delete_user_pictures')
+def delete_user_pictures(sender, instance, **kwargs):
+    """
+    Deletes all user picture copies from disk.
+    """
+    if instance.picture:
+        try:
+            logger.debug('delete_user_pictures: Deleting user pictures for %s', instance)
+            # Deletes Image Renditions
+            instance.picture.delete_all_created_images()
+            # Deletes Original Image
+            instance.picture.delete(save=False)
+        except Exception:
+            logger.exception('delet_user_pictures: Failed to delete %s user pictures from disk', instance)
