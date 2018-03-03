@@ -34,8 +34,6 @@ def user_post_save(sender, **kwargs):
 
 
 def on_commit_profile_following_change(action, pks, instance):
-    logger.debug("on_commit_profile_following_change - Commit happened!")
-    logger.debug("on_commit_profile_following_change - pk_set %s", pks)
     for id in pks:
         # Send out on the federation layer if local follower, remote followed/unfollowed
         if Profile.objects.filter(id=id, user__isnull=True).exists() and instance.user:
@@ -50,11 +48,7 @@ def on_commit_profile_following_change(action, pks, instance):
 @receiver(m2m_changed, sender=Profile.following.through)
 def profile_following_change(sender, instance, action, pk_set, **kwargs):
     """Deliver notification on new followers."""
-    logger.debug("profile_following_change - sender %s, instance %s, action %s, pk_set %s, kwargs: %s",
-                 sender, instance, action, pk_set, kwargs)
     if action in ["post_add", "post_remove"]:
-        logger.debug("profile_following_change - Got %s from %s for %s", action, sender, instance)
-        logger.debug("profile_following_change - pk_set %s", pk_set)
         transaction.on_commit(lambda: on_commit_profile_following_change(action, pk_set, instance))
 
 
