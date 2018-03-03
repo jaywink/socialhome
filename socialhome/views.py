@@ -1,3 +1,5 @@
+import coreapi
+import coreschema
 from importlib import import_module
 
 from braces.views import LoginRequiredMixin
@@ -8,6 +10,8 @@ from markdownx.views import ImageUploadView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework.schemas import AutoSchema
+from rest_framework.views import APIView
 
 from socialhome.forms import MarkdownXImageForm
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
@@ -55,7 +59,15 @@ class MarkdownXImageUploadView(LoginRequiredMixin, ImageUploadView):
         return kwargs
 
 
-class ObtainSocialhomeAuthToken(ObtainAuthToken):
+class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
+    # Documenting the API
+    schema = AutoSchema(manual_fields=[
+        coreapi.Field("username", description="User's username", required=True, location="form",
+                      schema=coreschema.String()),
+        coreapi.Field("password", description="User's password", required=True, location="form",
+                      schema=coreschema.String()),
+    ])
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
@@ -63,5 +75,4 @@ class ObtainSocialhomeAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         data = LimitedProfileSerializer(user.profile, context={"request": self.request}).data
         data.update({"token": token.key})
-        print(data)
         return Response(data)
