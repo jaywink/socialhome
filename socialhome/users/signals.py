@@ -4,10 +4,10 @@ import django_rq
 import logging
 from django.conf import settings
 from django.db import transaction
-from django.db.models.signals import post_save, m2m_changed, post_delete
+from django.db.models.signals import post_save, m2m_changed, post_delete, pre_delete
 from django.dispatch import receiver
 
-from socialhome.federate.tasks import send_follow_change, send_profile
+from socialhome.federate.tasks import send_follow_change, send_profile, send_profile_retraction
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.users.models import User, Profile
 
@@ -64,6 +64,18 @@ def federate_profile(profile):
         transaction.on_commit(lambda: django_rq.enqueue(send_profile, profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
+
+
+@receiver(pre_delete, sender=Profile)
+def federate_profile_retraction(instance, **kwargs):
+    """Send out local profile retractions to the federation layer."""
+    if instance.is_local:
+        logger.debug('federate_profile_retraction: Got local profile %s delete, sending out retraction', instance)
+        try:
+            # Don't enqueue, we must complete this before doing the delete
+            send_profile_retraction(instance)
+        except Exception as ex:
+            logger.exception("Failed to federate_profile_retraction %s: %s", instance, ex)
 
 
 @receiver(post_delete, sender=User, dispatch_uid='delete_user_pictures')

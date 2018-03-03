@@ -327,21 +327,30 @@ def make_federable_content(content):
     return _make_post(content)
 
 
-def make_federable_retraction(content, author):
-    """Make Content retraction federable by converting it to a federation entity."""
-    logger.info("make_federable_retraction - Content: %s", content)
+def make_federable_retraction(obj, author=None):
+    """Make object retraction federable by converting it to a federation entity."""
+    logger.info("make_federable_retraction - Object: %s", obj)
     try:
-        entity_type = "Comment" if content.content_type == ContentType.REPLY else \
-            "Share" if content.content_type == ContentType.SHARE else "Post"
+        if isinstance(obj, Content):
+            entity_type = {
+                ContentType.REPLY: "Comment",
+                ContentType.SHARE: "Share",
+                ContentType.CONTENT: "Post",
+            }.get(obj.content_type)
+            handle = author.handle
+        elif isinstance(obj, Profile):
+            entity_type = "Profile"
+            handle = obj.handle
+        else:
+            logger.warning("make_federable_retraction - Unknown object type %s", obj)
+            return
         return base.Retraction(
-            # TODO check share federation
             entity_type=entity_type,
-            handle=author.handle,
-            target_guid=content.guid,
+            handle=handle,
+            target_guid=obj.guid,
         )
     except Exception as ex:
-        logger.exception("make_federable_retraction - Failed to convert %s: %s", content.guid, ex)
-        return None
+        logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.guid, ex)
 
 
 def make_federable_profile(profile):

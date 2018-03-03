@@ -162,7 +162,7 @@ def send_share(content_id):
 
 
 def send_content_retraction(content, author_id):
-    """Handle sending of retractions.
+    """Handle sending of retractions for content.
 
     Currently only for public content.
     """
@@ -180,6 +180,30 @@ def send_content_retraction(content, author_id):
         handle_send(entity, author, recipients)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
+
+
+def send_profile_retraction(profile):
+    """Handle sending of retractions for profiles.
+
+    Only sent for public profiles. Reason: we might actually leak user information
+    outside for profiles which were never federated outside if we send for example
+    SELF or SITE profile retractions.
+
+    This must be called as a pre_delete signal or it will fail.
+    """
+    if not profile.visibility == Visibility.PUBLIC or not profile.is_local:
+        return
+    entity = make_federable_retraction(profile)
+    if entity:
+        if settings.DEBUG:
+            # Don't send in development mode
+            return
+        recipients = [settings.SOCIALHOME_RELAY_ID]
+        recipients.extend(_get_remote_followers(profile))
+        logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
+        handle_send(entity, profile, recipients)
+    else:
+        logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
 
 def forward_entity(entity, target_content_id):
