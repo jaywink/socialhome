@@ -1,3 +1,5 @@
+import coreapi
+import coreschema
 from importlib import import_module
 
 from braces.views import LoginRequiredMixin
@@ -5,10 +7,16 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from markdownx.views import ImageUploadView
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.schemas import AutoSchema
+from rest_framework.views import APIView
 
 from socialhome.forms import MarkdownXImageForm
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
 from socialhome.users.models import Profile
+from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.views import ProfileDetailView, ProfileAllContentView
 
 
@@ -49,3 +57,22 @@ class MarkdownXImageUploadView(LoginRequiredMixin, ImageUploadView):
         kwargs = super().get_form_kwargs()
         kwargs.update({"user": self.request.user})
         return kwargs
+
+
+class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
+    # Documenting the API
+    schema = AutoSchema(manual_fields=[
+        coreapi.Field("username", description="User's username", required=True, location="form",
+                      schema=coreschema.String()),
+        coreapi.Field("password", description="User's password", required=True, location="form",
+                      schema=coreschema.String()),
+    ])
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        token, created = Token.objects.get_or_create(user=user)
+        data = LimitedProfileSerializer(user.profile, context={"request": self.request}).data
+        data.update({"token": token.key})
+        return Response(data)

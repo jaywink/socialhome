@@ -41,6 +41,8 @@ Changed
 
   Since Vue streams all tweets are initialized programmatically as they are rendered in the stream so we don't need to have the script tag on each oembed separately.
 
+* ``/api-token-auth/`` endpoint now returns limited profile information in addition to token
+
 Fixed
 .....
 

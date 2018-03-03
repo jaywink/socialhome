@@ -4,7 +4,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
 from django.views.i18n import javascript_catalog
-from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
@@ -13,7 +12,7 @@ from django_js_reverse.views import urls_js
 from socialhome.content.views import ContentBookmarkletView
 from socialhome.content.viewsets import ContentViewSet
 from socialhome.viewsets import ImageUploadView
-from socialhome.views import HomeView, MarkdownXImageUploadView
+from socialhome.views import HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 js_translations = {
@@ -74,7 +73,7 @@ urlpatterns = [
     url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
     url(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    url(r"^api-token-auth/", obtain_auth_token),
+    url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
 
     # Preferences
     url(r"^preferences/", include("dynamic_preferences.urls")),
