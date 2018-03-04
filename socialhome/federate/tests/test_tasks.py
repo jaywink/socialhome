@@ -11,10 +11,10 @@ from socialhome.content.tests.factories import ContentFactory, LocalContentFacto
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply, forward_entity, _get_remote_followers,
-    send_follow_change, send_profile, send_share)
+    send_follow_change, send_profile, send_share, send_profile_retraction)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory
 
 
 @pytest.mark.usefixtures("db")
@@ -103,6 +103,38 @@ class TestSendContentRetraction(TestCase):
     def test_content_not_sent_in_debug_mode(self, mock_send):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_send.assert_not_called()
+
+
+@patch("socialhome.federate.tasks.handle_send")
+@patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
+class TestSendProfileRetraction(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.public_user = PublicUserFactory()
+        cls.public_profile = cls.public_user.profile
+        cls.remote_profile = PublicProfileFactory()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+
+    @patch("socialhome.federate.tasks._get_remote_followers", autospec=True)
+    def test_get_remote_followers_is_called(self, mock_followers, mock_make, mock_send):
+        send_profile_retraction(self.public_profile)
+        mock_followers.assert_called_once_with(self.public_profile)
+
+    def test_handle_send_is_called(self, mock_make, mock_send):
+        send_profile_retraction(self.public_profile)
+        mock_send.assert_called_once_with(
+            "entity", self.public_profile, ['diaspora://relay@relay.iliketoast.net/profile/'],
+        )
+
+    def test_non_local_profile_does_not_get_sent(self, mock_make, mock_send):
+        send_profile_retraction(self.remote_profile)
+        self.assertTrue(mock_send.called is False)
+
+    def test_non_public_profile_does_not_get_sent(self, mock_make, mock_send):
+        send_profile_retraction(self.profile)
+        self.assertTrue(mock_send.called is False)
 
 
 class TestSendReply(SocialhomeTestCase):

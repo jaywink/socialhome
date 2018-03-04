@@ -7,4 +7,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         # Import our signals
-        from socialhome.users.signals import user_post_save, profile_following_change, profile_post_save
+        import socialhome.users.signals

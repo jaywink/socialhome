@@ -7,4 +7,4 @@ class ContentConfig(AppConfig):
 
     def ready(self):
         """Import our signals."""
-        from socialhome.content.signals import notify_listeners, send_content, send_content_retraction
+        import socialhome.content.signals

@@ -40,3 +40,15 @@ Welp I found a security issue, shall I just file an issue?
 No, please report security issues directly to the maintainers in private messages. Reporting security issues publicly in the issue tracker would allow other people to use the security issue to their benefit before a fix is released. Reporting security issues to the maintainers in private allows us to fix the issue and roll out a fix hopefully before many users are affected.
 
 Please report security issues directly to the maintainer by email at ``mail@jasonrobinson.me``.
+
+How do I delete my account?
+---------------------------
+
+Currently it is not possible to delete a user account from the user interface. We know! This is absurd and ridiculous. Unfortunately as the software is still in very early stages, it just hasn't been implemented. A delete is coming to the user interface soon, and it will allow permanently deleting not just profile but content, replies and uploaded files.
+
+Please request account deletion from your server administrator for now.
+
+As admin, how do I delete a local user or block a remote spambot?
+-----------------------------------------------------------------
+
+Please see :ref:`delete-user-or-profile` section for instructions.

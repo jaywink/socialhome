@@ -1,4 +1,4 @@
-from unittest.mock import patch, call
+from unittest.mock import patch, call, Mock
 
 from django.conf import settings
 from django.test import TransactionTestCase, override_settings
@@ -6,6 +6,7 @@ from django.test import TransactionTestCase, override_settings
 from socialhome.federate.tasks import send_follow_change, send_profile
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User
+from socialhome.users.signals import delete_user_pictures
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
@@ -75,3 +76,25 @@ class TestFederateProfile(TransactionTestCase):
     def test_local_profile_gets_sent(self, mock_send):
         user = UserFactory()
         mock_send.assert_called_once_with(send_profile, user.profile.id)
+
+
+class TestFederateProfileRetraction(SocialhomeTestCase):
+    @patch("socialhome.users.signals.send_profile_retraction")
+    def test_non_local_profile_does_not_get_sent(self, mock_send):
+        profile = ProfileFactory()
+        profile.delete()
+        self.assertTrue(mock_send.called is False)
+
+    @patch("socialhome.users.signals.send_profile_retraction")
+    def test_local_profile_gets_sent(self, mock_send):
+        user = UserFactory()
+        user.profile.delete()
+        self.assertTrue(mock_send.called is True)
+
+
+class TestDeleteUserPictures(SocialhomeTestCase):
+    def test_user_pictures_are_deleted(self):
+        user = Mock(picture=Mock())
+        delete_user_pictures(User, user)
+        self.assertTrue(user.picture.delete_all_created_images.called is True)
+        self.assertTrue(user.picture.delete.called is True)

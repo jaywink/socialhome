@@ -38,6 +38,7 @@ def content_post_save(instance, **kwargs):
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
     if instance.local:
+        logger.debug('federate_content_retraction: Got local content %s delete, sending out retraction', instance)
         try:
             django_rq.enqueue(send_content_retraction, instance, instance.author_id)
         except Exception as ex:

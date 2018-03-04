@@ -4,7 +4,6 @@ from factory import fuzzy
 from federation.entities import base
 
 from socialhome.enums import Visibility
-from socialhome.users.models import Profile
 
 
 class UserFactory(factory.django.DjangoModelFactory):
