@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
+from django.templatetags.static import static
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 
 from socialhome.content.enums import ContentType
@@ -11,6 +12,7 @@ from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType
+from socialhome.utils import get_full_url
 
 
 class ContentVisibleForUserMixin(UserPassesTestMixin):
@@ -138,7 +140,6 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
 class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
     model = Content
     template_name = "streams/base.html"
-    vue = False
 
     def dispatch(self, request, *args, **kwargs):
         """If share or reply, redirect."""
@@ -162,6 +163,7 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["json_context"] = self.get_json_context()
+        context["meta"] = self.get_page_meta()
         return context
 
     def get_json_context(self):
@@ -170,6 +172,20 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
             "streamName": "%s__%s" % (StreamType.CONTENT.value, self.object.channel_group_name),
             "content": self.get_serialized_content(),
+        }
+
+    def get_page_meta(self):
+        return {
+            "type": "article",
+            # TODO get longer text depending on user agent, for example twitter
+            "title": self.object.short_text,
+            "url": self.object.url,
+            # TODO this could be for example second paragraph found
+            "description": self.object.short_text,
+            # TODO get image from text
+            "image": get_full_url(static("images/logo/Socialhome-dark-300.png")),
+            "author_url": self.object.author.home_url,
+            "author_name": self.object.author.name,
         }
 
     def get_serialized_content(self):

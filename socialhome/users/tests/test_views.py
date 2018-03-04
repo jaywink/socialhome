@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from rest_framework.authtoken.models import Token
@@ -69,6 +70,7 @@ class TestProfileDetailView(SocialhomeTestCase):
 
     def _get_request_view_and_content(self, create_content=True, anonymous_user=False):
         request = self.client.get("/")
+        request.site = get_current_site(request)
         if anonymous_user:
             request.user = AnonymousUser()
             profile = self.profile

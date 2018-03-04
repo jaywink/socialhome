@@ -7,11 +7,24 @@
 
 {% block containertype %}container-fluid{% endblock %}
 
-{% block ogtags %}
-    <meta property="og:title" content="{% block stream_title %}{% endblock %} - {{ request.site.name }}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://{{ request.site.domain }}{{ request.path }}" />
-    <meta property="og:image" content="https://{{ request.site.domain }}{% static "images/logo/Socialhome-dark-300.png" %}" />
+{% block title %}
+    {{ meta.title|addslashes }} - {{ request.site.name|addslashes }}
+{% endblock %}
+
+{% block description %}{{ meta.description|addslashes }}{% endblock %}
+
+{% block pagetags %}
+    <meta property="og:title" content="{{ meta.title|addslashes }} - {{ request.site.name|addslashes }}" />
+    <meta property="og:type" content="{{ meta.type }}" />
+    <meta property="og:url" content="{{ meta.url }}" />
+    <meta property="og:image" content="{{ meta.image }}" />
+    <meta property="og:description" content="{{ meta.description|addslashes }}" />
+    {% if meta.author_url %}
+        <link rel="me" href="{{ meta.author_url }}" type="text/html">
+    {% endif %}
+    {% if meta.author_name %}
+        <meta property="article:author" content="{{ meta.author_name }}">
+    {% endif %}
 {% endblock %}
 
 {% block content %}
