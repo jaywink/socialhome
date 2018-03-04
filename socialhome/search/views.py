@@ -1,11 +1,15 @@
 import xml
 
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from federation.fetchers import retrieve_remote_profile
 from haystack.generic_views import SearchView
+from whoosh.query import QueryError
 
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
@@ -51,7 +55,13 @@ class GlobalSearchView(SearchView):
                     profile = Profile.from_remote_profile(remote_profile)
             if profile:
                 return redirect(reverse("users:profile-detail", kwargs={"guid": profile.guid}))
-        return super().get(request, *args, **kwargs)
+        try:
+            return super().get(request, *args, **kwargs)
+        except QueryError:
+            # Re-render the form
+            messages.warning(self.request, _("Search string is invalid, please try another one."))
+            return HttpResponseRedirect(self.get_success_url())
+
 
     def filter_queryset(self, queryset):
         """Do some of our own filtering on the queryset before returning."""
