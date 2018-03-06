@@ -72,7 +72,7 @@ sphinxcontrib-websupport==1.0.1  # via sphinx
 sqlparse==0.2.4           # via django-debug-toolbar
 termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.2       # via faker
-tornado==5.0              # via livereload, sphinx-autobuild
+tornado==4.5.3
 traitlets==4.3.2          # via ipython
 urllib3==1.22             # via requests
 watchdog==0.8.3           # via sphinx-autobuild

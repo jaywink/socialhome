@@ -97,7 +97,7 @@ rq==0.10.0
 simplegeneric==0.8.1      # via ipython
 simplejson==3.13.2        # via django-rest-swagger
 six==1.11.0               # via asgi-redis, asgiref, autobahn, automat, bleach, django-dynamic-preferences, django-environ, django-extensions, html5lib, isodate, prompt-toolkit, python-dateutil, traitlets, txaio, unicode-slugify
-tornado==5.0              # via circus
+tornado==4.5.3
 traitlets==4.3.2          # via ipython
 twisted==17.9.0           # via daphne
 txaio==2.9.0              # via autobahn
