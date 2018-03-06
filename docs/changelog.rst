@@ -64,6 +64,10 @@ Fixed
 
   For example GNU Social implements webfinger but the necessary attributes we need are not present and were causing errors.
 
+* Add missing titles and OG tags back to streams (`#428 <https://github.com/jaywink/socialhome/issues/428>`_)
+
+  These disappeared in the rewrite of streams in 0.7.0. Also added a few new head tags improving author information in single content view and telling Twitter to not track users so much.
+
 0.7.0 (2018-02-04)
 ------------------
 

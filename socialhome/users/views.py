@@ -2,6 +2,7 @@ from braces.views import StaffuserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, get_object_or_404
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, TemplateView
 from rest_framework.authtoken.models import Token
 
@@ -12,6 +13,7 @@ from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tables import FollowedTable
+from socialhome.utils import get_full_url
 
 
 class UserDetailView(DetailView):
@@ -82,6 +84,15 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
         """
         return super().get_object(queryset=Profile.objects.all())
 
+    def get_page_meta(self):
+        meta = super().get_page_meta()
+        name = self.target_profile.name if self.target_profile.name else self.target_profile.guid
+        meta.update({
+            "title": name,
+            "description": _("Profile of %s." % name),
+        })
+        return meta
+
     def get_queryset(self):
         stream = self.stream_class(last_id=self.last_id, user=self.request.user, profile=self.target_profile)
         qs, self.throughs = stream.get_content()
@@ -108,6 +119,13 @@ class ProfileDetailView(ProfileViewMixin):
             return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
         return super().dispatch(request, *args, **kwargs)
 
+    def get_page_meta(self):
+        meta = super().get_page_meta()
+        meta.update({
+            "url": get_full_url(reverse("users:profile-detail", kwargs={"guid": self.target_profile.guid})),
+        })
+        return meta
+
 
 class ProfileAllContentView(ProfileViewMixin):
     profile_stream_type = "all_content"
@@ -120,6 +138,13 @@ class ProfileAllContentView(ProfileViewMixin):
         if qs.filter(pinned=True).exists():
             self.pinned_content_exists = True
         return super().dispatch(request, *args, **kwargs)
+
+    def get_page_meta(self):
+        meta = super().get_page_meta()
+        meta.update({
+            "url": get_full_url(reverse("users:profile-all-content", kwargs={"guid": self.target_profile.guid})),
+        })
+        return meta
 
 
 class OrganizeContentProfileDetailView(ProfileDetailView):

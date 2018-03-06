@@ -5,13 +5,17 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{{ request.site.name }}{% endblock title %}</title>
-    {% block ogtags %}
+    <meta property="og:site_name" content='{{ request.site.name|addslashes }}' />
+    {% block pagetags %}
         <meta property="og:title" content='{{ request.site.name|addslashes }}' />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://{{ request.site.domain }}" />
+        <meta property="og:description" content="{% trans "A federated social home." %}" />
         <meta property="og:image" content="https://{{ request.site.domain }}{% static "images/logo/Socialhome-dark-300.png" %}" />
     {% endblock %}
-    <meta name="description" content='{{ request.site.name|addslashes }}'>
+    <meta name="description" content='{% block description %}{% trans "A federated social home." %}{% endblock %}'>
+    <meta name="twitter:dnt" content="on">
+    <link rel="canonical" href="https://{{ request.site.domain }}{{ request.path }}">
 
     <link rel="icon" type="image/png" sizes="16x16" href="{% static "images/logo/Socialhome-dark-16.png" %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static "images/logo/Socialhome-dark-32.png" %}">
