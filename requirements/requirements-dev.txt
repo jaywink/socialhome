@@ -21,13 +21,13 @@ django-debug-toolbar-user-panel==1.1.0
 django-debug-toolbar==1.9.1
 django-querycount==0.7.0
 django-test-plus==1.0.22
-django==1.11.10
+django==1.11.11
 docutils==0.14            # via sphinx
 factory-boy==2.10.0
 faker==0.8.11
 first==2.0.1              # via pip-tools
 flake8==3.5.0
-freezegun==0.3.9
+freezegun==0.3.10
 future==0.16.0            # via commonmark
 idna==2.6                 # via requests
 imagesize==1.0.0          # via sphinx
@@ -39,7 +39,7 @@ jinja2==2.10              # via sphinx
 livereload==2.5.1         # via sphinx-autobuild
 markupsafe==1.0           # via jinja2
 mccabe==0.6.1             # via flake8
-packaging==16.8           # via sphinx
+packaging==17.1           # via sphinx
 parso==0.1.1              # via jedi
 pathtools==0.1.2          # via sphinx-autobuild, watchdog
 pexpect==4.4.0            # via ipython
@@ -58,7 +58,7 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-env==0.6.2
 pytest-sugar==0.9.1
-pytest==3.4.1
+pytest==3.4.2
 python-dateutil==2.6.1    # via faker, freezegun
 pytz==2018.3              # via babel, django
 pyyaml==3.12              # via sphinx-autobuild, watchdog
@@ -72,7 +72,7 @@ sphinxcontrib-websupport==1.0.1  # via sphinx
 sqlparse==0.2.4           # via django-debug-toolbar
 termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.2       # via faker
-tornado==4.5.3            # via livereload, sphinx-autobuild
+tornado==5.0              # via livereload, sphinx-autobuild
 traitlets==4.3.2          # via ipython
 urllib3==1.22             # via requests
 watchdog==0.8.3           # via sphinx-autobuild
