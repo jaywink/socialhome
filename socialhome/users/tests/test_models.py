@@ -1,9 +1,7 @@
 from unittest.mock import Mock, patch
 
-import factory
 from django.conf import settings
 from django.test import override_settings
-from federation.entities import base
 
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
@@ -85,6 +83,10 @@ class TestProfile(SocialhomeTestCase):
     def test_get_absolute_url(self):
         self.assertEqual(self.profile.get_absolute_url(), "/p/1234/")
 
+    def test_handle_can_have_port(self):
+        self.profile.handle = "foo@example.com:3000"
+        self.profile.save()
+
     def test_home_url(self):
         self.assertEqual(self.profile.home_url, self.profile.remote_url)
         self.assertEqual(
@@ -158,18 +160,18 @@ class TestProfile(SocialhomeTestCase):
 
     def test_from_remote_profile_relative_image_url(self):
         remote_profile = BaseProfileFactory(public=False)
-        remote_profile.handle = "foo@localhost"
+        remote_profile.handle = "foo@example.com"
         remote_profile.image_urls["small"] = "/sm"
         remote_profile.image_urls["medium"] = "/me"
         remote_profile.image_urls["large"] = "/lg"
         profile = Profile.from_remote_profile(remote_profile)
-        self.assertEqual(profile.image_url_small, "https://localhost/sm")
-        self.assertEqual(profile.image_url_medium, "https://localhost/me")
-        self.assertEqual(profile.image_url_large, "https://localhost/lg")
+        self.assertEqual(profile.image_url_small, "https://example.com/sm")
+        self.assertEqual(profile.image_url_medium, "https://example.com/me")
+        self.assertEqual(profile.image_url_large, "https://example.com/lg")
 
     def test_from_remote_profile_absolute_image_url(self):
         remote_profile = BaseProfileFactory(public=False)
-        remote_profile.handle = "foo@localhost"
+        remote_profile.handle = "foo@example.com"
         remote_profile.image_urls["small"] = "https://example1.com/sm"
         remote_profile.image_urls["medium"] = "https://example2.com/me"
         remote_profile.image_urls["large"] = "https://example3.com/lg"

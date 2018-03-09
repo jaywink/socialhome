@@ -5,11 +5,11 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
-from django.core.validators import validate_email
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from federation.utils.text import validate_handle
 from model_utils.models import TimeStampedModel
 from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
@@ -107,7 +107,7 @@ class Profile(TimeStampedModel):
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False)
 
     # Globally unique handle in format username@domain.tld
-    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, validators=[validate_email])
+    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True)
 
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
@@ -157,6 +157,8 @@ class Profile(TimeStampedModel):
         # Protect against empty guids which the search indexing would crash on
         if not self.guid:
             raise ValueError("Profile must have a guid!")
+        if not validate_handle(self.handle):
+            raise ValueError("Not a valid handle")
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
