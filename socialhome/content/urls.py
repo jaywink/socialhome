@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from socialhome.content import views
 
+app_name = 'content'
+
 urlpatterns = [
     url(r"^bookmarklet/$", views.ContentBookmarkletView.as_view(), name="bookmarklet"),
     url(r"^create/$", views.ContentCreateView.as_view(), name="create"),

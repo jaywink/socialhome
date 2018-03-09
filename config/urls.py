@@ -64,12 +64,12 @@ urlpatterns = [
     url(r"^jsreverse/$", urls_js, name="js_reverse"),
 
     # Admin pages
-    url(settings.ADMIN_URL, include(admin.site.urls)),
+    url(settings.ADMIN_URL, admin.site.urls),
     url(r"^django-rq/", include("django_rq.urls")),
 
     # API
     url(r"^api/$", schema_view, name="api-docs"),
-    url(r"^api/", include(router.urls, namespace="api")),
+    url(r"^api/", include((router.urls, "api"))),
     url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
     url(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),

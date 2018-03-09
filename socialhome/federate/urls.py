@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf.urls import url, include
 from django.views.decorators.csrf import csrf_exempt
 
@@ -8,6 +7,7 @@ from socialhome.federate.views import (
     host_meta_view, webfinger_view, hcard_view, nodeinfo_well_known_view, nodeinfo_view, social_relay_view,
     ReceivePublicView, ReceiveUserView, content_xml_view, content_fetch_view)
 
+app_name = 'federate'
 
 urlpatterns = [
     # Federation provided urls

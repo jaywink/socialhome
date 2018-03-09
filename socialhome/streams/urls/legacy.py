@@ -6,6 +6,8 @@ from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedSt
 # on 4th September 2017. Remove these if they are required for something else in the future, but notice there
 # will be some content linking to these pre this change.
 
+app_name = 'streams'
+
 urlpatterns = [
     url(r"^followed/$", FollowedStreamView.as_view(), name="followed"),
     url(r"^public/$", PublicStreamView.as_view(), name="public"),
