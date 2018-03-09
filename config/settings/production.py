@@ -34,7 +34,7 @@ SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 
 # Make sure djangosecure.middleware.SecurityMiddleware is listed first
-MIDDLEWARE_CLASSES = PRODUCTION_MIDDLEWARE + MIDDLEWARE_CLASSES
+MIDDLEWARE = PRODUCTION_MIDDLEWARE + MIDDLEWARE
 
 # Static Assets
 # ------------------------

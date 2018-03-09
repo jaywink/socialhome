@@ -44,7 +44,7 @@ CACHES = {
 # ------------------------------------------------------------------------------
 if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
     DEBUG_TOOLBAR_ENABLED = True
-    MIDDLEWARE_CLASSES += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+    MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
     INSTALLED_APPS += ("debug_toolbar", "debug_toolbar_user_panel")
 
     INTERNAL_IPS = ("127.0.0.1", "10.0.2.2",)
@@ -96,7 +96,7 @@ if testing:
     }
 
 # Extra tools for development
-MIDDLEWARE_CLASSES += ("querycount.middleware.QueryCountMiddleware",)
+MIDDLEWARE += ("querycount.middleware.QueryCountMiddleware",)
 
 # Tests
 if testing:
