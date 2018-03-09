@@ -199,9 +199,9 @@ class TestContentViewSet(SocialhomeAPITestCase):
 
     def test_replies_results(self):
         self.get("api:content-replies", pk=self.public_content.id)
-        self.assertEquals(len(self.last_response.data), 2)
-        self.assertEquals(self.last_response.data[0].get("id"), self.reply.id)
-        self.assertEquals(self.last_response.data[1].get("id"), self.share_reply.id)
+        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(self.last_response.data[0].get("id"), self.reply.id)
+        self.assertEqual(self.last_response.data[1].get("id"), self.share_reply.id)
 
     def test_share(self):
         self.post("api:content-share", pk=self.public_content.id)
@@ -262,5 +262,5 @@ class TestContentViewSet(SocialhomeAPITestCase):
 
     def test_shares_results(self):
         self.get("api:content-shares", pk=self.public_content.id)
-        self.assertEquals(len(self.last_response.data), 1)
-        self.assertEquals(self.last_response.data[0].get("id"), self.share.id)
+        self.assertEqual(len(self.last_response.data), 1)
+        self.assertEqual(self.last_response.data[0].get("id"), self.share.id)

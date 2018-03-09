@@ -1,14 +1,11 @@
-import warnings
-
 from django.utils.translation import ugettext_lazy as _
 from enumfields import Enum
 
 
 class ContentTarget(Enum):
+    # TODO WARNING ContentTarget has been removed. Don't use.
+    # Remove code once migrations have been squashed.
     PROFILE = 0
-
-    warnings.warn("ContentTarget has been removed. "
-                  "Remove code once migrations have been squashed.", UserWarning)
 
 
 class ContentType(Enum):

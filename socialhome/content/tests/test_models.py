@@ -382,12 +382,12 @@ class TestContentModel(SocialhomeTestCase):
         self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
 
     def test_channel_group_name(self):
-        self.assertEquals(
+        self.assertEqual(
             self.public_content.channel_group_name,
             "%s_%s" % (self.public_content.id, slugify(self.public_content.guid)),
         )
         long_non_ascii_guid_content = ContentFactory(guid="ä"*150)
-        self.assertEquals(
+        self.assertEqual(
             long_non_ascii_guid_content.channel_group_name, "%s_%s" % (
                 long_non_ascii_guid_content.id, "a"*(79-len(str(long_non_ascii_guid_content.id)))
             )

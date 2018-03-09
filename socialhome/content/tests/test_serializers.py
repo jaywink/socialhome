@@ -169,14 +169,14 @@ class ContentSerializerTestCase(SocialhomeTestCase):
     def test_tags_if_no_tag(self):
         self.content.tags.clear()
         serializer = ContentSerializer(self.content, context={"request": Mock(user=self.user)})
-        self.assertEquals(serializer.data["tags"], [])
+        self.assertEqual(serializer.data["tags"], [])
 
     def test_tags_with_tag(self):
         tag = TagFactory(name="yolo")
         self.content.tags.clear()
         self.content.tags.add(tag)
         serializer = ContentSerializer(self.content, context={"request": Mock(user=self.user)})
-        self.assertEquals(serializer.data["tags"], ["yolo"])
+        self.assertEqual(serializer.data["tags"], ["yolo"])
 
     def test_update_doesnt_allow_changing_parent(self):
         serializer = ContentSerializer(

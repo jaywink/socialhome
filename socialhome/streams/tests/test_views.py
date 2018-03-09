@@ -39,7 +39,7 @@ class TestFollowedStreamView(SocialhomeCBVTestCase):
     def test_renders_with_content(self):
         response = self.get(FollowedStreamView, request=self.get_request(self.user))
         self.assertContains(response, "Followed")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_stream_name(self):
         view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
