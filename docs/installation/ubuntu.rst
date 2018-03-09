@@ -56,7 +56,9 @@ Install system packages
 Install Node.js
 '''''''''''''''
 
-Node.js version 6+ is needed for statics management. Install it by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
+Node.js version 6-8 has been tested to work. Install one by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
+
+If you already have a system Node installed which is either too old or newer, consider using [NVM](https://github.com/creationix/nvm) to install a specific version for Socialhome only.
 
 Install PostgreSQL
 ''''''''''''''''''
