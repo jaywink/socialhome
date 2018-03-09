@@ -5,8 +5,7 @@ WORKDIR /code
 COPY . .
 
 # Ensure pip and setuptools are up to date as well
-# We need a slightly older setuptools due to a bug in pip-tools
-RUN pip install -U pip setuptools==30.4 pip-tools
+RUN pip install -U pip setuptools pip-tools
 
 # Development environment
 RUN pip-sync dev-requirements.txt

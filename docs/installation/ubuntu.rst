@@ -236,7 +236,7 @@ Update pip and setuptools
 
 ::
 
-    pip install -U pip setuptools==30.4
+    pip install -U pip setuptools
 
 Install pip-tools
 '''''''''''''''''
