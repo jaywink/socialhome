@@ -80,12 +80,6 @@ class TestHomeViewLandingPagePreference(SocialhomeTestCase):
             self.get("home")
         self.assertEqual(self.context["view"].__class__, PublicStreamView)
 
-    def test_renders_profile_as_fallback(self):
-        self.user.preferences["generic__landing_page"] = "foobar"
-        with self.login(self.user):
-            self.get("home")
-        self.assertEqual(self.context["view"].__class__, ProfileDetailView)
-
 
 class TestCustomHomeViewLandingPage(SocialhomeTestCase):
     @classmethod

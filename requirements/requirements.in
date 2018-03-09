@@ -10,7 +10,7 @@ django-allauth
 django-autoslug
 django-braces
 django-crispy-forms
-django-dynamic-preferences==1.2
+django-dynamic-preferences
 django-enumfields
 django-environ
 django-extensions
