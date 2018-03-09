@@ -15,6 +15,7 @@ Changed
 Fixed
 .....
 
+* Allow search with Diaspora handle that contains port (`#457 <https://github.com/jaywink/socialhome/issues/457>`_)
 
 0.8.0 (2018-03-06)
 ------------------

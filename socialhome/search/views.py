@@ -1,13 +1,12 @@
 import xml
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from federation.fetchers import retrieve_remote_profile
+from federation.utils.text import validate_handle
 from haystack.generic_views import SearchView
 from whoosh.query import QueryError
 
@@ -33,14 +32,10 @@ class GlobalSearchView(SearchView):
 
         Try fetching a remote profile if the search term is a handle.
         """
-        try:
-            q = safe_text(request.GET.get("q"))
-            if q:
-                q = q.strip().lower()
-            validate_email(q)
-        except ValidationError:
-            pass
-        else:
+        q = safe_text(request.GET.get("q"))
+        if q:
+            q = q.strip().lower()
+        if validate_handle(q):
             profile = None
             try:
                 profile = Profile.objects.visible_for_user(request.user).get(handle=q)
