@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
-from federation.utils.text import validate_handle
+from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
 from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
@@ -167,6 +167,9 @@ class Profile(TimeStampedModel):
                     setattr(self, attr, ponies[idx])
         # Ensure handle is *always* lowercase
         self.handle = self.handle.lower()
+        # Ensure keys are converted to str before saving
+        self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
+        self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
         super().save(*args, **kwargs)
 
     @property

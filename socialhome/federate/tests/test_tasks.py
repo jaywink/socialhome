@@ -142,7 +142,9 @@ class TestSendReply(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         author = UserFactory()
-        Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        Profile.objects.filter(id=author.profile.id).update(
+            rsa_private_key=get_dummy_private_key().exportKey().decode("utf-8")
+        )
         cls.public_content = ContentFactory(author=author.profile, visibility=Visibility.PUBLIC)
         cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)
         cls.remote_reply = ContentFactory(parent=cls.public_content, author=ProfileFactory())
@@ -173,7 +175,9 @@ class TestSendShare(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.create_local_and_remote_user()
-        Profile.objects.filter(id=cls.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        Profile.objects.filter(id=cls.profile.id).update(
+            rsa_private_key=get_dummy_private_key().exportKey().decode("utf-8")
+        )
         cls.content = ContentFactory(author=cls.remote_profile, visibility=Visibility.PUBLIC)
         cls.limited_content = ContentFactory(author=cls.remote_profile, visibility=Visibility.LIMITED)
         cls.share = ContentFactory(share_of=cls.content, author=cls.profile, visibility=Visibility.PUBLIC)
