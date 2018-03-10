@@ -31,7 +31,7 @@ djangorestframework
 ipython
 lxml
 Pillow
-psycopg2
+psycopg2-binary
 python-opengraph-jaywink
 pytz
 redis
@@ -49,7 +49,7 @@ whoosh
 # - GIF upload (upstream rejected)
 -e git+https://github.com/jaywink/django-markdownx.git@f954e9a53c7299fa60f4f39262c44206ed03c131#egg=django-markdownx==2.0.21.1
 
--e git+https://github.com/jaywink/federation.git@2a02f866aad037495b9d56f1a6c3e44a5e04c20a#egg=federation==0.14.1.1
+-e git+https://github.com/jaywink/federation.git@2a02f866aad037495b9d56f1a6c3e44a5e04c20a#egg=federation==0.15.0.1
 
 # Own pyembed fork for some tweaks:
 # - passing additional options (TODO make PR)
