@@ -1,6 +1,6 @@
 from braces.views import StaffuserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, TemplateView

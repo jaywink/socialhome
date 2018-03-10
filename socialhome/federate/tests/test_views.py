@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch, Mock
 
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
