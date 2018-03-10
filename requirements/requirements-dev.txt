@@ -21,7 +21,7 @@ django-debug-toolbar-user-panel==1.1.0
 django-debug-toolbar==1.9.1
 django-querycount==0.7.0
 django-test-plus==1.0.22
-django==1.11.11
+django==2.0.3
 docutils==0.14            # via sphinx
 factory-boy==2.10.0
 faker==0.8.11

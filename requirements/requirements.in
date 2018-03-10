@@ -26,7 +26,7 @@ django-secure
 django-settings-export
 django-tables2
 django-versatileimagefield
-django<2.0
+django
 djangorestframework
 ipython
 lxml
