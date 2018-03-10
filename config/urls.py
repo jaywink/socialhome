@@ -1,9 +1,10 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import include, path
 from django.views import defaults as default_views
-from django.views.i18n import javascript_catalog
+from django.views.i18n import JavaScriptCatalog
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
@@ -14,10 +15,6 @@ from socialhome.content.viewsets import ContentViewSet
 from socialhome.viewsets import ImageUploadView
 from socialhome.views import HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
-
-js_translations = {
-    "packages": ("socialhome",),
-}
 
 # API routes
 # NOTE! If changing or adding API urls, don't forget to update the JS tests URL config fixtures as follows:
@@ -58,7 +55,7 @@ urlpatterns = [
     url(r"^bookmarklet/", ContentBookmarkletView.as_view(), name="bookmarklet"),
 
     # JavaScript translations
-    url(r"^jsi18n/$", javascript_catalog, js_translations, name="javascript-catalog"),
+    path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome']), name="javascript-catalog"),
 
     # Django URLs in JS
     url(r"^jsreverse/$", urls_js, name="js_reverse"),
