@@ -39,6 +39,7 @@ rq
 rq-scheduler
 tornado<5.0  # Not a direct requirement but we need to lock due to circus not working with 5.0
              # Remove from this file once circus works with this
+typing  # Required by django-extensions on Python 3.4
 unicode-slugify
 uwsgi
 whitenoise
