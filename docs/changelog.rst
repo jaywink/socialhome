@@ -14,6 +14,10 @@ Changed
 
 * Bump Django to 2.0 🎉 (`#460 <https://github.com/jaywink/socialhome/issues/460>`_)
 
+* Only precache for users who have been active (`#436 <https://github.com/jaywink/socialhome/issues/436>`_)
+
+  Don't precache items into streams for users who have not been active. Controlled by the same settings as the maintenance of precached streams. Will reduce unnecessary background jobs and make Redis memory usage even more stable.
+
 Fixed
 .....
 

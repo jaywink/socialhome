@@ -1,10 +1,13 @@
+import datetime
 import logging
 import time
 
 import django_rq
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db.models import Case, When
+from django.db.models import Case, When, Q
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -58,9 +61,8 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
     except Profile.DoesNotExist:
         logger.warning("Stream.add_to_stream_for_users - acting profile %s does not exist!", acting_profile_id)
         return
-    qs = User.objects.filter(is_active=True)
-    if acting_profile.is_local:
-        qs = qs.exclude(id=acting_profile.user.id)
+
+    qs = get_precache_users_qs(acting_profile)
     keys = []
     # Cache for each active user
     for user in qs.iterator():
@@ -88,6 +90,22 @@ def check_and_add_to_keys(stream_cls, user, content, keys, acting_profile):
         if stream.should_cache_content(content):
             keys.append(stream.key)
     return keys
+
+
+def get_precache_users_qs(acting_profile):
+    """
+    Get User queryset for precaching.
+
+    Users must have either been active or created within amount of days configured.
+
+    :param acting_profile: Profile that caused the precaching ie author normally. Will be excluded if local.
+    :return: QuerySet
+    """
+    check_time = now() - datetime.timedelta(days=settings.SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS)
+    qs = User.objects.filter(is_active=True).filter(Q(last_login__gte=check_time) | Q(date_joined__gte=check_time))
+    if acting_profile.is_local:
+        qs = qs.exclude(id=acting_profile.user_id)
+    return qs
 
 
 def update_streams_with_content(content):
