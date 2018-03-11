@@ -3,6 +3,8 @@ from unittest.mock import patch, Mock, call
 
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Max
+from django.test import override_settings
+from freezegun import freeze_time
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
@@ -13,7 +15,7 @@ from socialhome.streams.streams import (
     BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_stream_for_users,
     update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream)
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.tests.factories import UserFactory
+from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
 
 @patch("socialhome.streams.streams.get_redis_connection")
@@ -62,6 +64,17 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
         add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
         mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [], self.content.author)
+
+    @patch("socialhome.streams.streams.check_and_add_to_keys")
+    @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
+    @override_settings(SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS=2)
+    @freeze_time('2018-02-01')
+    def test_calls_check_and_add_to_keys_for_each_user__skipping_inactives(self, mock_check):
+        with freeze_time('2018-01-25'):
+            PublicUserFactory()
+        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
+        # Would be called twice if inactives were not filtered out
+        mock_check.assert_called_once_with(ProfileAllStream, self.user, self.content, [], self.content.author)
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
