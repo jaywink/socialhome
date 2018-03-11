@@ -139,7 +139,9 @@ class TestContentFetchView(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         author = UserFactory()
-        Profile.objects.filter(id=author.profile.id).update(rsa_private_key=get_dummy_private_key().exportKey())
+        Profile.objects.filter(id=author.profile.id).update(
+            rsa_private_key=get_dummy_private_key().exportKey().decode("utf-8")
+        )
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
         cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)

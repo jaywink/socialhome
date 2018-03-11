@@ -1,11 +1,10 @@
 codecov
 coverage
 django-debug-toolbar
-django-debug-toolbar-user-panel
 django-querycount
 django-test-plus
 django_coverage_plugin
-django<2.0
+django
 factory_boy
 Faker
 flake8
@@ -25,3 +24,7 @@ Werkzeug
 
 # Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
+
+# Django-debug-toolbar-user-panel fixed with Django 2.0 support
+# Use pip once PR xxx merged
+-e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@10e14f6ab1ed6dd3f5aea20856c54f090180a482#egg=django-debug-toolbar-user-panel==1.1.0.1

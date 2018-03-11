@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 'ordering': ('domain',),
             },
             managers=[
-                (b'objects', django.contrib.sites.models.SiteManager()),
+                ('objects', django.contrib.sites.models.SiteManager()),
             ],
         ),
     ]
