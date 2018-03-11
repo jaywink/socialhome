@@ -12,6 +12,8 @@ Added
 Changed
 .......
 
+* Bump Django to 2.0 🎉 (`#460 <https://github.com/jaywink/socialhome/issues/460>`_)
+
 Fixed
 .....
 
