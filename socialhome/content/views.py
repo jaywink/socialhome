@@ -1,4 +1,4 @@
-from braces.views import UserPassesTestMixin, JSONResponseMixin, AjaxResponseMixin, LoginRequiredMixin
+from braces.views import UserPassesTestMixin, LoginRequiredMixin
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
@@ -137,7 +137,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMixin, DetailView):
+class ContentView(ContentVisibleForUserMixin, DetailView):
     model = Content
     template_name = "streams/base.html"
 
@@ -155,10 +155,6 @@ class ContentView(ContentVisibleForUserMixin, AjaxResponseMixin, JSONResponseMix
         if guid:
             return get_object_or_404(Content, guid=guid)
         return super().get_object(queryset=queryset)
-
-    def get_ajax(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return self.render_json_response(self.object.dict_for_view(request.user))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

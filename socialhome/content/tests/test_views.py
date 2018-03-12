@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.test.client import Client, RequestFactory
@@ -207,30 +206,6 @@ class TestContentView(SocialhomeTestCase):
         cls.share = PublicContentFactory(share_of=cls.content)
         cls.user = cls.content.author.user
         cls.profile = cls.content.author
-
-    def test_content_view_renders_json_result(self):
-        response = self.client.get(
-            reverse("content:view", kwargs={"pk": self.content.id}),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
-
-    def test_content_view_by_guid_renders_json_result(self):
-        response = self.client.get(
-            reverse("content:view-by-guid", kwargs={"guid": self.content.guid}),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
-
-    def test_content_view_by_slug_renders_json_result(self):
-        response = self.client.get(
-            reverse("content:view-by-slug", kwargs={"pk": self.content.id, "slug": self.content.slug}),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.content.dict_for_view(AnonymousUser()), response.json())
 
     def test_content_view_redirects_to_login_for_private_content_except_if_owned(self):
         self.client.force_login(self.content.author.user)
