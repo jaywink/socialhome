@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
 from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
-from socialhome.streams.views import StreamMixin
+from socialhome.streams.views import BaseStreamView
 from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
@@ -34,72 +34,47 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, guid=profile.guid)
 
 
-class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
+class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
+    data = None
     model = Profile
-    pinned_content_exists = None
+    object = None
     profile_stream_type = None  # TODO: refactor to use stream type value directly
     slug_field = "guid"
     slug_url_kwarg = "guid"
     template_name = "streams/base.html"
-    target_profile = None
-    content_list = None
 
     def dispatch(self, request, *args, **kwargs):
         """Handle profile visibility checks.
 
         Redirect to login if not allowed to see profile.
         """
-        if not self.target_profile:
-            self.target_profile = self.get_target_profile(kwargs.get("guid"))
-        if not self.content_list:
-            self.content_list = self.get_queryset()
-        if self.target_profile.visible_to_user(self.request.user):
+        self.set_object_and_data()
+        if self.data:
             return super().dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
             self.raise_exception = True
         return self.handle_no_permission()
 
-    def get_context_data(self, **kwargs):
-        self.followers_count = Profile.objects.followers(self.object).count()
-        context = super().get_context_data(**kwargs)
-        context["content_list"] = self.content_list
-        context["followers_count"] = self.followers_count
-        context["profile_stream_type"] = self.profile_stream_type
-        context["pinned_content_exists"] = self.pinned_content_exists
-        return context
-
     def get_json_context(self):
         json_context = super().get_json_context()
-        json_context.update({
-            "profile": ProfileSerializer(self.target_profile, context={'request': self.request}).data
-        })
-        json_context["profile"].update({"stream_type": self.profile_stream_type})
+        json_context["profile"] = self.data
         return json_context
-
-    def get_object(self, queryset=None):
-        """Ensure DetailView operates on the right queryset when fetching object.
-
-        Since this is a StreamMixin view, we must override get_queryset which is for the content. To ensure
-        DetailView works, we override get_object to pass a Profile queryset to get_object up in super.
-        """
-        return super().get_object(queryset=Profile.objects.all())
 
     def get_page_meta(self):
         meta = super().get_page_meta()
-        name = self.target_profile.name if self.target_profile.name else self.target_profile.guid
+        name = self.object.name if self.object.name else self.object.guid
         meta.update({
             "title": name,
             "description": _("Profile of %s." % name),
         })
         return meta
 
-    def get_queryset(self):
-        stream = self.stream_class(last_id=self.last_id, user=self.request.user, profile=self.target_profile)
-        qs, self.throughs = stream.get_content()
-        return qs
-
-    def get_target_profile(self, guid):
-        return get_object_or_404(Profile, guid=guid)
+    def set_object_and_data(self):
+        if not self.object:
+            self.object = self.get_object()
+        if not self.data and self.object.visible_to_user(self.request.user):
+            self.data = ProfileSerializer(self.object, context={'request': self.request}).data
+            self.data["stream_type"] = self.profile_stream_type
 
     @property
     def stream_name(self):
@@ -107,22 +82,20 @@ class ProfileViewMixin(AccessMixin, StreamMixin, DetailView):
 
 
 class ProfileDetailView(ProfileViewMixin):
-    pinned_content_exists = True
     profile_stream_type = "pinned"
     stream_class = ProfilePinnedStream
 
     def dispatch(self, request, *args, **kwargs):
         """Ensure we have pinned content. If not, render all content instead."""
-        self.target_profile = self.get_target_profile(kwargs.get("guid"))
-        self.content_list = self.get_queryset()
-        if not self.content_list.exists():
+        self.set_object_and_data()
+        if self.data and not self.data["has_pinned_content"]:
             return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_page_meta(self):
         meta = super().get_page_meta()
         meta.update({
-            "url": get_full_url(reverse("users:profile-detail", kwargs={"guid": self.target_profile.guid})),
+            "url": get_full_url(reverse("users:profile-detail", kwargs={"guid": self.object.guid})),
         })
         return meta
 
@@ -131,38 +104,28 @@ class ProfileAllContentView(ProfileViewMixin):
     profile_stream_type = "all_content"
     stream_class = ProfileAllStream
 
-    def dispatch(self, request, *args, **kwargs):
-        """Ensure we have pinned content. If not, render all content instead."""
-        self.target_profile = self.get_target_profile(kwargs.get("guid"))
-        qs = Content.objects.profile_pinned(self.target_profile, request.user)
-        if qs.filter(pinned=True).exists():
-            self.pinned_content_exists = True
-        return super().dispatch(request, *args, **kwargs)
-
     def get_page_meta(self):
         meta = super().get_page_meta()
         meta.update({
-            "url": get_full_url(reverse("users:profile-all-content", kwargs={"guid": self.target_profile.guid})),
+            "url": get_full_url(reverse("users:profile-all-content", kwargs={"guid": self.object.guid})),
         })
         return meta
 
 
-class OrganizeContentProfileDetailView(ProfileDetailView):
+class OrganizeContentProfileDetailView(LoginRequiredMixin, ListView):
+    model = Content
     template_name = "users/profile_detail_organize.html"
-
-    def get_object(self, queryset=None):
-        # Only get the Profile record for the user making the request
-        return Profile.objects.get(user=self.request.user)
 
     def dispatch(self, request, *args, **kwargs):
         """Use current user."""
-        kwargs.update({"guid": request.user.profile.guid})
-        self.kwargs.update({"guid": request.user.profile.guid})
+        self.profile = get_object_or_404(Profile, user=self.request.user)
         return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Content.objects.profile_pinned(self.profile, self.request.user).order_by("order")
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""
-        self.object = self.get_object()
         self._save_sort_order(request.POST.get("sort_order").split(","))
         return redirect(self.get_success_url())
 
@@ -177,10 +140,6 @@ class OrganizeContentProfileDetailView(ProfileDetailView):
 
     def get_success_url(self):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
-
-    def get_template_names(self):
-        """Override to not render Vue template if that is active."""
-        return [self.template_name]
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):

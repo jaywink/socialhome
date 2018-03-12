@@ -89,17 +89,8 @@ class TestProfileDetailView(SocialhomeTestCase):
             Content.objects.filter(id=contents[2].id).update(order=1)
         view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
         view.object = profile
-        view.target_profile = profile
+        view.set_object_and_data()
         return request, view, contents, profile
-
-    def test_get_context_data_contains_content_objects(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        view.content_list = view.get_queryset()
-        context = view.get_context_data()
-        assert context["content_list"].count() == 3
-        context_objs = {content for content in context["content_list"]}
-        objs = set(contents)
-        assert context_objs == objs
 
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
@@ -161,10 +152,6 @@ class TestProfileDetailView(SocialhomeTestCase):
             },
         )
 
-    def test_get_object__uses_a_profile_queryset(self):
-        request, view, contents, profile = self._get_request_view_and_content(create_content=False)
-        self.assertTrue(isinstance(view.get_object(), Profile))
-
     def test_detail_view_renders(self):
         request, view, contents, profile = self._get_request_view_and_content()
         with self.login(username=self.admin_user.username):
@@ -198,8 +185,7 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
             Content.objects.filter(id=contents[1].id).update(order=2)
             Content.objects.filter(id=contents[2].id).update(order=1)
         view = OrganizeContentProfileDetailView(request=request)
-        view.object = profile
-        view.target_profile = profile
+        view.profile = profile
         view.kwargs = {"guid": profile.guid}
         return request, view, contents, profile
 
@@ -211,15 +197,15 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
     def test_save_sort_order_updates_order(self):
         request, view, contents, profile = self._get_request_view_and_content()
         qs = view.get_queryset()
-        assert qs[0].id == contents[2].id
-        assert qs[1].id == contents[1].id
-        assert qs[2].id == contents[0].id
+        self.assertEqual(qs[0].id, contents[2].id)
+        self.assertEqual(qs[1].id, contents[1].id)
+        self.assertEqual(qs[2].id, contents[0].id)
         # Run id's via str() because request.POST gives them like that
         view._save_sort_order([str(contents[0].id), str(contents[1].id), str(contents[2].id)])
         qs = view.get_queryset()
-        assert qs[0].id == contents[0].id
-        assert qs[1].id == contents[1].id
-        assert qs[2].id == contents[2].id
+        self.assertEqual(qs[0].id, contents[0].id)
+        self.assertEqual(qs[1].id, contents[1].id)
+        self.assertEqual(qs[2].id, contents[2].id)
 
     def test_save_sort_order_skips_non_qs_contents(self):
         request, view, contents, profile = self._get_request_view_and_content()
@@ -368,7 +354,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
             Content.objects.filter(id=contents[2].id).update(order=1)
         view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
         view.object = profile
-        view.target_profile = profile
+        view.set_object_and_data()
         return request, view, contents, profile
 
     def test_get_json_context(self):

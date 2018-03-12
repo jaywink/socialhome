@@ -4,15 +4,14 @@ from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.views import View
-from django.views.generic import ListView
+from django.views.generic import TemplateView
 
-from socialhome.content.models import Content, Tag
+from socialhome.content.models import Tag
 from socialhome.streams.streams import PublicStream, FollowedStream, TagStream
 from socialhome.utils import get_full_url
 
 
-class StreamMixin(View):
+class BaseStreamView(TemplateView):
     last_id = None
     throughs = None
     stream_class = None
@@ -54,10 +53,6 @@ class StreamMixin(View):
     @property
     def stream_type_value(self):
         return self.stream_class.stream_type.value
-
-
-class BaseStreamView(StreamMixin, ListView):
-    model = Content
 
 
 class PublicStreamView(BaseStreamView):
