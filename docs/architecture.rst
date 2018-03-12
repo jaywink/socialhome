@@ -123,21 +123,6 @@ A stream should automatically subscribe the user using websockets and handle any
 
 This basic design should be kept in mind when touching stream related code.
 
-Stream templates
-::::::::::::::::
-
-.. note:: This section relates to the old Django templates + jQuery stream. For the Vue.js streams, see above.
-
-Content in streams in is visualized mainly as content grid boxes. This includes replies too, which mainly use the same template code.
-
-There are a few locations to modify when changing how content is rendered in streams or the content detail view:
-
-* ``socialhome/streams/templates/streams/base.html`` - This renders the initial stream as a basic Django template on page load.
-* ``socialhome/streams/templates/streams/_grid_item.html`` - Renders actual content item in initial stream and content detial.
-* ``socialhome/static/js/content.js`` - This is the main JavaScript template which is used to insert content into the stream. This is used for both top level content and replies in content streams.
-
-All these templates must be checked when any content rendering related tweaks are done. Note however that actual content Markdown rendering happens at save time, not in the templates.
-
 .. _precaching:
 
 Precaching
