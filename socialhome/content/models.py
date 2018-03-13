@@ -386,20 +386,6 @@ class Content(models.Model):
         self.save_tags(found_tags)
         return text
 
-    @staticmethod
-    def get_rendered_contents(qs, user, throughs=None):
-        """Get JSON serialized contents.
-
-        :param qs: QuerySet
-        :param user: User object
-        :param throughs: Optional dict containing through id's
-        """
-        rendered = []
-        for content in qs:
-            through = throughs.get(content.id) if throughs else None
-            rendered.append(content.dict_for_view(user, through=through))
-        return rendered
-
     def fix_local_uploads(self):
         """Fix the markdown URL of local uploads.
 

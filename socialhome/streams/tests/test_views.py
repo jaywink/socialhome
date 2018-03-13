@@ -93,7 +93,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
 
     def test_renders(self):
         response = self.client.get(reverse("streams:public"))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def test_stream_name(self):
         view = self.get_instance(PublicStreamView)
@@ -111,7 +111,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
     def test_logged_in_user(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("streams:public"))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
 
 class TestTagStreamView(SocialhomeCBVTestCase):
