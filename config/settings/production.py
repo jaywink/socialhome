@@ -1,6 +1,8 @@
 '''
 Production Configurations
 '''
+from django.core.exceptions import ImproperlyConfigured
+
 from .common import *  # noqa
 
 
@@ -73,17 +75,21 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # CACHING
 # ------------------------------------------------------------------------------
+# Guard against old setting
+redis_url = env('REDIS_URL', default=None)
+if redis_url:
+    raise ImproperlyConfigured("Setting REDIS_URL as an environment variable has been removed. Please define "
+                               "REDIS_HOST, REDIS_PORT, REDIS_DB and/or "
+                               "REDIS_PASSWORD. See docs for the defaults.")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "{0}/{1}".format(
-            env('REDIS_URL', default="redis://127.0.0.1:6379"),
-            env('REDIS_DB', default=0)
-        ),
+        "LOCATION": "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
                                         # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+            "PASSWORD": REDIS_PASSWORD,
         }
     }
 }
