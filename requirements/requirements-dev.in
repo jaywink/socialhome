@@ -26,5 +26,6 @@ Werkzeug
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
 
 # Django-debug-toolbar-user-panel fixed with Django 2.0 support
-# Use pip once PR xxx merged
--e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@10e14f6ab1ed6dd3f5aea20856c54f090180a482#egg=django-debug-toolbar-user-panel==1.1.0.1
+# Use pip once PR merged and upstream releases
+# https://github.com/thread/django-debug-toolbar-user-panel/pull/3
+-e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@django-2-fix#egg=django-debug-toolbar-user-panel==1.1.0.1

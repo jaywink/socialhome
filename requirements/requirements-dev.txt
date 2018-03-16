@@ -4,7 +4,7 @@
 #
 #    ./compile-requirements.sh
 #
--e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@10e14f6ab1ed6dd3f5aea20856c54f090180a482#egg=django-debug-toolbar-user-panel==1.1.0.1
+-e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@django-2-fix#egg=django-debug-toolbar-user-panel==1.1.0.1
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
 alabaster==0.7.10         # via sphinx
 argh==0.26.2              # via sphinx-autobuild, watchdog
