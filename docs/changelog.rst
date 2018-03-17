@@ -18,6 +18,8 @@ Changed
 
   Don't precache items into streams for users who have not been active. Controlled by the same settings as the maintenance of precached streams. Will reduce unnecessary background jobs and make Redis memory usage even more stable.
 
+* Provided Circus configuration now ensures RQ worker processes are not allowed to endlessly hog server memory. In some rare cases it has happened that normally very stable RQ worker processes have hogged several gigabytes of memory due to reasons which are still being investigated. Now Circus will end those processes automatically.
+
 Fixed
 .....
 
