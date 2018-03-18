@@ -21,7 +21,7 @@ channels==1.1.8
 chardet==3.0.4            # via requests
 circus==0.14.0
 click==6.7                # via rq
-commonmark==0.7.4
+commonmark==0.7.5
 constantly==15.1.0        # via twisted
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
@@ -38,7 +38,7 @@ django-crispy-forms==1.7.2
 django-dynamic-preferences==1.5.1
 django-enumfields==0.10.0
 django-environ==0.4.4
-django-extensions==2.0.3
+django-extensions==2.0.6
 django-floppyforms==1.7.0
 django-haystack==2.8.0
 django-js-reverse==0.8.1
@@ -49,7 +49,7 @@ django-rest-swagger==2.1.2
 django-rq==1.0.1
 django-secure==1.0.1
 django-settings-export==1.2.1
-django-tables2==1.20.0
+django-tables2==1.21.1
 django-versatileimagefield==1.9
 django==2.0.3
 djangorestframework==3.7.7
@@ -66,7 +66,7 @@ itypes==1.1.0             # via coreapi
 jedi==0.11.1              # via ipython
 jinja2==2.10              # via coreschema
 jsonschema==2.6.0
-lxml==4.1.1
+lxml==4.2.0
 markdown==2.6.11
 markupsafe==1.0           # via jinja2
 msgpack-python==0.5.6     # via asgi-redis
@@ -83,8 +83,8 @@ psycopg2-binary==2.7.4
 ptyprocess==0.5.2         # via pexpect
 pycrypto==2.6.1
 pygments==2.2.0           # via ipython
-python-dateutil==2.6.1    # via arrow, croniter
-python-opengraph-jaywink==0.1.0
+python-dateutil==2.7.0    # via arrow, croniter
+python-opengraph-jaywink==0.1.1
 python-xrd==0.1
 python3-openid==3.1.0     # via django-allauth
 pytz==2018.3
