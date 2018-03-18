@@ -89,6 +89,7 @@ python-xrd==0.1
 python3-openid==3.1.0     # via django-allauth
 pytz==2018.3
 pyzmq==17.0.0             # via circus
+raven==6.6.0
 redis==2.10.6
 requests-oauthlib==0.8.0  # via django-allauth
 requests==2.18.4          # via coreapi, django-allauth, python-opengraph-jaywink, requests-oauthlib

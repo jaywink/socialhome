@@ -9,6 +9,10 @@ Changelog
 Added
 .....
 
+* Add possibility to configure Sentry for error reporting.
+
+  Adding the Sentry project DSN as ``SENTRY_DSN=foo`` to environment variables will make all error level exceptions be raised to Sentry. To change the level, define ``SENTRY_LEVEL`` with a valid Python logging module level.
+
 Changed
 .......
 

@@ -241,6 +241,20 @@ REDIS_PORT
 
 Default: ``6379``
 
+SENTRY_DSN
+..........
+
+Default: ``None``
+
+Setting a Sentry project DSN will make all error level exceptions be raised to Sentry. To change the level, see below.
+
+SENTRY_LEVEL
+............
+
+Default: ``ERROR``
+
+Logging level used for Sentry reporting (see above). Possible options: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``.
+
 SOCIALHOME_ADDITIONAL_APPS
 ..........................
 
