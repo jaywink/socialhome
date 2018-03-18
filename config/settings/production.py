@@ -103,3 +103,37 @@ RQ_QUEUES["default"]["USE_REDIS_CACHE"] = "default"
 VERSATILEIMAGEFIELD_SETTINGS = {
     "create_images_on_demand": False,
 }
+
+# SENTRY
+# ------
+# If you wish to configure Sentry for error reporting, first create your
+# Sentry account and then place the DSN in `.env` as `SENTRY_DSN=dsnhere`.
+if env('SENTRY_DSN', default=None):
+    import raven
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+    RAVEN_CONFIG = {
+        'dsn': env('SENTRY_DSN'),
+        'release': raven.fetch_git_sha(os.path.abspath(os.curdir)),
+        'site': SOCIALHOME_DOMAIN,
+
+    }
+    LOGGING['handlers']['sentry'] = {
+        'level': env('SENTRY_LEVEL', default='ERROR'),
+        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+    }
+    LOGGING['loggers']['socialhome']['handlers'].append('sentry')
+    LOGGING['loggers']['federation']['handlers'].append('sentry')
+    LOGGING['root'] = {
+        'level': 'WARNING',
+        'handlers': ['sentry', log_target],
+    }
+    LOGGING['loggers']['raven'] = {
+        'level': 'DEBUG',
+        'handlers': [log_target],
+        'propagate': False,
+    }
+    LOGGING['loggers']['sentry.errors'] = {
+        'level': 'DEBUG',
+        'handlers': [log_target],
+        'propagate': False,
+    }
