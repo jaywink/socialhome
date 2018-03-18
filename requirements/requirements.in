@@ -56,4 +56,5 @@ whoosh
 # Own pyembed fork for some tweaks:
 # - passing additional options (TODO make PR)
 # - requests timeout (TODO make PR)
--e git+https://github.com/jaywink/pyembed.git@e2b8a994cc90b61e3a4a53eb60cad676307d8244#egg=pyembed==1.3.3.1
+# - decrease consumer error logging level to debug (TODO make PR)
+-e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
