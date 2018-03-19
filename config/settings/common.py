@@ -413,6 +413,11 @@ LOGGING = {
             "handlers": [log_target],
             "propagate": False,
         },
+        "rq_scheduler.scheduler": {
+            "level": "ERROR",
+            "handlers": [log_target],
+            "propagate": False,
+        },
     }
 }
 

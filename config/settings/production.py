@@ -123,6 +123,7 @@ if env('SENTRY_DSN', default=None):
     }
     LOGGING['loggers']['socialhome']['handlers'].append('sentry')
     LOGGING['loggers']['federation']['handlers'].append('sentry')
+    LOGGING['loggers']['rq_scheduler.scheduler']['handlers'].append('sentry')
     LOGGING['root'] = {
         'level': 'WARNING',
         'handlers': ['sentry', log_target],
