@@ -25,7 +25,6 @@ found on http://cssload.net
 
 <script>
 import Vue from "vue"
-import imagesLoaded from "vue-images-loaded"
 
 
 export default Vue.component("loading-element", {})

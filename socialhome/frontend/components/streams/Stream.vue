@@ -10,7 +10,7 @@
         <div v-if="this.$store.state.stream.single">
             <stream-element
                 class="grid-item grid-item-full"
-                :content="$store.getters.singleContent"
+                :content="singleContent"
             />
         </div>
         <div v-else v-masonry v-bind="masonryOptions">
@@ -21,6 +21,7 @@
             <div class="gutter-sizer"></div>
             <stream-element
                 class="grid-item"
+                @loadmore="loadStream"
                 v-masonry-tile
                 v-for="content in $store.getters.contentList"
                 :content="content"
@@ -31,25 +32,31 @@
     </div>
 </template>
 
-
 <script>
 import Vue from "vue"
 
 import VueScrollTo from "vue-scrollto"
 
-import "frontend/components/StreamElement.vue"
-import PublicStampedElement from "frontend/components/stamped_elements/PublicStampedElement.vue"
-import FollowedStampedElement from "frontend/components/stamped_elements/FollowedStampedElement.vue"
-import TagStampedElement from "frontend/components/stamped_elements/TagStampedElement.vue"
-import ProfileStampedElement from "frontend/components/stamped_elements/ProfileStampedElement.vue"
-import "frontend/components/LoadingElement.vue"
-
 import {streamStoreOperations} from "frontend/stores/streamStore"
+
+import "frontend/components/streams/StreamElement.vue"
+import PublicStampedElement from "frontend/components/streams/stamped_elements/PublicStampedElement.vue"
+import FollowedStampedElement from "frontend/components/streams/stamped_elements/FollowedStampedElement.vue"
+import TagStampedElement from "frontend/components/streams/stamped_elements/TagStampedElement.vue"
+import ProfileStampedElement from "frontend/components/streams/stamped_elements/ProfileStampedElement.vue"
+import "frontend/components/streams/LoadingElement.vue"
 
 
 Vue.use(VueScrollTo)
 
 export default Vue.component("stream", {
+    // TODO: Seperate Stream.vue into TagStream.vue, GuidProfile.vue and UsernameProfile.vue, etc. in the future
+    props: {
+        contentId: {type: String, default: ""},
+        guid: {type: String, default: ""},
+        user: {type: String, default: ""},
+        tag: {type: String, default: ""},
+    },
     components: {FollowedStampedElement, PublicStampedElement, ProfileStampedElement, TagStampedElement},
     data() {
         return {
@@ -65,6 +72,12 @@ export default Vue.component("stream", {
         }
     },
     computed: {
+        singleContent() {
+            if (!this.$store.state.singleContentId) {
+                return null
+            }
+            return this.$store.state.contents[this.$store.state.singleContentId]
+        },
         stampedElement() {
             switch (this.$store.state.stream.name) {
                 case "followed":
@@ -78,6 +91,7 @@ export default Vue.component("stream", {
                     return "ProfileStampedElement"
                 default:
                     console.error(`Unsupported stream name ${this.$store.state.stream.name}`)
+                    return ""
             }
         },
         translations() {
@@ -96,15 +110,46 @@ export default Vue.component("stream", {
                 () => this.$nextTick( // Wait for new content to be rendered
                     () => this.$scrollTo("body")))
         },
+        loadStream() {
+            const options = {params: {}}
+            const lastContentId = this.$store.state.contentIds[this.$store.state.contentIds.length - 1]
+            if (lastContentId && this.$store.state.contents[lastContentId]) {
+                options.params.lastId = this.$store.state.contents[lastContentId].through
+            }
+
+            switch (this.$store.state.stream.name) {
+                case "followed":
+                    this.$store.dispatch(streamStoreOperations.getFollowedStream, options)
+                    break
+                case "public":
+                    this.$store.dispatch(streamStoreOperations.getPublicStream, options)
+                    break
+                case "tag":
+                    options.params.name = this.tag
+                    this.$store.dispatch(streamStoreOperations.getTagStream, options)
+                    break
+                case "profile_all":
+                    // TODO: Replace this with guid property when API has evolved to support guid
+                    options.params.id = this.$store.state.applicationStore.profile.id
+                    this.$store.dispatch(streamStoreOperations.getProfileAll, options)
+                    break
+                case "profile_pinned":
+                    // TODO: Replace this with guid property when API has evolved to support guid
+                    options.params.id = this.$store.state.applicationStore.profile.id
+                    this.$store.dispatch(streamStoreOperations.getProfilePinned, options)
+                    break
+                default:
+                    break
+            }
+        },
     },
-    beforeCreate() {
+    beforeMount() {
         if (!this.$store.state.stream.single) {
-            this.$store.dispatch(streamStoreOperations.loadStream)
+            this.loadStream()
         }
     },
 })
 </script>
-
 
 <style scoped lang="scss">
     @media all and (max-width: 1200px) {
@@ -115,6 +160,7 @@ export default Vue.component("stream", {
             padding-right: 0;
         }
     }
+
     .new-content-load-link {
         cursor: pointer;
     }

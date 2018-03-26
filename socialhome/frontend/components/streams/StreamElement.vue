@@ -35,9 +35,9 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
 import {streamStoreOperations} from "frontend/stores/streamStore.operations"
-import "frontend/components/AuthorBar.vue"
-import "frontend/components/ReactionsBar.vue"
-import "frontend/components/NsfwShield.vue"
+import "frontend/components/streams/AuthorBar.vue"
+import "frontend/components/streams/ReactionsBar.vue"
+import "frontend/components/streams/NsfwShield.vue"
 
 
 export default Vue.component("stream-element", {
@@ -50,7 +50,7 @@ export default Vue.component("stream-element", {
             return Urls["content:delete"]({pk: this.content.id})
         },
         disableLoadMore() {
-            return this.$store.state.pending.contents || ! this.content.hasLoadMore
+            return this.$store.state.pending.contents || !this.content.hasLoadMore
         },
         timestampText() {
             return this.content.edited
@@ -101,7 +101,7 @@ export default Vue.component("stream-element", {
         },
         loadMore() {
             this.$store.dispatch(streamStoreOperations.disableLoadMore, this.content.id)
-            this.$store.dispatch(streamStoreOperations.loadStream)
+            this.$emit("loadmore")
         },
         onImageLoad() {
             if (!this.$store.state.stream.single) {

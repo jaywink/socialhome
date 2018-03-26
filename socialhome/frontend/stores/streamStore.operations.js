@@ -14,7 +14,6 @@ const streamStoreOperations = {
     getReplies: "getReplies",
     getShares: "getShares",
     getTagStream: "getTagStream",
-    loadStream: "loadStream",
     newContentAck: "newContentAck",
     receivedNewContent: "receivedNewContent",
     saveReply: "saveReply",
@@ -48,36 +47,6 @@ const mutations = {
 const actions = {
     [streamStoreOperations.disableLoadMore]({commit}, contentId) {
         commit(streamStoreOperations.disableLoadMore, contentId)
-    },
-    [streamStoreOperations.loadStream]({dispatch, state}) {
-        const options = {params: {}}
-        const lastContentId = state.contentIds[state.contentIds.length - 1]
-        if (lastContentId && state.contents[lastContentId]) {
-            options.params.lastId = state.contents[lastContentId].through
-        }
-
-        switch (state.stream.name) {
-            case "followed":
-                dispatch(streamStoreOperations.getFollowedStream, options)
-                break
-            case "public":
-                dispatch(streamStoreOperations.getPublicStream, options)
-                break
-            case "tag":
-                options.params.name = state.tagName
-                dispatch(streamStoreOperations.getTagStream, options)
-                break
-            case "profile_all":
-                options.params.id = state.applicationStore.profile.id
-                dispatch(streamStoreOperations.getProfileAll, options)
-                break
-            case "profile_pinned":
-                options.params.id = state.applicationStore.profile.id
-                dispatch(streamStoreOperations.getProfilePinned, options)
-                break
-            default:
-                console.log(`Unknown stream name ${state.stream.name}`)
-        }
     },
     [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
         commit(streamStoreOperations.receivedNewContent, newContentLengh)
@@ -134,12 +103,6 @@ const getters = {
             shares.push(state.shares[id])
         })
         return shares
-    },
-    singleContent(state) {
-        if (!state.singleContentId) {
-            return null
-        }
-        return state.contents[state.singleContentId]
     },
     hasNewContent(state) {
         return state.unfetchedContentIds.length > 0 && !state.pending.contents

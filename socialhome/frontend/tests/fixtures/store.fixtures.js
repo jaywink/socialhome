@@ -1,8 +1,8 @@
-import applicationStore from "frontend/stores/applicationStore"
 import Axios from "axios"
 import Vue from "vue"
 
 import {getFakeContent, getProfile} from "frontend/tests/fixtures/jsonContext.fixtures"
+import applicationStore from "frontend/stores/applicationStore"
 import {newStreamStore} from "frontend/stores/streamStore"
 
 

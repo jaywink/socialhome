@@ -22,7 +22,7 @@
 <script>
 import Vue from "vue"
 
-import ProfileReactionButtons from "./ProfileReactionButtons.vue"
+import ProfileReactionButtons from "frontend/components/streams/ProfileReactionButtons.vue"
 
 
 export default Vue.component("author-bar", {

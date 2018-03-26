@@ -1,8 +1,7 @@
-import main from "frontend/main"
-
 import Vue from "vue"
-import Vuex from "vuex"
-import {streamStoreOperations} from "../stores/streamStore"
+
+import main from "frontend/main"
+import {streamStoreOperations} from "frontend/stores/streamStore"
 
 
 describe("Main", () => {

@@ -6,7 +6,7 @@ import VueSnotify from "vue-snotify"
 import BootstrapVue from "bootstrap-vue"
 import {mount} from "avoriaz"
 
-import ProfileReactionButtons from "frontend/components/ProfileReactionButtons.vue"
+import ProfileReactionButtons from "frontend/components/streams/ProfileReactionButtons.vue"
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
 
 

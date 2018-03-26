@@ -10,6 +10,7 @@ function newApplicationStore() {
         state: {
             isUserAuthenticated: _get(window, ["context", "isUserAuthenticated"], false),
             currentBrowsingProfileId: _get(window, ["context", "currentBrowsingProfileId"]),
+            // TODO: To be removed
             profile: _get(window, ["context", "profile"]),
         },
     })

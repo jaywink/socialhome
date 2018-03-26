@@ -5,7 +5,7 @@ import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
 import Vuex from "vuex"
 
-import ProfileStampedElement from "frontend/components/stamped_elements/ProfileStampedElement.vue"
+import ProfileStampedElement from "frontend/components/streams/stamped_elements/ProfileStampedElement.vue"
 import {newApplicationStore} from "frontend/stores/applicationStore"
 
 
