@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# Socialhome Docker Production entrypoint
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+CODE_DIR=/code
+cd $CODE_DIR
+
+# Define help message
+show_help() {
+    echo """
+Usage: docker run <imagename> COMMAND
+Commands
+uwsgi          : Run Django in uwsgi
+daphne         : Run Daphne (websocket server)
+runworker      : Run runworker
+rqworker       : Run an RQ worker process
+rqscheduler    : Run RQ scheduler
+bash           : Start a bash shell
+manage         : Run a Django management command
+python         : Run a python command
+shell          : Start a Django Python shell
+help           : Show this message
+
+"""
+}
+
+# Run
+case "$1" in
+    uwsgi)
+        echo "Running UWSGI Server..."
+        uwsgi --die-on-term /code/uwsgi.ini
+    ;;
+    daphne)
+        echo "Running Daphne Server..."
+        daphne -p 8001 -b 0.0.0.0 config.asgi:channel_layer
+    ;;
+    runworker)
+        echo "Running Websocket Worker..."
+        python manage.py runworker
+    ;;
+    rqworker)
+        echo "Running RQ Worker..."
+        python manage.py rqworker
+    ;;
+    rqscheduler)
+        echo "Running RQ Scheduler..."
+        python manage.py rqscheduler
+    ;;
+    runworker)
+        echo "Running channel worker"
+        python manage.py runworker
+    ;;
+    bash)
+        /bin/bash "${@:2}"
+    ;;
+    manage)
+        pwd
+        echo "Running manage:" "${@:2}"
+        python manage.py "${@:2}"
+    ;;
+    python)
+        echo "Running python command..." "${@:2}"
+        python "${@:2}"
+    ;;
+    shell)
+        echo "Running shell_plus..."
+        python manage.py shell_plus
+    ;;
+    *)
+        show_help
+    ;;
+esac

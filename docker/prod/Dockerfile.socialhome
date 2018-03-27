@@ -1,0 +1,34 @@
+FROM python:3
+
+# Ensure pip and setuptools are up to date as well
+# We need a slightly older setuptools due to a bug in pip-tools
+RUN pip install -U pip setuptools==30.4 pip-tools
+
+## # We need Node for Javascript. Install it and then grab the latest version
+RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
+RUN apt-get install -y nodejs
+
+RUN npm cache clean -f
+RUN npm install -g n
+RUN n stable
+
+
+RUN mkdir -p /code/requirements
+COPY ./requirements/requirements.txt /code/requirements
+WORKDIR /code
+RUN pip install --no-cache-dir -r ./requirements/requirements.txt
+
+COPY . .
+
+RUN cp .env.example .env
+RUN cp docker/prod/uwsgi.ini /code/uwsgi.ini
+# This file needs to be outside the /code dir as it's mounted  durin development
+RUN cp docker/prod/docker-entrypoint.sh.socialhome ./docker-entrypoint.sh
+
+# For uWSGI
+EXPOSE 9000
+
+# For Daphene server
+EXPOSE 8001
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
