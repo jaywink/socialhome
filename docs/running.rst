@@ -333,6 +333,13 @@ If this is set to a local username, that users profile will be shown when naviga
 
 .. _configuration-statistics:
 
+SOCIALHOME_SHOW_ADMINS
+......................
+
+Default: ``False``
+
+If set to ``True``, allows showing the server admins to users and in server metadata. The settings used are ``DJANGO_ADMIN_NAME`` and ``DJANGO_ADMIN_MAIL``.
+
 SOCIALHOME_STATISTICS
 .....................
 

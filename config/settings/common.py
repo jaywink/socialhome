@@ -306,6 +306,10 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
 )
 # Relay to send public content to
 SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="diaspora://relay@relay.iliketoast.net/profile/")
+# Admins
+# Boolean whether to show admin contact information to users and in server metadata
+# Uses `settings.ADMINS`.
+SOCIALHOME_SHOW_ADMINS = env.bool("SOCIALHOME_SHOW_ADMINS", default=False)
 # Statistics
 # Controls whether to expose some generic statistics about the node. This includes local user, content and reply counts
 # User counts include 30 day and 6 month active users
@@ -497,5 +501,6 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
     "get_profile_function": "socialhome.federate.utils.generic.get_diaspora_profile_by_handle",
+    "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "search_path": "/search/?q=",
 }
