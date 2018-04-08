@@ -13,6 +13,8 @@ Added
 
   Adding the Sentry project DSN as ``SENTRY_DSN=foo`` to environment variables will make all error level exceptions be raised to Sentry. To change the level, define ``SENTRY_LEVEL`` with a valid Python logging module level.
 
+* Add `NodeInfo2 <https://github.com/jaywink/nodeinfo2>`_ support. For organization details, admin name and email will be published if the new setting ``SOCIALHOME_SHOW_ADMINS`` is set to ``True`` (default ``False``).
+
 Changed
 .......
 
