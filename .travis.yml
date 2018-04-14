@@ -8,7 +8,8 @@ services:
   - redis-server
   - postgresql
 install:
-  - pip install -U pip setuptools pip-tools
+  # pip 10 breaks pip-tools for now, see https://github.com/jazzband/pip-tools/issues/648
+  - pip install -U 'pip<10' setuptools pip-tools
   - pip-sync dev-requirements.txt
   - pip freeze
 cache:
