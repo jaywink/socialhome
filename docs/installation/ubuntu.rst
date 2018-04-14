@@ -238,7 +238,8 @@ Update pip and setuptools
 
 ::
 
-    pip install -U pip setuptools
+    # pip 10 breaks pip-tools for now, see https://github.com/jazzband/pip-tools/issues/648
+    pip install -U 'pip<10' setuptools
 
 Install pip-tools
 '''''''''''''''''
