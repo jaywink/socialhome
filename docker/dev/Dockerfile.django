@@ -5,8 +5,7 @@ WORKDIR /code
 COPY . .
 
 # Ensure pip and setuptools are up to date as well
-# pip 10 breaks pip-tools for now, see https://github.com/jazzband/pip-tools/issues/648
-RUN pip install -U 'pip<10' setuptools pip-tools
+RUN pip install -U pip setuptools pip-tools
 
 # Development environment
 RUN pip-sync dev-requirements.txt

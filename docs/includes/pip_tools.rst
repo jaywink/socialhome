@@ -5,8 +5,7 @@ To use ``pip-tools``, first install it:
 ::
 
     # Ensure pip and setuptools are up to date as well
-    # pip 10 breaks pip-tools for now, see https://github.com/jazzband/pip-tools/issues/648
-    pip install -U 'pip<10' pip-tools
+    pip install -U pip pip-tools
 
 Then install dependencies:
 
