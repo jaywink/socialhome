@@ -86,6 +86,17 @@ Just use the standard command:
 
 Unfortunately ``runserver_plus`` cannot be used as it does not integrate with Django Channels.
 
+Running the Django shell
+........................
+
+It is recommended to use the enhanced "shell plus" provided by Django Extensions package which is automatically installed via the development dependencies. One of the benefits is that it will automatically import all project models.
+
+To launch the shell:
+
+::
+
+    python manage.py shell_plus
+
 Creating a user
 ...............
 
@@ -99,6 +110,7 @@ After this you need to log in once with the user via the user interface (which c
 
 ::
 
+    from allauth.account.models import EmailAddress
     EmailAddress.objects.all().update(verified=True)
 
 You should now be able to log in as the user ``admin``.

@@ -33,6 +33,7 @@ You can manually confirm user emails via the shell by running the following:
 
 ::
 
+    from allauth.account.models import EmailAddress
     EmailAddress.objects.filter(email=<email>).update(verified=True)
 
 This will allow the user to log in without clicking the confirmation email link.
@@ -46,6 +47,7 @@ To make a user an admin, log in to the shell and execute the following to set th
 
 ::
 
+    from socialhome.users.models import User
     User.objects.filter(username=<username>).update(is_staff=True, is_superuser=True)
 
 Backups
