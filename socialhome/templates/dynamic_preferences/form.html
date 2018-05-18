@@ -9,7 +9,11 @@
     <form action="" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Back to profile" %}</a>
-        <input type="submit" class="btn btn-primary" value="{% trans "Submit" %}" />
+        <input type="submit" class="btn btn-primary" value="{% trans "Save" %}" />
     </form>
+    <br>
+    <div class="pull-right">
+        <a href="{% url "users:delete-account" %}" class="btn btn-danger">Delete account</a>
+    </div>
+    <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Back to profile" %}</a>
 {% endblock %}

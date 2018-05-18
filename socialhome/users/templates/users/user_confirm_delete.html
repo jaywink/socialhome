@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete account 😯" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Delete account 😯" %}</h1>
+    <p>{% trans "Are you completely sure? This cannot be undone..." %}</p>
+    <p><small>
+        {% blocktrans %}
+            Hey! Please note that if you <i>do</i> go ahead with this, might we say, drastic action, we will of course
+            delete any content you have created on <i>this server</i>. Additionally, we will try to delete the content
+            that <i>this server</i> has sent to <i>other servers</i> as requested by <i>you</i>. These servers are owned
+            by other people (decentralization <3). If these other servers choose to ignore the delete request or they
+            happen to have technical difficulties in deleting the content as requested by us, please contact the
+            administrators of the other servers. Thanks <3
+        {% endblocktrans %}
+    </small></p>
+    <form action="" method="post">{% csrf_token %}
+        {{ form }}
+        <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-primary">{% trans "Nah, take me back!" %}</a>
+        <input type="submit" class="btn btn-danger" value="{% trans "I'm leaving, bye" %}" />
+    </form>
+{% endblock %}

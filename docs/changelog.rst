@@ -15,6 +15,11 @@ Added
 
 * Add `NodeInfo2 <https://github.com/jaywink/nodeinfo2>`_ support. For organization details, admin name and email will be published if the new setting ``SOCIALHOME_SHOW_ADMINS`` is set to ``True`` (default ``False``).
 
+* Add possibility to delete user account (`#131 <https://github.com/jaywink/socialhome/issues/131>`_)
+
+  Deletion is permanent and will delete all created content including uploaded images. Delete request for profile
+  and related content will be sent to remote servers.
+
 Changed
 .......
 
