@@ -72,8 +72,8 @@ urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
 
-    # Preferences
-    url(r"^preferences/", include("dynamic_preferences.urls")),
+    # Account
+    url(r"^account/", include("dynamic_preferences.urls")),
 
     # Search
     url(r"^search/", include("socialhome.search.urls", namespace="search")),

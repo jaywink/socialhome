@@ -27,11 +27,11 @@
                     <i class="fa fa-camera" /> {{ translations.changePicture }}
                 </b-dropdown-item>
                 <b-dropdown-item
-                    :href="urls.preferences"
-                    :title="translations.preferences"
-                    :aria-label="translations.preferences"
+                    :href="urls.account"
+                    :title="translations.account"
+                    :aria-label="translations.account"
                 >
-                    <i class="fa fa-cog" /> {{ translations.preferences }}
+                    <i class="fa fa-cog" /> {{ translations.account }}
                 </b-dropdown-item>
                 <b-dropdown-item
                     :href="urls.apiToken"
@@ -165,6 +165,7 @@ export default Vue.component("profile-stamped-element", {
         },
         translations() {
             return {
+                account: gettext("Account"),
                 apiToken: gettext("API token"),
                 changePicture: gettext("Change picture"),
                 email: gettext("Email"),
@@ -172,7 +173,6 @@ export default Vue.component("profile-stamped-element", {
                 following: gettext("Following"),
                 organizeProfileContent: gettext("Organize profile content"),
                 pinnedContent: gettext("Pinned content"),
-                preferences: gettext("Preferences"),
                 profileAllContent: gettext("All content"),
                 updateProfile: gettext("Update profile"),
                 userHandle: gettext("User handle on The Federation"),
@@ -180,13 +180,13 @@ export default Vue.component("profile-stamped-element", {
         },
         urls() {
             return {
+                account: Urls["dynamic_preferences.user"](),
                 accountsEmail: Urls["account_email"](),
                 apiToken: Urls["users:api-token"](),
                 contactsFollowed: Urls["users:contacts-followed"](),
                 organizeProfileUrl: Urls["users:profile-organize"](),
                 pictureUpdate: Urls["users:picture-update"](),
                 pinnedContent: Urls["users:profile-detail"]({guid: this.profile.guid}),
-                preferences: Urls["dynamic_preferences.user"](),
                 profileAllContent: Urls["users:profile-all-content"]({guid: this.profile.guid}),
                 updateProfile: Urls["users:profile-update"](),
             }

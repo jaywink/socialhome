@@ -2,10 +2,10 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-{% block title %}{% trans "Preferences" %}{% endblock %}
+{% block title %}{% trans "Account" %}{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Preferences" %}</h1>
+    <h1>{% trans "Account" %}</h1>
     <form action="" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form|crispy }}
