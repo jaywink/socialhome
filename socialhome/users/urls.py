@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
@@ -55,4 +56,5 @@ urlpatterns = [
         view=views.ContactsFollowedView.as_view(),
         name="contacts-followed"
     ),
+    path('delete-account/', views.DeleteAccountView.as_view(), name="delete-account"),
 ]

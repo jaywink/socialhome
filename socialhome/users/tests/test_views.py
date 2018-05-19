@@ -18,6 +18,24 @@ from socialhome.users.views import (
     ProfileUpdateView, ProfileDetailView, OrganizeContentProfileDetailView, ProfileAllContentView)
 
 
+class TestDeleteAccountView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    def test_delete_confirm_renders(self):
+        with self.login(self.user):
+            self.get('users:delete-account')
+        self.response_200()
+
+    def test_delete_succeeds(self):
+        with self.login(self.user):
+            self.post('users:delete-account')
+        self.response_302()
+        self.assertTrue(User.objects.filter(id=self.user.id).exists() is False)
+
+
 class TestProfileUpdateView(SocialhomeTestCase):
     def setUp(self):
         super().setUp()

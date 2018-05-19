@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, ListView, UpdateView, TemplateView
+from django.views.generic import DetailView, ListView, UpdateView, TemplateView, DeleteView
 from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
@@ -14,6 +14,16 @@ from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tables import FollowedTable
 from socialhome.utils import get_full_url
+
+
+class DeleteAccountView(DeleteView):
+    model = User
+
+    def get_object(self, queryset=None):
+        return User.objects.get(id=self.request.user.id)
+
+    def get_success_url(self):
+        return reverse("home")
 
 
 class UserDetailView(DetailView):
