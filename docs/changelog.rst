@@ -20,6 +20,10 @@ Added
   Deletion is permanent and will delete all created content including uploaded images. Delete request for profile
   and related content will be sent to remote servers.
 
+* Add user export API (`#478 <https://github.com/jaywink/socialhome/issues/478>`_)
+
+  New API endpoints `/api/profiles/create_export/` will create an export and `/api/profiles/retrieve_export/` will retrieve the export zip file. Export will contain a JSON file of the user, profile, followers and content. A zip file of uploaded images will also be included.
+
 Changed
 .......
 
