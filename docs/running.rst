@@ -90,7 +90,7 @@ There are two main logs where Socialhome sends information during runtime.
 Deleting users and locking remote profiles
 ------------------------------------------
 
-Currently users cannot delete their own account (coming soon, sorry!). Thus to delete users and their content, a Django management command has been provided. This command can also be used to delete local content of remote profiles and optionally lock the profile so any new content is rejected. This makes it possible to lock out spam accounts for example. For locally created content, an automatic retraction will be sent to remotes.
+To delete users and their content, a Django management command has been provided. This command can also be used to delete local content of remote profiles and optionally lock the profile so any new content is rejected. This makes it possible to lock out spam accounts for example. For locally created content, an automatic retraction will be sent to remotes.
 
 NOTE! Any deletion is **permanent**. There is no possibility to get the data back, except by restoring database and uploaded file backups. Be sure before using the command and be extra sure about the GUID's passed in!
 
@@ -333,14 +333,14 @@ Default: ''
 
 If this is set to a local username, that users profile will be shown when navigating to ``/`` as not logged in user. Logged in users will still see their own profile. Good for single user instances.
 
-.. _configuration-statistics:
-
 SOCIALHOME_SHOW_ADMINS
 ......................
 
 Default: ``False``
 
 If set to ``True``, allows showing the server admins to users and in server metadata. The settings used are ``DJANGO_ADMIN_NAME`` and ``DJANGO_ADMIN_MAIL``.
+
+.. _configuration-statistics:
 
 SOCIALHOME_STATISTICS
 .....................

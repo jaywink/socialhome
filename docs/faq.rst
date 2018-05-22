@@ -41,13 +41,6 @@ No, please report security issues directly to the maintainers in private message
 
 Please report security issues directly to the maintainer by email at ``mail@jasonrobinson.me``.
 
-How do I delete my account?
----------------------------
-
-Currently it is not possible to delete a user account from the user interface. We know! This is absurd and ridiculous. Unfortunately as the software is still in very early stages, it just hasn't been implemented. A delete is coming to the user interface soon, and it will allow permanently deleting not just profile but content, replies and uploaded files.
-
-Please request account deletion from your server administrator for now.
-
 As admin, how do I delete a local user or block a remote spambot?
 -----------------------------------------------------------------
 
