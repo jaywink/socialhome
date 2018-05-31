@@ -1,8 +1,10 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.models import Profile
+from socialhome.users.tasks.exports import create_user_export
 from socialhome.users.tests.factories import UserFactory, ProfileFactory
 
 
@@ -45,6 +47,7 @@ class TestUserViewSet(SocialhomeAPITestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@override_settings(SOCIALHOME_EXPORTS_PATH='/tmp/socialhome/exports')
 class TestProfileViewSet(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -57,6 +60,15 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         cls.self_profile = ProfileFactory(visibility=Visibility.SELF)
         cls.limited_profile = ProfileFactory(visibility=Visibility.LIMITED)
         Profile.objects.filter(id=cls.profile.id).update(visibility=Visibility.PUBLIC)
+
+    def test_create_export__permissions(self):
+        self.post("api:profile-create-export")
+        self.response_403()
+
+        with self.login(self.user):
+            self.post("api:profile-create-export")
+            self.response_200()
+        self.assertEqual(self.last_response.data.get('status'), 'Data export job queued.')
 
     def test_profile_list(self):
         self.get("api:profile-list")
@@ -152,6 +164,15 @@ class TestProfileViewSet(SocialhomeAPITestCase):
             self.assertEqual(
                 response.data.get(field), value
             )
+
+    def test_retrieve_export(self):
+        create_user_export(self.user.id)
+        self.get('api:profile-retrieve-export')
+        self.response_403()
+
+        with self.login(self.user):
+            self.get('api:profile-retrieve-export')
+        self.response_200()
 
     def test_user_add_follower(self):
         # Not authenticated

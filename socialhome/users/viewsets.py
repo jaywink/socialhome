@@ -1,5 +1,7 @@
+import django_rq
+from django.http import HttpResponse
 from rest_framework import mixins
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
@@ -8,6 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer
+from socialhome.users.tasks.exports import create_user_export, UserExporter
 
 
 class IsOwnProfileOrReadOnly(BasePermission):
@@ -52,6 +55,11 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         profile.following.add(target_profile)
         return Response({"status": "Follower added."})
 
+    @list_route(methods=["post"], permission_classes=(IsAuthenticated,))
+    def create_export(self, request, pk=None):
+        django_rq.enqueue(create_user_export, request.user.id)
+        return Response({"status": "Data export job queued."})
+
     @detail_route(methods=["post"])
     def remove_follower(self, request, pk=None):
         guid = request.data.get("guid")
@@ -64,6 +72,14 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             raise ValidationError("Cannot unfollow self!")
         profile.following.remove(target_profile)
         return Response({"status": "Follower removed."})
+
+    @list_route(methods=["get"], permission_classes=(IsAuthenticated,))
+    def retrieve_export(self, request, pk=None):
+        exporter = UserExporter(request.user)
+        zipf = exporter.retrieve()
+        response = HttpResponse(zipf, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename=%s' % exporter.name
+        return response
 
 
 class UserViewSet(mixins.RetrieveModelMixin, GenericViewSet):
