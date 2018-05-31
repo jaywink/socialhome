@@ -1,6 +1,6 @@
 import django_rq
 from django.http import HttpResponse
-from rest_framework import mixins
+from rest_framework import mixins, status
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
@@ -77,6 +77,8 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
     def retrieve_export(self, request, pk=None):
         exporter = UserExporter(request.user)
         zipf = exporter.retrieve()
+        if not zipf:
+            return Response({"status": "No export available"}, status=status.HTTP_400_BAD_REQUEST)
         response = HttpResponse(zipf, content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename=%s' % exporter.name
         return response

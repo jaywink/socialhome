@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load i18n %}
+{% load users %}
 
 {% block title %}{% trans "Account" %}{% endblock %}
 
@@ -14,7 +15,12 @@
     </form>
     <br>
     <h2>{% trans "Export data" %}</h2>
-    <input id="request-export-button" type="button" class="btn btn-primary" value="{% trans "Request export" %}" style="cursor: pointer;"/>
+    {% get_user_export_date as export_date %}
+    {% if export_date %}
+        <a href="{% url 'api:profile-retrieve-export' %}" class="btn btn-success">{% trans "Download export" %}</a>
+        ({% trans "created" %} {{ export_date }})
+    {% endif %}
+    <input id="request-export-button" type="button" class="btn btn-primary" value="{% trans "Request new export" %}" style="cursor: pointer;"/>
     <div id="request-export-status">
         <br>
     </div>

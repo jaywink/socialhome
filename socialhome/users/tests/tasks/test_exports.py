@@ -15,7 +15,7 @@ from socialhome.users.tests.factories import UserFactory, PublicProfileFactory
 
 @freeze_time('2018-05-30')
 @override_settings(SOCIALHOME_EXPORTS_PATH='/tmp/socialhome/exports')
-class TestCreateUserExport(SocialhomeTestCase):
+class UserExportTestBase(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -28,6 +28,8 @@ class TestCreateUserExport(SocialhomeTestCase):
             for file in os.listdir(export_path):
                 os.unlink(os.path.join(export_path, file))
 
+
+class TestCreateUserExport(UserExportTestBase):
     def test_export_create(self):
         create_user_export(self.user.id)
         self.assertTrue(
