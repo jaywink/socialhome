@@ -12,7 +12,7 @@ from socialhome.users.models import User
 from socialhome.users.serializers import ProfileSerializer, UserSerializer, LimitedProfileSerializer
 
 
-def create_export(user_id):
+def create_user_export(user_id):
     user = User.objects.get(id=user_id)
     exporter = UserExporter(user=user)
     exporter.create()

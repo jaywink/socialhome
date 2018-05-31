@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer
-from socialhome.users.tasks.exports import create_export, UserExporter
+from socialhome.users.tasks.exports import create_user_export, UserExporter
 
 
 class IsOwnProfileOrReadOnly(BasePermission):
@@ -57,7 +57,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
     @list_route(methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
-        django_rq.enqueue(create_export, request.user.id)
+        django_rq.enqueue(create_user_export, request.user.id)
         return Response({"status": "Data export job queued."})
 
     @detail_route(methods=["post"])
