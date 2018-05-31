@@ -2,12 +2,15 @@ import json
 import os
 import zipfile
 
+import django_rq
 from django.conf import settings
 from django.test import RequestFactory
+from django.urls import reverse
 from django.utils.timezone import now
 
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
+from socialhome.notifications.tasks import send_data_export_ready_notification
 from socialhome.users.models import User
 from socialhome.users.serializers import ProfileSerializer, UserSerializer, LimitedProfileSerializer
 
@@ -80,12 +83,18 @@ class UserExporter:
     def create(self):
         self.collect_data()
         self.store()
+        self.notify()
 
     def get_path(self):
         path = os.path.join(settings.SOCIALHOME_EXPORTS_PATH, str(self.user.id))
         if not os.path.isdir(path):
             os.makedirs(path)
         return path
+
+    def notify(self):
+        django_rq.enqueue(
+            send_data_export_ready_notification, self.user.id, reverse("api:profile-retrieve-export"),
+        )
 
     def retrieve(self):
         files = os.listdir(self.get_path())

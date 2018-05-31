@@ -1,0 +1,6 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "Your data export is ready for download:" %} {{ download_url }}.
+{% endblock %}

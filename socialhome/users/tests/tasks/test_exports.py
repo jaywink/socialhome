@@ -1,7 +1,9 @@
 import os
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import override_settings
+from django.urls import reverse
 from freezegun import freeze_time
 
 from socialhome.content.enums import ContentType
@@ -50,14 +52,24 @@ class TestUserExporter(SocialhomeTestCase):
         cls.reply = ContentFactory(author=cls.profile, parent=cls.content2, content_type=ContentType.REPLY)
         cls.share = ContentFactory(author=cls.profile, share_of=cls.content2, content_type=ContentType.SHARE)
 
+    def setUp(self):
+        self.exporter = UserExporter(user=self.user)
+
     def test_collect_data(self):
-        exporter = UserExporter(user=self.user)
-        exporter.create()
-        self.assertTrue("user" in exporter.data)
-        self.assertTrue("profile" in exporter.data)
-        self.assertEqual(len(exporter.data.get('following')), 2)
-        contents = exporter.data.get('content')
+        self.exporter.create()
+        self.assertTrue("user" in self.exporter.data)
+        self.assertTrue("profile" in self.exporter.data)
+        self.assertEqual(len(self.exporter.data.get('following')), 2)
+        contents = self.exporter.data.get('content')
         self.assertEqual(len(contents), 3)
         self.assertEqual(contents[0].get('guid'), self.content.guid)
         self.assertEqual(contents[1].get('guid'), self.reply.guid)
         self.assertEqual(contents[2].get('guid'), self.share.guid)
+
+    @patch("socialhome.users.tasks.exports.django_rq.enqueue", autospec=True)
+    def test_notify(self, mock_enqueue):
+        self.exporter.notify()
+        self.assertEqual(mock_enqueue.call_count, 1)
+        args, kwargs = mock_enqueue.call_args
+        self.assertEqual(args[1], self.user.id)
+        self.assertEqual(args[2], reverse("api:profile-retrieve-export"))
