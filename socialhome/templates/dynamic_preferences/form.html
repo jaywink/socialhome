@@ -1,19 +1,59 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load i18n %}
+{% load users %}
 
 {% block title %}{% trans "Account" %}{% endblock %}
 
 {% block content %}
     <h1>{% trans "Account" %}</h1>
+    <h2>{% trans "Preferences" %}</h2>
     <form action="" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form|crispy }}
         <input type="submit" class="btn btn-primary" value="{% trans "Save" %}" />
     </form>
     <br>
+    <h2>{% trans "Export data" %}</h2>
+    {% get_user_export_date as export_date %}
+    {% if export_date %}
+        <a href="{% url 'api:profile-retrieve-export' %}" class="btn btn-success">{% trans "Download export" %}</a>
+        ({% trans "created" %} {{ export_date }})
+    {% endif %}
+    <input id="request-export-button" type="button" class="btn btn-primary" value="{% trans "Request new export" %}" style="cursor: pointer;"/>
+    <div id="request-export-status">
+        <br>
+    </div>
+    <br>
     <div class="pull-right">
         <a href="{% url "users:delete-account" %}" class="btn btn-danger">Delete account</a>
     </div>
     <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Back to profile" %}</a>
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script>
+        $(document).ready(function() {
+            $('#request-export-button').click(function() {
+                $.post({
+                    url: '{% url "api:profile-create-export" %}',
+                    headers: {
+                        'X-CSRFToken': Cookies.get('csrftoken'),
+                    },
+                    error: function() {
+                        $('#request-export-status').html(
+                            '<p style="color: red;">{% trans "Export request failed. Please try again later or contact the admin." %}</p>'
+                        );
+                    },
+                    success: function() {
+                        $('#request-export-status').html(
+                            '<p>{% trans "Export has been requested. You will receive an email when it is ready for download." %}</p>' +
+                            '<p>{% trans "The export can also be downloaded from this page when it is ready." %}</p>'
+                        );
+                    },
+                });
+            });
+        });
+    </script>
 {% endblock %}

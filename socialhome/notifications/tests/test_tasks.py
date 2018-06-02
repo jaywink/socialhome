@@ -4,9 +4,10 @@ from django.conf import settings
 from django.urls import reverse
 
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.notifications.tasks import send_reply_notifications, send_follow_notification, send_share_notification
+from socialhome.notifications.tasks import (
+    send_reply_notifications, send_follow_notification, send_share_notification, send_data_export_ready_notification)
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory
 
 
 class TestSendReplyNotification(SocialhomeTestCase):
@@ -71,6 +72,23 @@ class TestSendShareNotification(SocialhomeTestCase):
     @patch("socialhome.notifications.tasks.send_mail")
     def test_calls_send_email(self, mock_send):
         send_share_notification(self.share.id)
+        self.assertEqual(mock_send.call_count, 1)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(args[3], [self.user.email])
+        self.assertFalse(kwargs.get("fail_silently"))
+
+
+class TestSendDataExportReadyNotification(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+
+    @patch("socialhome.notifications.tasks.send_mail")
+    def test_calls_send_email(self, mock_send):
+        send_data_export_ready_notification(self.user.id, "/foo/bar")
+
         self.assertEqual(mock_send.call_count, 1)
         args, kwargs = mock_send.call_args_list[0]
         self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)

@@ -1,13 +1,19 @@
+import datetime
 import json
 import os
 import zipfile
 
+import django_rq
 from django.conf import settings
 from django.test import RequestFactory
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
+from socialhome.notifications.tasks import send_data_export_ready_notification
 from socialhome.users.models import User
 from socialhome.users.serializers import ProfileSerializer, UserSerializer, LimitedProfileSerializer
 
@@ -19,21 +25,24 @@ def create_user_export(user_id):
 
 
 class UserExporter:
-    def __init__(self, user):
+    def __init__(self, user, request=None):
         self.user = user
-        self.request = RequestFactory().get('/')
-        self.request.user = self.user
+        if request:
+            self.request = request
+        else:
+            self.request = RequestFactory().get('/')
+            self.request.user = self.user
         self.context = {
             'request': self.request,
         }
         self.data = {}
-        self.data_json_path = os.path.join(self.get_path(), 'data.json')
-        self.images_zip_path = os.path.join(self.get_path(), 'images.zip')
+        self.data_json_path = os.path.join(self.path, 'data.json')
+        self.images_zip_path = os.path.join(self.path, 'images.zip')
         self.name = '%s-%s.zip' % (settings.SOCIALHOME_DOMAIN, now().date().isoformat())
 
     def _create_final_zip(self):
         # Zip all together
-        with zipfile.ZipFile(os.path.join(self.get_path(), self.name), 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(os.path.join(self.path, self.name), 'w', zipfile.ZIP_DEFLATED) as zipf:
             zipf.write(self.data_json_path, arcname='data.json')
             zipf.write(self.images_zip_path, arcname='images.zip')
         # Remove the tmp files
@@ -42,9 +51,9 @@ class UserExporter:
 
     def _remove_previous_export(self):
         # Remove old ones first
-        files = os.listdir(self.get_path())
+        files = os.listdir(self.path)
         for file in files:
-            os.unlink(os.path.join(self.get_path(), file))
+            os.unlink(os.path.join(self.path, file))
 
     def _store_data(self):
         # Data
@@ -80,17 +89,37 @@ class UserExporter:
     def create(self):
         self.collect_data()
         self.store()
+        self.notify()
 
-    def get_path(self):
+    @property
+    def file_date(self):
+        if self.file_path:
+            stat = os.stat(self.file_path)
+            return datetime.datetime.fromtimestamp(stat.st_ctime, tz=timezone.get_current_timezone())
+
+    @cached_property
+    def file_path(self):
+        files = os.listdir(self.path)
+        if not files:
+            return
+        file = files[0]
+        return os.path.join(self.path, file)
+
+    @cached_property
+    def path(self):
         path = os.path.join(settings.SOCIALHOME_EXPORTS_PATH, str(self.user.id))
         if not os.path.isdir(path):
             os.makedirs(path)
         return path
 
+    def notify(self):
+        django_rq.enqueue(
+            send_data_export_ready_notification, self.user.id, reverse("api:profile-retrieve-export"),
+        )
+
     def retrieve(self):
-        files = os.listdir(self.get_path())
-        file = files[0]
-        return open(os.path.join(self.get_path(), file), 'rb')
+        if self.file_path:
+            return open(self.file_path, 'rb')
 
     def store(self):
         self._remove_previous_export()

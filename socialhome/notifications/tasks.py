@@ -134,3 +134,31 @@ def send_share_notification(share_id):
         fail_silently=False,
         html_message=render_to_string("notifications/share.html", context=context),
     )
+
+
+def send_data_export_ready_notification(user_id, download_url):
+    """
+    Send notification to user that their data export is ready.
+    """
+    if settings.DEBUG:
+        return
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        logger.warning("No user found with id %s", user_id)
+        return
+
+    subject = _("Data export is ready for download")
+    context = get_common_context()
+    context.update({
+        "download_url": "%s%s" % (settings.SOCIALHOME_URL, download_url),
+        "subject": subject,
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/data_export.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=render_to_string("notifications/data_export.html", context=context),
+    )
