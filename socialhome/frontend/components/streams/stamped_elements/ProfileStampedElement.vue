@@ -13,47 +13,26 @@
             <b-dropdown right>
                 <i slot="button-content" id="profile-menu-button" class="fa fa-cog" />
                 <b-dropdown-item
-                    :href="urls.updateProfile"
-                    :title="translations.updateProfile"
-                    :aria-label="translations.updateProfile"
+                        :href="urls.pictureUpdate"
+                        :title="translations.changePicture"
+                        :aria-label="translations.changePicture"
                 >
-                    <i class="fa fa-address-book" /> {{ translations.updateProfile }}
+                    {{ translations.changePicture }}
                 </b-dropdown-item>
                 <b-dropdown-item
-                    :href="urls.pictureUpdate"
-                    :title="translations.changePicture"
-                    :aria-label="translations.changePicture"
+                        v-if="profile.has_pinned_content"
+                        :href="urls.organizeProfileUrl"
+                        :title="translations.organizeProfileContent"
+                        :aria-label="translations.organizeProfileContent"
                 >
-                    <i class="fa fa-camera" /> {{ translations.changePicture }}
+                    {{ translations.organizeProfileContent }}
                 </b-dropdown-item>
                 <b-dropdown-item
-                    :href="urls.account"
-                    :title="translations.account"
-                    :aria-label="translations.account"
+                        :href="urls.updateProfile"
+                        :title="translations.updateProfile"
+                        :aria-label="translations.updateProfile"
                 >
-                    <i class="fa fa-cog" /> {{ translations.account }}
-                </b-dropdown-item>
-                <b-dropdown-item
-                    :href="urls.apiToken"
-                    :title="translations.apiToken"
-                    :aria-label="translations.apiToken"
-                >
-                    <i class="fa fa-code" /> {{ translations.apiToken }}
-                </b-dropdown-item>
-                <b-dropdown-item
-                    :href="urls.accountsEmail"
-                    :title="translations.email"
-                    :aria-label="translations.email"
-                >
-                    <i class="fa fa-envelope"></i> {{ translations.email }}
-                </b-dropdown-item>
-                <b-dropdown-item
-                    v-if="profile.has_pinned_content"
-                    :href="urls.organizeProfileUrl"
-                    :title="translations.organizeProfileContent"
-                    :aria-label="translations.organizeProfileContent"
-                >
-                    <i class="fa fa-arrows-v"></i> {{ translations.organizeProfileContent }}
+                    {{ translations.updateProfile }}
                 </b-dropdown-item>
             </b-dropdown>
             <div class="mt-1">
@@ -165,10 +144,7 @@ export default Vue.component("profile-stamped-element", {
         },
         translations() {
             return {
-                account: gettext("Account"),
-                apiToken: gettext("API token"),
                 changePicture: gettext("Change picture"),
-                email: gettext("Email"),
                 followers: gettext("Followers"),
                 following: gettext("Following"),
                 organizeProfileContent: gettext("Organize profile content"),
@@ -180,9 +156,6 @@ export default Vue.component("profile-stamped-element", {
         },
         urls() {
             return {
-                account: Urls["dynamic_preferences.user"](),
-                accountsEmail: Urls["account_email"](),
-                apiToken: Urls["users:api-token"](),
                 contactsFollowed: Urls["users:contacts-followed"](),
                 organizeProfileUrl: Urls["users:profile-organize"](),
                 pictureUpdate: Urls["users:picture-update"](),

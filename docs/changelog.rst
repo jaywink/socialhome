@@ -30,6 +30,8 @@ Added
 
 * New environment variable ``DJANGO_TIMEZONE`` allows easily customizing the time zone that the Socialhome instance runs on. It defaults to ``UTC``.
 
+* Staff users can now access the admin and task queue (background jobs) pages via the new "gears" menu in the navbar. See <`documentation <https://socialhome.readthedocs.io/en/latest/running.html#admin-user>`_ on how to make a user admin.
+
 Changed
 .......
 
@@ -40,6 +42,8 @@ Changed
   Don't precache items into streams for users who have not been active. Controlled by the same settings as the maintenance of precached streams. Will reduce unnecessary background jobs and make Redis memory usage even more stable.
 
 * Provided Circus configuration now ensures RQ worker processes are not allowed to endlessly hog server memory. In some rare cases it has happened that normally very stable RQ worker processes have hogged several gigabytes of memory due to reasons which are still being investigated. Now Circus will end those processes automatically.
+
+* Moved user account, logout, email management and API token pages links under the new "gears" menu in the navbar. These links used to be in the profile page menu.
 
 Fixed
 .....

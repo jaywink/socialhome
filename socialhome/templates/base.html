@@ -61,8 +61,22 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url "users:detail" request.user.username  %}">{% trans "My Profile" %}</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url "account_logout" %}">{% trans "Logout" %}</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" id="navbar-menu" href="#">
+                                <i class="fa fa-gear" aria-label="{% trans "Menu" %}"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbar-menu">
+                                <a class="dropdown-item" href="{% url "dynamic_preferences.user" %}">{% trans "Account" %}</a>
+                                <a class="dropdown-item" href="{% url "users:api-token" %}">{% trans "API token" %}</a>
+                                <a class="dropdown-item" href="{% url "account_email" %}">{% trans "Emails" %}</a>
+                                {% if request.user.is_staff %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{% url "admin:index" %}">{% trans "Admin" %}</a>
+                                    <a class="dropdown-item" href="{% url "rq_home" %}">{% trans "Task queue" %}</a>
+                                    <div class="dropdown-divider"></div>
+                                {% endif %}
+                                <a class="dropdown-item" href="{% url "account_logout" %}">{% trans "Logout" %}</a>
+                            </div>
                         </li>
                     {% else %}
                         <li class="nav-item">
