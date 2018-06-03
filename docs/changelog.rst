@@ -22,11 +22,13 @@ Added
 
 * Add user export API (`#478 <https://github.com/jaywink/socialhome/issues/478>`_)
 
-  New API endpoints `/api/profiles/create_export/` will create an export and `/api/profiles/retrieve_export/` will retrieve the export zip file. Export will contain a JSON file of the user, profile, followers and content. A zip file of uploaded images will also be included.
+  New API endpoints ``/api/profiles/create_export/`` will create an export and ``/api/profiles/retrieve_export/`` will retrieve the export zip file. Export will contain a JSON file of the user, profile, followers and content. A zip file of uploaded images will also be included.
 
 * Add user data export to user account page (`#478 <https://github.com/jaywink/socialhome/issues/478>`_)
 
   The account page now has a button to request an export of user data. In addition to user and profile data, this export contains a list of profiles followed, content (including shares and replies) and a zip file of image uploads. An email notification will be sent to the user once the export is ready for download from the account page.
+
+* New environment variable ``DJANGO_TIMEZONE`` allows easily customizing the time zone that the Socialhome instance runs on. It defaults to ``UTC``.
 
 Changed
 .......

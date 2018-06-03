@@ -223,6 +223,11 @@ Default: ``True``
 
 Redirect all requests to HTTPS. See `docs <https://django-secure.readthedocs.io/en/latest/settings.html#secure-ssl-redirect>`_.
 
+DJANGO_TIMEZONE
+...............
+
+Default: ``UTC``
+
 REDIS_DB
 ........
 

@@ -133,7 +133,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = "UTC"
+TIME_ZONE = env("DJANGO_TIMEZONE", default="UTC")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
