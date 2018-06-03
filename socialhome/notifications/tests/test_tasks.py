@@ -87,7 +87,7 @@ class TestSendDataExportReadyNotification(SocialhomeTestCase):
 
     @patch("socialhome.notifications.tasks.send_mail")
     def test_calls_send_email(self, mock_send):
-        send_data_export_ready_notification(self.user.id, "/foo/bar")
+        send_data_export_ready_notification(self.user.id)
 
         self.assertEqual(mock_send.call_count, 1)
         args, kwargs = mock_send.call_args_list[0]

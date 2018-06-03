@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from socialhome.content.enums import ContentType
@@ -136,7 +137,7 @@ def send_share_notification(share_id):
     )
 
 
-def send_data_export_ready_notification(user_id, download_url):
+def send_data_export_ready_notification(user_id):
     """
     Send notification to user that their data export is ready.
     """
@@ -151,7 +152,8 @@ def send_data_export_ready_notification(user_id, download_url):
     subject = _("Data export is ready for download")
     context = get_common_context()
     context.update({
-        "download_url": "%s%s" % (settings.SOCIALHOME_URL, download_url),
+        "download_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("dynamic_preferences.user")),
+        "name": user.profile.name_or_handle,
         "subject": subject,
     })
     send_mail(

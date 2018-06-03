@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.test import override_settings
-from django.urls import reverse
 from freezegun import freeze_time
 
 from socialhome.content.enums import ContentType
@@ -74,4 +73,3 @@ class TestUserExporter(SocialhomeTestCase):
         self.assertEqual(mock_enqueue.call_count, 1)
         args, kwargs = mock_enqueue.call_args
         self.assertEqual(args[1], self.user.id)
-        self.assertEqual(args[2], reverse("api:profile-retrieve-export"))

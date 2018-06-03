@@ -113,9 +113,7 @@ class UserExporter:
         return path
 
     def notify(self):
-        django_rq.enqueue(
-            send_data_export_ready_notification, self.user.id, reverse("api:profile-retrieve-export"),
-        )
+        django_rq.enqueue(send_data_export_ready_notification, self.user.id)
 
     def retrieve(self):
         if self.file_path:
