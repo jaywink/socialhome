@@ -32,6 +32,10 @@ Added
 
 * Staff users can now access the admin and task queue (background jobs) pages via the new "gears" menu in the navbar. See <`documentation <https://socialhome.readthedocs.io/en/latest/running.html#admin-user>`_ on how to make a user admin.
 
+* Add an easily customizable ``robots.txt`` with default rules
+
+  The rules by default disallow all except direct links to content, the root profile and the public stream. Server admins can customize the rules easily via the admin interface.
+
 Changed
 .......
 

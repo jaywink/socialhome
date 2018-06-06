@@ -58,3 +58,7 @@ whoosh
 # - requests timeout (TODO make PR)
 # - decrease consumer error logging level to debug (TODO make PR)
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
+
+# Django-Robots - waiting for pypi release of 3.1.0
+# See https://github.com/jazzband/django-robots/issues/87
+-e git+https://github.com/jazzband/django-robots.git@3.1.0#egg=robots

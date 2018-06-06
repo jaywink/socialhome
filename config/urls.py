@@ -33,6 +33,8 @@ schema_view = get_schema_view(title="Socialhome API", renderer_classes=[OpenAPIR
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),
 
+    url(r'^robots\.txt', include('robots.urls')),
+
     # Streams
     url(r"^streams/", include("socialhome.streams.urls.views", namespace="streams")),
     # Legacy streams urls support

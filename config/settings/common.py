@@ -61,6 +61,7 @@ THIRD_PARTY_APPS = (
     "versatileimagefield",
     "django_js_reverse",
     "memoize",
+    "robots",
 )
 LOCAL_APPS = (
     "socialhome",
