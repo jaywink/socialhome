@@ -62,6 +62,7 @@ THIRD_PARTY_APPS = (
     "django_js_reverse",
     "memoize",
     "robots",
+    "reversion",
 )
 LOCAL_APPS = (
     "socialhome",

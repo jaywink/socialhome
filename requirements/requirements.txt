@@ -41,12 +41,14 @@ django-enumfields==0.10.0
 django-environ==0.4.4
 django-extensions==2.0.6
 django-floppyforms==1.7.0
+django-fsm==2.6.0
 django-haystack==2.8.0
 django-js-reverse==0.8.1
 django-memoize==2.1.0
 django-model-utils==3.1.1
 django-redis==4.9.0
 django-rest-swagger==2.1.2
+django-reversion==2.0.13
 django-rq==1.0.1
 django-secure==1.0.1
 django-settings-export==1.2.1

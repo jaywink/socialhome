@@ -4,8 +4,10 @@ from importlib import import_module
 
 from braces.views import LoginRequiredMixin
 from django.conf import settings
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
+from markdownx.utils import markdownify
 from markdownx.views import ImageUploadView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -14,6 +16,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.views import APIView
 
 from socialhome.forms import MarkdownXImageForm
+from socialhome.models import PolicyDocument
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
 from socialhome.users.models import Profile
 from socialhome.users.serializers import LimitedProfileSerializer
@@ -76,3 +79,22 @@ class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
         data = LimitedProfileSerializer(user.profile, context={"request": self.request}).data
         data.update({"token": token.key})
         return Response(data)
+
+
+class PolicyDocumentView(TemplateView):
+    template_name = "socialhome/policy_document.html"
+
+    def dispatch(self, request, document_type=None, *args, **kwargs):
+        if not document_type:
+            return Http404()
+        self.document = get_object_or_404(PolicyDocument, type=document_type.value, published_version__isnull=False)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'policy_title': self.document.type.label,
+            'policy_content': markdownify(self.document.published_content),
+            'policy_version': self.document.published_version,
+        })
+        return context
