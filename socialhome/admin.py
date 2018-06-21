@@ -18,4 +18,3 @@ class PolicyDocumentAdmin(MarkdownxModelAdmin):
         else:
             raise ValidationError("Invalid state")
         super().save_model(request, obj, form, change)
-

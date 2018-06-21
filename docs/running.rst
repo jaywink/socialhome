@@ -114,6 +114,19 @@ To only delete remote profile content and then lock the profile, run as follows:
 
 Multiple ``guid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
 
+.. _policy-docs:
+
+Policy documents
+----------------
+
+Terms of Service and Privacy policy documents are good to have. These tell people visiting your site what rules you operate with. Socialhome provides default templates you can activate with a few clicks.
+
+To review and enable the policy documents, log in as admin and access the admin pages through the navigation bar cogs menu. Scroll down and locate "Policy documents". There are two types of documents, the Terms of Service and Privacy Policy. Each one can be edited in draft mode and then published. Further updates in draft mode will not overwrite the last published version, until published.
+
+To publish the documents, open them, review the text and then change the status below the document to "published". Click Save - this version is now published. To edit in draft mode, switch the status back and the current edited revision will not show to users.
+
+Policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
+
 Configuration
 -------------
 
@@ -140,14 +153,14 @@ DJANGO_ADMIN_MAIL
 
 Default: ``info@socialhome.local``
 
-Admin email for example for outgoing emails and providing a feedback channel for users.
+Admin email for terms of service and privacy policy documents, outgoing emails and server metadata.
 
 DJANGO_ADMIN_NAME
 .................
 
 Default: ``Socialhome Admin``
 
-Admin display name for example for outgoing emails.
+Admin display name or organization name for Terms of Service, outgoing emails and server metadata.
 
 DJANGO_ALLOWED_HOSTS
 ....................
@@ -390,3 +403,10 @@ SOCIALHOME_SYSLOG_LEVEL
 Default: ``INFO``
 
 Define the logging level of syslog logging, if ``SOCIALHOME_LOG_TARGET`` is set to ``syslog``. Possible options: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``.
+
+SOCIALHOME_TOS_JURISDICTION
+...........................
+
+Default: ``None``
+
+Define what jurisdiction (country) should be printed on the terms of service document. If not given, jurisdiction will not be included in the terms of service documents.

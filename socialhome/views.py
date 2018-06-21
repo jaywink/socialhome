@@ -6,6 +6,7 @@ from braces.views import LoginRequiredMixin
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.template import Template, Context
 from django.views.generic import TemplateView
 from markdownx.utils import markdownify
 from markdownx.views import ImageUploadView
@@ -92,9 +93,17 @@ class PolicyDocumentView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        template = Template(self.document.published_content)
+        template_context = Context({
+            'domain': settings.SOCIALHOME_DOMAIN,
+            'email': settings.SOCIALHOME_CONTACT_EMAIL,
+            'maintainer': settings.SOCIALHOME_MAINTAINER,
+            'jurisdiction': settings.SOCIALHOME_TOS_JURISDICTION,
+        })
+        rendered = template.render(template_context)
         context.update({
             'policy_title': self.document.type.label,
-            'policy_content': markdownify(self.document.published_content),
+            'policy_content': markdownify(rendered),
             'policy_version': self.document.published_version,
         })
         return context

@@ -363,10 +363,15 @@ For a SystemD config file, see :ref:`installation-other-systemd`.
 Done!
 '''''
 
-That wasn't so hard was it?
+That wasn't so hard was it? Navigate to the domain you chose to install Socialhome on and hopefully you will see a landing page. Signups will be open.
 
-Navigate to the domain you chose to install Socialhome on and hopefully you will see a landing page. Signups will be open. Unless you want to keep it that way, after creating your own account, you should close the signups to avoid random people signing up to your instance. See configuration tips at :ref:`running`.
+Final tweaks
+''''''''''''
+
+Unless you want to keep signups open, after creating your own account, you should close the signups to avoid random people signing up to your instance. See configuration tips at :ref:`running`.
 
 If you didn't configure emails, you cannot complete your user account registration without the email confirmation link. See :ref:`shell-email-confirm`.
 
 If you want to set your initially created user as admin, see :ref:`admin-user`.
+
+Terms of Service and Privacy policy documents are good to have. These tell people visiting your site what rules you operate with. Socialhome provides default templates you can activate with a few clicks. See :ref:`policy-docs` for more info.
