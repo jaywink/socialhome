@@ -3,18 +3,18 @@
 
 {% block body %}
     <p>
-        {{ subject }}
+        {{ subject }}.
     </p>
     <p>
     {% trans "The changes have become effective at" %} {{ update_time }}.
     {% if docs == 'both' or docs == 'tos' %}
         <p>
-            {% trans "Please find the updated Terms of Service document at" %} {{ tos_url }}.
+            {% trans "Please find the updated Terms of Service document" %} <a href="{{ tos_url }}">{% trans "here" %}</a>.
         </p>
     {% endif %}
     {% if docs == 'both' or docs == 'privacypolicy' %}
         <p>
-            {% trans "Please find the updated Privacy Policy document at" %} {{ privacypolicy_url }}.
+            {% trans "Please find the updated Privacy Policy document" %} <a href="{{ privacypolicy_url }}">{% trans "here" %}</a>.
         </p>
     {% endif %}
     <p>

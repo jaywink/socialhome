@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block body %}
-{{ subject }}
+{{ subject }}.
 
 {% trans "The changes have become effective at" %} {{ update_time }}.
 {% if docs == 'both' or docs == 'tos' %}
