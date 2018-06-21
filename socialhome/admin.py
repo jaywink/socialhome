@@ -28,7 +28,12 @@ class PolicyDocumentAdmin(MarkdownxModelAdmin):
         if not types:
             messages.error(request, _("Choose policy document types to send emails about first!"))
 
-        django_rq.enqueue(send_policy_document_update_notifications, types)
+        if len(types) == 2:
+            docs = 'both'
+        else:
+            docs = types[0].value
+
+        django_rq.enqueue(send_policy_document_update_notifications, docs)
         messages.info(request, _("Policy document update emails queued for sending."))
 
     send_email.short_description = _("Send email update to all users")
