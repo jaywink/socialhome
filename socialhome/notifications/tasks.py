@@ -1,10 +1,12 @@
 import logging
 
+import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from socialhome.content.enums import ContentType
@@ -164,3 +166,57 @@ def send_data_export_ready_notification(user_id):
         fail_silently=False,
         html_message=render_to_string("notifications/data_export.html", context=context),
     )
+
+
+def send_policy_document_update_notification(user_id, docs):
+    """
+    Send notification to user that policy documents have updates.
+    """
+    if settings.DEBUG:
+        return
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        logger.warning("No user found with id %s", user_id)
+        return
+
+    if docs == 'both':
+        subject = _("Important updates to our Terms of Service and Privacy Policy documents")
+    elif docs == 'privacypolicy':
+        subject = _("Important updates to our Privacy Policy document")
+    elif docs == 'tos':
+        subject = _("Important updates to our Terms of Service document")
+    else:
+        raise ValueError('Invalid docs type')
+    context = get_common_context()
+    context.update({
+        "docs": docs,
+        "privacypolicy_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("privacy-policy")),
+        "tos_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("terms-of-service")),
+        "name": user.profile.name_or_handle,
+        "subject": subject,
+        "update_time": now().isoformat(),
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/policy_document_update.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=render_to_string("notifications/policy_document_update.html", context=context),
+    )
+
+
+def send_policy_document_update_notifications(docs):
+    """
+    Queue sending policy document update notifications to users.
+    """
+    if settings.DEBUG:
+        return
+
+    users = User.objects.filter(emailaddress__verified=True).distinct()
+    for user in users:
+        try:
+            django_rq.enqueue(send_policy_document_update_notification, user.id, docs)
+        except Exception:
+            logger.error("Failed to enqueue policy document update to user %s" % user.id)

@@ -123,9 +123,9 @@ Terms of Service and Privacy policy documents are good to have. These tell peopl
 
 To review and enable the policy documents, log in as admin and access the admin pages through the navigation bar cogs menu. Scroll down and locate "Policy documents". There are two types of documents, the Terms of Service and Privacy Policy. Each one can be edited in draft mode and then published. Further updates in draft mode will not overwrite the last published version, until published.
 
-To publish the documents, open them, review the text and then change the status below the document to "published". Click Save - this version is now published. To edit in draft mode, switch the status back and the current edited revision will not show to users.
+To publish the documents, open them, review the text and then change the status below the document to "published". Click Save - this version is now published. To edit in draft mode, switch the status back and the current edited revision will not show to users. You can also send email updates to users from the policy documents list. Select the policy documents you wish the send an email about, choose "Send email" from the actions list and confirm.
 
-Policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
+Published policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
 
 Configuration
 -------------
