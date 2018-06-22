@@ -195,7 +195,7 @@ def send_policy_document_update_notification(user_id, docs):
         "tos_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("terms-of-service")),
         "name": user.profile.name_or_handle,
         "subject": subject,
-        "update_time": now().isoformat(),
+        "update_time": now(),
     })
     send_mail(
         "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
