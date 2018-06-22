@@ -102,3 +102,7 @@ MIDDLEWARE += ("querycount.middleware.QueryCountMiddleware",)
 if testing:
     # Possibly wont conflict with anything..
     REDIS_DB = 15
+
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]

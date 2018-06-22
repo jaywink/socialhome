@@ -62,6 +62,7 @@ THIRD_PARTY_APPS = (
     "django_js_reverse",
     "memoize",
     "robots",
+    "reversion",
 )
 LOCAL_APPS = (
     "socialhome",
@@ -107,17 +108,6 @@ DEBUG_TOOLBAR_ENABLED = False
 FIXTURE_DIRS = (
     str(APPS_DIR.path("fixtures")),
 )
-
-# MANAGER CONFIGURATION
-# ------------------------------------------------------------------------------
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = (
-    (env("DJANGO_ADMIN_NAME", default="Socialhome Admin"),
-     env("DJANGO_ADMIN_MAIL", default="info@socialhome.local")),
-)
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
-MANAGERS = ADMINS
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -182,6 +172,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
+                "socialhome.context_processors.policy_documents",
             ],
         },
     },
@@ -324,6 +315,12 @@ SOCIALHOME_ADDITIONAL_APPS_URLS = env("SOCIALHOME_ADDITIONAL_APPS_URLS", default
 SOCIALHOME_HOME_VIEW = env("SOCIALHOME_HOME_VIEW", default=None)
 # If signups are closed, make signup link point here
 SOCIALHOME_NODE_LIST_URL = env("SOCIALHOME_NODE_LIST_URL", default="https://the-federation.info/socialhome")
+# Contact email
+SOCIALHOME_CONTACT_EMAIL = env("DJANGO_ADMIN_MAIL", default="webmaster@%s" % SOCIALHOME_DOMAIN)
+# Maintainer
+SOCIALHOME_MAINTAINER = env("DJANGO_ADMIN_NAME", default="Private individual")
+# Jurisdiction for terms of service
+SOCIALHOME_TOS_JURISDICTION = env("SOCIALHOME_TOS_JURISDICTION", default=None)
 
 # Streams
 # Trim precached streams to this maximum size
@@ -333,6 +330,17 @@ SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE
 
 # Exports
 SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
+
+# MANAGER CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
+ADMINS = (
+    (env("DJANGO_ADMIN_NAME", default="Socialhome Admin"),
+     env("DJANGO_ADMIN_MAIL", default="webmaster@%s" % SOCIALHOME_DOMAIN)),
+)
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
+MANAGERS = ADMINS
 
 # CHANNELS
 # --------

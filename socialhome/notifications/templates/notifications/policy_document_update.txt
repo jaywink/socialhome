@@ -1,0 +1,15 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{{ subject }}.
+
+{% trans "The changes have become effective at" %} {{ update_time|date:"Y-m-d" }}.
+{% if docs == 'both' or docs == 'tos' %}
+{% trans "Please find the updated Terms of Service document at" %} {{ tos_url }}.
+{% endif %}
+{% if docs == 'both' or docs == 'privacypolicy' %}
+{% trans "Please find the updated Privacy Policy document at" %} {{ privacypolicy_url }}.
+{% endif %}
+{% trans "No actions are required by you. By continuing to use the service you accept the new document(s)." %}
+{% endblock %}

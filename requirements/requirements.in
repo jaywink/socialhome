@@ -15,12 +15,14 @@ django-enumfields
 django-environ
 django-extensions
 django-floppyforms
+django-fsm
 django-haystack
 django-js-reverse
 django-memoize
 django-model-utils
 django-redis
 django-rest-swagger
+django-reversion
 django-rq
 django-secure
 django-settings-export

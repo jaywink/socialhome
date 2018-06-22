@@ -1,7 +1,8 @@
 from django.test import override_settings, RequestFactory
 
 from socialhome.content.tests.factories import ContentFactory
-from socialhome.enums import Visibility
+from socialhome.enums import Visibility, PolicyDocumentType
+from socialhome.models import PolicyDocument
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeCBVTestCase
 from socialhome.users.models import Profile
@@ -20,6 +21,47 @@ class TestBaseView(SocialhomeTestCase):
     def test_signup_link_shows_when_signup_are_opened(self):
         response = self.client.get("/")
         assert "/accounts/signup/" in str(response.content)
+
+
+class TestPolicyDocumentView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        if PolicyDocument.objects.count() == 0:
+            # Pytest ignores data migrations for some reason..
+            # Possibly related? https://github.com/pytest-dev/pytest-django/issues/341
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.TERMS_OF_SERVICE,
+                content='foo',
+                state='draft',
+            )
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.PRIVACY_POLICY,
+                content='foo',
+                state='draft',
+            )
+
+    def test_privacy_policy_document(self):
+        pd = PolicyDocument.objects.get(type=PolicyDocumentType.PRIVACY_POLICY)
+        pd.publish()
+        pd.save()
+        self.get('privacy-policy')
+        self.response_200()
+
+    def test_privacy_policy_document__not_published(self):
+        self.get('privacy-policy')
+        self.response_404()
+
+    def test_tos_document(self):
+        pd = PolicyDocument.objects.get(type=PolicyDocumentType.TERMS_OF_SERVICE)
+        pd.publish()
+        pd.save()
+        self.get('terms-of-service')
+        self.response_200()
+
+    def test_tos_document__not_published(self):
+        self.get('terms-of-service')
+        self.response_404()
 
 
 class TestRootProfile(SocialhomeTestCase):

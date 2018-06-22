@@ -1,0 +1,23 @@
+{% extends "notifications/base.html" %}
+{% load i18n %}
+
+{% block body %}
+    <p>
+        {{ subject }}.
+    </p>
+    <p>
+    {% trans "The changes have become effective at" %} {{ update_time|date:"Y-m-d" }}.
+    {% if docs == 'both' or docs == 'tos' %}
+        <p>
+            {% trans "Please find the updated Terms of Service document" %} <a href="{{ tos_url }}">{% trans "here" %}</a>.
+        </p>
+    {% endif %}
+    {% if docs == 'both' or docs == 'privacypolicy' %}
+        <p>
+            {% trans "Please find the updated Privacy Policy document" %} <a href="{{ privacypolicy_url }}">{% trans "here" %}</a>.
+        </p>
+    {% endif %}
+    <p>
+        {% trans "No actions are required by you. By continuing to use the service you accept the new document(s)." %}
+    </p>
+{% endblock %}

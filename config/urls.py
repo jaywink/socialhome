@@ -12,8 +12,10 @@ from django_js_reverse.views import urls_js
 
 from socialhome.content.views import ContentBookmarkletView
 from socialhome.content.viewsets import ContentViewSet
+from socialhome.enums import PolicyDocumentType
 from socialhome.viewsets import ImageUploadView
-from socialhome.views import HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken
+from socialhome.views import (
+    HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 # API routes
@@ -79,6 +81,20 @@ urlpatterns = [
 
     # Search
     url(r"^search/", include("socialhome.search.urls", namespace="search")),
+
+    # Policy docs
+    path(
+        'privacy/',
+        PolicyDocumentView.as_view(),
+        {'document_type': PolicyDocumentType.PRIVACY_POLICY},
+        name="privacy-policy"
+    ),
+    path(
+        'terms/',
+        PolicyDocumentView.as_view(),
+        {'document_type': PolicyDocumentType.TERMS_OF_SERVICE},
+        name="terms-of-service"
+    ),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

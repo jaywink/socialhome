@@ -1,4 +1,5 @@
 import factory
+from allauth.account.models import EmailAddress
 from factory import fuzzy
 
 from federation.entities import base
@@ -13,6 +14,17 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.User"
+
+    @factory.post_generation
+    def with_verified_email(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        EmailAddress.objects.create(
+            user=self,
+            email=self.email,
+            verified=True,
+        )
 
 
 class PublicUserFactory(UserFactory):

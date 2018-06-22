@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ policy_title }}{% endblock %}
+
+{% block content %}
+    <h2>{{ policy_title }}</h2>
+    <sub>{% trans "Version" %}: {{ policy_version }}</sub>
+
+    <br><br>
+    {{ policy_content|safe }}
+{% endblock %}
