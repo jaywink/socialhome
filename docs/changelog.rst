@@ -36,6 +36,16 @@ Added
 
   The rules by default disallow all except direct links to content, the root profile and the public stream. Server admins can customize the rules easily via the admin interface.
 
+* Admins can now add Terms of Service and Privacy Policy documents to the site (`#477 <https://github.com/jaywink/socialhome/issues/477>`_)
+
+  Terms of Service and Privacy policy documents are good to have. These tell people visiting your site what rules you operate with. Socialhome provides default templates you can activate with a few clicks.
+
+  To review and enable the policy documents, log in as admin and access the admin pages through the navigation bar cogs menu. Scroll down and locate "Policy documents". There are two types of documents, the Terms of Service and Privacy Policy. Each one can be edited in draft mode and then published. Further updates in draft mode will not overwrite the last published version, until published.
+
+  To publish the documents, open them, review the text and then change the status below the document to "published". Click Save - this version is now published. To edit in draft mode, switch the status back and the current edited revision will not show to users. You can also send email updates to users from the policy documents list. Select the policy documents you wish the send an email about, choose "Send email" from the actions list and confirm.
+
+  Published policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
+
 Changed
 .......
 
