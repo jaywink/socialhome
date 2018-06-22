@@ -1,5 +1,6 @@
 codecov
 coverage
+ddt
 django-debug-toolbar
 django-querycount
 django-test-plus

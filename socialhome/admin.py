@@ -27,6 +27,7 @@ class PolicyDocumentAdmin(MarkdownxModelAdmin):
         types = queryset.values_list('type', flat=True)
         if not types:
             messages.error(request, _("Choose policy document types to send emails about first!"))
+            return
 
         if len(types) == 2:
             docs = 'both'
