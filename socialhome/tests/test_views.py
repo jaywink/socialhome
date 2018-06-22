@@ -24,6 +24,23 @@ class TestBaseView(SocialhomeTestCase):
 
 
 class TestPolicyDocumentView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        if PolicyDocument.objects.count() == 0:
+            # Pytest ignores data migrations for some reason..
+            # Possibly related? https://github.com/pytest-dev/pytest-django/issues/341
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.TERMS_OF_SERVICE,
+                content='foo',
+                state='draft',
+            )
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.PRIVACY_POLICY,
+                content='foo',
+                state='draft',
+            )
+
     def test_privacy_policy_document(self):
         pd = PolicyDocument.objects.get(type=PolicyDocumentType.PRIVACY_POLICY)
         pd.publish()

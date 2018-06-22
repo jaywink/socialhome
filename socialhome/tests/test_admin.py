@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 from django.contrib.admin import AdminSite
 
 from socialhome.admin import PolicyDocumentAdmin
+from socialhome.enums import PolicyDocumentType
 from socialhome.models import PolicyDocument
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import AdminUserFactory
@@ -16,6 +17,19 @@ class TestPolicyDocumentAdmin(SocialhomeTestCase):
         cls.site = AdminSite()
         cls.user = AdminUserFactory()
         cls.request = cls.get_request(cls.user)
+        if PolicyDocument.objects.count() == 0:
+            # Pytest ignores data migrations for some reason..
+            # Possibly related? https://github.com/pytest-dev/pytest-django/issues/341
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.TERMS_OF_SERVICE,
+                content='foo',
+                state='draft',
+            )
+            PolicyDocument.objects.create(
+                type=PolicyDocumentType.PRIVACY_POLICY,
+                content='foo',
+                state='draft',
+            )
         cls.document = PolicyDocument.objects.first()
         cls.admin = PolicyDocumentAdmin(PolicyDocument, cls.site)
 
