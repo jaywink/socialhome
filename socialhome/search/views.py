@@ -1,6 +1,7 @@
 import xml
 
 from django.contrib import messages
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -10,6 +11,7 @@ from federation.utils.text import validate_handle
 from haystack.generic_views import SearchView
 from whoosh.query import QueryError
 
+from socialhome.content.models import Tag
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
@@ -35,6 +37,21 @@ class GlobalSearchView(SearchView):
         q = safe_text(request.GET.get("q"))
         if q:
             q = q.strip().lower()
+        # Check if direct tag matches
+        if q.startswith('#'):
+            try:
+                tag = Tag.objects.filter(
+                    name=q[1:]
+                ).annotate(
+                    content_count=Count('contents')
+                ).filter(
+                    content_count__gt=0
+                ).get()
+            except Tag.DoesNotExist:
+                pass
+            else:
+                return redirect(tag.get_absolute_url())
+        # Check if profile matches
         if validate_handle(q):
             profile = None
             try:
