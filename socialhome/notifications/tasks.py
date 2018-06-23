@@ -73,6 +73,43 @@ def send_follow_notification(follower_id, followed_id):
     )
 
 
+def send_mention_notification(user_id, mention_profile_id, content_id):
+    """Super simple you've been mentioned notification email."""
+    if settings.DEBUG:
+        return
+    try:
+        user = User.objects.get(id=user_id, is_active=True)
+    except User.DoesNotExist:
+        logger.warning("No active user %s found for mention notification", user_id)
+        return
+    try:
+        content = Content.objects.get(id=content_id)
+    except Content.DoesNotExist:
+        logger.warning("No content found with id %s", content_id)
+        return
+    try:
+        mention_profile = Profile.objects.get(id=mention_profile_id)
+    except Profile.DoesNotExist:
+        logger.warning("No profile found with id %s", mention_profile_id)
+        return
+    content_url = "%s%s" % (settings.SOCIALHOME_URL, content.get_absolute_url())
+    subject = _("You have been mentioned")
+    context = get_common_context()
+    context.update({
+        "subject": subject, "actor_name": mention_profile.name_or_handle,
+        "actor_url": "%s%s" % (settings.SOCIALHOME_URL, mention_profile.get_absolute_url()),
+        "content_url": content_url,
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/mention.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=render_to_string("notifications/mention.html", context=context),
+    )
+
+
 def send_reply_notifications(content_id):
     """Super simple reply notification to content local participants.
 

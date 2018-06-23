@@ -3,7 +3,7 @@ import logging
 
 import django_rq
 from django.db import transaction
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 
 from socialhome.content.enums import ContentType
@@ -11,7 +11,7 @@ from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
-from socialhome.notifications.tasks import send_reply_notifications, send_share_notification
+from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
 from socialhome.streams.consumers import StreamConsumer
 from socialhome.streams.streams import update_streams_with_content
 from socialhome.users.models import Profile
@@ -21,6 +21,9 @@ logger = logging.getLogger("socialhome")
 
 @receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
+    # TODO remove extract mentions from here when we have UI for creating mentions
+    if instance.local:
+        instance.extract_mentions()
     fetch_preview(instance)
     render_content(instance)
     if kwargs.get("created"):
@@ -50,6 +53,20 @@ def fetch_preview(content):
         fetch_content_preview(content)
     except Exception as ex:
         logger.exception("Failed to fetch content preview for %s: %s", content, ex)
+
+
+def on_commit_mentioned(action, pks, instance):
+    for id in pks:
+        # Send out notification only if local mentioned
+        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False):
+            django_rq.enqueue(send_mention_notification, id, instance.author.id, instance.id)
+
+
+@receiver(m2m_changed, sender=Content.mentions.through)
+def content_mentions_change(sender, instance, action, pk_set, **kwargs):
+    """Deliver notification on mentions addition."""
+    if action == "post_add":
+        transaction.on_commit(lambda: on_commit_mentioned(action, pk_set, instance))
 
 
 def render_content(content):

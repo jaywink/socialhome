@@ -1,0 +1,8 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "You have been mentioned by" %} {{ actor_name }} ({{ actor_url }}).
+
+{% trans "Link to the content:" %} {{ content_url }}
+{% endblock %}
