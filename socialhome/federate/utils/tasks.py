@@ -3,6 +3,7 @@ import logging
 import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
+from federation.utils.diaspora import parse_profile_diaspora_id
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -126,6 +127,7 @@ def process_entity_post(entity, profile):
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     content, created = Content.objects.update_or_create(guid=guid, defaults=values)
+    _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
     else:
@@ -151,6 +153,7 @@ def process_entity_comment(entity, profile):
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     content, created = Content.objects.update_or_create(guid=guid, defaults=values)
+    _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
     else:
@@ -182,6 +185,27 @@ def _embed_entity_images_to_post(children, text):
             "".join(images), text
         )
     return text
+
+
+def _process_mentions(content, entity):
+    """
+    Link mentioned profiles to the content.
+    """
+    if entity._mentions:
+        handles = {parse_profile_diaspora_id(s)[0] for s in entity._mentions}
+        existing_handles = set(content.mentions.values_list('handle', flat=True))
+        to_remove = existing_handles.difference(handles)
+        to_add = handles.difference(existing_handles)
+        for handle in to_remove:
+            try:
+                content.mentions.remove(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
+        for handle in to_add:
+            try:
+                content.mentions.add(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
 
 
 def _retract_content(target_guid, profile):
@@ -260,6 +284,7 @@ def process_entity_share(entity, profile):
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     guid = safe_text(entity.guid)
     content, created = Content.objects.update_or_create(guid=guid, share_of=target_content, defaults=values)
+    _process_mentions(content, entity)
     if created:
         logger.info("Saved share: %s", content)
     else:

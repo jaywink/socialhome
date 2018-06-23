@@ -89,6 +89,17 @@ class TestProcessEntityPost(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.local_content = LocalContentFactory()
+        cls.profile = ProfileFactory()
+
+    def test_mentions_are_linked(self):
+        entity = entities.PostFactory()
+        entity._mentions = {'diaspora://%s/profile/' % self.profile.handle}
+        process_entity_post(entity, ProfileFactory())
+        content = Content.objects.get(guid=entity.guid)
+        self.assertEqual(
+            set(content.mentions.all()),
+            {self.profile},
+        )
 
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
@@ -144,11 +155,21 @@ class TestProcessEntityComment(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.content = ContentFactory()
+        cls.profile = ProfileFactory()
 
     def setUp(self):
         super().setUp()
         self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar",
                                     handle="thor@example.com")
+
+    def test_mentions_are_linked(self):
+        self.comment._mentions = {'diaspora://%s/profile/' % self.profile.handle}
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid)
+        self.assertEqual(
+            set(content.mentions.all()),
+            {self.profile},
+        )
 
     def test_reply_is_created_from_entity(self):
         process_entity_comment(self.comment, ProfileFactory())
