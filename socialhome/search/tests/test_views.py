@@ -7,8 +7,10 @@ from django.test import RequestFactory
 from django.urls import reverse
 from federation.entities import base
 
+from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.search.views import GlobalSearchView
+from socialhome.streams.views import TagStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase, SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory, BaseProfileFactory
@@ -62,23 +64,37 @@ class TestGlobalSearchView(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.public_profile = PublicProfileFactory(name="Foobar")
+        cls.content = ContentFactory(text='#barfoo')
+        cls.tag = cls.content.tags.first()
 
     def test_view_renders(self):
         self.get("search:global")
         self.response_200()
         self.assertResponseContains("Search", html=False)
 
-    def test_returns_a_result(self):
+    def test_returns_a_result__profile(self):
         self.get("%s?q=%s" % (reverse("search:global"), "foobar"))
         self.assertResponseContains("Results", html=False)
         self.assertResponseContains(self.public_profile.name, html=False)
         self.assertResponseContains(self.public_profile.username_part, html=False)
+
+    def test_returns_a_result__tag(self):
+        self.get("%s?q=%s" % (reverse("search:global"), "barfoo"))
+        self.assertResponseContains("Results", html=False)
+        self.assertResponseContains(self.tag.name, html=False)
 
     def test_direct_profile_match_goes_to_profile_view(self):
         self.get("%s?q=%s" % (reverse("search:global"), self.public_profile.handle), follow=True)
         self.assertResponseNotContains("Results", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], self.public_profile)
+
+    def test_direct_tag_match_goes_to_tag_stream(self):
+        self.get("%s?q=%s" % (reverse("search:global"), '%23barfoo'), follow=True)
+        self.assertResponseNotContains("Results", html=False)
+        print(self.context)
+        self.assertEqual(self.context["view"].__class__, TagStreamView)
+        self.assertEqual(self.context["name"], self.tag.name)
 
     @patch("socialhome.search.views.retrieve_remote_profile")
     def test_search_by_handle_fetches_unknown_profile(self, mock_retrieve):

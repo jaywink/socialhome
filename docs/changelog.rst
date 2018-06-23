@@ -46,6 +46,12 @@ Added
 
   Published policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
 
+* Searching for hashtags is now possible using the global search
+
+  The global search now in addition to profile results returns also results of matching hashtags. If the search term includes the hash ('#') and matches exactly to a tag, an instant redirect will be made to the tag stream.
+
+  **Note to admins**: Once pulling this code, you should regenerate the search indexes using the command ``./manage.py rebuild_indexes``.
+
 Changed
 .......
 

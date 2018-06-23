@@ -478,6 +478,9 @@ class TestTagModel(SocialhomeTestCase):
         cls.tag = Tag.objects.create(name="foobar")
         cls.tag2 = Tag.objects.create(name="f"*150)
 
+    def test_get_absolute_url(self):
+        self.assertEqual(self.tag.get_absolute_url(), '/streams/tag/foobar/')
+
     def test_tag_instance_created(self):
         self.assertTrue(Tag.objects.filter(name="foobar").exists())
 
