@@ -47,6 +47,10 @@ class TestContentModel(SocialhomeTestCase):
             cls.public_content, cls.site_content, cls.limited_content, cls.self_content
         }
         cls.content_with_twitter_oembed = ContentFactory(text='class="twitter-tweet"')
+        cls.content_with_mentions = ContentFactory(
+            text="foo @{bar; %s} bar @{foo; %s}" % (cls.user.profile.handle, cls.remote_profile.handle),
+            author=cls.local_user.profile,
+        )
 
     def setUp(self):
         super().setUp()
@@ -64,6 +68,12 @@ class TestContentModel(SocialhomeTestCase):
     def test_create(self):
         content = Content.objects.create(text="foobar", author=ProfileFactory())
         assert content.guid
+
+    def test_extract_mentions(self):
+        self.assertEqual(
+            set(self.content_with_mentions.mentions.values_list('id', flat=True)),
+            {self.user.profile.id, self.remote_profile.id},
+        )
 
     def test_has_shared(self):
         self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))

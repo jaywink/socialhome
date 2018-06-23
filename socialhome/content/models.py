@@ -109,6 +109,7 @@ class Content(models.Model):
         OpenGraphCache, verbose_name=_("OpenGraph cache"), on_delete=models.SET_NULL, null=True
     )
 
+    mentions = models.ManyToManyField(Profile, verbose_name=_("Mentions"), related_name="mentioned_in")
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
 
     parent = models.ForeignKey(
@@ -166,6 +167,28 @@ class Content(models.Model):
             self.parent.cache_data(commit=True)
             if self.parent.share_of:
                 self.parent.share_of.cache_data(commit=True)
+
+    def extract_mentions(self):
+        # TODO locally created mentions should not have to be ripped out of text
+        # For now we just rip out diaspora style mentions until we have UI layer
+        mentions = re.findall(r'@{[^;]+; [\w.-]+@[^}]+}', self.text)
+        if not mentions:
+            self.mentions.clear()
+        handles = {s.split(';')[1].strip(' }') for s in mentions}
+
+        existing_handles = set(self.mentions.values_list('handle', flat=True))
+        to_remove = existing_handles.difference(handles)
+        to_add = handles.difference(existing_handles)
+        for handle in to_remove:
+            try:
+                self.mentions.remove(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
+        for handle in to_add:
+            try:
+                self.mentions.add(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
 
     def get_absolute_url(self):
         if self.slug:
