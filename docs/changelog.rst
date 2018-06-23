@@ -50,7 +50,7 @@ Added
 
   The global search now in addition to profile results returns also results of matching hashtags. If the search term includes the hash ('#') and matches exactly to a tag, an instant redirect will be made to the tag stream.
 
-  **Note to admins**: Once pulling this code, you should regenerate the search indexes using the command ``./manage.py rebuild_indexes``.
+  **Note to admins**: Once pulling this code, you should regenerate the search indexes using the command ``./manage.py rebuild_index``. Depending on the amount of content, this could take from anything from minutes to hours.
 
 Changed
 .......
