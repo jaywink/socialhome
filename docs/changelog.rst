@@ -74,6 +74,8 @@ Fixed
 
 * Ensure all streams Redis keys have a default expiry of 30 days.
 
+* Fix parsing of remote profile names by also using ``last_name`` attribute, where given (`#414 <https://github.com/jaywink/socialhome/issues/414>`_)
+
 0.8.0 (2018-03-06)
 ------------------
 
