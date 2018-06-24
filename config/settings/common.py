@@ -256,6 +256,7 @@ REDIS_HOST = env("REDIS_HOST", default="localhost")
 REDIS_PORT = env("REDIS_PORT", default=6379)
 REDIS_DB = env("REDIS_DB", default=0)
 REDIS_PASSWORD = env("REDIS_PASSWORD", default=None)
+REDIS_DEFAULT_EXPIRY = 60*60*24*30
 
 # RQ
 # --

@@ -72,6 +72,8 @@ Fixed
 
 * **Important for server admins**. There was a mistake in the production Redis connection settings. The setting was not following the given configuration in the documentation. Now the possibility to set ``REDIS_URL`` (undocumented) directly has been removed and will raise an error. Use the ``REDIS_HOST``, ``REDIS_DB``, ``REDIS_PORT`` and ``REDIS_PASSWORD`` settings instead when needed.
 
+* Ensure all streams Redis keys have a default expiry of 30 days.
+
 0.8.0 (2018-03-06)
 ------------------
 

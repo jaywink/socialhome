@@ -33,7 +33,10 @@ def add_to_redis(content, through, keys):
         # This stops shares popping up more than once, for example
         if not r.zrank(key, content.id):
             r.zadd(key, int(time.time()), content.id)
-            r.hset(BaseStream.get_throughs_key(key), content.id, through.id)
+            r.expire(key, settings.REDIS_DEFAULT_EXPIRY)
+            throughs_key = BaseStream.get_throughs_key(key)
+            r.hset(throughs_key, content.id, through.id)
+            r.expire(throughs_key, settings.REDIS_DEFAULT_EXPIRY)
 
 
 def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_profile_id):
