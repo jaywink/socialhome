@@ -3,9 +3,9 @@ coverage
 ddt
 django-debug-toolbar
 django-querycount
-django-test-plus
+django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why
 django_coverage_plugin
-django
+django<2.0.6  # Bump after https://github.com/ierror/django-js-reverse/issues/65 fixed
 factory_boy
 Faker
 flake8
@@ -19,8 +19,6 @@ pytest-env
 pytest-sugar
 Sphinx
 sphinx-autobuild
-tornado<5.0  # Not a direct requirement but we need to lock due to circus not working with 5.0
-             # Remove from this file once circus works with this
 Werkzeug
 
 # Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet

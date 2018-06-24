@@ -10,7 +10,7 @@ django-allauth
 django-autoslug
 django-braces
 django-crispy-forms
-django-dynamic-preferences
+django-dynamic-preferences<1.6  # Some breaking changes there
 django-enumfields
 django-environ
 django-extensions
@@ -28,7 +28,7 @@ django-secure
 django-settings-export
 django-tables2
 django-versatileimagefield
-django
+django<2.0.6  # Bump after https://github.com/ierror/django-js-reverse/issues/65 fixed
 djangorestframework
 ipython
 lxml
@@ -40,8 +40,6 @@ raven
 redis
 rq
 rq-scheduler
-tornado<5.0  # Not a direct requirement but we need to lock due to circus not working with 5.0
-             # Remove from this file once circus works with this
 typing  # Required by django-extensions on Python 3.4
 unicode-slugify
 uwsgi
