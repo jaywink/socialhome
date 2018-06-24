@@ -75,6 +75,14 @@ class TestContentModel(SocialhomeTestCase):
             {self.user.profile.id, self.remote_profile.id},
         )
 
+    def test_extract_mentions__removes_mentions(self):
+        self.content_with_mentions.text = "foo bar @{foo; %s}" % self.remote_profile.handle
+        self.content_with_mentions.save()
+        self.assertEqual(
+            set(self.content_with_mentions.mentions.values_list('id', flat=True)),
+            {self.remote_profile.id},
+        )
+
     def test_has_shared(self):
         self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))
         # Do a share

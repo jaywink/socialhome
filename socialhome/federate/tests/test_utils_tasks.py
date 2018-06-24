@@ -13,7 +13,7 @@ from socialhome.federate.tasks import forward_entity
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
-    process_entity_relationship, make_federable_profile, process_entity_share)
+    process_entity_relationship, make_federable_profile, process_entity_share, _process_mentions)
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile
@@ -82,6 +82,36 @@ class TestProcessEntities(SocialhomeTestCase):
     def test_logger_is_called_on_process_exception(self, mock_sender, mock_process, mock_logger):
         process_entities([self.post])
         self.assertEqual(mock_logger.called, 1)
+
+
+class TestProcessMentions(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.entity = entities.PostFactory()
+        cls.content = ContentFactory()
+        cls.profile2 = ProfileFactory()
+        cls.content.mentions.add(cls.profile2)
+
+    def test_addition_happens(self):
+        self.entity._mentions = {
+            'diaspora://%s/profile/' % self.profile.handle,
+            'diaspora://%s/profile/' % self.profile2.handle,
+        }
+        _process_mentions(self.content, self.entity)
+        self.assertEqual(
+            set(self.content.mentions.all()),
+            {self.profile, self.profile2},
+        )
+
+    def test_removal_happens(self):
+        self.entity._mentions = {}
+        _process_mentions(self.content, self.entity)
+        self.assertEqual(
+            set(self.content.mentions.all()),
+            set(),
+        )
 
 
 class TestProcessEntityPost(SocialhomeTestCase):

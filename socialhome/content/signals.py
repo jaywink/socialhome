@@ -58,8 +58,9 @@ def fetch_preview(content):
 def on_commit_mentioned(action, pks, instance):
     for id in pks:
         # Send out notification only if local mentioned
-        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False):
-            django_rq.enqueue(send_mention_notification, id, instance.author.id, instance.id)
+        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
+            profile = Profile.objects.values('user_id').get(id=id)
+            django_rq.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
 
 
 @receiver(m2m_changed, sender=Content.mentions.through)

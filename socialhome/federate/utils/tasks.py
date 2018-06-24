@@ -191,21 +191,20 @@ def _process_mentions(content, entity):
     """
     Link mentioned profiles to the content.
     """
-    if entity._mentions:
-        handles = {parse_profile_diaspora_id(s)[0] for s in entity._mentions}
-        existing_handles = set(content.mentions.values_list('handle', flat=True))
-        to_remove = existing_handles.difference(handles)
-        to_add = handles.difference(existing_handles)
-        for handle in to_remove:
-            try:
-                content.mentions.remove(Profile.objects.get(handle=handle))
-            except Profile.DoesNotExist:
-                pass
-        for handle in to_add:
-            try:
-                content.mentions.add(Profile.objects.get(handle=handle))
-            except Profile.DoesNotExist:
-                pass
+    handles = {parse_profile_diaspora_id(s)[0] for s in entity._mentions}
+    existing_handles = set(content.mentions.values_list('handle', flat=True))
+    to_remove = existing_handles.difference(handles)
+    to_add = handles.difference(existing_handles)
+    for handle in to_remove:
+        try:
+            content.mentions.remove(Profile.objects.get(handle=handle))
+        except Profile.DoesNotExist:
+            pass
+    for handle in to_add:
+        try:
+            content.mentions.add(Profile.objects.get(handle=handle))
+        except Profile.DoesNotExist:
+            pass
 
 
 def _retract_content(target_guid, profile):
