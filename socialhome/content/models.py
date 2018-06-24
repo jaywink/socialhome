@@ -59,7 +59,7 @@ class Tag(models.Model):
         return "#%s" % self.name
 
     def get_absolute_url(self):
-        return reverse('streams:tag', kwargs={"name": self.name})
+        return reverse('streams:tag', kwargs={"name": slugify(self.name)})
 
     def save(self, *args, **kwargs):
         """Ensure name is lower case and stripped.
