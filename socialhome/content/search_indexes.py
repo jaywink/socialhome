@@ -5,7 +5,7 @@ from socialhome.content.models import Tag
 
 
 class TagIndex(indexes.ModelSearchIndex, indexes.Indexable):
-    text = indexes.EdgeNgramField(document=True, use_template=True)
+    text = indexes.CharField(document=True, use_template=True)
 
     class Meta:
         model = Tag

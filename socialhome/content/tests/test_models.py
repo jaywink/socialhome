@@ -477,9 +477,13 @@ class TestTagModel(SocialhomeTestCase):
         super().setUpTestData()
         cls.tag = Tag.objects.create(name="foobar")
         cls.tag2 = Tag.objects.create(name="f"*150)
+        cls.weird_tag = Tag.objects.create(name="github...")
 
     def test_get_absolute_url(self):
         self.assertEqual(self.tag.get_absolute_url(), '/streams/tag/foobar/')
+
+    def test_get_absolute_url__survives_weird_tags(self):
+        self.assertEqual(self.weird_tag.get_absolute_url(), '/streams/tag/github/')
 
     def test_tag_instance_created(self):
         self.assertTrue(Tag.objects.filter(name="foobar").exists())
