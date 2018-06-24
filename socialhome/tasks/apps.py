@@ -1,3 +1,5 @@
+import sys
+
 import django_rq
 from django.apps import AppConfig
 
@@ -9,6 +11,10 @@ class TasksConfig(AppConfig):
     verbose_name = "Tasks"
 
     def ready(self):
+        # Only register tasks if RQ Scheduler process
+        if "rqscheduler" not in sys.argv:
+            return
+
         scheduler = django_rq.get_scheduler("default")
 
         # Delete any existing jobs in the scheduler when the app starts up
