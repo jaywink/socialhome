@@ -98,7 +98,7 @@ def send_mention_notification(user_id, mention_profile_id, content_id):
     context.update({
         "subject": subject, "actor_name": mention_profile.name_or_handle,
         "actor_url": "%s%s" % (settings.SOCIALHOME_URL, mention_profile.get_absolute_url()),
-        "content_url": content_url,
+        "content_url": content_url, "name": user.profile.name_or_handle,
     })
     send_mail(
         "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
