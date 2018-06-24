@@ -58,6 +58,8 @@ Added
 
   When mentioned, local users will be sent an email notification with a link to the content.
 
+  **Note to admins**: A script is provided if you want to parse old content for mentions. Run ``./manage.py runscript link_old_mentions`` if you wish to parse the content from the last year and create the links. This will also send out email notifications.
+
 Changed
 .......
 
