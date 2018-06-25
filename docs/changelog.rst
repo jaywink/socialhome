@@ -52,6 +52,14 @@ Added
 
   **Note to admins**: Once pulling this code, you should regenerate the search indexes using the command ``./manage.py rebuild_index``. Depending on the amount of content, this could take from anything from minutes to hours.
 
+* Mentions are now parsed out of incoming remote content and locally created content.
+
+  Currently the only syntax supported is the Diaspora mentions syntax, ie ``@{Name; user@domain.tld}``. Currently Socialhome users can create mentions by using the syntax manually. UI layer will be added later to choose people using the standard @ syntax to trigger search.
+
+  When mentioned, local users will be sent an email notification with a link to the content.
+
+  **Note to admins**: A script is provided if you want to parse old content for mentions. Run ``./manage.py runscript link_old_mentions`` if you wish to parse the content from the last year and create the links. This will also send out email notifications.
+
 Changed
 .......
 

@@ -7,9 +7,26 @@ from django.urls import reverse
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.notifications.tasks import (
     send_reply_notifications, send_follow_notification, send_share_notification, send_data_export_ready_notification,
-    send_policy_document_update_notification, send_policy_document_update_notifications)
+    send_policy_document_update_notification, send_policy_document_update_notifications, send_mention_notification)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
+
+
+class TestSendMentionNotification(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.content = ContentFactory(author=cls.profile)
+
+    @patch("socialhome.notifications.tasks.send_mail")
+    def test_calls_send_email(self, mock_send):
+        send_mention_notification(self.user.id, self.remote_profile.id, self.content.id)
+        self.assertEqual(mock_send.call_count, 1)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(args[3], [self.user.email])
+        self.assertFalse(kwargs.get("fail_silently"))
 
 
 @ddt

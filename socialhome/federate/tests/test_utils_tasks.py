@@ -13,7 +13,7 @@ from socialhome.federate.tasks import forward_entity
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
-    process_entity_relationship, make_federable_profile, process_entity_share)
+    process_entity_relationship, make_federable_profile, process_entity_share, _process_mentions)
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile
@@ -84,11 +84,52 @@ class TestProcessEntities(SocialhomeTestCase):
         self.assertEqual(mock_logger.called, 1)
 
 
+class TestProcessMentions(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.entity = entities.PostFactory()
+        cls.content = ContentFactory()
+        cls.profile2 = ProfileFactory()
+        cls.content.mentions.add(cls.profile2)
+
+    def test_addition_happens(self):
+        self.entity._mentions = {
+            'diaspora://%s/profile/' % self.profile.handle,
+            'diaspora://%s/profile/' % self.profile2.handle,
+        }
+        _process_mentions(self.content, self.entity)
+        self.assertEqual(
+            set(self.content.mentions.all()),
+            {self.profile, self.profile2},
+        )
+
+    def test_removal_happens(self):
+        self.entity._mentions = {}
+        _process_mentions(self.content, self.entity)
+        self.assertEqual(
+            set(self.content.mentions.all()),
+            set(),
+        )
+
+
 class TestProcessEntityPost(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.local_content = LocalContentFactory()
+        cls.profile = ProfileFactory()
+
+    def test_mentions_are_linked(self):
+        entity = entities.PostFactory()
+        entity._mentions = {'diaspora://%s/profile/' % self.profile.handle}
+        process_entity_post(entity, ProfileFactory())
+        content = Content.objects.get(guid=entity.guid)
+        self.assertEqual(
+            set(content.mentions.all()),
+            {self.profile},
+        )
 
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
@@ -144,11 +185,21 @@ class TestProcessEntityComment(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.content = ContentFactory()
+        cls.profile = ProfileFactory()
 
     def setUp(self):
         super().setUp()
         self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar",
                                     handle="thor@example.com")
+
+    def test_mentions_are_linked(self):
+        self.comment._mentions = {'diaspora://%s/profile/' % self.profile.handle}
+        process_entity_comment(self.comment, ProfileFactory())
+        content = Content.objects.get(guid=self.comment.guid)
+        self.assertEqual(
+            set(content.mentions.all()),
+            {self.profile},
+        )
 
     def test_reply_is_created_from_entity(self):
         process_entity_comment(self.comment, ProfileFactory())
