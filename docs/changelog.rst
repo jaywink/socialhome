@@ -60,6 +60,8 @@ Added
 
   **Note to admins**: A script is provided if you want to parse old content for mentions. Run ``./manage.py runscript link_old_mentions`` if you wish to parse the content from the last year and create the links. This will also send out email notifications.
 
+* Admin now has a section for Content items, for debugging purposes.
+
 Changed
 .......
 
