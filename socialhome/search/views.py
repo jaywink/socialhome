@@ -2,7 +2,7 @@ import xml
 
 from django.contrib import messages
 from django.db.models import Count
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -18,6 +18,32 @@ from socialhome.users.models import Profile
 
 
 class GlobalSearchView(SearchView):
+    def get_context_data(self, *args, **kwargs):
+        """Add tags results to the context."""
+        context = super().get_context_data(*args, **kwargs)
+        tags = self.get_tags_qs()
+        tags_context = {
+            'paginator': None,
+            'page_obj': None,
+            'is_paginated': False,
+            'object_list': tags,
+        }
+        page_size = self.get_paginate_by(tags)
+        if page_size:
+            try:
+                paginator, page, queryset, is_paginated = self.paginate_queryset(tags, page_size)
+            except Http404:
+                pass
+            else:
+                tags_context = {
+                    'paginator': paginator,
+                    'page_obj': page,
+                    'is_paginated': is_paginated,
+                    'object_list': queryset,
+                }
+        context['tags'] = tags_context
+        return context
+
     def get_queryset(self):
         """Exclude some information from the queryset.
 
@@ -29,6 +55,17 @@ class GlobalSearchView(SearchView):
         queryset = super().get_queryset()
         return self.filter_queryset(queryset)
 
+    def get_tags_qs(self):
+        """
+        Retrieve tags.
+        """
+        return Tag.objects.annotate(
+            content_count=Count('contents')
+        ).filter(
+            content_count__gt=0,
+            name__icontains=self.q,
+        ).order_by('name')
+
     def get(self, request, *args, **kwargs):
         """See if we have a direct match. If so redirect, if not, search.
 
@@ -37,6 +74,7 @@ class GlobalSearchView(SearchView):
         q = safe_text(request.GET.get("q"))
         if q:
             q = q.strip().lower()
+        self.q = q
         # Check if direct tag matches
         if q.startswith('#'):
             try:
@@ -73,7 +111,6 @@ class GlobalSearchView(SearchView):
             # Re-render the form
             messages.warning(self.request, _("Search string is invalid, please try another one."))
             return HttpResponseRedirect(self.get_success_url())
-
 
     def filter_queryset(self, queryset):
         """Do some of our own filtering on the queryset before returning."""
