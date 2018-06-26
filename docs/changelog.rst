@@ -50,8 +50,6 @@ Added
 
   The global search now in addition to profile results returns also results of matching hashtags. If the search term includes the hash ('#') and matches exactly to a tag, an instant redirect will be made to the tag stream.
 
-  **Note to admins**: Once pulling this code, you should regenerate the search indexes using the command ``./manage.py rebuild_index``. Depending on the amount of content, this could take from anything from minutes to hours.
-
 * Mentions are now parsed out of incoming remote content and locally created content.
 
   Currently the only syntax supported is the Diaspora mentions syntax, ie ``@{Name; user@domain.tld}``. Currently Socialhome users can create mentions by using the syntax manually. UI layer will be added later to choose people using the standard @ syntax to trigger search.

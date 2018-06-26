@@ -17,57 +17,80 @@
 
     {% if query %}
         <br>
-        <h3>{% trans "Results" %}</h3>
-        <div class="search-results">
-            <ul>
-                {% for result in page_obj.object_list %}
-                    <li class="mb-1 pt-1">
-                        <div class="row">
-                            <div class="col-2 align-self-center">
-                                {% if result.content_type == "users.profile" %}
-                                    <a href="{{ result.object.get_absolute_url }}">
-                                        <img class="profile-picture" src="{{ result.object.safer_image_url_small }}">
-                                    </a>
-                                {% elif result.content_type == 'content.tag' %}
-                                    <a href="{{ result.object.get_absolute_url }}">
-                                        <i class="fa fa-hashtag" aria-hidden="true"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                            <div class="col-8 align-self-center">
-                                {% if result.content_type == "users.profile" %}
-                                    {% if result.object.name %}
-                                        <a href="{{ result.object.get_absolute_url }}">{{ result.object.name }} ({{ result.object.handle }})</a>
-                                    {% else %}
-                                        <a href="{{ result.object.get_absolute_url }}">{{ result.object.handle }}</a>
-                                    {% endif %}
-                                {% elif result.content_type == 'content.tag' %}
-                                    <a href="{{ result.object.get_absolute_url }}">#{{ result.object.name }}</a>
-                                {% endif %}
-                            </div>
-                            <div class="col-2 align-self-center">
-                                {% if result.content_type == "users.profile" %}
-                                    {% if request.user.is_authenticated %}
-                                        <button class="follower-button btn btn-secondary {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
-                                        <button class="follower-button btn btn-secondary {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </li>
-                {% empty %}
-                    <li>{% trans "No results found." %}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        {% if page_obj.has_previous or page_obj.has_next %}
-            <div class="text-center">
-                {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}" class="btn btn-secondary">&laquo; {% trans "Previous" %}</a>{% endif %}
-                |
-                {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}" class="btn btn-secondary">{% trans "Next" %} &raquo;</a>{% endif %}
+        <div class="row">
+            <div class="col-md-6">
+                <h3>{% trans "Profiles" %}</h3>
+                <div class="search-results">
+                    <ul>
+                        {% for result in page_obj.object_list %}
+                            <li class="mb-1 pt-1">
+                                <div class="row">
+                                    <div class="col-2 align-self-center">
+                                        {% if result.content_type == "users.profile" %}
+                                            <a href="{{ result.object.get_absolute_url }}">
+                                                <img class="profile-picture" src="{{ result.object.safer_image_url_small }}">
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-8 align-self-center">
+                                        {% if result.content_type == "users.profile" %}
+                                            {% if result.object.name %}
+                                                <a href="{{ result.object.get_absolute_url }}">{{ result.object.name }} ({{ result.object.handle }})</a>
+                                            {% else %}
+                                                <a href="{{ result.object.get_absolute_url }}">{{ result.object.handle }}</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-2 align-self-center">
+                                        {% if result.content_type == "users.profile" %}
+                                            {% if request.user.is_authenticated %}
+                                                <button class="follower-button btn btn-secondary {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                                                <button class="follower-button btn btn-secondary {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li>{% trans "No results found." %}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if page_obj.has_previous or page_obj.has_next %}
+                    <div class="text-center">
+                        {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}" class="btn btn-secondary">&laquo; {% trans "Previous" %}</a>{% endif %}
+                        |
+                        {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}" class="btn btn-secondary">{% trans "Next" %} &raquo;</a>{% endif %}
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+            <div class="col-md-6">
+                <h3>{% trans "Tags" %}</h3>
+                <div class="search-results">
+                    <ul>
+                        {% for result in tags.page_obj.object_list %}
+                            <li class="mb-1 pt-1">
+                                <div class="row">
+                                    <div class="col-2 align-self-center">
+                                        <a href="{{ result.get_absolute_url }}">
+                                            <i class="fa fa-hashtag" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                    <div class="col-8 align-self-center">
+                                        <a href="{{ result.get_absolute_url }}">#{{ result.name }}</a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li>{% trans "No results found." %}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if tags.page_obj.has_next %}
+                    <p class="ml-3">{% trans "There are more tags results. Please refine the query." %}</p>
+                {% endif %}
+            </div>
+        </div>
     {% else %}
         {# Show some example queries to run, maybe query syntax, something else? #}
     {% endif %}
