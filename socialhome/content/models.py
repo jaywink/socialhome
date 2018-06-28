@@ -111,6 +111,9 @@ class Content(models.Model):
 
     mentions = models.ManyToManyField(Profile, verbose_name=_("Mentions"), related_name="mentioned_in")
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
+    limited_visibilities = models.ManyToManyField(
+        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
+    )
 
     parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
