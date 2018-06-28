@@ -23,7 +23,7 @@ class TestReceiveTask:
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
     def test_receive_task_runs(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar")
-        mock_process_entities.assert_called_with(["entity"])
+        mock_process_entities.assert_called_with(["entity"], receiving_profile=None)
 
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", []))
     def test_receive_task_returns_none_on_no_entities(self, mock_handle_receive, mock_process_entities):
