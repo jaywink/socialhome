@@ -143,8 +143,8 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return "{text} ({guid})".format(
-            text=truncate_letters(self.text, 100), guid=self.guid
+        return "{text} ({type}, {visibility}, {guid})".format(
+            text=truncate_letters(self.text, 30), guid=self.guid, visibility=self.visibility, type=self.content_type,
         )
 
     def cache_data(self, commit=False):
