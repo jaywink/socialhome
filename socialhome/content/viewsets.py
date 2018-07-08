@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
-from rest_framework import exceptions
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import exceptions, status
 from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import BasePermission, SAFE_METHODS
@@ -9,6 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
+from socialhome.enums import Visibility
 
 
 class IsOwnContentOrReadOnly(BasePermission):
@@ -39,7 +41,8 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         Create content or reply
 
         When creating top level content, required values are: `text` and `visibility`.
-        Value for `visibility` should be one of: `public`, `site`, `limited`, `self`.
+        Value for `visibility` should be one of: `public`, `site` or `self`. Limited content
+        is currently not supported via the API.
 
         When creating replies, required values are: `text` and `parent`. The `parent` value is the ID of the
         content that is being replied on. A reply cannot have `visibility` set to anything else than the parent
@@ -102,6 +105,10 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         return super().get_throttles()
 
     def perform_create(self, serializer):
+        if serializer.validated_data.get('visibility') == Visibility.LIMITED:
+            return Response(
+                _("Limited content creation not yet supported via the API."), status=status.HTTP_400_BAD_REQUEST,
+            )
         serializer.save(author=self.request.user.profile)
 
     @detail_route(methods=["get"])
