@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-import pytest
 from django.test import override_settings
 from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
@@ -17,18 +16,17 @@ from socialhome.users.models import Profile
 from socialhome.users.tests.factories import UserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory
 
 
-@pytest.mark.usefixtures("db")
-@patch("socialhome.federate.tasks.process_entities")
-class TestReceiveTask:
-    @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]))
+@patch("socialhome.federate.tasks.process_entities", autospec=True)
+class TestReceiveTask(SocialhomeTestCase):
+    @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]), autospec=True)
     def test_receive_task_runs(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar")
         mock_process_entities.assert_called_with(["entity"], receiving_profile=None)
 
-    @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", []))
+    @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", []), autospec=True)
     def test_receive_task_returns_none_on_no_entities(self, mock_handle_receive, mock_process_entities):
-        assert receive_task("foobar") is None
-        mock_process_entities.assert_not_called()
+        self.assertIsNone(receive_task("foobar"))
+        self.assertTrue(mock_process_entities.called is False)
 
 
 class TestSendContent(SocialhomeTestCase):
@@ -41,9 +39,9 @@ class TestSendContent(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None, autospec=True)
     def test_only_limited_and_public_content_calls_make_federable_content(self, mock_maker):
         send_content(self.self_content.id)
-        mock_maker.assert_not_called()
+        self.assertTrue(mock_maker.called is False)
         send_content(self.site_content.id)
-        mock_maker.assert_not_called()
+        self.assertTrue(mock_maker.called is False)
         send_content(self.limited_content.id)
         mock_maker.assert_called_once_with(self.limited_content)
         mock_maker.reset_mock()
@@ -70,7 +68,7 @@ class TestSendContent(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     def test_content_not_sent_in_debug_mode(self, mock_send):
         send_content(self.public_content.id)
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
 
 class TestSendContentRetraction(SocialhomeTestCase):
@@ -83,9 +81,9 @@ class TestSendContentRetraction(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None, autospec=True)
     def test_only_limited_and_public_content_calls_make_federable_retraction(self, mock_maker):
         send_content_retraction(self.self_content, self.self_content.author_id)
-        mock_maker.assert_not_called()
+        self.assertTrue(mock_maker.called is False)
         send_content_retraction(self.site_content, self.site_content.author_id)
-        mock_maker.assert_not_called()
+        self.assertTrue(mock_maker.called is False)
         send_content_retraction(self.limited_content, self.limited_content.author_id)
         mock_maker.assert_called_once_with(self.limited_content, self.limited_content.author)
         mock_maker.reset_mock()
@@ -110,7 +108,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     def test_content_not_sent_in_debug_mode(self, mock_send):
         send_content_retraction(self.public_content, self.public_content.author_id)
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
 
 @patch("socialhome.federate.tasks.handle_send")
@@ -198,7 +196,7 @@ class TestSendShare(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     def test_only_public_share_calls_make_federable_content(self, mock_maker):
         send_share(self.limited_share.id)
-        mock_maker.assert_not_called()
+        self.assertTrue(mock_maker.called is False)
         send_share(self.share.id)
         mock_maker.assert_called_once_with(self.share)
 
@@ -222,7 +220,7 @@ class TestSendShare(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     def test_content_not_sent_in_debug_mode(self, mock_send):
         send_share(self.share.id)
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
