@@ -124,3 +124,11 @@ class ContentSerializer(serializers.ModelSerializer):
             if not value.visible_for_user(request.user):
                 raise serializers.ValidationError("Parent not found")
         return value
+
+    def validate_visibility(self, value):
+        """
+        Don't allow creating Limited visibility as of now.
+        """
+        if value == Visibility.LIMITED and not self.instance:
+            raise serializers.ValidationError("Limited content creation not yet supported via the API.")
+        return value

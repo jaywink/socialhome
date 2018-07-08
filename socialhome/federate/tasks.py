@@ -201,7 +201,7 @@ def send_content_retraction(content, author_id):
     """
     Handle sending of retractions for content.
     """
-    if not content.visibility in (Visibility.PUBLIC, Visibility.LIMITED) or not content.local:
+    if content.visibility not in (Visibility.PUBLIC, Visibility.LIMITED) or not content.local:
         return
     author = Profile.objects.get(id=author_id)
     entity = make_federable_retraction(content, author)
@@ -232,7 +232,7 @@ def send_profile_retraction(profile):
 
     This must be called as a pre_delete signal or it will fail.
     """
-    if not profile.visibility in (Visibility.PUBLIC, Visibility.LIMITED) or not profile.is_local:
+    if profile.visibility not in (Visibility.PUBLIC, Visibility.LIMITED) or not profile.is_local:
         return
     entity = make_federable_retraction(profile)
     if entity:
