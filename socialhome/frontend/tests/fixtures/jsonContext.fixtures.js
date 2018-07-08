@@ -34,6 +34,7 @@ const getFakeContent = function (args = {}) {
         user_following_author: faker.random.boolean(),
         user_is_author: faker.random.boolean(),
         user_has_shared: faker.random.boolean(),
+        visibility: "public",
     })
 }
 

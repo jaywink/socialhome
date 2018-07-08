@@ -73,7 +73,7 @@ export default Vue.component("reactions-bar", {
             return false
         },
         canShare() {
-            return !this.content.user_is_author
+            return !this.content.user_is_author && this.content.visibility === "public"
         },
         translations() {
             return {
