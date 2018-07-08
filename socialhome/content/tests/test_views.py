@@ -6,7 +6,8 @@ from django.test.client import Client, RequestFactory
 from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
+from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory, \
+    LimitedContentFactory
 from socialhome.content.views import ContentCreateView, ContentUpdateView, ContentDeleteView
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeCBVTestCase
@@ -138,6 +139,15 @@ class TestContentUpdateView(SocialhomeTestCase):
         cls.user = UserFactory()
         cls.other_user = UserFactory()
         cls.content = ContentFactory(author=cls.user.profile)
+        cls.limited_content = LimitedContentFactory(author=cls.user.profile)
+        cls.limited_content.limited_visibilities.add(cls.other_user.profile)
+
+    def test_limited_visibilities_keep_in_edit(self):
+        with self.login(self.user):
+            self.get("content:update", pk=self.limited_content.id)
+        self.limited_content.refresh_from_db()
+        self.assertEqual(self.limited_content.limited_visibilities.count(), 1)
+        self.assertEqual(self.limited_content.limited_visibilities.first(), self.other_user.profile)
 
     def test_update_view_renders(self):
         with self.login(self.user):
@@ -291,8 +301,10 @@ class TestContentReplyView(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        user = UserFactory()
-        cls.content = ContentFactory(author=user.profile)
+        cls.user = UserFactory()
+        cls.content = ContentFactory(author=cls.user.profile)
+        cls.limited_content = LimitedContentFactory(author=cls.user.profile)
+        cls.limited_content.limited_visibilities.add(cls.user.profile)
 
     def test_view_renders(self):
         with self.login(self.content.author.user):
@@ -311,3 +323,14 @@ class TestContentReplyView(SocialhomeTestCase):
         self.assertEqual(response.status_code, 302)
         self.content.refresh_from_db()
         self.assertEqual(self.content.children.count(), 1)
+
+    def test_form_valid__limited(self):
+        with self.login(self.user):
+            response = self.client.post(
+                reverse("content:reply", kwargs={"pk": self.limited_content.id}), {"text": "foobar"},
+            )
+        self.assertEqual(response.status_code, 302)
+        self.limited_content.refresh_from_db()
+        self.assertEqual(self.limited_content.children.count(), 1)
+        reply = self.limited_content.children.first()
+        self.assertEqual(reply.visibility, Visibility.LIMITED)

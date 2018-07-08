@@ -33,6 +33,8 @@ class FollowedStreamAPIView(StreamsAPIBaseView):
 
 
 class LimitedStreamAPIView(StreamsAPIBaseView):
+    permission_classes = (IsAuthenticated,)
+
     def get_content(self):
         stream = LimitedStream(last_id=self.last_id, user=self.request.user)
         return stream.get_content()

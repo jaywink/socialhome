@@ -77,25 +77,22 @@ class ContentForm(forms.ModelForm):
             return self.cleaned_data["text"]
         return safe_text_for_markdown(self.cleaned_data["text"])
 
-    def save(self, commit=True):
+    def save(self, commit=True, parent=None):
         """
         Set possible recipients after save.
         """
-        # If reply, get parent recipients
-        if self.instance.content_type == ContentType.REPLY and self.instance.parent.visibility == Visibility.LIMITED:
-            recipients_content = self.instance.parent
-            self.instance.visibility = self.instance.parent.visibility
-        else:
-            recipients_content = self.instance
-
         # Get previous recipients, if old instance
         previous_recipients = []
-        if self.instance.visibility == Visibility.LIMITED and not self.instance._state.adding:
-            previous_recipients = recipients_content.limited_visibilities.values_list('id', flat=True)
+        if not self.instance._state.adding and self.instance.limited_visibilities.count():
+            previous_recipients = self.instance.limited_visibilities.values_list('id', flat=True)
 
-        # Save the content
         if not self.instance.author_id:
             self.instance.author = self.user.profile
+
+        if parent:
+            self.instance.parent = parent
+
+        # Save the content
         content = super().save(commit=commit)
         if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
             return content
@@ -110,7 +107,7 @@ class ContentForm(forms.ModelForm):
                 recipients = recipients | self.user.profile.following.all()
                 recipients = recipients.distinct()
         elif content.content_type == ContentType.REPLY:
-            recipients = recipients_content.limited_visibilities.all()
+            recipients = content.parent.limited_visibilities.all()
         else:
             return content
 

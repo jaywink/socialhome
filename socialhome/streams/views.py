@@ -55,7 +55,7 @@ class BaseStreamView(TemplateView):
         return self.stream_class.stream_type.value
 
 
-class LimitedStreamView(BaseStreamView):
+class LimitedStreamView(LoginRequiredMixin, BaseStreamView):
     stream_class = LimitedStream
 
     def get_page_meta(self):

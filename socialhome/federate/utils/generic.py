@@ -13,10 +13,10 @@ from socialhome import __version__ as version
 from socialhome.content.enums import ContentType
 
 
-def generate_rsa_private_key():
+def generate_rsa_private_key(bits=4096):
     """Generate a new RSA private key."""
     rand = Random.new().read
-    return RSA.generate(4096, rand)
+    return RSA.generate(bits, rand)
 
 
 def get_diaspora_profile_by_handle(handle):

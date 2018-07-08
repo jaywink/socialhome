@@ -37,6 +37,12 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.site_content.author.refresh_from_db()
         self.limited_content.author.refresh_from_db()
 
+    def test_limited(self):
+        contents = set(Content.objects.limited(self.limited_content_user))
+        self.assertEqual(contents, {
+            self.limited_content, self.limited_tag_content, self.site_content, self.site_tag_content,
+        })
+
     def test_pinned(self):
         contents = set(Content.objects.pinned())
         self.assertEqual(contents, {self.public_content, self.site_content, self.self_content})
@@ -53,7 +59,6 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.visible_for_user(self.limited_content_user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
                                     self.site_tag_content, self.limited_content, self.limited_tag_content})
-
 
     def test_public(self):
         contents = set(Content.objects.public())

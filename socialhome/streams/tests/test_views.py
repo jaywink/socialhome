@@ -5,7 +5,7 @@ from django.test import Client
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
-from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView
+from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -58,6 +58,52 @@ class TestFollowedStreamView(SocialhomeCBVTestCase):
 
     def test_redirects_to_login_if_not_authenticated(self):
         self.assertLoginRequired("streams:followed")
+
+
+class TestLimitedStreamView(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.site = ContentFactory(visibility=Visibility.SITE)
+        cls.selff = ContentFactory(visibility=Visibility.SELF)
+        cls.limited = ContentFactory(visibility=Visibility.LIMITED)
+        cls.user = UserFactory()
+        cls.client = Client()
+
+    def test_get_json_context(self):
+        view = self.get_instance(LimitedStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+            }
+        )
+
+    def test_renders(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:limited"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_requires_being_logged_in(self):
+        response = self.client.get(reverse("streams:limited"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_stream_name(self):
+        view = self.get_instance(LimitedStreamView)
+        self.assertEqual(view.stream_name, StreamType.LIMITED.value)
+
+    def test_stream_type_value(self):
+        view = self.get_instance(LimitedStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.LIMITED.value)
+
+    def test_uses_correct_template(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:limited"))
+        template_names = [template.name for template in response.templates]
+        self.assertIn("streams/base.html", template_names)
 
 
 class TestPublicStreamView(SocialhomeCBVTestCase):

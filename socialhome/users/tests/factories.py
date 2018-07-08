@@ -27,12 +27,29 @@ class UserFactory(factory.django.DjangoModelFactory):
         )
 
 
+class LimitedUserFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        user.profile.visibility = Visibility.LIMITED
+        user.profile.save(update_fields=["visibility"])
+        return user
+
+
 class PublicUserFactory(UserFactory):
     @classmethod
     def _generate(cls, create, attrs):
         user = super(UserFactory, cls)._generate(create, attrs)
         user.profile.visibility = Visibility.PUBLIC
         user.profile.save(update_fields=["visibility"])
+        return user
+
+
+class UserWithKeyFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        user.profile.generate_new_rsa_key(bits=1024)
         return user
 
 
@@ -60,6 +77,13 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.Profile"
+
+    @factory.post_generation
+    def with_key(self, extracted, created, **kwargs):
+        if not extracted:
+            return
+
+        self.generate_new_rsa_key(bits=1024)
 
 
 class PublicProfileFactory(ProfileFactory):
