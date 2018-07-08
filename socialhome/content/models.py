@@ -111,9 +111,6 @@ class Content(models.Model):
 
     mentions = models.ManyToManyField(Profile, verbose_name=_("Mentions"), related_name="mentioned_in")
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
-    limited_visibilities = models.ManyToManyField(
-        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
-    )
 
     parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name=_("Parent"), related_name="children", null=True, blank=True,
@@ -125,10 +122,24 @@ class Content(models.Model):
 
     federate = models.BooleanField(
         _("Federate to remote servers"), default=True,
-        help_text=_("Disable to skip federating this version to remote servers. Note, saved content version"
+        help_text=_("Disable to skip federating this version to remote servers. Note, saved content version "
                     "will still be updated to local streams.")
     )
 
+    # Fields relevant for Visibility.LIMITED only
+    limited_visibilities = models.ManyToManyField(
+        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
+    )
+    include_following = models.BooleanField(
+        _("Include people I follow"), default=False,
+        help_text=_("Automatically includes all the people you follow as recipients."),
+    )
+    mention_recipients = models.BooleanField(
+        _("Mention recipients"), default=False,
+        help_text=_("Mention all recipients. This will make recipients visible to each other."),
+    )
+
+    # Dates
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))

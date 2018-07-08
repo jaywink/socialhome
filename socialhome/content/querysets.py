@@ -51,6 +51,9 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.visible_for_user(user)
 
+    def limited(self, user):
+        return self.top_level().visible_for_user(user).exclude(visibility=Visibility.PUBLIC)
+
     def pinned(self):
         return self.filter(pinned=True)
 
