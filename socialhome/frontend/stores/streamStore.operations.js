@@ -7,6 +7,7 @@ import _difference from "lodash/difference"
 const streamStoreOperations = {
     disableLoadMore: "disableLoadMore",
     getFollowedStream: "getFollowedStream",
+    getLimitedStream: "getLimitedStream",
     getNewContent: "getNewContent",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",

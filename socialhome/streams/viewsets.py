@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from socialhome.content.models import Tag
 from socialhome.content.serializers import ContentSerializer
-from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream
+from socialhome.streams.streams import (
+    PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream, LimitedStream)
 from socialhome.users.models import Profile
 
 
@@ -28,6 +29,12 @@ class FollowedStreamAPIView(StreamsAPIBaseView):
 
     def get_content(self):
         stream = FollowedStream(last_id=self.last_id, user=self.request.user)
+        return stream.get_content()
+
+
+class LimitedStreamAPIView(StreamsAPIBaseView):
+    def get_content(self):
+        stream = LimitedStream(last_id=self.last_id, user=self.request.user)
         return stream.get_content()
 
 

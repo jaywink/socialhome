@@ -42,6 +42,7 @@ import {streamStoreOperations} from "frontend/stores/streamStore"
 import "frontend/components/streams/StreamElement.vue"
 import PublicStampedElement from "frontend/components/streams/stamped_elements/PublicStampedElement.vue"
 import FollowedStampedElement from "frontend/components/streams/stamped_elements/FollowedStampedElement.vue"
+import LimitedStampedElement from "frontend/components/streams/stamped_elements/LimitedStampedElement.vue"
 import TagStampedElement from "frontend/components/streams/stamped_elements/TagStampedElement.vue"
 import ProfileStampedElement from "frontend/components/streams/stamped_elements/ProfileStampedElement.vue"
 import "frontend/components/streams/LoadingElement.vue"
@@ -57,7 +58,13 @@ export default Vue.component("stream", {
         user: {type: String, default: ""},
         tag: {type: String, default: ""},
     },
-    components: {FollowedStampedElement, PublicStampedElement, ProfileStampedElement, TagStampedElement},
+    components: {
+        FollowedStampedElement,
+        PublicStampedElement,
+        ProfileStampedElement,
+        TagStampedElement,
+        LimitedStampedElement,
+    },
     data() {
         return {
             masonryOptions: {
@@ -82,6 +89,8 @@ export default Vue.component("stream", {
             switch (this.$store.state.stream.name) {
                 case "followed":
                     return "FollowedStampedElement"
+                case "limited":
+                    return "LimitedStampedElement"
                 case "public":
                     return "PublicStampedElement"
                 case "tag":
@@ -120,6 +129,9 @@ export default Vue.component("stream", {
             switch (this.$store.state.stream.name) {
                 case "followed":
                     this.$store.dispatch(streamStoreOperations.getFollowedStream, options)
+                    break
+                case "limited":
+                    this.$store.dispatch(streamStoreOperations.getLimitedStream, options)
                     break
                 case "public":
                     this.$store.dispatch(streamStoreOperations.getPublicStream, options)

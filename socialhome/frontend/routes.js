@@ -11,6 +11,7 @@ const routes = [
     // TODO: In the future, Stream can be replaced by a generic RootStream.vue that just delegates to another component
     {path: "/", component: Stream},
     {path: "/streams/followed", component: Stream},
+    {path: "/streams/limited", component: Stream},
     {path: "/streams/public", component: Stream},
     {path: "/u/:user", component: Stream, props: $$()},
     {path: "/u/:user/all", component: Stream, props: $$()},
