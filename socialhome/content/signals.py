@@ -41,7 +41,7 @@ def content_post_save(instance, **kwargs):
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
     if instance.local:
-        logger.debug('federate_content_retraction: Got local content %s delete, sending out retraction', instance)
+        logger.debug('federate_content_retraction: Sending out Content retraction', instance)
         try:
             django_rq.enqueue(send_content_retraction, instance, instance.author_id)
         except Exception as ex:
@@ -68,6 +68,37 @@ def content_mentions_change(sender, instance, action, pk_set, **kwargs):
     """Deliver notification on mentions addition."""
     if action == "post_add":
         transaction.on_commit(lambda: on_commit_mentioned(action, pk_set, instance))
+
+
+def on_commit_limited_visibilities(action, pks, instance):
+    if action not in ("post_add", "post_remove"):
+        return
+
+    for id in pks:
+        # Send out federation only if remote profile
+        if not Profile.objects.filter(id=id, user__isnull=True).exists():
+            continue
+        profile = Profile.objects.get(id=id)
+
+        if action == "post_add":
+            try:
+                federate_content(instance, recipient=profile)
+            except Exception:
+                logger.exception("Failed to federate limited visibility content %s to %s", instance.guid, profile.guid)
+        elif action == "post_remove":
+            try:
+                federate_content_retraction(instance, recipient=profile)
+            except Exception:
+                logger.exception("Failed to federate limited visibility content %s to %s", instance.guid, profile.guid)
+
+
+@receiver(m2m_changed, sender=Content.limited_visibilities.through)
+def content_limited_visibilities_change(sender, instance, action, pk_set, **kwargs):
+    """Federate limited visibilities change."""
+    if not instance.local or not instance.content_type == ContentType.CONTENT:
+        return
+    if action in ("post_add", "post_remove"):
+        transaction.on_commit(lambda: on_commit_limited_visibilities(action, pk_set, instance))
 
 
 def render_content(content):
@@ -104,17 +135,20 @@ def notify_listeners(content):
             StreamConsumer.group_send("streams_followed__%s" % username, data)
 
 
-def federate_content(content):
+def federate_content(content, recipient=None):
     """Send out local content to the federation layer.
 
     Yes, edits also. The federation layer should decide whether these are really worth sending out.
     """
+    recipient_id = recipient.id if recipient else None
     try:
         if content.content_type == ContentType.REPLY:
             django_rq.enqueue(send_reply, content.id)
         elif content.content_type == ContentType.SHARE:
             django_rq.enqueue(send_share, content.id)
         else:
-            django_rq.enqueue(send_content, content.id)
+            if content.visibility == Visibility.LIMITED and not recipient_id:
+                return
+            django_rq.enqueue(send_content, content.id, recipient_id=recipient_id)
     except Exception as ex:
         logger.exception("Failed to federate_content %s: %s", content, ex)

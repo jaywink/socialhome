@@ -31,18 +31,22 @@ class TestReceiveTask:
         mock_process_entities.assert_not_called()
 
 
-class TestSendContent(TestCase):
+class TestSendContent(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         author = UserFactory()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
+        cls.create_content_set(author=author.profile)
 
-    @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
-    def test_only_public_content_calls_make_federable_content(self, mock_maker):
-        send_content(self.limited_content.id)
+    @patch("socialhome.federate.tasks.make_federable_content", return_value=None, autospec=True)
+    def test_only_limited_and_public_content_calls_make_federable_content(self, mock_maker):
+        send_content(self.self_content.id)
         mock_maker.assert_not_called()
+        send_content(self.site_content.id)
+        mock_maker.assert_not_called()
+        send_content(self.limited_content.id)
+        mock_maker.assert_called_once_with(self.limited_content)
+        mock_maker.reset_mock()
         send_content(self.public_content.id)
         mock_maker.assert_called_once_with(self.public_content)
 
@@ -69,18 +73,22 @@ class TestSendContent(TestCase):
         mock_send.assert_not_called()
 
 
-class TestSendContentRetraction(TestCase):
+class TestSendContentRetraction(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         author = UserFactory()
-        cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
-        cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
+        cls.create_content_set(author=author.profile)
 
-    @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
-    def test_only_public_content_calls_make_federable_retraction(self, mock_maker):
-        send_content_retraction(self.limited_content, self.limited_content.author_id)
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None, autospec=True)
+    def test_only_limited_and_public_content_calls_make_federable_retraction(self, mock_maker):
+        send_content_retraction(self.self_content, self.self_content.author_id)
         mock_maker.assert_not_called()
+        send_content_retraction(self.site_content, self.site_content.author_id)
+        mock_maker.assert_not_called()
+        send_content_retraction(self.limited_content, self.limited_content.author_id)
+        mock_maker.assert_called_once_with(self.limited_content, self.limited_content.author)
+        mock_maker.reset_mock()
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
 

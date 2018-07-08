@@ -150,7 +150,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
-        mock_send.assert_called_once_with(send_content, content.id)
+        mock_send.assert_called_once_with(send_content, content.id, recipient_id=None)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     @patch("socialhome.content.signals.update_streams_with_content")

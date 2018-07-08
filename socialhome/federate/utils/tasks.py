@@ -242,7 +242,7 @@ def _retract_relationship(target_guid, profile):
 def process_entity_retraction(entity, profile):
     """Process an entity of type Retraction."""
     entity_type = safe_text(entity.entity_type)
-    if entity_type == "Post":
+    if entity_type in ("Post", "Comment", "Share"):
         target_guid = safe_text(entity.target_guid)
         _retract_content(target_guid, profile)
     elif entity_type == "Profile":
