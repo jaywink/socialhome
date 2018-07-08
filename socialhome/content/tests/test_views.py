@@ -28,6 +28,7 @@ class TestContentCreateView(SocialhomeCBVTestCase):
     def test_form_valid(self):
         view = self.get_instance(ContentCreateView, request=self.req)
         form = ContentForm(data={"text": "barfoo", "visibility": Visibility.PUBLIC.value}, user=self.user)
+        form.full_clean()
         response = view.form_valid(form)
         assert response.status_code == 302
         content = Content.objects.first()
@@ -77,81 +78,102 @@ class TestContentBookmarkletView(SocialhomeTestCase):
         self.response_200()
 
 
-@pytest.mark.usefixtures("admin_client", "rf")
-class TestContentUpdateView:
-    def _get_request_view_and_content(self, rf):
-        request = rf.get("/")
-        request.user = UserFactory()
-        content = ContentFactory(author=request.user.profile)
-        view = ContentUpdateView(request=request, kwargs={"pk": content.id})
-        view.object = content
-        return request, view, content
+class TestContentUpdateViewCBV(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.content = ContentFactory(author=cls.user.profile)
 
-    def test_get_form_kwargs(self, admin_client, rf):
-        request, view, content = self._get_request_view_and_content(rf)
-        kwargs = view.get_form_kwargs()
-        assert kwargs["instance"] == content
+    def setUp(self):
+        super().setUp()
+        self.request = RequestFactory().get("/")
+        self.request.user = self.user
+        self.view = self.get_instance(ContentUpdateView, request=self.request, pk=self.content.id)
+        self.view.object = self.content
 
-    def test_form_valid(self, admin_client, rf):
-        request, view, content = self._get_request_view_and_content(rf)
-        form = ContentForm(data={"text": "barfoo", "visibility": Visibility.PUBLIC.value},
-                           instance=content, user=request.user)
-        response = view.form_valid(form)
-        assert response.status_code == 302
-        content = Content.objects.first()
-        assert content.author == request.user.profile
-        assert content.visibility == Visibility.PUBLIC
-        assert content.text == "barfoo"
+    def test_get_form_kwargs(self):
+        kwargs = self.view.get_form_kwargs()
+        self.assertEqual(kwargs["instance"], self.content)
 
-    def test_update_view_renders(self, admin_client, rf):
-        profile = Profile.objects.get(user__username="admin")
-        content = ContentFactory(author=profile)
-        response = admin_client.get(reverse("content:update", kwargs={"pk": content.id}))
-        assert response.status_code == 200
-
-    def test_update_view_raises_if_user_does_not_own_content(self, admin_client, rf):
-        user = UserFactory()
-        content = ContentFactory(author=user.profile)
-        response = admin_client.post(reverse("content:update", kwargs={"pk": content.id}), {
-            "text": "foobar",
-            "visibility": Visibility.PUBLIC.value,
-        })
-        assert response.status_code == 404
-
-    def test_update_view_updates_content(self, admin_client, rf):
-        profile = Profile.objects.get(user__username="admin")
-        content = ContentFactory(author=profile)
-        response = admin_client.post(reverse("content:update", kwargs={"pk": content.id}), {
-            "text": "foobar",
-            "visibility": Visibility.SITE.value,
-        })
-        assert response.status_code == 302
-        content.refresh_from_db()
-        assert content.text == "foobar"
-        assert content.visibility == Visibility.SITE
-
-    def test_untrusted_editor_text_is_cleaned(self, admin_client, rf):
-        request, view, content = self._get_request_view_and_content(rf)
-        request.user.trusted_editor = False
-        request.user.save()
+    def test_form_valid(self):
         form = ContentForm(
-            data={"text": "<script>console.log</script>", "visibility": Visibility.PUBLIC.value},
-            instance=content,
-            user=request.user
+            data={"text": "barfoo", "visibility": Visibility.PUBLIC.value},
+            instance=self.content,
+            user=self.user,
         )
         form.full_clean()
-        assert form.cleaned_data["text"] == "&lt;script&gt;console.log&lt;/script&gt;"
+        response = self.view.form_valid(form)
+        self.assertEqual(response.status_code, 302)
+        content = Content.objects.first()
+        self.assertEqual(content.author, self.user.profile)
+        self.assertEqual(content.visibility, Visibility.PUBLIC)
+        self.assertEqual(content.text, "barfoo")
 
-    def test_get_success_url_content_is_not_reply(self, rf):
-        _, view, _ = self._get_request_view_and_content(rf)
-        view.object.content_type = ContentType.CONTENT
-        assert view.get_success_url() == view.object.get_absolute_url()
+    def test_untrusted_editor_text_is_cleaned(self):
+        self.user.trusted_editor = False
+        self.user.save()
+        form = ContentForm(
+            data={"text": "<script>console.log</script>", "visibility": Visibility.PUBLIC.value},
+            instance=self.content,
+            user=self.user,
+        )
+        form.full_clean()
+        self.assertEqual(form.cleaned_data["text"], "&lt;script&gt;console.log&lt;/script&gt;")
 
-    def test_get_success_url_content_is_reply(self, rf):
-        _, view, content = self._get_request_view_and_content(rf)
-        view.object.content_type = ContentType.REPLY
-        view.object.parent = ContentFactory(author=content.author)
-        assert view.get_success_url() == view.object.parent.get_absolute_url()
+    def test_get_success_url_content_is_not_reply(self):
+        self.view.object.content_type = ContentType.CONTENT
+        self.assertEqual(self.view.get_success_url(), self.view.object.get_absolute_url())
+
+    def test_get_success_url_content_is_reply(self):
+        self.view.object.content_type = ContentType.REPLY
+        self.view.object.parent = ContentFactory(author=self.content.author)
+        self.assertEqual(self.view.get_success_url(), self.view.object.parent.get_absolute_url())
+
+
+class TestContentUpdateView(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.other_user = UserFactory()
+        cls.content = ContentFactory(author=cls.user.profile)
+
+    def test_update_view_renders(self):
+        with self.login(self.user):
+            self.get("content:update", pk=self.content.id)
+        self.response_200()
+
+    def test_update_view_raises_if_user_does_not_own_content(self):
+        with self.login(self.other_user):
+            self.get("content:update", pk=self.content.id)
+        self.response_404()
+
+        with self.login(self.other_user):
+            self.post(
+                "content:update",
+                data={
+                    "text": "foobar",
+                    "visibility": Visibility.PUBLIC.value,
+                },
+                pk=self.content.id,
+            )
+        self.response_404()
+
+    def test_update_view_updates_content(self):
+        with self.login(self.user):
+            self.post(
+                "content:update",
+                data={
+                    "text": "foobar",
+                    "visibility": Visibility.SITE.value,
+                },
+                pk=self.content.id,
+            )
+        self.response_302()
+        self.content.refresh_from_db()
+        self.assertEqual(self.content.text, "foobar")
+        self.assertEqual(self.content.visibility, Visibility.SITE)
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
