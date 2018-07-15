@@ -77,6 +77,16 @@ class ContentForm(forms.ModelForm):
             return self.cleaned_data["text"]
         return safe_text_for_markdown(self.cleaned_data["text"])
 
+    def get_initial_for_field(self, field, field_name):
+        """
+        Add the previous values from limited visibilities for existing limited content.
+        """
+        if field_name != 'recipients' or not self.instance or self.instance.visibility != Visibility.LIMITED:
+            return super().get_initial_for_field(field, field_name)
+
+        recipients = self.instance.limited_visibilities.values_list('handle', flat=True)
+        return ",".join(recipients)
+
     def save(self, commit=True, parent=None):
         """
         Set possible recipients after save.

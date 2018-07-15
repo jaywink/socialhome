@@ -162,3 +162,18 @@ class TestContentForm(SocialhomeTestCase):
             set(content.limited_visibilities.all()),
             {self.profile},
         )
+
+    def test_get_initial_for_field__recipients(self):
+        self.assertEqual(
+            set(self.limited_content.limited_visibilities.all()),
+            {self.profile, self.profile2},
+        )
+        form = ContentForm(
+            instance=self.limited_content,
+            user=self.user,
+        )
+        initial = form.get_initial_for_field(form.fields.get('recipients'), 'recipients')
+        self.assertEqual(
+            set(initial.split(',')),
+            {self.profile.handle, self.profile2.handle}
+        )
