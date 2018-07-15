@@ -196,16 +196,17 @@ class TestContentModel(SocialhomeTestCase):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
 
     def test_visible_for_user_unauthenticated_user(self):
-        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.site_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=False)))
+        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.site_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
 
     def test_visible_for_user_authenticated_user(self):
-        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True)))
+        user = UserFactory()
+        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
 
     def test_visible_for_user_limited_content_user(self):
         profile = self.limited_content.author
@@ -213,6 +214,21 @@ class TestContentModel(SocialhomeTestCase):
         self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
         self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
         self.assertTrue(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
+
+    def test_visible_for_user_limited_content__limited_visibilities(self):
+        self.limited_content.limited_visibilities.set((self.public_content.author, self.site_content.author))
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.public_content.author))
+        )
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.site_content.author))
+        )
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.limited_content.author))
+        )
+        self.assertFalse(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.self_content.author))
+        )
 
     def test_visible_for_user_self_content_user(self):
         profile = self.self_content.author

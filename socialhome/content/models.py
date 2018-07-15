@@ -12,7 +12,6 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
@@ -440,9 +439,11 @@ class Content(models.Model):
 
         Mirrors logic in `ContentQuerySet.visible_for_user`.
         """
-        # TODO: handle also LIMITED when contacts implemented
         if self.visibility == Visibility.PUBLIC:
             return True
-        if user.is_authenticated and (self.author == user.profile or self.visibility == Visibility.SITE):
-            return True
+        if user.is_authenticated:
+            if self.author == user.profile or self.visibility == Visibility.SITE:
+                return True
+            if self.limited_visibilities.filter(id=user.profile.id).exists():
+                return True
         return False
