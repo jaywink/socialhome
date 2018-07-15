@@ -58,7 +58,19 @@ Added
 
   **Note to admins**: A script is provided if you want to parse old content for mentions. Run ``./manage.py runscript link_old_mentions`` if you wish to parse the content from the last year and create the links. This will also send out email notifications.
 
-* Admin now has a section for Content items, for debugging purposes.
+* Admin now has a section for Content items and Profiles, for debugging purposes. The User admin was also improved.
+
+* Limited content is now supported 🙈 💪
+
+  Limited content can now be created using the web create form. Note, API does not currently allow creating limited content (except replies to limited content). Once create form is ported to the API, things should be refactored there, right now had no bandwidth to ensure both work.
+
+  Limited content is shown in the stream with a lock symbol. The create shows some extra fields for limited content. These include "recipients" and "include following". Recipients is a comma separated list of target profile handles the limited content will be sent to. Include following will populate recipients (on save) with all the profiles that one follows. Later on we will add contact lists for better targeting.
+
+  Limited content visibilities can be edited. If someone is removed from the target recipients, a retraction will be sent to try and delete the content remotely from the target recipient.
+
+  Currently recipients must already be known to the server, in the future a remote search will be done if the profile is not known. Any known remote profile can be targeted - it is up to the receiving server to decide whether to accept it or not. For local profiles, those of visibility SELF (ie hidden) cannot be targeted.
+
+  There is also a new stream "Limited" available. It shows all non-public content visible to you.
 
 Changed
 .......
@@ -83,6 +95,10 @@ Fixed
 * Ensure all streams Redis keys have a default expiry of 30 days.
 
 * Fix parsing of remote profile names by also using ``last_name`` attribute, where given (`#414 <https://github.com/jaywink/socialhome/issues/414>`_)
+
+* Show possible validation errors on create form instead of just not allowing a save.
+
+* Fix failure of processing remote retractions of replies or shares in some situations.
 
 0.8.0 (2018-03-06)
 ------------------

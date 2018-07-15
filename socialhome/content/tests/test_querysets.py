@@ -24,12 +24,24 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
         cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
+        cls.limited_content_user = UserFactory()
+        cls.limited_content_profile = cls.limited_content_user.profile
+        cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
+        cls.limited_tag_content = LimitedContentFactory(text="#foobar")
+        cls.limited_tag_content.limited_visibilities.add(cls.limited_content_profile)
 
     def setUp(self):
         super().setUp()
         self.public_content.author.refresh_from_db()
         self.self_content.author.refresh_from_db()
         self.site_content.author.refresh_from_db()
+        self.limited_content.author.refresh_from_db()
+
+    def test_limited(self):
+        contents = set(Content.objects.limited(self.limited_content_user))
+        self.assertEqual(contents, {
+            self.limited_content, self.limited_tag_content, self.site_content, self.site_tag_content,
+        })
 
     def test_pinned(self):
         contents = set(Content.objects.pinned())
@@ -44,6 +56,9 @@ class TestContentQuerySet(SocialhomeTestCase):
         contents = set(Content.objects.visible_for_user(self.self_content.author.user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
                                     self.site_tag_content, self.self_content, self.self_tag_content})
+        contents = set(Content.objects.visible_for_user(self.limited_content_user))
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
+                                    self.site_tag_content, self.limited_content, self.limited_tag_content})
 
     def test_public(self):
         contents = set(Content.objects.public())
@@ -56,6 +71,8 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content})
         contents = set(Content.objects.tag_by_name("foobar", self.self_content.author.user))
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.self_tag_content})
+        contents = set(Content.objects.tag_by_name("foobar", self.limited_content_user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.limited_tag_content})
 
     def test_tag(self):
         contents = set(Content.objects.tag(self.tag, self.anonymous_user))
@@ -64,6 +81,8 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content})
         contents = set(Content.objects.tag(self.tag, self.self_content.author.user))
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.self_tag_content})
+        contents = set(Content.objects.tag(self.tag, self.limited_content_user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.limited_tag_content})
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
@@ -269,6 +288,10 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         cls.share_limited_reply = LimitedContentFactory(parent=cls.limited_share)
         cls.share_self_reply = SelfContentFactory(parent=cls.self_share)
         cls.share_site_reply = SiteContentFactory(parent=cls.site_share)
+        cls.limited_content_user = UserFactory()
+        cls.limited_content_profile = cls.limited_content_user.profile
+        cls.limited_reply.limited_visibilities.add(cls.limited_content_profile)
+        cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
 
     def test_children(self):
         contents = set(Content.objects.children(self.public_content.id, self.anonymous_user))
@@ -289,6 +312,9 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         contents = set(Content.objects.children(self.site_content.id, self.other_user))
         self.assertEqual(contents, {self.site_reply, self.share_site_reply})
 
+        contents = set(Content.objects.children(self.limited_content.id, self.limited_content_user))
+        self.assertEqual(contents, {self.limited_reply})
+
 
 class TestContentQuerySetShares(SocialhomeTestCase):
     """Ensure certain querysets include content via shares."""
@@ -305,12 +331,19 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         cls.self_share = SelfContentFactory(share_of=cls.self_content, author=cls.other_user.profile)
         cls.site_share = SiteContentFactory(share_of=cls.site_content, author=cls.other_user.profile)
         cls.other_user.profile.following.add(cls.public_content.author, cls.profile)
+        cls.limited_content_user = UserFactory()
+        cls.limited_content_profile = cls.limited_content_user.profile
+        cls.limited_share.limited_visibilities.add(cls.limited_content_profile)
+        cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
+        cls.limited_content_profile.following.add(cls.other_user.profile)
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
         self.assertIn(self.site_content, contents)
         contents = set(Content.objects.followed(self.user))
         self.assertEqual(contents, set())
+        contents = set(Content.objects.followed(self.limited_content_user))
+        self.assertEqual(contents, {self.public_content, self.site_content, self.limited_content})
 
     def test_profile(self):
         contents = set(Content.objects.profile(self.other_user.profile, self.anonymous_user))
@@ -319,6 +352,8 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_content, self.site_content})
         contents = set(Content.objects.profile(self.other_user.profile, self.user))
         self.assertEqual(contents, {self.public_content, self.site_content})
+        contents = set(Content.objects.profile(self.other_user.profile, self.limited_content_user))
+        self.assertEqual(contents, {self.public_content, self.site_content, self.limited_content})
 
     def test_profile_by_attr(self):
         contents = set(Content.objects.profile_by_attr("guid", self.other_user.profile.guid, self.anonymous_user))
@@ -327,6 +362,8 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_content, self.site_content})
         contents = set(Content.objects.profile_by_attr("guid", self.other_user.profile.guid, self.user))
         self.assertEqual(contents, {self.public_content, self.site_content})
+        contents = set(Content.objects.profile_by_attr("guid", self.other_user.profile.guid, self.limited_content_user))
+        self.assertEqual(contents, {self.public_content, self.site_content, self.limited_content})
 
     def test_profile_pinned(self):
         contents = set(Content.objects.profile_pinned(self.other_user.profile, self.anonymous_user))
@@ -334,6 +371,8 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         contents = set(Content.objects.profile_pinned(self.other_user.profile, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.profile_pinned(self.other_user.profile, self.user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile_pinned(self.other_user.profile, self.limited_content_user))
         self.assertEqual(contents, set())
 
     def test_profile_pinned_by_attr(self):
@@ -344,6 +383,12 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         contents = set(Content.objects.profile_pinned_by_attr("guid", self.other_user.profile.guid, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.profile_pinned_by_attr("guid", self.other_user.profile.guid, self.user))
+        self.assertEqual(contents, set())
+        contents = set(
+            Content.objects.profile_pinned_by_attr(
+                "guid", self.other_user.profile.guid, self.limited_content_user,
+            )
+        )
         self.assertEqual(contents, set())
 
     def test_shares(self):
@@ -372,6 +417,15 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         contents = set(Content.objects.shares(self.self_content.id, self.other_user))
         self.assertEqual(contents, {self.self_share})
         contents = set(Content.objects.shares(self.limited_content.id, self.other_user))
+        self.assertEqual(contents, {self.limited_share})
+
+        contents = set(Content.objects.shares(self.public_content.id, self.limited_content_user))
+        self.assertEqual(contents, {self.public_share, self.public_share2})
+        contents = set(Content.objects.shares(self.site_content.id, self.limited_content_user))
+        self.assertEqual(contents, {self.site_share})
+        contents = set(Content.objects.shares(self.self_content.id, self.limited_content_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.shares(self.limited_content.id, self.limited_content_user))
         self.assertEqual(contents, {self.limited_share})
 
 

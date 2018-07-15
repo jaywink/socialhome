@@ -28,7 +28,7 @@ before_script:
   - npm run build
   - python manage.py print_settings
 script:
-  - py.test --cov=./
+  - py.test --cov=./ --blockage
   - python manage.py migrate --noinput -v 0
   - python manage.py collectstatic --noinput -v 0
   - npm run test

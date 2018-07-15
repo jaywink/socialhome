@@ -13,9 +13,11 @@ freezegun
 ipdb
 pip-tools
 pytest
+pytest-blockage
 pytest-cov
 pytest-django
 pytest-env
+pytest-profiling
 pytest-sugar
 Sphinx
 sphinx-autobuild

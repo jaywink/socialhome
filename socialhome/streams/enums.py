@@ -6,6 +6,7 @@ class StreamType(Enum):
     CONTENT = "content"
     CUSTOM = "custom"
     FOLLOWED = "followed"
+    LIMITED = "limited"
     PROFILE_ALL = "profile_all"
     PROFILE_PINNED = "profile_pinned"
     PUBLIC = "public"
@@ -16,6 +17,7 @@ class StreamType(Enum):
         CONTENT = _("Content")
         CUSTOM = _("Custom")
         FOLLOWED = _("Followed")
+        LIMITED = _("Limited")
         PROFILE_ALL = _("Profile (all)")
         PROFILE_PINNED = _("Profile (pinned)")
         PUBLIC = _("Public")

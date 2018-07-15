@@ -116,19 +116,19 @@ class TestNotifyListeners(SocialhomeTestCase):
 
 
 class TestFederateContent(SocialhomeTransactionTestCase):
-    @patch("socialhome.content.signals.django_rq.enqueue")
-    @patch("socialhome.content.signals.update_streams_with_content")
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_non_local_content_does_not_get_sent(self, mock_update, mock_send):
         ContentFactory()
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
-    @patch("socialhome.content.signals.update_streams_with_content")
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_local_content_with_federate_false_does_not_get_sent(self, mock_update, mock_send):
         user = UserFactory()
         mock_send.reset_mock()
         ContentFactory(author=user.profile, federate=False)
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_with_parent_sent_as_reply(self, mock_send):
@@ -150,7 +150,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
-        mock_send.assert_called_once_with(send_content, content.id)
+        mock_send.assert_called_once_with(send_content, content.id, recipient_id=None)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     @patch("socialhome.content.signals.update_streams_with_content")
@@ -168,11 +168,11 @@ class TestFederateContent(SocialhomeTransactionTestCase):
 
 
 class TestFederateContentRetraction(SocialhomeTestCase):
-    @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
     def test_non_local_content_retraction_does_not_get_sent(self, mock_send):
         content = ContentFactory()
         content.delete()
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_content_retraction_gets_sent(self, mock_send):

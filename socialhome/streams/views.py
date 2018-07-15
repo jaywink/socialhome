@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 
 from socialhome.content.models import Tag
-from socialhome.streams.streams import PublicStream, FollowedStream, TagStream
+from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, LimitedStream
 from socialhome.utils import get_full_url
 
 
@@ -53,6 +53,19 @@ class BaseStreamView(TemplateView):
     @property
     def stream_type_value(self):
         return self.stream_class.stream_type.value
+
+
+class LimitedStreamView(LoginRequiredMixin, BaseStreamView):
+    stream_class = LimitedStream
+
+    def get_page_meta(self):
+        meta = super().get_page_meta()
+        meta.update({
+            "title": _("Limited stream"),
+            "url": get_full_url(reverse("streams:limited")),
+            "description": _("Contains non-public content where you are recipient."),
+        })
+        return meta
 
 
 class PublicStreamView(BaseStreamView):

@@ -76,6 +76,18 @@
             },
         });
     });
+
+    /* Show limited visibility related fields based on visibility selection */
+    $('#id_visibility').change(function(ev) {
+        var val = $(ev.currentTarget).val();
+        if (val == '1') {  // Magic numbers <3 .. This is for "Visibility.LIMITED"
+            $('#id_recipients').parent().removeClass('hidden');
+            $('#id_include_following').parent().removeClass('hidden');
+        } else {
+            $('#id_recipients').parent().addClass('hidden');
+            $('#id_include_following').parent().addClass('hidden');
+        }
+    })
 })(jQuery);
 
 function publisherUploadImage() {

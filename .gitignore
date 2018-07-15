@@ -67,6 +67,7 @@ mailhog
 
 # Pytest
 .cache
+prof/
 
 # Socialhome environment file
 env.local

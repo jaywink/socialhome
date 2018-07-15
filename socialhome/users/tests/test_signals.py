@@ -67,10 +67,10 @@ class TestProfileFollowingChange(TransactionTestCase):
 
 
 class TestFederateProfile(TransactionTestCase):
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.enqueue", autospec=True)
     def test_non_local_profile_does_not_get_sent(self, mock_send):
         ProfileFactory()
-        mock_send.assert_not_called()
+        self.assertTrue(mock_send.called is False)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     def test_local_profile_gets_sent(self, mock_send):

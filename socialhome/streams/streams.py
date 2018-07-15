@@ -277,6 +277,13 @@ class FollowedStream(BaseStream):
         return Content.objects.followed(self.user)
 
 
+class LimitedStream(BaseStream):
+    stream_type = StreamType.LIMITED
+
+    def get_queryset(self):
+        return Content.objects.limited(self.user)
+
+
 class ProfileStreamBase(BaseStream):
     def __init__(self, profile, **kwargs):
         super().__init__(**kwargs)

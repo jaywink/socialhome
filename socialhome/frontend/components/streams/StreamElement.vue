@@ -16,6 +16,12 @@
                     {{ timestampText }}
                 </a>
                 &nbsp;
+                <i
+                    v-if="isLimited"
+                    class="fa fa-lock mr-2"
+                    aria-hidden="true"
+                ></i>
+
                 <template v-if="content.user_is_author">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update"></i>
@@ -51,6 +57,9 @@ export default Vue.component("stream-element", {
         },
         disableLoadMore() {
             return this.$store.state.pending.contents || !this.content.hasLoadMore
+        },
+        isLimited() {
+            return this.content.visibility === "limited"
         },
         timestampText() {
             return this.content.edited

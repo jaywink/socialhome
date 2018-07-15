@@ -51,6 +51,9 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.visible_for_user(user)
 
+    def limited(self, user):
+        return self.top_level().visible_for_user(user).exclude(visibility=Visibility.PUBLIC)
+
     def pinned(self):
         return self.filter(pinned=True)
 
@@ -126,8 +129,14 @@ class ContentQuerySet(models.QuerySet):
         """Filter by visibility to given user."""
         if not user.is_authenticated:
             return self.filter(visibility=Visibility.PUBLIC)
-        # TODO: handle also LIMITED when contacts implemented
-        return self.filter(Q(author=user.profile) | Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]))
+        return self.filter(
+            Q(author=user.profile) |
+            Q(visibility__in=[Visibility.SITE, Visibility.PUBLIC]) |
+            (
+                Q(visibility=Visibility.LIMITED) &
+                Q(limited_visibilities=user.profile)
+            )
+        )
 
 
 class ContentManager(models.Manager.from_queryset(ContentQuerySet)):

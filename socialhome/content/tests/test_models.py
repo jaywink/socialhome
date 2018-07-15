@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.timezone import make_aware
 from django_extensions.utils.text import truncate_letters
@@ -16,7 +15,6 @@ from socialhome.content.tests.factories import (
     ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory, LocalContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.models import Profile
 from socialhome.users.tests.factories import ProfileFactory, UserFactory
 
 
@@ -187,110 +185,6 @@ class TestContentModel(SocialhomeTestCase):
             self.public_content.save()
             self.assertTrue(self.public_content.edited)
 
-    def test_dict_for_view(self):
-        self.assertEqual(self.public_content.dict_for_view(self.user2), {
-            "author": self.public_content.author_id,
-            "author_guid": self.public_content.author.guid,
-            "author_handle": self.public_content.author.handle,
-            "author_home_url": self.public_content.author.home_url,
-            "author_image": self.public_content.author.safer_image_url_small,
-            "author_is_local": bool(self.public_content.author.user),
-            "author_name": self.public_content.author.handle,
-            "author_profile_url": self.public_content.author.get_absolute_url(),
-            "content_type": self.public_content.content_type.string_value,
-            "delete_url": "",
-            "detail_url": self.public_content.get_absolute_url(),
-            "formatted_timestamp": self.public_content.timestamp,
-            "guid": self.public_content.guid,
-            "has_shared": False,
-            "humanized_timestamp": self.public_content.humanized_timestamp,
-            "id": self.public_content.id,
-            "is_authenticated": False,
-            "is_author": False,
-            "is_following_author": False,
-            "parent": "",
-            "profile_id": "",
-            "rendered": self.public_content.rendered,
-            "reply_count": 0,
-            "reply_url": "",
-            "shares_count": 0,
-            "slug": self.public_content.slug,
-            "through": self.public_content.id,
-            "update_url": "",
-        })
-
-        # Add a share
-        ContentFactory(share_of=self.public_content)
-        dict_for_view = self.public_content.dict_for_view(self.user2)
-        self.assertEqual(dict_for_view.get("shares_count"), 1)
-
-    def test_dict_for_view_for_author(self):
-        Profile.objects.filter(id=self.profile.id).update(name="Foo Bar")
-        self.assertEqual(self.public_content.dict_for_view(self.user), {
-            "author": self.public_content.author_id,
-            "author_guid": self.public_content.author.guid,
-            "author_handle": self.public_content.author.handle,
-            "author_home_url": self.public_content.author.home_url,
-            "author_image": self.public_content.author.safer_image_url_small,
-            "author_is_local": bool(self.public_content.author.user),
-            "author_name": self.public_content.author.handle,
-            "author_profile_url": self.public_content.author.get_absolute_url(),
-            "content_type": self.public_content.content_type.string_value,
-            "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
-            "detail_url": self.public_content.get_absolute_url(),
-            "formatted_timestamp": self.public_content.timestamp,
-            "guid": self.public_content.guid,
-            "has_shared": False,
-            "humanized_timestamp": self.public_content.humanized_timestamp,
-            "id": self.public_content.id,
-            "is_authenticated": True,
-            "is_author": True,
-            "is_following_author": False,
-            "parent": "",
-            "profile_id": self.public_content.author.id,
-            "rendered": self.public_content.rendered,
-            "reply_count": 0,
-            "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-            "shares_count": 0,
-            "slug": self.public_content.slug,
-            "through": self.public_content.id,
-            "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
-        })
-
-    def test_dict_for_view_edited_post(self):
-        with freeze_time(self.public_content.created + datetime.timedelta(minutes=16)):
-            self.public_content.save()
-            self.assertEqual(self.public_content.dict_for_view(self.user), {
-                "author": self.public_content.author_id,
-                "author_guid": self.public_content.author.guid,
-                "author_handle": self.public_content.author.handle,
-                "author_home_url": self.public_content.author.home_url,
-                "author_image": self.public_content.author.safer_image_url_small,
-                "author_is_local": bool(self.public_content.author.user),
-                "author_name": self.public_content.author.handle,
-                "author_profile_url": self.public_content.author.get_absolute_url(),
-                "content_type": self.public_content.content_type.string_value,
-                "delete_url": reverse("content:delete", kwargs={"pk": self.public_content.id}),
-                "detail_url": self.public_content.get_absolute_url(),
-                "formatted_timestamp": self.public_content.timestamp,
-                "guid": self.public_content.guid,
-                "has_shared": False,
-                "humanized_timestamp": "%s (edited)" % self.public_content.humanized_timestamp,
-                "id": self.public_content.id,
-                "is_authenticated": True,
-                "is_author": True,
-                "is_following_author": False,
-                "parent": "",
-                "profile_id": self.public_content.author.id,
-                "rendered": self.public_content.rendered,
-                "reply_count": 0,
-                "reply_url": reverse("content:reply", kwargs={"pk": self.public_content.id}),
-                "shares_count": 0,
-                "slug": self.public_content.slug,
-                "through": self.public_content.id,
-                "update_url": reverse("content:update", kwargs={"pk": self.public_content.id}),
-            })
-
     def test_short_text(self):
         self.assertEqual(self.public_content.short_text, truncate_letters(self.public_content.text, 50))
 
@@ -302,16 +196,17 @@ class TestContentModel(SocialhomeTestCase):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
 
     def test_visible_for_user_unauthenticated_user(self):
-        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.site_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=False)))
-        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=False)))
+        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.site_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
+        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=False, profile=None)))
 
     def test_visible_for_user_authenticated_user(self):
-        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True)))
-        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True)))
+        user = UserFactory()
+        self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
+        self.assertFalse(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=user.profile)))
 
     def test_visible_for_user_limited_content_user(self):
         profile = self.limited_content.author
@@ -319,6 +214,21 @@ class TestContentModel(SocialhomeTestCase):
         self.assertTrue(self.site_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
         self.assertFalse(self.self_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
         self.assertTrue(self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=profile)))
+
+    def test_visible_for_user_limited_content__limited_visibilities(self):
+        self.limited_content.limited_visibilities.set((self.public_content.author, self.site_content.author))
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.public_content.author))
+        )
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.site_content.author))
+        )
+        self.assertTrue(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.limited_content.author))
+        )
+        self.assertFalse(
+            self.limited_content.visible_for_user(Mock(is_authenticated=True, profile=self.self_content.author))
+        )
 
     def test_visible_for_user_self_content_user(self):
         profile = self.self_content.author

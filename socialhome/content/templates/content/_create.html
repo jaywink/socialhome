@@ -8,25 +8,50 @@
         <small class="form-text">
             {% trans "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg/gif." %}
         </small>
+        <div class="text-danger">
+            {{ form.text.errors }}
+        </div>
         <div id="image-upload-progress-container" class="pt-2"></div>
     </div>
 
     <div class="row">
         <div class="col-6">
             {% if not is_reply %}
+                <div class="form-group {% if not content or content.visibility.string_value != 'limited' %}hidden{% endif %}">
+                    <label for="{{ form.recipients.id }}">{{ form.recipients.label }}</label>
+                    {{ form.recipients }}
+                    <small class="form-text">
+                        {% trans "Type in the handles (eg user@example.com) of the recipients. Separate by commas. Sorry, no search yet.." %}
+                    </small>
+                    <div class="text-danger">
+                        {{ form.recipients.errors }}
+                    </div>
+                </div>
+                <div class="form-group {% if not content or content.visibility.string_value != 'limited' %}hidden{% endif %}">
+                    <label for="{{ form.include_following.id }}">{{ form.include_following.label }}</label>
+                    {{ form.include_following }}
+                    <small class="form-text">
+                        {{ form.include_following.help_text }}
+                    </small>
+                    <div class="text-danger">
+                        {{ form.include_following.errors }}
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="{{ form.visibility.id }}">{{ form.visibility.label }}</label>
                     {{ form.visibility }}
                     <small class="form-text">
                         <ul>
                             <li>{% trans "Public - visible to anyone, even anonymous users and internet search bots." %}</li>
-                            <li>{% trans "Limited - visible to only those who shared with. NOTE! Currently cannot be shared, so visible to only self." %}</li>
-                            <li>{% trans "Site - visible to only users who are logged in." %}</li>
-                            <li>{% trans "Self - visible to only self." %}</li>
+                            <li>{% trans "Limited - visible to only those who shared with." %}</li>
+                            <li>{% trans "Site - visible to only users who are logged in. Does not federate to other servers." %}</li>
+                            <li>{% trans "Self - visible to only self. Does not federate to other servers." %}</li>
                         </ul>
-                        <p>{% trans "NOTE! Currently only 'Public' content will federate." %}</p>
                         <p>{% trans "Tip: You can use the 'Self' visibility to create draft content and then change the visibility to for example 'Public' when you want to publish it." %}</p>
                     </small>
+                    <div class="text-danger">
+                        {{ form.visibility.errors }}
+                    </div>
                 </div>
             {% endif %}
         </div>
@@ -38,6 +63,9 @@
                     <small class="form-text">
                         {% trans "Pinned content will be shown on your personal profile in the order you want. Reorder pinned content from the profile menu. Pinned content will federate and otherwise function as any other content." %}
                     </small>
+                    <div class="text-danger">
+                        {{ form.pinned.errors }}
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="{{ form.federate.id }}">{{ form.federate.label }}</label>
@@ -45,6 +73,9 @@
                     <small class="form-text">
                         {{ form.federate.help_text }}
                     </small>
+                    <div class="text-danger">
+                        {{ form.federate.errors }}
+                    </div>
                 </div>
             {% endif %}
             <div class="form-group">
@@ -53,11 +84,14 @@
                 <small class="form-text">
                     {{ form.show_preview.help_text }}
                 </small>
+                <div class="text-danger">
+                    {{ form.show_preview.errors }}
+                </div>
             </div>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    <button type="submit" class="btn btn-primary w-100 pointer">{% trans "Save" %}</button>
 </form>
 {# "Hidden" form for image upload input #}
 <div style="height:0px; overflow:hidden;">

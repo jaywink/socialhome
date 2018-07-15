@@ -44,6 +44,36 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.assert_called_once_with(last_id=None, user=self.user)
 
 
+class TestLimitedStreamAPIView(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.create_content_set()
+        LimitedContentFactory()
+        cls.limited_content.limited_visibilities.add(cls.profile)
+
+    def test_limited_content_returned(self):
+        with self.login(self.user):
+            self.get("api-streams:limited")
+        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(
+            {item['id'] for item in self.last_response.data},
+            {self.limited_content.id, self.site_content.id},
+        )
+
+    def test_login_required(self):
+        self.get("api-streams:limited")
+        self.response_403()
+
+    @patch("socialhome.streams.viewsets.LimitedStream")
+    def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
+        with self.login(self.user):
+            self.get("api-streams:limited")
+        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+
+
 class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):

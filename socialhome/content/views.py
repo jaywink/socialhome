@@ -41,12 +41,6 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
     template_name = "content/edit.html"
     is_reply = False
 
-    def form_valid(self, form):
-        object = form.save(commit=False)
-        object.author = self.request.user.profile
-        object.save()
-        return HttpResponseRedirect(object.get_absolute_url())
-
     def get_form_kwargs(self):
         """Add user to form kwargs."""
         kwargs = super(ContentCreateView, self).get_form_kwargs()
@@ -89,10 +83,7 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        object = form.save(commit=False)
-        object.parent = self.parent
-        object.author = self.request.user.profile
-        object.save()
+        self.object = form.save(parent=self.parent)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

@@ -42,27 +42,44 @@ def receive_task(payload, guid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    process_entities(entities)
+    process_entities(entities, receiving_profile=profile)
 
 
-def send_content(content_id):
-    """Handle sending a Content object out via the federation layer.
-
-    Currently we only deliver public content.
+def send_content(content_id, recipient_id=None):
+    """
+    Handle sending a Content object out via the federation layer.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.CONTENT,
-                                      local=True)
+        content = Content.objects.get(
+            id=content_id,
+            visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
+            content_type=ContentType.CONTENT,
+            local=True,
+        )
     except Content.DoesNotExist:
         logger.warning("No local content found with id %s", content_id)
         return
+    if recipient_id:
+        try:
+            recipient = Profile.objects.get(id=recipient_id, user__isnull=True)
+        except Profile.DoesNotExist:
+            logger.warning("No remote recipient found with id %s", recipient_id)
+            return
+    else:
+        recipient = None
     entity = make_federable_content(content)
     if entity:
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [settings.SOCIALHOME_RELAY_ID]
-        recipients.extend(_get_remote_followers(content.author))
+        if recipient:
+            recipients = [
+                (generate_diaspora_profile_id(recipient.handle, recipient.guid), recipient.key),
+            ]
+        else:
+            recipients = [settings.SOCIALHOME_RELAY_ID]
+            recipients.extend(_get_remote_followers(content.author))
+
         logger.debug("send_content - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
     else:
@@ -79,12 +96,16 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         participants = []
     if not include_remote and not target_content.local:
         return participants
-    replies = Content.objects.filter(parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
+    replies = Content.objects.filter(
+        parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
+    )
     for reply in replies:
         if reply.author.handle != exclude:
             participants.append(generate_diaspora_profile_id(reply.author.handle, reply.author.guid))
     if target_content.content_type == ContentType.CONTENT:
-        shares = Content.objects.filter(share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False)
+        shares = Content.objects.filter(
+            share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
+        )
         for share in shares:
             if share.author.handle != exclude:
                 participants.append(generate_diaspora_profile_id(share.author.handle, share.author.guid))
@@ -103,14 +124,24 @@ def _get_remote_followers(profile, exclude=None):
     return followers
 
 
-def send_reply(content_id):
-    """Handle sending a Content object that is a reply out via the federation layer.
+def _get_limited_recipients(sender, content):
+    return [
+        (generate_diaspora_profile_id(profile.handle, profile.guid), profile.key)
+        for profile in content.limited_visibilities.all() if profile.handle != sender
+    ]
 
-    Currently we only deliver public content.
+
+def send_reply(content_id):
+    """
+    Handle sending a Content object that is a reply out via the federation layer.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.REPLY,
-                                      local=True)
+        content = Content.objects.get(
+            id=content_id,
+            visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
+            content_type=ContentType.REPLY,
+            local=True,
+        )
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
@@ -126,9 +157,14 @@ def send_reply(content_id):
     else:
         # We only need to send to the original author
         parent_author = content.parent.author
-        recipients = [
-            generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
-        ]
+        if content.visibility == Visibility.PUBLIC:
+            recipients = [
+                generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
+            ]
+        else:
+            recipients = [
+                (generate_diaspora_profile_id(parent_author.handle, parent_author.guid), parent_author.key),
+            ]
         logger.debug("send_reply - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
 
@@ -162,11 +198,10 @@ def send_share(content_id):
 
 
 def send_content_retraction(content, author_id):
-    """Handle sending of retractions for content.
-
-    Currently only for public content.
     """
-    if not content.visibility == Visibility.PUBLIC or not content.local:
+    Handle sending of retractions for content.
+    """
+    if content.visibility not in (Visibility.PUBLIC, Visibility.LIMITED) or not content.local:
         return
     author = Profile.objects.get(id=author_id)
     entity = make_federable_retraction(content, author)
@@ -174,8 +209,14 @@ def send_content_retraction(content, author_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [settings.SOCIALHOME_RELAY_ID]
-        recipients.extend(_get_remote_followers(author))
+        if content.visibility == Visibility.PUBLIC:
+            recipients = [settings.SOCIALHOME_RELAY_ID]
+            recipients.extend(
+                _get_remote_followers(author)
+            )
+        else:
+            recipients = _get_limited_recipients(author.handle, content)
+
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         handle_send(entity, author, recipients)
     else:
@@ -185,21 +226,26 @@ def send_content_retraction(content, author_id):
 def send_profile_retraction(profile):
     """Handle sending of retractions for profiles.
 
-    Only sent for public profiles. Reason: we might actually leak user information
+    Only sent for public and limited profiles. Reason: we might actually leak user information
     outside for profiles which were never federated outside if we send for example
     SELF or SITE profile retractions.
 
     This must be called as a pre_delete signal or it will fail.
     """
-    if not profile.visibility == Visibility.PUBLIC or not profile.is_local:
+    if profile.visibility not in (Visibility.PUBLIC, Visibility.LIMITED) or not profile.is_local:
         return
     entity = make_federable_retraction(profile)
     if entity:
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = [settings.SOCIALHOME_RELAY_ID]
-        recipients.extend(_get_remote_followers(profile))
+        if profile.visibility == Visibility.PUBLIC:
+            recipients = [settings.SOCIALHOME_RELAY_ID]
+        else:
+            recipients = []
+        recipients.extend(
+            _get_remote_followers(profile)
+        )
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
         handle_send(entity, profile, recipients)
     else:
@@ -210,24 +256,36 @@ def forward_entity(entity, target_content_id):
     """Handle forwarding of an entity related to a target content.
 
     For example: remote replies on local content, remote shares on local content.
-
-    Currently only for public content.
     """
     try:
-        target_content = Content.objects.get(id=target_content_id, visibility=Visibility.PUBLIC, local=True)
+        target_content = Content.objects.get(
+            id=target_content_id,
+            visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
+            local=True,
+        )
     except Content.DoesNotExist:
-        logger.warning("forward_entity - No public local content found with id %s", target_content_id)
+        logger.warning("forward_entity - No local content found with id %s", target_content_id)
         return
     try:
-        content = Content.objects.get(guid=entity.guid, visibility=Visibility.PUBLIC)
+        content = Content.objects.get(
+            guid=entity.guid, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
+        )
     except Content.DoesNotExist:
         logger.warning("forward_entity - No content found with guid %s", entity.guid)
         return
     if settings.DEBUG:
         # Don't send in development mode
         return
-    recipients = _get_remote_participants_for_content(target_content, exclude=entity.handle)
-    recipients.extend(_get_remote_followers(target_content.author, exclude=entity.handle))
+    if target_content.visibility == Visibility.PUBLIC:
+        recipients = _get_remote_participants_for_content(target_content, exclude=entity.handle)
+        recipients.extend(_get_remote_followers(
+            target_content.author,
+            exclude=entity.handle,
+        ))
+    elif target_content.visibility == Visibility.LIMITED and content.content_type == ContentType.REPLY:
+        recipients = _get_limited_recipients(entity.handle, target_content)
+    else:
+        return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
     handle_send(entity, content.author, recipients, parent_user=target_content.author)
 

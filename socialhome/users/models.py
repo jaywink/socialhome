@@ -176,12 +176,12 @@ class Profile(TimeStampedModel):
     def url(self):
         return "%s%s" % (settings.SOCIALHOME_URL, self.get_absolute_url())
 
-    def generate_new_rsa_key(self):
+    def generate_new_rsa_key(self, bits=4096):
         """Generate a new RSA private key
 
         Also cache the public key for faster retrieval into own field.
         """
-        key = generate_rsa_private_key()
+        key = generate_rsa_private_key(bits=bits)
         self.rsa_public_key = key.publickey().exportKey()
         self.rsa_private_key = key.exportKey()
         self.save(update_fields=("rsa_private_key", "rsa_public_key"))

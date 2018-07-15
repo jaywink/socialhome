@@ -22,3 +22,7 @@ class Visibility(Enum):
         LIMITED = _("Limited")
         SITE = _("Site")
         SELF = _("Self")
+
+    @property
+    def string_value(self):
+        return {0: "public", 1: "limited", 2: "site", 3: "self"}.get(self.value)

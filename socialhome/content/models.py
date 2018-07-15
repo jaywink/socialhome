@@ -12,7 +12,6 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.utils.text import truncate_letters
@@ -122,10 +121,20 @@ class Content(models.Model):
 
     federate = models.BooleanField(
         _("Federate to remote servers"), default=True,
-        help_text=_("Disable to skip federating this version to remote servers. Note, saved content version"
+        help_text=_("Disable to skip federating this version to remote servers. Note, saved content version "
                     "will still be updated to local streams.")
     )
 
+    # Fields relevant for Visibility.LIMITED only
+    limited_visibilities = models.ManyToManyField(
+        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
+    )
+    include_following = models.BooleanField(
+        _("Include people I follow"), default=False,
+        help_text=_("Automatically includes all the people you follow as recipients."),
+    )
+
+    # Dates
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
     created = AutoCreatedField(_('Created'), db_index=True)
     modified = AutoLastModifiedField(_('Modified'))
@@ -140,8 +149,8 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return "{text} ({guid})".format(
-            text=truncate_letters(self.text, 100), guid=self.guid
+        return "{text} ({type}, {visibility}, {guid})".format(
+            text=truncate_letters(self.text, 30), guid=self.guid, visibility=self.visibility, type=self.content_type,
         )
 
     def cache_data(self, commit=False):
@@ -425,52 +434,16 @@ class Content(models.Model):
         """
         self.text = re.sub(r"!\[\]\(/media/uploads/", "![](%s/media/uploads/" % settings.SOCIALHOME_URL, self.text)
 
-    def dict_for_view(self, user, through=None):
-        if not through:
-            through = self.id
-        humanized_timestamp = "%s (edited)" % self.humanized_timestamp if self.edited else self.humanized_timestamp
-        is_author = bool(user.is_authenticated and self.author == user.profile)
-        is_following_author = bool(user.is_authenticated and self.author_id in user.profile.following_ids)
-        profile_id = user.profile.id if getattr(user, "profile", None) else ""
-        return {
-            "author": self.author_id,
-            "author_guid": self.author.guid,
-            "author_handle": self.author.handle,
-            "author_home_url": self.author.home_url,
-            "author_image": self.author.safer_image_url_small,
-            "author_is_local": self.local,
-            "author_name": escape(self.author.name) or self.author.handle,
-            "author_profile_url": self.author.get_absolute_url(),
-            "reply_count": self.reply_count,
-            "content_type": self.content_type.string_value,
-            "delete_url": reverse("content:delete", kwargs={"pk": self.id}) if is_author else "",
-            "detail_url": self.get_absolute_url(),
-            "formatted_timestamp": self.timestamp,
-            "guid": self.guid,
-            "has_shared": Content.has_shared(self.id, profile_id) if profile_id else False,
-            "humanized_timestamp": humanized_timestamp,
-            "id": self.id,
-            "is_authenticated": bool(user.is_authenticated),
-            "is_author": is_author,
-            "is_following_author": is_following_author,
-            "parent": self.parent_id if self.content_type == ContentType.REPLY else "",
-            "profile_id": profile_id,
-            "rendered": self.rendered,
-            "reply_url": reverse("content:reply", kwargs={"pk": self.id}) if user.is_authenticated else "",
-            "shares_count": self.shares_count,
-            "slug": self.slug,
-            "through": through,
-            "update_url": reverse("content:update", kwargs={"pk": self.id}) if is_author else "",
-        }
-
     def visible_for_user(self, user):
         """Check if visible to given user.
 
         Mirrors logic in `ContentQuerySet.visible_for_user`.
         """
-        # TODO: handle also LIMITED when contacts implemented
         if self.visibility == Visibility.PUBLIC:
             return True
-        if user.is_authenticated and (self.author == user.profile or self.visibility == Visibility.SITE):
-            return True
+        if user.is_authenticated:
+            if self.author == user.profile or self.visibility == Visibility.SITE:
+                return True
+            if self.limited_visibilities.filter(id=user.profile.id).exists():
+                return True
         return False

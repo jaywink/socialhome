@@ -36,7 +36,7 @@ def get_sender_profile(sender):
     return sender_profile
 
 
-def process_entities(entities):
+def process_entities(entities, receiving_profile=None):
     """Process a list of entities."""
     for entity in entities:
         logger.info("Entity: %s", entity)
@@ -46,11 +46,11 @@ def process_entities(entities):
             continue
         try:
             if isinstance(entity, base.Post):
-                process_entity_post(entity, profile)
+                process_entity_post(entity, profile, receiving_profile=receiving_profile)
             elif isinstance(entity, base.Retraction):
                 process_entity_retraction(entity, profile)
             elif isinstance(entity, base.Comment):
-                process_entity_comment(entity, profile)
+                process_entity_comment(entity, profile, receiving_profile=receiving_profile)
             elif isinstance(entity, base.Relationship):
                 process_entity_relationship(entity, profile)
             elif isinstance(entity, base.Follow):
@@ -113,7 +113,7 @@ def validate_against_old_content(guid, entity, profile):
     return True
 
 
-def process_entity_post(entity, profile):
+def process_entity_post(entity, profile, receiving_profile=None):
     """Process an entity of type Post."""
     guid = safe_text(entity.guid)
     if not validate_against_old_content(guid, entity, profile):
@@ -132,9 +132,12 @@ def process_entity_post(entity, profile):
         logger.info("Saved Content: %s", content)
     else:
         logger.info("Updated Content: %s", content)
+    if content.visibility != Visibility.PUBLIC and receiving_profile:
+        content.limited_visibilities.add(receiving_profile)
+        logger.info("Added visibility to Post %s to %s", content.guid, receiving_profile.guid)
 
 
-def process_entity_comment(entity, profile):
+def process_entity_comment(entity, profile, receiving_profile=None):
     """Process an entity of type Comment."""
     guid = safe_text(entity.guid)
     if not validate_against_old_content(guid, entity, profile):
@@ -158,6 +161,9 @@ def process_entity_comment(entity, profile):
         logger.info("Saved Content from comment entity: %s", content)
     else:
         logger.info("Updated Content from comment entity: %s", content)
+    if parent.visibility != Visibility.PUBLIC and receiving_profile:
+        content.limited_visibilities.add(receiving_profile)
+        logger.info("Added visibility to Comment %s to %s", content.guid, receiving_profile.guid)
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
@@ -236,7 +242,7 @@ def _retract_relationship(target_guid, profile):
 def process_entity_retraction(entity, profile):
     """Process an entity of type Retraction."""
     entity_type = safe_text(entity.entity_type)
-    if entity_type == "Post":
+    if entity_type in ("Post", "Comment", "Share"):
         target_guid = safe_text(entity.target_guid)
         _retract_content(target_guid, profile)
     elif entity_type == "Profile":

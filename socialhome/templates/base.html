@@ -47,6 +47,7 @@
                             {% if request.user.is_authenticated %}
                                 <a class="dropdown-item" href="{% url "streams:followed" %}">{% trans "Followed" %}</a>
                                 <a class="dropdown-item" href="{% url "users:all-content" username=request.user.username %}">{% trans "My content" %}</a>
+                                <a class="dropdown-item" href="{% url "streams:limited" %}">{% trans "Limited" %}</a>
                             {% endif %}
                             <a class="dropdown-item" href="{% url "streams:public" %}">{% trans "Public" %}</a>
                         </div>

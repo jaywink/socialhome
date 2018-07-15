@@ -39,7 +39,8 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         Create content or reply
 
         When creating top level content, required values are: `text` and `visibility`.
-        Value for `visibility` should be one of: `public`, `site`, `limited`, `self`.
+        Value for `visibility` should be one of: `public`, `site` or `self`. Limited content
+        is currently not supported via the API.
 
         When creating replies, required values are: `text` and `parent`. The `parent` value is the ID of the
         content that is being replied on. A reply cannot have `visibility` set to anything else than the parent

@@ -30,6 +30,8 @@ The file ``requirements.apt`` contains other various dependencies. You can use t
 
 You can use the ``install_alpine_dependencies.sh`` script to install required dependencies (including Python, NodeJS, PostgreSQL and Redis) on Alpine.
 
+To generate profiling SVG's with pytest, also install the ``graphviz`` package (for example from apt), which provides ``dot``.
+
 Install Python dependencies
 ...........................
 
@@ -138,6 +140,8 @@ Python tests
 ::
 
     py.test
+
+To also generate profiling information, add ``--profile --profile-svg`` to the command.
 
 JavaScript tests
 ................
