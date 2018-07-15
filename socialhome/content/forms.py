@@ -12,13 +12,12 @@ from socialhome.users.models import Profile
 
 
 class ContentForm(forms.ModelForm):
-    # TODO collect this for initial value from limited_visibilities
     recipients = forms.CharField(required=False, label=_("Recipients"))
 
     class Meta:
         model = Content
         fields = [
-            "text", "visibility", "pinned", "show_preview", "federate", "include_following", "mention_recipients",
+            "text", "visibility", "pinned", "show_preview", "federate", "include_following",
             "recipients",
         ]
         widgets = {
@@ -35,14 +34,12 @@ class ContentForm(forms.ModelForm):
             self.fields.pop("federate")
             self.fields.pop("recipients")
             self.fields.pop("include_following")
-            self.fields.pop("mention_recipients")
         else:
             self.fields["visibility"].widget.attrs = {"class": "form-control"}
             self.fields["pinned"].widget.attrs = {"class": "form-check"}
             self.fields["federate"].widget.attrs = {"class": "form-check"}
             self.fields["recipients"].widget.attrs = {"class": "form-control"}
             self.fields["include_following"].widget.attrs = {"class": "form-check"}
-            self.fields["mention_recipients"].widget.attrs = {"class": "form-check"}
         self.fields["show_preview"].widget.attrs = {"class": "form-check"}
         self.fields["text"].widget.attrs = {"class": "form-control"}
 

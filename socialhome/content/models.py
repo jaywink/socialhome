@@ -134,10 +134,6 @@ class Content(models.Model):
         _("Include people I follow"), default=False,
         help_text=_("Automatically includes all the people you follow as recipients."),
     )
-    mention_recipients = models.BooleanField(
-        _("Mention recipients"), default=False,
-        help_text=_("Mention all recipients. This will make recipients visible to each other."),
-    )
 
     # Dates
     remote_created = models.DateTimeField(_("Remote created"), blank=True, null=True)
