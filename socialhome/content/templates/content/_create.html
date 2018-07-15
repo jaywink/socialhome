@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-6">
             {% if not is_reply %}
-                <div class="form-group {# hidden#}">
+                <div class="form-group {% if not content or content.visibility.string_value != 'limited' %}hidden{% endif %}">
                     <label for="{{ form.recipients.id }}">{{ form.recipients.label }}</label>
                     {{ form.recipients }}
                     <small class="form-text">
@@ -27,7 +27,7 @@
                         {{ form.recipients.errors }}
                     </div>
                 </div>
-                <div class="form-group {# hidden#}">
+                <div class="form-group {% if not content or content.visibility.string_value != 'limited' %}hidden{% endif %}">
                     <label for="{{ form.include_following.id }}">{{ form.include_following.label }}</label>
                     {{ form.include_following }}
                     <small class="form-text">
