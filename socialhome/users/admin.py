@@ -1,35 +1,21 @@
-from django import forms
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.admin import ModelAdmin
 
-from socialhome.users.models import User
-
-
-class MyUserChangeForm(UserChangeForm):
-    class Meta(UserChangeForm.Meta):
-        model = User
+from socialhome.users.models import User, Profile
 
 
-class MyUserCreationForm(UserCreationForm):
-
-    error_message = UserCreationForm.error_messages.update({
-        'duplicate_username': 'This username has already been taken.'
-    })
-
-    class Meta(UserCreationForm.Meta):
-        model = User
-
-    def clean_username(self):
-        username = self.cleaned_data["username"]
-        try:
-            User.objects.get(username=username)
-        except User.DoesNotExist:
-            return username
-        raise forms.ValidationError(self.error_messages['duplicate_username'])
+@admin.register(Profile)
+class ProfileAdmin(ModelAdmin):
+    list_display = ('id', 'guid', 'name', 'handle', 'visibility', 'user')
+    list_filter = ('visibility',)
+    raw_id_fields = ('user', 'following')
+    search_fields = ('id', 'guid', 'name', 'handle', 'email')
+    list_select_related = ('user',)
 
 
 @admin.register(User)
-class UserAdmin(AuthUserAdmin):
-    form = MyUserChangeForm
-    add_form = MyUserCreationForm
+class UserAdmin(ModelAdmin):
+    list_display = ('id', 'username', 'name', 'trusted_editor')
+    list_filter = ('trusted_editor',)
+    raw_id_fields = ('followers', 'following')
+    search_fields = ('id', 'name', 'username')
