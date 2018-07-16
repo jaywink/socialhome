@@ -8,6 +8,7 @@ from socialhome.content.tests.factories import (
 from socialhome.streams.tests.utils import MockStream
 from socialhome.streams.viewsets import StreamsAPIBaseView
 from socialhome.tests.utils import SocialhomeAPITestCase
+from socialhome.users.tests.factories import UserFactory
 
 
 class TestFollowedStreamAPIView(SocialhomeAPITestCase):
@@ -71,6 +72,44 @@ class TestLimitedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:limited")
+        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+
+
+class TestLocalStreamAPIView(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.other_user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.create_content_set(author=cls.profile)
+        cls.remote_content = PublicContentFactory()
+
+    def test_local_content_returned(self):
+        self.get("api-streams:local")
+        self.assertEqual(len(self.last_response.data), 1)
+        self.assertEqual(
+            {item['id'] for item in self.last_response.data},
+            {self.public_content.id},
+        )
+
+        with self.login(self.other_user):
+            self.get("api-streams:local")
+        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(
+            {item['id'] for item in self.last_response.data},
+            {self.public_content.id, self.site_content.id},
+        )
+
+    def test_login_not_required(self):
+        self.get("api-streams:local")
+        self.response_200()
+
+    @patch("socialhome.streams.viewsets.LocalStream")
+    def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
+        with self.login(self.user):
+            self.get("api-streams:local")
         mock_stream.assert_called_once_with(last_id=None, user=self.user)
 
 

@@ -284,6 +284,13 @@ class LimitedStream(BaseStream):
         return Content.objects.limited(self.user)
 
 
+class LocalStream(BaseStream):
+    stream_type = StreamType.LOCAL
+
+    def get_queryset(self):
+        return Content.objects.local(self.user)
+
+
 class ProfileStreamBase(BaseStream):
     def __init__(self, profile, **kwargs):
         super().__init__(**kwargs)

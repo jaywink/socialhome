@@ -102,6 +102,13 @@ function newRestAPI(options) {
             onError,
         })
         .get({
+            action: streamStoreOperations.getLocalStream,
+            path: ({lastId = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}`,
+            property: "contents",
+            onSuccess: fetchContentsSuccess,
+            onError,
+        })
+        .get({
             action: streamStoreOperations.getTagStream,
             path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
             property: "contents",
