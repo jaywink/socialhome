@@ -12,6 +12,7 @@ const routes = [
     {path: "/", component: Stream},
     {path: "/streams/followed", component: Stream},
     {path: "/streams/limited", component: Stream},
+    {path: "/streams/local", component: Stream},
     {path: "/streams/public", component: Stream},
     {path: "/u/:user", component: Stream, props: $$()},
     {path: "/u/:user/all", component: Stream, props: $$()},

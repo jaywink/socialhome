@@ -8,6 +8,7 @@ const streamStoreOperations = {
     disableLoadMore: "disableLoadMore",
     getFollowedStream: "getFollowedStream",
     getLimitedStream: "getLimitedStream",
+    getLocalStream: "getLocalStream",
     getNewContent: "getNewContent",
     getProfileAll: "getProfileAll",
     getProfilePinned: "getProfilePinned",

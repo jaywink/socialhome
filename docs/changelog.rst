@@ -60,7 +60,7 @@ Added
 
 * Admin now has a section for Content items and Profiles, for debugging purposes. The User admin was also improved.
 
-* Limited content is now supported 🙈 💪
+* Limited content is now supported 🙈 💪 (`#302 <https://github.com/jaywink/socialhome/issues/302>`_)
 
   Limited content can now be created using the web create form. Note, API does not currently allow creating limited content (except replies to limited content). Once create form is ported to the API, things should be refactored there, right now had no bandwidth to ensure both work.
 
@@ -71,6 +71,8 @@ Added
   Currently recipients must already be known to the server, in the future a remote search will be done if the profile is not known. Any known remote profile can be targeted - it is up to the receiving server to decide whether to accept it or not. For local profiles, those of visibility SELF (ie hidden) cannot be targeted.
 
   There is also a new stream "Limited" available. It shows all limited content visible to you.
+
+* Add "Local" stream which contains only content from users registered on the same server. (`#491 <https://github.com/jaywink/socialhome/issues/491>`_)
 
 Changed
 .......

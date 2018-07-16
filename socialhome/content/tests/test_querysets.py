@@ -29,6 +29,8 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
         cls.limited_tag_content = LimitedContentFactory(text="#foobar")
         cls.limited_tag_content.limited_visibilities.add(cls.limited_content_profile)
+        cls.local_user = UserFactory()
+        cls.local_content = PublicContentFactory(author=cls.local_user.profile)
 
     def setUp(self):
         super().setUp()
@@ -43,26 +45,34 @@ class TestContentQuerySet(SocialhomeTestCase):
             self.limited_content, self.limited_tag_content,
         })
 
+    def test_local(self):
+        contents = set(Content.objects.local(self.other_user))
+        self.assertEqual(contents, {
+            self.local_content,
+        })
+
     def test_pinned(self):
         contents = set(Content.objects.pinned())
         self.assertEqual(contents, {self.public_content, self.site_content, self.self_content})
 
     def test_visible_for_user(self):
         contents = set(Content.objects.visible_for_user(self.anonymous_user))
-        self.assertEqual(contents, {self.public_content, self.public_tag_content})
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.local_content})
         contents = set(Content.objects.visible_for_user(self.other_user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
-                                    self.site_tag_content})
+                                    self.site_tag_content, self.local_content})
         contents = set(Content.objects.visible_for_user(self.self_content.author.user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
-                                    self.site_tag_content, self.self_content, self.self_tag_content})
+                                    self.site_tag_content, self.self_content, self.self_tag_content,
+                                    self.local_content})
         contents = set(Content.objects.visible_for_user(self.limited_content_user))
         self.assertEqual(contents, {self.public_content, self.public_tag_content, self.site_content,
-                                    self.site_tag_content, self.limited_content, self.limited_tag_content})
+                                    self.site_tag_content, self.limited_content, self.limited_tag_content,
+                                    self.local_content})
 
     def test_public(self):
         contents = set(Content.objects.public())
-        self.assertEqual(contents, {self.public_content, self.public_tag_content})
+        self.assertEqual(contents, {self.public_content, self.public_tag_content, self.local_content})
 
     def test_tag_by_name(self):
         contents = set(Content.objects.tag_by_name("foobar", self.anonymous_user))

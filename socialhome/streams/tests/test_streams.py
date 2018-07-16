@@ -13,7 +13,7 @@ from socialhome.content.tests.factories import (
 from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
     BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_stream_for_users,
-    update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream)
+    update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream, LocalStream)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -386,6 +386,44 @@ class TestFollowedStream(SocialhomeTestCase):
         self.assertFalse(self.stream.should_cache_content(self.limited_content))
         self.assertFalse(self.stream.should_cache_content(self.self_content))
         self.assertFalse(self.stream.should_cache_content(self.other_public_content))
+
+
+class TestLocalStream(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.other_user = UserFactory()
+        cls.create_content_set(author=cls.user.profile)
+        cls.remote_content = PublicContentFactory()
+
+    def setUp(self):
+        super().setUp()
+        self.stream = LocalStream(user=self.other_user)
+
+    def test_get_target_streams(self):
+        self.assertEqual(
+            len(LocalStream.get_target_streams(self.public_content, self.other_user, self.public_content.author)), 1,
+        )
+
+    def test_key(self):
+        self.assertEqual(self.stream.key, "sh:streams:local:%s" % self.other_user.id)
+        stream = LocalStream(user=AnonymousUser())
+        self.assertEqual(stream.key, "sh:streams:local:anonymous")
+
+    def test_only_local_content_returned(self):
+        qs, _throughs = self.stream.get_content()
+        self.assertEqual(
+            set(qs),
+            {self.public_content, self.site_content},
+        )
+
+    def test_should_cache_content(self):
+        self.assertTrue(self.stream.should_cache_content(self.public_content))
+        self.assertTrue(self.stream.should_cache_content(self.site_content))
+        self.assertFalse(self.stream.should_cache_content(self.limited_content))
+        self.assertFalse(self.stream.should_cache_content(self.self_content))
+        self.assertFalse(self.stream.should_cache_content(self.remote_content))
 
 
 class TestProfileAllStream(SocialhomeTestCase):

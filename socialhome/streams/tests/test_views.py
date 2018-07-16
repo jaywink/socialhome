@@ -5,7 +5,8 @@ from django.test import Client
 from socialhome.content.tests.factories import ContentFactory, TagFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
-from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView
+from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, \
+    LocalStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -102,6 +103,54 @@ class TestLimitedStreamView(SocialhomeCBVTestCase):
     def test_uses_correct_template(self):
         with self.login(self.user):
             response = self.client.get(reverse("streams:limited"))
+        template_names = [template.name for template in response.templates]
+        self.assertIn("streams/base.html", template_names)
+
+
+class TestLocalStreamView(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.local_user = UserFactory()
+        cls.content = ContentFactory(visibility=Visibility.PUBLIC, author=cls.local_user.profile)
+        cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.site = ContentFactory(visibility=Visibility.SITE, author=cls.local_user.profile)
+        cls.selff = ContentFactory(visibility=Visibility.SELF, author=cls.local_user.profile)
+        cls.limited = ContentFactory(visibility=Visibility.LIMITED)
+        cls.user = UserFactory()
+        cls.client = Client()
+
+    def test_does_not_require_being_logged_in(self):
+        response = self.client.get(reverse("streams:local"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_json_context(self):
+        view = self.get_instance(LocalStreamView, request=self.get_request(self.user))
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+            }
+        )
+
+    def test_renders(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:local"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_stream_name(self):
+        view = self.get_instance(LocalStreamView)
+        self.assertEqual(view.stream_name, StreamType.LOCAL.value)
+
+    def test_stream_type_value(self):
+        view = self.get_instance(LocalStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.LOCAL.value)
+
+    def test_uses_correct_template(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:local"))
         template_names = [template.name for template in response.templates]
         self.assertIn("streams/base.html", template_names)
 
