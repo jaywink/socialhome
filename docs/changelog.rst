@@ -70,7 +70,7 @@ Added
 
   Currently recipients must already be known to the server, in the future a remote search will be done if the profile is not known. Any known remote profile can be targeted - it is up to the receiving server to decide whether to accept it or not. For local profiles, those of visibility SELF (ie hidden) cannot be targeted.
 
-  There is also a new stream "Limited" available. It shows all non-public content visible to you.
+  There is also a new stream "Limited" available. It shows all limited content visible to you.
 
 Changed
 .......
