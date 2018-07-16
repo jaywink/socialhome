@@ -40,7 +40,7 @@ class TestContentQuerySet(SocialhomeTestCase):
     def test_limited(self):
         contents = set(Content.objects.limited(self.limited_content_user))
         self.assertEqual(contents, {
-            self.limited_content, self.limited_tag_content, self.site_content, self.site_tag_content,
+            self.limited_content, self.limited_tag_content,
         })
 
     def test_pinned(self):

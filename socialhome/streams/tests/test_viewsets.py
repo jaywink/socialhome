@@ -56,10 +56,10 @@ class TestLimitedStreamAPIView(SocialhomeAPITestCase):
     def test_limited_content_returned(self):
         with self.login(self.user):
             self.get("api-streams:limited")
-        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(len(self.last_response.data), 1)
         self.assertEqual(
             {item['id'] for item in self.last_response.data},
-            {self.limited_content.id, self.site_content.id},
+            {self.limited_content.id},
         )
 
     def test_login_required(self):
