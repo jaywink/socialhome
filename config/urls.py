@@ -39,8 +39,6 @@ urlpatterns = [
 
     # Streams
     url(r"^streams/", include("socialhome.streams.urls.views", namespace="streams")),
-    # Legacy streams urls support
-    url(r"", include("socialhome.streams.urls.legacy", namespace="streams-legacy")),
 
     url(r"^$", HomeView.as_view(), name="home"),
 

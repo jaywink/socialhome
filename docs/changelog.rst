@@ -102,6 +102,11 @@ Fixed
 
 * Fix failure of processing remote retractions of replies or shares in some situations.
 
+Removed
+.......
+
+* Legacy streams routes `/public/`, `/followed/` and `/tags/<name>/` have been removed. They already partially broke in the Vue.js streams rewrite.
+
 0.8.0 (2018-03-06)
 ------------------
 
