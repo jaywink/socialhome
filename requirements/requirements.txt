@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/jaywink/django-markdownx.git@bd2fa9dffcbfccc62f9cef2677921537f100bbaa#egg=django-markdownx==2.0.21.1
 -e git+https://github.com/jazzband/django-robots.git@3.1.0#egg=robots
--e git+https://git.feneas.org/jaywink/federation.git@ed98f65b3ec848ddc7359fa53e7751fbf2c93f21#egg=federation==0.17.0-dev.1
+-e git+https://git.feneas.org/jaywink/federation.git@e9fd332c4ce6b862402eb1fb542553047ba9bce9#egg=federation==0.17.0-dev.1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
 arrow==0.12.1
 asgi-redis==1.4.3
