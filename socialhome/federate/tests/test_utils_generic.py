@@ -1,24 +1,19 @@
-from django.urls import reverse
+from federation.entities import base
 
-from socialhome.federate.utils.generic import get_diaspora_profile_by_handle
+from socialhome.federate.utils import get_profile, make_federable_profile
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
 
 
-class TestGetDiasporaProfileIDByHandle(SocialhomeTestCase):
+class TestGetProfile(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
         cls.profile = cls.user.profile
 
-    def test_id_returned(self):
-        profile_path = reverse("users:detail", kwargs={"username": self.user.username})
-        self.assertEqual(
-            get_diaspora_profile_by_handle(self.profile.handle),
-            {
-                "id": "diaspora://%s/profile/%s" % (self.profile.handle, self.profile.guid),
-                "profile_path": profile_path,
-                "atom_path": profile_path,
-            }
-        )
+    def test_profile_returned(self):
+        returned = get_profile(handle=self.profile.handle)
+        maked = make_federable_profile(self.profile)
+        self.assertEqual(returned.handle, maked.handle)
+        self.assertTrue(isinstance(returned, base.Profile))

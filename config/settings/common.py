@@ -513,7 +513,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
-    "get_profile_function": "socialhome.federate.utils.generic.get_diaspora_profile_by_handle",
+    "get_profile_function": "socialhome.federate.utils.entities.get_profile",
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "search_path": "/search/?q=",
 }

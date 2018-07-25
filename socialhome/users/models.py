@@ -17,9 +17,8 @@ from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
-from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.querysets import ProfileQuerySet
-from socialhome.users.utils import get_pony_urls
+from socialhome.users.utils import get_pony_urls, generate_rsa_private_key
 from socialhome.utils import get_full_media_url
 
 logger = logging.getLogger("socialhome")

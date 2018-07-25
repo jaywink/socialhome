@@ -23,7 +23,6 @@ from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
 from socialhome.enums import Visibility
-from socialhome.users.models import Profile
 
 
 class OpenGraphCache(models.Model):
@@ -84,7 +83,7 @@ class Content(models.Model):
 
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
     guid = models.CharField(_("GUID"), max_length=255, unique=True)
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
+    author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     # Is this content pinned to the user profile
@@ -108,7 +107,7 @@ class Content(models.Model):
         OpenGraphCache, verbose_name=_("OpenGraph cache"), on_delete=models.SET_NULL, null=True
     )
 
-    mentions = models.ManyToManyField(Profile, verbose_name=_("Mentions"), related_name="mentioned_in")
+    mentions = models.ManyToManyField("users.Profile", verbose_name=_("Mentions"), related_name="mentioned_in")
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
 
     parent = models.ForeignKey(
@@ -127,7 +126,7 @@ class Content(models.Model):
 
     # Fields relevant for Visibility.LIMITED only
     limited_visibilities = models.ManyToManyField(
-        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
+        "users.Profile", verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
     )
     include_following = models.BooleanField(
         _("Include people I follow"), default=False,
@@ -180,6 +179,7 @@ class Content(models.Model):
     def extract_mentions(self):
         # TODO locally created mentions should not have to be ripped out of text
         # For now we just rip out diaspora style mentions until we have UI layer
+        from socialhome.users.models import Profile
         mentions = re.findall(r'@{[^;]+; [\w.-]+@[^}]+}', self.text)
         if not mentions:
             self.mentions.clear()

@@ -22,7 +22,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import receive_task
-from socialhome.federate.utils.tasks import make_federable_content
+from socialhome.federate.utils.entities import make_federable_content
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")

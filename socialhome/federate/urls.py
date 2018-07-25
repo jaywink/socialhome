@@ -11,7 +11,7 @@ app_name = 'federate'
 
 urlpatterns = [
     # Federation provided urls
-    url(r"", include("federation.hostmeta.django.urls")),
+    url(r"", include("federation.django.urls")),
 
     # Discovery
     url(r'^.well-known/host-meta$', host_meta_view, name="host-meta"),

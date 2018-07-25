@@ -11,9 +11,11 @@ from socialhome.content.tests.factories import ContentFactory, LocalContentFacto
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import forward_entity
 from socialhome.federate.utils.tasks import (
-    process_entities, get_sender_profile, make_federable_content, make_federable_retraction, process_entity_post,
+    process_entities, get_sender_profile, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
-    process_entity_relationship, make_federable_profile, process_entity_share, _process_mentions)
+    process_entity_relationship, process_entity_share, _process_mentions)
+from socialhome.federate.utils import make_federable_profile
+from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.notifications.tasks import send_follow_notification
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile

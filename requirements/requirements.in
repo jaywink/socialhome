@@ -52,7 +52,7 @@ whoosh
 # - GIF upload (upstream rejected)
 -e git+https://github.com/jaywink/django-markdownx.git@bd2fa9dffcbfccc62f9cef2677921537f100bbaa#egg=django-markdownx==2.0.21.1
 
--e git+https://git.feneas.org/jaywink/federation.git@db049c6638b46e18c9ce7f05938dcff72cd065c7#egg=federation==0.18.0-dev.1
+-e git+https://git.feneas.org/jaywink/federation.git@ed98f65b3ec848ddc7359fa53e7751fbf2c93f21#egg=federation==0.17.0-dev.1
 
 # Own pyembed fork for some tweaks:
 # - passing additional options (TODO make PR)

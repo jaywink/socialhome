@@ -11,8 +11,9 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.utils.tasks import (
-    process_entities, make_federable_content, make_federable_retraction, sender_key_fetcher,
-    make_federable_profile)
+    process_entities, sender_key_fetcher)
+from socialhome.federate.utils import make_federable_profile
+from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.users.models import Profile
 
 logger = logging.getLogger("socialhome")

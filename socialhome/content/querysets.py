@@ -3,7 +3,6 @@ from django.db.models import Q, F, OuterRef, Subquery, Case, When
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
-from socialhome.users.models import Profile
 
 
 class TagQuerySet(models.QuerySet):
@@ -92,6 +91,7 @@ class ContentQuerySet(models.QuerySet):
         Ensures if the profile is not visible to the user, no content will be returned.
         """
         from socialhome.content.models import Content
+        from socialhome.users.models import Profile
         get_by = {attr: value}
         try:
             profile = Profile.objects.get(**get_by)

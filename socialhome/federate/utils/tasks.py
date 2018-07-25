@@ -5,11 +5,10 @@ from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 from federation.utils.diaspora import parse_profile_diaspora_id
 
-from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
-from socialhome.federate.utils.generic import safe_make_aware
+from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
 
 logger = logging.getLogger("socialhome")
@@ -300,109 +299,6 @@ def process_entity_share(entity, profile):
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
         django_rq.enqueue(forward_entity, entity, target_content.id)
-
-
-def _make_post(content):
-    try:
-        return base.Post(
-            raw_content=content.text,
-            guid=str(content.guid),
-            handle=content.author.handle,
-            public=True if content.visibility == Visibility.PUBLIC else False,
-            provider_display_name="Socialhome",
-            created_at=content.effective_modified,
-        )
-    except Exception as ex:
-        logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
-        return None
-
-
-def _make_comment(content):
-    try:
-        return base.Comment(
-            raw_content=content.text,
-            guid=str(content.guid),
-            target_guid=str(content.parent.guid),
-            handle=content.author.handle,
-            created_at=content.effective_modified,
-        )
-    except Exception as ex:
-        logger.exception("_make_comment - Failed to convert %s: %s", content.guid, ex)
-        return None
-
-
-def _make_share(content):
-    try:
-        return base.Share(
-            raw_content=content.text,
-            guid=str(content.guid),
-            target_guid=str(content.share_of.guid),
-            handle=content.author.handle,
-            target_handle=content.share_of.author.handle,
-            created_at=content.effective_modified,
-            public=True if content.visibility == Visibility.PUBLIC else False,
-            provider_display_name="Socialhome",
-        )
-    except Exception as ex:
-        logger.exception("_make_share - Failed to convert %s: %s", content.guid, ex)
-
-
-def make_federable_content(content):
-    """Make Content federable by converting it to a federation entity."""
-    logger.info("make_federable_content - Content: %s", content)
-    if content.content_type == ContentType.REPLY:
-        return _make_comment(content)
-    elif content.content_type == ContentType.SHARE:
-        return _make_share(content)
-    return _make_post(content)
-
-
-def make_federable_retraction(obj, author=None):
-    """Make object retraction federable by converting it to a federation entity."""
-    logger.info("make_federable_retraction - Object: %s", obj)
-    try:
-        if isinstance(obj, Content):
-            entity_type = {
-                ContentType.REPLY: "Comment",
-                ContentType.SHARE: "Share",
-                ContentType.CONTENT: "Post",
-            }.get(obj.content_type)
-            handle = author.handle
-        elif isinstance(obj, Profile):
-            entity_type = "Profile"
-            handle = obj.handle
-        else:
-            logger.warning("make_federable_retraction - Unknown object type %s", obj)
-            return
-        return base.Retraction(
-            entity_type=entity_type,
-            handle=handle,
-            target_guid=obj.guid,
-        )
-    except Exception as ex:
-        logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.guid, ex)
-
-
-def make_federable_profile(profile):
-    """Make a federable profile."""
-    logger.info("make_federable_profile - Profile: %s", profile)
-    try:
-        return base.Profile(
-            handle=profile.handle,
-            raw_content="",
-            public=True if profile.visibility == Visibility.PUBLIC else False,
-            guid=profile.guid,
-            name=profile.name,
-            image_urls={
-                "small": profile.safer_image_url_small,
-                "medium": profile.safer_image_url_medium,
-                "large": profile.safer_image_url_large,
-            },
-            public_key=profile.rsa_public_key,
-        )
-    except Exception as ex:
-        logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)
-        return None
 
 
 def sender_key_fetcher(handle):
