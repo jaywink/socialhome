@@ -103,10 +103,13 @@ class Profile(TimeStampedModel):
     email = models.EmailField(_("email address"), blank=True)
 
     # GUID
-    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False)
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
-    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True)
+    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
+    # Federation identifier
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True)
 
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
@@ -131,10 +134,12 @@ class Profile(TimeStampedModel):
 
     objects = ProfileQuerySet.as_manager()
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.handle)
+    def __str__(self) -> str:
+        # TODO if no handle something else
+        return f"{self.name} ({self.handle} / {self.fid})"
 
     def get_absolute_url(self):
+        # TODO if no handle, something else?
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
 
     @property
@@ -146,16 +151,20 @@ class Profile(TimeStampedModel):
 
     @property
     def name_or_handle(self):
+        # TODO or guid or fid?
         return self.name or self.handle
 
     @property
     def remote_url(self):
+        # TODO fix this
         return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
 
     def save(self, *args, **kwargs):
         # Protect against empty guids which the search indexing would crash on
+        # TODO need to ditch this requirement
         if not self.guid:
             raise ValueError("Profile must have a guid!")
+        # TODO need to ditch this requirement
         if not validate_handle(self.handle):
             raise ValueError("Not a valid handle")
         # Set default pony images if image urls are empty
@@ -165,10 +174,14 @@ class Profile(TimeStampedModel):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
         # Ensure handle is *always* lowercase
+        # TODO only if handle
         self.handle = self.handle.lower()
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
+        # Ensure local profile has a fid
+        if not self.fid and self.is_local:
+            self.fid = self.url
         super().save(*args, **kwargs)
 
     @property
@@ -243,6 +256,7 @@ class Profile(TimeStampedModel):
 
     @property
     def username_part(self):
+        # TODO only if handle
         return self.handle.split("@")[0]
 
     def visible_to_user(self, user):
@@ -310,8 +324,10 @@ class Profile(TimeStampedModel):
             defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
         logger.debug("from_remote_profile - defaults %s", defaults)
         profile, created = Profile.objects.update_or_create(
+            # TODO only use fid here?
             guid=safe_text(remote_profile.guid),
             handle=safe_text(remote_profile.handle),
+            fid=safe_text(remote_profile.id),
             defaults=defaults,
         )
         logger.info("from_remote_profile - created %s, profile %s", created, profile)

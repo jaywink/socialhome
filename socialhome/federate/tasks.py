@@ -121,13 +121,13 @@ def _get_remote_followers(profile, exclude=None):
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if follower.handle != exclude:
-            followers.append(generate_diaspora_profile_id(follower.handle, follower.guid))
+            followers.append(follower.fid)
     return followers
 
 
 def _get_limited_recipients(sender, content):
     return [
-        (generate_diaspora_profile_id(profile.handle, profile.guid), profile.key)
+        (profile.fid, profile.key)
         for profile in content.limited_visibilities.all() if profile.handle != sender
     ]
 

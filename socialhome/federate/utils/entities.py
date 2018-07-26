@@ -122,6 +122,7 @@ def make_federable_profile(profile):
             created_at=profile.created,
             base_url=settings.SOCIALHOME_URL,
             username=profile.user.username if profile.user else "",
+            id=profile.fid,
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)

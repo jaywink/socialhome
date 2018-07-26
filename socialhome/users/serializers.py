@@ -15,6 +15,7 @@ class LimitedProfileSerializer(ModelSerializer):
     class Meta:
         model = Profile
         fields = (
+            "fid",
             "guid",
             "handle",
             "home_url",
@@ -25,6 +26,7 @@ class LimitedProfileSerializer(ModelSerializer):
             "url",
         )
         read_only_fields = (
+            "fid",
             "guid",
             "handle",
             "home_url",
@@ -46,6 +48,7 @@ class ProfileSerializer(ModelSerializer):
     class Meta:
         model = Profile
         fields = (
+            "fid",
             "followers_count",
             "following_count",
             "guid",
@@ -65,6 +68,7 @@ class ProfileSerializer(ModelSerializer):
             "visibility",
         )
         read_only_fields = (
+            "fid",
             "followers_count",
             "following_count",
             "guid",
