@@ -1,3 +1,6 @@
+import uuid
+from random import randint
+
 import factory
 from allauth.account.models import EmailAddress
 from factory import fuzzy
@@ -63,8 +66,7 @@ class AdminUserFactory(UserFactory):
 class ProfileFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     email = factory.Faker("safe_email")
-    handle = factory.SelfAttribute("email")
-    guid = factory.Faker("uuid4")
+    fid = factory.Faker("uri")
 
     # Dummy strings as keys since generating these is expensive
     rsa_private_key = fuzzy.FuzzyText()
@@ -77,6 +79,24 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.Profile"
+
+    @factory.post_generation
+    def set_guid(self, extracted, created, **kwargs):
+        if extracted is False:
+            return
+
+        # Set guid sometimes, sometimes not, but also allow passing in True to force
+        if extracted is True or randint(0, 100) > 50:
+            self.guid = uuid.uuid4()
+
+    @factory.post_generation
+    def set_handle(self, extracted, created, **kwargs):
+        if extracted is False:
+            return
+
+        # Set handle sometimes, sometimes not, but also allow passing in True to force
+        if extracted is True or randint(0, 100) > 50:
+            self.handle = self.email
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):

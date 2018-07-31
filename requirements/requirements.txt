@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/jaywink/django-markdownx.git@bd2fa9dffcbfccc62f9cef2677921537f100bbaa#egg=django-markdownx==2.0.21.1
 -e git+https://github.com/jazzband/django-robots.git@3.1.0#egg=robots
--e git+https://git.feneas.org/jaywink/federation.git@e9fd332c4ce6b862402eb1fb542553047ba9bce9#egg=federation==0.17.0-dev.1
+-e git+https://git.feneas.org/jaywink/federation.git@c5170d902e9e5baa4582940d5f343d288ca8d099#egg=federation==0.17.0-dev.1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
 arrow==0.12.1
 asgi-redis==1.4.3
@@ -60,7 +60,6 @@ django==2.0.8
 djangorestframework==3.8.2
 federation==0.17.0
 future==0.16.0            # via commonmark
-html2text==2018.1.9       # via little-boxes
 html5lib==1.0.1           # via bleach
 hyperlink==18.0.0         # via twisted
 idna==2.7                 # via hyperlink, requests
@@ -74,7 +73,7 @@ jedi==0.12.1              # via ipython
 jinja2==2.10              # via coreschema
 jsonschema==2.6.0
 lxml==4.2.2
-markdown==2.6.11          # via little-boxes
+markdown==2.6.11
 markupsafe==1.0           # via jinja2
 msgpack-python==0.5.6     # via asgi-redis
 oauthlib==2.1.0           # via requests-oauthlib
@@ -90,7 +89,6 @@ psycopg2-binary==2.7.5
 ptyprocess==0.6.0         # via pexpect
 pycryptodome==3.6.6       # via federation
 pygments==2.2.0           # via ipython
-pyld==1.0.3               # via little-boxes
 pyhamcrest==1.9.0         # via twisted
 python-dateutil==2.7.3    # via arrow, croniter, federation
 python-opengraph-jaywink==0.2.0

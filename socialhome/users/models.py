@@ -160,25 +160,23 @@ class Profile(TimeStampedModel):
         return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
 
     def save(self, *args, **kwargs):
-        # Protect against empty guids which the search indexing would crash on
-        # TODO need to ditch this requirement
-        if not self.guid:
-            raise ValueError("Profile must have a guid!")
-        # TODO need to ditch this requirement
-        if not validate_handle(self.handle):
-            raise ValueError("Not a valid handle")
+        if self.handle:
+            # Ensure handle is *always* lowercase
+            self.handle = self.handle.lower()
+            if not validate_handle(self.handle):
+                raise ValueError("Not a valid handle")
+
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
-        # Ensure handle is *always* lowercase
-        # TODO only if handle
-        self.handle = self.handle.lower()
+
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
+
         # Ensure local profile has a fid
         if not self.fid and self.is_local:
             self.fid = self.url
