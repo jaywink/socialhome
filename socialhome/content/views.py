@@ -1,4 +1,5 @@
 from braces.views import UserPassesTestMixin, LoginRequiredMixin
+from django.db.models import Q
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
@@ -144,7 +145,7 @@ class ContentView(ContentVisibleForUserMixin, DetailView):
     def get_object(self, queryset=None):
         guid = self.kwargs.get("guid")
         if guid:
-            return get_object_or_404(Content, guid=guid)
+            return get_object_or_404(Content, Q(guid=guid) | Q(uuid=guid))
         return super().get_object(queryset=queryset)
 
     def get_context_data(self, **kwargs):

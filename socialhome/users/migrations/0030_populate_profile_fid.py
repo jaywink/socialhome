@@ -11,6 +11,7 @@ def forward(apps, schema_editor):
     for profile in Profile.objects.all().iterator():
         if profile.user is not None:
             # Local
+            # TODO shoudl this be changed to the new uuid field?
             url = reverse('users:profile-detail', kwargs={'guid': profile.guid})
             fid = f"{settings.SOCIALHOME_URL}{url}"
         else:

@@ -96,13 +96,17 @@ class User(AbstractUser):
 
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
+    # Local UUID
+    uuid = models.UUIDField(unique=True)
+
+    # User object for local profiles
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
     # Fields mirroring 'User' table since all our Profiles are not local
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
 
-    # GUID
+    # Federation GUID
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
@@ -254,7 +258,8 @@ class Profile(TimeStampedModel):
 
     @property
     def username_part(self):
-        # TODO only if handle
+        if not self.handle:
+            return ""
         return self.handle.split("@")[0]
 
     def visible_to_user(self, user):

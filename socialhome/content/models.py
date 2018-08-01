@@ -79,12 +79,19 @@ class Tag(models.Model):
 
 
 class Content(models.Model):
+    # Local UUID
+    uuid = models.UUIDField(unique=True)
+
     text = models.TextField(_("Text"), blank=True)
 
+    # Federation GUID
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
-    guid = models.CharField(_("GUID"), max_length=255, unique=True)
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+
+    # Federation identifier
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
