@@ -6,6 +6,14 @@ Changelog
 0.10.0 (unreleased)
 -------------------
 
+0.9.1 (2018-08-11)
+------------------
+
+Fixed
+.....
+
+* Django bumped to 2.0.8 to fix a `security issue <https://docs.djangoproject.com/en/2.0/releases/2.0.8/>`_. This issue did not affect Socialhome, but we're upgrading just to be sure.
+
 0.9.0 (2018-07-21)
 ------------------
 

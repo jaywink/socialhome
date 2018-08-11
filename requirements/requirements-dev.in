@@ -2,10 +2,11 @@ codecov
 coverage
 ddt
 django-debug-toolbar
+django-debug-toolbar-user-panel
 django-querycount
 django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why
 django_coverage_plugin
-django<2.0.6  # Bump after https://github.com/ierror/django-js-reverse/issues/65 fixed
+django<2.1
 factory_boy
 Faker
 flake8
@@ -26,7 +27,6 @@ Werkzeug
 # Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
 
-# Django-debug-toolbar-user-panel fixed with Django 2.0 support
-# Use pip once PR merged and upstream releases
-# https://github.com/thread/django-debug-toolbar-user-panel/pull/3
--e git+https://github.com/jaywink/django-debug-toolbar-user-panel.git@django-2-fix#egg=django-debug-toolbar-user-panel==1.1.0.1
+# Not a direct requirement, just to match main requirements locked version
+# TODO remove once circus is bumped to work with tornado 5.0
+tornado<5
