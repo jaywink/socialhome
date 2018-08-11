@@ -6,6 +6,16 @@ Changelog
 0.10.0 (unreleased)
 -------------------
 
+0.9.2 (2018-08-11)
+------------------
+
+Fixed
+.....
+
+* Update to ``federation`` which switches crypto libraries to fix CVE-2018-6594.
+
+  **Note!** If you don't use ``pip-sync`` to deploy, then you **must** do ``pip uninstall pycrypto`` before deploying, or things will break badly.
+
 0.9.1 (2018-08-11)
 ------------------
 
