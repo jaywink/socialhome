@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
 from versatileimagefield.fields import VersatileImageField, PPOIField
@@ -146,6 +147,14 @@ class Profile(TimeStampedModel):
     def get_absolute_url(self):
         # TODO if no handle, something else?
         return reverse("users:profile-detail", kwargs={"guid": self.guid})
+
+    @property
+    def federable(self):
+        # TODO make UserType data class
+        profile = UserType()
+        profile.id = self.fid
+        profile.private_key = self.private_key
+        return profile
 
     @property
     def home_url(self):
@@ -326,11 +335,12 @@ class Profile(TimeStampedModel):
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
+        if hasattr(remote_profile, "guid"):
+            defaults['guid'] = safe_text(remote_profile.guid)
+        if hasattr(remote_profile, "handle"):
+            defaults['guid'] = safe_text(remote_profile.handle)
         logger.debug("from_remote_profile - defaults %s", defaults)
         profile, created = Profile.objects.update_or_create(
-            # TODO only use fid here?
-            guid=safe_text(remote_profile.guid),
-            handle=safe_text(remote_profile.handle),
             fid=safe_text(remote_profile.id),
             defaults=defaults,
         )

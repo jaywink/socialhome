@@ -10,8 +10,7 @@ from federation.utils.diaspora import generate_diaspora_profile_id
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
-from socialhome.federate.utils.tasks import (
-    process_entities, sender_key_fetcher)
+from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher
 from socialhome.federate.utils import make_federable_profile
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.users.models import Profile
@@ -29,7 +28,9 @@ def receive_task(payload, guid=None):
             logger.warning("No local profile found with guid")
             return
     try:
-        sender, protocol_name, entities = handle_receive(payload, user=profile, sender_key_fetcher=sender_key_fetcher)
+        sender, protocol_name, entities = handle_receive(
+            payload, user=profile.federable, sender_key_fetcher=sender_key_fetcher,
+        )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
     except NoSuitableProtocolFoundError:
         logger.warning("No suitable protocol found for payload")
@@ -101,15 +102,15 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
     )
     for reply in replies:
-        if reply.author.handle != exclude:
-            participants.append(generate_diaspora_profile_id(reply.author.handle, reply.author.guid))
+        if reply.author.fid != exclude:
+            participants.append(reply.author.fid)
     if target_content.content_type == ContentType.CONTENT:
         shares = Content.objects.filter(
             share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
         )
         for share in shares:
-            if share.author.handle != exclude:
-                participants.append(generate_diaspora_profile_id(share.author.handle, share.author.guid))
+            if share.author.fid != exclude:
+                participants.append(share.author.fid)
             participants = _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
@@ -128,7 +129,7 @@ def _get_remote_followers(profile, exclude=None):
 def _get_limited_recipients(sender, content):
     return [
         (profile.fid, profile.key)
-        for profile in content.limited_visibilities.all() if profile.handle != sender
+        for profile in content.limited_visibilities.all() if profile.fid != sender
     ]
 
 
@@ -269,22 +270,22 @@ def forward_entity(entity, target_content_id):
         return
     try:
         content = Content.objects.get(
-            guid=entity.guid, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
+            fid=entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
         )
     except Content.DoesNotExist:
-        logger.warning("forward_entity - No content found with guid %s", entity.guid)
+        logger.warning("forward_entity - No content found with guid %s", entity.id)
         return
     if settings.DEBUG:
         # Don't send in development mode
         return
     if target_content.visibility == Visibility.PUBLIC:
-        recipients = _get_remote_participants_for_content(target_content, exclude=entity.handle)
+        recipients = _get_remote_participants_for_content(target_content, exclude=entity.actor_id)
         recipients.extend(_get_remote_followers(
             target_content.author,
-            exclude=entity.handle,
+            exclude=entity.actor_id,
         ))
     elif target_content.visibility == Visibility.LIMITED and content.content_type == ContentType.REPLY:
-        recipients = _get_limited_recipients(entity.handle, target_content)
+        recipients = _get_limited_recipients(entity.actor_id, target_content)
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
