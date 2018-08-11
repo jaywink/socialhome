@@ -1,3 +1,6 @@
+import uuid
+from random import randint
+
 import factory
 
 from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
@@ -17,8 +20,17 @@ class ContentFactory(factory.DjangoModelFactory):
         model = Content
 
     text = factory.Faker("text")
-    guid = factory.Faker("uuid4")
+    fid = factory.Faker("uri")
     author = factory.SubFactory(ProfileFactory)
+
+    @factory.post_generation
+    def set_guid(self, extracted, created, **kwargs):
+        if extracted is False or self.guid:
+            return
+
+        # Set guid sometimes, sometimes not, but also allow passing in True to force
+        if extracted is True or randint(0, 100) > 50:
+            self.guid = str(uuid.uuid4())
 
 
 class PublicContentFactory(ContentFactory):

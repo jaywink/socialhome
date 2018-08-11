@@ -65,7 +65,7 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_create(self):
         content = Content.objects.create(text="foobar", author=ProfileFactory())
-        assert content.guid
+        assert content.uuid
 
     def test_extract_mentions(self):
         self.assertEqual(
@@ -165,10 +165,10 @@ class TestContentModel(SocialhomeTestCase):
         self.assertIsNotNone(self.remote_content.remote_created)
 
     def test_content_saved_in_correct_order(self):
-        profile = ProfileFactory(guid="1234")
-        pinned_content_1 = ContentFactory(pinned=True, text="foobar", author=profile)
-        pinned_content_2 = ContentFactory(pinned=True, text="foobar", author=profile)
-        pinned_content_3 = ContentFactory(pinned=True, text="foobar", author=profile)
+        user = UserFactory()
+        pinned_content_1 = ContentFactory(pinned=True, text="foobar", author=user.profile)
+        pinned_content_2 = ContentFactory(pinned=True, text="foobar", author=user.profile)
+        pinned_content_3 = ContentFactory(pinned=True, text="foobar", author=user.profile)
 
         self.assertEqual([pinned_content_1.order, pinned_content_2.order, pinned_content_3.order], [1, 2, 3])
 

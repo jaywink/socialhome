@@ -1,5 +1,6 @@
 import logging
 import os
+from uuid import uuid4
 
 from Crypto.PublicKey import RSA
 from django.conf import settings
@@ -97,7 +98,7 @@ class User(AbstractUser):
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
-    uuid = models.UUIDField(unique=True)
+    uuid = models.UUIDField(unique=True, default=uuid4)
 
     # User object for local profiles
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)

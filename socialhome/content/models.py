@@ -80,7 +80,7 @@ class Tag(models.Model):
 
 class Content(models.Model):
     # Local UUID
-    uuid = models.UUIDField(unique=True)
+    uuid = models.UUIDField(unique=True, default=uuid4)
 
     text = models.TextField(_("Text"), blank=True)
 
@@ -238,6 +238,10 @@ class Content(models.Model):
     def url(self):
         return "%s%s" % (settings.SOCIALHOME_URL, self.get_absolute_url())
 
+    @property
+    def url_uuid(self):
+        return "%s%s" % (settings.SOCIALHOME_URL, reverse("content:view-by-guid", kwargs={"guid": self.uuid}))
+
     @staticmethod
     @memoize(timeout=604800)  # a week
     def has_shared(content_id, profile_id):
@@ -256,9 +260,13 @@ class Content(models.Model):
         elif self.share_of:
             self.content_type = ContentType.SHARE
 
-        if not self.pk:
+        if not self.pk and self.local:
             if not self.guid:
                 self.guid = uuid4()
+            if not self.uuid:
+                self.uuid = self.guid
+            if not self.fid:
+                self.fid = self.url_uuid
             if self.pinned:
                 max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet

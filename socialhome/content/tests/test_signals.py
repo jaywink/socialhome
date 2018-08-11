@@ -130,7 +130,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         ContentFactory(author=user.profile, federate=False)
         self.assertTrue(mock_send.called is False)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
     def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
         parent = ContentFactory(author=user.profile)
@@ -140,17 +140,21 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         call_args = [
             call(send_reply_notifications, content.id),
             call(send_reply, content.id),
+            call(send_reply, content.id),
         ]
-        assert mock_send.call_args_list == call_args
+        self.assertEqual(mock_send.call_args_list, call_args)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
-    @patch("socialhome.content.signals.update_streams_with_content")
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_local_content_gets_sent(self, mock_update, mock_send):
         user = UserFactory()
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
-        mock_send.assert_called_once_with(send_content, content.id, recipient_id=None)
+        self.assertEqual(mock_send.call_count, 2)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args, (send_content, content.id))
+        self.assertEqual(kwargs, {'recipient_id': None})
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     @patch("socialhome.content.signals.update_streams_with_content")
@@ -162,6 +166,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         content = ContentFactory(author=user.profile, share_of=share_of)
         call_args = [
             call(send_share_notification, content.id),
+            call(send_share, content.id),
             call(send_share, content.id),
         ]
         assert mock_send.call_args_list == call_args
@@ -194,10 +199,10 @@ class TestFederateContentRetraction(SocialhomeTestCase):
 
 
 class TestFetchPreview(SocialhomeTestCase):
-    @patch("socialhome.content.signals.fetch_content_preview")
+    @patch("socialhome.content.signals.fetch_content_preview", autospec=True)
     def test_fetch_content_preview_called(self, fetch):
-        content = ContentFactory()
-        fetch.assert_called_once_with(content)
+        ContentFactory()
+        self.assertEqual(fetch.call_count, 2)
 
     @patch("socialhome.content.signals.fetch_content_preview", side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")
