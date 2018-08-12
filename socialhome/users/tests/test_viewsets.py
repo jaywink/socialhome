@@ -146,8 +146,8 @@ class TestProfileViewSet(SocialhomeAPITestCase):
 
     def test_read_only_fields(self):
         self.client.login(username=self.user.username, password="password")
-        for field in ("id", "guid", "handle", "image_url_large", "image_url_medium", "image_url_small", "is_local",
-                      "url", "home_url"):
+        for field in ("id", "uuid", "fid", "handle", "image_url_large", "image_url_medium", "image_url_small",
+                      "is_local", "url", "home_url"):
             response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {field: "82"})
             self.assertEqual(response.data.get(field), getattr(self.profile, field))
         for field in ("name", "location", "nsfw", "visibility"):
@@ -177,28 +177,28 @@ class TestProfileViewSet(SocialhomeAPITestCase):
     def test_user_add_follower(self):
         # Not authenticated
         response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
         response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.staff_profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 404)
         response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.site_profile.guid,
+            "guid": self.site_profile.uuid,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower added.")
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
         response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.staff_profile.guid,
+            "guid": self.staff_profile.uuid,
         })
         self.assertEqual(response.status_code, 403)
         response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.staff_profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower added.")
@@ -206,28 +206,28 @@ class TestProfileViewSet(SocialhomeAPITestCase):
     def test_user_remove_follower(self):
         # Not authenticated
         response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
         response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.staff_profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 404)
         response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.staff_profile.guid,
+            "guid": self.staff_profile.uuid,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower removed.")
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
         response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "guid": self.staff_profile.guid,
+            "guid": self.staff_profile.uuid,
         })
         self.assertEqual(response.status_code, 403)
         response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.staff_profile.id}), {
-            "guid": self.profile.guid,
+            "guid": self.profile.uuid,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower removed.")

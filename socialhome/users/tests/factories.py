@@ -80,23 +80,28 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "users.Profile"
 
-    @factory.post_generation
-    def set_guid(self, extracted, created, **kwargs):
-        if extracted is False or self.guid:
-            return
+    class Params:
+        diaspora = factory.Trait(
+            fid=factory.lazy_attribute(lambda x: f"diaspora://{x.email}/profile/{randint(1, 100000)}")
+        )
 
-        # Set guid sometimes, sometimes not, but also allow passing in True to force
-        if extracted is True or randint(0, 100) > 50:
-            self.guid = str(uuid.uuid4())
+    # @factory.post_generation
+    # def set_guid(self, extracted, created, **kwargs):
+    #     if extracted is False or self.guid:
+    #         return
+    #
+    #     # Set guid sometimes, sometimes not, but also allow passing in True to force
+    #     if extracted is True or randint(0, 100) > 50:
+    #         self.guid = str(uuid.uuid4())
 
-    @factory.post_generation
-    def set_handle(self, extracted, created, **kwargs):
-        if extracted is False or self.handle:
-            return
-
-        # Set handle sometimes, sometimes not, but also allow passing in True to force
-        if extracted is True or randint(0, 100) > 50:
-            self.handle = self.email
+    # @factory.post_generation
+    # def set_handle(self, extracted, created, **kwargs):
+    #     if extracted is False or self.handle:
+    #         return
+    #
+    #     # Set handle sometimes, sometimes not, but also allow passing in True to force
+    #     if extracted is True or randint(0, 100) > 50:
+    #         self.handle = self.email
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
@@ -114,7 +119,7 @@ class BaseProfileFactory(factory.Factory):
     class Meta:
         model = base.Profile
 
-    handle = factory.Faker("safe_email")
+    id = factory.Faker('uri')
     raw_content = factory.Faker("paragraphs", nb=3)
     email = factory.Faker("safe_email")
     gender = factory.Faker("job")
@@ -122,7 +127,6 @@ class BaseProfileFactory(factory.Factory):
     nsfw = factory.Faker("pybool")
     public_key = factory.Faker("sha1")
     public = factory.Faker("pybool")
-    guid = factory.Faker("uuid4")
     image_urls = {
         "small": factory.Faker("image_url", width=30, height=30).generate({}),
         "medium": factory.Faker("image_url", width=100, height=100).generate({}),

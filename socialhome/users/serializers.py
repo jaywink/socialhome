@@ -16,8 +16,7 @@ class LimitedProfileSerializer(ModelSerializer):
         model = Profile
         fields = (
             "fid",
-            "guid",
-            "handle",
+            "uuid",
             "home_url",
             "id",
             "image_url_small",
@@ -27,8 +26,7 @@ class LimitedProfileSerializer(ModelSerializer):
         )
         read_only_fields = (
             "fid",
-            "guid",
-            "handle",
+            "uuid",
             "home_url",
             "id",
             "image_url_small",
@@ -51,8 +49,7 @@ class ProfileSerializer(ModelSerializer):
             "fid",
             "followers_count",
             "following_count",
-            "guid",
-            "handle",
+            "uuid",
             "has_pinned_content",
             "home_url",
             "id",
@@ -71,7 +68,7 @@ class ProfileSerializer(ModelSerializer):
             "fid",
             "followers_count",
             "following_count",
-            "guid",
+            "uuid",
             "handle",
             "has_pinned_content",
             "home_url",

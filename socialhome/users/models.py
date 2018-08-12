@@ -143,8 +143,7 @@ class Profile(TimeStampedModel):
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
-        # TODO if no handle something else
-        return f"{self.name} ({self.handle} / {self.fid})"
+        return f"{self.name} ({self.fid})"
 
     def get_absolute_url(self):
         # TODO if no handle, something else?

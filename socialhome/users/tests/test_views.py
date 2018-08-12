@@ -120,7 +120,8 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "isUserAuthenticated": True,
                 "profile": {
                     "id": profile.id,
-                    "guid": profile.guid,
+                    "uuid": profile.uuid,
+                    "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
                     "handle": profile.handle,
@@ -149,7 +150,8 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "isUserAuthenticated": False,
                 "profile": {
                     "id": profile.id,
-                    "guid": profile.guid,
+                    "uuid": profile.uuid,
+                    "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
                     "handle": profile.handle,
@@ -385,10 +387,10 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "isUserAuthenticated": True,
                 "profile": {
                     "id": profile.id,
-                    "guid": profile.guid,
+                    "uuid": profile.uuid,
+                    "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
-                    "handle": profile.handle,
                     "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
                     "home_url": profile.home_url,
                     "image_url_large": profile.image_url_large,
@@ -414,7 +416,8 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "isUserAuthenticated": False,
                 "profile": {
                     "id": profile.id,
-                    "guid": profile.guid,
+                    "uuid": profile.uuid,
+                    "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
                     "handle": profile.handle,
@@ -440,11 +443,11 @@ class TestProfileAllContentView(SocialhomeTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_renders_for_remote_profile(self):
-        response = self.get("users:profile-all-content", guid=self.profile.guid)
+        response = self.get("users:profile-all-content", guid=self.profile.uuid)
         self.assertEqual(response.status_code, 200)
 
     def test_stream_name(self):
-        self.get("users:profile-all-content", guid=self.profile.guid)
+        self.get("users:profile-all-content", guid=self.profile.uuid)
         self.assertEqual(self.last_response.context["json_context"]["streamName"],
                          "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
 

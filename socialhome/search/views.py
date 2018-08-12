@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from federation.fetchers import retrieve_remote_profile
+from federation.utils.diaspora import generate_diaspora_profile_id
 from federation.utils.text import validate_handle
 from haystack.generic_views import SearchView
 from whoosh.query import QueryError
@@ -93,18 +94,18 @@ class GlobalSearchView(SearchView):
         if validate_handle(q):
             profile = None
             try:
-                profile = Profile.objects.visible_for_user(request.user).get(handle=q)
+                profile = Profile.objects.visible_for_user(request.user).get(fid__startswith=f"diaspora://{q}/profile/")
             except Profile.DoesNotExist:
                 # Try a remote search
                 try:
-                    remote_profile = retrieve_remote_profile(q)
+                    remote_profile = retrieve_remote_profile(generate_diaspora_profile_id(q))
                 except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
                     # Catch various errors parsing the remote profile
                     return super().get(request, *args, **kwargs)
                 if remote_profile:
                     profile = Profile.from_remote_profile(remote_profile)
             if profile:
-                return redirect(reverse("users:profile-detail", kwargs={"guid": profile.guid}))
+                return redirect(reverse("users:profile-detail", kwargs={"guid": profile.uuid}))
         try:
             return super().get(request, *args, **kwargs)
         except QueryError:
@@ -115,7 +116,7 @@ class GlobalSearchView(SearchView):
     def filter_queryset(self, queryset):
         """Do some of our own filtering on the queryset before returning."""
         if self.request.user.is_authenticated:
-            queryset = queryset.exclude(handle=self.request.user.profile.handle)
+            queryset = queryset.exclude(id=self.request.user.profile.id)
             if self.request.user.is_staff:
                 return queryset
             else:

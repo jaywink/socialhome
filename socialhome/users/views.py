@@ -1,4 +1,3 @@
-from braces.views import StaffuserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
@@ -34,14 +33,14 @@ class UserDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         """Render ProfileDetailView for this user."""
         profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
-        return ProfileDetailView.as_view()(request, guid=profile.guid)
+        return ProfileDetailView.as_view()(request, guid=profile.uuid)
 
 
 class UserAllContentView(UserDetailView):
     def get(self, request, *args, **kwargs):
         """Render ProfileDetailView for this user."""
         profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
-        return ProfileAllContentView.as_view()(request, guid=profile.guid)
+        return ProfileAllContentView.as_view()(request, guid=profile.uuid)
 
 
 class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
@@ -49,8 +48,8 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
     model = Profile
     object = None
     profile_stream_type = None  # TODO: refactor to use stream type value directly
-    slug_field = "guid"
-    slug_url_kwarg = "guid"
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
     template_name = "streams/base.html"
 
     def dispatch(self, request, *args, **kwargs):
@@ -72,7 +71,7 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
 
     def get_page_meta(self):
         meta = super().get_page_meta()
-        name = self.object.name if self.object.name else self.object.guid
+        name = self.object.name if self.object.name else self.object.fid
         meta.update({
             "title": name,
             "description": _("Profile of %s." % name),
@@ -99,13 +98,13 @@ class ProfileDetailView(ProfileViewMixin):
         """Ensure we have pinned content. If not, render all content instead."""
         self.set_object_and_data()
         if self.data and not self.data["has_pinned_content"]:
-            return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("guid"))
+            return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_page_meta(self):
         meta = super().get_page_meta()
         meta.update({
-            "url": get_full_url(reverse("users:profile-detail", kwargs={"guid": self.object.guid})),
+            "url": get_full_url(reverse("users:profile-detail", kwargs={"uuid": self.object.uuid})),
         })
         return meta
 
@@ -117,7 +116,7 @@ class ProfileAllContentView(ProfileViewMixin):
     def get_page_meta(self):
         meta = super().get_page_meta()
         meta.update({
-            "url": get_full_url(reverse("users:profile-all-content", kwargs={"guid": self.object.guid})),
+            "url": get_full_url(reverse("users:profile-all-content", kwargs={"uuid": self.object.uuid})),
         })
         return meta
 
@@ -160,7 +159,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 
     def get_object(self, queryset=None):
-        return Profile.objects.get(guid=self.request.user.profile.guid)
+        return Profile.objects.get(id=self.request.user.profile.id)
 
 
 class UserPictureUpdateView(LoginRequiredMixin, UpdateView):
@@ -173,14 +172,6 @@ class UserPictureUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return User.objects.get(id=self.request.user.id)
-
-
-class UserListView(StaffuserRequiredMixin, ListView):
-    model = User
-    slug_field = "username"
-    slug_url_kwarg = "username"
-    redirect_unauthenticated_users = True
-    raise_exception = True
 
 
 class UserAPITokenView(LoginRequiredMixin, TemplateView):
@@ -212,7 +203,7 @@ class ContactsFollowedView(LoginRequiredMixin, DetailView):
     template_name = "users/contacts_followed.html"
 
     def get_object(self, queryset=None):
-        return Profile.objects.get(guid=self.request.user.profile.guid)
+        return Profile.objects.get(id=self.request.user.profile.id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

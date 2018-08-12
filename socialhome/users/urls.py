@@ -7,11 +7,6 @@ app_name = 'users'
 
 urlpatterns = [
     url(
-        regex=r"^u/$",
-        view=views.UserListView.as_view(),
-        name="list"
-    ),
-    url(
         regex=r"^u/(?P<username>[\w.@+-]+)/all/$",
         view=views.UserAllContentView.as_view(),
         name="all-content"
@@ -42,12 +37,12 @@ urlpatterns = [
         name="profile-update"
     ),
     url(
-        regex=r"^p/(?P<guid>[^/]+)/all/$",
+        regex=r"^p/(?P<uuid>[^/]+)/all/$",
         view=views.ProfileAllContentView.as_view(),
         name="profile-all-content"
     ),
     url(
-        regex=r"^p/(?P<guid>[^/]+)/$",
+        regex=r"^p/(?P<uuid>[^/]+)/$",
         view=views.ProfileDetailView.as_view(),
         name="profile-detail"
     ),
