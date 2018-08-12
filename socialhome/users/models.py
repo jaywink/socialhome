@@ -109,9 +109,11 @@ class Profile(TimeStampedModel):
     email = models.EmailField(_("email address"), blank=True)
 
     # Federation GUID
+    # TODO drop guid once things have rolled out
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
+    # TODO drop handle once things have rolled out
     handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Federation identifier

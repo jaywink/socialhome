@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 import django_rq
 from federation.entities import base
@@ -13,7 +14,7 @@ from socialhome.users.models import Profile, User
 logger = logging.getLogger("socialhome")
 
 
-def get_sender_profile(sender):
+def get_sender_profile(sender: str) -> Optional[Profile]:
     """Get or create sender profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
@@ -22,7 +23,6 @@ def get_sender_profile(sender):
         sender_profile = Profile.objects.exclude(rsa_public_key="").get(fid=sender)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - FID %s was not found, fetching from remote", sender)
-        # TODO federation should accept id
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
             logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
@@ -57,13 +57,13 @@ def process_entities(entities, receiving_profile=None):
             elif isinstance(entity, base.Share):
                 process_entity_share(entity, profile)
         except Exception as ex:
-            logger.exception("Failed to handle %s: %s", entity.guid, ex)
+            logger.exception("Failed to handle %s: %s", entity.id, ex)
 
 
 def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
     try:
-        user = User.objects.get(profile__hfid=entity.target_id, is_active=True)
+        user = User.objects.get(profile__fid=entity.target_id, is_active=True)
     except User.DoesNotExist:
         logger.warning("Could not find local user %s for follow entity %s", entity.target_id, entity)
         return
@@ -122,7 +122,7 @@ def process_entity_post(entity, profile, receiving_profile=None):
 
 def process_entity_comment(entity, profile, receiving_profile=None):
     """Process an entity of type Comment."""
-    fid = safe_text(entity.fid)
+    fid = safe_text(entity.id)
     if not validate_against_old_content(fid, entity, profile):
         return
     try:

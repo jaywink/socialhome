@@ -13,7 +13,7 @@ from socialhome.federate.tasks import forward_entity
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
-    process_entity_relationship, process_entity_share, _process_mentions)
+    process_entity_share, _process_mentions)
 from socialhome.federate.utils import make_federable_profile
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.notifications.tasks import send_follow_notification
@@ -31,7 +31,6 @@ class TestProcessEntities(SocialhomeTestCase):
         cls.post = entities.PostFactory()
         cls.comment = base.Comment()
         cls.retraction = base.Retraction()
-        cls.relationship = base.Relationship()
         cls.follow = base.Follow()
         cls.profile = BaseProfileFactory()
         cls.share = BaseShareFactory()
@@ -67,12 +66,6 @@ class TestProcessEntities(SocialhomeTestCase):
     def test_process_entity_comment_is_called__with_receiving_profile(self, mock_sender, mock_process):
         process_entities([self.comment], receiving_profile=self.receiving_profile)
         mock_process.assert_called_once_with(self.comment, "profile", receiving_profile=self.receiving_profile)
-
-    @patch("socialhome.federate.utils.tasks.process_entity_relationship")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
-    def test_process_entity_relationship_is_called(self, mock_sender, mock_process):
-        process_entities([self.relationship])
-        mock_process.assert_called_once_with(self.relationship, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_follow")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -112,8 +105,8 @@ class TestProcessMentions(SocialhomeTestCase):
 
     def test_addition_happens(self):
         self.entity._mentions = {
-            'diaspora://%s/profile/' % self.profile.handle,
-            'diaspora://%s/profile/' % self.profile2.handle,
+            self.profile.fid,
+            self.profile2.fid,
         }
         _process_mentions(self.content, self.entity)
         self.assertEqual(
@@ -142,13 +135,13 @@ class TestProcessEntityPost(SocialhomeTestCase):
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory())
-        content = Content.objects.get(guid=entity.guid)
+        content = Content.objects.get(fid=entity.id)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
     def test_visibility_is_added_to_receiving_profile(self):
         entity = entities.PostFactory()
         process_entity_post(entity, ProfileFactory(), receiving_profile=self.receiving_profile)
-        content = Content.objects.get(guid=entity.guid)
+        content = Content.objects.get(fid=entity.id)
         self.assertEqual(
             set(content.limited_visibilities.all()),
             {self.receiving_profile},
@@ -157,7 +150,7 @@ class TestProcessEntityPost(SocialhomeTestCase):
     def test_visibility_is_not_added_to_public_content(self):
         entity = entities.PostFactory(public=True)
         process_entity_post(entity, ProfileFactory(), receiving_profile=self.receiving_profile)
-        content = Content.objects.get(guid=entity.guid)
+        content = Content.objects.get(fid=entity.id)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
     def test_entity_images_are_prefixed_to_post_text(self):
@@ -168,20 +161,20 @@ class TestProcessEntityPost(SocialhomeTestCase):
             ],
         )
         process_entity_post(entity, ProfileFactory())
-        content = Content.objects.get(guid=entity.guid)
+        content = Content.objects.get(fid=entity.id)
         assert content.text.index("![](foobar) ![](zoodee) \n\n%s" % entity.raw_content) == 0
 
     def test_post_is_updated_from_entity(self):
         entity = entities.PostFactory()
-        author = ProfileFactory(handle=entity.handle)
-        ContentFactory(guid=entity.guid, author=author)
+        author = ProfileFactory(fid=entity.actor_id)
+        ContentFactory(fid=entity.id, author=author)
         process_entity_post(entity, author)
-        content = Content.objects.get(guid=entity.guid)
+        content = Content.objects.get(fid=entity.id)
         self.assertEqual(content.text, entity.raw_content)
 
         # Don't allow updating if the author is different
-        invalid_entity = entities.PostFactory(guid=entity.guid)
-        process_entity_post(invalid_entity, ProfileFactory(handle=invalid_entity.handle))
+        invalid_entity = entities.PostFactory(fid=entity.id)
+        process_entity_post(invalid_entity, ProfileFactory(fid=invalid_entity.actor_id))
         content.refresh_from_db()
         self.assertEqual(content.text, entity.raw_content)
         self.assertEqual(content.author, author)
@@ -190,16 +183,16 @@ class TestProcessEntityPost(SocialhomeTestCase):
         entity = entities.PostFactory(
             raw_content="<script>alert('yup');</script>",
             provider_display_name="<script>alert('yup');</script>",
-            guid="<script>alert('yup');</script>"
+            id="https://example.com/foobar",
         )
         process_entity_post(entity, ProfileFactory())
-        content = Content.objects.get(guid="alert('yup');")
+        content = Content.objects.get(fid="https://example.com/foobar")
         assert content.text == "&lt;script&gt;alert('yup');&lt;/script&gt;"
         assert content.service_label == "alert('yup');"
 
-    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None))
+    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None), autospec=True)
     def test_local_content_is_skipped(self, mock_update):
-        entity = entities.PostFactory(guid=self.local_content.guid)
+        entity = entities.PostFactory(id=self.local_content.fid)
         process_entity_post(entity, ProfileFactory())
         self.assertFalse(mock_update.called)
 
@@ -216,13 +209,15 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def setUp(self):
         super().setUp()
-        self.comment = base.Comment(guid="guid"*4, target_guid=self.content.guid, raw_content="foobar",
-                                    handle="thor@example.com")
+        self.comment = base.Comment(
+            id="https://example.com/comment", target_id=self.content.fid, raw_content="foobar",
+            actor_id="https://example.com/profile",
+        )
 
     def test_mentions_are_linked(self):
-        self.comment._mentions = {'diaspora://%s/profile/' % self.profile.handle}
+        self.comment._mentions = {self.profile.fid}
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid)
+        content = Content.objects.get(fid=self.comment.id)
         self.assertEqual(
             set(content.mentions.all()),
             {self.profile},
@@ -230,12 +225,12 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def test_reply_is_created_from_entity(self):
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
     def test_visibility_is_added_to_receiving_profile(self):
         process_entity_comment(self.comment, ProfileFactory(), receiving_profile=self.receiving_profile)
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(
             set(content.limited_visibilities.all()),
             {self.receiving_profile},
@@ -243,10 +238,11 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def test_visibility_is_not_added_if_public_parent_content(self):
         comment = base.Comment(
-            guid="guid" * 4, target_guid=self.public_content.guid, raw_content="foobar", handle="thor@example.com",
+            id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
+            actor_id="https://example.com/profile2",
         )
         process_entity_comment(comment, ProfileFactory(), receiving_profile=self.receiving_profile)
-        content = Content.objects.get(guid=comment.guid, parent=self.public_content)
+        content = Content.objects.get(fid=comment.id, parent=self.public_content)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
     def test_entity_images_are_prefixed_to_post_text(self):
@@ -255,27 +251,32 @@ class TestProcessEntityComment(SocialhomeTestCase):
             base.Image(remote_path="zoo", remote_name="dee"),
         ]
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.text.index("![](foobar) ![](zoodee) \n\n%s" % self.comment.raw_content), 0)
 
     def test_reply_is_updated_from_entity(self):
-        author = ProfileFactory(handle=self.comment.handle)
-        ContentFactory(guid=self.comment.guid, author=author)
+        author = ProfileFactory(fid=self.comment.actor_id)
+        ContentFactory(fid=self.comment.id, author=author)
         process_entity_comment(self.comment, author)
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.text, self.comment.raw_content)
 
         # Don't allow updating if the author is different
-        invalid_entity = base.Comment(guid=self.comment.guid, raw_content="barfoo", handle="loki@example.com",
-                                      target_guid=self.content.guid)
-        process_entity_comment(invalid_entity, ProfileFactory(handle=invalid_entity.handle))
+        invalid_entity = base.Comment(
+            id=self.comment.id, raw_content="barfoo", actor_id="https://example.com/notthesameperson",
+            target_id=self.content.fid,
+        )
+        process_entity_comment(invalid_entity, ProfileFactory(fid=invalid_entity.actor_id))
         content.refresh_from_db()
         self.assertEqual(content.text, self.comment.raw_content)
         self.assertEqual(content.author, author)
 
         # Don't allow changing parent
-        invalid_entity = base.Comment(guid=self.comment.guid, raw_content="barfoo", handle="thor@example.com",
-                                      target_guid=ContentFactory().guid)
+        invalid_entity = base.Comment(
+            id=self.comment.id, raw_content="barfoo", actor_id="https://example.com/notthesameperson",
+            target_id=ContentFactory().fid,
+        )
+
         process_entity_comment(invalid_entity, author)
         content.refresh_from_db()
         self.assertEqual(content.text, self.comment.raw_content)
@@ -284,16 +285,16 @@ class TestProcessEntityComment(SocialhomeTestCase):
     def test_reply_text_fields_are_cleaned(self):
         self.comment.raw_content = "<script>alert('yup');</script>"
         process_entity_comment(self.comment, ProfileFactory())
-        content = Content.objects.get(guid=self.comment.guid, parent=self.content)
+        content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.text, "&lt;script&gt;alert('yup');&lt;/script&gt;")
 
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
-    def test_does_not_forwards_relayable_if_not_local_content(self, mock_rq):
+    def test_does_not_forward_relayable_if_not_local_content(self, mock_rq):
         process_entity_comment(self.comment, ProfileFactory())
-        Content.objects.get(guid=self.comment.guid, parent=self.content)
+        Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertFalse(mock_rq.called)
 
-    @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
+    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
     def test_forwards_relayable_if_local_content(self, mock_rq):
         user = UserFactory()
         self.content.author = user.profile
@@ -301,16 +302,16 @@ class TestProcessEntityComment(SocialhomeTestCase):
         self.content.refresh_from_db()
         mock_rq.reset_mock()
         process_entity_comment(self.comment, ProfileFactory())
-        Content.objects.get(guid=self.comment.guid, parent=self.content)
+        Content.objects.get(fid=self.comment.id, parent=self.content)
         call_args = [
             call(forward_entity, self.comment, self.content.id),
         ]
         self.assertEqual(mock_rq.call_args_list, call_args)
 
-    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None))
+    @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None), autospec=True)
     def test_local_reply_is_skipped(self, mock_update):
         user = UserFactory()
-        ContentFactory(guid=self.comment.guid, author=user.profile)
+        ContentFactory(fid=self.comment.id, author=user.profile)
         process_entity_comment(self.comment, ProfileFactory())
         self.assertFalse(mock_update.called)
 
@@ -327,46 +328,38 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
         super().setUp()
         self.content.refresh_from_db()
 
-    @patch("socialhome.federate.utils.tasks.logger.debug")
+    @patch("socialhome.federate.utils.tasks.logger.debug", autospec=True)
     def test_non_post_entity_types_are_skipped(self, mock_logger):
         process_entity_retraction(Mock(entity_type="foo"), Mock())
         mock_logger.assert_called_with("Ignoring retraction of entity_type %s", "foo")
 
-    @patch("socialhome.federate.utils.tasks.logger.warning")
+    @patch("socialhome.federate.utils.tasks.logger.warning", autospec=True)
     def test_does_nothing_if_content_doesnt_exist(self, mock_logger):
-        process_entity_retraction(Mock(entity_type="Post", target_guid="bar"), Mock())
-        mock_logger.assert_called_with("Retracted remote content %s cannot be found", "bar")
+        process_entity_retraction(Mock(entity_type="Post", target_id="https://example.com/notfound"), Mock())
+        mock_logger.assert_called_with("Retracted remote content %s cannot be found", "https://example.com/notfound")
 
-    @patch("socialhome.federate.utils.tasks.logger.warning")
+    @patch("socialhome.federate.utils.tasks.logger.warning", autospec=True)
     def test_does_nothing_if_content_is_not_local(self, mock_logger):
-        process_entity_retraction(Mock(entity_type="Post", target_guid=self.local_content.guid), Mock())
+        process_entity_retraction(Mock(entity_type="Post", target_id=self.local_content.fid), Mock())
         mock_logger.assert_called_with(
-            "Retracted remote content %s cannot be found", self.local_content.guid,
+            "Retracted remote content %s cannot be found", self.local_content.fid,
         )
 
-    @patch("socialhome.federate.utils.tasks.logger.warning")
+    @patch("socialhome.federate.utils.tasks.logger.warning", autospec=True)
     def test_does_nothing_if_content_author_is_not_same_as_remote_profile(self, mock_logger):
         remote_profile = Mock()
-        process_entity_retraction(Mock(entity_type="Post", target_guid=self.content.guid), remote_profile)
+        process_entity_retraction(Mock(entity_type="Post", target_id=self.content.fid), remote_profile)
         mock_logger.assert_called_with(
             "Content %s is not owned by remote retraction profile %s", self.content, remote_profile
         )
 
     def test_deletes_content(self):
         process_entity_retraction(
-            Mock(entity_type="Post", target_guid=self.content.guid, handle=self.content.author.handle),
+            Mock(entity_type="Post", target_id=self.content.fid, actor_id=self.content.author.fid),
             self.content.author
         )
         with self.assertRaises(Content.DoesNotExist):
             Content.objects.get(id=self.content.id)
-
-    def test_removes_follower(self):
-        self.remote_profile.following.add(self.profile)
-        process_entity_retraction(
-            base.Retraction(entity_type="Profile", _receiving_guid=self.profile.guid),
-            self.remote_profile,
-        )
-        self.assertEqual(self.remote_profile.following.count(), 0)
 
 
 class TestProcessEntityFollow(SocialhomeTransactionTestCase):
@@ -375,44 +368,18 @@ class TestProcessEntityFollow(SocialhomeTransactionTestCase):
         self.create_local_and_remote_user()
 
     def test_follower_added_on_following_true(self):
-        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
+        process_entity_follow(base.Follow(target_id=self.profile.fid, following=True), self.remote_profile)
         self.assertEqual(self.remote_profile.following.count(), 1)
-        self.assertEqual(self.remote_profile.following.first().handle, self.profile.handle)
+        self.assertEqual(self.remote_profile.following.first().fid, self.profile.fid)
 
     def test_follower_removed_on_following_false(self):
         self.remote_profile.following.add(self.profile)
-        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=False), self.remote_profile)
+        process_entity_follow(base.Follow(target_id=self.profile.fid, following=False), self.remote_profile)
         self.assertEqual(self.remote_profile.following.count(), 0)
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.enqueue", autospec=True)
     def test_follower_added_sends_a_notification(self, mock_enqueue):
-        process_entity_follow(base.Follow(target_handle=self.profile.handle, following=True), self.remote_profile)
-        mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
-
-
-class TestProcessEntityRelationship(SocialhomeTransactionTestCase):
-    def setUp(self):
-        super().setUp()
-        self.create_local_and_remote_user()
-
-    def test_follower_added_on_following(self):
-        process_entity_relationship(
-            base.Relationship(target_handle=self.profile.handle, relationship="following"), self.remote_profile,
-        )
-        self.assertEqual(self.remote_profile.following.count(), 1)
-        self.assertEqual(self.remote_profile.following.first().handle, self.profile.handle)
-
-    def test_follower_not_added_on_not_following(self):
-        process_entity_relationship(
-            base.Relationship(target_handle=self.profile.handle, relationship="sharing"), self.remote_profile,
-        )
-        self.assertEqual(self.remote_profile.following.count(), 0)
-
-    @patch("socialhome.users.signals.django_rq.enqueue")
-    def test_follower_added_sends_a_notification(self, mock_enqueue):
-        process_entity_relationship(
-            base.Relationship(target_handle=self.profile.handle, relationship="following"), self.remote_profile,
-        )
+        process_entity_follow(base.Follow(target_id=self.profile.fid, following=True), self.remote_profile)
         mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
 
 
@@ -429,8 +396,8 @@ class TestProcessEntityShare(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
     def test_does_not_forward_share_if_not_local_content(self, mock_rq):
         entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.remote_content.guid,
-            target_handle=self.remote_content.author.handle, public=True,
+            id="https://example.com/share", actor_id=self.remote_profile.fid,
+            target_id=self.remote_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
         self.assertFalse(mock_rq.called)
@@ -438,24 +405,24 @@ class TestProcessEntityShare(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
     def test_forwards_share_if_local_content(self, mock_rq):
         entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
-            target_handle=self.local_content.author.handle, public=True,
+            id="https://example.com/share", actor_id=self.remote_profile.fid,
+            target_id=self.local_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
         mock_rq.assert_called_once_with(forward_entity, entity, self.local_content.id)
 
     def test_share_is_created(self):
         entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
-            target_handle=self.local_content.author.handle, public=True,
+            id="https://example.com/share", actor_id=self.remote_profile.fid,
+            target_id=self.local_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
-        share = Content.objects.get(guid=entity.guid, share_of=self.local_content)
+        share = Content.objects.get(fid=entity.id, share_of=self.local_content)
         self.assertEqual(share.text, "")
         self.assertEqual(share.author, self.remote_profile)
         self.assertEqual(share.visibility, Visibility.PUBLIC)
         self.assertEqual(share.service_label, "")
-        self.assertEqual(share.guid, entity.guid)
+        self.assertEqual(share.fid, entity.id)
 
         # Update
         entity.raw_content = "now we have text"
@@ -466,24 +433,16 @@ class TestProcessEntityShare(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.retrieve_remote_content", autospec=True, return_value=None)
     def test_share_is_not_created_if_no_target_found(self, mock_retrieve):
         entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid="notexistingguid",
-            target_handle=self.local_content.author.handle, public=True,
+            id="https://example.com/share", actor_id=self.remote_profile.fid,
+            target_id="https://example.com/doesnotexistatall", public=True,
         )
         process_entity_share(entity, self.remote_profile)
-        self.assertFalse(Content.objects.filter(guid=entity.guid, share_of=self.local_content).exists())
-
-    def test_share_is_not_created_if_target_handle_and_local_owner_differ(self):
-        entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid=self.local_content.guid,
-            target_handle="someoneelse@example.com", public=True,
-        )
-        process_entity_share(entity, self.remote_profile)
-        self.assertFalse(Content.objects.filter(guid=entity.guid, share_of=self.local_content).exists())
+        self.assertFalse(Content.objects.filter(fid=entity.id, share_of=self.local_content).exists())
 
     def test_share_cant_hijack_local_content(self):
         entity = base.Share(
-            guid=self.local_content2.guid, handle=self.local_content2.author.handle,
-            target_guid=self.local_content.guid, target_handle=self.local_content.author.handle, public=True,
+            id=self.local_content2.fid, actor_id=self.local_content2.author.fid,
+            target_id=self.local_content.fid, public=True,
             raw_content="this should never get saved",
         )
         current_text = self.local_content2.text
@@ -496,18 +455,18 @@ class TestProcessEntityShare(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.retrieve_remote_content", autospec=True)
     def test_share_target_is_fetched_if_no_target_found(self, mock_retrieve):
         entity = base.Share(
-            guid=str(uuid4()), handle=self.remote_profile.handle, target_guid="notexistingguid",
-            target_handle=self.remote_profile2.handle, public=True,
+            id="https://example.com/share", actor_id=self.remote_profile.fid,
+            target_id="https://example.com/notexistingatallll", public=True,
         )
         mock_retrieve.return_value = entities.PostFactory(
-            guid=entity.target_guid, handle=self.remote_profile2.handle,
+            id=entity.target_id, actor_id=self.remote_profile2.fid,
         )
         process_entity_share(entity, self.remote_profile)
         mock_retrieve.assert_called_once_with(entity.target_id, sender_key_fetcher=sender_key_fetcher)
-        self.assertTrue(Content.objects.filter(guid=entity.target_guid, content_type=ContentType.CONTENT).exists())
+        self.assertTrue(Content.objects.filter(fid=entity.target_id, content_type=ContentType.CONTENT).exists())
         self.assertTrue(
             Content.objects.filter(
-                guid=entity.guid, share_of__guid=entity.target_guid, content_type=ContentType.SHARE
+                fid=entity.id, share_of__fid=entity.target_id, content_type=ContentType.SHARE
             ).exists()
         )
 
@@ -519,22 +478,20 @@ class TestGetSenderProfile(SocialhomeTestCase):
         cls.create_local_and_remote_user()
 
     def test_returns_existing_profile(self):
-        self.assertEqual(get_sender_profile(self.remote_profile.handle), self.remote_profile)
+        self.assertEqual(get_sender_profile(self.remote_profile.fid), self.remote_profile)
 
     def test_returns_none_on_existing_local_profile(self):
-        self.assertIsNone(get_sender_profile(self.profile.handle))
+        self.assertIsNone(get_sender_profile(self.profile.fid))
 
-    @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
+    @patch("socialhome.federate.utils.tasks.retrieve_remote_profile", autospec=True)
     def test_fetches_remote_profile_if_not_found(self, mock_retrieve):
         mock_retrieve.return_value = entities.ProfileFactory(
             name="foobar", raw_content="barfoo", public_key="xyz",
-            handle="foo@example.com", guid="123456"
+            id="https:/example.com/foo/bar",
         )
-        sender_profile = get_sender_profile("foo@example.com")
+        sender_profile = get_sender_profile("https:/example.com/foo/bar")
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "foobar"
-        assert sender_profile.guid == "123456"
-        assert sender_profile.handle == "foo@example.com"
         assert sender_profile.visibility == Visibility.LIMITED
         assert sender_profile.rsa_public_key == "xyz"
         assert not sender_profile.rsa_private_key
@@ -542,14 +499,14 @@ class TestGetSenderProfile(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_returns_none_if_no_remote_profile_found(self, mock_retrieve):
         mock_retrieve.return_value = None
-        assert not get_sender_profile("foo@example.com")
+        assert not get_sender_profile("https:/example.com/foo/bar")
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_cleans_text_fields_in_profile(self, mock_retrieve):
         mock_retrieve.return_value = entities.ProfileFactory(
             name="<script>alert('yup');</script>", raw_content="<script>alert('yup');</script>",
             public_key="<script>alert('yup');</script>",
-            handle="foo@example.com", guid="<script>alert('yup');</script>",
+            id="https:/example.com/foo/bar",
             image_urls={
                 "small": "<script>alert('yup');</script>",
                 "medium": "<script>alert('yup');</script>",
@@ -557,10 +514,9 @@ class TestGetSenderProfile(SocialhomeTestCase):
             },
             location="<script>alert('yup');</script>",
         )
-        sender_profile = get_sender_profile("foo@example.com")
+        sender_profile = get_sender_profile("https:/example.com/foo/bar")
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "alert('yup');"
-        assert sender_profile.guid == "alert('yup');"
         assert sender_profile.rsa_public_key == "alert('yup');"
         assert sender_profile.image_url_small == "alert('yup');"
         assert sender_profile.image_url_medium == "alert('yup');"
@@ -580,8 +536,8 @@ class TestMakeFederableContent(SocialhomeTestCase):
         entity = make_federable_content(self.content)
         self.assertTrue(isinstance(entity, base.Post))
         self.assertEqual(entity.raw_content, self.content.text)
-        self.assertEqual(entity.guid, self.content.guid)
-        self.assertEqual(entity.handle, self.content.author.handle)
+        self.assertEqual(entity.id, self.content.fid)
+        self.assertEqual(entity.actor_id, self.content.author.fid)
         self.assertEqual(entity.public, True)
         self.assertEqual(entity.provider_display_name, "Socialhome")
         self.assertEqual(entity.created_at, self.content.effective_modified)
@@ -602,19 +558,18 @@ class TestMakeFederableContent(SocialhomeTestCase):
         entity = make_federable_content(self.reply)
         self.assertTrue(isinstance(entity, base.Comment))
         self.assertEqual(entity.raw_content, self.reply.text)
-        self.assertEqual(entity.guid, self.reply.guid)
-        self.assertEqual(entity.target_guid, self.reply.parent.guid)
-        self.assertEqual(entity.handle, self.reply.author.handle)
+        self.assertEqual(entity.id, self.reply.fid)
+        self.assertEqual(entity.target_id, self.reply.parent.fid)
+        self.assertEqual(entity.actor_id, self.reply.author.fid)
         self.assertEqual(entity.created_at, self.reply.effective_modified)
 
     def test_share_returns_entity(self):
         entity = make_federable_content(self.share)
         self.assertTrue(isinstance(entity, base.Share))
         self.assertEqual(entity.raw_content, self.share.text)
-        self.assertEqual(entity.guid, self.share.guid)
-        self.assertEqual(entity.target_guid, self.share.share_of.guid)
-        self.assertEqual(entity.handle, self.share.author.handle)
-        self.assertEqual(entity.target_handle, self.share.share_of.author.handle)
+        self.assertEqual(entity.id, self.share.fid)
+        self.assertEqual(entity.target_id, self.share.share_of.fid)
+        self.assertEqual(entity.actor_id, self.share.author.fid)
         self.assertEqual(entity.public, True)
         self.assertEqual(entity.provider_display_name, "Socialhome")
         self.assertEqual(entity.created_at, self.share.effective_modified)
@@ -644,8 +599,8 @@ class TestMakeFederableRetraction(SocialhomeTestCase):
         content = ContentFactory()
         entity = make_federable_retraction(content, content.author)
         self.assertEqual(entity.entity_type, "Post")
-        self.assertEqual(entity.target_guid, content.guid)
-        self.assertEqual(entity.handle, content.author.handle)
+        self.assertEqual(entity.target_id, content.fid)
+        self.assertEqual(entity.actor_id, content.author.fid)
 
     @patch("socialhome.federate.utils.tasks.base.Retraction", side_effect=Exception)
     def test_returns_none_on_exception(self, mock_post):
@@ -658,10 +613,9 @@ class TestMakeFederableProfile(SocialhomeTestCase):
         profile = ProfileFactory(visibility=Visibility.SELF)
         entity = make_federable_profile(profile)
         self.assertTrue(isinstance(entity, base.Profile))
-        self.assertEqual(entity.handle, profile.handle)
+        self.assertEqual(entity.id, profile.fid)
         self.assertEqual(entity.raw_content, "")
         self.assertEqual(entity.public, False)
-        self.assertEqual(entity.guid, profile.guid)
         self.assertEqual(entity.name, profile.name)
         self.assertEqual(entity.public_key, profile.rsa_public_key)
         self.assertEqual(entity.image_urls, {
@@ -687,23 +641,23 @@ class TestSenderKeyFetcher(SocialhomeTestCase):
         cls.create_local_and_remote_user()
 
     def test_existing_remote_profile_public_key_is_returned(self):
-        self.assertEqual(sender_key_fetcher(self.remote_profile.handle), self.remote_profile.rsa_public_key)
+        self.assertEqual(sender_key_fetcher(self.remote_profile.fid), self.remote_profile.rsa_public_key)
 
     def test_local_profile_is_skipped(self):
-        self.assertIsNone(sender_key_fetcher(self.profile.handle), self.profile.rsa_public_key)
+        self.assertIsNone(sender_key_fetcher(self.profile.fid), self.profile.rsa_public_key)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
     def test_remote_profile_public_key_is_returned(self, mock_from_remote, mock_retrieve):
         remote_profile = Mock(rsa_public_key="foo")
         mock_retrieve.return_value = mock_from_remote.return_value = remote_profile
-        self.assertEqual(sender_key_fetcher("bar"), "foo")
-        mock_retrieve.assert_called_once_with("bar")
+        self.assertEqual(sender_key_fetcher("https://example.com/foo"), "foo")
+        mock_retrieve.assert_called_once_with("https://example.com/foo")
         mock_from_remote.assert_called_once_with(remote_profile)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile", return_value=None)
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
-        self.assertEqual(sender_key_fetcher("bar"), None)
+        self.assertEqual(sender_key_fetcher("https://example.com/foo"), None)
         mock_logger.assert_called_once_with("get_sender_profile - Remote profile %s not found locally "
-                                            "or remotely.", "bar")
+                                            "or remotely.", "https://example.com/foo")

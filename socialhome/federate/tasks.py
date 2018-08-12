@@ -29,7 +29,7 @@ def receive_task(payload, guid=None):
             return
     try:
         sender, protocol_name, entities = handle_receive(
-            payload, user=profile.federable, sender_key_fetcher=sender_key_fetcher,
+            payload, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
         )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
     except NoSuitableProtocolFoundError:
@@ -121,7 +121,7 @@ def _get_remote_followers(profile, exclude=None):
     """Get remote followers for a profile."""
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
-        if follower.handle != exclude:
+        if follower.fid != exclude:
             followers.append(follower.fid)
     return followers
 

@@ -8,7 +8,10 @@ from django.db.migrations import RunPython
 def forward(apps, schema_editor):
     Profile = apps.get_model("users", "Profile")
     for profile in Profile.objects.all().iterator():
-        profile.uuid = str(uuid.uuid4())
+        if profile.user is not None:
+            profile.uuid = profile.guid
+        else:
+            profile.uuid = str(uuid.uuid4())
         Profile.objects.filter(id=profile.id).update(uuid=profile.uuid)
 
 

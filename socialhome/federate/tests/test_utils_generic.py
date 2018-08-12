@@ -13,7 +13,7 @@ class TestGetProfile(SocialhomeTestCase):
         cls.profile = cls.user.profile
 
     def test_profile_returned(self):
-        returned = get_profile(handle=self.profile.handle)
+        returned = get_profile(fid=self.profile.fid)
         maked = make_federable_profile(self.profile)
-        self.assertEqual(returned.handle, maked.handle)
+        self.assertEqual(returned.id, maked.id)
         self.assertTrue(isinstance(returned, base.Profile))

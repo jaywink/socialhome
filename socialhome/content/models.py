@@ -86,6 +86,7 @@ class Content(models.Model):
 
     # Federation GUID
     # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
+    # TODO drop guid once things have rolled out
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)

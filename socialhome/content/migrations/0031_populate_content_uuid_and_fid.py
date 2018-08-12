@@ -19,12 +19,13 @@ def forward(apps, schema_editor):
     Content = apps.get_model("content", "Content")
     Profile = apps.get_model("users", "Profile")
     for content in Content.objects.all().select_related("author").iterator():
-        content.uuid = str(uuid.uuid4())
         if content.local:
+            content.uuid = content.guid
             url = reverse("content:view-by-guid", kwargs={"guid": content.uuid})
             fid = f"{settings.SOCIALHOME_URL}{url}"
         else:
             # Diaspora remote
+            content.uuid = str(uuid.uuid4())
             fid = generate_diaspora_id(
                 content.author.handle, TYPE_MAPPINGS.get(content.content_type.value), content.guid,
             )
