@@ -84,12 +84,12 @@ def on_commit_limited_visibilities(action, pks, instance):
             try:
                 federate_content(instance, recipient=profile)
             except Exception:
-                logger.exception("Failed to federate limited visibility content %s to %s", instance.guid, profile.guid)
+                logger.exception("Failed to federate limited visibility content %s to %s", instance.uuid, profile.uuid)
         elif action == "post_remove":
             try:
                 federate_content_retraction(instance, recipient=profile)
             except Exception:
-                logger.exception("Failed to federate limited visibility content %s to %s", instance.guid, profile.guid)
+                logger.exception("Failed to federate limited visibility content %s to %s", instance.uuid, profile.uuid)
 
 
 @receiver(m2m_changed, sender=Content.limited_visibilities.through)

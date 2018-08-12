@@ -240,13 +240,7 @@ class TestContentModel(SocialhomeTestCase):
     def test_channel_group_name(self):
         self.assertEqual(
             self.public_content.channel_group_name,
-            "%s_%s" % (self.public_content.id, slugify(self.public_content.guid)),
-        )
-        long_non_ascii_guid_content = ContentFactory(guid="ä"*150)
-        self.assertEqual(
-            long_non_ascii_guid_content.channel_group_name, "%s_%s" % (
-                long_non_ascii_guid_content.id, "a"*(79-len(str(long_non_ascii_guid_content.id)))
-            )
+            "%s_%s" % (self.public_content.id, self.public_content.uuid),
         )
 
     def test_reply_gets_parent_values(self):
@@ -278,28 +272,20 @@ class TestContentModel(SocialhomeTestCase):
 
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):
-        content = Content.objects.create(text="# Foobar <img src='localhost'>", guid="barfoo", author=ProfileFactory())
+        content = ContentFactory(text="# Foobar <img src='localhost'>")
         self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"></h1>')
 
     def test_renders_with_nsfw_shield(self):
-        content = Content.objects.create(
-            text="<img src='localhost'> #nsfw", guid="barfoo", author=ProfileFactory()
-        )
+        content = ContentFactory(text="<img src='localhost'> #nsfw")
         self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> '
                                            '<a href="/streams/tag/nsfw/">#nsfw</a></p>')
 
     def test_renders_with_oembed(self):
-        content = Content.objects.create(
-            text="foobar", guid="barfoo", author=ProfileFactory(),
-            oembed=OEmbedCacheFactory()
-        )
+        content = ContentFactory(text="foobar", oembed=OEmbedCacheFactory())
         self.assertEqual(content.rendered, "<p>foobar</p><br>%s" % content.oembed.oembed)
 
     def test_renders_with_opengraphcache(self):
-        content = Content.objects.create(
-            text="foobar", guid="barfoo", author=ProfileFactory(),
-            opengraph=OpenGraphCacheFactory()
-        )
+        content = ContentFactory(text="foobar", opengraph=OpenGraphCacheFactory())
         rendered_og = render_to_string("content/_og_preview.html", {"opengraph": content.opengraph})
         self.assertEqual(content.rendered, "<p>foobar</p>%s" % rendered_og)
 
@@ -309,12 +295,12 @@ class TestContentRendered(SocialhomeTestCase):
                                            '<a href="/streams/tag/mixed/">#MiXeD</a></p>')
 
     def test_renders_without_previews_with_show_preview_false(self):
-        content = Content.objects.create(
-            text="foobar", guid="barfoo", author=ProfileFactory(),
-            oembed=OEmbedCacheFactory(), opengraph=OpenGraphCacheFactory(),
+        content = ContentFactory(
+            text="foobar", oembed=OEmbedCacheFactory(), opengraph=OpenGraphCacheFactory(),
             show_preview=False,
         )
         self.assertEqual(content.rendered, "<p>foobar</p>")
+
 
 class TestContentSaveTags(SocialhomeTestCase):
     @classmethod

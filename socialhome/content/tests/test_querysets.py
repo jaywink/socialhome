@@ -146,6 +146,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.self_content, self.self_tag_content})
 
     def test_profile_by_attr(self):
+        # TODO continuing on replacing guid > uuid
         contents = set(Content.objects.profile_by_attr("guid", self.public_content.author.guid, self.anonymous_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.profile_by_attr("guid", self.site_content.author.guid, self.anonymous_user))

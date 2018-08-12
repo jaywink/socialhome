@@ -156,8 +156,8 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return "{text} ({type}, {visibility}, {guid})".format(
-            text=truncate_letters(self.text, 30), guid=self.guid, visibility=self.visibility, type=self.content_type,
+        return "{text} ({type}, {visibility}, {fid})".format(
+            text=truncate_letters(self.text, 30), fid=self.fid, visibility=self.visibility, type=self.content_type,
         )
 
     def cache_data(self, commit=False):
@@ -262,10 +262,10 @@ class Content(models.Model):
             self.content_type = ContentType.SHARE
 
         if not self.pk and self.local:
-            if not self.guid:
-                self.guid = uuid4()
             if not self.uuid:
-                self.uuid = self.guid
+                self.uuid = uuid4()
+                # TODO remove this once guid dropped
+                self.guid = self.uuid
             if not self.fid:
                 self.fid = self.url_uuid
             if self.pinned:
@@ -360,9 +360,9 @@ class Content(models.Model):
         """Make a safe Channel group name.
 
         ASCII or hyphens or periods only.
-        Prefix with ID as we have to cut long guids due to asgi library group name restriction.
         """
-        return ("%s_%s" % (self.id, slugify(self.guid)))[:80]
+        # TODO use only id
+        return ("%s_%s" % (self.id, self.uuid))
 
     def render(self):
         """Pre-render text to Content.rendered."""

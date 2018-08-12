@@ -143,9 +143,9 @@ class ContentView(ContentVisibleForUserMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
-        guid = self.kwargs.get("guid")
-        if guid:
-            return get_object_or_404(Content, Q(guid=guid) | Q(uuid=guid))
+        uuid = self.kwargs.get("uuid")
+        if uuid:
+            return get_object_or_404(Content, uuid=uuid)
         return super().get_object(queryset=queryset)
 
     def get_context_data(self, **kwargs):
