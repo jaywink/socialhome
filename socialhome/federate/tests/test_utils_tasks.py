@@ -389,7 +389,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
         cls.local_content = LocalContentFactory()
-        cls.local_content2 = LocalContentFactory(guid=str(uuid4()))
+        cls.local_content2 = LocalContentFactory()
         cls.remote_content = PublicContentFactory()
         cls.remote_profile2 = PublicProfileFactory()
 

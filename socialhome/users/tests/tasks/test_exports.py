@@ -63,9 +63,9 @@ class TestUserExporter(SocialhomeTestCase):
         self.assertEqual(len(self.exporter.data.get('following')), 2)
         contents = self.exporter.data.get('content')
         self.assertEqual(len(contents), 3)
-        self.assertEqual(contents[0].get('guid'), self.content.guid)
-        self.assertEqual(contents[1].get('guid'), self.reply.guid)
-        self.assertEqual(contents[2].get('guid'), self.share.guid)
+        self.assertEqual(contents[0].get('uuid'), self.content.uuid)
+        self.assertEqual(contents[1].get('uuid'), self.reply.uuid)
+        self.assertEqual(contents[2].get('uuid'), self.share.uuid)
 
     @patch("socialhome.users.tasks.exports.django_rq.enqueue", autospec=True)
     def test_notify(self, mock_enqueue):

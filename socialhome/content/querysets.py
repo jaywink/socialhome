@@ -86,7 +86,7 @@ class ContentQuerySet(models.QuerySet):
         return qs.visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user, include_shares=True):
-        """Filter for a user profile by GUID.
+        """Filter for a user profile by attribute.
 
         Ensures if the profile is not visible to the user, no content will be returned.
         """

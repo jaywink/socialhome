@@ -16,7 +16,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--profiles', dest='profiles', default='',
-            help='Remote profile GUIDs to delete, separated by comma.',
+            help='Remote profile FIDs to delete, separated by comma.',
         )
         parser.add_argument(
             '--lock-remote-profiles', dest='lock_remote_profiles', default=False,
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--users', dest='users', default='',
-            help='Local user profile GUIDs to delete, separated by comma. Deletes both user and profile.',
+            help='Local user profile UUIDs to delete, separated by comma. Deletes both user and profile.',
         )
 
     def handle(self, *args, **options):
@@ -37,20 +37,20 @@ class Command(BaseCommand):
         self.handle_profiles(profiles, lock_profiles=lock_profiles)
 
     def handle_users(self, users):
-        for guid in users:
-            guid = guid.strip()
-            if not guid:
+        for uuid in users:
+            uuid = uuid.strip()
+            if not uuid:
                 continue
             try:
-                user = User.objects.get(profile__guid=guid)
+                user = User.objects.get(profile__uuid=uuid)
             except User.DoesNotExist:
-                print("WARN: Could not find user with profile %s" % guid)
+                print("WARN: Could not find user with profile %s" % uuid)
                 continue
             confirm = input('\n\nConfirm delete of "%s %s (%s)" (type "DELETE"): ' % (
-                user.profile.name, user.username, guid
+                user.profile.name, user.username, uuid
             ))
             if confirm != 'DELETE':
-                print('WARN: Skipping delete of %s' % guid)
+                print('WARN: Skipping delete of %s' % uuid)
                 continue
             try:
                 user.delete()
@@ -64,21 +64,21 @@ class Command(BaseCommand):
                 logger.info(msg)
 
     def handle_profiles(self, profiles, lock_profiles=False):
-        for guid in profiles:
-            guid = guid.strip()
-            if not guid:
+        for fid in profiles:
+            fid = fid.strip()
+            if not fid:
                 continue
             try:
-                profile = Profile.objects.get(guid=guid, user__isnull=True)
+                profile = Profile.objects.get(fid=fid, user__isnull=True)
             except Profile.DoesNotExist:
-                print("WARN: Could not find remote profile %s" % guid)
+                print("WARN: Could not find remote profile %s" % fid)
                 continue
 
-            confirm = input('\n\nConfirm delete of "%s %s (%s)" (type "DELETE"): ' % (
-                profile.name, profile.handle, guid
+            confirm = input('\n\nConfirm delete of "%s (%s)" (type "DELETE"): ' % (
+                profile.name, fid
             ))
             if confirm != 'DELETE':
-                print('WARN: Skipping delete of %s' % guid)
+                print('WARN: Skipping delete of %s' % fid)
                 continue
 
             if lock_profiles:

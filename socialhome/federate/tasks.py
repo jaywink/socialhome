@@ -18,14 +18,14 @@ from socialhome.users.models import Profile
 logger = logging.getLogger("socialhome")
 
 
-def receive_task(payload, guid=None):
+def receive_task(payload, uuid=None):
     """Process received payload."""
     profile = None
-    if guid:
+    if uuid:
         try:
-            profile = Profile.objects.get(guid=guid, user__isnull=False)
+            profile = Profile.objects.get(uuid=uuid, user__isnull=False)
         except Profile.DoesNotExist:
-            logger.warning("No local profile found with guid")
+            logger.warning("No local profile found with uuid")
             return
     try:
         sender, protocol_name, entities = handle_receive(
@@ -76,7 +76,7 @@ def send_content(content_id, recipient_id=None):
             return
         if recipient:
             recipients = [
-                (generate_diaspora_profile_id(recipient.handle, recipient.guid), recipient.key),
+                (recipient.fid, recipient.key),
             ]
         else:
             recipients = [settings.SOCIALHOME_RELAY_ID]
@@ -161,11 +161,11 @@ def send_reply(content_id):
         parent_author = content.parent.author
         if content.visibility == Visibility.PUBLIC:
             recipients = [
-                generate_diaspora_profile_id(parent_author.handle, parent_author.guid),
+                parent_author.fid,
             ]
         else:
             recipients = [
-                (generate_diaspora_profile_id(parent_author.handle, parent_author.guid), parent_author.key),
+                (parent_author.fid, parent_author.key),
             ]
         logger.debug("send_reply - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
@@ -191,7 +191,7 @@ def send_share(content_id):
         if not content.share_of.local:
             # Send to original author
             recipients.append(
-                generate_diaspora_profile_id(content.share_of.author.handle, content.share_of.author.guid),
+                content.share_of.author.fid,
             )
         logger.debug("send_share - sending to recipients: %s", recipients)
         handle_send(entity, content.author, recipients)
@@ -273,7 +273,7 @@ def forward_entity(entity, target_content_id):
             fid=entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
         )
     except Content.DoesNotExist:
-        logger.warning("forward_entity - No content found with guid %s", entity.id)
+        logger.warning("forward_entity - No content found with uuid %s", entity.id)
         return
     if settings.DEBUG:
         # Don't send in development mode
@@ -309,12 +309,12 @@ def send_follow_change(profile_id, followed_id, follow):
         return
     entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle, following=follow)
     recipients = [
-        (generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid), remote_profile.key),
+        (remote_profile.fid, remote_profile.key),
      ]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile, recipients)
     # Also trigger a profile send
-    send_profile(profile_id, recipients=[generate_diaspora_profile_id(remote_profile.handle, remote_profile.guid)])
+    send_profile(profile_id, recipients=[remote_profile.fid])
 
 
 def send_profile(profile_id, recipients=None):

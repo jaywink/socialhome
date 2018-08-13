@@ -146,7 +146,7 @@ def process_entity_comment(entity, profile, receiving_profile=None):
         logger.info("Updated Content from comment entity: %s", content)
     if parent.visibility != Visibility.PUBLIC and receiving_profile:
         content.limited_visibilities.add(receiving_profile)
-        logger.info("Added visibility to Comment %s to %s", content.guid, receiving_profile.guid)
+        logger.info("Added visibility to Comment %s to %s", content.uuid, receiving_profile.uuid)
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
@@ -211,12 +211,12 @@ def _retract_content(target_fid, profile):
     logger.info("Retraction done for content %s", content)
 
 
-def _retract_relationship(target_guid, profile):
+def _retract_relationship(target_uuid, profile):
     """Retract a (legacy) relationship."""
     try:
-        user = User.objects.get(profile__guid=target_guid)
+        user = User.objects.get(profile__uuid=target_uuid)
     except User.DoesNotExist:
-        logger.warning("Could not find local user %s for relationship retraction", target_guid)
+        logger.warning("Could not find local user %s for relationship retraction", target_uuid)
         return
     profile.following.remove(user.profile)
     logger.info("Profile %s has unfollowed user %s", profile, user)

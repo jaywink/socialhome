@@ -22,7 +22,7 @@ class TestUserPostSave(SocialhomeTestCase):
         assert profile.rsa_private_key
         assert profile.rsa_public_key
         assert profile.handle == "%s@%s" % (user.username, settings.SOCIALHOME_DOMAIN)
-        assert profile.guid
+        assert profile.fid
         self.assertEqual(mock_init.call_count, 2)
 
     @patch.object(User, "init_pictures_on_disk")

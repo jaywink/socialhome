@@ -33,14 +33,14 @@ class UserDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         """Render ProfileDetailView for this user."""
         profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
-        return ProfileDetailView.as_view()(request, guid=profile.uuid)
+        return ProfileDetailView.as_view()(request, uuid=profile.uuid)
 
 
 class UserAllContentView(UserDetailView):
     def get(self, request, *args, **kwargs):
         """Render ProfileDetailView for this user."""
         profile = get_object_or_404(Profile, user__username=kwargs.get("username"))
-        return ProfileAllContentView.as_view()(request, guid=profile.uuid)
+        return ProfileAllContentView.as_view()(request, uuid=profile.uuid)
 
 
 class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
@@ -98,7 +98,7 @@ class ProfileDetailView(ProfileViewMixin):
         """Ensure we have pinned content. If not, render all content instead."""
         self.set_object_and_data()
         if self.data and not self.data["has_pinned_content"]:
-            return ProfileAllContentView.as_view()(request, guid=self.kwargs.get("uuid"))
+            return ProfileAllContentView.as_view()(request, uuid=self.kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_page_meta(self):

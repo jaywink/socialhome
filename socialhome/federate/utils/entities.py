@@ -121,5 +121,5 @@ def make_federable_profile(profile):
             id=profile.fid,
         )
     except Exception as ex:
-        logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)
+        logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)
         return None

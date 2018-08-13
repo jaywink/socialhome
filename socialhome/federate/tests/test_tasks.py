@@ -36,8 +36,8 @@ class TestReceiveTask(SocialhomeTestCase):
         self.assertTrue(mock_process_entities.called is False)
 
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]), autospec=True)
-    def test_receive_task_with_guid(self, mock_handle_receive, mock_process_entities):
-        receive_task("foobar", guid=self.user.profile.guid)
+    def test_receive_task_with_uuid(self, mock_handle_receive, mock_process_entities):
+        receive_task("foobar", uuid=self.user.profile.uuid)
         mock_process_entities.assert_called_with(["entity"], receiving_profile=self.user.profile)
 
 
@@ -80,7 +80,7 @@ class TestSendContent(SocialhomeTestCase):
             "entity",
             self.limited_content.author,
             [(
-                generate_diaspora_profile_id(self.remote_profile.handle, guid=self.remote_profile.guid),
+                self.remote_profile.fid,
                 self.remote_profile.key,
             )],
         )
@@ -226,7 +226,7 @@ class TestSendReply(SocialhomeTestCase):
             "entity",
             self.limited_reply.author,
             [(
-                generate_diaspora_profile_id(self.remote_profile.handle, guid=self.remote_profile.guid),
+                self.remote_profile.fid,
                 self.remote_profile.key,
             )],
         )
@@ -245,7 +245,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author, [
-            generate_diaspora_profile_id(self.remote_content.author.handle, self.remote_content.author.guid),
+            self.remote_content.author.gid,
         ])
         self.assertTrue(mock_forward.called is False)
 
@@ -281,7 +281,7 @@ class TestSendShare(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.share.author,
-            [generate_diaspora_profile_id(self.content.author.handle, self.content.author.guid)],
+            [self.content.author.fid],
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -412,12 +412,10 @@ class TestSendFollow(TestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.profile,
-            [(generate_diaspora_profile_id(
-                self.remote_profile.handle, self.remote_profile.guid
-            ), self.remote_profile.key)],
+            [(self.remote_profile.fid, self.remote_profile.key)],
         )
         mock_profile.assert_called_once_with(self.profile.id, recipients=[
-            generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid),
+            self.remote_profile.fid,
         ])
 
 
@@ -435,8 +433,8 @@ class TestSendProfile(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
     def test_send_local_profile(self, mock_federable, mock_get, mock_send):
         recipients = [
-            generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid),
-            generate_diaspora_profile_id(self.remote_profile2.handle, self.remote_profile2.guid),
+            self.remote_profile.fid,
+            self.remote_profile2.fid,
         ]
         mock_get.return_value = recipients
         send_profile(self.profile.id)
@@ -452,6 +450,6 @@ class TestSendProfile(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
     def test_send_to_given_recipients_only(self, mock_federable, mock_send):
-        recipients = [generate_diaspora_profile_id(self.remote_profile.handle, self.remote_profile.guid)]
+        recipients = [self.remote_profile.fid]
         send_profile(self.profile.id, recipients=recipients)
         mock_send.assert_called_once_with("profile", self.profile, recipients)

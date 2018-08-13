@@ -95,10 +95,11 @@ class ContentSerializerTestCase(SocialhomeTestCase):
     def test_serializes_author(self):
         serializer = ContentSerializer(self.content)
         data = serializer.data["author"]
-        self.assertEqual(data["guid"], self.remote_profile.guid)
+        self.assertEqual(data["uuid"], self.remote_profile.uuid)
         self.assertEqual(data["handle"], self.remote_profile.handle)
         self.assertEqual(data["home_url"], self.remote_profile.home_url)
         self.assertEqual(data["id"], self.remote_profile.id)
+        self.assertEqual(data["fid"], self.remote_profile.fid)
         self.assertEqual(data["image_url_small"], self.remote_profile.image_url_small)
         self.assertEqual(data["is_local"], self.remote_profile.is_local)
         self.assertEqual(data["name"], self.remote_profile.name)

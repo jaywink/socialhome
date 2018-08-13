@@ -105,7 +105,7 @@ class TestProfileDetailView(SocialhomeTestCase):
             Content.objects.filter(id=contents[0].id).update(order=3)
             Content.objects.filter(id=contents[1].id).update(order=2)
             Content.objects.filter(id=contents[2].id).update(order=1)
-        view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
+        view = ProfileDetailView(request=request, kwargs={"uuid": profile.uuid})
         view.object = profile
         view.set_object_and_data()
         return request, view, contents, profile
@@ -206,7 +206,7 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
             Content.objects.filter(id=contents[2].id).update(order=1)
         view = OrganizeContentProfileDetailView(request=request)
         view.profile = profile
-        view.kwargs = {"guid": profile.guid}
+        view.kwargs = {"uuid": profile.uuid}
         return request, view, contents, profile
 
     def test_view_renders(self):
@@ -247,28 +247,28 @@ class TestProfileVisibilityForAnonymous:
         Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SELF)
         response = client.get("/u/admin/")
         assert response.status_code == 302
-        response = client.get("/p/%s/" % admin_user.profile.guid)
+        response = client.get("/p/%s/" % admin_user.profile.uuid)
         assert response.status_code == 302
 
     def test_visible_to_limited_profile_requires_login_for_anonymous(self, admin_user, client):
         Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.LIMITED)
         response = client.get("/u/admin/")
         assert response.status_code == 302
-        response = client.get("/p/%s/" % admin_user.profile.guid)
+        response = client.get("/p/%s/" % admin_user.profile.uuid)
         assert response.status_code == 302
 
     def test_visible_to_site_profile_requires_login_for_anonymous(self, admin_user, client):
         Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.SITE)
         response = client.get("/u/admin/")
         assert response.status_code == 302
-        response = client.get("/p/%s/" % admin_user.profile.guid)
+        response = client.get("/p/%s/" % admin_user.profile.uuid)
         assert response.status_code == 302
 
     def test_public_profile_doesnt_require_login(self, admin_user, client):
         Profile.objects.filter(user__username=admin_user.username).update(visibility=Visibility.PUBLIC)
         response = client.get("/u/admin/")
         assert response.status_code == 200
-        response = client.get("/p/%s/" % admin_user.profile.guid)
+        response = client.get("/p/%s/" % admin_user.profile.uuid)
         assert response.status_code == 200
 
 
@@ -283,9 +283,9 @@ class TestProfileVisibilityForLoggedInUsers:
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 403
-        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        response = admin_client.get("/p/%s/" % admin.profile.uuid)
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % user.profile.guid)
+        response = admin_client.get("/p/%s/" % user.profile.uuid)
         assert response.status_code == 403
 
     def test_visible_to_limited_profile(self, admin_client):
@@ -297,9 +297,9 @@ class TestProfileVisibilityForLoggedInUsers:
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        response = admin_client.get("/p/%s/" % admin.profile.uuid)
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % user.profile.guid)
+        response = admin_client.get("/p/%s/" % user.profile.uuid)
         assert response.status_code == 200
 
     def test_visible_to_site_profile(self, admin_client):
@@ -311,9 +311,9 @@ class TestProfileVisibilityForLoggedInUsers:
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        response = admin_client.get("/p/%s/" % admin.profile.uuid)
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % user.profile.guid)
+        response = admin_client.get("/p/%s/" % user.profile.uuid)
         assert response.status_code == 200
 
     def test_visible_to_public_profile(self, admin_client):
@@ -325,9 +325,9 @@ class TestProfileVisibilityForLoggedInUsers:
         assert response.status_code == 200
         response = admin_client.get("/u/foobar/")
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % admin.profile.guid)
+        response = admin_client.get("/p/%s/" % admin.profile.uuid)
         assert response.status_code == 200
-        response = admin_client.get("/p/%s/" % user.profile.guid)
+        response = admin_client.get("/p/%s/" % user.profile.uuid)
         assert response.status_code == 200
 
 
@@ -372,7 +372,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
             Content.objects.filter(id=contents[0].id).update(order=3)
             Content.objects.filter(id=contents[1].id).update(order=2)
             Content.objects.filter(id=contents[2].id).update(order=1)
-        view = ProfileDetailView(request=request, kwargs={"guid": profile.guid})
+        view = ProfileDetailView(request=request, kwargs={"uuid": profile.uuid})
         view.object = profile
         view.set_object_and_data()
         return request, view, contents, profile
@@ -439,15 +439,15 @@ class TestProfileAllContentView(SocialhomeTestCase):
         )
 
     def test_renders_for_user(self):
-        response = self.get("users:profile-all-content", guid=self.user.profile.guid)
+        response = self.get("users:profile-all-content", uuid=self.user.profile.uuid)
         self.assertEqual(response.status_code, 200)
 
     def test_renders_for_remote_profile(self):
-        response = self.get("users:profile-all-content", guid=self.profile.uuid)
+        response = self.get("users:profile-all-content", uuid=self.profile.uuid)
         self.assertEqual(response.status_code, 200)
 
     def test_stream_name(self):
-        self.get("users:profile-all-content", guid=self.profile.uuid)
+        self.get("users:profile-all-content", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.context["json_context"]["streamName"],
                          "%s__%s" % (StreamType.PROFILE_ALL.value, self.profile.id))
 

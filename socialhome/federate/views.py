@@ -48,19 +48,19 @@ def webfinger_view(request):
         "diaspora",
         handle="{username}@{domain}".format(username=user.username, domain=settings.SOCIALHOME_DOMAIN),
         host=settings.SOCIALHOME_URL,
-        guid=str(user.profile.guid),
+        guid=str(user.profile.uuid),
         public_key=user.profile.rsa_public_key
     )
     return HttpResponse(webfinger, content_type="application/xrd+xml")
 
 
-def hcard_view(request, guid):
+def hcard_view(request, uuid):
     """Generate a hcard document.
 
     For local users only.
     """
     try:
-        profile = get_object_or_404(Profile, guid=guid, user__isnull=False)
+        profile = get_object_or_404(Profile, uuid=uuid, user__isnull=False)
     except ValueError:
         raise Http404()
     hcard = generate_hcard(
@@ -73,7 +73,7 @@ def hcard_view(request, guid):
         photo100=profile.safer_image_url_medium,
         photo50=profile.safer_image_url_small,
         searchable="true" if profile.public else "false",
-        guid=profile.guid,
+        guid=profile.uuid,
         username=profile.user.username,
         public_key=profile.rsa_public_key,
     )
@@ -117,18 +117,18 @@ def social_relay_view(request):
     return JsonResponse(relay.doc)
 
 
-def content_xml_view(request, guid):
+def content_xml_view(request, uuid):
     """Diaspora single post view XML representation.
 
     Fetched by remote servers in certain situations.
     """
-    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC, local=True)
+    content = get_object_or_404(Content, uuid=uuid, visibility=Visibility.PUBLIC, local=True)
     entity = make_federable_content(content)
     xml = get_full_xml_representation(entity, content.author.private_key)
     return HttpResponse(xml, content_type="application/xml")
 
 
-def content_fetch_view(request, objtype, guid):
+def content_fetch_view(request, objtype, uuid):
     """Diaspora content fetch view.
 
     Returns the signed payload for the public content. Non-public content will return 404.
@@ -138,14 +138,14 @@ def content_fetch_view(request, objtype, guid):
     Args:
         objtype (str) - Diaspora content type. Currently if it is `status_message`, `post` or `reshare`,
             we try to find `Content`.
-        guid (str) - The object guid to look for.
+        uuid (str) - The object uuid to look for.
     """
     if objtype not in ["status_message", "post", "reshare", "comment"]:
         raise Http404()
-    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
+    content = get_object_or_404(Content, uuid=uuid, visibility=Visibility.PUBLIC)
     if not content.local:
         url = "https://%s/fetch/%s/%s" % (
-            content.author.handle.split("@")[1], objtype, guid
+            content.author.handle.split("@")[1], objtype, uuid
         )
         return HttpResponseRedirect(url)
     entity = make_federable_content(content)
@@ -183,6 +183,6 @@ class ReceiveUserView(DiasporaReceiveViewMixin):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
         payload = self.get_payload_from_request(request)
-        guid = kwargs.get("guid")
-        django_rq.enqueue(receive_task, payload, guid=guid)
+        uuid = kwargs.get("uuid")
+        django_rq.enqueue(receive_task, payload, uuid=uuid)
         return HttpResponse(status=202)

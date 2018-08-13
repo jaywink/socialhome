@@ -147,7 +147,7 @@ class Profile(TimeStampedModel):
 
     def get_absolute_url(self):
         # TODO if no handle, something else?
-        return reverse("users:profile-detail", kwargs={"guid": self.guid})
+        return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
 
     @property
     def federable(self):
@@ -166,13 +166,14 @@ class Profile(TimeStampedModel):
 
     @property
     def name_or_handle(self):
-        # TODO or guid or fid?
-        return self.name or self.handle
+        return self.name or self.fid
 
     @property
     def remote_url(self):
         # TODO fix this
-        return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
+        # TODO this is completely broken, remove or something better
+        return ""
+        # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
 
     def save(self, *args, **kwargs):
         if self.handle:
@@ -336,10 +337,6 @@ class Profile(TimeStampedModel):
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
-        if hasattr(remote_profile, "guid"):
-            defaults['guid'] = safe_text(remote_profile.guid)
-        if hasattr(remote_profile, "handle"):
-            defaults['guid'] = safe_text(remote_profile.handle)
         logger.debug("from_remote_profile - defaults %s", defaults)
         profile, created = Profile.objects.update_or_create(
             fid=safe_text(remote_profile.id),

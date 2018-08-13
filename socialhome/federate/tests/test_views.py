@@ -39,19 +39,19 @@ class TestFederationDiscovery:
         assert response.status_code == 200
 
     def test_hcard_responds_on_404_on_unknown_user(self, client):
-        response = client.get(reverse("federate:hcard", kwargs={"guid": "fehwuyfehiufhewiuhfiuhuiewfew"}))
+        response = client.get(reverse("federate:hcard", kwargs={"uuid": "fehwuyfehiufhewiuhfiuhuiewfew"}))
         assert response.status_code == 404
         with patch("socialhome.federate.views.get_object_or_404") as mock_get:
             # Test also ValueError raising ending up as 404
             Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
             mock_get.side_effect = ValueError()
-            response = client.get(reverse("federate:hcard", kwargs={"guid": "foobar"}))
+            response = client.get(reverse("federate:hcard", kwargs={"uuid": "foobar"}))
             assert response.status_code == 404
 
     def test_hcard_responds_on_200_on_known_user(self, client):
         user = UserFactory(username="foobar")
         Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
-        response = client.get(reverse("federate:hcard", kwargs={"guid": user.profile.guid}))
+        response = client.get(reverse("federate:hcard", kwargs={"uuid": user.profile.uuid}))
         assert response.status_code == 200
 
     def test_nodeinfo_wellknown_responds(self, client):
@@ -91,12 +91,12 @@ class TestReceivePublic:
 @pytest.mark.usefixtures("db", "client")
 class TestReceiveUser:
     def test_receive_user_responds_for_xml_payload(self, client):
-        response = client.post(reverse("federate:receive-user", kwargs={"guid": "1234"}), {"xml": "foo"})
+        response = client.post(reverse("federate:receive-user", kwargs={"uuid": "1234"}), {"xml": "foo"})
         assert response.status_code == 202
 
     def test_receive_user_responds_for_json_payload(self, client):
         response = client.post(
-            reverse("federate:receive-user", kwargs={"guid": "1234"}), data='{"foo": "bar"}',
+            reverse("federate:receive-user", kwargs={"uuid": "1234"}), data='{"foo": "bar"}',
             content_type="application/json",
         )
         assert response.status_code == 202
@@ -114,23 +114,23 @@ class TestContentXMLView(SocialhomeTestCase):
         cls.profile = author.profile
 
     def test_non_public_content_returns_404(self):
-        response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.limited_content.guid}))
+        response = self.client.get(reverse("federate:content-xml", kwargs={"uuid": self.limited_content.uuid}))
         self.assertEqual(response.status_code, 404)
 
     def test_public_content_returns_success_code(self):
-        response = self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        response = self.client.get(reverse("federate:content-xml", kwargs={"uuid": self.public_content.uuid}))
         self.assertEqual(response.status_code, 200)
 
     @patch("socialhome.federate.views.make_federable_content")
     @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
     def test_calls_make_federable_content(self, mock_getter, mock_maker):
-        self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        self.client.get(reverse("federate:content-xml", kwargs={"uuid": self.public_content.uuid}))
         mock_maker.assert_called_once_with(self.public_content)
 
     @patch("socialhome.federate.views.make_federable_content", return_value="entity")
     @patch("socialhome.federate.views.get_full_xml_representation", return_value="<foo></foo>")
     def test_calls_get_full_xml_representation(self, mock_getter, mock_maker):
-        self.client.get(reverse("federate:content-xml", kwargs={"guid": self.public_content.guid}))
+        self.client.get(reverse("federate:content-xml", kwargs={"uuid": self.public_content.uuid}))
         mock_getter.assert_called_once_with("entity", self.profile.private_key)
 
 
@@ -148,29 +148,29 @@ class TestContentFetchView(SocialhomeTestCase):
 
     def test_invalid_objtype_returns_404(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "foobar", "guid": self.public_content.guid
+            "objtype": "foobar", "uuid": self.public_content.uuid
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_non_public_content_returns_404(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "guid": self.limited_content.guid
+            "objtype": "post", "uuid": self.limited_content.uuid
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_public_content_returns_success_code(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "guid": self.public_content.guid
+            "objtype": "post", "uuid": self.public_content.uuid
         }))
         self.assertEqual(response.status_code, 200)
 
     def test_remote_content_redirects(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "guid": self.remote_content.guid
+            "objtype": "post", "uuid": self.remote_content.uuid
         }))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "https://%s/fetch/post/%s" %(
-            self.remote_content.author.handle.split("@")[1], self.remote_content.guid
+            self.remote_content.author.handle.split("@")[1], self.remote_content.uuid
         ))
 
 

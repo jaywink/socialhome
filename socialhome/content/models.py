@@ -73,8 +73,8 @@ class Tag(models.Model):
         """Make a safe Channel group name.
 
         ASCII or hyphens or periods only.
-        Prefix with ID as we have to slugify the name and cut long guids due to asgi library group name restriction.
         """
+        # TODO use just id
         return ("%s_%s" % (self.id, slugify(self.name)))[:80]
 
 
@@ -241,7 +241,7 @@ class Content(models.Model):
 
     @property
     def url_uuid(self):
-        return "%s%s" % (settings.SOCIALHOME_URL, reverse("content:view-by-guid", kwargs={"guid": self.uuid}))
+        return "%s%s" % (settings.SOCIALHOME_URL, reverse("content:view-by-uuid", kwargs={"uuid": self.uuid}))
 
     @staticmethod
     @memoize(timeout=604800)  # a week

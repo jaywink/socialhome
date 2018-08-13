@@ -85,24 +85,6 @@ class ProfileFactory(factory.django.DjangoModelFactory):
             fid=factory.lazy_attribute(lambda x: f"diaspora://{x.email}/profile/{randint(1, 100000)}")
         )
 
-    # @factory.post_generation
-    # def set_guid(self, extracted, created, **kwargs):
-    #     if extracted is False or self.guid:
-    #         return
-    #
-    #     # Set guid sometimes, sometimes not, but also allow passing in True to force
-    #     if extracted is True or randint(0, 100) > 50:
-    #         self.guid = str(uuid.uuid4())
-
-    # @factory.post_generation
-    # def set_handle(self, extracted, created, **kwargs):
-    #     if extracted is False or self.handle:
-    #         return
-    #
-    #     # Set handle sometimes, sometimes not, but also allow passing in True to force
-    #     if extracted is True or randint(0, 100) > 50:
-    #         self.handle = self.email
-
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
         if not extracted:
@@ -139,8 +121,7 @@ class BaseShareFactory(factory.Factory):
     class Meta:
         model = base.Share
 
-    guid = factory.Faker("uuid4")
-    handle = factory.Faker("safe_email")
-    target_guid = factory.Faker("sha1")
-    target_handle = factory.Faker("safe_email")
+    id = factory.Faker('uri')
+    actor_id = factory.Faker('uri')
+    target_id = factory.Faker('uri')
     public = factory.Faker("pybool")

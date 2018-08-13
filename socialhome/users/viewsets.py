@@ -44,13 +44,13 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
     @detail_route(methods=["post"])
     def add_follower(self, request, pk=None):
-        guid = request.data.get("guid")
+        uuid = request.data.get("uuid")
         try:
-            target_profile = Profile.objects.get(guid=guid)
+            target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
             raise PermissionDenied("Profile given does not exist.")
         profile = self.get_object()
-        if profile.guid == guid:
+        if profile.uuid == uuid:
             raise ValidationError("Cannot follow self!")
         profile.following.add(target_profile)
         return Response({"status": "Follower added."})
@@ -62,13 +62,13 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
     @detail_route(methods=["post"])
     def remove_follower(self, request, pk=None):
-        guid = request.data.get("guid")
+        uuid = request.data.get("uuid")
         try:
-            target_profile = Profile.objects.get(guid=guid)
+            target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
             raise PermissionDenied("Profile given does not exist.")
         profile = self.get_object()
-        if profile.guid == guid:
+        if profile.uuid == uuid:
             raise ValidationError("Cannot unfollow self!")
         profile.following.remove(target_profile)
         return Response({"status": "Follower removed."})

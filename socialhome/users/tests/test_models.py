@@ -68,7 +68,7 @@ class TestProfile(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.profile = ProfileFactory(guid="1234")
+        cls.profile = ProfileFactory()
         cls.user = UserFactory()
 
     def test_generate_new_rsa_key(self):
@@ -81,7 +81,7 @@ class TestProfile(SocialhomeTestCase):
         assert profile.rsa_public_key != current_public_key
 
     def test_get_absolute_url(self):
-        self.assertEqual(self.profile.get_absolute_url(), "/p/1234/")
+        self.assertEqual(self.profile.get_absolute_url(), f"/p/{self.profile.uuid}/")
 
     def test_handle_can_have_port(self):
         self.profile.handle = "foo@example.com:3000"
