@@ -3,7 +3,6 @@ from unittest.mock import patch
 from django.test import override_settings
 from federation.entities.base import Comment
 from federation.tests.fixtures.keys import get_dummy_private_key
-from federation.utils.diaspora import generate_diaspora_profile_id
 from test_plus import TestCase
 
 from socialhome.content.tests.factories import (
@@ -245,7 +244,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author, [
-            self.remote_content.author.gid,
+            self.remote_content.author.fid,
         ])
         self.assertTrue(mock_forward.called is False)
 

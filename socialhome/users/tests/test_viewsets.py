@@ -149,7 +149,7 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         for field in ("id", "uuid", "fid", "handle", "image_url_large", "image_url_medium", "image_url_small",
                       "is_local", "url", "home_url"):
             response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {field: "82"})
-            self.assertEqual(response.data.get(field), getattr(self.profile, field))
+            self.assertEqual(str(response.data.get(field)), str(getattr(self.profile, field)))
         for field in ("name", "location", "nsfw", "visibility"):
             if field == "nsfw":
                 value = not self.profile.nsfw

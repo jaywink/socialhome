@@ -120,7 +120,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "isUserAuthenticated": True,
                 "profile": {
                     "id": profile.id,
-                    "uuid": profile.uuid,
+                    "uuid": str(profile.uuid),
                     "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
@@ -150,7 +150,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                 "isUserAuthenticated": False,
                 "profile": {
                     "id": profile.id,
-                    "uuid": profile.uuid,
+                    "uuid": str(profile.uuid),
                     "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
@@ -387,10 +387,11 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "isUserAuthenticated": True,
                 "profile": {
                     "id": profile.id,
-                    "uuid": profile.uuid,
+                    "uuid": str(profile.uuid),
                     "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),
+                    "handle": profile.handle,
                     "has_pinned_content": Content.objects.profile_pinned(profile, request.user).exists(),
                     "home_url": profile.home_url,
                     "image_url_large": profile.image_url_large,
@@ -416,7 +417,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
                 "isUserAuthenticated": False,
                 "profile": {
                     "id": profile.id,
-                    "uuid": profile.uuid,
+                    "uuid": str(profile.uuid),
                     "fid": profile.fid,
                     "followers_count": 0,
                     "following_count": profile.following.count(),

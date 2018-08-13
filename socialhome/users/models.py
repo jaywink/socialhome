@@ -113,7 +113,7 @@ class Profile(TimeStampedModel):
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
-    # TODO drop handle once things have rolled out
+    # Optional, only exists for Diaspora and some other platforms
     handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Federation identifier
@@ -337,6 +337,8 @@ class Profile(TimeStampedModel):
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
+        if hasattr(remote_profile, "handle"):
+            defaults['handle'] = safe_text(remote_profile.handle)
         logger.debug("from_remote_profile - defaults %s", defaults)
         profile, created = Profile.objects.update_or_create(
             fid=safe_text(remote_profile.id),

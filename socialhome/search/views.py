@@ -94,7 +94,7 @@ class GlobalSearchView(SearchView):
         if validate_handle(q):
             profile = None
             try:
-                profile = Profile.objects.visible_for_user(request.user).get(fid__startswith=f"diaspora://{q}/profile/")
+                profile = Profile.objects.visible_for_user(request.user).get(handle=q)
             except Profile.DoesNotExist:
                 # Try a remote search
                 try:
@@ -105,6 +105,13 @@ class GlobalSearchView(SearchView):
                 if remote_profile:
                     profile = Profile.from_remote_profile(remote_profile)
             if profile:
+                return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+        elif q.startswith("https://"):
+            try:
+                profile = Profile.objects.visible_for_user(request.user).get(fid=q)
+            except Profile.DoesNotExist:
+                pass
+            else:
                 return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
         try:
             return super().get(request, *args, **kwargs)

@@ -49,7 +49,7 @@ class TestContentForm(SocialhomeTestCase):
         self.assertFalse(form.is_valid())
 
         form = ContentForm(
-            data={"text": "barfoo", "visibility": Visibility.LIMITED.value, "recipients": self.user.profile.handle},
+            data={"text": "barfoo", "visibility": Visibility.LIMITED.value, "recipients": self.user.profile.fid},
             user=self.user,
         )
         form.full_clean()
@@ -175,5 +175,5 @@ class TestContentForm(SocialhomeTestCase):
         initial = form.get_initial_for_field(form.fields.get('recipients'), 'recipients')
         self.assertEqual(
             set(initial.split(',')),
-            {self.profile.handle, self.profile2.handle}
+            {self.profile.fid, self.profile2.fid}
         )

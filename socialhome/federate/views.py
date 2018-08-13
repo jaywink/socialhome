@@ -4,6 +4,7 @@ import logging
 import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.http.response import Http404, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -61,7 +62,7 @@ def hcard_view(request, uuid):
     """
     try:
         profile = get_object_or_404(Profile, uuid=uuid, user__isnull=False)
-    except ValueError:
+    except (ValueError, ValidationError):
         raise Http404()
     hcard = generate_hcard(
         "diaspora",
@@ -73,7 +74,7 @@ def hcard_view(request, uuid):
         photo100=profile.safer_image_url_medium,
         photo50=profile.safer_image_url_small,
         searchable="true" if profile.public else "false",
-        guid=profile.uuid,
+        guid=str(profile.uuid),
         username=profile.user.username,
         public_key=profile.rsa_public_key,
     )

@@ -203,7 +203,7 @@ class ContactsFollowedView(LoginRequiredMixin, DetailView):
     template_name = "users/contacts_followed.html"
 
     def get_object(self, queryset=None):
-        return Profile.objects.get(id=self.request.user.profile.id)
+        return self.request.user.profile
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

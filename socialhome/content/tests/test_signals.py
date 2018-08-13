@@ -140,7 +140,6 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         call_args = [
             call(send_reply_notifications, content.id),
             call(send_reply, content.id),
-            call(send_reply, content.id),
         ]
         self.assertEqual(mock_send.call_args_list, call_args)
 
@@ -151,7 +150,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
-        self.assertEqual(mock_send.call_count, 2)
+        self.assertEqual(mock_send.call_count, 1)
         args, kwargs = mock_send.call_args_list[0]
         self.assertEqual(args, (send_content, content.id))
         self.assertEqual(kwargs, {'recipient_id': None})
@@ -166,7 +165,6 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         content = ContentFactory(author=user.profile, share_of=share_of)
         call_args = [
             call(send_share_notification, content.id),
-            call(send_share, content.id),
             call(send_share, content.id),
         ]
         assert mock_send.call_args_list == call_args
@@ -202,7 +200,7 @@ class TestFetchPreview(SocialhomeTestCase):
     @patch("socialhome.content.signals.fetch_content_preview", autospec=True)
     def test_fetch_content_preview_called(self, fetch):
         ContentFactory()
-        self.assertEqual(fetch.call_count, 2)
+        self.assertEqual(fetch.call_count, 1)
 
     @patch("socialhome.content.signals.fetch_content_preview", side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")

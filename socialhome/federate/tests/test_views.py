@@ -1,8 +1,8 @@
 import datetime
 import json
+import uuid
 from unittest.mock import patch, Mock
 
-import pytest
 from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils.timezone import now
@@ -20,51 +20,53 @@ from socialhome.users.models import Profile, User
 from socialhome.users.tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures("db", "client")
-class TestFederationDiscovery:
-    def test_host_meta_responds(self, client):
-        response = client.get(reverse("federate:host-meta"))
-        assert response.status_code == 200
+class TestFederationDiscovery(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory(username="foobar")
+        cls.profile = cls.user.profile
+        cls.profile.rsa_public_key = "fooobar"
+        cls.profile.save()
 
-    def test_webfinger_responds_404_on_unknown_user(self, client):
-        response = client.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
-        assert response.status_code == 404
+    def test_host_meta_responds(self):
+        self.get("federate:host-meta")
+        self.response_200()
 
-    def test_webfinger_responds_200_on_known_user(self, client):
-        UserFactory(username="foobar")
-        Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
-        response = client.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
-        assert response.status_code == 200
-        response = client.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
-        assert response.status_code == 200
+    def test_webfinger_responds_404_on_unknown_user(self):
+        self.get("{url}?q=barfoo%40socialhome.local".format(url=reverse("federate:webfinger")))
+        self.response_404()
 
-    def test_hcard_responds_on_404_on_unknown_user(self, client):
-        response = client.get(reverse("federate:hcard", kwargs={"uuid": "fehwuyfehiufhewiuhfiuhuiewfew"}))
-        assert response.status_code == 404
+    def test_webfinger_responds_200_on_known_user(self):
+        self.get("{url}?q=foobar%40socialhome.local".format(url=reverse("federate:webfinger")))
+        self.response_200()
+        self.get("{url}?q=acct%3Afoobar%40socialhome.local".format(url=reverse("federate:webfinger")))
+        self.response_200()
+
+    def test_hcard_responds_on_404_on_unknown_user(self):
+        self.get("federate:hcard", uuid="fehwuyfehiufhewiuhfiuhuiewfew")
+        self.response_404()
         with patch("socialhome.federate.views.get_object_or_404") as mock_get:
             # Test also ValueError raising ending up as 404
-            Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
             mock_get.side_effect = ValueError()
-            response = client.get(reverse("federate:hcard", kwargs={"uuid": "foobar"}))
-            assert response.status_code == 404
+            self.get("federate:hcard", uuid="foobar")
+            self.response_404()
 
-    def test_hcard_responds_on_200_on_known_user(self, client):
-        user = UserFactory(username="foobar")
-        Profile.objects.filter(user__username="foobar").update(rsa_public_key="fooobar")
-        response = client.get(reverse("federate:hcard", kwargs={"uuid": user.profile.uuid}))
-        assert response.status_code == 200
+    def test_hcard_responds_on_200_on_known_user(self):
+        self.get("federate:hcard", uuid=self.user.profile.uuid)
+        self.response_200()
 
-    def test_nodeinfo_wellknown_responds(self, client):
-        response = client.get(reverse("federate:nodeinfo-wellknown"))
-        assert response.status_code == 200
+    def test_nodeinfo_wellknown_responds(self):
+        self.get("federate:nodeinfo-wellknown")
+        self.response_200()
 
-    def test_nodeinfo_responds(self, client):
-        response = client.get(reverse("federate:nodeinfo"))
-        assert response.status_code == 200
+    def test_nodeinfo_responds(self):
+        self.get("federate:nodeinfo")
+        self.response_200()
 
-    def test_social_relay_responds(self, client):
-        response = client.get(reverse("federate:social-relay"))
-        assert response.status_code == 200
+    def test_social_relay_responds(self):
+        self.get("federate:social-relay")
+        self.response_200()
 
 
 class TestDiasporaReceiveViewMixin(SocialhomeTestCase):
@@ -81,25 +83,23 @@ class TestDiasporaReceiveViewMixin(SocialhomeTestCase):
         )
 
 
-@pytest.mark.usefixtures("db", "client")
-class TestReceivePublic:
-    def test_receive_public_responds(self, client):
-        response = client.post(reverse("federate:receive-public"), {"xml": "foo"})
-        assert response.status_code == 202
+class TestReceivePublic(SocialhomeTestCase):
+    def test_receive_public_responds(self):
+        self.post("federate:receive-public", data={"xml": "foo"})
+        self.assertEqual(self.last_response.status_code, 202)
 
 
-@pytest.mark.usefixtures("db", "client")
-class TestReceiveUser:
-    def test_receive_user_responds_for_xml_payload(self, client):
-        response = client.post(reverse("federate:receive-user", kwargs={"uuid": "1234"}), {"xml": "foo"})
-        assert response.status_code == 202
+class TestReceiveUser(SocialhomeTestCase):
+    def test_receive_user_responds_for_xml_payload(self):
+        self.post("federate:receive-user", uuid=str(uuid.uuid4()), data={"xml": "foo"})
+        self.assertEqual(self.last_response.status_code, 202)
 
-    def test_receive_user_responds_for_json_payload(self, client):
-        response = client.post(
-            reverse("federate:receive-user", kwargs={"uuid": "1234"}), data='{"foo": "bar"}',
-            content_type="application/json",
+    def test_receive_user_responds_for_json_payload(self):
+        self.post(
+            "federate:receive-user", uuid=str(uuid.uuid4()), data='{"foo": "bar"}',
+            extra={"content_type": "application/json"},
         )
-        assert response.status_code == 202
+        self.assertEqual(self.last_response.status_code, 202)
 
 
 class TestContentXMLView(SocialhomeTestCase):

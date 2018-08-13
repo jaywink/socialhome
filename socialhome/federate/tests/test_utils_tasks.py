@@ -1,5 +1,4 @@
 from unittest.mock import patch, Mock, call
-from uuid import uuid4
 
 from django.db import IntegrityError
 from federation.entities import base
@@ -173,7 +172,7 @@ class TestProcessEntityPost(SocialhomeTestCase):
         self.assertEqual(content.text, entity.raw_content)
 
         # Don't allow updating if the author is different
-        invalid_entity = entities.PostFactory(fid=entity.id)
+        invalid_entity = entities.PostFactory(id=entity.id)
         process_entity_post(invalid_entity, ProfileFactory(fid=invalid_entity.actor_id))
         content.refresh_from_db()
         self.assertEqual(content.text, entity.raw_content)

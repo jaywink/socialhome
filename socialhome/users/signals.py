@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 import django_rq
 import logging
 from django.conf import settings
@@ -23,6 +21,7 @@ def user_post_save(sender, **kwargs):
             user=user,
             name=user.name,
             email=user.email,
+            handle="%s@%s" % (user.username, settings.SOCIALHOME_DOMAIN),
         )
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()

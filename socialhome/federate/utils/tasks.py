@@ -22,7 +22,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     try:
         sender_profile = Profile.objects.exclude(rsa_public_key="").get(fid=sender)
     except Profile.DoesNotExist:
-        logger.debug("get_sender_profile - FID %s was not found, fetching from remote", sender)
+        logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
             logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
@@ -30,7 +30,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
         sender_profile = Profile.from_remote_profile(remote_profile)
     else:
         if sender_profile.is_local:
-            logger.warning("get_sender_profile - Handle %s is local! Skip.", sender)
+            logger.warning("get_sender_profile - %s is local! Skip.", sender)
             return
     return sender_profile
 

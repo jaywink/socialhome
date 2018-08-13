@@ -1,4 +1,3 @@
-import uuid
 from random import randint
 
 import factory
@@ -84,6 +83,15 @@ class ProfileFactory(factory.django.DjangoModelFactory):
         diaspora = factory.Trait(
             fid=factory.lazy_attribute(lambda x: f"diaspora://{x.email}/profile/{randint(1, 100000)}")
         )
+
+    @factory.post_generation
+    def set_handle(self, extracted, created, **kwargs):
+        if extracted is False or self.handle:
+            return
+
+        # Set handle sometimes, sometimes not, but also allow passing in True to force
+        if extracted is True or randint(0, 100) > 50:
+            self.handle = self.email
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
