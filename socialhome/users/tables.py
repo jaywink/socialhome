@@ -7,7 +7,7 @@ from socialhome.users.models import Profile
 class FollowedTable(Table):
     picture = TemplateColumn(template_name="users/_picture_column.html", orderable=False)
     handle = LinkColumn(
-        "users:profile-detail", args=[Accessor("uuid")], text=lambda record: record.handle,
+        "users:profile-detail", args=[Accessor("uuid")], text=lambda record: record.handle if record.handle else "",
         attrs={"th": {"class": "hidden-md-down"}, "td": {"class": "hidden-md-down"}},
     )
     fid = LinkColumn("users:profile-detail", args=[Accessor("uuid")], text=lambda record: record.fid)

@@ -278,18 +278,18 @@ def process_entity_share(entity, profile):
         django_rq.enqueue(forward_entity, entity, target_content.id)
 
 
-def sender_key_fetcher(handle):
-    """Return the RSA public key for a handle, if found.
+def sender_key_fetcher(fid):
+    """Return the RSA public key for a fid, if found.
 
     Fetches the key first from a local Profile and if not found, looks for a remote Profile over the network.
 
-    :param handle: Handle of profile
-    :type handle: str
+    :param fid: Fid of profile
+    :type fid: str
     :returns: RSA public key or None
     :rtype: str
     """
-    logger.debug("sender_key_fetcher - Checking for handle '%s'", handle)
-    profile = get_sender_profile(handle)
+    logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
+    profile = get_sender_profile(fid)
     if not profile:
         return
     return profile.rsa_public_key

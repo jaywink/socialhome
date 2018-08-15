@@ -166,7 +166,7 @@ class Profile(TimeStampedModel):
 
     @property
     def name_or_handle(self):
-        return self.name or self.fid
+        return self.name or self.handle or self.fid
 
     @property
     def remote_url(self):
@@ -246,7 +246,7 @@ class Profile(TimeStampedModel):
         Some urls are proven to be relative to host instead of absolute urls.
         """
         attr = "image_url_%s" % size
-        if getattr(self, attr).startswith("/"):
+        if getattr(self, attr).startswith("/") and self.handle:
             return "https://%s%s" % (
                 self.handle.split("@")[1], getattr(self, attr),
             )
@@ -311,7 +311,7 @@ class Profile(TimeStampedModel):
         """Returns absolute version of image URL of given size if they wasn't absolute"""
         url = safe_text(profile.image_urls[image_name])
 
-        if url.startswith("/"):
+        if url.startswith("/") and profile.handle:
             return "https://%s%s" % (
                 profile.handle.split("@")[1], url,
             )

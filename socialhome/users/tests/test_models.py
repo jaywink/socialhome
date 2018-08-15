@@ -97,6 +97,9 @@ class TestProfile(SocialhomeTestCase):
     def test_name_or_handle(self):
         self.assertEqual(self.profile.name_or_handle, self.profile.name)
         self.profile.name = ""
+        self.profile.handle = 'foobariooo@example.com'
+        self.assertEqual(self.profile.name_or_handle, self.profile.handle)
+        self.profile.handle = None
         self.assertEqual(self.profile.name_or_handle, self.profile.fid)
 
     @skip
@@ -169,7 +172,6 @@ class TestProfile(SocialhomeTestCase):
 
     def test_from_remote_profile_absolute_image_url(self):
         remote_profile = BaseProfileFactory(public=False)
-        remote_profile.handle = "foo@example.com"
         remote_profile.image_urls["small"] = "https://example1.com/sm"
         remote_profile.image_urls["medium"] = "https://example2.com/me"
         remote_profile.image_urls["large"] = "https://example3.com/lg"

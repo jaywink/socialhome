@@ -56,7 +56,7 @@ def send_follow_notification(follower_id, followed_id):
         logger.warning("No follower profile %s found for follow notifications", follower_id)
         return
     logger.info("send_follow_notification - Sending mail to %s", user.email)
-    subject = _("New follower: %s" % follower.handle)
+    subject = _("New follower: %s" % follower.name_or_handle)
     context = get_common_context()
     context.update({
         "subject": subject, "actor_name": follower.name_or_handle,

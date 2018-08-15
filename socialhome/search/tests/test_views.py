@@ -4,6 +4,7 @@ import haystack
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 from django.urls import reverse
+from django.utils.http import urlquote
 from federation.entities import base
 from federation.utils.diaspora import parse_profile_diaspora_id
 
@@ -86,6 +87,11 @@ class TestGlobalSearchView(SocialhomeTestCase):
     def test_direct_profile_match_goes_to_profile_view(self):
         handle, _guid = parse_profile_diaspora_id(self.public_profile.fid)
         self.get("%s?q=%s" % (reverse("search:global"), handle), follow=True)
+        self.assertResponseNotContains("Profiles", html=False)
+        self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
+        self.assertEqual(self.context["object"], self.public_profile)
+
+        self.get("%s?q=%s" % (reverse("search:global"), urlquote(self.public_profile.fid)), follow=True)
         self.assertResponseNotContains("Profiles", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], self.public_profile)

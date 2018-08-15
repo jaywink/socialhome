@@ -217,7 +217,7 @@ def send_content_retraction(content, author_id):
                 _get_remote_followers(author)
             )
         else:
-            recipients = _get_limited_recipients(author.handle, content)
+            recipients = _get_limited_recipients(author.fid, content)
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         handle_send(entity, author, recipients)
@@ -307,7 +307,11 @@ def send_follow_change(profile_id, followed_id, follow):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    entity = base.Follow(handle=profile.handle, target_handle=remote_profile.handle, following=follow)
+    entity = base.Follow(
+        actor_id=profile.fid,
+        target_id=remote_profile.fid,
+        following=follow,
+    )
     recipients = [
         (remote_profile.fid, remote_profile.key),
      ]

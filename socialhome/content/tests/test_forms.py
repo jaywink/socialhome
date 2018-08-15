@@ -16,6 +16,8 @@ class TestContentForm(SocialhomeTestCase):
         cls.user = UserFactory()
         cls.profile = ProfileFactory(visibility=Visibility.PUBLIC, handle='profile1@example.com')
         cls.profile2 = ProfileFactory(visibility=Visibility.SITE, handle='profile2@example.com')
+        cls.profile3 = ProfileFactory(visibility=Visibility.PUBLIC, fid='https://example.com/profile3')
+        cls.profile4 = ProfileFactory(visibility=Visibility.PUBLIC, fid='diaspora://profile@example.com/profile/1234')
         cls.self_profile = ProfileFactory(visibility=Visibility.SELF, handle="self@example.com")
         cls.content = PublicContentFactory()
         cls.limited_content = LimitedContentFactory(author=cls.user.profile)
@@ -30,6 +32,8 @@ class TestContentForm(SocialhomeTestCase):
     @data(
         ("profile1@example.com", True),
         ("profile1@example.com,profile2@example.com", True),
+        ("https://example.com/profile3,profile2@example.com", True),
+        ("https://example.com/profile3,diaspora://profile@example.com/profile/1234", True),
         ("profile1@example.com,foobar", False),
         ("self@example.com", False),
         ("foobar", False),

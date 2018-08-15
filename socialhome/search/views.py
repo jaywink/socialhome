@@ -1,3 +1,4 @@
+import re
 import xml
 
 from django.contrib import messages
@@ -70,7 +71,7 @@ class GlobalSearchView(SearchView):
     def get(self, request, *args, **kwargs):
         """See if we have a direct match. If so redirect, if not, search.
 
-        Try fetching a remote profile if the search term is a handle.
+        Try fetching a remote profile if the search term is a handle or fid.
         """
         q = safe_text(request.GET.get("q"))
         if q:
@@ -106,7 +107,7 @@ class GlobalSearchView(SearchView):
                     profile = Profile.from_remote_profile(remote_profile)
             if profile:
                 return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
-        elif q.startswith("https://"):
+        elif re.match(r"(diaspora://|https?://)", q):
             try:
                 profile = Profile.objects.visible_for_user(request.user).get(fid=q)
             except Profile.DoesNotExist:

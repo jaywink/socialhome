@@ -9,5 +9,5 @@ class ContentAdmin(ModelAdmin):
     list_display = ('id', 'uuid', 'author', 'visibility', 'content_type')
     list_filter = ('content_type', 'visibility', 'pinned', 'service_label', 'local')
     raw_id_fields = ('oembed', 'opengraph', 'mentions', 'tags', 'parent', 'share_of', 'limited_visibilities', 'author')
-    search_fields = ('uuid', 'id', 'author__handle', 'author__name')
+    search_fields = ('uuid', 'id', 'author__handle', 'author__name', 'author__fid')
     list_select_related = ('author',)
