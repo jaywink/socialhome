@@ -94,5 +94,5 @@ socialhome/static/mocha/
 /staticfiles/
 
 # Docker
-docker-compose.yml
+./docker-compose.yml
 

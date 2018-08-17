@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./../nginx/nginx.conf:/etc/nginx/conf.d/socialhome.conf
+      - /etc/letsencrypt/live/demo.socialhome.network/cert.pem:/opt/cert.pem
+      - /etc/letsencrypt/live/demo.socialhome.network/privkey.pem:/opt/privkey.pem
+      - /etc/letsencrypt/live/demo.socialhome.network/fullchain.pem:/opt/fullchain.pem
+    ports:
+      - "8080:443"
+    depends_on:
+      - app
+
+  redis:
+    image: redis
+
+  app:
+    image: jaywink/socialhome
+    depends_on:
+      - redis
+    env_file:
+      - ../../.env
+    ports:
+      - "5000:5000"
+      - "23564:23564"

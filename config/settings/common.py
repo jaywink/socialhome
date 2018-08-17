@@ -113,7 +113,7 @@ FIXTURE_DIRS = (
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres:///socialhome"),
+    "default": env.db("DATABASE_URL", default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
