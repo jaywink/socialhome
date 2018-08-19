@@ -21,7 +21,7 @@ def forward(apps, schema_editor):
     for content in Content.objects.all().select_related("author").iterator():
         if content.local:
             content.uuid = content.guid
-            url = reverse("content:view-by-guid", kwargs={"guid": content.uuid})
+            url = reverse("content:view-by-uuid", kwargs={"uuid": content.uuid})
             fid = f"{settings.SOCIALHOME_URL}{url}"
         else:
             # Diaspora remote

@@ -11,7 +11,7 @@ def forward(apps, schema_editor):
     for profile in Profile.objects.all().iterator():
         if profile.user is not None:
             # Local
-            url = reverse('users:profile-detail', kwargs={'guid': profile.guid})
+            url = reverse('users:profile-detail', kwargs={'uuid': profile.guid})
             fid = f"{settings.SOCIALHOME_URL}{url}"
         else:
             # Diaspora remote
