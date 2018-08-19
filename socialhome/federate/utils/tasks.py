@@ -39,9 +39,10 @@ def process_entities(entities, receiving_profile=None):
     """Process a list of entities."""
     for entity in entities:
         logger.info("Entity: %s", entity)
-        profile = get_sender_profile(entity.actor_id)
+        sender_id = entity.id if isinstance(entity, base.Profile) else entity.actor_id
+        profile = get_sender_profile(sender_id)
         if not profile:
-            logger.warning("No sender profile for entity %s, skipping" % entity)
+            logger.warning("No sender profile for entity %s, skipping", entity)
             continue
         try:
             if isinstance(entity, base.Post):
