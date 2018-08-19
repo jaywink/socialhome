@@ -151,11 +151,7 @@ class Profile(TimeStampedModel):
 
     @property
     def federable(self):
-        # TODO make UserType data class
-        profile = UserType()
-        profile.id = self.fid
-        profile.private_key = self.private_key
-        return profile
+        return UserType(id=self.fid, private_key=self.private_key)
 
     @property
     def home_url(self):

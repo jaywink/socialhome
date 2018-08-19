@@ -82,7 +82,7 @@ def send_content(content_id, recipient_id=None):
             recipients.extend(_get_remote_followers(content.author))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
-        handle_send(entity, content.author, recipients)
+        handle_send(entity, content.author.federable, recipients)
     else:
         logger.warning("send_content - No entity for %s", content)
 
@@ -167,7 +167,7 @@ def send_reply(content_id):
                 (parent_author.fid, parent_author.key),
             ]
         logger.debug("send_reply - sending to recipients: %s", recipients)
-        handle_send(entity, content.author, recipients)
+        handle_send(entity, content.author.federable, recipients)
 
 
 def send_share(content_id):
@@ -193,7 +193,7 @@ def send_share(content_id):
                 content.share_of.author.fid,
             )
         logger.debug("send_share - sending to recipients: %s", recipients)
-        handle_send(entity, content.author, recipients)
+        handle_send(entity, content.author.federable, recipients)
     else:
         logger.warning("send_share - No entity for %s", content)
 
@@ -219,7 +219,7 @@ def send_content_retraction(content, author_id):
             recipients = _get_limited_recipients(author.fid, content)
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
-        handle_send(entity, author, recipients)
+        handle_send(entity, author.federable, recipients)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 
@@ -248,7 +248,7 @@ def send_profile_retraction(profile):
             _get_remote_followers(profile)
         )
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
-        handle_send(entity, profile, recipients)
+        handle_send(entity, profile.federable, recipients)
     else:
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
@@ -288,7 +288,7 @@ def forward_entity(entity, target_content_id):
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
-    handle_send(entity, content.author, recipients, parent_user=target_content.author)
+    handle_send(entity, content.author.federable, recipients, parent_user=target_content.author)
 
 
 def send_follow_change(profile_id, followed_id, follow):
@@ -315,7 +315,7 @@ def send_follow_change(profile_id, followed_id, follow):
         (remote_profile.fid, remote_profile.key),
      ]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
-    handle_send(entity, profile, recipients)
+    handle_send(entity, profile.federable, recipients)
     # Also trigger a profile send
     send_profile(profile_id, recipients=[remote_profile.fid])
 
@@ -341,4 +341,4 @@ def send_profile(profile_id, recipients=None):
     if not recipients:
         recipients = _get_remote_followers(profile)
     logger.debug("send_profile - sending to recipients: %s", recipients)
-    handle_send(entity, profile, recipients)
+    handle_send(entity, profile.federable, recipients)
