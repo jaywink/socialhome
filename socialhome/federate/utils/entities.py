@@ -87,7 +87,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             actor_id = author.fid
         elif isinstance(obj, Profile):
             entity_type = "Profile"
-            actor_id=obj.fid
+            actor_id = obj.fid
         else:
             logger.warning("make_federable_retraction - Unknown object type %s", obj)
             return

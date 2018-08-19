@@ -5,7 +5,6 @@ from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
 from federation.outbound import handle_send
-from federation.utils.diaspora import generate_diaspora_profile_id
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
