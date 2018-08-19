@@ -96,8 +96,10 @@
             />
         </div>
         <div class="d-inline-block ml-3 align-center stamped-profile-info">
-            <h1>{{ nameOrGuid }}</h1>
-            <h3><cite :title="translations.userHandle">{{ profile.handle }}</cite></h3>
+            <h1>{{ displayName }}</h1>
+            <h3>
+                <cite :title="translations.userHandle">{{ profile.handle.length ? profile.handle : profile.fid }}</cite>
+            </h3>
         </div>
         <div class="text-center">
             <b-button v-if="profile.has_pinned_content" :variant="pinnedContentVariant" :href="urls.pinnedContent">
@@ -122,8 +124,8 @@ export default Vue.component("profile-stamped-element", {
         ProfileReactionButtons,
     },
     computed: {
-        nameOrGuid() {
-            return this.profile.name ? this.profile.name : this.profile.guid
+        displayName() {
+            return this.profile.name ? this.profile.name : this.profile.fid
         },
         pinnedContentVariant() {
             return this.profile.stream_type === "pinned" ? "primary" : "secondary"
@@ -151,7 +153,7 @@ export default Vue.component("profile-stamped-element", {
                 pinnedContent: gettext("Pinned content"),
                 profileAllContent: gettext("All content"),
                 updateProfile: gettext("Update profile"),
-                userHandle: gettext("User handle on The Federation"),
+                userHandle: gettext("User handle or URL on The Federation"),
             }
         },
         urls() {
@@ -159,8 +161,8 @@ export default Vue.component("profile-stamped-element", {
                 contactsFollowed: Urls["users:contacts-followed"](),
                 organizeProfileUrl: Urls["users:profile-organize"](),
                 pictureUpdate: Urls["users:picture-update"](),
-                pinnedContent: Urls["users:profile-detail"]({guid: this.profile.guid}),
-                profileAllContent: Urls["users:profile-all-content"]({guid: this.profile.guid}),
+                pinnedContent: Urls["users:profile-detail"]({uuid: this.profile.uuid}),
+                profileAllContent: Urls["users:profile-all-content"]({uuid: this.profile.uuid}),
                 updateProfile: Urls["users:profile-update"](),
             }
         },
