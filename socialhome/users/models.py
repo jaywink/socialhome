@@ -146,12 +146,15 @@ class Profile(TimeStampedModel):
         return f"{self.name} ({self.fid})"
 
     def get_absolute_url(self):
-        # TODO if no handle, something else?
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
 
     @property
     def federable(self):
-        return UserType(id=self.fid, private_key=self.private_key)
+        return UserType(
+            id=self.fid,
+            private_key=self.private_key,
+            handle=self.handle,
+        )
 
     @property
     def home_url(self):
