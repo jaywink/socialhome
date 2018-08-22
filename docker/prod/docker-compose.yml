@@ -8,6 +8,7 @@ services:
       - /etc/letsencrypt/live/demo.socialhome.network/cert.pem:/opt/cert.pem
       - /etc/letsencrypt/live/demo.socialhome.network/privkey.pem:/opt/privkey.pem
       - /etc/letsencrypt/live/demo.socialhome.network/fullchain.pem:/opt/fullchain.pem
+      - media:/srv/media
     ports:
       - "8080:443"
     depends_on:
@@ -25,3 +26,8 @@ services:
     ports:
       - "5000:5000"
       - "23564:23564"
+    volumes:
+      - media:/app/socialhome/media
+
+volumes:
+  media:
