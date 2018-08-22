@@ -7,12 +7,12 @@ $(document).ready(function() {
 
         followUnfollow: function(ev) {
             var $elem = $(ev.currentTarget);
-            var targetGuid = $elem.data("target");
+            var targetUuid = $elem.data("target");
             $.post({
                 url: "/api/profiles/" +$elem.data("profileid") + "/" + $elem.data("action") + "/",
-                data: { guid: targetGuid },
+                data: { uuid: targetUuid },
                 success: function () {
-                    $(".follower-button[data-target='" + targetGuid + "']").toggleClass("hidden");
+                    $(".follower-button[data-target='" + targetUuid + "']").toggleClass("hidden");
                 },
                 headers: { "X-CSRFToken": Cookies.get('csrftoken') },
             });

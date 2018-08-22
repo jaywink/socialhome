@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static i18n %}
 
-{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %} - {% trans "Organize content" %}{% endblock %}
+{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.fid }}{% endif %} - {% trans "Organize content" %}{% endblock %}
 
 {% block containertype %}container{% endblock %}
 
