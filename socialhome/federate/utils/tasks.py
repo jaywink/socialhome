@@ -4,6 +4,7 @@ from typing import Optional
 import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
+from federation.utils.diaspora import parse_profile_diaspora_id
 
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
@@ -19,8 +20,14 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
+    if sender.startswith("diaspora://"):
+        handle, _guid = parse_profile_diaspora_id(sender)
+        params = {'handle': handle}
+    else:
+        params = {'fid': sender}
     try:
-        sender_profile = Profile.objects.exclude(rsa_public_key="").get(fid=sender)
+        logger.debug("get_sender_profile - looking from local db using %s", params)
+        sender_profile = Profile.objects.exclude(rsa_public_key="").get(**params)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
