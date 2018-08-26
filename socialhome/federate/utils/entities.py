@@ -21,6 +21,8 @@ def _make_post(content: Content) -> Optional[base.Post]:
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
             created_at=content.effective_modified,
+            guid=str(content.uuid),
+            handle=content.author.handle,
         )
     except Exception as ex:
         logger.exception("_make_post - Failed to convert %s: %s", content.fid, ex)
@@ -34,6 +36,9 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
             actor_id=content.author.fid,
             target_id=content.parent.fid,
             created_at=content.effective_modified,
+            guid=str(content.uuid),
+            handle=content.author.handle,
+            target_guid=content.parent.guid,
         )
     except Exception as ex:
         logger.exception("_make_comment - Failed to convert %s: %s", content.fid, ex)
@@ -49,6 +54,9 @@ def _make_share(content: Content) -> Optional[base.Share]:
             created_at=content.effective_modified,
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
+            guid=str(content.uuid),
+            handle=content.author.handle,
+            target_guid=content.share_of.guid,
         )
     except Exception as ex:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
@@ -85,9 +93,11 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
                 ContentType.CONTENT: "Post",
             }.get(obj.content_type)
             actor_id = author.fid
+            handle = author.handle
         elif isinstance(obj, Profile):
             entity_type = "Profile"
             actor_id = obj.fid
+            handle = obj.handle
         else:
             logger.warning("make_federable_retraction - Unknown object type %s", obj)
             return
@@ -95,6 +105,8 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             entity_type=entity_type,
             actor_id=actor_id,
             target_id=obj.fid,
+            handle=handle,
+            target_guid=obj.guid,
         )
     except Exception as ex:
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
@@ -119,6 +131,7 @@ def make_federable_profile(profile):
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
             handle=profile.handle or "",
+            guid=str(profile.uuid),
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)

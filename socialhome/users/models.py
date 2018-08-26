@@ -108,8 +108,7 @@ class Profile(TimeStampedModel):
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
 
-    # Federation GUID
-    # TODO drop guid once things have rolled out
+    # Federation GUID (optional, related to Diaspora network platforms)
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld

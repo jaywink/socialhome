@@ -310,6 +310,8 @@ def send_follow_change(profile_id, followed_id, follow):
         actor_id=profile.fid,
         target_id=remote_profile.fid,
         following=follow,
+        handle=profile.handle,
+        target_handle=remote_profile.handle,
     )
     recipients = [
         (remote_profile.fid, remote_profile.key),

@@ -84,10 +84,9 @@ class Content(models.Model):
 
     text = models.TextField(_("Text"), blank=True)
 
-    # Federation GUID
-    # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
-    # TODO drop guid once things have rolled out
+    # Federation GUID (optional, related to Diaspora network platforms)
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
+
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
@@ -264,8 +263,7 @@ class Content(models.Model):
         if not self.pk and self.local:
             if not self.uuid:
                 self.uuid = uuid4()
-                # TODO remove this once guid dropped
-                self.guid = self.uuid
+                self.guid = str(self.uuid)
             if not self.fid:
                 self.fid = self.url_uuid
             if self.pinned:
