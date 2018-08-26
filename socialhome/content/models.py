@@ -263,6 +263,7 @@ class Content(models.Model):
         if not self.pk and self.local:
             if not self.uuid:
                 self.uuid = uuid4()
+            if not self.guid:
                 self.guid = str(self.uuid)
             if not self.fid:
                 self.fid = self.url_uuid
