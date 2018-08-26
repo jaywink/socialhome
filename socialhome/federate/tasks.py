@@ -288,7 +288,7 @@ def forward_entity(entity, target_content_id):
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
-    handle_send(entity, content.author.federable, recipients, parent_user=target_content.author)
+    handle_send(entity, content.author.federable, recipients, parent_user=target_content.author.federable)
 
 
 def send_follow_change(profile_id, followed_id, follow):

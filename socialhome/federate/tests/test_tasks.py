@@ -328,7 +328,7 @@ class TestForwardEntity(TestCase):
             self.remote_reply.author.fid,
             self.share.author.fid,
             self.share_reply.author.fid,
-        ], parent_user=self.public_content.author)
+        ], parent_user=self.public_content.author.federable)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_forward_entity__limited_content(self, mock_send):
@@ -337,7 +337,7 @@ class TestForwardEntity(TestCase):
         mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [(
             self.remote_limited_reply.author.fid,
             self.remote_limited_reply.author.key,
-        )], parent_user=self.limited_content.author)
+        )], parent_user=self.limited_content.author.federable)
 
 
 class TestGetRemoteFollowers(TestCase):
