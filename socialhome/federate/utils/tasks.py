@@ -134,6 +134,8 @@ def process_entity_comment(entity, profile, receiving_profile=None):
     if not validate_against_old_content(fid, entity, profile):
         return
     try:
+        #WARNING 2018-08-26 23:43:36,108 tasks 483 139688243422976 No target found for comment:
+        # <federation.entities.diaspora.entities.DiasporaComment object at 0x7f0ba2108d30>
         parent = Content.objects.get(fid=entity.target_id)
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)
