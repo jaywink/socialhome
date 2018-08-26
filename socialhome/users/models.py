@@ -337,6 +337,8 @@ class Profile(TimeStampedModel):
             defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
         if hasattr(remote_profile, "handle"):
             defaults['handle'] = safe_text(remote_profile.handle)
+        if hasattr(remote_profile, "guid"):
+            defaults['guid'] = safe_text(remote_profile.guid)
         logger.debug("from_remote_profile - defaults %s", defaults)
         profile, created = Profile.objects.update_or_create(
             fid=safe_text(remote_profile.id),
