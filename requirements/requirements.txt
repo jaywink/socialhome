@@ -85,7 +85,7 @@ prompt-toolkit==1.0.15    # via ipython
 psutil==5.4.6             # via circus
 psycopg2-binary==2.7.5
 ptyprocess==0.6.0         # via pexpect
-pycryptodome==3.6.4       # via federation
+pycryptodome==3.6.6       # via federation
 pygments==2.2.0           # via ipython
 pyhamcrest==1.9.0         # via twisted
 python-dateutil==2.7.3    # via arrow, croniter, federation
