@@ -28,6 +28,14 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.order_by("created")
 
+    def fed(self, value: str) -> models.QuerySet:
+        """
+        Get Content by federated ID.
+        """
+        return self.filter(
+            Q(fid=value) | Q(guid=value)
+        )
+
     def followed(self, user):
         """Get content from followed users.
 

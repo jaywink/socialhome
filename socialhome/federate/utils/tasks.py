@@ -4,7 +4,6 @@ from typing import Optional
 import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
-from federation.utils.diaspora import parse_profile_diaspora_id
 
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
@@ -20,14 +19,9 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
-    if sender.startswith("diaspora://"):
-        handle, _guid = parse_profile_diaspora_id(sender)
-        params = {'handle': handle}
-    else:
-        params = {'fid': sender}
     try:
-        logger.debug("get_sender_profile - looking from local db using %s", params)
-        sender_profile = Profile.objects.exclude(rsa_public_key="").get(**params)
+        logger.debug("get_sender_profile - looking from local db using %s", sender)
+        sender_profile = Profile.objects.exclude(rsa_public_key="").get(fid=sender)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
@@ -134,8 +128,6 @@ def process_entity_comment(entity, profile, receiving_profile=None):
     if not validate_against_old_content(fid, entity, profile):
         return
     try:
-        #WARNING 2018-08-26 23:43:36,108 tasks 483 139688243422976 No target found for comment:
-        # <federation.entities.diaspora.entities.DiasporaComment object at 0x7f0ba2108d30>
         parent = Content.objects.get(fid=entity.target_id)
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)

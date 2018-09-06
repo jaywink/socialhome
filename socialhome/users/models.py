@@ -108,7 +108,8 @@ class Profile(TimeStampedModel):
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
 
-    # Federation GUID (optional, related to Diaspora network platforms)
+    # Federation GUID
+    # Optional, related to Diaspora network platforms
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
@@ -116,7 +117,8 @@ class Profile(TimeStampedModel):
     handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Federation identifier
-    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True)
+    # Optional
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
@@ -150,7 +152,7 @@ class Profile(TimeStampedModel):
     @property
     def federable(self):
         return UserType(
-            id=self.fid,
+            id=self.fid or self.handle,
             private_key=self.private_key,
             handle=self.handle,
         )
@@ -174,6 +176,13 @@ class Profile(TimeStampedModel):
         # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
 
     def save(self, *args, **kwargs):
+        # Ensure local profile has a fid
+        if not self.fid and self.is_local:
+            self.fid = self.url
+
+        if not self.fid and not self.handle:
+            raise ValueError("Profile must have either a fid or a handle")
+
         if self.handle:
             # Ensure handle is *always* lowercase
             self.handle = self.handle.lower()
@@ -191,9 +200,6 @@ class Profile(TimeStampedModel):
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
 
-        # Ensure local profile has a fid
-        if not self.fid and self.is_local:
-            self.fid = self.url
         super().save(*args, **kwargs)
 
     @property

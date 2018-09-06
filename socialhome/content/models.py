@@ -84,14 +84,16 @@ class Content(models.Model):
 
     text = models.TextField(_("Text"), blank=True)
 
-    # Federation GUID (optional, related to Diaspora network platforms)
+    # Federation GUID
+    # Otional, related to Diaspora network platforms
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     # Federation identifier
-    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True)
+    # Optional
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -271,6 +273,9 @@ class Content(models.Model):
                 max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet
                     self.order = max_order + 1
+
+        if not self.fid and not self.guid:
+            raise ValueError("Content must have either a fid or a guid")
 
         self.fix_local_uploads()
         super().save(*args, **kwargs)
