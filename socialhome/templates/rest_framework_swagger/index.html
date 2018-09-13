@@ -18,10 +18,9 @@
     <div class="topbar">
       <div class="wrapper">
         <div class="topbar-wrapper">
-          <a href="#" class="link">
-            <img src="{% static 'rest_framework_swagger/logo_small.png' %}" alt="Swagger Logo">
-            <span>swagger</span>
-          </a>
+          <div class="input" style="float: left; margin-top: 5px;">
+            <a href="/" class="header__btn">{{ request.site.name }}</a>
+          </div>
           <div class="download-url-wrapper">
           {% if USE_SESSION_AUTH %}
             {% if request.user.is_authenticated %}
