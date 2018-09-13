@@ -15,7 +15,7 @@ from socialhome.content.tests.factories import (
     ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory, LocalContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
-from socialhome.users.tests.factories import ProfileFactory, UserFactory
+from socialhome.users.tests.factories import UserFactory
 
 
 @freeze_time("2017-03-11")
@@ -64,7 +64,7 @@ class TestContentModel(SocialhomeTestCase):
         self.site_content.refresh_from_db()
 
     def test_create(self):
-        content = Content.objects.create(text="foobar", author=ProfileFactory())
+        content = ContentFactory()
         assert content.uuid
 
     def test_extract_mentions(self):

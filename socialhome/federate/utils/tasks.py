@@ -21,7 +21,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     """
     try:
         logger.debug("get_sender_profile - looking from local db using %s", sender)
-        sender_profile = Profile.objects.exclude(rsa_public_key="").get(fid=sender)
+        sender_profile = Profile.objects.exclude(rsa_public_key="").fed(sender)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)

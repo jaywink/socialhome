@@ -32,7 +32,7 @@ class ContentQuerySet(models.QuerySet):
         """
         Get Content by federated ID.
         """
-        return self.filter(
+        return self.get(
             Q(fid=value) | Q(guid=value)
         )
 

@@ -8,7 +8,7 @@ class ProfileQuerySet(QuerySet):
         """
         Get Profile by federated ID.
         """
-        return self.filter(
+        return self.get(
             Q(fid=value) | Q(guid=value) | Q(handle=value)
         )
 
