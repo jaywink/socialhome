@@ -6,6 +6,11 @@ Changelog
 0.10.0-dev (unreleased)
 -----------------------
 
+Fixed
+.....
+
+* API docs regression fixed (`#509 <https://github.com/jaywink/socialhome/issues/509>`_)
+
 0.9.3 (2018-08-29)
 ------------------
 
