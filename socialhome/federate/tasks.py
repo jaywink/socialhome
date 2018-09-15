@@ -268,9 +268,7 @@ def forward_entity(entity, target_content_id):
         logger.warning("forward_entity - No local content found with id %s", target_content_id)
         return
     try:
-        content = Content.objects.get(
-            fid=entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
-        )
+        content = Content.objects.filter(visibility__in=(Visibility.PUBLIC, Visibility.LIMITED)).fed(entity.id)
     except Content.DoesNotExist:
         logger.warning("forward_entity - No content found with uuid %s", entity.id)
         return

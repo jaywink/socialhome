@@ -1,8 +1,14 @@
+from typing import Dict, Tuple, TYPE_CHECKING, Any
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q, F, OuterRef, Subquery, Case, When
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
+
+if TYPE_CHECKING:
+    from socialhome.content.models import Content
 
 
 class TagQuerySet(models.QuerySet):
@@ -28,13 +34,33 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.order_by("created")
 
-    def fed(self, value: str) -> models.QuerySet:
+    def fed(self, value: str) -> 'Content':
         """
         Get Content by federated ID.
         """
         return self.get(
             Q(fid=value) | Q(guid=value)
         )
+
+    def fed_update_or_create(self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None) -> Tuple['Content', bool]:
+        """
+        Update or create by federated ID.
+        """
+        if extra_lookups:
+            qs = self.filter(**extra_lookups)
+        else:
+            qs = self
+        try:
+            content = qs.fed(fid)
+        except ObjectDoesNotExist:
+            return self.create(**values), True
+        else:
+            for key, value in values.items():
+                if key in ('fid', 'guid'):
+                    continue
+                setattr(content, key, value)
+            content.save()
+            return content, False
 
     def followed(self, user):
         """Get content from followed users.
@@ -135,7 +161,6 @@ class ContentQuerySet(models.QuerySet):
 
     def top_level(self):
         return self.filter(content_type=ContentType.CONTENT)
-
     def visible_for_user(self, user):
         """Filter by visibility to given user."""
         if not user.is_authenticated:

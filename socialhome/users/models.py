@@ -325,7 +325,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
-        defaults = {
+        values = {
             "name": safe_text(remote_profile.name),
             "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
             "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
@@ -337,18 +337,16 @@ class Profile(TimeStampedModel):
         public_key = safe_text(remote_profile.public_key)
         if public_key:
             # Only update public key if it has a value
-            defaults["rsa_public_key"] = public_key
+            values["rsa_public_key"] = public_key
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
-            defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
+            values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
         if hasattr(remote_profile, "handle"):
-            defaults['handle'] = safe_text(remote_profile.handle)
+            values['handle'] = safe_text(remote_profile.handle)
         if hasattr(remote_profile, "guid"):
-            defaults['guid'] = safe_text(remote_profile.guid)
-        logger.debug("from_remote_profile - defaults %s", defaults)
-        profile, created = Profile.objects.update_or_create(
-            fid=safe_text(remote_profile.id),
-            defaults=defaults,
-        )
+            values['guid'] = safe_text(remote_profile.guid)
+        logger.debug("from_remote_profile - values %s", values)
+        fid = safe_text(remote_profile.id)
+        profile, created = Profile.objects.fed_update_or_create(fid, values)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

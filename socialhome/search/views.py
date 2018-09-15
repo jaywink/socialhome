@@ -1,4 +1,3 @@
-import re
 import xml
 
 from django.contrib import messages
@@ -8,8 +7,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from federation.fetchers import retrieve_remote_profile
-from federation.utils.diaspora import generate_diaspora_profile_id
-from federation.utils.text import validate_handle
 from haystack.generic_views import SearchView
 from whoosh.query import QueryError
 
@@ -92,28 +89,20 @@ class GlobalSearchView(SearchView):
             else:
                 return redirect(tag.get_absolute_url())
         # Check if profile matches
-        if validate_handle(q):
-            profile = None
+        profile = None
+        try:
+            profile = Profile.objects.visible_for_user(request.user).fed(q)
+        except Profile.DoesNotExist:
+            # Try a remote search
             try:
-                profile = Profile.objects.visible_for_user(request.user).get(handle=q)
-            except Profile.DoesNotExist:
-                # Try a remote search
-                try:
-                    remote_profile = retrieve_remote_profile(generate_diaspora_profile_id(q))
-                except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
-                    # Catch various errors parsing the remote profile
-                    return super().get(request, *args, **kwargs)
-                if remote_profile:
-                    profile = Profile.from_remote_profile(remote_profile)
-            if profile:
-                return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
-        elif re.match(r"(diaspora://|https?://)", q):
-            try:
-                profile = Profile.objects.visible_for_user(request.user).get(fid=q)
-            except Profile.DoesNotExist:
-                pass
-            else:
-                return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+                remote_profile = retrieve_remote_profile(q)
+            except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
+                # Catch various errors parsing the remote profile
+                return super().get(request, *args, **kwargs)
+            if remote_profile:
+                profile = Profile.from_remote_profile(remote_profile)
+        if profile:
+            return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
         try:
             return super().get(request, *args, **kwargs)
         except QueryError:

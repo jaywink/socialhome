@@ -16,13 +16,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--profiles', dest='profiles', default='',
-            help='Remote profile FIDs to delete, separated by comma.',
+            help='Remote profile FIDs (fid, guid or handle) to delete, separated by comma.',
         )
         parser.add_argument(
-            '--lock-remote-profiles', dest='lock_remote_profiles', default=False,
+            '--lock-remote-profiles', dest='lock_remote_profiles', default=True,
             action='store_true',
             help='Give this to lock remote profiles instead of deleting them. Their'
-                 'content will still be deleted locally.',
+                 'content will still be deleted locally. Defaults to True.',
         )
         parser.add_argument(
             '--users', dest='users', default='',
@@ -69,7 +69,7 @@ class Command(BaseCommand):
             if not fid:
                 continue
             try:
-                profile = Profile.objects.get(fid=fid, user__isnull=True)
+                profile = Profile.objects.filter(user__isnull=True).fed(fid)
             except Profile.DoesNotExist:
                 print("WARN: Could not find remote profile %s" % fid)
                 continue
