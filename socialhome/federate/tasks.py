@@ -1,6 +1,8 @@
 import logging
+from typing import List
 
 from django.conf import settings
+from django.db.models import Q
 from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
@@ -75,7 +77,8 @@ def send_content(content_id, recipient_id=None):
             return
         if recipient:
             recipients = [
-                (recipient.fid, recipient.key),
+                # TODO fid or handle?
+                (recipient.handle, recipient.key, recipient.guid),
             ]
         else:
             recipients = [settings.SOCIALHOME_RELAY_ID]
@@ -101,15 +104,17 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
     )
     for reply in replies:
-        if reply.author.fid != exclude:
-            participants.append(reply.author.fid)
+        if reply.author.fid != exclude and reply.author.handle != exclude:
+            # TODO fid or handle?
+            participants.append(reply.author.handle)
     if target_content.content_type == ContentType.CONTENT:
         shares = Content.objects.filter(
             share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
         )
         for share in shares:
-            if share.author.fid != exclude:
-                participants.append(share.author.fid)
+            if share.author.fid != exclude and share.author.handle != exclude:
+                # TODO fid or handle?
+                participants.append(share.author.handle)
             participants = _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
@@ -120,15 +125,18 @@ def _get_remote_followers(profile, exclude=None):
     """Get remote followers for a profile."""
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
-        if follower.fid != exclude:
-            followers.append(follower.fid)
+        if follower.fid != exclude and follower.handle != exclude:
+            # TODO fid or handle?
+            followers.append(follower.handle)
     return followers
 
 
-def _get_limited_recipients(sender, content):
+def _get_limited_recipients(sender: str, content: Content) -> List:
     return [
-        (profile.fid, profile.key)
-        for profile in content.limited_visibilities.all() if profile.fid != sender
+        # TODO fid or handle?
+        (profile.handle, profile.key, profile.guid)
+        for profile in content.limited_visibilities.all()
+        if profile.fid != sender and profile.handle != sender and profile.guid != sender
     ]
 
 
@@ -160,11 +168,13 @@ def send_reply(content_id):
         parent_author = content.parent.author
         if content.visibility == Visibility.PUBLIC:
             recipients = [
-                parent_author.fid,
+                # TODO fid or handle?
+                parent_author.handle,
             ]
         else:
             recipients = [
-                (parent_author.fid, parent_author.key),
+                # TODO fid or handle?
+                (parent_author.handle, parent_author.key, parent_author.guid),
             ]
         logger.debug("send_reply - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients)
@@ -190,7 +200,8 @@ def send_share(content_id):
         if not content.share_of.local:
             # Send to original author
             recipients.append(
-                content.share_of.author.fid,
+                # TODO fid or handle?
+                content.share_of.author.handle,
             )
         logger.debug("send_share - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients)
@@ -216,7 +227,7 @@ def send_content_retraction(content, author_id):
                 _get_remote_followers(author)
             )
         else:
-            recipients = _get_limited_recipients(author.fid, content)
+            recipients = _get_limited_recipients(author.uuid, content)
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         handle_send(entity, author.federable, recipients)
@@ -312,12 +323,14 @@ def send_follow_change(profile_id, followed_id, follow):
         target_handle=remote_profile.handle,
     )
     recipients = [
-        (remote_profile.fid, remote_profile.key),
+        # TODO fid or handle?
+        (remote_profile.handle, remote_profile.key, remote_profile.guid),
      ]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients)
     # Also trigger a profile send
-    send_profile(profile_id, recipients=[remote_profile.fid])
+    # TODO fid or handle?
+    send_profile(profile_id, recipients=[remote_profile.handle])
 
 
 def send_profile(profile_id, recipients=None):

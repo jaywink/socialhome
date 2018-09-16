@@ -68,7 +68,7 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.public_content.author.federable,
-            ["diaspora://relay@relay.iliketoast.net/profile/"],
+            ["relay@relay.iliketoast.net"],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -79,8 +79,9 @@ class TestSendContent(SocialhomeTestCase):
             "entity",
             self.limited_content.author.federable,
             [(
-                self.remote_profile.fid,
+                self.remote_profile.handle,
                 self.remote_profile.key,
+                self.remote_profile.guid,
             )],
         )
 
@@ -132,7 +133,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
     def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_sender.assert_called_once_with(
-            "entity", self.public_content.author.federable, ["diaspora://relay@relay.iliketoast.net/profile/"]
+            "entity", self.public_content.author.federable, ["relay@relay.iliketoast.net"]
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
@@ -175,8 +176,8 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             "entity",
             self.public_profile.federable,
             [
-                'diaspora://relay@relay.iliketoast.net/profile/',
-                self.remote_profile.fid,
+                'relay@relay.iliketoast.net',
+                self.remote_profile.handle,
             ],
         )
 
@@ -186,7 +187,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             "entity",
             self.limited_profile.federable,
             [
-                self.remote_profile.fid,
+                self.remote_profile.handle,
             ],
         )
 
@@ -225,8 +226,9 @@ class TestSendReply(SocialhomeTestCase):
             "entity",
             self.limited_reply.author.federable,
             [(
-                self.remote_profile.fid,
+                self.remote_profile.handle,
                 self.remote_profile.key,
+                self.remote_profile.guid,
             )],
         )
 
@@ -244,7 +246,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author.federable, [
-            self.remote_content.author.fid,
+            self.remote_content.author.handle,
         ])
         self.assertTrue(mock_forward.called is False)
 
@@ -281,7 +283,7 @@ class TestSendShare(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.share.author.federable,
-            [self.content.author.fid],
+            [self.content.author.handle],
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -325,9 +327,9 @@ class TestForwardEntity(TestCase):
         entity = Comment(actor_id=self.reply.author.fid, id=self.reply.fid)
         forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author.federable, [
-            self.remote_reply.author.fid,
-            self.share.author.fid,
-            self.share_reply.author.fid,
+            self.remote_reply.author.handle,
+            self.share.author.handle,
+            self.share_reply.author.handle,
         ], parent_user=self.public_content.author.federable)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
@@ -335,8 +337,9 @@ class TestForwardEntity(TestCase):
         entity = Comment(actor_id=self.limited_reply.author.fid, id=self.limited_reply.fid)
         forward_entity(entity, self.limited_content.id)
         mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [(
-            self.remote_limited_reply.author.fid,
+            self.remote_limited_reply.author.handle,
             self.remote_limited_reply.author.key,
+            self.remote_limited_reply.author.guid,
         )], parent_user=self.limited_content.author.federable)
 
 
@@ -357,8 +360,8 @@ class TestGetRemoteFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                self.remote_follower.fid,
-                self.remote_follower2.fid,
+                self.remote_follower.handle,
+                self.remote_follower2.handle,
             }
         )
 
@@ -367,7 +370,7 @@ class TestGetRemoteFollowers(TestCase):
         self.assertEqual(
             followers,
             {
-                self.remote_follower2.fid,
+                self.remote_follower2.handle,
             }
         )
 
@@ -384,12 +387,12 @@ class TestGetLimitedRecipients(SocialhomeTestCase):
 
     def test_correct_recipients_returned(self):
         recipients = _get_limited_recipients(self.profile.fid, self.limited_content)
-        recipients = {id for id, key in recipients}
+        recipients = {id for id, key, guid in recipients}
         self.assertEqual(
             recipients,
             {
-                self.profile2.fid,
-                self.profile3.fid,
+                self.profile2.handle,
+                self.profile3.handle,
             },
         )
 
@@ -412,10 +415,10 @@ class TestSendFollow(TestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.profile.federable,
-            [(self.remote_profile.fid, self.remote_profile.key)],
+            [(self.remote_profile.handle, self.remote_profile.key, self.remote_profile.guid)],
         )
         mock_profile.assert_called_once_with(self.profile.id, recipients=[
-            self.remote_profile.fid,
+            self.remote_profile.handle,
         ])
 
 
