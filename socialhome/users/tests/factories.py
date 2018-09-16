@@ -1,3 +1,5 @@
+from random import randint
+
 import factory
 from allauth.account.models import EmailAddress
 from factory import fuzzy
@@ -63,8 +65,7 @@ class AdminUserFactory(UserFactory):
 class ProfileFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     email = factory.Faker("safe_email")
-    handle = factory.SelfAttribute("email")
-    guid = factory.Faker("uuid4")
+    fid = factory.Faker("uri")
 
     # Dummy strings as keys since generating these is expensive
     rsa_private_key = fuzzy.FuzzyText()
@@ -77,6 +78,21 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "users.Profile"
+
+    class Params:
+        diaspora = factory.Trait(
+            handle=factory.lazy_attribute(lambda x: x.email),
+            guid=factory.Faker('uuid4'),
+        )
+
+    @factory.post_generation
+    def set_handle(self, extracted, created, **kwargs):
+        if extracted is False or self.handle:
+            return
+
+        # Set handle sometimes, sometimes not, but also allow passing in True to force
+        if extracted is True or randint(0, 100) > 50:
+            self.handle = self.email
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
@@ -94,7 +110,7 @@ class BaseProfileFactory(factory.Factory):
     class Meta:
         model = base.Profile
 
-    handle = factory.Faker("safe_email")
+    id = factory.Faker('uri')
     raw_content = factory.Faker("paragraphs", nb=3)
     email = factory.Faker("safe_email")
     gender = factory.Faker("job")
@@ -102,7 +118,6 @@ class BaseProfileFactory(factory.Factory):
     nsfw = factory.Faker("pybool")
     public_key = factory.Faker("sha1")
     public = factory.Faker("pybool")
-    guid = factory.Faker("uuid4")
     image_urls = {
         "small": factory.Faker("image_url", width=30, height=30).generate({}),
         "medium": factory.Faker("image_url", width=100, height=100).generate({}),
@@ -115,8 +130,7 @@ class BaseShareFactory(factory.Factory):
     class Meta:
         model = base.Share
 
-    guid = factory.Faker("uuid4")
-    handle = factory.Faker("safe_email")
-    target_guid = factory.Faker("sha1")
-    target_handle = factory.Faker("safe_email")
+    id = factory.Faker('uri')
+    actor_id = factory.Faker('uri')
+    target_id = factory.Faker('uri')
     public = factory.Faker("pybool")

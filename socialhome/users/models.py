@@ -1,5 +1,6 @@
 import logging
 import os
+from uuid import uuid4
 
 from Crypto.PublicKey import RSA
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
 from versatileimagefield.fields import VersatileImageField, PPOIField
@@ -17,9 +19,8 @@ from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
-from socialhome.federate.utils.generic import generate_rsa_private_key
 from socialhome.users.querysets import ProfileQuerySet
-from socialhome.users.utils import get_pony_urls
+from socialhome.users.utils import get_pony_urls, generate_rsa_private_key
 from socialhome.utils import get_full_media_url
 
 logger = logging.getLogger("socialhome")
@@ -97,17 +98,27 @@ class User(AbstractUser):
 
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
+    # Local UUID
+    uuid = models.UUIDField(unique=True, blank=True, null=True)
+
+    # User object for local profiles
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
     # Fields mirroring 'User' table since all our Profiles are not local
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
 
-    # GUID
-    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False)
+    # Federation GUID
+    # Optional, related to Diaspora network platforms
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     # Globally unique handle in format username@domain.tld
-    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True)
+    # Optional, only exists for Diaspora and some other platforms
+    handle = models.CharField(_("Handle"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
+    # Federation identifier
+    # Optional
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
@@ -132,11 +143,19 @@ class Profile(TimeStampedModel):
 
     objects = ProfileQuerySet.as_manager()
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.handle)
+    def __str__(self) -> str:
+        return f"{self.name} ({self.fid})"
 
     def get_absolute_url(self):
-        return reverse("users:profile-detail", kwargs={"guid": self.guid})
+        return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
+
+    @property
+    def federable(self):
+        return UserType(
+            id=self.fid or self.handle,
+            private_key=self.private_key,
+            handle=self.handle,
+        )
 
     @property
     def home_url(self):
@@ -147,29 +166,44 @@ class Profile(TimeStampedModel):
 
     @property
     def name_or_handle(self):
-        return self.name or self.handle
+        return self.name or self.handle or self.fid
 
     @property
     def remote_url(self):
-        return "https://%s/people/%s" % (self.handle.split("@")[1], self.guid)
+        # TODO fix this
+        # TODO this is completely broken, remove or something better
+        return ""
+        # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
 
     def save(self, *args, **kwargs):
-        # Protect against empty guids which the search indexing would crash on
-        if not self.guid:
-            raise ValueError("Profile must have a guid!")
-        if not validate_handle(self.handle):
-            raise ValueError("Not a valid handle")
+        if not self.uuid:
+            self.uuid = uuid4()
+        if not self.pk and self.is_local:
+            if not self.guid:
+                self.guid = str(self.uuid)
+            if not self.fid:
+                self.fid = self.url
+
+        if not self.fid and not self.handle:
+            raise ValueError("Profile must have either a fid or a handle")
+
+        if self.handle:
+            # Ensure handle is *always* lowercase
+            self.handle = self.handle.lower()
+            if not validate_handle(self.handle):
+                raise ValueError("Not a valid handle")
+
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
-        # Ensure handle is *always* lowercase
-        self.handle = self.handle.lower()
+
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
+
         super().save(*args, **kwargs)
 
     @property
@@ -220,7 +254,7 @@ class Profile(TimeStampedModel):
         Some urls are proven to be relative to host instead of absolute urls.
         """
         attr = "image_url_%s" % size
-        if getattr(self, attr).startswith("/"):
+        if getattr(self, attr).startswith("/") and self.handle:
             return "https://%s%s" % (
                 self.handle.split("@")[1], getattr(self, attr),
             )
@@ -244,6 +278,8 @@ class Profile(TimeStampedModel):
 
     @property
     def username_part(self):
+        if not self.handle:
+            return ""
         return self.handle.split("@")[0]
 
     def visible_to_user(self, user):
@@ -283,7 +319,7 @@ class Profile(TimeStampedModel):
         """Returns absolute version of image URL of given size if they wasn't absolute"""
         url = safe_text(profile.image_urls[image_name])
 
-        if url.startswith("/"):
+        if url.startswith("/") and profile.handle:
             return "https://%s%s" % (
                 profile.handle.split("@")[1], url,
             )
@@ -293,7 +329,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
-        defaults = {
+        values = {
             "name": safe_text(remote_profile.name),
             "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
             "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
@@ -305,15 +341,16 @@ class Profile(TimeStampedModel):
         public_key = safe_text(remote_profile.public_key)
         if public_key:
             # Only update public key if it has a value
-            defaults["rsa_public_key"] = public_key
+            values["rsa_public_key"] = public_key
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
-            defaults["image_url_%s" % img_size] = defaults["image_url_%s" % img_size].replace("&amp;", "&")
-        logger.debug("from_remote_profile - defaults %s", defaults)
-        profile, created = Profile.objects.update_or_create(
-            guid=safe_text(remote_profile.guid),
-            handle=safe_text(remote_profile.handle),
-            defaults=defaults,
-        )
+            values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
+        fid = safe_text(remote_profile.id)
+        if hasattr(remote_profile, "handle"):
+            values['handle'] = safe_text(remote_profile.handle)
+        if hasattr(remote_profile, "guid"):
+            values['guid'] = safe_text(remote_profile.guid)
+        logger.debug("from_remote_profile - values %s", values)
+        profile, created = Profile.objects.fed_update_or_create(fid, values)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

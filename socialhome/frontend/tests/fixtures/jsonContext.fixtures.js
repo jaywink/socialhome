@@ -4,7 +4,7 @@ import faker from "faker"
 
 const getFakeAuthor = function (args = {}) {
     return _.defaults({}, args, {
-        guid: faker.random.uuid(),
+        uuid: faker.random.uuid(),
         handle: faker.internet.exampleEmail(),
         home_url: "https://127.0.0.1",
         id: faker.random.number(),
@@ -12,6 +12,7 @@ const getFakeAuthor = function (args = {}) {
         is_local: faker.random.boolean(),
         name: faker.name.findName(),
         url: "https://127.0.0.1",
+        fid: `https://127.0.0.1/profile/${faker.random.uuid()}`,
     })
 }
 
@@ -59,7 +60,7 @@ const getFakePostList = function (args = {}, nbPosts = 1) {
 const getProfile = function (args = {}) {
     return _.defaults({}, args, {
         id: faker.random.number(),
-        guid: faker.random.uuid(),
+        uuid: faker.random.uuid(),
         followersCount: faker.random.number(),
         followingCount: faker.random.number(),
         handle: faker.internet.exampleEmail(),

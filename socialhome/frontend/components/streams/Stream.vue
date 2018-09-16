@@ -55,7 +55,7 @@ export default Vue.component("stream", {
     // TODO: Seperate Stream.vue into TagStream.vue, GuidProfile.vue and UsernameProfile.vue, etc. in the future
     props: {
         contentId: {type: String, default: ""},
-        guid: {type: String, default: ""},
+        uuid: {type: String, default: ""},
         user: {type: String, default: ""},
         tag: {type: String, default: ""},
     },
@@ -148,12 +148,12 @@ export default Vue.component("stream", {
                     this.$store.dispatch(streamStoreOperations.getTagStream, options)
                     break
                 case "profile_all":
-                    // TODO: Replace this with guid property when API has evolved to support guid
+                    // TODO: Replace this with uuid property when API has evolved to support uuid
                     options.params.id = this.$store.state.applicationStore.profile.id
                     this.$store.dispatch(streamStoreOperations.getProfileAll, options)
                     break
                 case "profile_pinned":
-                    // TODO: Replace this with guid property when API has evolved to support guid
+                    // TODO: Replace this with uuid property when API has evolved to support uuid
                     options.params.id = this.$store.state.applicationStore.profile.id
                     this.$store.dispatch(streamStoreOperations.getProfilePinned, options)
                     break

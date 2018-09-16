@@ -1,5 +1,8 @@
+import re
+
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from federation.utils.text import validate_handle
 from markdownx.widgets import MarkdownxWidget
@@ -59,9 +62,11 @@ class ContentForm(forms.ModelForm):
         recipients = [r.strip() for r in self.cleaned_data.get('recipients', '').split(',')]
 
         for recipient in recipients:
-            if not validate_handle(recipient):
+            if not validate_handle(recipient) and not re.match(r"(diaspora://|https?://)", recipient):
                 raise ValidationError(_("Recipient %s is not in the correct format." % recipient))
-        recipient_profiles = Profile.objects.filter(handle__in=recipients).visible_for_user(self.user)
+        recipient_profiles = Profile.objects.filter(
+            Q(handle__in=recipients) | Q(fid__in=recipients)
+        ).visible_for_user(self.user)
         # TODO we should probably try to lookup missing ones over the network first before failing
         if recipient_profiles.distinct().count() != len(set(recipients)):
             raise ValidationError(_("Not all recipients could be found."))
@@ -81,7 +86,7 @@ class ContentForm(forms.ModelForm):
         if field_name != 'recipients' or not self.instance or self.instance.visibility != Visibility.LIMITED:
             return super().get_initial_for_field(field, field_name)
 
-        recipients = self.instance.limited_visibilities.values_list('handle', flat=True)
+        recipients = self.instance.limited_visibilities.values_list('fid', flat=True)
         return ",".join(recipients)
 
     def save(self, commit=True, parent=None):
@@ -107,7 +112,9 @@ class ContentForm(forms.ModelForm):
         if content.content_type == ContentType.CONTENT:
             # Collect new recipients
             recipients = [r.strip() for r in self.cleaned_data.get('recipients').split(',')]
-            recipients = Profile.objects.filter(handle__in=recipients).visible_for_user(self.user)
+            recipients = Profile.objects.filter(
+                Q(handle__in=recipients) | Q(fid__in=recipients)
+            ).visible_for_user(self.user)
 
             # Add following, if included
             if self.cleaned_data.get('include_following'):

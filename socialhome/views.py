@@ -37,19 +37,19 @@ class HomeView(TemplateView):
         if request.user.is_authenticated:
             landing_page = request.user.preferences.get("generic__landing_page")
             if landing_page == "profile":
-                return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
+                return ProfileDetailView.as_view()(request, uuid=request.user.profile.uuid)
             elif landing_page == "profile_all":
-                return ProfileAllContentView.as_view()(request, guid=request.user.profile.guid)
+                return ProfileAllContentView.as_view()(request, uuid=request.user.profile.uuid)
             elif landing_page == "followed":
                 return FollowedStreamView.as_view()(request)
             elif landing_page == "public":
                 return PublicStreamView.as_view()(request)
             else:
                 # Fallback to profile view
-                return ProfileDetailView.as_view()(request, guid=request.user.profile.guid)
+                return ProfileDetailView.as_view()(request, uuid=request.user.profile.uuid)
         if settings.SOCIALHOME_ROOT_PROFILE:
             profile = get_object_or_404(Profile, user__username=settings.SOCIALHOME_ROOT_PROFILE)
-            return ProfileDetailView.as_view()(request, guid=profile.guid)
+            return ProfileDetailView.as_view()(request, uuid=profile.uuid)
         return super(HomeView, self).get(request, *args, **kwargs)
 
 

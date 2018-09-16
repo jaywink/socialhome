@@ -92,27 +92,27 @@ Deleting users and locking remote profiles
 
 To delete users and their content, a Django management command has been provided. This command can also be used to delete local content of remote profiles and optionally lock the profile so any new content is rejected. This makes it possible to lock out spam accounts for example. For locally created content, an automatic retraction will be sent to remotes.
 
-NOTE! Any deletion is **permanent**. There is no possibility to get the data back, except by restoring database and uploaded file backups. Be sure before using the command and be extra sure about the GUID's passed in!
+NOTE! Any deletion is **permanent**. There is no possibility to get the data back, except by restoring database and uploaded file backups. Be sure before using the command and be extra sure about the UUID's passed in!
 
 To delete a local user, run the command as follows:
 
 ::
 
-   python manage.py delete_users_and_profiles --users <guid>
+   python manage.py delete_users_and_profiles --users <uuid>
 
 To delete a remote profile, run the command as follows:
 
 ::
 
-   python manage.py delete_users_and_profiles --profiles <guid>
+   python manage.py delete_users_and_profiles --profiles <uuid>
 
 To only delete remote profile content and then lock the profile, run as follows:
 
 ::
 
-   python manage.py delete_users_and_profiles --profiles <guid> --lock-remote-profiles
+   python manage.py delete_users_and_profiles --profiles <uuid> --lock-remote-profiles
 
-Multiple ``guid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
+Multiple ``uuid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
 
 .. _policy-docs:
 

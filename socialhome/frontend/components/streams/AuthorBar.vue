@@ -3,10 +3,10 @@
         <div class="grid-item-author-bar mt-1">
             <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
                 <img :src="author.image_url_small" class="grid-item-author-bar-pic" />
-                {{ author.name.length ? author.name : author.handle }}
+                {{ author.name.length ? author.name : author.fid }}
             </div>
             <div v-show="showProfileBox" class="profile-box">
-                {{ author.handle }}
+                {{ author.handle.length ? author.handle : author.fid }}
                 <div class="pull-right">
                     <ProfileReactionButtons
                         :profile="author"

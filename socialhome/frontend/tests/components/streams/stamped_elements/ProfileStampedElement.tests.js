@@ -18,7 +18,7 @@ describe("ProfileStampedElement", () => {
     })
 
     describe("computed", () => {
-        describe("nameOrGuid", () => {
+        describe("displayName", () => {
             it("should return name if set", () => {
                 window.context.profile.name = "Karl Marx"
                 const store = new Vuex.Store({
@@ -27,19 +27,19 @@ describe("ProfileStampedElement", () => {
                 })
                 const target = mount(ProfileStampedElement, {store})
 
-                target.instance().nameOrGuid.should.eql("Karl Marx")
+                target.instance().displayName.should.eql("Karl Marx")
             })
 
-            it("should return GUID if name is unset", () => {
+            it("should return FID if name is unset", () => {
                 window.context.profile.name = undefined
-                window.context.profile.guid = "123456789"
+                window.context.profile.fid = "http://example.com/profile"
                 const store = new Vuex.Store({
                     state: {},
                     modules: {applicationStore: newApplicationStore()}
                 })
                 const target = mount(ProfileStampedElement, {store})
 
-                target.instance().nameOrGuid.should.eql("123456789")
+                target.instance().displayName.should.eql("http://example.com/profile")
             })
         })
 

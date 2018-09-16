@@ -24,7 +24,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "author",
             "content_type",
             "edited",
-            "guid",
+            "uuid",
             "has_twitter_oembed",
             "humanized_timestamp",
             "id",
@@ -53,7 +53,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "author",
             "content_type"
             "edited",
-            "guid",
+            "uuid",
             "has_twitter_oembed",
             "humanized_timestamp",
             "id",

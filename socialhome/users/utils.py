@@ -1,4 +1,12 @@
+from Crypto import Random
+from Crypto.PublicKey import RSA
 from django.conf import settings
+
+
+def generate_rsa_private_key(bits=4096):
+    """Generate a new RSA private key."""
+    rand = Random.new().read
+    return RSA.generate(bits, rand)
 
 
 def get_pony_urls():

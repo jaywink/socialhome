@@ -19,6 +19,11 @@ Fixed
 
 * Update ``pycryptodome`` due to CVE-2018-15560 security issue.
 
+Changed
+.......
+
+* **Backwards incompatible**. Python 3.6 is now the lowest supported Python version. Please do not try to upgrade Socialhome to this release before updating your Python virtualenv, if running an older Python!
+
 0.9.2 (2018-08-11)
 ------------------
 
