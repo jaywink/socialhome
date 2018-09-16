@@ -80,12 +80,12 @@ class Tag(models.Model):
 
 class Content(models.Model):
     # Local UUID
-    uuid = models.UUIDField(unique=True, default=uuid4)
+    uuid = models.UUIDField(unique=True, blank=True, null=True)
 
     text = models.TextField(_("Text"), blank=True)
 
     # Federation GUID
-    # Otional, related to Diaspora network platforms
+    # Optional, related to Diaspora network platforms
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
@@ -262,9 +262,9 @@ class Content(models.Model):
         elif self.share_of:
             self.content_type = ContentType.SHARE
 
+        if not self.uuid:
+            self.uuid = uuid4()
         if not self.pk and self.local:
-            if not self.uuid:
-                self.uuid = uuid4()
             if not self.guid:
                 self.guid = str(self.uuid)
             if not self.fid:

@@ -99,7 +99,7 @@ class User(AbstractUser):
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
-    uuid = models.UUIDField(unique=True, default=uuid4)
+    uuid = models.UUIDField(unique=True, blank=True, null=True)
 
     # User object for local profiles
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
@@ -176,9 +176,13 @@ class Profile(TimeStampedModel):
         # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
 
     def save(self, *args, **kwargs):
-        # Ensure local profile has a fid
-        if not self.fid and self.is_local:
-            self.fid = self.url
+        if not self.uuid:
+            self.uuid = uuid4()
+        if not self.pk and self.is_local:
+            if not self.guid:
+                self.guid = str(self.uuid)
+            if not self.fid:
+                self.fid = self.url
 
         if not self.fid and not self.handle:
             raise ValueError("Profile must have either a fid or a handle")
