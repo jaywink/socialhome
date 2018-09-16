@@ -1,7 +1,6 @@
 from typing import Dict, Tuple, TYPE_CHECKING, Any
 
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet, Q, ObjectDoesNotExist
 
 from socialhome.enums import Visibility
 
@@ -10,25 +9,28 @@ if TYPE_CHECKING:
 
 
 class ProfileQuerySet(QuerySet):
-    def fed(self, value: str) -> 'Profile':
+    def fed(self, value: str, **params) -> QuerySet:
         """
         Get Profile by federated ID.
         """
-        return self.get(
+        return self.filter(
             Q(fid=value) | Q(guid=value) | Q(handle=value)
-        )
+        ).filter(**params)
 
-    def fed_update_or_create(self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None) -> Tuple['Profile', bool]:
+    def fed_update_or_create(
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None
+    ) -> Tuple['Profile', bool]:
         """
         Update or create by federated ID.
         """
-        if extra_lookups:
-            qs = self.filter(**extra_lookups)
-        else:
-            qs = self
+        if not extra_lookups:
+            extra_lookups = {}
         try:
-            profile = qs.fed(fid)
+            profile = self.fed(fid, **extra_lookups).get()
         except ObjectDoesNotExist:
+            if fid.startswith('http'):
+                values['fid'] = fid
+            values.update(extra_lookups)
             return self.create(**values), True
         else:
             for key, value in values.items():

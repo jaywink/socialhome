@@ -81,7 +81,8 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     class Params:
         diaspora = factory.Trait(
-            fid=factory.lazy_attribute(lambda x: f"diaspora://{x.email}/profile/{randint(1, 100000)}")
+            handle=factory.lazy_attribute(lambda x: x.email),
+            guid=factory.Faker('uuid4'),
         )
 
     @factory.post_generation

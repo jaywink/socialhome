@@ -69,7 +69,7 @@ class Command(BaseCommand):
             if not fid:
                 continue
             try:
-                profile = Profile.objects.filter(user__isnull=True).fed(fid)
+                profile = Profile.objects.fed(fid, user__isnull=True).get()
             except Profile.DoesNotExist:
                 print("WARN: Could not find remote profile %s" % fid)
                 continue

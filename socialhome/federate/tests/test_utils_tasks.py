@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock, call
 
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from federation.entities import base
 from federation.tests.factories import entities
 
@@ -416,7 +416,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
             target_id=self.local_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
-        share = Content.objects.get(fid=entity.id, share_of=self.local_content)
+        share = Content.objects.fed(entity.id, share_of=self.local_content).get()
         self.assertEqual(share.text, "")
         self.assertEqual(share.author, self.remote_profile)
         self.assertEqual(share.visibility, Visibility.PUBLIC)
@@ -446,7 +446,8 @@ class TestProcessEntityShare(SocialhomeTestCase):
         )
         current_text = self.local_content2.text
         with self.assertRaises(IntegrityError):
-            process_entity_share(entity, self.remote_profile)
+            with transaction.atomic():
+                process_entity_share(entity, self.remote_profile)
         self.local_content2.refresh_from_db()
         self.assertIsNone(self.local_content2.share_of)
         self.assertEqual(self.local_content2.text, current_text)
@@ -462,10 +463,10 @@ class TestProcessEntityShare(SocialhomeTestCase):
         )
         process_entity_share(entity, self.remote_profile)
         mock_retrieve.assert_called_once_with(entity.target_id, sender_key_fetcher=sender_key_fetcher)
-        self.assertTrue(Content.objects.filter(fid=entity.target_id, content_type=ContentType.CONTENT).exists())
+        self.assertTrue(Content.objects.fed(entity.target_id, content_type=ContentType.CONTENT).exists())
         self.assertTrue(
-            Content.objects.filter(
-                fid=entity.id, share_of__fid=entity.target_id, content_type=ContentType.SHARE
+            Content.objects.fed(
+                entity.id, share_of__fid=entity.target_id, content_type=ContentType.SHARE
             ).exists()
         )
 

@@ -21,7 +21,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     """
     try:
         logger.debug("get_sender_profile - looking from local db using %s", sender)
-        sender_profile = Profile.objects.exclude(rsa_public_key="").fed(sender)
+        sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
@@ -65,8 +65,7 @@ def process_entities(entities, receiving_profile=None):
 def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
     try:
-        profile = Profile.objects.fed(entity.target_id)
-        user = User.objects.get(profile=profile, is_active=True)
+        user = User.objects.get(profile=Profile.objects.fed(entity.target_id).get(), is_active=True)
     except (Profile.DoesNotExist, User.DoesNotExist):
         logger.warning("Could not find local user %s for follow entity %s", entity.target_id, entity)
         return
@@ -81,7 +80,7 @@ def process_entity_follow(entity, profile):
 def validate_against_old_content(fid, entity, profile):
     """Do some validation against a possible local object."""
     try:
-        old_content = Content.objects.fed(fid)
+        old_content = Content.objects.fed(fid).get()
     except Content.DoesNotExist:
         return True
     # Do some validation
@@ -132,7 +131,7 @@ def process_entity_comment(entity, profile, receiving_profile=None):
     if not validate_against_old_content(fid, entity, profile):
         return
     try:
-        parent = Content.objects.fed(entity.target_id)
+        parent = Content.objects.fed(entity.target_id).get()
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)
         return
@@ -194,12 +193,12 @@ def _process_mentions(content, entity):
     to_add = fids.difference(existing_fids)
     for fid in to_remove:
         try:
-            content.mentions.remove(Profile.objects.fed(fid))
+            content.mentions.remove(Profile.objects.fed(fid).get())
         except Profile.DoesNotExist:
             pass
     for fid in to_add:
         try:
-            content.mentions.add(Profile.objects.fed(fid))
+            content.mentions.add(Profile.objects.fed(fid).get())
         except Profile.DoesNotExist:
             pass
 
@@ -207,7 +206,7 @@ def _process_mentions(content, entity):
 def _retract_content(target_fid, profile):
     """Retract a Content."""
     try:
-        content = Content.objects.filter(local=False).fed(target_fid)
+        content = Content.objects.fed(target_fid, local=False).get()
     except Content.DoesNotExist:
         logger.warning("Retracted remote content %s cannot be found", target_fid)
         return
@@ -247,14 +246,14 @@ def process_entity_share(entity, profile):
         logger.warning("Ignoring share entity type that is not of type Post")
         return
     try:
-        target_content = Content.objects.filter(share_of__isnull=True).fed(entity.target_id)
+        target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
     except Content.DoesNotExist:
         # Try fetching. If found, process and then try again
         remote_target = retrieve_remote_content(entity.target_id, sender_key_fetcher=sender_key_fetcher)
         if remote_target:
             process_entities([remote_target])
             try:
-                target_content = Content.objects.filter(share_of__isnull=True).fed(entity.target_id)
+                target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
             except Content.DoesNotExist:
                 logger.warning("Share target was fetched from remote, but it is still missing locally! Share: %s",
                                entity)
@@ -274,7 +273,7 @@ def process_entity_share(entity, profile):
     fid = safe_text(entity.id)
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
-    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookup={'share_of': target_content})
+    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups={'share_of': target_content})
     _process_mentions(content, entity)
     if created:
         logger.info("Saved share: %s", content)

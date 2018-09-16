@@ -341,12 +341,12 @@ class Profile(TimeStampedModel):
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
+        fid = safe_text(remote_profile.id)
         if hasattr(remote_profile, "handle"):
             values['handle'] = safe_text(remote_profile.handle)
         if hasattr(remote_profile, "guid"):
             values['guid'] = safe_text(remote_profile.guid)
         logger.debug("from_remote_profile - values %s", values)
-        fid = safe_text(remote_profile.id)
         profile, created = Profile.objects.fed_update_or_create(fid, values)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

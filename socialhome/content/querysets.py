@@ -1,8 +1,7 @@
 from typing import Dict, Tuple, TYPE_CHECKING, Any
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import Q, F, OuterRef, Subquery, Case, When
+from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNotExist
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
@@ -34,25 +33,28 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.order_by("created")
 
-    def fed(self, value: str) -> 'Content':
+    def fed(self, value: str, **params) -> models.QuerySet:
         """
         Get Content by federated ID.
         """
-        return self.get(
+        return self.filter(
             Q(fid=value) | Q(guid=value)
-        )
+        ).filter(**params)
 
-    def fed_update_or_create(self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None) -> Tuple['Content', bool]:
+    def fed_update_or_create(
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None
+    ) -> Tuple['Content', bool]:
         """
         Update or create by federated ID.
         """
-        if extra_lookups:
-            qs = self.filter(**extra_lookups)
-        else:
-            qs = self
+        if not extra_lookups:
+            extra_lookups = {}
         try:
-            content = qs.fed(fid)
+            content = self.fed(fid, **extra_lookups).get()
         except ObjectDoesNotExist:
+            if fid.startswith('http'):
+                values['fid'] = fid
+            values.update(extra_lookups)
             return self.create(**values), True
         else:
             for key, value in values.items():
