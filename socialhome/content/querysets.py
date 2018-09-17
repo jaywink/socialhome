@@ -163,6 +163,7 @@ class ContentQuerySet(models.QuerySet):
 
     def top_level(self):
         return self.filter(content_type=ContentType.CONTENT)
+
     def visible_for_user(self, user):
         """Filter by visibility to given user."""
         if not user.is_authenticated:

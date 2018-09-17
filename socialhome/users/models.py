@@ -144,7 +144,7 @@ class Profile(TimeStampedModel):
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.fid})"
+        return f"{self.name} ({self.fid or self.handle})"
 
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})

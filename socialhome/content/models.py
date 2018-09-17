@@ -157,9 +157,7 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return "{text} ({type}, {visibility}, {fid})".format(
-            text=truncate_letters(self.text, 30), fid=self.fid, visibility=self.visibility, type=self.content_type,
-        )
+        return f"{truncate_letters(self.text, 30)} ({self.content_type}, {self.visibility}, {self.fid or self.guid})"
 
     def cache_data(self, commit=False):
         """Calculate some extra data."""
