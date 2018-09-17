@@ -104,7 +104,7 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
     )
     for reply in replies:
-        if reply.author.fid != exclude and reply.author.handle != exclude:
+        if not exclude or (reply.author.fid != exclude and reply.author.handle != exclude):
             # TODO fid or handle?
             participants.append(reply.author.handle)
     if target_content.content_type == ContentType.CONTENT:
@@ -112,7 +112,7 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
             share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
         )
         for share in shares:
-            if share.author.fid != exclude and share.author.handle != exclude:
+            if not exclude or (share.author.fid != exclude and share.author.handle != exclude):
                 # TODO fid or handle?
                 participants.append(share.author.handle)
             participants = _get_remote_participants_for_content(
@@ -125,7 +125,7 @@ def _get_remote_followers(profile, exclude=None):
     """Get remote followers for a profile."""
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
-        if follower.fid != exclude and follower.handle != exclude:
+        if not exclude or (follower.fid != exclude and follower.handle != exclude):
             # TODO fid or handle?
             followers.append(follower.handle)
     return followers
