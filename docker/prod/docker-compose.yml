@@ -12,37 +12,21 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./../traefik/traefik.toml:/traefik.toml
       - ./../traefik/acme.json:/acme.json
-#    labels:
-#      traefik.frontend.rule: "Host:traefik1.jasonrobinson.me"
-#      traefik.port: "8080"
-#      traefik.docker.network: "proxy"
-#      traefik.enable: "true"
-#    networks:
-#      - proxy
-
-#  nginx:
-#    image: nginx
-#    volumes:
-#      - ./../nginx/nginx.conf:/etc/nginx/conf.d/socialhome.conf
-#      - /etc/letsencrypt/live/demo.socialhome.network/cert.pem:/opt/cert.pem
-#      - /etc/letsencrypt/live/demo.socialhome.network/privkey.pem:/opt/privkey.pem
-#      - /etc/letsencrypt/live/demo.socialhome.network/fullchain.pem:/opt/fullchain.pem
-#      - media:/srv/media
-#    ports:
-#      - "8080:443"
-#    depends_on:
-#      - app
 
   redis:
+    container_name: redis
+    restart: unless-stopped
     image: redis
 
   app:
+    container_name: socialhome
     image: jaywink/socialhome
+    restart: unless-stopped
     depends_on:
       - redis
 #      - db
     env_file:
-      - ../../.env
+      - .env
     ports:
       - "5000:5000"
       - "23564:23564"
@@ -50,17 +34,13 @@ services:
       - media:/app/socialhome/media
     labels:
       traefik.frontend.rule: "Host:demo.socialhome.network"
-#      traefik.docker.network: proxy
       traefik.port: "5000"
       traefik.enable: "true"
-#    networks:
-#      - proxy
 
 #  db:
+#    container_name: db
 #    image: postgres
+#    restart: unless-stopped
 
 volumes:
   media:
-
-#networks:
-#  proxy:
