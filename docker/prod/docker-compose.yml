@@ -1,18 +1,37 @@
 version: '3'
 
 services:
-  nginx:
-    image: nginx
-    volumes:
-      - ./../nginx/nginx.conf:/etc/nginx/conf.d/socialhome.conf
-      - /etc/letsencrypt/live/demo.socialhome.network/cert.pem:/opt/cert.pem
-      - /etc/letsencrypt/live/demo.socialhome.network/privkey.pem:/opt/privkey.pem
-      - /etc/letsencrypt/live/demo.socialhome.network/fullchain.pem:/opt/fullchain.pem
-      - media:/srv/media
+  traefik:
+    container_name: traefik
+    image: traefik
+    restart: unless-stopped
     ports:
-      - "8080:443"
-    depends_on:
-      - app
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./../traefik/traefik.toml:/traefik.toml
+      - ./../traefik/acme.json:/acme.json
+#    labels:
+#      traefik.frontend.rule: "Host:traefik1.jasonrobinson.me"
+#      traefik.port: "8080"
+#      traefik.docker.network: "proxy"
+#      traefik.enable: "true"
+#    networks:
+#      - proxy
+
+#  nginx:
+#    image: nginx
+#    volumes:
+#      - ./../nginx/nginx.conf:/etc/nginx/conf.d/socialhome.conf
+#      - /etc/letsencrypt/live/demo.socialhome.network/cert.pem:/opt/cert.pem
+#      - /etc/letsencrypt/live/demo.socialhome.network/privkey.pem:/opt/privkey.pem
+#      - /etc/letsencrypt/live/demo.socialhome.network/fullchain.pem:/opt/fullchain.pem
+#      - media:/srv/media
+#    ports:
+#      - "8080:443"
+#    depends_on:
+#      - app
 
   redis:
     image: redis
@@ -21,6 +40,7 @@ services:
     image: jaywink/socialhome
     depends_on:
       - redis
+#      - db
     env_file:
       - ../../.env
     ports:
@@ -28,6 +48,19 @@ services:
       - "23564:23564"
     volumes:
       - media:/app/socialhome/media
+    labels:
+      traefik.frontend.rule: "Host:demo.socialhome.network"
+#      traefik.docker.network: proxy
+      traefik.port: "5000"
+      traefik.enable: "true"
+#    networks:
+#      - proxy
+
+#  db:
+#    image: postgres
 
 volumes:
   media:
+
+#networks:
+#  proxy:

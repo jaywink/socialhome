@@ -2,6 +2,8 @@ FROM python:3.6
 
 ENV PYTHONUNBUFFERED 1
 
+WORKDIR /
+
 RUN apt-get update && apt-get install python-dev python3-dev -y
 
 COPY requirements/requirements.txt ./
@@ -10,23 +12,7 @@ RUN pip install -U pip setuptools pip-tools
 
 RUN pip-sync requirements.txt
 
-# TODO use uwsgi or move to reqs
 RUN pip install gunicorn
-
-COPY . /app
-
-RUN mkdir -p /logs
-
-RUN groupadd -r django \
-    && useradd -r -g django django
-
-COPY docker/app/gunicorn.sh /gunicorn.sh
-
-RUN sed -i 's/\r//' /gunicorn.sh \
-    && chmod +x /gunicorn.sh \
-    && chown django /gunicorn.sh
-
-WORKDIR /app
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -45,16 +31,33 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.11//install.sh |
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
+COPY package.json ./
 RUN npm install
 
+COPY bower.json ./
 RUN node_modules/.bin/bower --allow-root install
+
+COPY docker/app/gunicorn.sh /gunicorn.sh
+RUN chmod +x /gunicorn.sh
+
+COPY . /app
+
+RUN ln -s /node_modules /app/node_modules
+RUN ln -s /bower_components /app/bower_components
+
+WORKDIR /app
 
 RUN npm run build
 
-RUN chown -R django /app
+RUN rm -rf /node_modules
+RUN rm -rf /bower_components
+
+RUN cp config/circus_docker.ini config/circus.ini
+
+RUN mkdir -p /logs
 
 ENV POSTGRES_PASSWORD postgres
-ENV RQWORKER_NUM 5
+ENV RQWORKER_NUM 1
 ENV DJANGO_SETTINGS_MODULE config.settings.production
 ENV REDIS_HOST redis
 ENV DATABASE_URL postgres://postgres:$POSTGRES_PASSWORD@db:5432/postgres
@@ -63,5 +66,4 @@ ENV DJANGO_DEBUG False
 ENV DJANGO_ALLOWED_HOSTS socialhome.local
 ENV DBHOST=db
 
-#CMD bash -c "./utils/wait-for-it/wait-for-it.sh --strict --timeout=10 $DBHOST:5432 && circusd /app/config/circus.ini"
 CMD circusd /app/config/circus.ini

@@ -1,0 +1,29 @@
+debug = true
+logLevel = "DEBUG"
+defaultEntryPoints = ["http", "https"]
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+  [entryPoints.https.tls]
+
+[api]
+entryPoint = "traefik"
+dashboard = true
+
+[docker]
+watch = true
+exposedbydefault = false
+domain = "demo.jasonrobinson.me"
+
+[acme]
+email = "mail@jasonrobinson.me"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+onDemand = true
+[acme.httpChallenge]
+entryPoint = "http"
