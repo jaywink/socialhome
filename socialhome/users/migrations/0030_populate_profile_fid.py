@@ -3,13 +3,14 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import migrations
+from django.db.migrations import RunPython
 from django.urls import reverse
 
 
 def forward(apps, schema_editor):
     Profile = apps.get_model("users", "Profile")
     for profile in Profile.objects.select_related('user').iterator():
-        if profile.is_local:
+        if profile.user:
             profile.uuid = profile.guid
             url = reverse("users:profile-detail", kwargs={"uuid": profile.uuid})
             fid = f"{settings.SOCIALHOME_URL}{url}"
@@ -25,4 +26,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        RunPython(forward, RunPython.noop)
     ]
