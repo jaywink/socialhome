@@ -62,7 +62,7 @@ class ContentForm(forms.ModelForm):
         recipients = [r.strip() for r in self.cleaned_data.get('recipients', '').split(',')]
 
         for recipient in recipients:
-            if not validate_handle(recipient) and not re.match(r"(diaspora://|https?://)", recipient):
+            if not validate_handle(recipient) and not re.match(r"https?://", recipient):
                 raise ValidationError(_("Recipient %s is not in the correct format." % recipient))
         recipient_profiles = Profile.objects.filter(
             Q(handle__in=recipients) | Q(fid__in=recipients)
@@ -86,8 +86,12 @@ class ContentForm(forms.ModelForm):
         if field_name != 'recipients' or not self.instance or self.instance.visibility != Visibility.LIMITED:
             return super().get_initial_for_field(field, field_name)
 
-        recipients = self.instance.limited_visibilities.values_list('fid', flat=True)
-        return ",".join(recipients)
+        handles = self.instance.limited_visibilities.filter(fid__isnull=True).values_list('handle', flat=True)
+        fids = self.instance.limited_visibilities.filter(handle__isnull=True).values_list('fid', flat=True)
+        both = self.instance.limited_visibilities.filter(
+            handle__isnull=False, fid__isnull=False,
+        ).values_list('handle', flat=True)
+        return ",".join(list(handles) + list(fids) + list(both))
 
     def save(self, commit=True, parent=None):
         """

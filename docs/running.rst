@@ -340,7 +340,7 @@ URL to make signup link go to in the case that signups are closed.
 SOCIALHOME_RELAY_ID
 .......................
 
-Default: ``diaspora://relay@relay.iliketoast.net/profile/``
+Default: ``relay@relay.iliketoast.net``
 
 Which relay instance ID to send outgoing content to. Socialhome automatically integrates with the `relay system <https://github.com/jaywink/social-relay>`_.
 

@@ -14,10 +14,10 @@ class TestContentForm(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory()
-        cls.profile = ProfileFactory(visibility=Visibility.PUBLIC, handle='profile1@example.com')
+        cls.profile = ProfileFactory(visibility=Visibility.PUBLIC, handle='profile1@example.com', fid=None)
         cls.profile2 = ProfileFactory(visibility=Visibility.SITE, handle='profile2@example.com')
         cls.profile3 = ProfileFactory(visibility=Visibility.PUBLIC, fid='https://example.com/profile3')
-        cls.profile4 = ProfileFactory(visibility=Visibility.PUBLIC, fid='diaspora://profile@example.com/profile/1234')
+        cls.profile4 = ProfileFactory(visibility=Visibility.PUBLIC, fid='https://example.com/profile/1234')
         cls.self_profile = ProfileFactory(visibility=Visibility.SELF, handle="self@example.com")
         cls.content = PublicContentFactory()
         cls.limited_content = LimitedContentFactory(author=cls.user.profile)
@@ -33,7 +33,7 @@ class TestContentForm(SocialhomeTestCase):
         ("profile1@example.com", True),
         ("profile1@example.com,profile2@example.com", True),
         ("https://example.com/profile3,profile2@example.com", True),
-        ("https://example.com/profile3,diaspora://profile@example.com/profile/1234", True),
+        ("https://example.com/profile3,https://example.com/profile/1234", True),
         ("profile1@example.com,foobar", False),
         ("self@example.com", False),
         ("foobar", False),
@@ -179,5 +179,5 @@ class TestContentForm(SocialhomeTestCase):
         initial = form.get_initial_for_field(form.fields.get('recipients'), 'recipients')
         self.assertEqual(
             set(initial.split(',')),
-            {self.profile.fid, self.profile2.fid}
+            {self.profile.handle, self.profile2.handle}
         )
