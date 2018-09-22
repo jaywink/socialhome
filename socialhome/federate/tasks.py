@@ -2,7 +2,6 @@ import logging
 from typing import List
 
 from django.conf import settings
-from django.db.models import Q
 from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive

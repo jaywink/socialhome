@@ -57,6 +57,7 @@ def _make_share(content: Content) -> Optional[base.Share]:
             guid=str(content.uuid),
             handle=content.author.handle,
             target_guid=content.share_of.guid,
+            target_handle=content.share_of.author.handle,
         )
     except Exception as ex:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
