@@ -144,33 +144,33 @@ class TestContentFetchView(SocialhomeTestCase):
         )
         cls.limited_content = ContentFactory(visibility=Visibility.LIMITED, author=author.profile)
         cls.public_content = ContentFactory(visibility=Visibility.PUBLIC, author=author.profile)
-        cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC)
+        cls.remote_content = ContentFactory(visibility=Visibility.PUBLIC, guid=uuid.uuid4())
 
     def test_invalid_objtype_returns_404(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "foobar", "uuid": self.public_content.uuid
+            "objtype": "foobar", "guid": self.public_content.guid
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_non_public_content_returns_404(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "uuid": self.limited_content.uuid
+            "objtype": "post", "guid": self.limited_content.guid
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_public_content_returns_success_code(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "uuid": self.public_content.uuid
+            "objtype": "post", "guid": self.public_content.guid
         }))
         self.assertEqual(response.status_code, 200)
 
     def test_remote_content_redirects(self):
         response = self.client.get(reverse("federate:content-fetch", kwargs={
-            "objtype": "post", "uuid": self.remote_content.uuid
+            "objtype": "post", "guid": self.remote_content.guid
         }))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "https://%s/fetch/post/%s" %(
-            self.remote_content.author.handle.split("@")[1], self.remote_content.uuid
+            self.remote_content.author.handle.split("@")[1], self.remote_content.guid
         ))
 
 

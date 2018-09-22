@@ -129,7 +129,7 @@ def content_xml_view(request, uuid):
     return HttpResponse(xml, content_type="application/xml")
 
 
-def content_fetch_view(request, objtype, uuid):
+def content_fetch_view(request, objtype, guid):
     """Diaspora content fetch view.
 
     Returns the signed payload for the public content. Non-public content will return 404.
@@ -139,14 +139,14 @@ def content_fetch_view(request, objtype, uuid):
     Args:
         objtype (str) - Diaspora content type. Currently if it is `status_message`, `post` or `reshare`,
             we try to find `Content`.
-        uuid (str) - The object uuid to look for.
+        guid (str) - The object guid to look for.
     """
     if objtype not in ["status_message", "post", "reshare", "comment"]:
         raise Http404()
-    content = get_object_or_404(Content, uuid=uuid, visibility=Visibility.PUBLIC)
+    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     if not content.local:
         url = "https://%s/fetch/%s/%s" % (
-            content.author.handle.split("@")[1], objtype, uuid
+            content.author.handle.split("@")[1], objtype, guid
         )
         return HttpResponseRedirect(url)
     entity = make_federable_content(content)

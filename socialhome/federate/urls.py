@@ -31,5 +31,5 @@ urlpatterns = [
 
     # Content
     url(r"^p/(?P<uuid>[^/]+).xml$", content_xml_view, name="content-xml"),
-    url(r"^fetch/(?P<objtype>[a-z_]+)/(?P<uuid>[^/]+)$", content_fetch_view, name="content-fetch"),
+    url(r"^fetch/(?P<objtype>[a-z_]+)/(?P<guid>[^/]+)$", content_fetch_view, name="content-fetch"),
 ]
