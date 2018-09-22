@@ -80,7 +80,7 @@ class Tag(models.Model):
 
 class Content(models.Model):
     # Local UUID
-    uuid = models.UUIDField(unique=True, default=uuid4)
+    uuid = models.UUIDField(unique=True, blank=True, null=True)
 
     text = models.TextField(_("Text"), blank=True)
 
