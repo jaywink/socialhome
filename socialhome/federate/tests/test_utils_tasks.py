@@ -462,7 +462,13 @@ class TestProcessEntityShare(SocialhomeTestCase):
             id=entity.target_id, actor_id=self.remote_profile2.fid,
         )
         process_entity_share(entity, self.remote_profile)
-        mock_retrieve.assert_called_once_with(entity.target_id, sender_key_fetcher=sender_key_fetcher)
+        mock_retrieve.assert_called_once_with(
+            entity.target_id,
+            guid=entity.target_guid,
+            handle=entity.target_handle,
+            entity_type="Post",
+            sender_key_fetcher=sender_key_fetcher,
+        )
         self.assertTrue(Content.objects.fed(entity.target_id, content_type=ContentType.CONTENT).exists())
         self.assertTrue(
             Content.objects.fed(
