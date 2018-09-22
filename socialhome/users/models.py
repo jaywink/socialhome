@@ -99,7 +99,7 @@ class User(AbstractUser):
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
-    uuid = models.UUIDField(unique=True, blank=True, null=True)
+    uuid = models.UUIDField(unique=True, default=uuid4)
 
     # User object for local profiles
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
