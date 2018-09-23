@@ -256,7 +256,7 @@ Get Socialhome code
 
 ::
 
-    git clone https://github.com/jaywink/socialhome
+    git clone https://git.feneas.org/socialhome/socialhome
     cd socialhome
 
 Install Python dependencies

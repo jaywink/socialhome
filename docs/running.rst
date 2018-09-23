@@ -342,7 +342,7 @@ SOCIALHOME_RELAY_ID
 
 Default: ``relay@relay.iliketoast.net``
 
-Which relay instance ID to send outgoing content to. Socialhome automatically integrates with the `relay system <https://github.com/jaywink/social-relay>`_.
+Which relay instance ID to send outgoing content to. Socialhome automatically integrates with the `relay system <https://git.feneas.org/jaywink/social-relay>`_.
 
 SOCIALHOME_ROOT_PROFILE
 .......................
