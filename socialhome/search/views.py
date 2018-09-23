@@ -69,7 +69,7 @@ class GlobalSearchView(SearchView):
     def get(self, request, *args, **kwargs):
         """See if we have a direct match. If so redirect, if not, search.
 
-        Try fetching a remote profile if the search term is a handle.
+        Try fetching a remote profile if the search term is a handle or fid.
         """
         q = safe_text(request.GET.get("q"))
         if q:
@@ -90,12 +90,13 @@ class GlobalSearchView(SearchView):
             else:
                 return redirect(tag.get_absolute_url())
         # Check if profile matches
-        if validate_handle(q):
-            profile = None
-            try:
-                profile = Profile.objects.visible_for_user(request.user).get(handle=q)
-            except Profile.DoesNotExist:
-                # Try a remote search
+        profile = None
+        try:
+            profile = Profile.objects.visible_for_user(request.user).fed(q).get()
+        except Profile.DoesNotExist:
+            # Try a remote search
+            # TODO currently only if diaspora handle
+            if validate_handle(q):
                 try:
                     remote_profile = retrieve_remote_profile(q)
                 except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
@@ -103,8 +104,8 @@ class GlobalSearchView(SearchView):
                     return super().get(request, *args, **kwargs)
                 if remote_profile:
                     profile = Profile.from_remote_profile(remote_profile)
-            if profile:
-                return redirect(reverse("users:profile-detail", kwargs={"guid": profile.guid}))
+        if profile:
+            return redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
         try:
             return super().get(request, *args, **kwargs)
         except QueryError:
@@ -115,7 +116,7 @@ class GlobalSearchView(SearchView):
     def filter_queryset(self, queryset):
         """Do some of our own filtering on the queryset before returning."""
         if self.request.user.is_authenticated:
-            queryset = queryset.exclude(handle=self.request.user.profile.handle)
+            queryset = queryset.exclude(id=self.request.user.profile.id)
             if self.request.user.is_staff:
                 return queryset
             else:

@@ -6,6 +6,21 @@ Changelog
 0.10.0-dev (unreleased)
 -----------------------
 
+Changed
+.......
+
+* **Backwards incompatible**. Python 3.6 is now the lowest supported Python version. Please do not try to upgrade Socialhome to this release before updating your Python virtualenv, if running an older Python!
+
+* Code repository moved to the `Feneas GitLab <https://git.feneas.org/socialhome/socialhome>`_ which offers a richer set of features compared to GitHub. What is Feneas? `Check this post <https://feneas.org/hello-federation/>`_.
+
+  Code will still be mirrored to GitHub so participation through there is still very much welcome. So you can still fork the repository on GitHub and submit a pull request. Issues however will be available only on the GitLab server to avoid these getting out of sync between the servers.
+
+* New federation library version which prepares for adding ActivityPub support. Considerable effort was put into refactoring Socialhome internals to work with multiple protocols. The doors are now fully open to add support for federating with platforms like Mastodon, Pleroma, Pixelfed, PeerTube and many many more ActivityPub powered platforms hosting an estimated 600K monthly active users 🎉
+
+  This refactoring affects mostly the internals of Socialhome with only minor visual changes. Some of those include changes in URL's and fallback display names for non-local profiles.
+
+* The behaviour of the ``delete_users_and_profiles`` management command has been changed to lock remote profiles by default instead of deleting them. This is more efficient for spam control as deleted profiles just appear back. The lock option can still be set as false to delete the profile which is a good option for example when cleaning data of remote profiles on request.
+
 Fixed
 .....
 

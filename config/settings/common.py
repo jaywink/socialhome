@@ -113,7 +113,7 @@ FIXTURE_DIRS = (
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres:///socialhome"),
+    "default": env.db("DATABASE_URL", default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -298,7 +298,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     domain=SOCIALHOME_DOMAIN
 )
 # Relay to send public content to
-SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="diaspora://relay@relay.iliketoast.net/profile/")
+SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="relay@relay.iliketoast.net")
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.
@@ -513,7 +513,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
-    "get_profile_function": "socialhome.federate.utils.generic.get_diaspora_profile_by_handle",
+    "get_profile_function": "socialhome.federate.utils.entities.get_profile",
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "search_path": "/search/?q=",
 }

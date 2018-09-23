@@ -1,29 +1,29 @@
 import logging
+from typing import Optional
 
 import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
-from federation.utils.diaspora import parse_profile_diaspora_id
 
-from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
-from socialhome.federate.utils.generic import safe_make_aware
+from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
 
 logger = logging.getLogger("socialhome")
 
 
-def get_sender_profile(sender):
+def get_sender_profile(sender: str) -> Optional[Profile]:
     """Get or create sender profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
     try:
-        sender_profile = Profile.objects.exclude(rsa_public_key="").get(handle=sender)
+        logger.debug("get_sender_profile - looking from local db using %s", sender)
+        sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
     except Profile.DoesNotExist:
-        logger.debug("get_sender_profile - Handle %s was not found, fetching from remote", sender)
+        logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
             logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
@@ -31,7 +31,7 @@ def get_sender_profile(sender):
         sender_profile = Profile.from_remote_profile(remote_profile)
     else:
         if sender_profile.is_local:
-            logger.warning("get_sender_profile - Handle %s is local! Skip.", sender)
+            logger.warning("get_sender_profile - %s is local! Skip.", sender)
             return
     return sender_profile
 
@@ -40,9 +40,10 @@ def process_entities(entities, receiving_profile=None):
     """Process a list of entities."""
     for entity in entities:
         logger.info("Entity: %s", entity)
-        profile = get_sender_profile(entity.handle)
+        sender_id = entity.id if isinstance(entity, base.Profile) else entity.actor_id
+        profile = get_sender_profile(sender_id)
         if not profile:
-            logger.warning("No sender profile for entity %s, skipping" % entity)
+            logger.warning("No sender profile for entity %s, skipping", entity)
             continue
         try:
             if isinstance(entity, base.Post):
@@ -51,8 +52,6 @@ def process_entities(entities, receiving_profile=None):
                 process_entity_retraction(entity, profile)
             elif isinstance(entity, base.Comment):
                 process_entity_comment(entity, profile, receiving_profile=receiving_profile)
-            elif isinstance(entity, base.Relationship):
-                process_entity_relationship(entity, profile)
             elif isinstance(entity, base.Follow):
                 process_entity_follow(entity, profile)
             elif isinstance(entity, base.Profile):
@@ -60,15 +59,15 @@ def process_entities(entities, receiving_profile=None):
             elif isinstance(entity, base.Share):
                 process_entity_share(entity, profile)
         except Exception as ex:
-            logger.exception("Failed to handle %s: %s", entity.guid, ex)
+            logger.exception("Failed to handle %s: %s", entity.id, ex)
 
 
 def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
     try:
-        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
-    except User.DoesNotExist:
-        logger.warning("Could not find local user %s for follow entity %s", entity.target_handle, entity)
+        user = User.objects.get(profile=Profile.objects.fed(entity.target_id).get(), is_active=True)
+    except (Profile.DoesNotExist, User.DoesNotExist):
+        logger.warning("Could not find local user %s for follow entity %s", entity.target_id, entity)
         return
     if entity.following:
         profile.following.add(user.profile)
@@ -78,47 +77,34 @@ def process_entity_follow(entity, profile):
         logger.info("Profile %s has unfollowed user %s", profile, user)
 
 
-def process_entity_relationship(entity, profile):
-    """Process entity of type Relationship."""
-    if not entity.relationship == "following":
-        logger.debug("Ignoring relationship of type %s", entity.relationship)
-        return
-    try:
-        user = User.objects.get(profile__handle=entity.target_handle, is_active=True)
-    except User.DoesNotExist:
-        logger.warning("Could not find local user %s for relationship entity %s", entity.target_handle, entity)
-        return
-    profile.following.add(user.profile)
-    logger.info("Profile %s now follows user %s", profile, user)
-
-
-def validate_against_old_content(guid, entity, profile):
+def validate_against_old_content(fid, entity, profile):
     """Do some validation against a possible local object."""
     try:
-        old_content = Content.objects.get(guid=guid)
+        old_content = Content.objects.fed(fid).get()
     except Content.DoesNotExist:
         return True
     # Do some validation
     if old_content.author.user:
         logger.warning("Remote sent update for content (%s) that is local (%s)! Skipping.",
-                       guid, old_content.author.handle)
+                       fid, old_content.author.fid)
         return False
     if old_content.author != profile:
         logger.warning("Remote sent update for content (%s) with different author (%s) than our content (%s)! "
-                       "Skipping.", guid, profile.handle, old_content.author.handle)
+                       "Skipping.", fid, profile.fid, old_content.author.fid)
         return False
-    if old_content.parent and entity.target_guid and old_content.parent.guid != entity.target_guid:
-        logger.warning("Remote sent update for content (%s) with different parent! Skipping.", guid)
+    if old_content.parent and entity.target_id and old_content.parent.fid != entity.target_id:
+        logger.warning("Remote sent update for content (%s) with different parent! Skipping.", fid)
         return False
     return True
 
 
 def process_entity_post(entity, profile, receiving_profile=None):
     """Process an entity of type Post."""
-    guid = safe_text(entity.guid)
-    if not validate_against_old_content(guid, entity, profile):
+    fid = safe_text(entity.id)
+    if not validate_against_old_content(fid, entity, profile):
         return
     values = {
+        "fid": fid,
         "text": safe_text_for_markdown(entity.raw_content),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
@@ -126,7 +112,9 @@ def process_entity_post(entity, profile, receiving_profile=None):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
-    content, created = Content.objects.update_or_create(guid=guid, defaults=values)
+    if getattr(entity, "guid", None):
+        values["guid"] = safe_text(entity.guid)
+    content, created = Content.objects.fed_update_or_create(fid, values)
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
@@ -134,16 +122,16 @@ def process_entity_post(entity, profile, receiving_profile=None):
         logger.info("Updated Content: %s", content)
     if content.visibility != Visibility.PUBLIC and receiving_profile:
         content.limited_visibilities.add(receiving_profile)
-        logger.info("Added visibility to Post %s to %s", content.guid, receiving_profile.guid)
+        logger.info("Added visibility to Post %s to %s", content.fid, receiving_profile.fid)
 
 
 def process_entity_comment(entity, profile, receiving_profile=None):
     """Process an entity of type Comment."""
-    guid = safe_text(entity.guid)
-    if not validate_against_old_content(guid, entity, profile):
+    fid = safe_text(entity.id)
+    if not validate_against_old_content(fid, entity, profile):
         return
     try:
-        parent = Content.objects.get(guid=entity.target_guid)
+        parent = Content.objects.fed(entity.target_id).get()
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)
         return
@@ -155,7 +143,9 @@ def process_entity_comment(entity, profile, receiving_profile=None):
         "parent": parent,
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
-    content, created = Content.objects.update_or_create(guid=guid, defaults=values)
+    if getattr(entity, "guid", None):
+        values["guid"] = safe_text(entity.guid)
+    content, created = Content.objects.fed_update_or_create(fid, values)
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
@@ -163,7 +153,7 @@ def process_entity_comment(entity, profile, receiving_profile=None):
         logger.info("Updated Content from comment entity: %s", content)
     if parent.visibility != Visibility.PUBLIC and receiving_profile:
         content.limited_visibilities.add(receiving_profile)
-        logger.info("Added visibility to Comment %s to %s", content.guid, receiving_profile.guid)
+        logger.info("Added visibility to Comment %s to %s", content.uuid, receiving_profile.uuid)
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
@@ -197,28 +187,28 @@ def _process_mentions(content, entity):
     """
     Link mentioned profiles to the content.
     """
-    handles = {parse_profile_diaspora_id(s)[0] for s in entity._mentions}
-    existing_handles = set(content.mentions.values_list('handle', flat=True))
-    to_remove = existing_handles.difference(handles)
-    to_add = handles.difference(existing_handles)
-    for handle in to_remove:
+    fids = set(entity._mentions)
+    existing_fids = set(content.mentions.values_list('fid', flat=True))
+    to_remove = existing_fids.difference(fids)
+    to_add = fids.difference(existing_fids)
+    for fid in to_remove:
         try:
-            content.mentions.remove(Profile.objects.get(handle=handle))
+            content.mentions.remove(Profile.objects.fed(fid).get())
         except Profile.DoesNotExist:
             pass
-    for handle in to_add:
+    for fid in to_add:
         try:
-            content.mentions.add(Profile.objects.get(handle=handle))
+            content.mentions.add(Profile.objects.fed(fid).get())
         except Profile.DoesNotExist:
             pass
 
 
-def _retract_content(target_guid, profile):
+def _retract_content(target_fid, profile):
     """Retract a Content."""
     try:
-        content = Content.objects.get(guid=target_guid, local=False)
+        content = Content.objects.fed(target_fid, local=False).get()
     except Content.DoesNotExist:
-        logger.warning("Retracted remote content %s cannot be found", target_guid)
+        logger.warning("Retracted remote content %s cannot be found", target_fid)
         return
     if content.author != profile:
         logger.warning("Content %s is not owned by remote retraction profile %s", content, profile)
@@ -228,12 +218,12 @@ def _retract_content(target_guid, profile):
     logger.info("Retraction done for content %s", content)
 
 
-def _retract_relationship(target_guid, profile):
+def _retract_relationship(target_uuid, profile):
     """Retract a (legacy) relationship."""
     try:
-        user = User.objects.get(profile__guid=target_guid)
+        user = User.objects.get(profile__uuid=target_uuid)
     except User.DoesNotExist:
-        logger.warning("Could not find local user %s for relationship retraction", target_guid)
+        logger.warning("Could not find local user %s for relationship retraction", target_uuid)
         return
     profile.following.remove(user.profile)
     logger.info("Profile %s has unfollowed user %s", profile, user)
@@ -243,12 +233,8 @@ def process_entity_retraction(entity, profile):
     """Process an entity of type Retraction."""
     entity_type = safe_text(entity.entity_type)
     if entity_type in ("Post", "Comment", "Share"):
-        target_guid = safe_text(entity.target_guid)
-        _retract_content(target_guid, profile)
-    elif entity_type == "Profile":
-        # This is legacy stuff and means basically retract sharing/following
-        target_guid = safe_text(entity._receiving_guid)
-        _retract_relationship(target_guid, profile)
+        target_fid = safe_text(entity.target_id)
+        _retract_content(target_fid, profile)
     else:
         logger.debug("Ignoring retraction of entity_type %s", entity_type)
 
@@ -260,14 +246,20 @@ def process_entity_share(entity, profile):
         logger.warning("Ignoring share entity type that is not of type Post")
         return
     try:
-        target_content = Content.objects.get(guid=entity.target_guid, share_of__isnull=True)
+        target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
     except Content.DoesNotExist:
         # Try fetching. If found, process and then try again
-        remote_target = retrieve_remote_content(entity.target_id, sender_key_fetcher=sender_key_fetcher)
+        remote_target = retrieve_remote_content(
+            entity.target_id,
+            guid=entity.target_guid,
+            handle=entity.target_handle,
+            entity_type=entity.entity_type,
+            sender_key_fetcher=sender_key_fetcher,
+        )
         if remote_target:
             process_entities([remote_target])
             try:
-                target_content = Content.objects.get(guid=entity.target_guid, share_of__isnull=True)
+                target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
             except Content.DoesNotExist:
                 logger.warning("Share target was fetched from remote, but it is still missing locally! Share: %s",
                                entity)
@@ -275,9 +267,6 @@ def process_entity_share(entity, profile):
         else:
             logger.warning("No target found for share even after fetching from remote: %s", entity)
             return
-    if not target_content.author.handle == entity.target_handle:
-        logger.warning("Share target handle is different from the author of locally known shared content!")
-        return
     values = {
         "text": safe_text_for_markdown(entity.raw_content),
         "author": profile,
@@ -287,8 +276,10 @@ def process_entity_share(entity, profile):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
-    guid = safe_text(entity.guid)
-    content, created = Content.objects.update_or_create(guid=guid, share_of=target_content, defaults=values)
+    fid = safe_text(entity.id)
+    if getattr(entity, "guid", None):
+        values["guid"] = safe_text(entity.guid)
+    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups={'share_of': target_content})
     _process_mentions(content, entity)
     if created:
         logger.info("Saved share: %s", content)
@@ -302,121 +293,18 @@ def process_entity_share(entity, profile):
         django_rq.enqueue(forward_entity, entity, target_content.id)
 
 
-def _make_post(content):
-    try:
-        return base.Post(
-            raw_content=content.text,
-            guid=str(content.guid),
-            handle=content.author.handle,
-            public=True if content.visibility == Visibility.PUBLIC else False,
-            provider_display_name="Socialhome",
-            created_at=content.effective_modified,
-        )
-    except Exception as ex:
-        logger.exception("_make_post - Failed to convert %s: %s", content.guid, ex)
-        return None
-
-
-def _make_comment(content):
-    try:
-        return base.Comment(
-            raw_content=content.text,
-            guid=str(content.guid),
-            target_guid=str(content.parent.guid),
-            handle=content.author.handle,
-            created_at=content.effective_modified,
-        )
-    except Exception as ex:
-        logger.exception("_make_comment - Failed to convert %s: %s", content.guid, ex)
-        return None
-
-
-def _make_share(content):
-    try:
-        return base.Share(
-            raw_content=content.text,
-            guid=str(content.guid),
-            target_guid=str(content.share_of.guid),
-            handle=content.author.handle,
-            target_handle=content.share_of.author.handle,
-            created_at=content.effective_modified,
-            public=True if content.visibility == Visibility.PUBLIC else False,
-            provider_display_name="Socialhome",
-        )
-    except Exception as ex:
-        logger.exception("_make_share - Failed to convert %s: %s", content.guid, ex)
-
-
-def make_federable_content(content):
-    """Make Content federable by converting it to a federation entity."""
-    logger.info("make_federable_content - Content: %s", content)
-    if content.content_type == ContentType.REPLY:
-        return _make_comment(content)
-    elif content.content_type == ContentType.SHARE:
-        return _make_share(content)
-    return _make_post(content)
-
-
-def make_federable_retraction(obj, author=None):
-    """Make object retraction federable by converting it to a federation entity."""
-    logger.info("make_federable_retraction - Object: %s", obj)
-    try:
-        if isinstance(obj, Content):
-            entity_type = {
-                ContentType.REPLY: "Comment",
-                ContentType.SHARE: "Share",
-                ContentType.CONTENT: "Post",
-            }.get(obj.content_type)
-            handle = author.handle
-        elif isinstance(obj, Profile):
-            entity_type = "Profile"
-            handle = obj.handle
-        else:
-            logger.warning("make_federable_retraction - Unknown object type %s", obj)
-            return
-        return base.Retraction(
-            entity_type=entity_type,
-            handle=handle,
-            target_guid=obj.guid,
-        )
-    except Exception as ex:
-        logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.guid, ex)
-
-
-def make_federable_profile(profile):
-    """Make a federable profile."""
-    logger.info("make_federable_profile - Profile: %s", profile)
-    try:
-        return base.Profile(
-            handle=profile.handle,
-            raw_content="",
-            public=True if profile.visibility == Visibility.PUBLIC else False,
-            guid=profile.guid,
-            name=profile.name,
-            image_urls={
-                "small": profile.safer_image_url_small,
-                "medium": profile.safer_image_url_medium,
-                "large": profile.safer_image_url_large,
-            },
-            public_key=profile.rsa_public_key,
-        )
-    except Exception as ex:
-        logger.exception("_make_profile - Failed to convert %s: %s", profile.guid, ex)
-        return None
-
-
-def sender_key_fetcher(handle):
-    """Return the RSA public key for a handle, if found.
+def sender_key_fetcher(fid):
+    """Return the RSA public key for a fid, if found.
 
     Fetches the key first from a local Profile and if not found, looks for a remote Profile over the network.
 
-    :param handle: Handle of profile
-    :type handle: str
+    :param fid: Fid of profile
+    :type fid: str
     :returns: RSA public key or None
     :rtype: str
     """
-    logger.debug("sender_key_fetcher - Checking for handle '%s'", handle)
-    profile = get_sender_profile(handle)
+    logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
+    profile = get_sender_profile(fid)
     if not profile:
         return
     return profile.rsa_public_key

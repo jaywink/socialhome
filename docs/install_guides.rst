@@ -20,7 +20,7 @@ Available guides:
 Ubuntu (14.04, Ansible)
 -----------------------
 
-See this `Ansible role <https://github.com/jaywink/ansible-socialhome>`_.
+See this `Ansible role <https://git.feneas.org/socialhome/ansible-socialhome>`_.
 
 .. _installation-other-systemd:
 

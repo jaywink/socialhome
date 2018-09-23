@@ -18,7 +18,7 @@ No, Socialhome doesn't work in a peer2peer sense. Incoming content does not happ
 
   The relay system is a network of servers that exist for one single purpose, to receive public content and to distribute it to places it would not otherwise reach (with social relationships based federation). Socialhome by default integrates with the relay system by sending all public content to it and subscribing to all public content on the relays. To receive content, this requires registering the Socialhome server to the relays so that they know about the server and can start sending content.
 
-  Registration happens at `The-Federation.info <https://the-federation.info>`_. For more technical details about the relay system, check the `reference server documentation <https://github.com/jaywink/social-relay/blob/master/docs/relays.md>`_.
+  Registration happens at `The-Federation.info <https://the-federation.info>`_. For more technical details about the relay system, check the `reference server documentation <https://git.feneas.org/jaywink/social-relay/blob/master/docs/relays.md>`_.
 
 As a recap:
 

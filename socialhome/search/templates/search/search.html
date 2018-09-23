@@ -44,8 +44,8 @@
                                     <div class="col-2 align-self-center">
                                         {% if result.content_type == "users.profile" %}
                                             {% if request.user.is_authenticated %}
-                                                <button class="follower-button btn btn-secondary {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
-                                                <button class="follower-button btn btn-secondary {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.guid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
+                                                <button class="follower-button btn btn-secondary {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="remove_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                                                <button class="follower-button btn btn-secondary {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="add_follower" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
                                             {% endif %}
                                         {% endif %}
                                     </div>

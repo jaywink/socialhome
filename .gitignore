@@ -54,7 +54,7 @@ node_modules/
 .sass-cache
 
 # virtual environments
-.env
+/.env
 
 # User-uploaded media
 socialhome/media/
@@ -94,5 +94,5 @@ socialhome/static/mocha/
 /staticfiles/
 
 # Docker
-docker-compose.yml
+/docker-compose.yml
 

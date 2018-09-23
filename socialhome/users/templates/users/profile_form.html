@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.guid }}{% endif %}{% endblock %}
+{% block title %}{% if object.name %}{{ object.name }}{% else %}{{ object.fid }}{% endif %}{% endblock %}
 
 {% block content %}
     <h1>{{ user.username }}</h1>

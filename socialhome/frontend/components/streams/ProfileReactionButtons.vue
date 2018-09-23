@@ -60,11 +60,11 @@ export default {
         currentBrowsingProfileId() {
             return this.$store.state.applicationStore.currentBrowsingProfileId
         },
+        displayName() {
+            return this.profile.name ? this.profile.name : this.profile.fid
+        },
         isUserAuthenticated() {
             return this.$store.state.applicationStore.isUserAuthenticated
-        },
-        authorNameOrHandle() {
-            return this.profile.name ? this.profile.name : this.profile.handle
         },
         showFollowBtn() {
             return this.$store.state.applicationStore.isUserAuthenticated && !this.following
@@ -93,20 +93,20 @@ export default {
                 this.$snotify.error(gettext("You must be logged in to follow someone"))
                 return
             }
-            this.$http.post(this.urls.followUrl, {guid: this.profile.guid})
+            this.$http.post(this.urls.followUrl, {uuid: this.profile.uuid})
                 .then(() => this.following = true)
                 .catch(_ => this.$snotify.error(
-                    `${gettext("An error happened while trying to follow")} ${this.authorNameOrHandle}`))
+                    `${gettext("An error happened while trying to follow")} ${this.displayName}`))
         },
         unfollow() {
             if (!this.isUserAuthenticated) {
                 this.$snotify.error(gettext("You must be logged in to unfollow someone"))
                 return
             }
-            this.$http.post(this.urls.unfollowUrl, {guid: this.profile.guid})
+            this.$http.post(this.urls.unfollowUrl, {uuid: this.profile.uuid})
                 .then(() => this.following = false)
                 .catch(_ => this.$snotify.error(
-                    `${gettext("An error happened while trying to unfollow")} ${this.authorNameOrHandle}`))
+                    `${gettext("An error happened while trying to unfollow")} ${this.displayName}`))
         },
     },
 }

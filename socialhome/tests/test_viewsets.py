@@ -54,10 +54,11 @@ class TestObtainSocialhomeAuthToken(SocialhomeAPITestCase):
         response = self.post(reverse("api-token-auth"),
                              data={"username": self.user.username, "password": "password"})
         self.assertEqual(response.data,
-                         {"guid": self.user.profile.guid,
+                         {"uuid": str(self.user.profile.uuid),
                           "handle": self.user.profile.handle,
                           "home_url": self.user.profile.home_url,
                           "id": self.user.profile.id,
+                          "fid": self.user.profile.fid,
                           "image_url_small": self.user.profile.safer_image_url_small,
                           "is_local": self.user.profile.is_local,
                           "name": self.user.profile.name,

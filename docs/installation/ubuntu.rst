@@ -227,6 +227,8 @@ Add the following lines to your ``.bashrc`` and reload it via ``source ~/.bashrc
 Create Python virtualenv
 ''''''''''''''''''''''''
 
+Python 3.6+ is required! If your system Python 3 is not at least this version, please install Python 3.6 and replace ``/usr/bin/python3`` in the below command with the path to the Python 3.6 binary.
+
 ::
 
     mkvirtualenv -p /usr/bin/python3 socialhome
@@ -254,7 +256,7 @@ Get Socialhome code
 
 ::
 
-    git clone https://github.com/jaywink/socialhome
+    git clone https://git.feneas.org/socialhome/socialhome
     cd socialhome
 
 Install Python dependencies

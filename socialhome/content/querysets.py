@@ -1,9 +1,13 @@
+from typing import Dict, Tuple, TYPE_CHECKING, Any
+
 from django.db import models
-from django.db.models import Q, F, OuterRef, Subquery, Case, When
+from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNotExist
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
-from socialhome.users.models import Profile
+
+if TYPE_CHECKING:
+    from socialhome.content.models import Content
 
 
 class TagQuerySet(models.QuerySet):
@@ -28,6 +32,37 @@ class ContentQuerySet(models.QuerySet):
             Q(parent_id=parent_id) | Q(parent__share_of_id=parent_id)
         )
         return qs.order_by("created")
+
+    def fed(self, value: str, **params) -> models.QuerySet:
+        """
+        Get Content by federated ID.
+        """
+        return self.filter(
+            Q(fid=value) | Q(guid=value)
+        ).filter(**params)
+
+    def fed_update_or_create(
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None
+    ) -> Tuple['Content', bool]:
+        """
+        Update or create by federated ID.
+        """
+        if not extra_lookups:
+            extra_lookups = {}
+        try:
+            content = self.fed(fid, **extra_lookups).get()
+        except ObjectDoesNotExist:
+            if fid.startswith('http'):
+                values['fid'] = fid
+            values.update(extra_lookups)
+            return self.create(**values), True
+        else:
+            for key, value in values.items():
+                if key in ('fid', 'guid'):
+                    continue
+                setattr(content, key, value)
+            content.save()
+            return content, False
 
     def followed(self, user):
         """Get content from followed users.
@@ -87,11 +122,12 @@ class ContentQuerySet(models.QuerySet):
         return qs.visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user, include_shares=True):
-        """Filter for a user profile by GUID.
+        """Filter for a user profile by attribute.
 
         Ensures if the profile is not visible to the user, no content will be returned.
         """
         from socialhome.content.models import Content
+        from socialhome.users.models import Profile
         get_by = {attr: value}
         try:
             profile = Profile.objects.get(**get_by)

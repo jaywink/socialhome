@@ -259,9 +259,9 @@ class TestContentView(SocialhomeTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_content_view_renders_by_guid(self):
+    def test_content_view_renders_by_uuid(self):
         response = self.client.get(
-            reverse("content:view-by-guid", kwargs={"guid": self.content.guid}),
+            reverse("content:view-by-uuid", kwargs={"uuid": self.content.uuid}),
         )
         self.assertEqual(response.status_code, 200)
 
@@ -284,7 +284,7 @@ class TestContentView(SocialhomeTestCase):
         self.assertEqual(self.context["json_context"]["currentBrowsingProfileId"], None)
         self.assertEqual(self.context["json_context"]["isUserAuthenticated"], False)
         self.assertEqual(self.context["json_context"]["streamName"], "content__%s_%s" % (
-            self.content.id, self.content.guid.lower()))
+            self.content.id, self.content.uuid))
         self.assertEqual(self.context["json_context"]["content"]["id"], self.content.id)
 
         # Authenticated
@@ -293,7 +293,7 @@ class TestContentView(SocialhomeTestCase):
             self.assertEqual(self.context["json_context"]["currentBrowsingProfileId"], self.profile.id)
             self.assertEqual(self.context["json_context"]["isUserAuthenticated"], True)
             self.assertEqual(self.context["json_context"]["streamName"], "content__%s_%s" % (
-                self.content.id, self.content.guid.lower()))
+                self.content.id, self.content.uuid))
             self.assertEqual(self.context["json_context"]["content"]["id"], self.content.id)
 
 

@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/socialhomedemo/traefik.toml:/traefik.toml
+      - /opt/socialhomedemo/acme.json:/acme.json
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - /opt/socialhomedemo/default.conf:/etc/nginx/conf.d/default.conf
+      - media:/media
+    labels:
+      traefik.enable: "true"
+      traefik.backend: "nginx"
+      traefik.frontend.rule: "Host:demo.socialhome.network;PathPrefix:/media"
+      traefik.port: "80"
+
+  redis:
+    container_name: redis
+    restart: unless-stopped
+    image: redis
+
+  app:
+    container_name: socialhome
+    image: jaywink/socialhome
+    restart: unless-stopped
+    depends_on:
+      - redis
+#      - db
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5000:5000"
+      - "127.0.0.1:23564:23564"
+    volumes:
+      - media:/app/socialhome/media
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.rule: "Host:demo.socialhome.network"
+      traefik.daphne.frontend.headers.customRequestHeaders: "CONNECTION:upgrade||UPGRADE:websocket"
+      traefik.daphne.frontend.rule: "Host:demo.socialhome.network;PathPrefix:/ch/"
+      traefik.daphne.port: "23564"
+      traefik.django.port: "5000"
+
+#  db:
+#    container_name: db
+#    image: postgres
+#    restart: unless-stopped
+
+volumes:
+  media:

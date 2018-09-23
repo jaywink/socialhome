@@ -21,7 +21,7 @@ describe("AuthorBar", () => {
 
         content = getFakeContent({
             id: 1,
-            author: getFakeAuthor({guid: "42"}),
+            author: getFakeAuthor({uuid: "42"}),
         })
         window.context = getContext({currentBrowsingProfileId: 26}, 0)
         store = newStreamStore({modules: {applicationStore: newApplicationStore()}})

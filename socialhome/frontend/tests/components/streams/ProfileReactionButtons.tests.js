@@ -83,7 +83,7 @@ describe("ProfileReactionButtons", () => {
                 target.instance().follow()
                 target.instance().$http.post.getCall(0).args
                     .should.eql([`/api/profiles/${store.profile.id}/add_follower/`, {
-                        guid: store.content.author.guid,
+                        uuid: store.content.author.uuid,
                     }])
             })
 
@@ -161,7 +161,7 @@ describe("ProfileReactionButtons", () => {
                 target.instance().unfollow()
                 target.instance().$http.post.getCall(0).args
                     .should.eql([`/api/profiles/${store.profile.id}/remove_follower/`, {
-                        guid: store.content.author.guid,
+                        uuid: store.content.author.uuid,
                     }])
             })
 

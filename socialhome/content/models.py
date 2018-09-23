@@ -23,7 +23,6 @@ from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
 from socialhome.enums import Visibility
-from socialhome.users.models import Profile
 
 
 class OpenGraphCache(models.Model):
@@ -74,18 +73,27 @@ class Tag(models.Model):
         """Make a safe Channel group name.
 
         ASCII or hyphens or periods only.
-        Prefix with ID as we have to slugify the name and cut long guids due to asgi library group name restriction.
         """
+        # TODO use just id
         return ("%s_%s" % (self.id, slugify(self.name)))[:80]
 
 
 class Content(models.Model):
+    # Local UUID
+    uuid = models.UUIDField(unique=True, blank=True, null=True)
+
     text = models.TextField(_("Text"), blank=True)
 
-    # It would be nice to use UUIDField but in practise this could be anything due to other server implementations
-    guid = models.CharField(_("GUID"), max_length=255, unique=True)
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name=_("Author"))
+    # Federation GUID
+    # Optional, related to Diaspora network platforms
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
+
+    author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+
+    # Federation identifier
+    # Optional
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -108,7 +116,7 @@ class Content(models.Model):
         OpenGraphCache, verbose_name=_("OpenGraph cache"), on_delete=models.SET_NULL, null=True
     )
 
-    mentions = models.ManyToManyField(Profile, verbose_name=_("Mentions"), related_name="mentioned_in")
+    mentions = models.ManyToManyField("users.Profile", verbose_name=_("Mentions"), related_name="mentioned_in")
     tags = models.ManyToManyField(Tag, verbose_name=_("Tags"), related_name="contents")
 
     parent = models.ForeignKey(
@@ -127,7 +135,7 @@ class Content(models.Model):
 
     # Fields relevant for Visibility.LIMITED only
     limited_visibilities = models.ManyToManyField(
-        Profile, verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
+        "users.Profile", verbose_name=_("Limitied visibilities"), related_name="limited_visibilities",
     )
     include_following = models.BooleanField(
         _("Include people I follow"), default=False,
@@ -149,9 +157,7 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return "{text} ({type}, {visibility}, {guid})".format(
-            text=truncate_letters(self.text, 30), guid=self.guid, visibility=self.visibility, type=self.content_type,
-        )
+        return f"{truncate_letters(self.text, 30)} ({self.content_type}, {self.visibility}, {self.fid or self.guid})"
 
     def cache_data(self, commit=False):
         """Calculate some extra data."""
@@ -180,6 +186,7 @@ class Content(models.Model):
     def extract_mentions(self):
         # TODO locally created mentions should not have to be ripped out of text
         # For now we just rip out diaspora style mentions until we have UI layer
+        from socialhome.users.models import Profile
         mentions = re.findall(r'@{[^;]+; [\w.-]+@[^}]+}', self.text)
         if not mentions:
             self.mentions.clear()
@@ -231,6 +238,10 @@ class Content(models.Model):
     def url(self):
         return "%s%s" % (settings.SOCIALHOME_URL, self.get_absolute_url())
 
+    @property
+    def url_uuid(self):
+        return "%s%s" % (settings.SOCIALHOME_URL, reverse("content:view-by-uuid", kwargs={"uuid": self.uuid}))
+
     @staticmethod
     @memoize(timeout=604800)  # a week
     def has_shared(content_id, profile_id):
@@ -249,13 +260,20 @@ class Content(models.Model):
         elif self.share_of:
             self.content_type = ContentType.SHARE
 
-        if not self.pk:
+        if not self.uuid:
+            self.uuid = uuid4()
+        if not self.pk and self.local:
             if not self.guid:
-                self.guid = uuid4()
+                self.guid = str(self.uuid)
+            if not self.fid:
+                self.fid = self.url_uuid
             if self.pinned:
                 max_order = Content.objects.top_level().filter(author=self.author).aggregate(Max("order"))["order__max"]
                 if max_order is not None:  # If max_order is None, there is likely to be no content yet
                     self.order = max_order + 1
+
+        if not self.fid and not self.guid:
+            raise ValueError("Content must have either a fid or a guid")
 
         self.fix_local_uploads()
         super().save(*args, **kwargs)
@@ -344,9 +362,9 @@ class Content(models.Model):
         """Make a safe Channel group name.
 
         ASCII or hyphens or periods only.
-        Prefix with ID as we have to cut long guids due to asgi library group name restriction.
         """
-        return ("%s_%s" % (self.id, slugify(self.guid)))[:80]
+        # TODO use only id
+        return ("%s_%s" % (self.id, self.uuid))
 
     def render(self):
         """Pre-render text to Content.rendered."""

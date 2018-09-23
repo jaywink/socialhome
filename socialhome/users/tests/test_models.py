@@ -1,3 +1,4 @@
+from unittest import skip
 from unittest.mock import Mock, patch
 
 from django.conf import settings
@@ -68,7 +69,7 @@ class TestProfile(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.profile = ProfileFactory(guid="1234")
+        cls.profile = ProfileFactory()
         cls.user = UserFactory()
 
     def test_generate_new_rsa_key(self):
@@ -81,7 +82,7 @@ class TestProfile(SocialhomeTestCase):
         assert profile.rsa_public_key != current_public_key
 
     def test_get_absolute_url(self):
-        self.assertEqual(self.profile.get_absolute_url(), "/p/1234/")
+        self.assertEqual(self.profile.get_absolute_url(), f"/p/{self.profile.uuid}/")
 
     def test_handle_can_have_port(self):
         self.profile.handle = "foo@example.com:3000"
@@ -96,8 +97,12 @@ class TestProfile(SocialhomeTestCase):
     def test_name_or_handle(self):
         self.assertEqual(self.profile.name_or_handle, self.profile.name)
         self.profile.name = ""
+        self.profile.handle = 'foobariooo@example.com'
         self.assertEqual(self.profile.name_or_handle, self.profile.handle)
+        self.profile.handle = None
+        self.assertEqual(self.profile.name_or_handle, self.profile.fid)
 
+    @skip
     def test_remote_url(self):
         self.assertEqual(
             self.profile.remote_url,
@@ -111,8 +116,8 @@ class TestProfile(SocialhomeTestCase):
         self.assertEqual(urls, ponies)
 
     def test___str__(self):
-        profile = ProfileFactory(name="foo", handle="foo@example.com")
-        assert str(profile) == "foo (foo@example.com)"
+        profile = ProfileFactory(name="foo")
+        assert str(profile) == f"foo ({profile.fid})"
 
     @override_settings(SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE=True)
     def test_key_properties(self):
@@ -150,10 +155,6 @@ class TestProfile(SocialhomeTestCase):
         profile.image_url_small = "https://example.com/foobar"
         assert profile.safer_image_url_small == "https://example.com/foobar"
 
-    def test_empty_guid(self):
-        with self.assertRaises(ValueError):
-            ProfileFactory(guid="")
-
     def test_is_local(self):
         self.assertTrue(self.user.profile.is_local)
         self.assertFalse(self.profile.is_local)
@@ -171,7 +172,6 @@ class TestProfile(SocialhomeTestCase):
 
     def test_from_remote_profile_absolute_image_url(self):
         remote_profile = BaseProfileFactory(public=False)
-        remote_profile.handle = "foo@example.com"
         remote_profile.image_urls["small"] = "https://example1.com/sm"
         remote_profile.image_urls["medium"] = "https://example2.com/me"
         remote_profile.image_urls["large"] = "https://example3.com/lg"
@@ -183,8 +183,7 @@ class TestProfile(SocialhomeTestCase):
     def test_from_remote_profile(self):
         remote_profile = BaseProfileFactory(public=False)
         profile = Profile.from_remote_profile(remote_profile)
-        self.assertEqual(profile.guid, remote_profile.guid)
-        self.assertEqual(profile.handle, remote_profile.handle)
+        self.assertEqual(profile.fid, remote_profile.id)
         self.assertEqual(profile.name, remote_profile.name)
         self.assertEqual(profile.visibility, Visibility.LIMITED)
         self.assertEqual(profile.image_url_large, remote_profile.image_urls["large"])
@@ -195,20 +194,17 @@ class TestProfile(SocialhomeTestCase):
         self.assertEqual(profile.rsa_public_key, remote_profile.public_key)
 
         # Update to public
-        remote_profile_update = BaseProfileFactory(public=True, guid=remote_profile.guid, handle=remote_profile.handle)
+        remote_profile_update = BaseProfileFactory(public=True, id=remote_profile.id)
         profile = Profile.from_remote_profile(remote_profile_update)
-        self.assertEqual(profile.guid, remote_profile.guid)
-        self.assertEqual(profile.handle, remote_profile.handle)
+        self.assertEqual(profile.fid, remote_profile.id)
         self.assertEqual(profile.visibility, Visibility.PUBLIC)
 
         # Make sure public key doesn't get deleted if it doesn't have a value
         public_key = profile.rsa_public_key
         assert public_key
-        remote_profile_update = BaseProfileFactory(public_key="", guid=remote_profile.guid,
-                                                   handle=remote_profile.handle)
+        remote_profile_update = BaseProfileFactory(public_key="", id=remote_profile.id)
         profile = Profile.from_remote_profile(remote_profile_update)
         self.assertEqual(profile.rsa_public_key, public_key)
-        remote_profile_update = BaseProfileFactory(public_key=None, guid=remote_profile.guid,
-                                                   handle=remote_profile.handle)
+        remote_profile_update = BaseProfileFactory(public_key=None, id=remote_profile.id)
         profile = Profile.from_remote_profile(remote_profile_update)
         self.assertEqual(profile.rsa_public_key, public_key)

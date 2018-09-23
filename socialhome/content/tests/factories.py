@@ -17,7 +17,7 @@ class ContentFactory(factory.DjangoModelFactory):
         model = Content
 
     text = factory.Faker("text")
-    guid = factory.Faker("uuid4")
+    fid = factory.Faker("uri")
     author = factory.SubFactory(ProfileFactory)
 
 
