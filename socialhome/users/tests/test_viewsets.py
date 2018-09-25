@@ -84,63 +84,63 @@ class TestProfileViewSet(SocialhomeAPITestCase):
 
     def test_profile_get(self):
         # Not authenticated
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}))
         self.assertEqual(response.status_code, 404)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}))
         self.assertEqual(response.status_code, 404)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}))
         self.assertEqual(response.status_code, 404)
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}))
+        response = self.client.get(reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}))
         self.assertEqual(response.status_code, 200)
 
     def test_profile_edit(self):
         # Not authenticated
-        response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {"name": "foo"})
+        response = self.client.patch(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}), {"name": "foo"})
         self.assertEqual(response.status_code, 403)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 403)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
-        response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {"name": "foo"})
+        response = self.client.patch(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}), {"name": "foo"})
         self.assertEqual(response.status_code, 200)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 403)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 404)
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {"name": "foo"})
+        response = self.client.patch(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}), {"name": "foo"})
         self.assertEqual(response.status_code, 403)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.site_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.site_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 403)
         response = self.client.patch(
-            reverse("api:profile-detail", kwargs={"pk": self.self_profile.id}), {"name": "foo"}
+            reverse("api:profile-detail", kwargs={"uuid": self.self_profile.uuid}), {"name": "foo"}
         )
         self.assertEqual(response.status_code, 403)
 
@@ -148,7 +148,7 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         self.client.login(username=self.user.username, password="password")
         for field in ("id", "uuid", "fid", "handle", "image_url_large", "image_url_medium", "image_url_small",
                       "is_local", "url", "home_url"):
-            response = self.client.patch(reverse("api:profile-detail", kwargs={"pk": self.profile.id}), {field: "82"})
+            response = self.client.patch(reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}), {field: "82"})
             self.assertEqual(str(response.data.get(field)), str(getattr(self.profile, field)))
         for field in ("name", "location", "nsfw", "visibility"):
             if field == "nsfw":
@@ -158,7 +158,7 @@ class TestProfileViewSet(SocialhomeAPITestCase):
             else:
                 value = "82"
             response = self.client.patch(
-                reverse("api:profile-detail", kwargs={"pk": self.profile.id}),
+                reverse("api:profile-detail", kwargs={"uuid": self.profile.uuid}),
                 {field: value}
             )
             self.assertEqual(
@@ -176,73 +176,51 @@ class TestProfileViewSet(SocialhomeAPITestCase):
 
     def test_user_add_follower(self):
         # Not authenticated
-        response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-add-follower", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
-        response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.staff_profile.id}), {
-            "uuid": self.profile.uuid,
-        })
-        self.assertEqual(response.status_code, 404)
-        response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.site_profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-add-follower", kwargs={"uuid": self.site_profile.uuid}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower added.")
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.staff_profile.uuid,
-        })
-        self.assertEqual(response.status_code, 403)
-        response = self.client.post(reverse("api:profile-add-follower", kwargs={"pk": self.staff_profile.id}), {
-            "uuid": self.profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-add-follower", kwargs={"uuid": self.staff_profile.uuid}))
+        self.assertEqual(response.status_code, 400)
+        response = self.client.post(reverse("api:profile-add-follower", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower added.")
 
     def test_user_remove_follower(self):
         # Not authenticated
-        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 403)
         # Normal user authenticated
         self.client.login(username=self.user.username, password="password")
-        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.staff_profile.id}), {
-            "uuid": self.profile.uuid,
-        })
-        self.assertEqual(response.status_code, 404)
-        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.staff_profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"uuid": self.profile.uuid}))
+        self.assertEqual(response.status_code, 400)
+        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"uuid": self.staff_profile.uuid}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower removed.")
         # Staff user authenticated
         self.client.login(username=self.staff_user.username, password="password")
-        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.profile.id}), {
-            "uuid": self.staff_profile.uuid,
-        })
-        self.assertEqual(response.status_code, 403)
-        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"pk": self.staff_profile.id}), {
-            "uuid": self.profile.uuid,
-        })
+        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"uuid": self.staff_profile.uuid}))
+        self.assertEqual(response.status_code, 400)
+        response = self.client.post(reverse("api:profile-remove-follower", kwargs={"uuid": self.profile.uuid}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["status"], "Follower removed.")
 
     def test_user_following__false_when_not_logged_in(self):
-        self.get("api:profile-detail", pk=self.profile.id)
+        self.get("api:profile-detail", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.data['user_following'], False)
 
     def test_user_following__false_when_not_following(self):
         with self.login(self.staff_user):
-            self.get("api:profile-detail", pk=self.profile.id)
+            self.get("api:profile-detail", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.data['user_following'], False)
 
     def test_user_following__true_when_following(self):
         self.staff_user.profile.following.add(self.profile)
         with self.login(self.staff_user):
-            self.get("api:profile-detail", pk=self.profile.id)
+            self.get("api:profile-detail", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.data['user_following'], True)
