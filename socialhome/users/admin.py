@@ -9,6 +9,7 @@ class ProfileAdmin(ModelAdmin):
     list_display = ('id', 'uuid', 'name', 'handle', 'fid', 'visibility', 'user')
     list_filter = ('visibility',)
     raw_id_fields = ('user', 'following')
+    readonly_fields = ('uuid', 'fid', 'guid', 'handle', 'rsa_public_key')
     search_fields = ('id', 'uuid', 'name', 'handle', 'email', 'fid')
     list_select_related = ('user',)
 

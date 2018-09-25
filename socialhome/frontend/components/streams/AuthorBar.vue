@@ -3,10 +3,10 @@
         <div class="grid-item-author-bar mt-1">
             <div @click.stop.prevent="profileBoxTrigger" class="profilebox-trigger">
                 <img :src="author.image_url_small" class="grid-item-author-bar-pic" />
-                {{ author.name.length ? author.name : author.fid }}
+                {{ authorName }}
             </div>
             <div v-show="showProfileBox" class="profile-box">
-                {{ author.handle.length ? author.handle : author.fid }}
+                {{ authorFederationId }}
                 <div class="pull-right">
                     <ProfileReactionButtons
                         :profile="author"
@@ -40,6 +40,20 @@ export default Vue.component("author-bar", {
     computed: {
         author() {
             return this.content.author
+        },
+        authorFederationId() {
+            if (this.author.handle) {
+                return this.author.handle
+            }
+            return this.author.fid
+        },
+        authorName() {
+            if (this.author.name) {
+                return this.author.name
+            } else if (this.author.handle) {
+                return this.author.handle
+            }
+            return this.author.fid
         },
         isUserAuthenticated() {
             return this.$store.state.applicationStore.isUserAuthenticated

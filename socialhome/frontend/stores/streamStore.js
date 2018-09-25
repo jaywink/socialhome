@@ -4,7 +4,6 @@ import Vuex from "vuex"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
 import _get from "lodash/get"
-import _pullAll from "lodash/pullAll"
 
 import getState from "frontend/stores/streamStore.state"
 import {actions, mutations, streamStoreOperations, getters} from "frontend/stores/streamStore.operations"
