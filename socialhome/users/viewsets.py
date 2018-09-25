@@ -34,6 +34,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
     queryset = Profile.objects.none()
     serializer_class = ProfileSerializer
     permission_classes = (IsOwnProfileOrReadOnly,)
+    lookup_field = 'uuid'
 
     def get_queryset(self):
         qs = Profile.objects.visible_for_user(self.request.user)
@@ -43,14 +44,13 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return qs
 
     @detail_route(methods=["post"])
-    def add_follower(self, request, pk=None):
-        uuid = request.data.get("uuid")
+    def add_follower(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
             raise PermissionDenied("Profile given does not exist.")
-        profile = self.get_object()
-        if profile.uuid == uuid:
+        profile = request.user.profile
+        if str(profile.uuid) == uuid:
             raise ValidationError("Cannot follow self!")
         profile.following.add(target_profile)
         return Response({"status": "Follower added."})
@@ -61,16 +61,15 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return Response({"status": "Data export job queued."})
 
     @detail_route(methods=["post"])
-    def remove_follower(self, request, pk=None):
-        uuid = request.data.get("uuid")
+    def remove_follower(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
             raise PermissionDenied("Profile given does not exist.")
-        profile = self.get_object()
-        if profile.uuid == uuid:
+        profile = request.user.profile
+        if str(profile.uuid) == uuid:
             raise ValidationError("Cannot unfollow self!")
-        profile.following.remove(target_profile)
+        profile.following.remove(target_profile)  
         return Response({"status": "Follower removed."})
 
     @list_route(methods=["get"], permission_classes=(IsAuthenticated,))
