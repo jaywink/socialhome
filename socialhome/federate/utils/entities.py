@@ -3,6 +3,7 @@ from typing import Optional, Union
 
 from django.conf import settings
 from federation.entities import base
+from federation.entities.mixins import BaseEntity
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -61,6 +62,20 @@ def _make_share(content: Content) -> Optional[base.Share]:
         )
     except Exception as ex:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
+
+
+def get_federable_object(object_id: str) -> Optional[BaseEntity]:
+    """
+    Retrieve local object by fid and return it as a federable version.
+    """
+    # TODO support also content
+    if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
+        profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+    else:
+        profile = Profile.objects.filter(fid=object_id).first()
+    if profile:
+        federable_profile = make_federable_profile(profile)
+        return federable_profile
 
 
 def get_profile(**kwargs) -> base.Profile:
