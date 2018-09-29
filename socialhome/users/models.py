@@ -165,6 +165,12 @@ class Profile(TimeStampedModel):
         return self.url
 
     @property
+    def local_url(self) -> str:
+        if self.is_local:
+            return f"{settings.SOCIALHOME_URL}{self.user.get_absolute_url()}"
+        return self.url
+
+    @property
     def name_or_handle(self):
         return self.name or self.handle or self.fid
 
