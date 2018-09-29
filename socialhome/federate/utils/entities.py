@@ -148,7 +148,7 @@ def make_federable_profile(profile):
                 "large": profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
-            url=profile.url,
+            url=profile.local_url,
             created_at=profile.created,
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
