@@ -1,4 +1,5 @@
 import factory
+from django.conf import settings
 
 from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
 from socialhome.enums import Visibility
@@ -16,9 +17,10 @@ class ContentFactory(factory.DjangoModelFactory):
     class Meta:
         model = Content
 
-    text = factory.Faker("text")
-    fid = factory.Faker("uri")
     author = factory.SubFactory(ProfileFactory)
+    fid = factory.LazyAttribute(lambda o: f"{settings.SOCIALHOME_URL}/content/{o.uuid}/")
+    text = factory.Faker("text")
+    uuid = factory.Faker('uuid4')
 
 
 class PublicContentFactory(ContentFactory):

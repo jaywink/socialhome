@@ -2,6 +2,7 @@ from random import randint
 
 import factory
 from allauth.account.models import EmailAddress
+from django.conf import settings
 from factory import fuzzy
 
 from federation.entities import base
@@ -63,9 +64,9 @@ class AdminUserFactory(UserFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker("name")
     email = factory.Faker("safe_email")
-    fid = factory.Faker("uri")
+    fid = factory.LazyAttribute(lambda o: f"{settings.SOCIALHOME_URL}/p/{o.uuid}/")
+    name = factory.Faker("name")
 
     # Dummy strings as keys since generating these is expensive
     rsa_private_key = fuzzy.FuzzyText()
@@ -75,6 +76,8 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     image_url_small = "https://127.0.0.1:8000/foo/small.png"
     image_url_medium = "https://127.0.0.1:8000/foo/medium.png"
     image_url_large = "/foo/large.png"
+
+    uuid = factory.Faker('uuid4')
 
     class Meta:
         model = "users.Profile"
