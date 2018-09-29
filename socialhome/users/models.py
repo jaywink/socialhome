@@ -76,6 +76,8 @@ class User(AbstractUser):
         return ""
 
     def get_absolute_url(self):
+        if settings.SOCIALHOME_ROOT_PROFILE == self.username:
+            return "/"
         return reverse("users:detail", kwargs={"username": self.username})
 
     def copy_picture_to_profile(self):

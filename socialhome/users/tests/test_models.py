@@ -24,6 +24,10 @@ class TestUser(SocialhomeTestCase):
     def test_get_absolute_url(self):
         assert self.user.get_absolute_url() == "/u/%s/" % self.user.username
 
+    def test_get_absolute_url__root_profile(self):
+        with override_settings(SOCIALHOME_ROOT_PROFILE=self.user.username):
+            assert self.user.get_absolute_url() == "/"
+
     def test_get_first_name(self):
         self.user.first_name = "foo"
         assert self.user.get_first_name() == "foo"
