@@ -5,7 +5,9 @@ from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.templatetags.static import static
+from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from federation.entities.activitypub.django.views import activitypub_object_view
 
 from socialhome.content.enums import ContentType
 from socialhome.content.forms import ContentForm
@@ -128,6 +130,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
+@method_decorator(activitypub_object_view, name="get")
 class ContentView(ContentVisibleForUserMixin, DetailView):
     model = Content
     template_name = "streams/base.html"

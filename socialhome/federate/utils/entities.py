@@ -68,14 +68,20 @@ def get_federable_object(object_id: str) -> Optional[BaseEntity]:
     """
     Retrieve local object by fid and return it as a federable version.
     """
-    # TODO support also content
-    if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
-        profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+    path = object_id.replace(settings.SOCIALHOME_URL, '')
+    if path.startswith('/content/'):
+        content = Content.objects.filter(fid=object_id).first()
+        if content:
+            federable_content = make_federable_content(content)
+            return federable_content
     else:
-        profile = Profile.objects.filter(fid=object_id).first()
-    if profile:
-        federable_profile = make_federable_profile(profile)
-        return federable_profile
+        if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
+            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+        else:
+            profile = Profile.objects.filter(fid=object_id).first()
+        if profile:
+            federable_profile = make_federable_profile(profile)
+            return federable_profile
 
 
 def get_profile(**kwargs) -> base.Profile:
