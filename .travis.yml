@@ -33,4 +33,13 @@ script:
 after_success:
   - codecov
 env:
- - DATABASE_URL=postgres://postgres@127.0.0.1:5432/travis_ci_test DJANGO_SETTINGS_MODULE=config.settings.local DJANGO_ALLOWED_HOSTS=127.0.0.1 DJANGO_SECURE_SSL_REDIRECT=False SOCIALHOME_DOMAIN=127.0.0.1:8000 SOCIALHOME_HTTPS=False DJANGO_DEBUG=False DJANGO_DEBUG_TOOLBAR=False
+  global:
+    - DATABASE_URL=postgres://postgres@127.0.0.1:5432/travis_ci_test
+    - DJANGO_SETTINGS_MODULE=config.settings.local
+    - DJANGO_ALLOWED_HOSTS=127.0.0.1
+    - DJANGO_SECURE_SSL_REDIRECT=False
+    - SOCIALHOME_DOMAIN=127.0.0.1:8000
+    - SOCIALHOME_HTTPS=False
+    - DJANGO_DEBUG=False
+    - DJANGO_DEBUG_TOOLBAR=False
+    - GIT_SSL_NO_VERIFY=1  # Because Feneas GitLab validation will fail from travis
