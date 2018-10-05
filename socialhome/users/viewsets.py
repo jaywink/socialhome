@@ -69,7 +69,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         profile = request.user.profile
         if str(profile.uuid) == uuid:
             raise ValidationError("Cannot unfollow self!")
-        profile.following.remove(target_profile)  
+        profile.following.remove(target_profile)
         return Response({"status": "Follower removed."})
 
     @list_route(methods=["get"], permission_classes=(IsAuthenticated,))
