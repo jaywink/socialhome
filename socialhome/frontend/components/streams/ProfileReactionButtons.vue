@@ -82,8 +82,8 @@ export default {
         },
         urls() {
             return {
-                followUrl: Urls["api:profile-add-follower"]({pk: this.currentBrowsingProfileId}),
-                unfollowUrl: Urls["api:profile-remove-follower"]({pk: this.currentBrowsingProfileId}),
+                followUrl: Urls["api:profile-add-follower"]({uuid: this.profile.uuid}),
+                unfollowUrl: Urls["api:profile-remove-follower"]({uuid: this.profile.uuid}),
             }
         },
     },
@@ -93,7 +93,7 @@ export default {
                 this.$snotify.error(gettext("You must be logged in to follow someone"))
                 return
             }
-            this.$http.post(this.urls.followUrl, {uuid: this.profile.uuid})
+            this.$http.post(this.urls.followUrl)
                 .then(() => this.following = true)
                 .catch(_ => this.$snotify.error(
                     `${gettext("An error happened while trying to follow")} ${this.displayName}`))
@@ -103,7 +103,7 @@ export default {
                 this.$snotify.error(gettext("You must be logged in to unfollow someone"))
                 return
             }
-            this.$http.post(this.urls.unfollowUrl, {uuid: this.profile.uuid})
+            this.$http.post(this.urls.unfollowUrl)
                 .then(() => this.following = false)
                 .catch(_ => this.$snotify.error(
                     `${gettext("An error happened while trying to unfollow")} ${this.displayName}`))
