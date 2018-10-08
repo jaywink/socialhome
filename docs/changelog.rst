@@ -162,7 +162,7 @@ Removed
 Added
 .....
 
-* RFC3033 webfinger support for Diaspora protocol (`#405 <https://github.com/jaywink/socialhome/issues/405>`_)
+* RFC7033 webfinger support for Diaspora protocol (`#405 <https://github.com/jaywink/socialhome/issues/405>`_)
 
   This allows better profile discovery by remote non-Socialhome servers.
 

@@ -7,7 +7,9 @@ from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template import Template, Context
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from federation.entities.activitypub.django.views import activitypub_object_view
 from markdownx.utils import markdownify
 from markdownx.views import ImageUploadView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -24,6 +26,7 @@ from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.views import ProfileDetailView, ProfileAllContentView
 
 
+@method_decorator(activitypub_object_view, name='get')
 class HomeView(TemplateView):
     template_name = "pages/home.html"
 

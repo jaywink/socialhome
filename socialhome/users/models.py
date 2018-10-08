@@ -76,6 +76,8 @@ class User(AbstractUser):
         return ""
 
     def get_absolute_url(self):
+        if settings.SOCIALHOME_ROOT_PROFILE == self.username:
+            return "/"
         return reverse("users:detail", kwargs={"username": self.username})
 
     def copy_picture_to_profile(self):
@@ -162,6 +164,12 @@ class Profile(TimeStampedModel):
         if not self.user:
             # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
             return self.remote_url
+        return self.url
+
+    @property
+    def local_url(self) -> str:
+        if self.is_local:
+            return f"{settings.SOCIALHOME_URL}{self.user.get_absolute_url()}"
         return self.url
 
     @property
