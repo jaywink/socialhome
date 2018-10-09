@@ -1,3 +1,6 @@
+# Include main requirements to avoid conflicts
+-r requirements.txt
+
 codecov
 coverage
 ddt
@@ -6,7 +9,6 @@ django-debug-toolbar-user-panel
 django-querycount
 django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why
 django_coverage_plugin
-django<2.1
 factory_boy
 Faker
 flake8
@@ -26,7 +28,3 @@ Werkzeug
 
 # Recommonmark master has a fix for CommonMark==0.7.3 compatibility which is not released yet
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
-
-# Not a direct requirement, just to match main requirements locked version
-# TODO remove once circus is bumped to work with tornado 5.0
-tornado<5
