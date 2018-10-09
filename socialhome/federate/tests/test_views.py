@@ -1,7 +1,7 @@
 import datetime
 import json
 import uuid
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from django.urls import reverse
 from django.test.utils import override_settings
@@ -14,7 +14,6 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.views import DiasporaReceiveViewMixin
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile, User
 from socialhome.users.tests.factories import UserFactory
@@ -69,31 +68,17 @@ class TestFederationDiscovery(SocialhomeTestCase):
         self.response_200()
 
 
-class TestDiasporaReceiveViewMixin(SocialhomeTestCase):
-    def test_returns_legacy_xml_payload(self):
-        self.assertEqual(
-            DiasporaReceiveViewMixin.get_payload_from_request(Mock(body="foobar", POST={"xml": "barfoo"})),
-            "barfoo",
-        )
-
-    def test_returns_other_payload(self):
-        self.assertEqual(
-            DiasporaReceiveViewMixin.get_payload_from_request(Mock(body="foobar", POST={})),
-            "foobar",
-        )
-
-
 class TestReceivePublic(SocialhomeTestCase):
     def test_receive_public_responds(self):
-        self.post("federate:receive-public", data={"xml": "foo"})
+        self.post(
+            "federate:receive-public",
+            data='<foobar/>',
+            extra={"content_type": "application/magic-envelope+xml"},
+        )
         self.assertEqual(self.last_response.status_code, 202)
 
 
 class TestReceiveUser(SocialhomeTestCase):
-    def test_receive_user_responds_for_xml_payload(self):
-        self.post("federate:receive-user", uuid=str(uuid.uuid4()), data={"xml": "foo"})
-        self.assertEqual(self.last_response.status_code, 202)
-
     def test_receive_user_responds_for_json_payload(self):
         self.post(
             "federate:receive-user", uuid=str(uuid.uuid4()), data='{"foo": "bar"}',

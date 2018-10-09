@@ -3,7 +3,7 @@ from django.test import override_settings
 from federation.entities import base
 
 from socialhome.content.tests.factories import PublicContentFactory
-from socialhome.federate.utils import get_federable_object
+from socialhome.federate.utils import get_federable_object, get_profile, make_federable_profile
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
 
@@ -32,3 +32,17 @@ class TestGetFederableObject(SocialhomeTestCase):
         self.assertTrue(isinstance(content, base.Post))
         self.assertEqual(content.id, self.content.fid)
         self.assertEqual(content.actor_id, self.profile.fid)
+
+
+class TestGetProfile(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+
+    def test_profile_returned(self):
+        returned = get_profile(fid=self.profile.fid)
+        maked = make_federable_profile(self.profile)
+        self.assertEqual(returned.id, maked.id)
+        self.assertTrue(isinstance(returned, base.Profile))
