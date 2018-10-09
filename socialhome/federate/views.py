@@ -1,16 +1,14 @@
 import datetime
 import logging
 
-import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.http.response import Http404, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.views.generic import View
-from dynamic_preferences.registries import global_preferences_registry
 
 from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
@@ -22,7 +20,7 @@ from socialhome import __version__ as version
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import receive_task
+from socialhome.federate.utils import queue_payload
 from socialhome.federate.utils.entities import make_federable_content
 from socialhome.users.models import User, Profile
 
@@ -157,33 +155,17 @@ def content_fetch_view(request, objtype, guid):
     return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
 
 
-class DiasporaReceiveViewMixin(View):
-    @staticmethod
-    def get_payload_from_request(request):
-        """Get the payload from request, trying legacy first."""
-        preferences = global_preferences_registry.manager()
-        body = request.body
-        if request.POST.get("xml"):
-            payload = request.POST.get("xml")
-        else:
-            payload = body
-        if preferences["admin__log_all_receive_payloads"]:
-            logger.debug("get_payload_from_request - Payload: %s", payload)
-        return payload
-
-
-class ReceivePublicView(DiasporaReceiveViewMixin):
+class ReceivePublicView(View):
     """Diaspora /receive/public view."""
     def post(self, request, *args, **kwargs):
-        payload = self.get_payload_from_request(request)
-        django_rq.enqueue(receive_task, payload)
-        return HttpResponse(status=202)
+        if queue_payload(request):
+            return HttpResponse(status=202)
+        return HttpResponseBadRequest()
 
 
-class ReceiveUserView(DiasporaReceiveViewMixin):
+class ReceiveUserView(View):
     """Diaspora /receive/users view."""
     def post(self, request, *args, **kwargs):
-        payload = self.get_payload_from_request(request)
-        uuid = kwargs.get("uuid")
-        django_rq.enqueue(receive_task, payload, uuid=uuid)
-        return HttpResponse(status=202)
+        if queue_payload(request, uuid=kwargs.get('uuid')):
+            return HttpResponse(status=202)
+        return HttpResponseBadRequest()
