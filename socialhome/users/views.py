@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -46,8 +45,7 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, uuid=profile.uuid)
 
 
-@method_decorator(activitypub_object_view, name='get')
-@method_decorator(activitypub_object_view, name='post')
+@method_decorator(activitypub_object_view, name='dispatch')
 class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
     data = None
     model = Profile
@@ -82,12 +80,6 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
             "description": _("Profile of %s." % name),
         })
         return meta
-
-    def post(self, request, *args, **kwargs):
-        """
-        This just here for ActivityPub routing.
-        """
-        return HttpResponseBadRequest()
 
     def set_object_and_data(self):
         if not self.object:

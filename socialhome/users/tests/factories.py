@@ -48,6 +48,15 @@ class PublicUserFactory(UserFactory):
         return user
 
 
+class SiteUserFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        user.profile.visibility = Visibility.SITE
+        user.profile.save(update_fields=["visibility"])
+        return user
+
+
 class UserWithKeyFactory(UserFactory):
     @classmethod
     def _generate(cls, create, attrs):
