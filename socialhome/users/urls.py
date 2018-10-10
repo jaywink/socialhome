@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
@@ -43,7 +44,8 @@ urlpatterns = [
     ),
     url(
         regex=r"^p/(?P<uuid>[^/]+)/",
-        view=views.ProfileDetailView.as_view(),
+        # CSRF exempt needed for POST to work for ActivityPub object inboxes
+        view=csrf_exempt(views.ProfileDetailView.as_view()),
         name="profile-detail"
     ),
     url(
