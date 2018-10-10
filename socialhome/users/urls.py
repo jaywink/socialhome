@@ -42,7 +42,7 @@ urlpatterns = [
         name="profile-all-content"
     ),
     url(
-        regex=r"^p/(?P<uuid>[^/]+)/$",
+        regex=r"^p/(?P<uuid>[^/]+)/",
         view=views.ProfileDetailView.as_view(),
         name="profile-detail"
     ),
