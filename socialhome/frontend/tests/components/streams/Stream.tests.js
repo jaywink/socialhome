@@ -3,6 +3,7 @@ import {shallow, mount} from "avoriaz"
 import Vue from "vue"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
+import uuid from "uuid"
 
 import Stream from "frontend/components/streams/Stream.vue"
 import StreamElement from "frontend/components/streams/StreamElement.vue"
@@ -16,6 +17,9 @@ import applicationStore from "frontend/stores/applicationStore"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
+
+
+const UUID = uuid()
 
 describe("Stream", () => {
     let store
@@ -57,7 +61,7 @@ describe("Stream", () => {
             context("store.dispatch without contents", () => {
                 beforeEach(() => {
                     store.state.contentIds = []
-                    store.state.applicationStore = {profile: {id: 5}}
+                    store.state.applicationStore = {profile: {uuid: UUID}}
                 })
 
                 it("followed stream with no contents", () => {
@@ -85,14 +89,14 @@ describe("Stream", () => {
                     store.state.stream = {name: "profile_all"}
                     mount(Stream, {store})
                     store.dispatch.getCall(0).args.should
-                        .eql([streamStoreOperations.getProfileAll, {params: {id: 5}, data: {}}])
+                        .eql([streamStoreOperations.getProfileAll, {params: {uuid: UUID}, data: {}}])
                 })
 
                 it("profile pinned stream with no contents", () => {
                     store.state.stream = {name: "profile_pinned"}
                     mount(Stream, {store})
                     store.dispatch.getCall(0).args.should
-                        .eql([streamStoreOperations.getProfilePinned, {params: {id: 5}, data: {}}])
+                        .eql([streamStoreOperations.getProfilePinned, {params: {uuid: UUID}, data: {}}])
                 })
 
             })
@@ -101,7 +105,7 @@ describe("Stream", () => {
                 beforeEach(() => {
                     store.state.contentIds = ["1", "2"]
                     store.state.contents = {"1": {through: "3"}, "2": {through: "4"}}
-                    store.state.applicationStore = {profile: {id: 5}}
+                    store.state.applicationStore = {profile: {uuid: UUID}}
                 })
 
                 it("followed stream with contents", () => {
@@ -130,7 +134,7 @@ describe("Stream", () => {
                     store.state.stream = {name: "profile_all"}
                     mount(Stream, {store})
                     store.dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfileAll, {params: {id: 5, lastId: "4"}, data: {}}],
+                        [streamStoreOperations.getProfileAll, {params: {uuid: UUID, lastId: "4"}, data: {}}],
                     )
                 })
 
@@ -138,7 +142,7 @@ describe("Stream", () => {
                     store.state.stream = {name: "profile_pinned"}
                     mount(Stream, {store})
                     store.dispatch.getCall(0).args.should.eql(
-                        [streamStoreOperations.getProfilePinned, {params: {id: 5, lastId: "4"}, data: {}}],
+                        [streamStoreOperations.getProfilePinned, {params: {uuid: UUID, lastId: "4"}, data: {}}],
                     )
                 })
             })
