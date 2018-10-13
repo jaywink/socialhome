@@ -21,6 +21,10 @@ Changed
 
 * The behaviour of the ``delete_users_and_profiles`` management command has been changed to lock remote profiles by default instead of deleting them. This is more efficient for spam control as deleted profiles just appear back. The lock option can still be set as false to delete the profile which is a good option for example when cleaning data of remote profiles on request.
 
+* **Breaking change**. Profile API has been migrated to use UUID's instead of ID's. (`#451 <https://git.feneas.org/socialhome/socialhome/issues/451>`_)
+
+  All API endpoints will be receiving this change which is done while the API has a limited number of consumers and will be one of the last planned breaking changes planned before a 1.0 API can be announced.
+
 Fixed
 .....
 
