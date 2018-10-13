@@ -82,9 +82,7 @@ describe("ProfileReactionButtons", () => {
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().follow()
                 target.instance().$http.post.getCall(0).args
-                    .should.eql([`/api/profiles/${store.profile.id}/add_follower/`, {
-                        uuid: store.content.author.uuid,
-                    }])
+                    .should.eql([`/api/profiles/${store.content.author.uuid}/add_follower/`])
             })
 
             it("should show that user is following author when the HTTP request succeeds", done => {
@@ -160,9 +158,7 @@ describe("ProfileReactionButtons", () => {
                 Sinon.spy(target.instance().$http, "post")
                 target.instance().unfollow()
                 target.instance().$http.post.getCall(0).args
-                    .should.eql([`/api/profiles/${store.profile.id}/remove_follower/`, {
-                        uuid: store.content.author.uuid,
-                    }])
+                    .should.eql([`/api/profiles/${store.content.author.uuid}/remove_follower/`])
             })
 
             it("should show that user is not following author when the HTTP request succeeds", done => {
