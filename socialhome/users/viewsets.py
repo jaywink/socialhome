@@ -44,7 +44,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return qs
 
     @detail_route(methods=["post"])
-    def add_follower(self, request, uuid=None):
+    def follow(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
@@ -53,7 +53,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         if str(profile.uuid) == uuid:
             raise ValidationError("Cannot follow self!")
         profile.following.add(target_profile)
-        return Response({"status": "Follower added."})
+        return Response({"status": "Followed."})
 
     @list_route(methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
@@ -61,7 +61,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return Response({"status": "Data export job queued."})
 
     @detail_route(methods=["post"])
-    def remove_follower(self, request, uuid=None):
+    def unfollow(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
@@ -70,7 +70,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         if str(profile.uuid) == uuid:
             raise ValidationError("Cannot unfollow self!")
         profile.following.remove(target_profile)
-        return Response({"status": "Follower removed."})
+        return Response({"status": "Unfollowed."})
 
     @list_route(methods=["get"], permission_classes=(IsAuthenticated,))
     def retrieve_export(self, request, pk=None):

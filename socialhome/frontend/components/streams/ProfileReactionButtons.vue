@@ -82,8 +82,8 @@ export default {
         },
         urls() {
             return {
-                followUrl: Urls["api:profile-add-follower"]({uuid: this.profile.uuid}),
-                unfollowUrl: Urls["api:profile-remove-follower"]({uuid: this.profile.uuid}),
+                followUrl: Urls["api:profile-follow"]({uuid: this.profile.uuid}),
+                unfollowUrl: Urls["api:profile-unfollow"]({uuid: this.profile.uuid}),
             }
         },
     },
