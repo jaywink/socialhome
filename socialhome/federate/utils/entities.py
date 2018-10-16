@@ -2,7 +2,10 @@ import logging
 from typing import Optional, Union
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.http import HttpRequest
 from federation.entities import base
+from federation.entities.mixins import BaseEntity
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -61,6 +64,29 @@ def _make_share(content: Content) -> Optional[base.Share]:
         )
     except Exception as ex:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
+
+
+def get_federable_object(request: HttpRequest) -> Optional[BaseEntity]:
+    """
+    Retrieve local object and return it as a federable version.
+
+    Ensure to check permissions before returning object.
+    """
+    object_id = request.build_absolute_uri()
+    user = getattr(request, 'user', AnonymousUser())
+    if request.path.startswith('/content/'):
+        content = Content.objects.filter(fid=object_id).first()
+        if content and content.visible_for_user(user):
+            federable_content = make_federable_content(content)
+            return federable_content
+    elif request.path.startswith('/p/') or request.path == '/':
+        if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
+            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+        else:
+            profile = Profile.objects.filter(fid=object_id).first()
+        if profile and profile.visible_to_user(user):
+            federable_profile = make_federable_profile(profile)
+            return federable_profile
 
 
 def get_profile(**kwargs) -> base.Profile:
@@ -127,7 +153,7 @@ def make_federable_profile(profile):
                 "large": profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
-            url=profile.url,
+            url=profile.local_url,
             created_at=profile.created,
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,

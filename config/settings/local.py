@@ -106,3 +106,6 @@ if testing:
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
+
+# Logging
+LOGGING['loggers']['socialhome']['handlers'].append('console')

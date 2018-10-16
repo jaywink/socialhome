@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, TemplateView, DeleteView
+from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
 
 from socialhome.content.models import Content
@@ -43,6 +45,7 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, uuid=profile.uuid)
 
 
+@method_decorator(activitypub_object_view, name='dispatch')
 class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
     data = None
     model = Profile

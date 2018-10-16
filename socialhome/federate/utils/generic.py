@@ -1,11 +1,17 @@
 import datetime
+import logging
 
+import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.http import HttpRequest
 from django.utils.timezone import now
+from dynamic_preferences.registries import global_preferences_registry
 
 from socialhome import __version__ as version
 from socialhome.content.enums import ContentType
+
+logger = logging.getLogger("socialhome")
 
 
 def get_nodeinfo2_data():
@@ -43,3 +49,19 @@ def get_nodeinfo2_data():
             "name": settings.ADMINS[0][0],
         }})
     return data
+
+
+def queue_payload(request: HttpRequest, uuid: str=None):
+    """
+    Queue payload for processing.
+    """
+    from socialhome.federate.tasks import receive_task  # Circulars
+    try:
+        payload = request.body
+        preferences = global_preferences_registry.manager()
+        if preferences["admin__log_all_receive_payloads"]:
+            logger.debug("get_payload_from_request - Payload: %s", payload)
+        django_rq.enqueue(receive_task, payload, uuid=uuid)
+        return True
+    except Exception:
+        return False
