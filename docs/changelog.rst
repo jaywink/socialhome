@@ -25,6 +25,10 @@ Changed
 
   All API endpoints will be receiving this change which is done while the API has a limited number of consumers and will be one of the last planned breaking changes planned before a 1.0 API can be announced.
 
+* **Breaking change**. Profile API following and unfollowing endpoints have changed.
+
+  The action ``add_follower`` has been renamed to ``follow`` and ``remove_follower`` to ``unfollow``. The change reflects the change of the endpoints themselves. Now to add a follower one does a POST to the ``follow`` of the profile that one wants to follow, instead of doing a POST to the ``add_follower`` endpoint of ones own profile. Same change has been done for the follower removal endpoint.
+
 Fixed
 .....
 
