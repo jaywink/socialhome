@@ -5,12 +5,15 @@ import Vue from "vue"
 import Vuex from "vuex"
 import Axios from "axios"
 import VueSnotify from "vue-snotify"
+import uuid from "uuid"
 
 import {actions, mutations, getters} from "frontend/stores/streamStore.operations"
 import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
 import {streamStoreOperations, exportsForTests} from "frontend/stores/streamStore"
 import getState from "frontend/stores/streamStore.state"
 
+
+const UUID = uuid()
 
 describe("streamStore", () => {
     afterEach(() => {
@@ -407,9 +410,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile stream request", (done) => {
-                Moxios.stubRequest("/api/streams/profile-all/26/", response)
+                Moxios.stubRequest("/api/streams/profile-all/" + UUID + "/", response)
 
-                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {uuid: UUID}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -421,9 +424,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile all stream request with lastId", (done) => {
-                Moxios.stubRequest("/api/streams/profile-all/26/?last_id=8", response)
+                Moxios.stubRequest("/api/streams/profile-all/" + UUID + "/?last_id=8", response)
 
-                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26, lastId: 8}})
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {uuid: UUID, lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -435,9 +438,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile stream request error", (done) => {
-                Moxios.stubRequest("/api/streams/profile-all/26/", {status: 500})
+                Moxios.stubRequest("/api/streams/profile-all/" + UUID + "/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getProfileAll, {params: {id: 26}})
+                target.dispatch(streamStoreOperations.getProfileAll, {params: {uuid: UUID}})
 
                 Moxios.wait(() => {
                     target.state.error.contents.should.exist
@@ -453,9 +456,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile stream request", (done) => {
-                Moxios.stubRequest("/api/streams/profile-pinned/26/", response)
+                Moxios.stubRequest("/api/streams/profile-pinned/" + UUID + "/", response)
 
-                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {uuid: UUID}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -467,9 +470,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile pinned stream request with lastId", (done) => {
-                Moxios.stubRequest("/api/streams/profile-pinned/26/?last_id=8", response)
+                Moxios.stubRequest("/api/streams/profile-pinned/" + UUID + "/?last_id=8", response)
 
-                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26, lastId: 8}})
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {uuid: UUID, lastId: 8}})
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
@@ -481,9 +484,9 @@ describe("streamStore", () => {
             })
 
             it("should handle profile stream request error", (done) => {
-                Moxios.stubRequest("/api/streams/profile-pinned/26/", {status: 500})
+                Moxios.stubRequest("/api/streams/profile-pinned/" + UUID + "/", {status: 500})
 
-                target.dispatch(streamStoreOperations.getProfilePinned, {params: {id: 26}})
+                target.dispatch(streamStoreOperations.getProfilePinned, {params: {uuid: UUID}})
 
                 Moxios.wait(() => {
                     target.state.error.contents.should.exist
