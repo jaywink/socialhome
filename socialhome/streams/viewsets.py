@@ -48,7 +48,7 @@ class LocalStreamAPIView(StreamsAPIBaseView):
 
 class ProfileAllStreamAPIView(StreamsAPIBaseView):
     def dispatch(self, request, *args, **kwargs):
-        self.profile = get_object_or_404(Profile, id=kwargs.get("id"))
+        self.profile = get_object_or_404(Profile, uuid=kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
@@ -58,7 +58,7 @@ class ProfileAllStreamAPIView(StreamsAPIBaseView):
 
 class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
     def dispatch(self, request, *args, **kwargs):
-        self.profile = get_object_or_404(Profile, id=kwargs.get("id"))
+        self.profile = get_object_or_404(Profile, uuid=kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):

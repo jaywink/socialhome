@@ -116,14 +116,14 @@ function newRestAPI(options) {
         })
         .get({
             action: streamStoreOperations.getProfileAll,
-            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-all"]({id})}${getLastIdParam(lastId)}`,
+            path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: streamStoreOperations.getProfilePinned,
-            path: ({id, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({id})}${getLastIdParam(lastId)}`,
+            path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,

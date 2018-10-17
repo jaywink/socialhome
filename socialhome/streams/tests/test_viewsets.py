@@ -124,15 +124,15 @@ class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
         LimitedContentFactory(author=cls.profile)
 
     def test_profile_content_returned(self):
-        self.get("api-streams:profile-all", id=self.content.author.id)
+        self.get("api-streams:profile-all", uuid=self.content.author.uuid)
         self.assertEqual(len(self.last_response.data), 1)
-        self.assertEqual(self.last_response.data[0]["id"], self.content.id)
+        self.assertEqual(self.last_response.data[0]["uuid"], str(self.content.uuid))
 
     @patch("socialhome.streams.viewsets.ProfileAllStream")
     def test_users_correct_stream_class(self, mock_stream):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
-            self.get("api-streams:profile-all", id=self.content.author.id)
+            self.get("api-streams:profile-all", uuid=self.content.author.uuid)
         mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
 
 
@@ -148,15 +148,15 @@ class TestProfilePinnedStreamAPIView(SocialhomeAPITestCase):
         LimitedContentFactory(author=cls.profile, pinned=True)
 
     def test_profile_content_returned(self):
-        self.get("api-streams:profile-pinned", id=self.content.author.id)
+        self.get("api-streams:profile-pinned", uuid=self.content.author.uuid)
         self.assertEqual(len(self.last_response.data), 1)
-        self.assertEqual(self.last_response.data[0]["id"], self.content.id)
+        self.assertEqual(self.last_response.data[0]["uuid"], str(self.content.uuid))
 
     @patch("socialhome.streams.viewsets.ProfilePinnedStream")
     def test_users_correct_stream_class(self, mock_stream):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
-            self.get("api-streams:profile-pinned", id=self.content.author.id)
+            self.get("api-streams:profile-pinned", uuid=self.content.author.uuid)
         mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
 
 
