@@ -17,7 +17,7 @@ module.exports = {
                     path.resolve(__dirname, "../../mocha"),
                 ],
                 exclude: path.resolve(__dirname, "../../socialhome/static/js"),
-                query: {presets: ["env"]},
+                query: {presets: ["vue-app"]},
             },
             {
                 test: /\.scss$/,

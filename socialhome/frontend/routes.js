@@ -3,7 +3,7 @@ import Stream from "frontend/components/streams/Stream.vue"
 
 
 function $$(props = {}) {
-    return route => Object.assign({}, route.params, props)
+    return route => ({...(route.params), ...props})
 }
 
 const routes = [
