@@ -240,6 +240,11 @@ class TestOrganizeContentUserDetailView(SocialhomeTestCase):
         request, view, contents, profile = self._get_request_view_and_content()
         assert view.get_success_url() == "/u/%s/" % profile.user.username
 
+    def test_login_required(self):
+        self.user = AnonymousUser()
+        response = self.get('users:profile-organize')
+        assert response.status_code == 302
+
 
 @pytest.mark.usefixtures("admin_user", "client")
 class TestProfileVisibilityForAnonymous:

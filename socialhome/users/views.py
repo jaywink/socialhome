@@ -128,13 +128,9 @@ class OrganizeContentProfileDetailView(LoginRequiredMixin, ListView):
     model = Content
     template_name = "users/profile_detail_organize.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        """Use current user."""
-        self.profile = get_object_or_404(Profile, user=self.request.user)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
-        return Content.objects.profile_pinned(self.profile, self.request.user).order_by("order")
+        profile = get_object_or_404(Profile, user=self.request.user)
+        return Content.objects.profile_pinned(profile, self.request.user).order_by("order")
 
     def post(self, request, *args, **kwargs):
         """Save sort order."""
