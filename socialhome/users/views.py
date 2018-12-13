@@ -176,10 +176,6 @@ class UserPictureUpdateView(LoginRequiredMixin, UpdateView):
 class UserAPITokenView(LoginRequiredMixin, TemplateView):
     template_name = "users/user_api_token.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().dispatch(request, *args, **kwargs)
-
     def get_object(self, queryset=None):
         return User.objects.get(id=self.request.user.id)
 
@@ -193,7 +189,7 @@ class UserAPITokenView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         if request.POST.get("regenerate") == "regenerate":
-            self.object.auth_token.delete()
+            self.get_object().auth_token.delete()
         return redirect(self.get_success_url())
 
 

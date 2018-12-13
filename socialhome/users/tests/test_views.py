@@ -503,6 +503,11 @@ class TestUserAPITokenView(SocialhomeTestCase):
         new_token = Token.objects.get(user=self.user)
         self.assertNotEqual(new_token.key, old_token.key)
 
+    def test_login_required(self):
+        self.user = AnonymousUser()
+        response = self.get('users:api-token')
+        assert response.status_code == 302
+
 
 class TestUserPictureUpdateView(SocialhomeTestCase):
     @classmethod
