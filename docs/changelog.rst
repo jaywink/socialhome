@@ -38,6 +38,8 @@ Fixed
 
 * API docs regression fixed (`#509 <https://github.com/jaywink/socialhome/issues/509>`_)
 
+* Fix internal server error for anonymous user for certain internal user pages (`#518 <https://git.feneas.org/socialhome/socialhome/issues/518>`_)
+
 0.9.3 (2018-08-29)
 ------------------
 
