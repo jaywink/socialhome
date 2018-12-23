@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/jaywink/socialhome.svg?branch=master)](https://travis-ci.org/jaywink/socialhome) [![codecov](https://codecov.io/gh/jaywink/socialhome/branch/master/graph/badge.svg)](https://codecov.io/gh/jaywink/socialhome) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
-[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/badge/chat-on%20matrix-orange.svg)](https://matrix.to/#/#socialhome:matrix.org) [![issue tracker](https://img.shields.io/badge/issue%20tracker-gitlab-orange.svg)](https://git.feneas.org/socialhome/socialhome/issues)
+[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:matrix.org.svg)](https://matrix.to/#/#socialhome:matrix.org) [![issue tracker](https://img.shields.io/badge/issue%20tracker-gitlab-orange.svg)](https://git.feneas.org/socialhome/socialhome/issues)
 
 ![Socialhome](http://socialhome.readthedocs.io/en/latest/_images/socialhome.png)
 
