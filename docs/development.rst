@@ -43,8 +43,7 @@ Do NPM, Bower
 ::
 
     npm install
-    bower install
-    sudo npm -g install grunt
+    node_modules/.bin/bower install
     npm run dev
 
 To watch files and build bundles automatically, use this.
@@ -67,7 +66,28 @@ Edit any values necessary. By default the ``SECRET_KEY`` is empty. You MUST set 
 Create a database
 .................
 
-If you changed the ``DATABASE_URL`` in the settings file, make sure to change the values in these commands accordingly.
+Docker
+''''''
+
+The easiest way to run a database is using Docker. Install Docker and then use the following command:
+
+::
+
+    docker run -e 'POSTGRESS_PASSWORD=socialhome POSTGRES_USER=socialhome POSTGRES_DB=socialhome' \
+        --name socialhomedb -d -p '5432:5432' postgres
+    # Migrate the database
+    python manage.py migrate
+
+Later to start the same container just do:
+
+::
+
+    docker start socialhomedb
+
+System
+''''''
+
+For example on Ubuntu:
 
 ::
 
@@ -76,6 +96,21 @@ If you changed the ``DATABASE_URL`` in the settings file, make sure to change th
     createdb -O socialhome socialhome
     exit
     python manage.py migrate
+
+Install Redis
+.............
+
+Either use system Redis (for example on Ubuntu `sudo apt install redis-server`) or use Docker:
+
+::
+
+    docker run --name socialhomeredis -d -p '6379:6379' redis
+
+To later start it:
+
+::
+
+    docker start socialhomeredis
 
 Running the development server
 ..............................
@@ -238,7 +273,7 @@ This guide assumes you are running Docker on a GNU/Linux based system such as Ub
 The docker development installation was tested on Docker version 17.09 and docker-compose 1.16.1.
 
 Steps
-......
+.....
 
 The first step is to copy the example docker-compose file ``docker/dev/docker-compose.yml.example`` file to the root of the project. eg
 
@@ -261,7 +296,7 @@ And then just
 ``docker-compose up``
 
 Defaults
-..........
+........
 
 The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postgres will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
 
