@@ -6,6 +6,13 @@ Changelog
 0.10.0-dev (unreleased)
 -----------------------
 
+Added
+.....
+
+* Limited ActivityPub support has landed!
+
+  Currently the support includes webfinger support for ActivityPub discovery, profile AS2 objects and content AS2 objects.
+
 Changed
 .......
 
