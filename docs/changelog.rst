@@ -13,6 +13,8 @@ Added
 
   Currently the support includes webfinger support for ActivityPub discovery, profile AS2 objects and content AS2 objects.
 
+  Since this limited support breaks compatibility with platforms that prefer ActivityPub, it is disabled by default. Add the environment variable ``SOCIALHOME_ACTIVITYPUB_ALPHA=1`` to activate it.
+
 Changed
 .......
 

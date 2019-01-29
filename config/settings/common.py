@@ -519,3 +519,7 @@ FEDERATION = {
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",
     "search_path": "/search/?q=",
 }
+
+# TODO remove once AP support is more ready
+if env.bool("SOCIALHOME_ACTIVITYPUB_ALPHA", default=False):
+    FEDERATION["activitypub"] = True
