@@ -18,5 +18,4 @@ class ProfileAdmin(ModelAdmin):
 class UserAdmin(ModelAdmin):
     list_display = ('id', 'username', 'name', 'trusted_editor')
     list_filter = ('trusted_editor',)
-    raw_id_fields = ('followers', 'following')
     search_fields = ('id', 'name', 'username')

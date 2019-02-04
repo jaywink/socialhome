@@ -49,6 +49,11 @@ Fixed
 
 * Fix internal server error for anonymous user for certain internal user pages (`#518 <https://git.feneas.org/socialhome/socialhome/issues/518>`_)
 
+Removed
+.......
+
+* Removed ``User`` relationship fields. These were migrated to ``Profile`` a long time ago.
+
 0.9.3 (2018-08-29)
 ------------------
 
