@@ -1,5 +1,5 @@
 from socialhome.content.models import Content
-from socialhome.content.tests.factories import PublicContentFactory
+from socialhome.content.tests.factories import PublicContentFactory, TagFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.tests.factories import UserFactory, AdminUserFactory, ProfileFactory
@@ -273,3 +273,65 @@ class TestContentViewSet(SocialhomeAPITestCase):
         self.get("api:content-shares", pk=self.public_content.id)
         self.assertEqual(len(self.last_response.data), 1)
         self.assertEqual(self.last_response.data[0].get("id"), self.share.id)
+
+
+class TestTagViewset(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory()
+        cls.profile = cls.user.profile
+        cls.tag = TagFactory()
+        cls.tag2 = TagFactory()
+
+    def test_create(self):
+        with self.login(self.user):
+            self.post("api:tag-list", data={"name": "creatingatag"})
+        self.response_405()
+
+    def test_delete(self):
+        with self.login(self.user):
+            self.delete("api:tag-detail", uuid=self.tag.uuid)
+        self.response_405()
+
+    def test_detail(self):
+        self.get("api:tag-detail", uuid=self.tag.uuid)
+        self.response_200()
+        self.assertEqual(self.last_response.data["name"], self.tag.name)
+        self.assertEqual(self.last_response.data["uuid"], str(self.tag.uuid))
+
+    def test_follow(self):
+        self.post("api:tag-follow", uuid=self.tag.uuid)
+        self.response_401()
+
+        with self.login(self.user):
+            self.post("api:tag-follow", uuid=self.tag.uuid)
+        self.response_200()
+        self.assertEqual(self.profile.followed_tags.count(), 1)
+        self.assertEqual(self.profile.followed_tags.first(), self.tag)
+
+    def test_list(self):
+        self.get("api:tag-list")
+        self.response_200()
+        self.assertEqual(len(self.last_response.data["results"]), 2)
+
+    def test_unfollow(self):
+        self.profile.followed_tags.add(self.tag)
+
+        self.post("api:tag-unfollow", uuid=self.tag.uuid)
+        self.response_401()
+
+        with self.login(self.user):
+            self.post("api:tag-unfollow", uuid=self.tag.uuid)
+        self.response_200()
+        self.assertEqual(self.profile.followed_tags.count(), 0)
+
+        # Second unfollow fails silently
+        with self.login(self.user):
+            self.post("api:tag-unfollow", uuid=self.tag.uuid)
+        self.response_200()
+
+    def test_update(self):
+        with self.login(self.user):
+            self.patch("api:tag-detail", uuid=self.tag.uuid, data={"name": "newnameyo"})
+        self.response_405()
