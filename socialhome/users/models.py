@@ -138,6 +138,11 @@ class Profile(TimeStampedModel):
     # Following
     following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
 
+    # Tags
+    followed_tags = models.ManyToManyField(
+        "content.Tag", verbose_name=_("Followed tags"), related_name="following_profiles",
+    )
+
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:

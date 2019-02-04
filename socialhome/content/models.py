@@ -50,6 +50,7 @@ class OEmbedCache(models.Model):
 class Tag(models.Model):
     name = models.CharField(_("Name"), max_length=255, unique=True)
     created = AutoCreatedField(_('Created'))
+    uuid = models.UUIDField(unique=True, default=uuid4, editable=False)
 
     objects = TagQuerySet.as_manager()
 
