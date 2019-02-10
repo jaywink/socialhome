@@ -1,6 +1,7 @@
 from django.test import override_settings
 from django.urls import reverse
 
+from socialhome.content.tests.factories import TagFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.models import Profile
@@ -56,10 +57,13 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         cls.profile = cls.user.profile
         cls.staff_user = UserFactory(is_staff=True)
         cls.staff_profile = cls.staff_user.profile
+        cls.other_user = UserFactory()
         cls.site_profile = ProfileFactory(visibility=Visibility.SITE)
         cls.self_profile = ProfileFactory(visibility=Visibility.SELF)
         cls.limited_profile = ProfileFactory(visibility=Visibility.LIMITED)
         Profile.objects.filter(id=cls.profile.id).update(visibility=Visibility.PUBLIC)
+        cls.tag = TagFactory()
+        cls.profile.followed_tags.add(cls.tag)
 
     def test_create_export__permissions(self):
         self.post("api:profile-create-export")
@@ -69,6 +73,21 @@ class TestProfileViewSet(SocialhomeAPITestCase):
             self.post("api:profile-create-export")
             self.response_200()
         self.assertEqual(self.last_response.data.get('status'), 'Data export job queued.')
+
+    def test_followed_tags__self(self):
+        with self.login(self.user):
+            self.get("api:profile-detail", uuid=self.profile.uuid)
+        self.assertEqual(self.last_response.data["followed_tags"], [self.tag.name])
+
+    def test_followed_tags__other_user(self):
+        with self.login(self.other_user):
+            self.get("api:profile-detail", uuid=self.profile.uuid)
+        self.assertEqual(self.last_response.data["followed_tags"], [])
+
+    def test_followed_tags__staff_user(self):
+        with self.login(self.staff_user):
+            self.get("api:profile-detail", uuid=self.profile.uuid)
+        self.assertEqual(self.last_response.data["followed_tags"], [self.tag.name])
 
     def test_profile_list(self):
         self.get("api:profile-list")

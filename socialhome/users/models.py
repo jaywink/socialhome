@@ -37,11 +37,6 @@ class User(AbstractUser):
     # with unlimited usage of HTML tags.
     trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
 
-    # Relationships
-    # TODO remove in favour of Profile.following
-    followers = models.ManyToManyField("users.Profile", verbose_name=_("Followers"), related_name="following_set")
-    following = models.ManyToManyField("users.Profile", verbose_name=_("Following"), related_name="followers_set")
-
     # Picture
     picture = VersatileImageField(
         _("Picture"), upload_to="profiles/", width_field="picture_width", height_field="picture_height",
@@ -142,6 +137,11 @@ class Profile(TimeStampedModel):
 
     # Following
     following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
+
+    # Tags
+    followed_tags = models.ManyToManyField(
+        "content.Tag", verbose_name=_("Followed tags"), related_name="following_profiles",
+    )
 
     objects = ProfileQuerySet.as_manager()
 

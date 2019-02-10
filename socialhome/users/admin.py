@@ -8,7 +8,7 @@ from socialhome.users.models import User, Profile
 class ProfileAdmin(ModelAdmin):
     list_display = ('id', 'uuid', 'name', 'handle', 'fid', 'visibility', 'user')
     list_filter = ('visibility',)
-    raw_id_fields = ('user', 'following')
+    raw_id_fields = ('user', 'following', 'followed_tags')
     readonly_fields = ('uuid', 'fid', 'guid', 'handle', 'rsa_public_key')
     search_fields = ('id', 'uuid', 'name', 'handle', 'email', 'fid')
     list_select_related = ('user',)
@@ -18,5 +18,4 @@ class ProfileAdmin(ModelAdmin):
 class UserAdmin(ModelAdmin):
     list_display = ('id', 'username', 'name', 'trusted_editor')
     list_filter = ('trusted_editor',)
-    raw_id_fields = ('followers', 'following')
     search_fields = ('id', 'name', 'username')

@@ -1,4 +1,7 @@
+from typing import List
+
 from enumfields.drf import EnumField
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
@@ -39,6 +42,7 @@ class LimitedProfileSerializer(ModelSerializer):
 
 
 class ProfileSerializer(ModelSerializer):
+    followed_tags = SerializerMethodField()
     followers_count = SerializerMethodField()
     following_count = SerializerMethodField()
     has_pinned_content = SerializerMethodField()
@@ -49,6 +53,7 @@ class ProfileSerializer(ModelSerializer):
         model = Profile
         fields = (
             "fid",
+            "followed_tags",
             "followers_count",
             "following_count",
             "uuid",
@@ -69,6 +74,7 @@ class ProfileSerializer(ModelSerializer):
         )
         read_only_fields = (
             "fid",
+            "followed_tags",
             "followers_count",
             "following_count",
             "uuid",
@@ -83,6 +89,15 @@ class ProfileSerializer(ModelSerializer):
             "url",
             "user_following",
         )
+
+    def get_followed_tags(self, obj: Profile) -> List:
+        """
+        Return list of followed tags if owned by logged in user.
+        """
+        user = self.context.get("request").user
+        if (hasattr(user, "profile") and user.profile.id == obj.id) or user.is_staff:
+            return list(obj.followed_tags.values_list('name', flat=True))
+        return []
 
     def get_following_count(self, obj):
         return obj.following.count()

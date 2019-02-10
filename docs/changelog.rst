@@ -15,6 +15,10 @@ Added
 
   Since this limited support breaks compatibility with platforms that prefer ActivityPub, it is disabled by default. Add the environment variable ``SOCIALHOME_ACTIVITYPUB_ALPHA=1`` to activate it.
 
+* Added Tags API. In addition to listing Tag objects, it allows authenticated users to follow and unfollow tags.
+
+* Profile API now includes a list of tags followed for logged in users.
+
 Changed
 .......
 
@@ -48,6 +52,11 @@ Fixed
 * API docs regression fixed (`#509 <https://github.com/jaywink/socialhome/issues/509>`_)
 
 * Fix internal server error for anonymous user for certain internal user pages (`#518 <https://git.feneas.org/socialhome/socialhome/issues/518>`_)
+
+Internal changes
+................
+
+* Removed ``User`` relationship fields. These were migrated to ``Profile`` a long time ago.
 
 0.9.3 (2018-08-29)
 ------------------

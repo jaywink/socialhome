@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 
 
 @admin.register(Content)
@@ -12,3 +12,11 @@ class ContentAdmin(ModelAdmin):
     readonly_fields = ('content_type', 'local', 'rendered', 'reply_count', 'shares_count', 'uuid', 'fid', 'guid')
     search_fields = ('uuid', 'id', 'author__handle', 'author__name', 'author__fid')
     list_select_related = ('author',)
+
+
+@admin.register(Tag)
+class TagAdmin(ModelAdmin):
+    list_display = ("id", "uuid", "name", "created")
+    list_filter = ("id", "uuid", "name", "created")
+    readonly_fields = ("id", "uuid", "created", "name")
+    search_fields = ("id", "uuid", "name")

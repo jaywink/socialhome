@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from socialhome.content.enums import ContentType
-from socialhome.content.models import Content
+from socialhome.content.models import Content, Tag
 from socialhome.enums import Visibility
 from socialhome.users.serializers import LimitedProfileSerializer
 
@@ -132,3 +132,10 @@ class ContentSerializer(serializers.ModelSerializer):
         if value == Visibility.LIMITED and not self.instance:
             raise serializers.ValidationError("Limited content creation not yet supported via the API.")
         return value
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("name", "created", "uuid")
+        read_only_fields = ("created", "uuid")

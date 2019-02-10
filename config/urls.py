@@ -11,7 +11,7 @@ from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from django_js_reverse.views import urls_js
 
 from socialhome.content.views import ContentBookmarkletView
-from socialhome.content.viewsets import ContentViewSet
+from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
 from socialhome.viewsets import ImageUploadView
 from socialhome.views import (
@@ -27,6 +27,7 @@ from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
+router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
 
 # API docs

@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.permissions import BasePermission, SAFE_METHODS
@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.viewsets import GenericViewSet
 
-from socialhome.content.models import Content
-from socialhome.content.serializers import ContentSerializer
+from socialhome.content.models import Content, Tag
+from socialhome.content.serializers import ContentSerializer, TagSerializer
 
 
 class IsOwnContentOrReadOnly(BasePermission):
@@ -125,3 +125,42 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         queryset = self.filter_queryset(self.get_queryset(share_of=content)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class TagViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    """
+    list:
+
+        List Tag objects.
+
+    follow:
+
+        Follow a Tag.
+
+        Requires being logged in.
+
+    unfollow:
+
+        Unfollow a Tag.
+
+        Requires being logged in.
+    """
+    lookup_field = "uuid"
+    queryset = Tag.objects.all().order_by("name")
+    serializer_class = TagSerializer
+
+    @detail_route(methods=["post"])
+    def follow(self, request, uuid=None):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Must be authenticated to follow a tag."}, status=status.HTTP_401_UNAUTHORIZED)
+        tag = self.get_object()
+        request.user.profile.followed_tags.add(tag)
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+    @detail_route(methods=["post"])
+    def unfollow(self, request, uuid=None):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Must be authenticated to follow a tag."}, status=status.HTTP_401_UNAUTHORIZED)
+        tag = self.get_object()
+        request.user.profile.followed_tags.remove(tag)
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
