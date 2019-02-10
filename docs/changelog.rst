@@ -17,6 +17,8 @@ Added
 
 * Added Tags API. In addition to listing Tag objects, it allows authenticated users to follow and unfollow tags.
 
+* Profile API now includes a list of tags followed for logged in users.
+
 Changed
 .......
 
