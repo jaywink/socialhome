@@ -1,20 +1,12 @@
-import Axios from "axios"
-import Vue from "vue"
-
 import {getFakeContent, getProfile} from "frontend/tests/fixtures/jsonContext.fixtures"
-import applicationStore from "frontend/stores/applicationStore"
-import {newStreamStore} from "frontend/stores/streamStore"
-
+import getStreamState from "../../store/modules/stream.state"
+import {getters} from "../../store/modules/stream"
 
 const getStore = () => {
-    const store = newStreamStore({
-        modules: {applicationStore},
-        baseURL: "",
-        axios: Axios.create({
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-        }),
-    })
+    const store = {state: {}}
+    store.state.stream = getStreamState()
+    store.state.profile = {}
+    store.state.application = {}
     store.content = getFakeContent()
     store.reply = getFakeContent({parent: store.content.id, content_type: "reply"})
     store.share = getFakeContent({share_of: store.content.id, content_type: "share"})
@@ -23,23 +15,35 @@ const getStore = () => {
     store.content.replyIds = [store.reply.id]
     store.share.replyIds = [store.shareReply.id]
     store.content.shareIds = [store.share.id]
-    store.state.contentIds.push(store.content.id)
+    store.state.stream.contentIds.push(store.content.id)
 
     store.profile = getProfile()
 
-    Vue.set(store.state.contents, store.content.id, store.content)
-    Vue.set(store.state.replies, store.reply.id, store.reply)
-    Vue.set(store.state.shares, store.share.id, store.share)
-    Vue.set(store.state.replies, store.shareReply.id, store.shareReply)
+    store.state.stream.contents[store.content.id] = store.content
+    store.state.stream.replies[store.reply.id] = store.reply
+    store.state.stream.shares[store.share.id] = store.share
+    store.state.stream.replies[store.shareReply.id] = store.shareReply
+    store.state.stream.pending = {
+        contents: false,
+        replies: false,
+        shares: false,
+    }
 
-    Vue.set(store.state.stream, "id", "")
-    Vue.set(store.state.stream, "isProfile", false)
-    Vue.set(store.state.stream, "name", "public")
-    Vue.set(store.state.stream, "single", false)
+    store.state.stream.stream.id = ""
+    store.state.stream.stream.isProfile = false
+    store.state.stream.stream.name = "public"
+    store.state.stream.stream.single = false
 
-    store.state.applicationStore.currentBrowsingProfileId = store.profile.id
-    store.state.applicationStore.isUserAuthenticated = true
-    store.state.applicationStore.profile = store.profile
+    store.state.application.currentBrowsingProfileId = store.profile.id
+    store.state.application.isUserAuthenticated = true
+    store.state.application.profile = store.profile
+
+    store.getters = {
+        "stream/replies": getters.replies,
+        "stream/shares": getters.shares,
+    }
+    store.dispatch = () => {}
+
     return store
 }
 

@@ -1,6 +1,7 @@
 import {mount} from "avoriaz"
 
 import Vue from "vue"
+import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
@@ -9,6 +10,7 @@ import {getStore} from "frontend/tests/fixtures/store.fixtures"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
+Vue.use(Vuex)
 
 
 describe("NsfwShield", () => {
@@ -22,6 +24,7 @@ describe("NsfwShield", () => {
     describe("lifecycle", () => {
         context("updated", () => {
             it("redraws masonry if not single stream", (done) => {
+                store.state.stream.stream.single = false
                 let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
@@ -32,7 +35,7 @@ describe("NsfwShield", () => {
             })
 
             it("does not redraw masonry if single stream", (done) => {
-                store.state.stream.single = true
+                store.state.stream.stream.single = true
                 let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
                 Sinon.spy(Vue, "redrawVueMasonry")
                 target.update()
@@ -55,7 +58,7 @@ describe("NsfwShield", () => {
                 })
 
                 it("does not if single stream", () => {
-                    store.state.stream.single = true
+                    store.state.stream.stream.single = true
                     let target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
                     Sinon.spy(Vue, "redrawVueMasonry")
                     target.instance().onImageLoad()

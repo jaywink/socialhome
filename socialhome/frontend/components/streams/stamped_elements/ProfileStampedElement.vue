@@ -134,15 +134,15 @@ export default Vue.component("profile-stamped-element", {
             return this.profile.stream_type === "all_content" ? "primary" : "secondary"
         },
         profile() {
-            return this.$store.state.applicationStore.profile
+            return this.$store.state.application.profile
         },
         showProfileButtons() {
-            return this.$store.state.applicationStore.isUserAuthenticated &&
-                this.profile.id === this.$store.state.applicationStore.currentBrowsingProfileId
+            return this.$store.state.application.isUserAuthenticated &&
+                this.profile.id === this.$store.state.application.currentBrowsingProfileId
         },
         showProfileReactionButtons() {
-            return this.$store.state.applicationStore.isUserAuthenticated &&
-                this.profile.id !== this.$store.state.applicationStore.currentBrowsingProfileId
+            return this.$store.state.application.isUserAuthenticated &&
+                this.profile.id !== this.$store.state.application.currentBrowsingProfileId
         },
         translations() {
             return {

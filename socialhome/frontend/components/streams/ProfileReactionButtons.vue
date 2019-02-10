@@ -42,8 +42,6 @@
 </template>
 
 <script>
-
-
 export default {
     name: "profile-reaction-buttons",
     data() {
@@ -58,19 +56,19 @@ export default {
     },
     computed: {
         currentBrowsingProfileId() {
-            return this.$store.state.applicationStore.currentBrowsingProfileId
+            return this.$store.state.application.currentBrowsingProfileId
         },
         displayName() {
             return this.profile.name ? this.profile.name : this.profile.fid
         },
         isUserAuthenticated() {
-            return this.$store.state.applicationStore.isUserAuthenticated
+            return this.$store.state.application.isUserAuthenticated
         },
         showFollowBtn() {
-            return this.$store.state.applicationStore.isUserAuthenticated && !this.following
+            return this.$store.state.application.isUserAuthenticated && !this.following
         },
         showUnfollowBtn() {
-            return this.$store.state.applicationStore.isUserAuthenticated && this.following
+            return this.$store.state.application.isUserAuthenticated && this.following
         },
         translations() {
             return {

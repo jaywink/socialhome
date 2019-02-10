@@ -40,7 +40,6 @@
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
-import {streamStoreOperations} from "frontend/stores/streamStore.operations"
 import "frontend/components/streams/AuthorBar.vue"
 import "frontend/components/streams/ReactionsBar.vue"
 import "frontend/components/streams/NsfwShield.vue"
@@ -56,7 +55,7 @@ export default Vue.component("stream-element", {
             return Urls["content:delete"]({pk: this.content.id})
         },
         disableLoadMore() {
-            return this.$store.state.pending.contents || !this.content.hasLoadMore
+            return this.$store.state.stream.pending.contents || !this.content.hasLoadMore
         },
         isLimited() {
             return this.content.visibility === "limited"
@@ -70,12 +69,12 @@ export default Vue.component("stream-element", {
             if (this.content.content_type === "reply") {
                 // Always show author bar for replies
                 return true
-            } else if (this.$store.state.applicationStore.isUserAuthenticated && !this.content.user_is_author) {
+            } else if (this.$store.state.application.isUserAuthenticated && !this.content.user_is_author) {
                 // Always show if authenticated and not own content
                 return true
             }
             // Fall back to central state
-            return this.$store.state.showAuthorBar
+            return this.$store.state.stream.showAuthorBar
         },
         updateUrl() {
             return Urls["content:update"]({pk: this.content.id})
@@ -97,8 +96,8 @@ export default Vue.component("stream-element", {
                         window.twttr.widgets.load(document.getElementsByClassName(".streams-container")[0])
                     }, 1000)
                 }
-                if (this.$store.state.layoutDoneAfterTwitterOEmbeds) return
-                this.$store.dispatch(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds, true)
+                if (this.$store.state.stream.layoutDoneAfterTwitterOEmbeds) return
+                this.$store.dispatch("stream/setLayoutDoneAfterTwitterOEmbeds", true)
                 const c = this
                 setTimeout(() => {
                     c.onImageLoad()
@@ -109,11 +108,11 @@ export default Vue.component("stream-element", {
             }
         },
         loadMore() {
-            this.$store.dispatch(streamStoreOperations.disableLoadMore, this.content.id)
+            this.$store.dispatch("stream/disableLoadMore", this.content.id)
             this.$emit("loadmore")
         },
         onImageLoad() {
-            if (!this.$store.state.stream.single) {
+            if (!this.$store.state.stream.stream.single) {
                 Vue.redrawVueMasonry()
             }
         },
@@ -122,7 +121,7 @@ export default Vue.component("stream-element", {
         this.layoutAfterTwitterOEmbeds()
     },
     updated() {
-        if (!this.$store.state.stream.single) {
+        if (!this.$store.state.stream.stream.single) {
             Vue.redrawVueMasonry()
         }
     },

@@ -1,7 +1,6 @@
 import Vue from "vue"
 
 import main from "frontend/main"
-import {streamStoreOperations} from "frontend/stores/streamStore"
 
 
 describe("Main", () => {
@@ -26,21 +25,21 @@ describe("Main", () => {
                     Sinon.spy(main.$store, "dispatch")
                     main.onWebsocketMessage({data: JSON.stringify({event: "new", id: 4})})
                     main.$store.dispatch.getCall(0).args
-                        .should.eql([streamStoreOperations.receivedNewContent, 4])
+                        .should.eql(["streams/receivedNewContent", 4])
                 })
             })
 
             describe("websocketPath", () => {
                 it("should connect with protocol wss:// when browser protocol is HTTPS", () => {
                     jsdom.reconfigure({url: "https://localhost"})
-                    main.$store.state.streamName = "public"
+                    main.$store.state.stream.streamName = "public"
 
                     main.websocketPath().should.eq("wss://localhost/ch/streams/public/")
                 })
 
                 it("should connect with protocol ws:// when browser protocol is HTTP", () => {
                     jsdom.reconfigure({url: "http://localhost"})
-                    main.$store.state.streamName = "public"
+                    main.$store.state.stream.streamName = "public"
 
                     main.websocketPath().should.eq("ws://localhost/ch/streams/public/")
                 })

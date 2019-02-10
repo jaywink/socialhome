@@ -1,6 +1,7 @@
 import Axios from "axios"
 import Moxios from "moxios"
 import Vue from "vue"
+import Vuex from "vuex"
 import VueMasonryPlugin from "vue-masonry"
 import VueSnotify from "vue-snotify"
 import BootstrapVue from "bootstrap-vue"
@@ -9,10 +10,10 @@ import {mount} from "avoriaz"
 import ProfileReactionButtons from "frontend/components/streams/ProfileReactionButtons.vue"
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
 
-
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 Vue.use(VueSnotify)
+Vue.use(Vuex)
 
 describe("ProfileReactionButtons", () => {
     let store
@@ -26,7 +27,7 @@ describe("ProfileReactionButtons", () => {
         describe("showFollowBtn and showUnfollowBtn", () => {
             it("should show the follow button when the user can and is not following the author", () => {
                 store.content.user_is_author = false
-                store.state.applicationStore.isUserAuthenticated = true
+                store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
                     propsData: {
                         profile: store.content.author,
@@ -41,7 +42,7 @@ describe("ProfileReactionButtons", () => {
 
             it("should show the unfollow button when the user can and is not following the author", () => {
                 store.content.user_is_author = false
-                store.state.applicationStore.isUserAuthenticated = true
+                store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
                     propsData: {
                         profile: store.content.author,
@@ -135,7 +136,7 @@ describe("ProfileReactionButtons", () => {
                     store,
                 })
 
-                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().$store.state.application.isUserAuthenticated = false
 
                 Sinon.spy(target.instance().$snotify, "error")
                 target.instance().following.should.be.false
@@ -211,7 +212,7 @@ describe("ProfileReactionButtons", () => {
                     store,
                 })
 
-                target.instance().$store.state.applicationStore.isUserAuthenticated = false
+                target.instance().$store.state.application.isUserAuthenticated = false
 
                 Sinon.spy(target.instance().$snotify, "error")
                 target.instance().following.should.be.true

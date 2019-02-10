@@ -1,13 +1,13 @@
 <template>
-    <div :class="{ container: this.$store.state.stream.single }">
-        <div v-show="$store.getters.hasNewContent" class="new-content-container">
+    <div :class="{ container: this.$store.state.stream.stream.single }">
+        <div v-show="$store.getters['stream/hasNewContent']" class="new-content-container">
             <b-link @click.prevent.stop="onNewContentClick" class="new-content-load-link">
                 <b-badge pill variant="primary">
                     {{ translations.newPostsAvailables }}
                 </b-badge>
             </b-link>
         </div>
-        <div v-if="this.$store.state.stream.single">
+        <div v-if="this.$store.state.stream.stream.single">
             <stream-element
                 class="grid-item grid-item-full"
                 :content="singleContent"
@@ -23,21 +23,18 @@
                 class="grid-item"
                 @loadmore="loadStream"
                 v-masonry-tile
-                v-for="content in $store.getters.contentList"
+                v-for="content in $store.getters['stream/contentList']"
                 :content="content"
                 :key="content.id"
             />
         </div>
-        <loading-element v-show="$store.state.pending.contents" />
+        <loading-element v-show="$store.state.stream.pending.contents" />
     </div>
 </template>
 
 <script>
 import Vue from "vue"
-
 import VueScrollTo from "vue-scrollto"
-
-import {streamStoreOperations} from "frontend/stores/streamStore"
 
 import "frontend/components/streams/StreamElement.vue"
 import PublicStampedElement from "frontend/components/streams/stamped_elements/PublicStampedElement.vue"
@@ -47,7 +44,6 @@ import LocalStampedElement from "frontend/components/streams/stamped_elements/Lo
 import TagStampedElement from "frontend/components/streams/stamped_elements/TagStampedElement.vue"
 import ProfileStampedElement from "frontend/components/streams/stamped_elements/ProfileStampedElement.vue"
 import "frontend/components/streams/LoadingElement.vue"
-
 
 Vue.use(VueScrollTo)
 
@@ -82,13 +78,13 @@ export default Vue.component("stream", {
     },
     computed: {
         singleContent() {
-            if (!this.$store.state.singleContentId) {
+            if (!this.$store.state.stream.singleContentId) {
                 return null
             }
-            return this.$store.state.contents[this.$store.state.singleContentId]
+            return this.$store.state.stream.contents[this.$store.state.stream.singleContentId]
         },
         stampedElement() {
-            switch (this.$store.state.stream.name) {
+            switch (this.$store.state.stream.stream.name) {
                 case "followed":
                     return "FollowedStampedElement"
                 case "limited":
@@ -103,7 +99,7 @@ export default Vue.component("stream", {
                 case "profile_pinned":
                     return "ProfileStampedElement"
                 default:
-                    console.error(`Unsupported stream name ${this.$store.state.stream.name}`)
+                    console.error(`Unsupported stream name ${this.$store.state.stream.stream.name}`)
                     return ""
             }
         },
@@ -114,46 +110,46 @@ export default Vue.component("stream", {
             }
         },
         unfetchedContentIds() {
-            return this.$store.state.unfetchedContentIds
+            return this.$store.state.stream.unfetchedContentIds
         },
     },
     methods: {
         onNewContentClick() {
-            this.$store.dispatch(streamStoreOperations.newContentAck).then(
+            this.$store.dispatch("stream/newContentAck").then(
                 () => this.$nextTick( // Wait for new content to be rendered
                     () => this.$scrollTo("body")))
         },
         loadStream() {
             const options = {params: {}}
-            const lastContentId = this.$store.state.contentIds[this.$store.state.contentIds.length - 1]
-            if (lastContentId && this.$store.state.contents[lastContentId]) {
-                options.params.lastId = this.$store.state.contents[lastContentId].through
+            const lastContentId = this.$store.state.stream.contentIds[this.$store.state.stream.contentIds.length - 1]
+            if (lastContentId && this.$store.state.stream.contents[lastContentId]) {
+                options.params.lastId = this.$store.state.stream.contents[lastContentId].through
             }
 
-            switch (this.$store.state.stream.name) {
+            switch (this.$store.state.stream.stream.name) {
                 case "followed":
-                    this.$store.dispatch(streamStoreOperations.getFollowedStream, options)
+                    this.$store.dispatch("stream/getFollowedStream", options)
                     break
                 case "limited":
-                    this.$store.dispatch(streamStoreOperations.getLimitedStream, options)
+                    this.$store.dispatch("stream/getLimitedStream", options)
                     break
                 case "local":
-                    this.$store.dispatch(streamStoreOperations.getLocalStream, options)
+                    this.$store.dispatch("stream/getLocalStream", options)
                     break
                 case "public":
-                    this.$store.dispatch(streamStoreOperations.getPublicStream, options)
+                    this.$store.dispatch("stream/getPublicStream", options)
                     break
                 case "tag":
                     options.params.name = this.tag
-                    this.$store.dispatch(streamStoreOperations.getTagStream, options)
+                    this.$store.dispatch("stream/getTagStream", options)
                     break
                 case "profile_all":
-                    options.params.uuid = this.$store.state.applicationStore.profile.uuid
-                    this.$store.dispatch(streamStoreOperations.getProfileAll, options)
+                    options.params.uuid = this.$store.state.application.profile.uuid
+                    this.$store.dispatch("stream/getProfileAll", options)
                     break
                 case "profile_pinned":
-                    options.params.uuid = this.$store.state.applicationStore.profile.uuid
-                    this.$store.dispatch(streamStoreOperations.getProfilePinned, options)
+                    options.params.uuid = this.$store.state.application.profile.uuid
+                    this.$store.dispatch("stream/getProfilePinned", options)
                     break
                 default:
                     break
@@ -161,7 +157,7 @@ export default Vue.component("stream", {
         },
     },
     beforeMount() {
-        if (!this.$store.state.stream.single) {
+        if (!this.$store.state.stream.stream.single) {
             this.loadStream()
         }
     },

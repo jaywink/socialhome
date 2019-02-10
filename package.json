@@ -2,6 +2,7 @@
   "name": "socialhome",
   "version": "0.1.0",
   "scripts": {
+    "bower": "./node_modules/.bin/bower install",
     "build": "./node_modules/grunt/bin/grunt build && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.prod.js",
     "dev": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --config config/webpack/webpack.dev.js",
     "watch": "./node_modules/grunt/bin/grunt dev && ./node_modules/webpack/bin/webpack.js --watch --config config/webpack/webpack.dev.js",

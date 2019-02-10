@@ -12,7 +12,7 @@
     "max-len": ["error", 120],
     "no-unused-expressions": "off",
     "object-curly-spacing": ["error", "never"],
-    "quotes": ["warn", "double"],
+    "quotes": "off",
     "semi": ["error", "never"],
     "no-return-assign": "off"
   },

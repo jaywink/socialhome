@@ -57,6 +57,7 @@ Internal changes
 ................
 
 * Removed ``User`` relationship fields. These were migrated to ``Profile`` a long time ago.
+* Heavy refactoring of Vue frontend store.
 
 0.9.3 (2018-08-29)
 ------------------

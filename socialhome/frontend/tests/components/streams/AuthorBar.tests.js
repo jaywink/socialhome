@@ -5,8 +5,7 @@ import {mount} from "avoriaz"
 
 import AuthorBar from "frontend/components/streams/AuthorBar.vue"
 import {getContext, getFakeContent, getFakeAuthor} from "frontend/tests/fixtures/jsonContext.fixtures"
-import {newApplicationStore} from "frontend/stores/applicationStore"
-import {newStreamStore} from "frontend/stores/streamStore"
+import {getStore} from "../../fixtures/store.fixtures"
 
 
 Vue.use(BootstrapVue)
@@ -24,9 +23,9 @@ describe("AuthorBar", () => {
             author: getFakeAuthor({uuid: "42"}),
         })
         window.context = getContext({currentBrowsingProfileId: 26}, 0)
-        store = newStreamStore({modules: {applicationStore: newApplicationStore()}})
-        store.state.contentIds.push(content.id)
-        Vue.set(store.state.contents, content.id, content)
+        store = getStore()
+        store.state.stream.contentIds.push(content.id)
+        Vue.set(store.state.stream.contents, content.id, content)
     })
 
     describe("methods", () => {

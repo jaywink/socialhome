@@ -30,7 +30,6 @@
 import imagesLoaded from "vue-images-loaded"
 import Vue from "vue"
 
-import {streamStoreOperations} from "frontend/stores/streamStore.operations";
 import "frontend/components/streams/ReplyEditor.vue"
 
 
@@ -49,17 +48,17 @@ export default Vue.component("replies-container", {
             return this.content.content_type === "content"
         },
         isUserAuthenticated() {
-            return this.$store.state.applicationStore.isUserAuthenticated
+            return this.$store.state.application.isUserAuthenticated
         },
         replies() {
-            return this.$store.getters.replies(this.content)
+            return this.$store.getters["stream/replies"](this.content)
         },
         shares() {
-            return this.$store.getters.shares(this.content.id)
+            return this.$store.getters["stream/shares"](this.content.id)
         },
         showReplyButton() {
             if (!this.isUserAuthenticated || this.replyEditorActive || (
-                    this.$store.state.pending.replies && this.content.reply_count > 0)) {
+                    this.$store.state.stream.pending.replies && this.content.reply_count > 0)) {
                 return false
             }
             if (this.content.content_type === "content") {
@@ -70,7 +69,7 @@ export default Vue.component("replies-container", {
             return false
         },
         showSpinner() {
-            return this.isContent && this.$store.state.pending.replies && this.content.reply_count > 0
+            return this.isContent && this.$store.state.stream.pending.replies && this.content.reply_count > 0
         },
         translations() {
             return {
@@ -80,7 +79,7 @@ export default Vue.component("replies-container", {
     },
     methods: {
         onImageLoad() {
-            if (!this.$store.state.stream.single) {
+            if (!this.$store.state.stream.stream.single) {
                 Vue.redrawVueMasonry()
             }
         },
@@ -90,12 +89,12 @@ export default Vue.component("replies-container", {
     },
     mounted() {
         if (this.isContent) {
-            this.$store.dispatch(streamStoreOperations.getReplies, { params: { id: this.content.id } })
-            this.$store.dispatch(streamStoreOperations.getShares, { params: { id: this.content.id } })
+            this.$store.dispatch("stream/getReplies", { params: { id: this.content.id } })
+            this.$store.dispatch("stream/getShares", { params: { id: this.content.id } })
         }
     },
     updated() {
-        if (!this.$store.state.stream.single) {
+        if (!this.$store.state.stream.stream.single) {
             Vue.redrawVueMasonry()
         }
     },
