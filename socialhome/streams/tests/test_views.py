@@ -8,6 +8,7 @@ from socialhome.streams.enums import StreamType
 from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, \
     LocalStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase
+from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
 
@@ -22,13 +23,16 @@ class TestFollowedStreamView(SocialhomeCBVTestCase):
         cls.user.profile.following.add(cls.content.author)
 
     def test_get_json_context(self):
-        view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
+        request = self.get_request(self.user)
+        view = self.get_instance(FollowedStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
                 "currentBrowsingProfileId": self.user.profile.id,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": True,
+                "ownProfile": profile,
             }
         )
 
@@ -73,13 +77,16 @@ class TestLimitedStreamView(SocialhomeCBVTestCase):
         cls.client = Client()
 
     def test_get_json_context(self):
-        view = self.get_instance(LimitedStreamView, request=self.get_request(self.user))
+        request = self.get_request(self.user)
+        view = self.get_instance(LimitedStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
                 "currentBrowsingProfileId": self.user.profile.id,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": True,
+                "ownProfile": profile,
             }
         )
 
@@ -125,13 +132,16 @@ class TestLocalStreamView(SocialhomeCBVTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_json_context(self):
-        view = self.get_instance(LocalStreamView, request=self.get_request(self.user))
+        request = self.get_request(self.user)
+        view = self.get_instance(LocalStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
                 "currentBrowsingProfileId": self.user.profile.id,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": True,
+                "ownProfile": profile,
             }
         )
 
@@ -167,13 +177,16 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
         cls.client = Client()
 
     def test_get_json_context(self):
-        view = self.get_instance(PublicStreamView, request=self.get_request(self.user))
+        request = self.get_request(self.user)
+        view = self.get_instance(PublicStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
                 "currentBrowsingProfileId": self.user.profile.id,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": True,
+                "ownProfile": profile,
             }
         )
         view = self.get_instance(PublicStreamView, request=self.get_request(AnonymousUser()))
@@ -183,6 +196,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
                 "currentBrowsingProfileId": None,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": False,
+                "ownProfile": {},
             }
         )
 
@@ -219,7 +233,9 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         cls.client = Client()
 
     def test_get_json_context(self):
-        view = self.get_instance(TagStreamView, request=self.get_request(self.user))
+        request = self.get_request(self.user)
+        view = self.get_instance(TagStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
         view.tag = self.tag_no_content
         self.assertEqual(
             view.get_json_context(),
@@ -227,6 +243,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
                 "currentBrowsingProfileId": self.user.profile.id,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": True,
+                "ownProfile": profile,
             }
         )
         view = self.get_instance(TagStreamView, request=self.get_request(AnonymousUser()))
@@ -237,6 +254,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
                 "currentBrowsingProfileId": None,
                 "streamName": view.stream_name,
                 "isUserAuthenticated": False,
+                "ownProfile": {},
             }
         )
 

@@ -86,6 +86,12 @@ export function newRestAPI() {
     }
 
     return new Vapi(options)
+        .post({
+            action: "followTag",
+            path: ({uuid = undefined}) => `${Urls["api:tag-follow"]({uuid})}`,
+            onSuccess: () => {},
+            onError,
+        })
         .get({
             action: "getPublicStream",
             path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
@@ -112,6 +118,13 @@ export function newRestAPI() {
             path: ({lastId = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
+            onError,
+        })
+        .get({
+            action: "getNewContent",
+            path: ({pk}) => Urls["api:content-detail"]({pk}),
+            property: "contents",
+            onSuccess: fetchNewContentSuccess,
             onError,
         })
         .get({
@@ -157,11 +170,10 @@ export function newRestAPI() {
             onSuccess: fetchRepliesSuccess,
             onError,
         })
-        .get({
-            action: "getNewContent",
-            path: ({pk}) => Urls["api:content-detail"]({pk}),
-            property: "contents",
-            onSuccess: fetchNewContentSuccess,
+        .post({
+            action: "unfollowTag",
+            path: ({uuid = undefined}) => `${Urls["api:tag-unfollow"]({uuid})}`,
+            onSuccess:  () => {},
             onError,
         })
         .getStore()

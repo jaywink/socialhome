@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 from socialhome.content.models import Tag
 from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, LimitedStream, LocalStream
 from socialhome.utils import get_full_url
+from socialhome.users.serializers import ProfileSerializer
 
 
 class BaseStreamView(TemplateView):
@@ -30,10 +31,15 @@ class BaseStreamView(TemplateView):
         return context
 
     def get_json_context(self):
+        if self.request.user.is_authenticated:
+            profile = ProfileSerializer(self.request.user.profile, context={'request': self.request}).data
+        else:
+            profile = {}
         return {
             "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
             "streamName": self.stream_name,
+            "ownProfile": profile,
         }
 
     def get_page_meta(self):
@@ -103,7 +109,10 @@ class TagStreamView(BaseStreamView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["json_context"]["tagName"] = self.tag.name
+        context["json_context"]["tag"] = {
+            "name": self.tag.name,
+            "uuid": self.tag.uuid,
+        }
         return context
 
     def get_page_meta(self):

@@ -19,6 +19,8 @@ Added
 
 * Profile API now includes a list of tags followed for logged in users.
 
+* It is now possible to follow and unfollow tags from a tag stream (`#465 <https://git.feneas.org/socialhome/socialhome/issues/465>`_)
+
 Changed
 .......
 

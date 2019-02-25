@@ -1,21 +1,79 @@
 <template>
-    <base-stamped-element :title="title" :help-text="helpText"/>
+    <div>
+        <div
+            v-if="showTagActions"
+            class="pull-right"
+        >
+            <b-button
+                v-if="!followingTag"
+                @click.prevent="onFollowClick"
+                variant="secondary"
+                class="tag-actions-button"
+                :title="translations.follow"
+                :aria-label="translations.follow"
+            >
+                <i class="fa fa-plus"></i>
+            </b-button>
+            <b-button
+                v-if="followingTag"
+                @click.prevent="onUnFollowClick"
+                variant="secondary"
+                class="tag-actions-button"
+                :title="translations.unfollow"
+                :aria-label="translations.unfollow"
+            >
+                <i class="fa fa-minus"></i>
+            </b-button>
+        </div>
+        <h2>{{ title }}</h2>
+        <p>{{ helpText }}</p>
+    </div>
 </template>
 
 <script>
 import Vue from "vue"
 
-import "frontend/components/streams/stamped_elements/BaseStampedElement.vue"
-
-
 export default Vue.component("tag-stamped-element", {
     computed: {
+        followingTag() {
+            return this.$store.state.profile.followed_tags.includes(this.name)
+        },
+        name() {
+            return this.$store.state.stream.tag.name
+        },
         title() {
-            return `#${this.$store.state.stream.tagName}`
+            return `#${this.name}`
         },
         helpText() {
-            return `${gettext("All content tagged with")} #${this.$store.state.stream.tagName}.`
+            return `${gettext("All content tagged with")} #${this.name}.`
+        },
+        showTagActions() {
+            return this.$store.state.application.isUserAuthenticated
+        },
+        translations() {
+            return {
+                follow: gettext("Follow"),
+                unfollow: gettext("Unfollow"),
+            }
+        },
+    },
+    methods: {
+        onFollowClick() {
+            this.$store.dispatch("stream/followTag", {params: {uuid: this.$store.state.stream.tag.uuid}}).then(() => {
+                this.$store.dispatch("profile/followTag", this.name)
+            })
+        },
+        onUnFollowClick() {
+            this.$store.dispatch("stream/unfollowTag", {params: {uuid: this.$store.state.stream.tag.uuid}}).then(() => {
+                this.$store.dispatch("profile/unfollowTag", this.name)
+            })
         },
     },
 })
 </script>
+
+<style scoped lang="scss">
+    .tag-actions-button {
+        cursor: pointer;
+    }
+</style>

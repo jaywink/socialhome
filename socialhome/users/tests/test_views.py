@@ -11,6 +11,7 @@ from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
+from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tables import FollowedTable
 from socialhome.users.tests.factories import (
     UserFactory, AdminUserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory)
@@ -112,6 +113,7 @@ class TestProfileDetailView(SocialhomeTestCase):
 
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        ownProfile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
@@ -140,6 +142,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                     "user_following": False,
                     "visibility": str(profile.visibility).lower(),
                 },
+                "ownProfile": ownProfile,
             },
         )
         request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
@@ -171,6 +174,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                     "user_following": False,
                     "visibility": str(profile.visibility).lower(),
                 },
+                "ownProfile": {},
             },
         )
 
@@ -386,6 +390,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
 
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
+        ownProfile = ProfileSerializer(request.user.profile, context={'request': request}).data
         self.assertEqual(
             view.get_json_context(),
             {
@@ -414,6 +419,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
                     "user_following": False,
                     "visibility": str(profile.visibility).lower(),
                 },
+                "ownProfile": ownProfile,
             },
         )
         request, view, contents, profile = self._get_request_view_and_content(anonymous_user=True, create_content=False)
@@ -445,6 +451,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
                     "user_following": False,
                     "visibility": str(profile.visibility).lower(),
                 },
+                "ownProfile": {},
             },
         )
 
