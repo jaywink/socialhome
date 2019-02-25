@@ -27,6 +27,12 @@ export default function () {
         name: streamSplits[0],
         single: streamSplits[0] === "content",
     }
+    // Only defined if on a tag stream
+    const tagContext = _get(window, ["context", "tag"], {})
+    const tag = {
+        name: tagContext.name,
+        uuid: tagContext.uuid,
+    }
 
     return {
         contents,
@@ -40,7 +46,7 @@ export default function () {
         singleContentId,
         stream,
         streamName,
-        tagName: _get(window, ["context", "tagName"], ""),
+        tag,
         unfetchedContentIds,
     }
 }
