@@ -58,17 +58,17 @@ export default Vue.component("reactions-bar", {
     },
     computed: {
         showRepliesContainer() {
-            return this.showRepliesBox || this.$store.state.stream.single
+            return this.showRepliesBox || this.$store.state.stream.stream.single
         },
         showReplyReactionIcon() {
             if (this.content.content_type === "content") {
-                return this.$store.state.applicationStore.isUserAuthenticated || this.content.reply_count > 0
+                return this.$store.state.application.isUserAuthenticated || this.content.reply_count > 0
             }
             return false
         },
         showShareReactionIcon() {
             if (this.content.content_type === "content") {
-                return this.$store.state.applicationStore.isUserAuthenticated || this.content.shares_count > 0
+                return this.$store.state.application.isUserAuthenticated || this.content.shares_count > 0
             }
             return false
         },
@@ -99,7 +99,7 @@ export default Vue.component("reactions-bar", {
                 this.$snotify.error(gettext("Unable to reshare own post"))
                 return
             }
-            if (!this.$store.state.applicationStore.isUserAuthenticated) {
+            if (!this.$store.state.application.isUserAuthenticated) {
                 this.$snotify.error(gettext("You must be logged in to reshare"))
                 return
             }
@@ -117,7 +117,7 @@ export default Vue.component("reactions-bar", {
                 this.$snotify.error(gettext("Unable to unshare own post"))
                 return
             }
-            if (!this.$store.state.applicationStore.isUserAuthenticated) {
+            if (!this.$store.state.application.isUserAuthenticated) {
                 this.$snotify.error(gettext("You must be logged in to unshare"))
                 return
             }
@@ -132,7 +132,7 @@ export default Vue.component("reactions-bar", {
         },
     },
     updated() {
-        if (!this.$store.state.stream.single) {
+        if (!this.$store.state.stream.stream.single) {
             Vue.redrawVueMasonry()
         }
     },

@@ -1,15 +1,15 @@
 import {mount} from "avoriaz"
 import Vue from "vue"
+import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
-import {streamStoreOperations} from "frontend/stores/streamStore.operations"
 import ReplyEditor from "frontend/components/streams/ReplyEditor.vue"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
-
+Vue.use(Vuex)
 
 describe("ReplyEditor", () => {
     let store
@@ -38,7 +38,7 @@ describe("ReplyEditor", () => {
                 target.instance().saveReply()
                 store.dispatch.callCount.should.eql(1)
                 store.dispatch.args[0].should.eql([
-                    streamStoreOperations.saveReply, {
+                    "stream/saveReply", {
                         data: {parent: store.content.id, text: "\"Code without tests doesn't exist\" -Albert Einstein"}
                     },
                 ])

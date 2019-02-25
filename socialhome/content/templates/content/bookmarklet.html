@@ -13,7 +13,7 @@
 
     {% block css %}
         <!-- Compiled project CSS -->
-        <link href="{% static 'css/project.css' %}" rel="stylesheet">
+        <link href="{% static 'dist/project.css' %}" rel="stylesheet">
     {% endblock %}
 </head>
 
@@ -26,7 +26,7 @@
         <!-- JavaScript locales -->
         <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
         <!-- Compiled project JS -->
-        <script src="{% static 'js/project.js' %}"></script>
+        <script src="{% static 'dist/project.js' %}"></script>
         {{ form.media }}
     {% endblock javascript %}
 </body>

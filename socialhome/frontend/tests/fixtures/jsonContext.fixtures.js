@@ -39,23 +39,6 @@ const getFakeContent = function (args = {}) {
     })
 }
 
-const getFakePostList = function (args = {}, nbPosts = 1) {
-    let contents = {}
-    let contentIds = []
-    for (let n = 0; ++n <= nbPosts;) {
-        let post = getFakeContent()
-        contentIds.push(post.id)
-        contents[post.id] = post
-    }
-
-    let contentList = _.get(args, ["contentList"], [])
-    for (let n = 0; ++n <= contentList.length;) {
-        contentIds.push(contentList[n].id)
-        contents[contentList[n].id] = contentList[n]
-    }
-
-    return {contents, contentIds}
-}
 
 const getProfile = function (args = {}) {
     return _.defaults({}, args, {

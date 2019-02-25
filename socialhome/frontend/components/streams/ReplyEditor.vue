@@ -21,9 +21,6 @@
 <script>
 import Vue from "vue"
 
-import {streamStoreOperations} from "frontend/stores/streamStore.operations";
-
-
 export default Vue.component("reply-editor", {
     props: {
         contentId: {type: Number, required: true},
@@ -49,7 +46,7 @@ export default Vue.component("reply-editor", {
         saveReply() {
             if (this.replyText) {
                 this.$store.dispatch(
-                    streamStoreOperations.saveReply, {
+                    "stream/saveReply", {
                         data: {parent: this.contentId, text: this.replyText},
                     }
                 )

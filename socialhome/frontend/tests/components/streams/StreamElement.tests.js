@@ -1,25 +1,29 @@
 import {mount} from "avoriaz"
 import infiniteScroll from "vue-infinite-scroll"
 import Vue from "vue"
+import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import VueMasonryPlugin from "vue-masonry"
 
 import {getStore} from "frontend/tests/fixtures/store.fixtures"
 import {getFakeContent} from "frontend/tests/fixtures/jsonContext.fixtures"
-import {streamStoreOperations} from "frontend/stores/streamStore.operations"
 import StreamElement from "frontend/components/streams/StreamElement.vue"
-
 
 Vue.use(BootstrapVue)
 Vue.use(infiniteScroll)
 Vue.use(VueMasonryPlugin)
+Vue.use(Vuex)
 
 describe("StreamElement", () => {
     let store
 
     beforeEach(() => {
-        Sinon.restore()
         store = getStore()
+        Sinon.spy(store, "dispatch")
+    })
+
+    afterEach(() => {
+        Sinon.restore()
     })
 
     describe("computed", () => {
@@ -28,9 +32,10 @@ describe("StreamElement", () => {
             let target = mount(StreamElement, {propsData: {content}, store})
             target.instance().disableLoadMore.should.be.false
 
-            target.instance().$store.state.pending.contents = true
+            store.state.stream.pending.contents = true
+            target = mount(StreamElement, {propsData: {content}, store})
             target.instance().disableLoadMore.should.be.true
-            target.instance().$store.state.pending.contents = false
+            store.state.stream.pending.contents = false
 
             content = getFakeContent({hasLoadMore: false})
             target = mount(StreamElement, {propsData: {content}, store})
@@ -38,13 +43,14 @@ describe("StreamElement", () => {
         })
 
         it("showAuthorBar with content", () => {
-            store.state.applicationStore.isUserAuthenticated = false
+            store.state.application.isUserAuthenticated = false
+            store.state.stream.showAuthorBar = false
             let target = mount(StreamElement, {propsData: {content: store.content}, store})
-            store.state.showAuthorBar = false
             target.instance().showAuthorBar.should.be.false
-            store.state.showAuthorBar = true
+            store.state.stream.showAuthorBar = true
+            target = mount(StreamElement, {propsData: {content: store.content}, store})
             target.instance().showAuthorBar.should.be.true
-            store.state.applicationStore.isUserAuthenticated = true
+            store.state.application.isUserAuthenticated = true
         })
 
         it("showAuthorBar with reply", () => {
@@ -67,28 +73,10 @@ describe("StreamElement", () => {
     describe("methods", () => {
         it("loadMore dispatches stream operations", () => {
             const target = mount(StreamElement, {propsData: {content: store.content}, store})
-            Sinon.spy(target.instance().$store, "dispatch")
             Sinon.spy(target.instance(), "$emit")
             target.instance().loadMore()
-            target.instance().$store.dispatch.getCall(0).args[0].should.eql(streamStoreOperations.disableLoadMore)
+            target.instance().$store.dispatch.getCall(0).args[0].should.eql("stream/disableLoadMore")
             target.instance().$emit.getCall(0).args[0].should.eql("loadmore")
-        })
-
-        describe("onImageLoad", () => {
-            it("should call Vue.redrawVueMasonry if not single stream", () => {
-                let target = mount(StreamElement, {propsData: {content: store.content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
-                target.instance().onImageLoad()
-                Vue.redrawVueMasonry.called.should.be.true
-            })
-
-            it("should not call Vue.redrawVueMasonry if single stream", () => {
-                store.state.stream.single = true
-                let target = mount(StreamElement, {propsData: {content: store.content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
-                target.instance().onImageLoad()
-                Vue.redrawVueMasonry.called.should.be.false
-            })
         })
     })
 

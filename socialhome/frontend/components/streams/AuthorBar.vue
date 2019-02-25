@@ -56,7 +56,7 @@ export default Vue.component("author-bar", {
             return this.author.fid
         },
         isUserAuthenticated() {
-            return this.$store.state.applicationStore.isUserAuthenticated
+            return this.$store.state.application.isUserAuthenticated
         },
     },
     methods: {

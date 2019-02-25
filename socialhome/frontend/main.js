@@ -4,20 +4,16 @@ import VueInfiniteScroll from "vue-infinite-scroll"
 import VueMasonryPlugin from "vue-masonry"
 import VueRouter from "vue-router"
 import VueSnotify from "vue-snotify"
-
-import Axios from "axios"
 import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
 
 import router from "frontend/routes"
-
-import {newStreamStore, streamStoreOperations} from "frontend/stores/streamStore"
-import applicationStore from "frontend/stores/applicationStore"
 
 import "frontend/components/streams/Stream.vue"
 
 // CSS
 import "frontend/main.stylesheet"
 
+import store from "./store"
 
 Vue.use(BootstrapVue)
 Vue.use(VueInfiniteScroll)
@@ -25,16 +21,7 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueRouter)
 Vue.use(VueSnotify)
 
-Vue.prototype.$http = Axios.create({
-    xsrfCookieName: "csrftoken",
-    xsrfHeaderName: "X-CSRFToken",
-})
-
-const store = newStreamStore({
-    modules: {applicationStore},
-    baseURL: "",
-    axios: Vue.prototype.$http,
-})
+console.log(store)
 
 const main = new Vue({
     el: "#app",
@@ -45,12 +32,12 @@ const main = new Vue({
             const data = JSON.parse(message.data)
 
             if (data.event === "new") {
-                this.$store.dispatch(streamStoreOperations.receivedNewContent, data.id)
+                this.$store.dispatch("streams/receivedNewContent", data.id)
             }
         },
         websocketPath() {
             const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws"
-            return `${websocketProtocol}://${window.location.host}/ch/streams/${this.$store.state.streamName}/`
+            return `${websocketProtocol}://${window.location.host}/ch/streams/${this.$store.state.stream.streamName}/`
         },
     },
     created() {

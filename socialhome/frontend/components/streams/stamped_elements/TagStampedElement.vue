@@ -11,10 +11,10 @@ import "frontend/components/streams/stamped_elements/BaseStampedElement.vue"
 export default Vue.component("tag-stamped-element", {
     computed: {
         title() {
-            return `#${this.$store.state.tagName}`
+            return `#${this.$store.state.stream.tagName}`
         },
         helpText() {
-            return `${gettext("All content tagged with")} #${this.$store.state.tagName}.`
+            return `${gettext("All content tagged with")} #${this.$store.state.stream.tagName}.`
         },
     },
 })

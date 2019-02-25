@@ -10,9 +10,7 @@ socialhome/media/
 .cache
 env.local
 socialhome/static/css/*.css
-socialhome/static/js/project.js
-socialhome/static/js/webpack.*.js
-socialhome/static/js/webpack.*.js.map
+socialhome/static/dist
 socialhome/static/fonts/
 staticfiles/
 bower_components/

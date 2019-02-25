@@ -1,17 +1,14 @@
 /* eslint-disable no-param-reassign */
+import Axios from "axios"
 import Vue from "vue"
-import Vuex from "vuex"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
-import _get from "lodash/get"
 
-import getState from "frontend/stores/streamStore.state"
-import {actions, mutations, streamStoreOperations, getters} from "frontend/stores/streamStore.operations"
+import getState from "frontend/store/modules/stream.state"
+import {streamActions, streamMutations, streamGetters} from "frontend/store/modules/stream.operations"
 
 
-Vue.use(Vuex)
-
-function addHasLoadMore(state) {
+export function addHasLoadMore(state) {
     const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
@@ -22,7 +19,7 @@ function addHasLoadMore(state) {
     state.layoutDoneAfterTwitterOEmbeds = false
 }
 
-function fetchContentsSuccess(state, payload) {
+export function fetchContentsSuccess(state, payload) {
     let newItems = 0
     payload.data.forEach(item => {
         const content = Object.assign({}, item, {replyIds: [], shareIds: []})
@@ -37,7 +34,7 @@ function fetchContentsSuccess(state, payload) {
     }
 }
 
-function fetchRepliesSuccess(state, payload) {
+export function fetchRepliesSuccess(state, payload) {
     let items = payload.data
     if (!Array.isArray(payload.data)) {
         items = [payload.data]
@@ -57,7 +54,7 @@ function fetchRepliesSuccess(state, payload) {
     })
 }
 
-function fetchSharesSuccess(state, payload) {
+export function fetchSharesSuccess(state, payload) {
     payload.data.forEach(item => {
         const share = Object.assign({}, item, {replyIds: []})
         Vue.set(state.shares, share.id, share)
@@ -67,90 +64,101 @@ function fetchSharesSuccess(state, payload) {
     })
 }
 
-function fetchNewContentSuccess(state, payload) {
+export function fetchNewContentSuccess(state, payload) {
     Vue.set(state.contents, payload.data.id, payload.data)
 }
 
-function onError() {
+export function onError() {
     Vue.snotify.error(gettext("An error happened while fetching new content"))
 }
 
-function newRestAPI(options) {
+export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
+
+    Vue.prototype.$http = Axios.create({
+        xsrfCookieName: "csrftoken",
+        xsrfHeaderName: "X-CSRFToken",
+    })
+    const options = {
+        baseURL: "",
+        axios: Vue.prototype.$http,
+        state: getState(),
+    }
 
     return new Vapi(options)
         .get({
-            action: streamStoreOperations.getPublicStream,
+            action: "getPublicStream",
             path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getFollowedStream,
+            action: "getFollowedStream",
             path: ({lastId = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getLimitedStream,
+            action: "getLimitedStream",
             path: ({lastId = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getLocalStream,
+            action: "getLocalStream",
             path: ({lastId = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getTagStream,
+            action: "getTagStream",
             path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getProfileAll,
+            action: "getProfileAll",
             path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getProfilePinned,
-            path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}`,
+            action: "getProfilePinned",
+            path: (
+                {uuid, lastId = undefined}) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getReplies,
+            action: "getReplies",
             path: ({id}) => Urls["api:content-replies"]({pk: id}),
             property: "replies",
             onSuccess: fetchRepliesSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getShares,
+            action: "getShares",
             path: ({id}) => Urls["api:content-shares"]({pk: id}),
             property: "shares",
             onSuccess: fetchSharesSuccess,
             onError,
         })
         .post({
-            action: streamStoreOperations.saveReply,
+            action: "saveReply",
             path: Urls["api:content-list"],
             property: "reply",
             onSuccess: fetchRepliesSuccess,
             onError,
         })
         .get({
-            action: streamStoreOperations.getNewContent,
+            action: "getNewContent",
             path: ({pk}) => Urls["api:content-detail"]({pk}),
             property: "contents",
             onSuccess: fetchNewContentSuccess,
@@ -159,30 +167,20 @@ function newRestAPI(options) {
         .getStore()
 }
 
-function getStructure(options) {
-    const storePrototype = newRestAPI(_defaults({}, {state: getState()}, options))
-    const modules = _get(options, "modules", {})
+const streamsAPI = newRestAPI()
 
-    storePrototype.mutations = _defaults({}, mutations, storePrototype.mutations)
-    storePrototype.actions = _defaults({}, actions, storePrototype.actions)
-    storePrototype.getters = _defaults({}, getters, storePrototype.getters)
-    storePrototype.modules = _defaults({}, modules, storePrototype.modules)
+const state = streamsAPI.state
 
-    return storePrototype
+export const getters = _defaults({}, streamGetters, streamsAPI.getters)
+
+export const actions = _defaults({}, streamActions, streamsAPI.actions)
+
+export const mutations = _defaults({}, streamMutations, streamsAPI.mutations)
+
+export default {
+    namespaced: true,
+    state,
+    getters,
+    actions,
+    mutations,
 }
-
-function newStreamStore(options = {}) {
-    return new Vuex.Store(getStructure(options))
-}
-
-const exportsForTests = {
-    addHasLoadMore,
-    fetchContentsSuccess,
-    fetchNewContentSuccess,
-    fetchRepliesSuccess,
-    fetchSharesSuccess,
-    getStructure,
-    newRestAPI,
-    onError,
-}
-export {streamStoreOperations, newStreamStore, exportsForTests}

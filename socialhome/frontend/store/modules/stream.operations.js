@@ -3,36 +3,17 @@ import Vue from "vue"
 import _concat from "lodash/concat"
 import _difference from "lodash/difference"
 
-
-const streamStoreOperations = {
-    disableLoadMore: "disableLoadMore",
-    getFollowedStream: "getFollowedStream",
-    getLimitedStream: "getLimitedStream",
-    getLocalStream: "getLocalStream",
-    getNewContent: "getNewContent",
-    getProfileAll: "getProfileAll",
-    getProfilePinned: "getProfilePinned",
-    getPublicStream: "getPublicStream",
-    getReplies: "getReplies",
-    getShares: "getShares",
-    getTagStream: "getTagStream",
-    newContentAck: "newContentAck",
-    receivedNewContent: "receivedNewContent",
-    saveReply: "saveReply",
-    setLayoutDoneAfterTwitterOEmbeds: "setLayoutDoneAfterTwitterOEmbeds",
-}
-
-const mutations = {
-    [streamStoreOperations.disableLoadMore](state, contentId) {
+const streamMutations = {
+    disableLoadMore(state, contentId) {
         Vue.set(state.contents[contentId], "hasLoadMore", false)
     },
-    [streamStoreOperations.receivedNewContent](state, contentId) {
+    receivedNewContent(state, contentId) {
         state.unfetchedContentIds.push(contentId)
     },
-    [streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds](state, status) {
+    setLayoutDoneAfterTwitterOEmbeds(state, status) {
         state.layoutDoneAfterTwitterOEmbeds = status
     },
-    [streamStoreOperations.newContentAck](state) {
+    newContentAck(state) {
         /*
          * First, get all IDs present in unfetchedContentIds and absent in contentIds
          * This is neccessary since content ids that could not be fetched due to
@@ -46,21 +27,21 @@ const mutations = {
     },
 }
 
-const actions = {
-    [streamStoreOperations.disableLoadMore]({commit}, contentId) {
-        commit(streamStoreOperations.disableLoadMore, contentId)
+const streamActions = {
+    disableLoadMore({commit}, contentId) {
+        commit("disableLoadMore", contentId)
     },
-    [streamStoreOperations.receivedNewContent]({commit}, newContentLengh) {
-        commit(streamStoreOperations.receivedNewContent, newContentLengh)
+    receivedNewContent({commit}, newContentLengh) {
+        commit("receivedNewContent", newContentLengh)
     },
-    [streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds]({commit}, status) {
-        commit(streamStoreOperations.setLayoutDoneAfterTwitterOEmbeds, status)
+    setLayoutDoneAfterTwitterOEmbeds({commit}, status) {
+        commit("setLayoutDoneAfterTwitterOEmbeds", status)
     },
-    [streamStoreOperations.newContentAck]({commit, dispatch, state}) {
+    newContentAck({commit, dispatch, state}) {
         const promises = []
         const unfetchedContentIds = _concat([], state.unfetchedContentIds)
 
-        commit(streamStoreOperations.newContentAck)
+        commit("newContentAck")
 
         unfetchedContentIds.forEach(pk => {
             // Force the promise to resolve in all cases
@@ -68,7 +49,7 @@ const actions = {
                 state.unfetchedContentIds.push(pk)
                 return Promise.resolve()
             }
-            const promise = dispatch(streamStoreOperations.getNewContent, {params: {pk}})
+            const promise = dispatch("getNewContent", {params: {pk}})
                 .then(Promise.resolve(), reAddAndResolve)
             promises.push(promise)
         })
@@ -76,7 +57,7 @@ const actions = {
     },
 }
 
-const getters = {
+const streamGetters = {
     contentList(state) {
         const contents = []
         state.contentIds.forEach(id => {
@@ -111,4 +92,4 @@ const getters = {
     },
 }
 
-export {actions, mutations, streamStoreOperations, getters}
+export {streamActions, streamMutations, streamGetters}

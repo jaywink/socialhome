@@ -5,7 +5,7 @@ module.exports = {
     entry: path.resolve(__dirname, "../../socialhome/frontend/main.js"),
     output: {
         path: path.resolve(__dirname, "../../socialhome/static"),
-        filename: "js/webpack.bundle.js",
+        filename: "dist/webpack.bundle.js",
     },
     module: {
         loaders: [
@@ -49,7 +49,7 @@ module.exports = {
         ],
     },
     plugins: [
-        new ExtractTextPlugin("css/webpack.bundle.css"),
+        new ExtractTextPlugin("dist/webpack.bundle.css"),
     ],
     resolve: {
         modules: [
