@@ -360,7 +360,7 @@ CHANNEL_LAYERS = {
 
 # MARKDOWN
 # --------
-MARKDOWNX_MARKDOWNIFY_FUNCTION = "CommonMark.commonmark"
+MARKDOWNX_MARKDOWNIFY_FUNCTION = "commonmark.commonmark"
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime("uploads/%Y/%m/%d")
 MARKDOWNX_IMAGE_MAX_SIZE = {
     "size": (2048, 0),

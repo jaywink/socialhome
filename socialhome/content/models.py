@@ -3,7 +3,7 @@ import re
 from uuid import uuid4
 
 import arrow
-from CommonMark import commonmark
+from commonmark import commonmark
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models

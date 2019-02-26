@@ -75,7 +75,7 @@ class TestMakeNSFWSafe(TestCase):
         )
         self.assertEqual(
             make_nsfw_safe(self.nsfw_text_empty_class),
-            '<div>FooBar</div><div><img class=" nsfw" src="localhost"/></div><div>#nsfw</div>'
+            '<div>FooBar</div><div><img class="nsfw" src="localhost"/></div><div>#nsfw</div>'
         )
         self.assertEqual(
             make_nsfw_safe(self.nsfw_text_many_classes),
