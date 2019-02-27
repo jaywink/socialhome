@@ -13,7 +13,7 @@ from socialhome.content.tests.factories import (
 from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
     BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_stream_for_users,
-    update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream, LocalStream)
+    update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream, LocalStream, TagsStream)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -156,6 +156,7 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
         calls = [
             call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream", self.content.author.id),
             call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream", self.content.author.id),
+            call(add_to_stream_for_users, self.content.id, self.content.id, "TagsStream", self.content.author.id),
         ]
         self.assertEqual(mock_enqueue.call_args_list, calls)
 
@@ -165,6 +166,7 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
         calls = [
             call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream", self.share.author.id),
             call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream", self.share.author.id),
+            call(add_to_stream_for_users, self.content.id, self.share.id, "TagsStream", self.share.author.id),
         ]
         self.assertEqual(mock_enqueue.call_args_list, calls)
 
@@ -616,3 +618,35 @@ class TestTagStream(SocialhomeTestCase):
         self.assertFalse(self.local_stream.should_cache_content(self.site_content))
         self.assertFalse(self.local_stream.should_cache_content(self.limited_content))
         self.assertFalse(self.local_stream.should_cache_content(self.self_content))
+
+
+class TestTagsStream(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.local_user = UserFactory()
+        cls.create_content_set()
+        cls.tagged_foobar = PublicContentFactory(text="#foobar", author=cls.profile)
+        cls.tagged_foobar2 = SiteContentFactory(text="#foobar", author=cls.profile)
+        cls.tagged_spam = PublicContentFactory(text="#spam", author=cls.profile)
+        cls.tagged_spam2 = SiteContentFactory(text="#spam", author=cls.profile)
+        cls.tag_foobar = Tag.objects.get(name="foobar")
+        cls.tag_spam = Tag.objects.get(name="spam")
+        cls.user.profile.followed_tags.add(cls.tag_spam)
+
+    def setUp(self):
+        super().setUp()
+        self.stream = TagsStream(user=self.user)
+
+    def test_only_followed_tagged_content_returned(self):
+        qs, _throughs = self.stream.get_content()
+        self.assertEqual(
+            set(qs),
+            {self.tagged_spam, self.tagged_spam2},
+        )
+
+    def test_raises_if_no_user(self):
+        self.stream.user = None
+        with self.assertRaises(AttributeError):
+            self.stream.get_content()

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 
 from socialhome.content.models import Tag
-from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, LimitedStream, LocalStream
+from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, LimitedStream, LocalStream, TagsStream
 from socialhome.utils import get_full_url
 from socialhome.users.serializers import ProfileSerializer
 
@@ -127,6 +127,19 @@ class TagStreamView(BaseStreamView):
     @property
     def stream_name(self):
         return "%s__%s" % (self.stream_type_value, self.tag.channel_group_name)
+
+
+class TagsStreamView(LoginRequiredMixin, BaseStreamView):
+    stream_class = TagsStream
+
+    def get_page_meta(self):
+        meta = super().get_page_meta()
+        meta.update({
+            "title": _("Followed tags stream"),
+            "url": get_full_url(reverse("streams:tags")),
+            "description": _("Content from followed tags."),
+        })
+        return meta
 
 
 class FollowedStreamView(LoginRequiredMixin, BaseStreamView):

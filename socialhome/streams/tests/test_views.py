@@ -2,11 +2,11 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.test import Client
 
-from socialhome.content.tests.factories import ContentFactory, TagFactory
+from socialhome.content.tests.factories import ContentFactory, TagFactory, PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
 from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, \
-    LocalStreamView
+    LocalStreamView, TagsStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase
 from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
@@ -275,5 +275,52 @@ class TestTagStreamView(SocialhomeCBVTestCase):
 
     def test_uses_correct_template(self):
         response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
+        template_names = [template.name for template in response.templates]
+        assert "streams/base.html" in template_names
+
+
+class TestTagsStreamView(SocialhomeCBVTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = PublicUserFactory()
+        cls.content_spam = PublicContentFactory(text="#spam")
+        cls.content_eggs = PublicContentFactory(text="#eggs")
+        cls.client = Client()
+
+    def test_get_json_context(self):
+        request = self.get_request(self.user)
+        view = self.get_instance(TagsStreamView, request=request)
+        profile = ProfileSerializer(request.user.profile, context={'request': request}).data
+        self.assertEqual(
+            view.get_json_context(),
+            {
+                "currentBrowsingProfileId": self.user.profile.id,
+                "streamName": view.stream_name,
+                "isUserAuthenticated": True,
+                "ownProfile": profile,
+            }
+        )
+
+    def test_renders(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:tags"))
+        assert response.status_code == 200
+
+    def test_requires_being_logged_in(self):
+        response = self.client.get(reverse("streams:tags"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_stream_name(self):
+        view = self.get_instance(TagsStreamView)
+        self.assertEqual(view.stream_name, StreamType.TAGS.value)
+
+    def test_stream_type_value(self):
+        view = self.get_instance(TagsStreamView)
+        self.assertEqual(view.stream_type_value, StreamType.TAGS.value)
+
+    def test_uses_correct_template(self):
+        with self.login(self.user):
+            response = self.client.get(reverse("streams:tags"))
         template_names = [template.name for template in response.templates]
         assert "streams/base.html" in template_names

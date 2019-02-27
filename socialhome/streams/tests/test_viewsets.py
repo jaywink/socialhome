@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.test import RequestFactory
 from django.urls import reverse
 
+from socialhome.content.models import Tag
 from socialhome.content.tests.factories import (
     PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
 from socialhome.streams.tests.utils import MockStream
@@ -119,14 +120,16 @@ class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
         cls.content = PublicContentFactory(author=cls.remote_profile)
+        cls.content2 = PublicContentFactory(author=cls.remote_profile)
         SiteContentFactory(author=cls.profile)
         SelfContentFactory(author=cls.profile)
         LimitedContentFactory(author=cls.profile)
 
     def test_profile_content_returned(self):
         self.get("api-streams:profile-all", uuid=self.content.author.uuid)
-        self.assertEqual(len(self.last_response.data), 1)
-        self.assertEqual(self.last_response.data[0]["uuid"], str(self.content.uuid))
+        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(self.last_response.data[0]["uuid"], str(self.content2.uuid))
+        self.assertEqual(self.last_response.data[1]["uuid"], str(self.content.uuid))
 
     @patch("socialhome.streams.viewsets.ProfileAllStream")
     def test_users_correct_stream_class(self, mock_stream):
@@ -209,3 +212,33 @@ class TestTagStreamAPIView(SocialhomeAPITestCase):
         with self.login(self.user):
             self.get("api-streams:tag", name="foobar")
         mock_stream.assert_called_once_with(last_id=None, tag=self.content.tags.first(), user=self.user)
+
+
+class TestTagsStreamAPIView(SocialhomeAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        PublicContentFactory(text="#foobar")
+        SiteContentFactory(text="#foobar")
+        SelfContentFactory(text="#foobar")
+        LimitedContentFactory(text="#foobar")
+        cls.content = PublicContentFactory(text="#spam")
+        cls.content2 = SiteContentFactory(text="#spam")
+        SelfContentFactory(text="#spam")
+        LimitedContentFactory(text="#spam")
+        cls.profile.followed_tags.add(Tag.objects.get(name="spam"))
+
+    def test_content_from_followed_tags_returned(self):
+        with self.login(self.user):
+            self.get("api-streams:tags")
+        self.assertEqual(len(self.last_response.data), 2)
+        self.assertEqual(self.last_response.data[0]["id"], self.content2.id)
+        self.assertEqual(self.last_response.data[1]["id"], self.content.id)
+
+    @patch("socialhome.streams.viewsets.TagsStream")
+    def test_users_correct_stream_class(self, mock_stream):
+        mock_stream.return_value = MockStream()
+        with self.login(self.user):
+            self.get("api-streams:tags")
+        mock_stream.assert_called_once_with(last_id=None, user=self.user)

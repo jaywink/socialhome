@@ -24,6 +24,7 @@ class TestContentQuerySet(SocialhomeTestCase):
         cls.other_user = UserFactory()
         cls.anonymous_user = AnonymousUser()
         cls.other_user.profile.following.add(cls.public_content.author, cls.self_user.profile)
+        cls.other_user.profile.followed_tags.add(cls.tag)
         cls.limited_content_user = UserFactory()
         cls.limited_content_profile = cls.limited_content_user.profile
         cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
@@ -93,6 +94,16 @@ class TestContentQuerySet(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.self_tag_content})
         contents = set(Content.objects.tag(self.tag, self.limited_content_user))
         self.assertEqual(contents, {self.public_tag_content, self.site_tag_content, self.limited_tag_content})
+
+    def test_tags_followed_by_user(self):
+        contents = set(Content.objects.tags_followed_by_user(self.anonymous_user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.tags_followed_by_user(self.other_user))
+        self.assertEqual(contents, {self.public_tag_content, self.site_tag_content})
+        contents = set(Content.objects.tags_followed_by_user(self.self_content.author.user))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.tags_followed_by_user(self.limited_content_user))
+        self.assertEqual(contents, set())
 
     def test_followed(self):
         contents = set(Content.objects.followed(self.other_user))
