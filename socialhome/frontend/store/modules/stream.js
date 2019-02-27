@@ -135,6 +135,13 @@ export function newRestAPI() {
             onError,
         })
         .get({
+            action: "getTagsStream",
+            path: ({lastId = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}`,
+            property: "contents",
+            onSuccess: fetchContentsSuccess,
+            onError,
+        })
+        .get({
             action: "getProfileAll",
             path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}`,
             property: "contents",

@@ -21,6 +21,8 @@ Added
 
 * It is now possible to follow and unfollow tags from a tag stream (`#465 <https://git.feneas.org/socialhome/socialhome/issues/465>`_)
 
+  Content from followed tags is available under a new "Tags" stream.
+
 Changed
 .......
 

@@ -42,6 +42,7 @@ import FollowedStampedElement from "frontend/components/streams/stamped_elements
 import LimitedStampedElement from "frontend/components/streams/stamped_elements/LimitedStampedElement.vue"
 import LocalStampedElement from "frontend/components/streams/stamped_elements/LocalStampedElement.vue"
 import TagStampedElement from "frontend/components/streams/stamped_elements/TagStampedElement.vue"
+import TagsStampedElement from "frontend/components/streams/stamped_elements/TagsStampedElement.vue"
 import ProfileStampedElement from "frontend/components/streams/stamped_elements/ProfileStampedElement.vue"
 import "frontend/components/streams/LoadingElement.vue"
 
@@ -62,6 +63,7 @@ export default Vue.component("stream", {
         ProfileStampedElement,
         PublicStampedElement,
         TagStampedElement,
+        TagsStampedElement,
     },
     data() {
         return {
@@ -95,6 +97,8 @@ export default Vue.component("stream", {
                     return "PublicStampedElement"
                 case "tag":
                     return "TagStampedElement"
+                case "tags":
+                    return "TagsStampedElement"
                 case "profile_all":
                 case "profile_pinned":
                     return "ProfileStampedElement"
@@ -142,6 +146,9 @@ export default Vue.component("stream", {
                 case "tag":
                     options.params.name = this.tag
                     this.$store.dispatch("stream/getTagStream", options)
+                    break
+                case "tags":
+                    this.$store.dispatch("stream/getTagsStream", options)
                     break
                 case "profile_all":
                     options.params.uuid = this.$store.state.application.profile.uuid

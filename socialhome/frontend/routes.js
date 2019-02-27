@@ -19,6 +19,7 @@ const routes = [
     {path: "/p/:uuid", component: Stream, props: $$()},
     {path: "/p/:uuid/all", component: Stream, props: $$()},
     {path: "/streams/tag/:tag", component: Stream, props: $$()},
+    {path: "/streams/tags/", component: Stream},
     {path: "/content/:contentId", component: Stream, props: $$()},
     {path: "/content/:contentId/:shorttext", component: Stream, props: $$()},
 ]
