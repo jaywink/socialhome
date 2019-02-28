@@ -122,7 +122,7 @@ class Profile(TimeStampedModel):
     rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
 
     # Profile visibility
-    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.SELF)
+    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
     # Image urls
     image_url_large = models.URLField(_("Image - large"), blank=True)
@@ -339,7 +339,7 @@ class Profile(TimeStampedModel):
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
         values = {
             "name": safe_text(remote_profile.name),
-            "visibility": Visibility.PUBLIC if remote_profile.public else Visibility.LIMITED,
+            "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public
             "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
             "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
             "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
