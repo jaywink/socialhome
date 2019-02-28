@@ -25,7 +25,7 @@ describe("Main", () => {
                     Sinon.spy(main.$store, "dispatch")
                     main.onWebsocketMessage({data: JSON.stringify({event: "new", id: 4})})
                     main.$store.dispatch.getCall(0).args
-                        .should.eql(["streams/receivedNewContent", 4])
+                        .should.eql(["stream/receivedNewContent", 4])
                 })
             })
 

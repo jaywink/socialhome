@@ -32,7 +32,7 @@ const main = new Vue({
             const data = JSON.parse(message.data)
 
             if (data.event === "new") {
-                this.$store.dispatch("streams/receivedNewContent", data.id)
+                this.$store.dispatch("stream/receivedNewContent", data.id)
             }
         },
         websocketPath() {
