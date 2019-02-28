@@ -12,11 +12,11 @@ class TestContentQuerySet(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.public_content = PublicContentFactory(pinned=True, author=ProfileFactory())
+        cls.public_content = PublicContentFactory(pinned=True, author=ProfileFactory(visibility=Visibility.SELF))
         cls.public_tag_content = PublicContentFactory(text="#foobar")
-        cls.limited_content = LimitedContentFactory()
+        cls.limited_content = LimitedContentFactory(author=ProfileFactory(visibility=Visibility.SELF))
         cls.tag = Tag.objects.get(name="foobar")
-        cls.site_content = SiteContentFactory(pinned=True)
+        cls.site_content = SiteContentFactory(pinned=True, author=ProfileFactory(visibility=Visibility.SELF))
         cls.site_tag_content = SiteContentFactory(text="#foobar")
         cls.self_user = UserFactory()
         cls.self_content = SelfContentFactory(author=cls.self_user.profile, pinned=True)

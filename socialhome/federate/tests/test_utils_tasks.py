@@ -498,7 +498,7 @@ class TestGetSenderProfile(SocialhomeTestCase):
         sender_profile = get_sender_profile("https:/example.com/foo/bar")
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "foobar"
-        assert sender_profile.visibility == Visibility.LIMITED
+        assert sender_profile.visibility == Visibility.PUBLIC
         assert sender_profile.rsa_public_key == "xyz"
         assert not sender_profile.rsa_private_key
 

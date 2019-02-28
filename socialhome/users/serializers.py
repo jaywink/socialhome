@@ -1,7 +1,6 @@
 from typing import List
 
 from enumfields.drf import EnumField
-from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 

@@ -3,7 +3,8 @@ from django.conf import settings
 
 from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
 from socialhome.enums import Visibility
-from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory
+from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory, SiteProfileFactory, \
+    LimitedProfileFactory, SelfProfileFactory
 
 
 class TagFactory(factory.DjangoModelFactory):
@@ -30,14 +31,17 @@ class PublicContentFactory(ContentFactory):
 
 class LimitedContentFactory(ContentFactory):
     visibility = Visibility.LIMITED
+    author = factory.SubFactory(LimitedProfileFactory)
 
 
 class SiteContentFactory(ContentFactory):
     visibility = Visibility.SITE
+    author = factory.SubFactory(SiteProfileFactory)
 
 
 class SelfContentFactory(ContentFactory):
     visibility = Visibility.SELF
+    author = factory.SubFactory(SelfProfileFactory)
 
 
 class LocalContentFactory(ContentFactory):

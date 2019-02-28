@@ -14,7 +14,8 @@ from socialhome.federate.tasks import (
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import (
-    UserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory, UserWithKeyFactory, LimitedUserFactory)
+    UserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory, UserWithKeyFactory, LimitedUserFactory,
+    SelfUserFactory)
 
 
 @patch("socialhome.federate.tasks.process_entities", autospec=True)
@@ -158,7 +159,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
         cls.public_user = PublicUserFactory()
         cls.public_profile = cls.public_user.profile
         cls.remote_profile = PublicProfileFactory()
-        cls.user = UserFactory()
+        cls.user = SelfUserFactory()
         cls.profile = cls.user.profile
         cls.limited_user = LimitedUserFactory()
         cls.limited_profile = cls.limited_user.profile

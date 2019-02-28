@@ -13,8 +13,8 @@ class TestProfileQuerySet(SocialhomeTestCase):
         cls.public_profile = ProfileFactory(visibility=Visibility.PUBLIC)
         cls.site_profile = ProfileFactory(visibility=Visibility.SITE)
         cls.limited_profile = ProfileFactory(visibility=Visibility.LIMITED)
-        cls.profile = ProfileFactory()
-        cls.profile2 = ProfileFactory()
+        cls.profile = ProfileFactory(visibility=Visibility.SELF)
+        cls.profile2 = ProfileFactory(visibility=Visibility.SELF)
         cls.public_profile.following.add(cls.site_profile, cls.profile)
 
     def test_visible_for_user_unauthenticated_user(self):

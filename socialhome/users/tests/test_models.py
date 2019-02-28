@@ -195,19 +195,13 @@ class TestProfile(SocialhomeTestCase):
         profile = Profile.from_remote_profile(remote_profile)
         self.assertEqual(profile.fid, remote_profile.id)
         self.assertEqual(profile.name, remote_profile.name)
-        self.assertEqual(profile.visibility, Visibility.LIMITED)
+        self.assertEqual(profile.visibility, Visibility.PUBLIC)
         self.assertEqual(profile.image_url_large, remote_profile.image_urls["large"])
         self.assertEqual(profile.image_url_medium, remote_profile.image_urls["medium"])
         self.assertEqual(profile.image_url_small, remote_profile.image_urls["small"])
         self.assertEqual(profile.location, remote_profile.location)
         self.assertEqual(profile.email, remote_profile.email)
         self.assertEqual(profile.rsa_public_key, remote_profile.public_key)
-
-        # Update to public
-        remote_profile_update = BaseProfileFactory(public=True, id=remote_profile.id)
-        profile = Profile.from_remote_profile(remote_profile_update)
-        self.assertEqual(profile.fid, remote_profile.id)
-        self.assertEqual(profile.visibility, Visibility.PUBLIC)
 
         # Make sure public key doesn't get deleted if it doesn't have a value
         public_key = profile.rsa_public_key

@@ -57,6 +57,15 @@ class SiteUserFactory(UserFactory):
         return user
 
 
+class SelfUserFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        user = super(UserFactory, cls)._generate(create, attrs)
+        user.profile.visibility = Visibility.SELF
+        user.profile.save(update_fields=["visibility"])
+        return user
+
+
 class UserWithKeyFactory(UserFactory):
     @classmethod
     def _generate(cls, create, attrs):
@@ -116,6 +125,18 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
 class PublicProfileFactory(ProfileFactory):
     visibility = Visibility.PUBLIC
+
+
+class SiteProfileFactory(ProfileFactory):
+    visibility = Visibility.SITE
+
+
+class LimitedProfileFactory(ProfileFactory):
+    visibility = Visibility.LIMITED
+
+
+class SelfProfileFactory(ProfileFactory):
+    visibility = Visibility.SELF
 
 
 class BaseProfileFactory(factory.Factory):

@@ -13,7 +13,8 @@ from socialhome.search.views import GlobalSearchView
 from socialhome.streams.views import TagStreamView
 from socialhome.tests.utils import SocialhomeCBVTestCase, SocialhomeTestCase
 from socialhome.users.models import Profile
-from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory, BaseProfileFactory
+from socialhome.users.tests.factories import (
+    ProfileFactory, PublicProfileFactory, BaseProfileFactory, SelfUserFactory)
 from socialhome.users.views import ProfileAllContentView
 
 
@@ -21,13 +22,13 @@ class TestGlobalSearchViewQuerySet(SocialhomeCBVTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.staff_user = SelfUserFactory(is_staff=True)
+        cls.normal_user = SelfUserFactory()
         haystack.connections['default'].get_backend().clear()
         cls.self_profile = ProfileFactory(visibility=Visibility.SELF)
         cls.public_profile = ProfileFactory(visibility=Visibility.PUBLIC)
         cls.limited_profile = ProfileFactory(visibility=Visibility.LIMITED)
         cls.site_profile = ProfileFactory(visibility=Visibility.SITE)
-        cls.staff_user = UserFactory(is_staff=True)
-        cls.normal_user = UserFactory()
 
     def test_profile_visibility_authenticated_user(self):
         request = RequestFactory().get('/')

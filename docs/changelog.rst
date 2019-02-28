@@ -50,6 +50,12 @@ Changed
 
   * Streams profile API's have moved to using UUID's instead of ID's.
 
+* Make profile default visibility public (`#515 <https://git.feneas.org/socialhome/socialhome/issues/515>`_)
+
+  This fixes an issue where new profiles can follow others but the others cannot follow back, since the default was SELF. For now, make all new profiles public by default. Later the visibility setting should be moved from the profile to profile fields themselves. Some core identity will always need to be public but what the profile shares could be controlled.
+
+  Also make remote profiles always locally public to avoid situations where a user can see the post but can't see the local profile. Any profile that federates to us is public to some extent since it left the server.
+
 Fixed
 .....
 
