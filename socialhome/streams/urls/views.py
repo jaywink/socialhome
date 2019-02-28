@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from socialhome.streams.views import (
-    PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, LocalStreamView)
+    PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, LocalStreamView, TagsStreamView)
 
 app_name = 'streams'
 
@@ -11,4 +11,5 @@ urlpatterns = [
     url(r"^local/$", LocalStreamView.as_view(), name="local"),
     url(r"^public/$", PublicStreamView.as_view(), name="public"),
     url(r"^tag/(?P<name>[\w-]+)/$", TagStreamView.as_view(), name="tag"),
+    url(r"^tags/$", TagsStreamView.as_view(), name="tags"),
 ]

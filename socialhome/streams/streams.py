@@ -349,9 +349,17 @@ class TagStream(BaseStream):
         return str(self.tag.id)
 
 
+class TagsStream(BaseStream):
+    stream_type = StreamType.TAGS
+
+    def get_queryset(self):
+        return Content.objects.tags_followed_by_user(self.user)
+
+
 CACHED_STREAM_CLASSES = (
     FollowedStream,
     ProfileAllStream,
+    TagsStream,
 )
 
 CACHED_ANONYMOUS_STREAM_CLASSES = (

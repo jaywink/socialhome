@@ -5,6 +5,7 @@ from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNot
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
+from socialhome.users.models import User
 
 if TYPE_CHECKING:
     from socialhome.content.models import Content
@@ -161,10 +162,19 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         return self.tag(tag, user)
 
+    def tags_followed_by_user(self, user):
+        # type: (User) -> ContentQuerySet
+        if not user.is_authenticated:
+            return self.none()
+        qs = self.top_level().visible_for_user(user)
+        return qs.filter(tags__in=user.profile.followed_tags.all())
+
     def top_level(self):
+        # type: () -> ContentQuerySet
         return self.filter(content_type=ContentType.CONTENT)
 
     def visible_for_user(self, user):
+        # type: (User) -> ContentQuerySet
         """Filter by visibility to given user."""
         if not user.is_authenticated:
             return self.filter(visibility=Visibility.PUBLIC)
