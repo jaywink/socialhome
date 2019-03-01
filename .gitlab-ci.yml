@@ -1,0 +1,59 @@
+# This file is a template, and might need editing before it works on your project.
+# Official language image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/python/tags/
+image: python:3.6
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+    - node_modules/
+    - bower_components/
+
+services:
+  - redis
+  - postgres
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+  DATABASE_URL: "postgres://postgres@postgres:5432/postgres"
+  DJANGO_SETTINGS_MODULE: "config.settings.local"
+  DJANGO_ALLOWED_HOSTS: "*"
+  DJANGO_SECURE_SSL_REDIRECT: "False"
+  SOCIALHOME_DOMAIN: "127.0.0.1:8000"
+  SOCIALHOME_HTTPS: "False"
+  DJANGO_DEBUG: "False"
+  DJANGO_DEBUG_TOOLBAR: "False"
+  DJANGO_SECRET_KEY: "foobar"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+
+before_script:
+  - unset NPM_CONFIG_PREFIX
+  - rm -rf ~/.nvm
+  - git clone https://github.com/creationix/nvm.git ~/.nvm
+  - (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
+  - source ~/.nvm/nvm.sh && nvm install 8
+  - npm install
+  - node_modules/.bin/bower install --allow-root
+  - npm run build
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -U pip-tools pip setuptools
+  - pip-sync dev-requirements.txt
+
+test:
+  script:
+    - pip freeze
+    - python manage.py print_settings
+    - pytest
+    - python manage.py migrate --noinput -v 0
+    - python manage.py collectstatic --noinput -v 0
+    - npm run test
