@@ -7,14 +7,11 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 line_length = 120
 
-[*.{py,rst,ini,html,jinja,css,scss,less,yml,js,json,jsx}]
+[*.{py,rst,ini,html,jinja,css,scss,less,js,jsx}]
 indent_style = space
 indent_size = 4
 
-# Override spacing for some files
-# previously configured file extensions
-[.travis.yml]
-indent_style = space
+[*.{json,yml,yaml}]
 indent_size = 2
 
 [Makefile]
