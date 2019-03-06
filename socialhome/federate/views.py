@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.http.response import Http404, JsonResponse, HttpResponseRedirect
+from django.http.response import Http404, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.views.generic import View
@@ -112,7 +112,13 @@ def nodeinfo_view(request):
 
 def social_relay_view(request):
     """Generate a .well-known/x-social-relay document."""
-    relay = SocialRelayWellKnown(subscribe=True)
+    scope = settings.SOCIALHOME_RELAY_SCOPE
+    if scope == 'none':
+        relay = SocialRelayWellKnown(subscribe=False, scope="")
+    elif scope == 'all':
+        relay = SocialRelayWellKnown(subscribe=True)
+    else:
+        return HttpResponseNotFound()
     return JsonResponse(relay.doc)
 
 

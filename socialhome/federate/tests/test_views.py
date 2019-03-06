@@ -187,3 +187,36 @@ class TestNodeInfoView(SocialhomeTestCase):
                     author__user__isnull=False, content_type=ContentType.REPLY).count(),
             }
         )
+
+
+class TestSocialRelayView(SocialhomeTestCase):
+    @override_settings(SOCIALHOME_RELAY_SCOPE="all")
+    def test_view_responds__scope_all(self):
+        self.get("federate:social-relay")
+        self.response_200()
+        self.assertEqual(
+            json.loads(self.last_response.content),
+            {
+                "subscribe": True,
+                "scope": "all",
+                "tags": [],
+            }
+        )
+
+    @override_settings(SOCIALHOME_RELAY_SCOPE="none")
+    def test_view_responds__scope_none(self):
+        self.get("federate:social-relay")
+        self.response_200()
+        self.assertEqual(
+            json.loads(self.last_response.content),
+            {
+                "subscribe": False,
+                "scope": "",
+                "tags": [],
+            }
+        )
+
+    @override_settings(SOCIALHOME_RELAY_SCOPE="spam")
+    def test_view_responds__scope_invalid(self):
+        self.get("federate:social-relay")
+        self.response_404()
