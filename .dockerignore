@@ -17,3 +17,10 @@ bower_components/
 socialhome/static/mocha/
 /docs/_build/
 /yarn.lock
+docker_release.sh
+docker-compose.yml
+package-lock.json
+.env
+.tox
+.pytest_cache
+/var/exports
