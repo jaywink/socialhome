@@ -338,11 +338,18 @@ Default: ``https://the-federation.info/socialhome``
 URL to make signup link go to in the case that signups are closed.
 
 SOCIALHOME_RELAY_ID
-.......................
+...................
 
 Default: ``relay@relay.iliketoast.net``
 
-Which relay instance ID to send outgoing content to. Socialhome automatically integrates with the `relay system <https://git.feneas.org/jaywink/social-relay>`_.
+Which relay instance ID to send outgoing content to. For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
+
+SOCIALHOME_RELAY_SCOPE
+......................
+
+Default: ``all``
+
+Possible values ``all`` or ``none``. Defines at which level the defined relay is subscribed with. Set to ``none`` to disable the relay incoming subscription. For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
 
 SOCIALHOME_ROOT_PROFILE
 .......................

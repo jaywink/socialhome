@@ -23,6 +23,8 @@ Added
 
   Content from followed tags is available under a new "Tags" stream.
 
+* It's now possible to disable incoming `relay system <https://git.feneas.org/jaywink/social-relay>`_ integration by setting the environment variable ``SOCIALHOME_RELAY_SCOPE`` to ``none``. (`#94 <https://git.feneas.org/socialhome/socialhome/issues/94>`_)
+
 Changed
 .......
 

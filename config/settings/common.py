@@ -299,6 +299,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
 )
 # Relay to send public content to
 SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="relay@relay.iliketoast.net")
+SOCIALHOME_RELAY_SCOPE = env("SOCIALHOME_RELAY_SCOPE", default="all")
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.
