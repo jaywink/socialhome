@@ -28,8 +28,7 @@ def get_nodeinfo2_data():
             "software": "socialhome",
             "version": version,
         },
-        # TODO fix when relay is configurable
-        "relay": "all",
+        "relay": settings.SOCIALHOME_RELAY_SCOPE,
         "openRegistrations": settings.ACCOUNT_ALLOW_REGISTRATION,
     }
     if settings.SOCIALHOME_STATISTICS:
