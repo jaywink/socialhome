@@ -1,5 +1,6 @@
 import datetime
 import logging
+import pickle
 
 import django_rq
 from django.conf import settings
@@ -58,7 +59,15 @@ def queue_payload(request: HttpRequest, uuid: str = None):
     from socialhome.federate.tasks import receive_task  # Circulars
     try:
         # Create a simpler request object we can push to RQ
-        headers = {k.replace('HTTP_', '').lower().replace('_', '-').capitalize(): v for k, v in request.META.items()}
+        headers = {}
+        for key, value in request.META.items():
+            key = key.replace('HTTP_', '').lower().replace('_', '-').capitalize()
+            try:
+                pickle.dumps(value)
+            except Exception:
+                headers[key] = "[unserializable]"
+            else:
+                headers[key] = value
         _request = RequestType(
             body=request.body,
             headers=headers,
