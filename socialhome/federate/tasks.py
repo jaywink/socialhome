@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, TYPE_CHECKING, Optional
 
 from django.conf import settings
 from federation.entities import base
@@ -15,10 +15,14 @@ from socialhome.federate.utils import make_federable_profile
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.users.models import Profile
 
+if TYPE_CHECKING:
+    from federation import RequestType
+
 logger = logging.getLogger("socialhome")
 
 
-def receive_task(payload, uuid=None):
+def receive_task(request, uuid=None):
+    # type: (RequestType, Optional[str]) -> None
     """Process received payload."""
     profile = None
     if uuid:
@@ -29,7 +33,7 @@ def receive_task(payload, uuid=None):
             return
     try:
         sender, protocol_name, entities = handle_receive(
-            payload, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
+            request, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
         )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
     except NoSuitableProtocolFoundError:

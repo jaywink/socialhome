@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpRequest
 from django.utils.timezone import now
 from dynamic_preferences.registries import global_preferences_registry
+from federation.types import RequestType
 
 from socialhome import __version__ as version
 from socialhome.content.enums import ContentType
@@ -50,17 +51,25 @@ def get_nodeinfo2_data():
     return data
 
 
-def queue_payload(request: HttpRequest, uuid: str=None):
+def queue_payload(request: HttpRequest, uuid: str = None):
     """
     Queue payload for processing.
     """
     from socialhome.federate.tasks import receive_task  # Circulars
     try:
-        payload = request.body
+        # Create a simpler request object we can push to RQ
+        headers = {k.replace('HTTP_', '').lower().replace('_', '-').capitalize(): v for k, v in request.META.items()}
+        _request = RequestType(
+            body=request.body,
+            headers=headers,
+            method=request.method,
+            url=request.build_absolute_uri(),
+        )
         preferences = global_preferences_registry.manager()
         if preferences["admin__log_all_receive_payloads"]:
-            logger.debug("get_payload_from_request - Payload: %s", payload)
-        django_rq.enqueue(receive_task, payload, uuid=uuid)
+            logger.debug("queue_payload - Request: %s", _request)
+        django_rq.enqueue(receive_task, _request, uuid=uuid)
         return True
     except Exception:
+        logger.exception('Failed to enqueue payload')
         return False
