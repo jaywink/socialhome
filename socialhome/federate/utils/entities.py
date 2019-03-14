@@ -147,7 +147,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     try:
         return base.Profile(
             raw_content="",
-            public=True if profile.visibility == Visibility.PUBLIC else False,
+            public=True,  # A profile is public in the context of federation if it is sent outwards
             name=profile.name,
             image_urls={
                 "small": profile.safer_image_url_small,
