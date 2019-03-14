@@ -65,9 +65,11 @@ def queue_payload(request: HttpRequest, uuid: str = None):
             try:
                 pickle.dumps(value)
             except Exception:
-                headers[key] = "[unserializable]"
+                pass
             else:
                 headers[key] = value
+                # Include also a lowercase version for compatibility with signature verification module
+                headers[key.lower()] = value
         _request = RequestType(
             body=request.body,
             headers=headers,

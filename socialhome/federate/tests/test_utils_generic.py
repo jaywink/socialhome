@@ -17,6 +17,7 @@ class TestQueuePayload(SocialhomeTestCase):
         self.assertEqual(args[0], receive_task)
         request = args[1]
         self.assertEqual(request.body, self.request.body)
+        self.assertEqual(request.headers['server-name'], 'testserver')
         self.assertEqual(request.headers['Server-name'], 'testserver')
         self.assertEqual(request.method, 'GET')
         self.assertEqual(request.url, self.request.build_absolute_uri())
