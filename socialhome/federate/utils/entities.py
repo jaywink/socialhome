@@ -139,9 +139,11 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
 
 
-def make_federable_profile(profile):
+def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
+    if not profile.is_local:
+        return
     try:
         return base.Profile(
             raw_content="",
@@ -162,4 +164,4 @@ def make_federable_profile(profile):
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)
-        return None
+        return

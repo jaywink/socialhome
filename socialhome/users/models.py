@@ -200,6 +200,11 @@ class Profile(TimeStampedModel):
             self.handle = self.handle.lower()
             if not validate_handle(self.handle):
                 raise ValueError("Not a valid handle")
+        else:
+            self.handle = None
+
+        if self.guid == "":
+            self.guid = None
 
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
@@ -354,10 +359,8 @@ class Profile(TimeStampedModel):
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
         fid = safe_text(remote_profile.id)
-        if hasattr(remote_profile, "handle"):
-            values['handle'] = safe_text(remote_profile.handle)
-        if hasattr(remote_profile, "guid"):
-            values['guid'] = safe_text(remote_profile.guid)
+        values['handle'] = safe_text(remote_profile.handle)
+        values['guid'] = safe_text(remote_profile.guid)
         logger.debug("from_remote_profile - values %s", values)
         profile, created = Profile.objects.fed_update_or_create(fid, values)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
