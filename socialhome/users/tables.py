@@ -4,7 +4,7 @@ from django_tables2.utils import Accessor
 from socialhome.users.models import Profile
 
 
-class FollowedTable(Table):
+class ContactTable(Table):
     picture = TemplateColumn(template_name="users/_picture_column.html", orderable=False)
     handle = LinkColumn(
         "users:profile-detail", args=[Accessor("uuid")], text=lambda record: record.handle if record.handle else "",

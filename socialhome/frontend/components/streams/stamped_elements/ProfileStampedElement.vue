@@ -51,7 +51,7 @@
             <div class="mt-1">
                 <b-button
                     variant="secondary"
-                    href="#"
+                    :href="urls.contactsFollowers"
                     :title="translations.followers"
                     :aria-label="translations.followers"
                 >
@@ -159,6 +159,7 @@ export default Vue.component("profile-stamped-element", {
         urls() {
             return {
                 contactsFollowed: Urls["users:contacts-followed"](),
+                contactsFollowers: Urls["users:contacts-followers"](),
                 organizeProfileUrl: Urls["users:profile-organize"](),
                 pictureUpdate: Urls["users:picture-update"](),
                 pinnedContent: Urls["users:profile-detail"]({uuid: this.profile.uuid}),
