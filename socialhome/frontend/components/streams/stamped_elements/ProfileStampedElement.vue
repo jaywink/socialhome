@@ -98,7 +98,7 @@
         <div class="d-inline-block ml-3 align-center stamped-profile-info">
             <h1>{{ displayName }}</h1>
             <h3>
-                <cite :title="translations.userHandle">{{ profile.handle.length ? profile.handle : profile.fid }}</cite>
+                <cite :title="translations.userHandle">{{ profileHandle }}</cite>
             </h3>
         </div>
         <div class="text-center">
@@ -135,6 +135,9 @@ export default Vue.component("profile-stamped-element", {
         },
         profile() {
             return this.$store.state.application.profile
+        },
+        profileHandle() {
+            return this.profile.handle ? this.profile.handle : this.profile.fid
         },
         showProfileButtons() {
             return this.$store.state.application.isUserAuthenticated &&
