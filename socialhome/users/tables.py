@@ -20,5 +20,5 @@ class ContactTable(Table):
         model = Profile
         fields = ()
         order_by = ("name", "fid", "handle")
-        template = "django_tables2/bootstrap.html"
+        template_name = "django_tables2/semantic.html"
         sequence = ("picture", "name", "fid", "handle")
