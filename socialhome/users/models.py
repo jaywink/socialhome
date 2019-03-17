@@ -148,6 +148,9 @@ class Profile(TimeStampedModel):
     inbox_private = models.URLField(_("Private inbox"), blank=True)
     inbox_public = models.URLField(_("Public inbox"), blank=True)
 
+    # Federation protocol
+    protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
+
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
@@ -196,6 +199,8 @@ class Profile(TimeStampedModel):
                 self.guid = str(self.uuid)
             if not self.fid:
                 self.fid = self.url
+            # Default protocol for all new profiles
+            self.protocol = "activitypub"
 
         if not self.fid and not self.handle:
             raise ValueError("Profile must have either a fid or a handle")
@@ -362,6 +367,9 @@ class Profile(TimeStampedModel):
             "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
+            "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
+            "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
+            "protocol": remote_profile._source_protocol,
         }
         public_key = safe_text(remote_profile.public_key)
         if public_key:
