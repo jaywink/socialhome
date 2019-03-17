@@ -1,5 +1,6 @@
 import logging
 from typing import List, TYPE_CHECKING, Optional
+from uuid import uuid4
 
 from django.conf import settings
 from federation.entities import base
@@ -301,6 +302,7 @@ def send_follow_change(profile_id, followed_id, follow):
         # Don't send in development mode
         return
     entity = base.Follow(
+        activity_id=f'{profile.fid}#follow-{uuid4()}',
         actor_id=profile.fid,
         target_id=remote_profile.fid,
         following=follow,
