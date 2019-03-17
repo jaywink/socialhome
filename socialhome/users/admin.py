@@ -6,8 +6,8 @@ from socialhome.users.models import User, Profile
 
 @admin.register(Profile)
 class ProfileAdmin(ModelAdmin):
-    list_display = ('id', 'uuid', 'name', 'handle', 'fid', 'visibility', 'user')
-    list_filter = ('visibility',)
+    list_display = ('id', 'uuid', 'name', 'handle', 'fid', 'visibility', 'user', 'protocol')
+    list_filter = ('visibility', 'protocol')
     raw_id_fields = ('user', 'following', 'followed_tags')
     readonly_fields = ('uuid', 'fid', 'guid', 'handle', 'rsa_public_key')
     search_fields = ('id', 'uuid', 'name', 'handle', 'email', 'fid')
