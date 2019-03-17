@@ -177,6 +177,10 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
             id=profile.fid,
             handle=profile.handle or "",
             guid=str(profile.uuid),
+            inboxes={
+                "private": profile.inbox_private,
+                "public": profile.inbox_public,
+            },
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)

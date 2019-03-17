@@ -78,14 +78,17 @@ def send_content(content_id, recipient_id=None):
         if settings.DEBUG:
             # Don't send in development mode
             return
+        recipients = []
         if recipient:
-            recipients = [
-                # TODO fid or handle?
-                (recipient.handle, recipient.key, recipient.guid),
-            ]
+            recipients.append(recipient.get_recipient_for_visibility(content.visibility))
         else:
-            recipients = [settings.SOCIALHOME_RELAY_ID]
-            recipients.extend(_get_remote_followers(content.author))
+            if content.visibility == Visibility.PUBLIC:
+                recipients.append({
+                    "fid": settings.SOCIALHOME_RELAY_ID,
+                    "public": True,
+                    "protocol": "diaspora"
+                })
+            recipients.extend(_get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients)
@@ -103,41 +106,33 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         participants = []
     if not include_remote and not target_content.local:
         return participants
-    replies = Content.objects.filter(
-        parent_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
-    )
+    replies = Content.objects.filter(parent_id=target_content.id, local=False)
     for reply in replies:
         if not exclude or (reply.author.fid != exclude and reply.author.handle != exclude):
-            # TODO fid or handle?
-            participants.append(reply.author.handle)
+            participants.append(reply.author.get_recipient_for_visibility(target_content.visibility))
     if target_content.content_type == ContentType.CONTENT:
-        shares = Content.objects.filter(
-            share_of_id=target_content.id, visibility=Visibility.PUBLIC, local=False,
-        )
+        shares = Content.objects.filter(share_of_id=target_content.id, local=False)
         for share in shares:
             if not exclude or (share.author.fid != exclude and share.author.handle != exclude):
-                # TODO fid or handle?
-                participants.append(share.author.handle)
+                participants.append(share.author.get_recipient_for_visibility(target_content.visibility))
             participants = _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
     return participants
 
 
-def _get_remote_followers(profile, exclude=None):
+def _get_remote_followers(profile: Profile, visibility: Visibility, exclude=None):
     """Get remote followers for a profile."""
     followers = []
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if not exclude or (follower.fid != exclude and follower.handle != exclude):
-            # TODO fid or handle?
-            followers.append(follower.handle)
+            followers.append(follower.get_recipient_for_visibility(visibility))
     return followers
 
 
 def _get_limited_recipients(sender: str, content: Content) -> List:
     return [
-        # TODO fid or handle?
-        (profile.handle, profile.key, profile.guid)
+        profile.get_recipient_for_visibility(content.visibility)
         for profile in content.limited_visibilities.all()
         if profile.fid != sender and profile.handle != sender and profile.guid != sender
     ]
@@ -169,16 +164,7 @@ def send_reply(content_id):
     else:
         # We only need to send to the original author
         parent_author = content.parent.author
-        if content.visibility == Visibility.PUBLIC:
-            recipients = [
-                # TODO fid or handle?
-                parent_author.handle,
-            ]
-        else:
-            recipients = [
-                # TODO fid or handle?
-                (parent_author.handle, parent_author.key, parent_author.guid),
-            ]
+        recipients = [parent_author.get_recipient_for_visibility(content.visibility)]
         logger.debug("send_reply - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients)
 
@@ -199,13 +185,10 @@ def send_share(content_id):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        recipients = _get_remote_followers(content.author)
+        recipients = _get_remote_followers(content.author, content.visibility)
         if not content.share_of.local:
             # Send to original author
-            recipients.append(
-                # TODO fid or handle?
-                content.share_of.author.handle,
-            )
+            recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients)
     else:
@@ -225,9 +208,13 @@ def send_content_retraction(content, author_id):
             # Don't send in development mode
             return
         if content.visibility == Visibility.PUBLIC:
-            recipients = [settings.SOCIALHOME_RELAY_ID]
+            recipients = [{
+                "fid": settings.SOCIALHOME_RELAY_ID,
+                "public": True,
+                "protocol": "diaspora"
+            }]
             recipients.extend(
-                _get_remote_followers(author)
+                _get_remote_followers(author, content.visibility)
             )
         else:
             recipients = _get_limited_recipients(author.uuid, content)
@@ -254,13 +241,7 @@ def send_profile_retraction(profile):
         if settings.DEBUG:
             # Don't send in development mode
             return
-        if profile.visibility == Visibility.PUBLIC:
-            recipients = [settings.SOCIALHOME_RELAY_ID]
-        else:
-            recipients = []
-        recipients.extend(
-            _get_remote_followers(profile)
-        )
+        recipients = _get_remote_followers(profile, profile.visibility)
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
         handle_send(entity, profile.federable, recipients)
     else:
@@ -293,6 +274,7 @@ def forward_entity(entity, target_content_id):
         recipients = _get_remote_participants_for_content(target_content, exclude=entity.actor_id)
         recipients.extend(_get_remote_followers(
             target_content.author,
+            target_content.visibility,
             exclude=entity.actor_id,
         ))
     elif target_content.visibility == Visibility.LIMITED and content.content_type == ContentType.REPLY:
@@ -325,9 +307,8 @@ def send_follow_change(profile_id, followed_id, follow):
         handle=profile.handle,
         target_handle=remote_profile.handle,
     )
-    recipients = [
-        remote_profile.fid if remote_profile.fid else (remote_profile.handle, remote_profile.key, remote_profile.guid),
-    ]
+    # Explicitly use limited visibility to force private endpoint
+    recipients = [remote_profile.get_recipient_for_visibility(Visibility.LIMITED)]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients)
     # Also trigger a profile send
@@ -353,6 +334,6 @@ def send_profile(profile_id, recipients=None):
         # Don't send in development mode
         return
     if not recipients:
-        recipients = _get_remote_followers(profile)
+        recipients = _get_remote_followers(profile, profile.visibility)
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients)

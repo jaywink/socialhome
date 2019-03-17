@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Dict
 from uuid import uuid4
 
 from Crypto.PublicKey import RSA
@@ -158,6 +159,27 @@ class Profile(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
+
+    def get_recipient_for_visibility(self, visibility: Visibility) -> Dict:
+        """
+        Get a recipient dictionary based on visibility.
+        """
+        if visibility == Visibility.PUBLIC:
+            return {
+                "fid": self.inbox_public,
+                "public": True,
+                "protocol": self.protocol,
+            }
+        elif visibility == Visibility.LIMITED:
+            return {
+                "fid": self.inbox_private,
+                "public": False,
+                "protocol": self.protocol,
+                "public_key": self.key,
+            }
+        else:
+            raise ValueError("get_recipient_for_visibility - Invalid visibility for federating, "
+                             "should be public or limited")
 
     @property
     def federable(self):
