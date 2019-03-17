@@ -14,7 +14,9 @@ class LandingPage(ChoicePreference):
         ("profile", _("Profile")),
         ("profile_all", _("Profile - all content")),
         ("followed", _("Followed stream")),
+        ("local", _("Local stream")),
         ("public", _("Public stream")),
+        ("tags", _("Tags stream")),
     ]
     default = "followed"
     verbose_name = _("Landing page")
