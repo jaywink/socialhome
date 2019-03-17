@@ -93,6 +93,7 @@ class User(AbstractUser):
         picture_warmer.warm()
 
 
+# noinspection PyCallingNonCallable
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
@@ -142,6 +143,10 @@ class Profile(TimeStampedModel):
     followed_tags = models.ManyToManyField(
         "content.Tag", verbose_name=_("Followed tags"), related_name="following_profiles",
     )
+
+    # Federation endpoints
+    inbox_private = models.URLField(_("Private inbox"), blank=True)
+    inbox_public = models.URLField(_("Public inbox"), blank=True)
 
     objects = ProfileQuerySet.as_manager()
 
@@ -216,6 +221,13 @@ class Profile(TimeStampedModel):
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
+
+        # Set default federation endpoints for local users
+        if self.is_local:
+            if not self.inbox_private:
+                self.inbox_private = f"{self.url}inbox/"
+            if not self.inbox_public:
+                self.inbox_public = reverse("federate:receive-public")
 
         super().save(*args, **kwargs)
 

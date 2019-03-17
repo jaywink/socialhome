@@ -162,7 +162,7 @@ def content_fetch_view(request, objtype, guid):
 
 
 class ReceivePublicView(View):
-    """Diaspora /receive/public view."""
+    """Generic federation /receive/public view."""
     def post(self, request, *args, **kwargs):
         if queue_payload(request):
             return HttpResponse(status=202)
