@@ -1,8 +1,10 @@
 import logging
 from typing import Optional, Union
 
+from Crypto.PublicKey.RSA import RsaKey
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.db.models.query_utils import Q
 from django.http import HttpRequest
 from federation.entities import base
 from federation.entities.mixins import BaseEntity
@@ -97,6 +99,20 @@ def get_profile(**kwargs) -> base.Profile:
     kwargs.pop('request', None)
     profile = Profile.objects.select_related('user').get(**kwargs)
     return make_federable_profile(profile)
+
+
+def get_user_private_key(identifier: str) -> Optional[RsaKey]:
+    """
+    Get a local user private key by identifier (fid, handle or guid).
+    """
+    from socialhome.users.models import Profile  # Circulars
+    try:
+        profile = Profile.objects.only('rsa_private_key').get(
+            Q(fid=identifier) | Q(handle=identifier) | Q(guid=identifier),
+        )
+    except Profile.DoesNotExist:
+        return
+    return profile.private_key
 
 
 def make_federable_content(content: Content) -> Optional[Union[base.Post, base.Comment, base.Share]]:
