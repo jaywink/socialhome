@@ -326,14 +326,12 @@ def send_follow_change(profile_id, followed_id, follow):
         target_handle=remote_profile.handle,
     )
     recipients = [
-        # TODO fid or handle?
-        (remote_profile.handle, remote_profile.key, remote_profile.guid),
-     ]
+        remote_profile.fid if remote_profile.fid else (remote_profile.handle, remote_profile.key, remote_profile.guid),
+    ]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients)
     # Also trigger a profile send
-    # TODO fid or handle?
-    send_profile(profile_id, recipients=[remote_profile.handle])
+    send_profile(profile_id, recipients=recipients)
 
 
 def send_profile(profile_id, recipients=None):
