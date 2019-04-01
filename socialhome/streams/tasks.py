@@ -74,4 +74,5 @@ def streams_tasks(scheduler):
         scheduled_time=datetime.utcnow(),
         func=groom_redis_precaches,
         interval=60*60*3,  # every 3 hours
+        timeout=60*60*2,  # 2 hours
     )

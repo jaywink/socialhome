@@ -65,6 +65,8 @@ Fixed
 
 * Fix internal server error for anonymous user for certain internal user pages (`#518 <https://git.feneas.org/socialhome/socialhome/issues/518>`_)
 
+* Timeout of the pre-calculated stream cache cleanup job has been extended so that it doesn't timeout on larger servers.
+
 Internal changes
 ................
 

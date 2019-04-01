@@ -19,7 +19,8 @@ def test_streams_tasks():
     mock_scheduler.schedule.assert_called_once_with(
         scheduled_time=datetime.utcnow(),
         func=groom_redis_precaches,
-        interval=60 * 60 * 3,
+        interval=60*60*3,
+        timeout=60*60*2,
     )
 
 
