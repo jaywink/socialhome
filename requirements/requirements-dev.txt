@@ -33,7 +33,7 @@ constantly==15.1.0
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==4.5.2
-croniter==0.3.27
+croniter==0.3.30
 cssselect==1.0.3
 daphne==1.4.2
 ddt==1.2.1

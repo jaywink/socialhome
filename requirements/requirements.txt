@@ -26,7 +26,7 @@ commonmark==0.8.1
 constantly==15.1.0        # via twisted
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
-croniter==0.3.27          # via rq-scheduler
+croniter==0.3.30          # via rq-scheduler
 cssselect==1.0.3
 daphne==1.4.2             # via channels
 decorator==4.3.2          # via ipython, traitlets
