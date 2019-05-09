@@ -73,7 +73,7 @@ The easiest way to run a database is using Docker. Install Docker and then use t
 
 ::
 
-    docker run -e 'POSTGRESS_PASSWORD=socialhome POSTGRES_USER=socialhome POSTGRES_DB=socialhome' \
+    docker run -e 'POSTGRES_PASSWORD=socialhome POSTGRES_USER=socialhome POSTGRES_DB=socialhome' \
         --name socialhomedb -d -p '5432:5432' postgres
     # Migrate the database
     python manage.py migrate
