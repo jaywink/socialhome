@@ -12,7 +12,7 @@
     }
 
     const jsdom = require("jsdom") // eslint-disable-line global-require
-    global.jsdom = new jsdom.JSDOM(HTML, {})
+    global.jsdom = new jsdom.JSDOM(HTML)
     global.document = global.jsdom.window.document
     global.window = global.jsdom.window
     global.window.console = global.console
@@ -23,10 +23,31 @@
     keys.forEach(key => {
         global[key] = global.window[key]
     })
+
+    // JSDOM fixes
+    // See https://github.com/jsdom/jsdom/issues/317
+    global.window.document.createRange = () => {
+        return {
+            setEnd: () => {},
+            setStart: () => {},
+            getBoundingClientRect: () => {
+                return {right: 0}
+            },
+            getClientRects: () => [],
+            createContextualFragment: (html) => {
+                const div = document.createElement('div')
+                div.innerHTML = html
+                return div.children[0]
+            },
+        }
+    }
+    global.window.document.body.createTextRange = () => {}
+    global.window.focus = () => {}
 }())
 
 require("chai/register-should")
-require("chai").use(require("chai-as-promised"))
+require("chai").use(require("chai-as-promised")).use(require("sinon-chai"))
+require("django-i18n")
 
 // Noop function to make the tests pass
 global.WebSocket = function () {} // eslint-disable-line func-names
@@ -39,5 +60,4 @@ global.Sinon = require("sinon").sandbox.create()
 const file = "socialhome/frontend/tests/fixtures/Url"
 global.Urls = require(`../../${file}`).Urls // eslint-disable-line global-require, import/no-dynamic-require
 
-global.gettext = key => key
-global.ngettext = (key1, key2, num) => (num > 1 ? key2 : key1)
+

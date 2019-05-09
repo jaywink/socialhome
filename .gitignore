@@ -87,6 +87,9 @@ bower_components/
 # Mocha test statics
 socialhome/static/mocha/
 
+# Test coverage
+.nyc_output/
+
 # DOcs
 /docs/_build/
 /yarn.lock

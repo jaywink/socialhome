@@ -1,5 +1,6 @@
 import VueRouter from "vue-router"
 import Stream from "frontend/components/streams/Stream.vue"
+import Publisher from "frontend/components/publisher/Publisher"
 
 
 function $$(props = {}) {
@@ -20,6 +21,11 @@ const routes = [
     {path: "/p/:uuid/all", component: Stream, props: $$()},
     {path: "/streams/tag/:tag", component: Stream, props: $$()},
     {path: "/streams/tags/", component: Stream},
+
+    // Publisher
+    {path: "/content/create", component: Publisher},
+    {path: "/content/:contentId/~reply/", component: Publisher, props: $$()},
+
     {path: "/content/:contentId", component: Stream, props: $$()},
     {path: "/content/:contentId/:shorttext", component: Stream, props: $$()},
 ]
