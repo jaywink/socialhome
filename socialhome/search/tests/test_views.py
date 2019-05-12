@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from urllib.parse import quote
 
 import haystack
 from django.contrib.auth.models import AnonymousUser
@@ -102,16 +103,36 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertEqual(self.context["name"], self.tag.name)
 
     @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
-    def test_search_by_handle_fetches_unknown_profile(self, mock_retrieve):
-        fid = "i-dont-exist-locally@example.com"
+    def test_search_by_fid_fetches_unknown_profile(self, mock_retrieve):
+        fid = "https://example.com/i-dont-exist-locally"
         mock_retrieve.return_value = base.Profile(
             name="I don't exist locally",
             id=fid,
-            handle=fid,
             public=True,
         )
-        self.get("%s?q=%s" % (reverse("search:global"), fid), follow=True)
+        self.get("%s?q=%s" % (reverse("search:global"), quote(fid)), follow=True)
         profile = Profile.objects.fed(fid).get()
+        self.assertResponseNotContains("Profiles", html=False)
+        self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
+        self.assertEqual(self.context["object"], profile)
+
+        # Survives extra spaces around
+        self.get("%s?q=%s" % (reverse("search:global"), f"%20{quote(fid)}%20"), follow=True)
+        self.assertResponseNotContains("Profiles", html=False)
+        self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
+        self.assertEqual(self.context["object"], profile)
+
+    @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
+    def test_search_by_handle_fetches_unknown_profile(self, mock_retrieve):
+        handle = "i-dont-exist-locally@example.com"
+        mock_retrieve.return_value = base.Profile(
+            name="I don't exist locally",
+            id=handle,
+            handle=handle,
+            public=True,
+        )
+        self.get("%s?q=%s" % (reverse("search:global"), handle), follow=True)
+        profile = Profile.objects.fed(handle).get()
         self.assertResponseNotContains("Profiles", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], profile)

@@ -3,6 +3,8 @@ import datetime
 import pytz
 import redis
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.utils.timezone import make_aware
 
 
@@ -30,6 +32,15 @@ def is_dst(zonename):
     tz = pytz.timezone(zonename)
     now = pytz.utc.localize(datetime.datetime.utcnow())
     return now.astimezone(tz).dst() != datetime.timedelta(0)
+
+
+def is_url(url):
+    val = URLValidator()
+    try:
+        val(url)
+    except ValidationError:
+        return False
+    return True
 
 
 def safe_make_aware(value, timezone=None):

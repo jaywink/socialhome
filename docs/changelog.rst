@@ -60,6 +60,8 @@ Changed
 
   Also make remote profiles always locally public to avoid situations where a user can see the post but can't see the local profile. Any profile that federates to us is public to some extent since it left the server.
 
+* Global search now works also with ActivityPub ID's to fetch a remote profile
+
 Fixed
 .....
 

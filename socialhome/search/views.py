@@ -15,6 +15,7 @@ from socialhome.content.models import Tag
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
+from socialhome.utils import is_url
 
 
 class GlobalSearchView(SearchView):
@@ -95,8 +96,7 @@ class GlobalSearchView(SearchView):
             profile = Profile.objects.visible_for_user(request.user).fed(q).get()
         except Profile.DoesNotExist:
             # Try a remote search
-            # TODO currently only if diaspora handle
-            if validate_handle(q):
+            if is_url(q) or validate_handle(q):
                 try:
                     remote_profile = retrieve_remote_profile(q)
                 except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
