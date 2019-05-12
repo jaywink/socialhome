@@ -9,6 +9,7 @@ django-debug-toolbar-user-panel
 django-querycount
 django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why
 django_coverage_plugin
+djangorestframework-stubs
 factory_boy
 Faker
 flake8

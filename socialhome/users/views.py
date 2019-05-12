@@ -13,7 +13,7 @@ from socialhome.streams.views import BaseStreamView
 from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
-from socialhome.users.tables import FollowedTable
+from socialhome.users.tables import ContactTable
 from socialhome.utils import get_full_url
 
 
@@ -202,7 +202,22 @@ class ContactsFollowedView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table = FollowedTable(self.object.following.all(), order_by=self.request.GET.get("sort"))
+        table = ContactTable(self.object.following.all(), order_by=self.request.GET.get("sort"))
         table.paginate(page=self.request.GET.get("page", 1), per_page=25)
         context["followed_table"] = table
+        return context
+
+
+class ContactsFollowersView(LoginRequiredMixin, DetailView):
+    model = Profile
+    template_name = "users/contacts_followers.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table = ContactTable(self.object.followers.all(), order_by=self.request.GET.get("sort"))
+        table.paginate(page=self.request.GET.get("page", 1), per_page=25)
+        context["followers_table"] = table
         return context

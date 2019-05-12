@@ -13,9 +13,18 @@ class TestQueuePayload(SocialhomeTestCase):
     @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
     def test_calls_enqueue(self, mock_enqueue):
         queue_payload(self.request)
-        mock_enqueue.assert_called_once_with(receive_task, self.request.body, uuid=None)
+        args, kwargs = mock_enqueue.call_args
+        self.assertEqual(args[0], receive_task)
+        request = args[1]
+        self.assertEqual(request.body, self.request.body)
+        self.assertEqual(request.headers['server-name'], 'testserver')
+        self.assertEqual(request.headers['Server-name'], 'testserver')
+        self.assertEqual(request.method, 'GET')
+        self.assertEqual(request.url, self.request.build_absolute_uri())
+        self.assertIsNone(kwargs['uuid'])
 
     @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
     def test_calls_enqueue__with_uuid(self, mock_enqueue):
         queue_payload(self.request, uuid='1234')
-        mock_enqueue.assert_called_once_with(receive_task, self.request.body, uuid='1234')
+        _args, kwargs = mock_enqueue.call_args
+        self.assertEqual(kwargs['uuid'], '1234')

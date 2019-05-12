@@ -298,7 +298,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     domain=SOCIALHOME_DOMAIN
 )
 # Relay to send public content to
-SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="relay@relay.iliketoast.net")
+SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="https://relay.iliketoast.net/receive/public")
 SOCIALHOME_RELAY_SCOPE = env("SOCIALHOME_RELAY_SCOPE", default="all")
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
@@ -515,6 +515,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
+    "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",
     "get_profile_function": "socialhome.federate.utils.entities.get_profile",
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",

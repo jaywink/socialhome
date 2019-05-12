@@ -20,7 +20,7 @@ from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTest
 from socialhome.users.models import Profile
 from socialhome.users.tests.factories import (
     ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory, PublicProfileFactory,
-)
+    SelfUserFactory)
 
 
 class TestProcessEntities(SocialhomeTestCase):
@@ -616,12 +616,13 @@ class TestMakeFederableRetraction(SocialhomeTestCase):
 
 class TestMakeFederableProfile(SocialhomeTestCase):
     def test_make_federable_profile(self):
-        profile = ProfileFactory(visibility=Visibility.SELF)
+        user = SelfUserFactory()
+        profile = user.profile
         entity = make_federable_profile(profile)
         self.assertTrue(isinstance(entity, base.Profile))
         self.assertEqual(entity.id, profile.fid)
         self.assertEqual(entity.raw_content, "")
-        self.assertEqual(entity.public, False)
+        self.assertEqual(entity.public, True)
         self.assertEqual(entity.name, profile.name)
         self.assertEqual(entity.public_key, profile.rsa_public_key)
         self.assertEqual(entity.image_urls, {
@@ -629,16 +630,6 @@ class TestMakeFederableProfile(SocialhomeTestCase):
             "medium": profile.safer_image_url_medium,
             "large": profile.safer_image_url_large,
         })
-        profile = ProfileFactory(visibility=Visibility.LIMITED)
-        entity = make_federable_profile(profile)
-        self.assertEqual(entity.public, False)
-        profile = ProfileFactory(visibility=Visibility.SITE)
-        entity = make_federable_profile(profile)
-        self.assertEqual(entity.public, False)
-        profile = ProfileFactory(visibility=Visibility.PUBLIC)
-        entity = make_federable_profile(profile)
-        self.assertEqual(entity.public, True)
-
 
 class TestSenderKeyFetcher(SocialhomeTestCase):
     @classmethod

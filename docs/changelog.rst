@@ -25,6 +25,8 @@ Added
 
 * It's now possible to disable incoming `relay system <https://git.feneas.org/jaywink/social-relay>`_ integration by setting the environment variable ``SOCIALHOME_RELAY_SCOPE`` to ``none``. (`#94 <https://git.feneas.org/socialhome/socialhome/issues/94>`_)
 
+* User profile now has a link to a new followers contacts page. This is limited to the logged in user only.
+
 Changed
 .......
 

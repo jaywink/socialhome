@@ -4,7 +4,7 @@ from django_tables2.utils import Accessor
 from socialhome.users.models import Profile
 
 
-class FollowedTable(Table):
+class ContactTable(Table):
     picture = TemplateColumn(template_name="users/_picture_column.html", orderable=False)
     handle = LinkColumn(
         "users:profile-detail", args=[Accessor("uuid")], text=lambda record: record.handle if record.handle else "",
@@ -20,5 +20,5 @@ class FollowedTable(Table):
         model = Profile
         fields = ()
         order_by = ("name", "fid", "handle")
-        template = "django_tables2/bootstrap.html"
+        template_name = "django_tables2/semantic.html"
         sequence = ("picture", "name", "fid", "handle")

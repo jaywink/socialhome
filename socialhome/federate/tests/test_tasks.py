@@ -69,7 +69,7 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.public_content.author.federable,
-            ["relay@relay.iliketoast.net"],
+            [{'fid': 'https://relay.iliketoast.net/receive/public', 'public': True, 'protocol': 'diaspora'}],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -79,11 +79,7 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.limited_content.author.federable,
-            [(
-                self.remote_profile.handle,
-                self.remote_profile.key,
-                self.remote_profile.guid,
-            )],
+            [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -134,7 +130,9 @@ class TestSendContentRetraction(SocialhomeTestCase):
     def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_sender.assert_called_once_with(
-            "entity", self.public_content.author.federable, ["relay@relay.iliketoast.net"]
+            "entity",
+            self.public_content.author.federable,
+            [{'fid': 'https://relay.iliketoast.net/receive/public', 'public': True, 'protocol': 'diaspora'}],
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
@@ -169,7 +167,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
     @patch("socialhome.federate.tasks._get_remote_followers", autospec=True)
     def test_get_remote_followers_is_called(self, mock_followers, mock_make, mock_send):
         send_profile_retraction(self.public_profile)
-        mock_followers.assert_called_once_with(self.public_profile)
+        mock_followers.assert_called_once_with(self.public_profile, Visibility.PUBLIC)
 
     def test_handle_send_is_called(self, mock_make, mock_send):
         send_profile_retraction(self.public_profile)
@@ -177,8 +175,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             "entity",
             self.public_profile.federable,
             [
-                'relay@relay.iliketoast.net',
-                self.remote_profile.handle,
+                self.remote_profile.get_recipient_for_visibility(Visibility.PUBLIC),
             ],
         )
 
@@ -188,7 +185,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             "entity",
             self.limited_profile.federable,
             [
-                self.remote_profile.handle,
+                self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED),
             ],
         )
 
@@ -226,11 +223,7 @@ class TestSendReply(SocialhomeTestCase):
         mock_sender.assert_called_once_with(
             "entity",
             self.limited_reply.author.federable,
-            [(
-                self.remote_profile.handle,
-                self.remote_profile.key,
-                self.remote_profile.guid,
-            )],
+            [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -247,7 +240,7 @@ class TestSendReply(SocialhomeTestCase):
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         send_reply(self.reply2.id)
         mock_sender.assert_called_once_with("entity", self.reply2.author.federable, [
-            self.remote_content.author.handle,
+            self.remote_content.author.get_recipient_for_visibility(self.reply2.visibility),
         ])
         self.assertTrue(mock_forward.called is False)
 
@@ -284,7 +277,7 @@ class TestSendShare(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.share.author.federable,
-            [self.content.author.handle],
+            [self.content.author.get_recipient_for_visibility(self.share.visibility)],
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -328,20 +321,18 @@ class TestForwardEntity(TestCase):
         entity = Comment(actor_id=self.reply.author.fid, id=self.reply.fid)
         forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author.federable, [
-            self.remote_reply.author.handle,
-            self.share.author.handle,
-            self.share_reply.author.handle,
+            self.remote_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
+            self.share.author.get_recipient_for_visibility(Visibility.PUBLIC),
+            self.share_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
         ], parent_user=self.public_content.author.federable)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_forward_entity__limited_content(self, mock_send):
         entity = Comment(actor_id=self.limited_reply.author.fid, id=self.limited_reply.fid)
         forward_entity(entity, self.limited_content.id)
-        mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [(
-            self.remote_limited_reply.author.handle,
-            self.remote_limited_reply.author.key,
-            self.remote_limited_reply.author.guid,
-        )], parent_user=self.limited_content.author.federable)
+        mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [
+            self.remote_limited_reply.author.get_recipient_for_visibility(Visibility.LIMITED),
+        ], parent_user=self.limited_content.author.federable)
 
 
 class TestGetRemoteFollowers(TestCase):
@@ -357,22 +348,24 @@ class TestGetRemoteFollowers(TestCase):
         cls.remote_follower2.following.add(cls.user.profile)
 
     def test_all_remote_returned(self):
-        followers = set(_get_remote_followers(self.user.profile))
+        followers = _get_remote_followers(self.user.profile, self.user.profile.visibility)
         self.assertEqual(
             followers,
-            {
-                self.remote_follower.handle,
-                self.remote_follower2.handle,
-            }
+            [
+                self.remote_follower.get_recipient_for_visibility(self.user.profile.visibility),
+                self.remote_follower2.get_recipient_for_visibility(self.user.profile.visibility),
+            ],
         )
 
     def test_exclude_is_excluded(self):
-        followers = set(_get_remote_followers(self.user.profile, exclude=self.remote_follower.fid))
+        followers = _get_remote_followers(
+            self.user.profile, self.user.profile.visibility, exclude=self.remote_follower.fid,
+        )
         self.assertEqual(
             followers,
-            {
-                self.remote_follower2.handle,
-            }
+            [
+                self.remote_follower2.get_recipient_for_visibility(self.user.profile.visibility),
+            ]
         )
 
 
@@ -388,13 +381,12 @@ class TestGetLimitedRecipients(SocialhomeTestCase):
 
     def test_correct_recipients_returned(self):
         recipients = _get_limited_recipients(self.profile.fid, self.limited_content)
-        recipients = {id for id, key, guid in recipients}
         self.assertEqual(
             recipients,
-            {
-                self.profile2.handle,
-                self.profile3.handle,
-            },
+            [
+                self.profile2.get_recipient_for_visibility(Visibility.LIMITED),
+                self.profile3.get_recipient_for_visibility(Visibility.LIMITED),
+            ],
         )
 
 
@@ -416,10 +408,10 @@ class TestSendFollow(TestCase):
         mock_send.assert_called_once_with(
             "entity",
             self.profile.federable,
-            [(self.remote_profile.handle, self.remote_profile.key, self.remote_profile.guid)],
+            [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
         )
         mock_profile.assert_called_once_with(self.profile.id, recipients=[
-            self.remote_profile.handle,
+            self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED),
         ])
 
 

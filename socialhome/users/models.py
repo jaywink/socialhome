@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Dict
 from uuid import uuid4
 
 from Crypto.PublicKey import RSA
@@ -93,6 +94,7 @@ class User(AbstractUser):
         picture_warmer.warm()
 
 
+# noinspection PyCallingNonCallable
 class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
@@ -143,6 +145,13 @@ class Profile(TimeStampedModel):
         "content.Tag", verbose_name=_("Followed tags"), related_name="following_profiles",
     )
 
+    # Federation endpoints
+    inbox_private = models.URLField(_("Private inbox"), blank=True)
+    inbox_public = models.URLField(_("Public inbox"), blank=True)
+
+    # Federation protocol
+    protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
+
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
@@ -150,6 +159,27 @@ class Profile(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
+
+    def get_recipient_for_visibility(self, visibility: Visibility) -> Dict:
+        """
+        Get a recipient dictionary based on visibility.
+        """
+        if visibility == Visibility.PUBLIC:
+            return {
+                "fid": self.inbox_public,
+                "public": True,
+                "protocol": self.protocol,
+            }
+        elif visibility == Visibility.LIMITED:
+            return {
+                "fid": self.inbox_private,
+                "public": False,
+                "protocol": self.protocol,
+                "public_key": self.key,
+            }
+        else:
+            raise ValueError("get_recipient_for_visibility - Invalid visibility for federating, "
+                             "should be public or limited")
 
     @property
     def federable(self):
@@ -191,6 +221,8 @@ class Profile(TimeStampedModel):
                 self.guid = str(self.uuid)
             if not self.fid:
                 self.fid = self.url
+            # Default protocol for all new profiles
+            self.protocol = "activitypub"
 
         if not self.fid and not self.handle:
             raise ValueError("Profile must have either a fid or a handle")
@@ -200,6 +232,11 @@ class Profile(TimeStampedModel):
             self.handle = self.handle.lower()
             if not validate_handle(self.handle):
                 raise ValueError("Not a valid handle")
+        else:
+            self.handle = None
+
+        if self.guid == "":
+            self.guid = None
 
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
@@ -211,6 +248,13 @@ class Profile(TimeStampedModel):
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
+
+        # Set default federation endpoints for local users
+        if self.is_local:
+            if not self.inbox_private:
+                self.inbox_private = f"{self.url}inbox/"
+            if not self.inbox_public:
+                self.inbox_public = reverse("federate:receive-public")
 
         super().save(*args, **kwargs)
 
@@ -345,6 +389,9 @@ class Profile(TimeStampedModel):
             "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
+            "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
+            "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
+            "protocol": remote_profile._source_protocol,
         }
         public_key = safe_text(remote_profile.public_key)
         if public_key:
@@ -354,10 +401,8 @@ class Profile(TimeStampedModel):
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
         fid = safe_text(remote_profile.id)
-        if hasattr(remote_profile, "handle"):
-            values['handle'] = safe_text(remote_profile.handle)
-        if hasattr(remote_profile, "guid"):
-            values['guid'] = safe_text(remote_profile.guid)
+        values['handle'] = safe_text(remote_profile.handle)
+        values['guid'] = safe_text(remote_profile.guid)
         logger.debug("from_remote_profile - values %s", values)
         profile, created = Profile.objects.fed_update_or_create(fid, values)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)

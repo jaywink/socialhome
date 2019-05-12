@@ -1,8 +1,10 @@
 import logging
 from typing import Optional, Union
 
+from Crypto.PublicKey.RSA import RsaKey
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.db.models.query_utils import Q
 from django.http import HttpRequest
 from federation.entities import base
 from federation.entities.mixins import BaseEntity
@@ -99,6 +101,20 @@ def get_profile(**kwargs) -> base.Profile:
     return make_federable_profile(profile)
 
 
+def get_user_private_key(identifier: str) -> Optional[RsaKey]:
+    """
+    Get a local user private key by identifier (fid, handle or guid).
+    """
+    from socialhome.users.models import Profile  # Circulars
+    try:
+        profile = Profile.objects.only('rsa_private_key').get(
+            Q(fid=identifier) | Q(handle=identifier) | Q(guid=identifier),
+        )
+    except Profile.DoesNotExist:
+        return
+    return profile.private_key
+
+
 def make_federable_content(content: Content) -> Optional[Union[base.Post, base.Comment, base.Share]]:
     """Make Content federable by converting it to a federation entity."""
     logger.info("make_federable_content - Content: %s", content)
@@ -139,13 +155,15 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
 
 
-def make_federable_profile(profile):
+def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
+    if not profile.is_local:
+        return
     try:
         return base.Profile(
             raw_content="",
-            public=True if profile.visibility == Visibility.PUBLIC else False,
+            public=True,  # A profile is public in the context of federation if it is sent outwards
             name=profile.name,
             image_urls={
                 "small": profile.safer_image_url_small,
@@ -159,7 +177,11 @@ def make_federable_profile(profile):
             id=profile.fid,
             handle=profile.handle or "",
             guid=str(profile.uuid),
+            inboxes={
+                "private": profile.inbox_private,
+                "public": profile.inbox_public,
+            },
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)
-        return None
+        return

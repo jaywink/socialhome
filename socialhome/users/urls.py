@@ -38,6 +38,16 @@ urlpatterns = [
         name="profile-update"
     ),
     url(
+        regex=r"^p/~followed/$",
+        view=views.ContactsFollowedView.as_view(),
+        name="contacts-followed"
+    ),
+    url(
+        regex=r"^p/~followers/$",
+        view=views.ContactsFollowersView.as_view(),
+        name="contacts-followers"
+    ),
+    url(
         regex=r"^p/(?P<uuid>[^/]+)/all/$",
         view=views.ProfileAllContentView.as_view(),
         name="profile-all-content"
@@ -47,11 +57,6 @@ urlpatterns = [
         # CSRF exempt needed for POST to work for ActivityPub object inboxes
         view=csrf_exempt(views.ProfileDetailView.as_view()),
         name="profile-detail"
-    ),
-    url(
-        regex=r"^contacts/$",
-        view=views.ContactsFollowedView.as_view(),
-        name="contacts-followed"
     ),
     path('delete-account/', views.DeleteAccountView.as_view(), name="delete-account"),
 ]
