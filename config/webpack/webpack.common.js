@@ -4,8 +4,8 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin")
 module.exports = {
     entry: path.resolve(__dirname, "../../socialhome/frontend/main.js"),
     output: {
-        path: path.resolve(__dirname, "../../socialhome/static"),
-        filename: "dist/webpack.bundle.js",
+        path: path.resolve(__dirname, "../../socialhome/static/dist"),
+        filename: "webpack.bundle.js",
     },
     module: {
         loaders: [
@@ -46,10 +46,14 @@ module.exports = {
                     },
                 },
             },
+            {
+                test: /\.(eot|woff|woff2|svg|ttf)$/,
+                use: ["file-loader"]
+            },
         ],
     },
     plugins: [
-        new ExtractTextPlugin("dist/webpack.bundle.css"),
+        new ExtractTextPlugin("webpack.bundle.css"),
     ],
     resolve: {
         modules: [

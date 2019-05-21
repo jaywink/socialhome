@@ -42,6 +42,18 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
     form_class = ContentForm
     template_name = "content/edit.html"
     is_reply = False
+    vue = False
+
+    def dispatch(self, request, *args, **kwargs):
+        use_vue_parameter = request.GET.get("vue", None)
+        if use_vue_parameter is not None:
+            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
+        else:
+            self.vue = (
+                hasattr(request.user, "preferences") and
+                request.user.preferences.get("content__use_new_publisher")
+            )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         """Add user to form kwargs."""
@@ -53,7 +65,16 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["bookmarklet"] = render_to_string("content/bookmarklet.min.js", {}, request=self.request)
         context["is_reply"] = self.is_reply
+        if self.vue:
+            context["json_context"] = self.get_json_context()
         return context
+
+    def get_json_context(self):
+        return {
+            "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+            "isUserAuthenticated": bool(self.request.user.is_authenticated),
+            "isReply": self.is_reply,
+        }
 
     def get_initial(self):
         initial = super().get_initial()
@@ -70,6 +91,9 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
             parameters["notes"] = self.request.GET.get("notes")
         if parameters:
             return render_to_string("content/_bookmarklet_initial.html", parameters, request=self.request)
+
+    def get_template_names(self):
+        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
 
 
 class ContentBookmarkletView(ContentCreateView):
@@ -96,6 +120,18 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
     model = Content
     form_class = ContentForm
     template_name = "content/edit.html"
+    vue = False
+
+    def dispatch(self, request, *args, **kwargs):
+        use_vue_parameter = request.GET.get("vue", None)
+        if use_vue_parameter is not None:
+            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
+        else:
+            self.vue = (
+                hasattr(request.user, "preferences") and
+                request.user.preferences.get("content__use_new_publisher")
+            )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super(ContentUpdateView, self).get_form_kwargs()
@@ -112,7 +148,19 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["is_reply"] = self.is_reply
+        if self.vue:
+            context["json_context"] = self.get_json_context()
         return context
+
+    def get_json_context(self):
+        return {
+            "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+            "isUserAuthenticated": bool(self.request.user.is_authenticated),
+            "isReply": self.is_reply,
+        }
+
+    def get_template_names(self):
+        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
 
     @property
     def is_reply(self):

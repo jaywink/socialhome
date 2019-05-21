@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import application from "./modules/application"
 import profile from "./modules/profile"
 import stream from "./modules/stream"
+import publisher from "./modules/publisher"
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
         application,
         profile,
         stream,
+        publisher
     },
     strict: debug,
 })

@@ -6,9 +6,8 @@ import VueRouter from "vue-router"
 import VueSnotify from "vue-snotify"
 import ReconnectingWebSocket from "ReconnectingWebSocket/reconnecting-websocket.min"
 
+import filters from "frontend/filters"
 import router from "frontend/routes"
-
-import "frontend/components/streams/Stream.vue"
 
 // CSS
 import "frontend/main.stylesheet"
@@ -21,7 +20,8 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueRouter)
 Vue.use(VueSnotify)
 
-console.log(store)
+// Globally add filters
+Object.entries(filters).forEach(([key, value]) => Vue.filter(`${key}`, value))
 
 const main = new Vue({
     el: "#app",
