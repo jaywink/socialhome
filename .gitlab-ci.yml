@@ -14,6 +14,7 @@ cache:
     - venv/
     - node_modules/
     - bower_components/
+    - socialhome/frontend/node_modules
 
 services:
   - redis
@@ -33,14 +34,21 @@ variables:
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
 
+stages:
+  - lint
+  - test_backend
+  - test_frontend_unit
+  - test_frontend_e2e
+
 before_script:
   - unset NPM_CONFIG_PREFIX
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
   - (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
   - source ~/.nvm/nvm.sh && nvm install 8
-  - npm install
+  - npm install --ignore-scripts
   - node_modules/.bin/bower install --allow-root
+  - npm i --prefix=socialhome/frontend
   - npm run build
   - python -V
   - pip install virtualenv
@@ -48,12 +56,27 @@ before_script:
   - source venv/bin/activate
   - pip install -U pip-tools pip setuptools
   - pip-sync dev-requirements.txt
+  - python manage.py migrate --noinput -v 0
+  - python manage.py collectstatic --noinput -v 0
 
-test:
+lint:
+  stage: lint
+  script:
+    - npm run lint
+
+test_backend:
+  stage: test_backend
   script:
     - pip freeze
     - python manage.py print_settings
     - pytest
-    - python manage.py migrate --noinput -v 0
-    - python manage.py collectstatic --noinput -v 0
-    - npm run test
+
+test_frontend_unit:
+  stage: test_frontend_unit
+  script:
+    - npm run test:unit
+
+test_frontend_e2e:
+  stage: test_frontend_e2e
+  script:
+    - npm run test:e2e

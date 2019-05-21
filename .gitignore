@@ -48,7 +48,8 @@ htmlcov
 *.swo
 
 # npm
-node_modules/
+**/node_modules/
+package-lock.json
 
 # Compass
 .sass-cache

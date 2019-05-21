@@ -1,0 +1,25 @@
+module.exports = {
+    env: {mocha: true},
+    rules: {
+        "arrow-parens": ["error", "as-needed"],
+        indent: ["error", 4, {SwitchCase: 1}],
+        "import/extensions": "off",
+        "import/no-extraneous-dependencies": "off",
+        "import/no-unresolved": "off",
+        "max-len": ["error", 120],
+        "no-unused-expressions": "off",
+        "object-curly-spacing": ["error", "never"],
+        "prefer-promise-reject-errors": "off",
+        quotes: ["error", "double"],
+        semi: ["error", "never"],
+        "no-return-assign": "off",
+    },
+    globals: {
+        gettext: true,
+        interpolate: true,
+        jsdom: true,
+        ngettext: true,
+        Sinon: true,
+        Urls: true,
+    },
+}

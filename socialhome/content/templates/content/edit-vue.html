@@ -24,10 +24,6 @@
     {{ block.super }}
     {{ form.media }}
     <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
-    <script src="{% static 'dist/webpack.bundle.js' %}"></script>
+    <script src="{% static 'dist/app.js' %}"></script>
 {% endblock %}
 
-{% block css %}
-    {{ block.super }}
-    <link href="{% static "dist/webpack.bundle.css" %}" rel="stylesheet" >
-{% endblock %}
