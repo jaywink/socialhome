@@ -92,23 +92,23 @@ describe("ReactionsBar", () => {
         context("updated", () => {
             it("redraws masonry if not single stream", done => {
                 const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
+                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
                 target.update()
-                target.vm.$nextTick(() => {
-                    Vue.redrawVueMasonry.called.should.be.true
+                target.vm.$nextTick().then(() => {
+                    Vue.prototype.$redrawVueMasonry.called.should.be.true
                     done()
-                })
+                }).catch(done)
             })
 
             it("does not redraw masonry if single stream", done => {
                 store.state.stream.stream.single = true
                 const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
+                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
                 target.update()
-                target.vm.$nextTick(() => {
-                    Vue.redrawVueMasonry.called.should.be.false
+                target.vm.$nextTick().then(() => {
+                    Vue.prototype.$redrawVueMasonry.called.should.be.false
                     done()
-                })
+                }).catch(done)
             })
         })
     })

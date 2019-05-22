@@ -54,7 +54,7 @@ export default Vue.component("author-bar", {
         },
     },
     updated() {
-        Vue.redrawVueMasonry()
+        this.$redrawVueMasonry()
     },
     methods: {
         profileBoxTrigger() {

@@ -83,13 +83,14 @@ describe("StreamElement", () => {
     describe("lifecycle", () => {
         describe("updated", () => {
             it("redraws masonry", done => {
+                store.state.stream.stream.single = false
                 const target = mount(StreamElement, {propsData: {content: store.content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
+                Sinon.spy(target.instance(), "$redrawVueMasonry")
                 target.update()
-                target.instance().$nextTick(() => {
-                    Vue.redrawVueMasonry.called.should.be.true
+                target.instance().$nextTick().then(() => {
+                    target.instance().$redrawVueMasonry.called.should.be.true
                     done()
-                })
+                }).catch(done)
             })
         })
     })

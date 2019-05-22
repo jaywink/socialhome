@@ -106,7 +106,7 @@ export default Vue.component("reactions-bar", {
     },
     updated() {
         if (!this.$store.state.stream.stream.single) {
-            Vue.redrawVueMasonry()
+            this.$redrawVueMasonry()
         }
     },
     methods: {

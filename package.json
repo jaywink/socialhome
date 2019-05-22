@@ -11,7 +11,7 @@
     "test:unit": "npm run --prefix=socialhome/frontend test:unit",
     "test:e2e": "npm run --prefix=socialhome/frontend test:e2e",
     "test:e2e:ci": "npm run --prefix=socialhome/frontend test:e2e -- --headless",
-    "lint": "npm run --prefix=socialhome/frontend  lint -- --no-fix",
+    "lint": "npm run --prefix=socialhome/frontend lint -- --no-fix",
     "lint:fix": "npm run --prefix=socialhome/frontend lint",
     "postinstall": "./node_modules/.bin/bower install && npm i --prefix=socialhome/frontend"
   },

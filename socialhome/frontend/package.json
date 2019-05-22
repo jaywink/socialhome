@@ -45,6 +45,7 @@
     "django-i18n": "^1.3.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "jsdom-global": "https://github.com/christophehenry/jsdom-global.git#v3.0.3",
     "mock-socket": "^8.0.5",
     "moxios": "^0.4.0",
     "sass": "^1.18.0",

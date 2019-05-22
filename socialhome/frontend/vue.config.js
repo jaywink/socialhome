@@ -9,6 +9,7 @@ module.exports = {
                 "%fixtures": path.resolve(__dirname, "tests", "unit", "fixtures"),
                 "mock-socket": "mock-socket/dist/mock-socket.js",
                 "reconnecting-websocket": "ReconnectingWebSocket/reconnecting-websocket.min.js",
+                "vue-masonry": "vue-masonry/src/masonry.plugin.js",
             },
         },
     },

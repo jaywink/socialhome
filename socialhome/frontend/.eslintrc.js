@@ -16,7 +16,7 @@ module.exports = {
             ImportDeclaration: {multiline: true, minProperties: 6},
             ExportDeclaration: {multiline: true, minProperties: 6},
         }],
-        quotes: ["error", "double"],
+        quotes: ["error", "double", {avoidEscape: true}],
         semi: ["error", "never"],
         "vue/max-attributes-per-line": ["error", {
             singleline: 5,

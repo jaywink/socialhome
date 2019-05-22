@@ -55,12 +55,12 @@ describe("AuthorBar", () => {
         describe("updated", () => {
             it("should redraw VueMasonry", done => {
                 const target = mount(AuthorBar, {propsData: {content}, store})
-                Sinon.spy(Vue, "redrawVueMasonry")
+                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
                 target.update()
-                target.vm.$nextTick(() => {
-                    Vue.redrawVueMasonry.called.should.be.true
+                target.vm.$nextTick().then(() => {
+                    Vue.prototype.$redrawVueMasonry.called.should.be.true
                     done()
-                })
+                }).catch(done)
             })
         })
     })

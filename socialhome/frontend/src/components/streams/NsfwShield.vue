@@ -9,10 +9,7 @@
       {{ nsfwBtnText }}
     </b-link>
     <div v-else class="text-center nsfw-shield">
-      <a
-        href="#"
-        @click.stop.prevent="toggleNsfwShield"
-      >{{ nsfwBtnText }}</a>
+      <a href="#" @click.stop.prevent="toggleNsfwShield">{{ nsfwBtnText }}</a>
     </div>
     <div v-show="!showNsfwContent" class="mt-2 mb-2">
       <b-link v-for="tag in tags" :key="tag" :href="getTagUrl(tag)" class="mr-2">
@@ -41,13 +38,13 @@ export default Vue.component("nsfw-shield", {
     },
     updated() {
         if (!this.$store.state.stream.stream.single) {
-            Vue.redrawVueMasonry()
+            this.$redrawVueMasonry()
         }
     },
     methods: {
         onImageLoad() {
             if (!this.$store.state.stream.stream.single) {
-                Vue.redrawVueMasonry()
+                this.$redrawVueMasonry()
             }
         },
         toggleNsfwShield() {

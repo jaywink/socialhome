@@ -14,8 +14,9 @@ describe("Main", () => {
         Vue.prototype.$http.defaults.xsrfHeaderName.should.equal("X-CSRFToken")
     })
 
-    it("Vue.redrawVueMasonry is defined", () => {
-        (typeof Vue.redrawVueMasonry).should.equal("function")
+    it("VueMasonry is correctly initialized is defined", () => {
+        Vue.prototype.$redrawVueMasonry.should.be.a("function")
+        main.$redrawVueMasonry.should.be.a("function")
     })
 
     describe("`main` instance", () => {

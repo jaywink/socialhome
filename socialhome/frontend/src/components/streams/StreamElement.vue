@@ -82,7 +82,7 @@ export default Vue.component("stream-element", {
     },
     updated() {
         if (!this.$store.state.stream.stream.single) {
-            Vue.redrawVueMasonry()
+            this.$redrawVueMasonry()
         }
     },
     methods: {
@@ -120,7 +120,7 @@ export default Vue.component("stream-element", {
         },
         onImageLoad() {
             if (!this.$store.state.stream.stream.single) {
-                Vue.redrawVueMasonry()
+                this.$redrawVueMasonry()
             }
         },
     },

@@ -81,13 +81,13 @@ export default Vue.component("replies-container", {
     },
     updated() {
         if (!this.$store.state.stream.stream.single) {
-            Vue.redrawVueMasonry()
+            this.$redrawVueMasonry()
         }
     },
     methods: {
         onImageLoad() {
             if (!this.$store.state.stream.stream.single) {
-                Vue.redrawVueMasonry()
+                this.$redrawVueMasonry()
             }
         },
         showReplyEditor() {
