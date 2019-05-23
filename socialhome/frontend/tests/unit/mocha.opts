@@ -1,4 +1,2 @@
---recursive
 --webpack-config webpack.config.js
 --require socialhome/frontend/tests/unit/setup.js
---timeout 4s

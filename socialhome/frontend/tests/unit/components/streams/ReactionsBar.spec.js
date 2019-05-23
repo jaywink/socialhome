@@ -1,8 +1,7 @@
 import Axios from "axios"
 import Moxios from "moxios"
-import Vue from "vue"
 import Vuex from "vuex"
-import {mount} from "avoriaz"
+import {shallowMount, createLocalVue} from "@vue/test-utils"
 import BootstrapVue from "bootstrap-vue"
 import VueSnotify from "vue-snotify"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -11,10 +10,13 @@ import ReactionsBar from "@/components/streams/ReactionsBar.vue"
 import {getContext, getFakeContent} from "%fixtures/jsonContext.fixtures"
 import {getStore} from "%fixtures/store.fixtures"
 
-Vue.use(BootstrapVue)
-Vue.use(VueMasonryPlugin)
-Vue.use(VueSnotify)
-Vue.use(Vuex)
+
+const localVue = createLocalVue()
+
+localVue.use(BootstrapVue)
+localVue.use(VueMasonryPlugin)
+localVue.use(VueSnotify)
+localVue.use(Vuex)
 
 describe("ReactionsBar", () => {
     let content
@@ -27,99 +29,87 @@ describe("ReactionsBar", () => {
         window.context = getContext()
         store = getStore()
         store.state.stream.contentIds.push(content.id)
-        Vue.set(store.state.stream.contents, content.id, content)
+        localVue.set(store.state.stream.contents, content.id, content)
     })
 
     describe("computed", () => {
         describe("showReplyReactionIcon", () => {
             it("should be true if user is authenticated or content has replies", () => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].reply_count = 0
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().showReplyReactionIcon.should.be.true
+                store.state.stream.contents[content.id].reply_count = 0
+                store.state.application.isUserAuthenticated = true
+                let target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showReplyReactionIcon.should.be.true
 
-                target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].reply_count = 1
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().showReplyReactionIcon.should.be.true
+                store.state.stream.contents[content.id].reply_count = 1
+                store.state.application.isUserAuthenticated = false
+                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showReplyReactionIcon.should.be.true
 
-                target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].reply_count = 0
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().showReplyReactionIcon.should.be.false
+                store.state.stream.contents[content.id].reply_count = 0
+                store.state.application.isUserAuthenticated = false
+                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showReplyReactionIcon.should.be.false
             })
 
             it("should be false if content is not of type content", () => {
                 content.content_type = "reply"
-                const target = mount(ReactionsBar, {
-                    propsData: {content},
-                    store,
-                })
-                target.instance().showReplyReactionIcon.should.be.false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showReplyReactionIcon.should.be.false
             })
         })
 
         describe("showShareReactionIcon", () => {
             it("should be true if user is authenticated or content has shares", () => {
-                let target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].shares_count = 0
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().showShareReactionIcon.should.be.true
+                store.state.stream.contents[content.id].shares_count = 0
+                store.state.application.isUserAuthenticated = true
+                let target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showShareReactionIcon.should.be.true
 
-                target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].shares_count = 1
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().showShareReactionIcon.should.be.true
+                store.state.stream.contents[content.id].shares_count = 1
+                store.state.application.isUserAuthenticated = false
+                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showShareReactionIcon.should.be.true
 
-                target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.stream.contents[1].shares_count = 0
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().showShareReactionIcon.should.be.false
+                store.state.stream.contents[content.id].shares_count = 0
+                store.state.application.isUserAuthenticated = false
+                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showShareReactionIcon.should.be.false
             })
 
             it("should be false if content is not of type content", () => {
                 content.content_type = "reply"
-                const target = mount(ReactionsBar, {
-                    propsData: {content},
-                    store,
-                })
-                target.instance().showShareReactionIcon.should.be.false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showShareReactionIcon.should.be.false
             })
         })
     })
 
     describe("lifecycle", () => {
         context("updated", () => {
-            it("redraws masonry if not single stream", done => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
-                target.update()
-                target.vm.$nextTick().then(() => {
-                    Vue.prototype.$redrawVueMasonry.called.should.be.true
-                    done()
-                }).catch(done)
+            it("redraws masonry if not single stream", () => {
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm, "$redrawVueMasonry")
+                target.vm.$forceUpdate()
+                target.vm.$redrawVueMasonry.called.should.be.true
             })
 
-            it("does not redraw masonry if single stream", done => {
+            it("does not redraw masonry if single stream", () => {
                 store.state.stream.stream.single = true
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
-                target.update()
-                target.vm.$nextTick().then(() => {
-                    Vue.prototype.$redrawVueMasonry.called.should.be.false
-                    done()
-                }).catch(done)
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm, "$redrawVueMasonry")
+                target.vm.$forceUpdate()
+                target.vm.$redrawVueMasonry.called.should.be.false
             })
         })
     })
 
     describe("methods", () => {
         beforeEach(() => {
-            Vue.prototype.$http = Axios.create({
+            localVue.prototype.$http = Axios.create({
                 xsrfCookieName: "csrftoken",
                 xsrfHeaderName: "X-CSRFToken",
             })
-            Moxios.install(Vue.prototype.$http)
+            Moxios.install(localVue.prototype.$http)
         })
 
         afterEach(() => {
@@ -128,7 +118,7 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                const target = mount(ReactionsBar, {propsData: {content}})
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
                 target.vm.expandShares()
                 target.vm.showSharesBox.should.be.true
                 target.vm.expandShares()
@@ -138,158 +128,157 @@ describe("ReactionsBar", () => {
 
         describe("share", () => {
             it("should show the reshare box", () => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].isUserAuthor = false
-                target.instance().$data.showRepliesBox = true
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].isUserAuthor = false
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content, showRepliesBox: true},
+                    store,
+                    localVue,
+                })
 
-                target.instance().expandShares()
-                target.instance().$data.showSharesBox.should.be.true
+                target.vm.expandShares()
+                target.vm.$data.showSharesBox.should.be.true
             })
 
             it("should create share on server", done => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
 
                 // Ensure data
-                target.instance().expandShares()
-                target.instance().showSharesBox.should.be.true
-                target.instance().$store.state.stream.contents[1].user_has_shared.should.be.false
-                target.instance().$store.state.stream.contents[1].shares_count = 12
+                target.vm.expandShares()
+                target.vm.showSharesBox.should.be.true
+                store.state.stream.contents[content.id].user_has_shared.should.be.false
+                store.state.stream.contents[content.id].shares_count = 12
 
-                target.instance().share()
+                target.vm.share()
 
                 Moxios.wait(() => {
                     Moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: {status: "ok", content_id: 123},
                     }).then(() => {
-                        target.instance().$data.showSharesBox.should.be.false
-                        target.instance().$store.state.stream.contents[1].user_has_shared.should.be.true
-                        target.instance().$store.state.stream.contents[1].shares_count.should.eq(13)
+                        target.vm.$data.showSharesBox.should.be.false
+                        target.vm.$store.state.stream.contents[content.id].user_has_shared.should.be.true
+                        target.vm.$store.state.stream.contents[content.id].shares_count.should.eq(13)
                         done()
                     })
                 })
             })
 
             it("should show an error to the user when share fails", done => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().share()
+                target.vm.share()
 
                 Moxios.wait(() => {
                     Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
-                        target.instance().$snotify.error.getCall(0).args[0]
-                            .should.eq("An error happened while resharing the content")
+                        target.vm.$snotify.error.should.have.been
+                            .calledWithExactly("An error happened while resharing the content")
                         done()
                     })
                 })
             })
 
             it("should show an error to the user when user is not logged in", () => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = false
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().share()
+                target.vm.share()
 
-                target.instance().$snotify.error.getCall(0).args[0]
-                    .should.eq("You must be logged in to reshare")
+                target.vm.$snotify.error.should.have.been.calledWithExactly("You must be logged in to reshare")
             })
 
             it("should show an error to the user when user tries to share own post", () => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = true
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = true
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().share()
+                target.vm.share()
 
-                target.instance().$snotify.error.getCall(0).args[0]
-                    .should.eq("Unable to reshare own post")
+                target.vm.$snotify.error.should.have.been.calledWithExactly("Unable to reshare own post")
             })
         })
 
         describe("unshare", () => {
             it("should removes share on server", done => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = true
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = true
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
 
                 // Ensure data
-                target.instance().expandShares()
-                target.instance().showSharesBox.should.be.true
-                target.instance().$store.state.stream.contents[1].user_has_shared.should.be.true
-                target.instance().$store.state.stream.contents[1].shares_count = 12
+                target.vm.expandShares()
+                target.vm.showSharesBox.should.be.true
+                target.vm.$store.state.stream.contents[content.id].user_has_shared.should.be.true
+                target.vm.$store.state.stream.contents[content.id].shares_count = 12
 
                 // Actual thing we are testing - the unshare
-                target.instance().unshare()
+                target.vm.unshare()
 
                 Moxios.wait(() => {
                     Moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: {status: "ok"},
                     }).then(() => {
-                        target.instance().showSharesBox.should.be.false
-                        target.instance().$store.state.stream.contents[1].shares_count.should.eq(11)
-                        target.instance().$store.state.stream.contents[1].user_has_shared.should.be.false
+                        target.vm.showSharesBox.should.be.false
+                        target.vm.$store.state.stream.contents[content.id].shares_count.should.eq(11)
+                        target.vm.$store.state.stream.contents[content.id].user_has_shared.should.be.false
                         done()
                     })
                 })
             })
 
             it("should show an error to the user when share fails", done => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().unshare()
+                target.vm.unshare()
 
                 Moxios.wait(() => {
                     Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
-                        target.instance().$snotify.error.getCall(0).args[0]
-                            .should.eq("An error happened while unsharing the content")
+                        target.vm.$snotify.error.should.have.been
+                            .calledWithExactly("An error happened while unsharing the content")
                         done()
                     })
                 })
             })
 
             it("should show an error to the user when user is not logged in", () => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = false
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = false
+                store.state.application.isUserAuthenticated = false
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = false
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().unshare()
+                target.vm.unshare()
 
-                target.instance().$snotify.error.getCall(0).args[0]
-                    .should.eq("You must be logged in to unshare")
+                target.vm.$snotify.error.should.have.been.calledWithExactly("You must be logged in to unshare")
             })
 
             it("should show an error to the user when user tries to share own post", () => {
-                const target = mount(ReactionsBar, {propsData: {content}, store})
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().$store.state.application.isUserAuthenticated = true
-                target.instance().$store.state.stream.contents[1].user_has_shared = false
-                target.instance().$store.state.stream.contents[1].user_is_author = true
+                store.state.application.isUserAuthenticated = true
+                store.state.stream.contents[content.id].user_has_shared = false
+                store.state.stream.contents[content.id].user_is_author = true
+                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                Sinon.spy(target.vm.$snotify, "error")
 
-                target.instance().unshare()
+                target.vm.unshare()
 
-                target.instance().$snotify.error.getCall(0).args[0]
-                    .should.eq("Unable to unshare own post")
+                target.vm.$snotify.error.should.have.been.calledWithExactly("Unable to unshare own post")
             })
         })
     })

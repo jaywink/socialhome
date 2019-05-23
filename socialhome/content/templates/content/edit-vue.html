@@ -24,6 +24,9 @@
     {{ block.super }}
     {{ form.media }}
     <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
-    <script src="{% static 'dist/app.js' %}"></script>
+    <script src="{% static 'dist/vue/app.js' %}"></script>
 {% endblock %}
 
+{% block css %}
+    {{ block.super }}
+{% endblock %}

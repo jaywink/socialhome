@@ -10,11 +10,12 @@ module.exports = {
                 "mock-socket": "mock-socket/dist/mock-socket.js",
                 "reconnecting-websocket": "ReconnectingWebSocket/reconnecting-websocket.min.js",
                 "vue-masonry": "vue-masonry/src/masonry.plugin.js",
+                vue$: "vue/dist/vue.common.js",
             },
         },
     },
     css: {loaderOptions: {postcss: {plugins: [require("autoprefixer")({})]}}},
-    outputDir: path.resolve(__dirname, "..", "static", "dist"),
+    outputDir: path.resolve(__dirname, "..", "static", "dist", "vue"),
     pluginOptions: {
         "style-resources-loader": {
             preProcessor: "scss",

@@ -15,6 +15,7 @@ cache:
     - node_modules/
     - bower_components/
     - socialhome/frontend/node_modules
+    - /root/.cache/Cypress
 
 services:
   - redis

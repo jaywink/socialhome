@@ -1,18 +1,19 @@
-import Vue from "vue"
 import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
 import uuid from "uuid/v4"
-import {mount} from "avoriaz"
+import {shallowMount, createLocalVue} from "@vue/test-utils"
 
 import Stream from "@/components/streams/Stream.vue"
 import "@/components/streams/stamped_elements/PublicStampedElement.vue"
 import "@/components/streams/stamped_elements/FollowedStampedElement.vue"
 import {getStore} from "%fixtures/store.fixtures"
 
-Vue.use(BootstrapVue)
-Vue.use(VueMasonryPlugin)
-Vue.use(Vuex)
+
+const localVue = createLocalVue()
+localVue.use(BootstrapVue)
+localVue.use(VueMasonryPlugin)
+localVue.use(Vuex)
 
 const UUID = uuid()
 
@@ -38,37 +39,32 @@ describe("Stream", () => {
 
                 it("followed stream with no contents", () => {
                     store.state.stream.stream = {name: "followed"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getFollowedStream", {params: {}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been.calledWithExactly("stream/getFollowedStream", {params: {}})
                 })
 
                 it("public stream with no contents", () => {
                     store.state.stream.stream = {name: "public"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getPublicStream", {params: {}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been.calledWithExactly("stream/getPublicStream", {params: {}})
                 })
 
                 it("tag stream with no contents", () => {
                     store.state.stream.stream = {name: "tag"}
-                    mount(Stream, {store, propsData: {tag: "eggs"}})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getTagStream", {params: {name: "eggs"}}])
+                    shallowMount(Stream, {store, propsData: {tag: "eggs"}, localVue})
+                    store.dispatch.should.have.been.calledWithExactly("stream/getTagStream", {params: {name: "eggs"}})
                 })
 
                 it("profile all stream with no contents", () => {
                     store.state.stream.stream = {name: "profile_all"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getProfileAll", {params: {uuid: UUID}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been.calledWithExactly("stream/getProfileAll", {params: {uuid: UUID}})
                 })
 
                 it("profile pinned stream with no contents", () => {
                     store.state.stream.stream = {name: "profile_pinned"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getProfilePinned", {params: {uuid: UUID}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been.calledWithExactly("stream/getProfilePinned", {params: {uuid: UUID}})
                 })
             })
 
@@ -81,40 +77,37 @@ describe("Stream", () => {
 
                 it("followed stream with contents", () => {
                     store.state.stream.stream = {name: "followed"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getFollowedStream", {params: {lastId: "4"}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been
+                        .calledWithExactly("stream/getFollowedStream", {params: {lastId: "4"}})
                 })
 
                 it("public stream with contents", () => {
                     store.state.stream.stream = {name: "public"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should
-                        .eql(["stream/getPublicStream", {params: {lastId: "4"}}])
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been
+                        .calledWithExactly("stream/getPublicStream", {params: {lastId: "4"}})
                 })
 
                 it("tag stream with contents", () => {
                     store.state.stream.stream = {name: "tag"}
-                    mount(Stream, {store, propsData: {tag: "eggs"}})
-                    store.dispatch.getCall(0).args.should.eql(
-                        ["stream/getTagStream", {params: {name: "eggs", lastId: "4"}}],
-                    )
+                    shallowMount(Stream, {store, propsData: {tag: "eggs"}, localVue})
+                    store.dispatch.should.have.been
+                        .calledWithExactly("stream/getTagStream", {params: {name: "eggs", lastId: "4"}})
                 })
 
                 it("profile all stream with contents", () => {
                     store.state.stream.stream = {name: "profile_all"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should.eql(
-                        ["stream/getProfileAll", {params: {uuid: UUID, lastId: "4"}}],
-                    )
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been
+                        .calledWithExactly("stream/getProfileAll", {params: {uuid: UUID, lastId: "4"}})
                 })
 
                 it("profile pinned stream with contents", () => {
                     store.state.stream.stream = {name: "profile_pinned"}
-                    mount(Stream, {store})
-                    store.dispatch.getCall(0).args.should.eql(
-                        ["stream/getProfilePinned", {params: {uuid: UUID, lastId: "4"}}],
-                    )
+                    shallowMount(Stream, {store, localVue})
+                    store.dispatch.should.have.been
+                        .calledWithExactly("stream/getProfilePinned", {params: {uuid: UUID, lastId: "4"}})
                 })
             })
         })
@@ -124,7 +117,7 @@ describe("Stream", () => {
         describe("beforeMount", () => {
             it("loads stream if not single stream", () => {
                 const spy = Sinon.spy(Stream.options.methods, "loadStream")
-                mount(Stream, {store})
+                shallowMount(Stream, {store, localVue})
                 spy.calledOnce.should.be.true
             })
 
@@ -133,7 +126,7 @@ describe("Stream", () => {
                 // But shallow mount wont work for some reason with our Stream component
                 store.state.stream.stream.single = true
                 const spy = Sinon.spy(Stream.options.methods, "loadStream")
-                mount(Stream, {store})
+                shallowMount(Stream, {store, localVue})
                 spy.called.should.be.false
             })
         })

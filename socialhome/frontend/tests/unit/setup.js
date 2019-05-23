@@ -6,7 +6,9 @@ const HTML = `<!doctype html>
             <meta charset="utf-8">
             <title>Socialhome tests</title>
         </head>
-        <body></body>
+        <body>
+            <div id="app"></div>
+        </body>
 </html>`
 
 require("jsdom-global")(HTML, {pretendToBeVisual: true, url: "http://localhost"})

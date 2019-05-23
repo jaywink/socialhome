@@ -33,7 +33,7 @@
 import Vue from "vue"
 import VueScrollTo from "vue-scrollto"
 
-import "@/components/streams/StreamElement.vue"
+import StreamElement from "@/components/streams/StreamElement.vue"
 import PublicStampedElement from "@/components/streams/stamped_elements/PublicStampedElement.vue"
 import FollowedStampedElement from "@/components/streams/stamped_elements/FollowedStampedElement.vue"
 import LimitedStampedElement from "@/components/streams/stamped_elements/LimitedStampedElement.vue"
@@ -52,6 +52,7 @@ export default Vue.component("stream", {
         LocalStampedElement,
         ProfileStampedElement,
         PublicStampedElement,
+        StreamElement,
         TagStampedElement,
         TagsStampedElement,
     },
