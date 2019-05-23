@@ -30,12 +30,11 @@
 
 <script>
 import imagesLoaded from "vue-images-loaded"
-import Vue from "vue"
-
 import "@/components/streams/ReplyEditor.vue"
 
 
-export default Vue.component("replies-container", {
+export default {
+    name: "RepliesContainer",
     directives: {imagesLoaded},
     props: {content: {type: Object, required: true}},
     data() {
@@ -94,7 +93,7 @@ export default Vue.component("replies-container", {
             this.replyEditorActive = true
         },
     },
-})
+}
 </script>
 
 

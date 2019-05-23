@@ -1,6 +1,5 @@
-import {mount} from "avoriaz"
+import {shallowMount, createLocalVue} from "@vue/test-utils"
 
-import Vue from "vue"
 import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -8,9 +7,11 @@ import {VueMasonryPlugin} from "vue-masonry"
 import NsfwShield from "@/components/streams/NsfwShield.vue"
 import {getStore} from "%fixtures/store.fixtures"
 
-Vue.use(BootstrapVue)
-Vue.use(VueMasonryPlugin)
-Vue.use(Vuex)
+
+const localVue = createLocalVue()
+localVue.use(BootstrapVue)
+localVue.use(VueMasonryPlugin)
+localVue.use(Vuex)
 
 
 describe("NsfwShield", () => {
@@ -23,26 +24,20 @@ describe("NsfwShield", () => {
 
     describe("lifecycle", () => {
         context("updated", () => {
-            it("redraws masonry if not single stream", done => {
+            it("redraws masonry if not single stream", () => {
                 store.state.stream.stream.single = false
-                const target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
-                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
-                target.update()
-                target.vm.$nextTick().then(() => {
-                    Vue.prototype.$redrawVueMasonry.called.should.be.true
-                    done()
-                }).catch(done)
+                const target = shallowMount(NsfwShield, {propsData: {tags: ["nsfw"]}, store, localVue})
+                Sinon.spy(target.vm, "$redrawVueMasonry")
+                target.vm.$forceUpdate()
+                target.vm.$redrawVueMasonry.called.should.be.true
             })
 
-            it("does not redraw masonry if single stream", done => {
+            it("does not redraw masonry if single stream", () => {
                 store.state.stream.stream.single = true
-                const target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
-                Sinon.spy(Vue.prototype, "$redrawVueMasonry")
-                target.update()
-                target.vm.$nextTick().then(() => {
-                    Vue.prototype.$redrawVueMasonry.called.should.be.false
-                    done()
-                }).catch(done)
+                const target = shallowMount(NsfwShield, {propsData: {tags: ["nsfw"]}, store, localVue})
+                Sinon.spy(target.vm, "$redrawVueMasonry")
+                target.vm.$forceUpdate()
+                target.vm.$redrawVueMasonry.called.should.be.false
             })
         })
     })
@@ -51,43 +46,43 @@ describe("NsfwShield", () => {
         describe("onImageLoad", () => {
             context("call Vue.redrawVueMasonry", () => {
                 it("does if not single stream", () => {
-                    const target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store}).instance()
-                    Sinon.spy(target, "$redrawVueMasonry")
-                    target.onImageLoad()
-                    target.$redrawVueMasonry.called.should.be.true
+                    const target = shallowMount(NsfwShield, {propsData: {tags: ["nsfw"]}, store, localVue})
+                    Sinon.spy(target.vm, "$redrawVueMasonry")
+                    target.vm.onImageLoad()
+                    target.vm.$redrawVueMasonry.called.should.be.true
                 })
 
                 it("does not if single stream", () => {
                     store.state.stream.stream.single = true
-                    const target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store}).instance()
-                    Sinon.spy(target, "$redrawVueMasonry")
-                    target.onImageLoad()
-                    target.$redrawVueMasonry.called.should.be.false
+                    const target = shallowMount(NsfwShield, {propsData: {tags: ["nsfw"]}, store, localVue})
+                    Sinon.spy(target.vm, "$redrawVueMasonry")
+                    target.vm.onImageLoad()
+                    target.vm.$redrawVueMasonry.called.should.be.false
                 })
             })
         })
 
         describe("toggleNsfwShield", () => {
             it("should toggle `showNsfwContent`", () => {
-                const target = mount(NsfwShield, {propsData: {tags: ["nsfw"]}, store})
-                target.instance().showNsfwContent.should.be.false
-                target.instance().toggleNsfwShield()
-                target.instance().showNsfwContent.should.be.true
-                target.instance().toggleNsfwShield()
-                target.instance().showNsfwContent.should.be.false
+                const target = shallowMount(NsfwShield, {propsData: {tags: ["nsfw"]}, store, localVue})
+                target.vm.showNsfwContent.should.be.false
+                target.vm.toggleNsfwShield()
+                target.vm.showNsfwContent.should.be.true
+                target.vm.toggleNsfwShield()
+                target.vm.showNsfwContent.should.be.false
             })
 
-            // TODO: Figure out the problem when works in the browser
-            it.skip("should show and hide content", done => {
-                const target = mount(NsfwShield, {
+            it("should show and hide content", done => {
+                const target = shallowMount(NsfwShield, {
                     propsData: {tags: ["nsfw"]},
                     slots: {default: {template: "<div>This is #NSFW content</div>"}},
                     store,
+                    localVue,
                 })
 
                 target.text().should.not.match(/This is #NSFW content/)
-                target.instance().toggleNsfwShield()
-                target.instance().$nextTick().then(() => {
+                target.vm.toggleNsfwShield()
+                target.vm.$nextTick().then(() => {
                     target.text().should.match(/This is #NSFW content/)
                     done()
                 }).catch(done)

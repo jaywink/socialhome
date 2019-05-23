@@ -62,12 +62,12 @@
 </template>
 
 <script>
-import Vue from "vue"
-
-import "@/components/streams/RepliesContainer.vue"
+import RepliesContainer from "@/components/streams/RepliesContainer.vue"
 
 
-export default Vue.component("reactions-bar", {
+export default {
+    name: "ReactionsBar",
+    components: {RepliesContainer},
     props: {content: {type: Object, required: true}},
     data() {
         return {
@@ -153,5 +153,5 @@ export default Vue.component("reactions-bar", {
                 .catch(() => this.$snotify.error(gettext("An error happened while unsharing the content")))
         },
     },
-})
+}
 </script>

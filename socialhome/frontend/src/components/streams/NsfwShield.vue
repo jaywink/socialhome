@@ -21,11 +21,11 @@
 </template>
 
 <script>
-import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
 
-export default Vue.component("nsfw-shield", {
+export default {
+    name: "NsfwShield",
     directives: {imagesLoaded},
     props: {tags: {type: Array, required: true}},
     data() {
@@ -54,5 +54,5 @@ export default Vue.component("nsfw-shield", {
             return Urls["streams:tag"]({name})
         },
     },
-})
+}
 </script>

@@ -1,6 +1,5 @@
-import {mount} from "avoriaz"
+import {shallowMount, createLocalVue} from "@vue/test-utils"
 import infiniteScroll from "vue-infinite-scroll"
-import Vue from "vue"
 import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -9,10 +8,12 @@ import {getStore} from "%fixtures/store.fixtures"
 import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 import StreamElement from "@/components/streams/StreamElement.vue"
 
-Vue.use(BootstrapVue)
-Vue.use(infiniteScroll)
-Vue.use(VueMasonryPlugin)
-Vue.use(Vuex)
+
+const localVue = createLocalVue()
+localVue.use(BootstrapVue)
+localVue.use(infiniteScroll)
+localVue.use(VueMasonryPlugin)
+localVue.use(Vuex)
 
 describe("StreamElement", () => {
     let store
@@ -29,68 +30,64 @@ describe("StreamElement", () => {
     describe("computed", () => {
         it("disableLoadMore", () => {
             let content = getFakeContent({hasLoadMore: true})
-            let target = mount(StreamElement, {propsData: {content}, store})
-            target.instance().disableLoadMore.should.be.false
+            let target = shallowMount(StreamElement, {propsData: {content}, store, localVue})
+            target.vm.disableLoadMore.should.be.false
 
             store.state.stream.pending.contents = true
-            target = mount(StreamElement, {propsData: {content}, store})
-            target.instance().disableLoadMore.should.be.true
+            target = shallowMount(StreamElement, {propsData: {content}, store, localVue})
+            target.vm.disableLoadMore.should.be.true
             store.state.stream.pending.contents = false
 
             content = getFakeContent({hasLoadMore: false})
-            target = mount(StreamElement, {propsData: {content}, store})
-            target.instance().disableLoadMore.should.be.true
+            target = shallowMount(StreamElement, {propsData: {content}, store, localVue})
+            target.vm.disableLoadMore.should.be.true
         })
 
         it("showAuthorBar with content", () => {
             store.state.application.isUserAuthenticated = false
             store.state.stream.showAuthorBar = false
-            let target = mount(StreamElement, {propsData: {content: store.content}, store})
-            target.instance().showAuthorBar.should.be.false
+            let target = shallowMount(StreamElement, {propsData: {content: store.content}, store, localVue})
+            target.vm.showAuthorBar.should.be.false
             store.state.stream.showAuthorBar = true
-            target = mount(StreamElement, {propsData: {content: store.content}, store})
-            target.instance().showAuthorBar.should.be.true
+            target = shallowMount(StreamElement, {propsData: {content: store.content}, store, localVue})
+            target.vm.showAuthorBar.should.be.true
             store.state.application.isUserAuthenticated = true
         })
 
         it("showAuthorBar with reply", () => {
-            const target = mount(StreamElement, {propsData: {content: store.reply}, store})
+            const target = shallowMount(StreamElement, {propsData: {content: store.reply}, store, localVue})
             store.state.showAuthorBar = false
-            target.instance().showAuthorBar.should.be.true
+            target.vm.showAuthorBar.should.be.true
             store.state.showAuthorBar = true
-            target.instance().showAuthorBar.should.be.true
+            target.vm.showAuthorBar.should.be.true
         })
 
         it("showAuthorBar with other author", () => {
             const otherContent = Object.assign({}, store.content)
             otherContent.user_is_author = false
-            const target = mount(StreamElement, {propsData: {content: otherContent}, store})
+            const target = shallowMount(StreamElement, {propsData: {content: otherContent}, store, localVue})
             store.state.showAuthorBar = false
-            target.instance().showAuthorBar.should.be.true
+            target.vm.showAuthorBar.should.be.true
         })
     })
 
     describe("methods", () => {
         it("loadMore dispatches stream operations", () => {
-            const target = mount(StreamElement, {propsData: {content: store.content}, store})
-            Sinon.spy(target.instance(), "$emit")
-            target.instance().loadMore()
-            target.instance().$store.dispatch.getCall(0).args[0].should.eql("stream/disableLoadMore")
-            target.instance().$emit.getCall(0).args[0].should.eql("loadmore")
+            const target = shallowMount(StreamElement, {propsData: {content: store.content}, store, localVue})
+            Sinon.spy(target.vm, "$emit")
+            target.vm.loadMore()
+            target.vm.$store.dispatch.should.have.been.calledWithExactly("stream/disableLoadMore", Sinon.match.number)
+            target.vm.$emit.getCall(0).args[0].should.eql("loadmore")
         })
     })
 
     describe("lifecycle", () => {
         describe("updated", () => {
-            it("redraws masonry", done => {
-                store.state.stream.stream.single = false
-                const target = mount(StreamElement, {propsData: {content: store.content}, store})
-                Sinon.spy(target.instance(), "$redrawVueMasonry")
-                target.update()
-                target.instance().$nextTick().then(() => {
-                    target.instance().$redrawVueMasonry.called.should.be.true
-                    done()
-                }).catch(done)
+            it("redraws masonry", () => {
+                const target = shallowMount(StreamElement, {propsData: {content: store.content}, store, localVue})
+                Sinon.spy(target.vm, "$redrawVueMasonry")
+                target.vm.$forceUpdate()
+                target.vm.$redrawVueMasonry.should.have.been.called
             })
         })
     })

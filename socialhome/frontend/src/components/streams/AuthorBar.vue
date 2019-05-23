@@ -20,12 +20,10 @@
 </template>
 
 <script>
-import Vue from "vue"
-
 import ProfileReactionButtons from "@/components/streams/ProfileReactionButtons.vue"
 
 
-export default Vue.component("author-bar", {
+export default {
     components: {ProfileReactionButtons},
     props: {content: {type: Object, required: true}},
     data() {
@@ -61,7 +59,7 @@ export default Vue.component("author-bar", {
             this.showProfileBox = !this.showProfileBox
         },
     },
-})
+}
 </script>
 
 <style scoped lang="scss">

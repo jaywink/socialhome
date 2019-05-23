@@ -37,8 +37,7 @@ variables:
 stages:
   - lint
   - test_backend
-  - test_frontend_unit
-  - test_frontend_e2e
+  - test_frontend
 
 before_script:
   - unset NPM_CONFIG_PREFIX
@@ -72,11 +71,11 @@ test_backend:
     - pytest
 
 test_frontend_unit:
-  stage: test_frontend_unit
+  stage: test_frontend
   script:
     - npm run test:unit
 
 test_frontend_e2e:
-  stage: test_frontend_e2e
+  stage: test_frontend
   script:
     - npm run test:e2e

@@ -128,11 +128,11 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                const target = new ReactionsBar({propsData: {content}})
-                target.expandShares()
-                target.showSharesBox.should.be.true
-                target.expandShares()
-                target.showSharesBox.should.be.false
+                const target = mount(ReactionsBar, {propsData: {content}})
+                target.vm.expandShares()
+                target.vm.showSharesBox.should.be.true
+                target.vm.expandShares()
+                target.vm.showSharesBox.should.be.false
             })
         })
 

@@ -2,7 +2,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
-import uuid from "uuid"
+import uuid from "uuid/v4"
 import {mount} from "avoriaz"
 
 import Stream from "@/components/streams/Stream.vue"

@@ -35,16 +35,17 @@
 </template>
 
 <script>
-import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
-import "@/components/streams/AuthorBar.vue"
-import "@/components/streams/ReactionsBar.vue"
-import "@/components/streams/NsfwShield.vue"
+import AuthorBar from "@/components/streams/AuthorBar.vue"
+import ReactionsBar from "@/components/streams/ReactionsBar.vue"
+import NsfwShield from "@/components/streams/NsfwShield.vue"
 
 
-export default Vue.component("stream-element", {
+export default {
+    name: "StreamElement",
     directives: {imagesLoaded},
+    components: {NsfwShield, ReactionsBar, AuthorBar},
     props: {content: {type: Object, required: true}},
     computed: {
         deleteUrl() {
@@ -124,5 +125,5 @@ export default Vue.component("stream-element", {
             }
         },
     },
-})
+}
 </script>
