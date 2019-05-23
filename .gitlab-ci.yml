@@ -78,5 +78,10 @@ test_frontend_unit:
 
 test_frontend_e2e:
   stage: test_frontend
+  environment:
+    name: production
+  image: cypress/base:10
+  before_script:
+    - npm i --prefix=socialhome/frontend
   script:
     - npm run test:e2e
