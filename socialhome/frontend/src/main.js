@@ -10,6 +10,8 @@ import filters from "@/filters"
 import router from "@/routes"
 import store from "@/store"
 
+import "@/styles/index.scss"
+
 Vue.use(BootstrapVue)
 Vue.use(VueInfiniteScroll)
 Vue.use(VueMasonryPlugin)

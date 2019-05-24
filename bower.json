@@ -15,15 +15,15 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "v4.0.0-alpha.6",
     "tether": "~1.4.0",
     "fontawesome": "~4.7.0",
     "jquery-ui": "jqueryui#^1.12.1",
     "underscore": "^1.8.3",
     "bootstrap-markdown": "2.10.0",
-    "js-cookie": "^2.1.4"
+    "js-cookie": "^2.1.4",
+    "bootstrap": "^4.3.1"
   },
   "resolutions": {
-    "bootstrap": "v4.0.0-alpha.6"
+    "bootstrap": "^4.3.1"
   }
 }

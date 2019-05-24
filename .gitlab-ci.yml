@@ -59,6 +59,8 @@ test_backend:
 
 test_frontend_unit:
   stage: test_frontend
+  environment:
+    name: production
   image: node:8
   cache:
     paths:

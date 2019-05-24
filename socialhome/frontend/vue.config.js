@@ -16,10 +16,4 @@ module.exports = {
     },
     css: {loaderOptions: {postcss: {plugins: [require("autoprefixer")({})]}}},
     outputDir: path.resolve(__dirname, "..", "static", "dist", "vue"),
-    pluginOptions: {
-        "style-resources-loader": {
-            preProcessor: "scss",
-            patterns: [path.resolve(__dirname, "src", "styles", "index.scss")],
-        },
-    },
 }
