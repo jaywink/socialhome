@@ -66,6 +66,7 @@ THIRD_PARTY_APPS = (
 )
 LOCAL_APPS = (
     "socialhome",
+    "socialhome.activities",
     "socialhome.users",
     "socialhome.federate",
     "socialhome.content",
