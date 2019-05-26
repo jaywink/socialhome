@@ -5,7 +5,9 @@ import django_rq
 from django.db import transaction
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
+from federation.entities.activitypub.enums import ActivityType
 
+from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.previews import fetch_content_preview
@@ -26,7 +28,8 @@ def content_post_save(instance, **kwargs):
         instance.extract_mentions()
     fetch_preview(instance)
     render_content(instance)
-    if kwargs.get("created"):
+    created = kwargs.get("created")
+    if created:
         notify_listeners(instance)
         if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
@@ -34,7 +37,10 @@ def content_post_save(instance, **kwargs):
             transaction.on_commit(lambda: django_rq.enqueue(send_share_notification, instance.id))
         transaction.on_commit(lambda: update_streams_with_content(instance))
     if instance.federate and instance.local:
-        transaction.on_commit(lambda: federate_content(instance))
+        # Get an activity to be used when federating
+        activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
+        activity = instance.create_activity(activity_type)
+        transaction.on_commit(lambda: federate_content(instance, activity))
 
 
 @receiver(post_delete, sender=Content)
@@ -135,20 +141,21 @@ def notify_listeners(content):
             StreamConsumer.group_send("streams_followed__%s" % username, data)
 
 
-def federate_content(content, recipient=None):
+def federate_content(content: Content, recipient: Profile = None, activity: Activity = None):
     """Send out local content to the federation layer.
 
     Yes, edits also. The federation layer should decide whether these are really worth sending out.
+    # TODO also use activity type for federating?
     """
     recipient_id = recipient.id if recipient else None
     try:
         if content.content_type == ContentType.REPLY:
-            django_rq.enqueue(send_reply, content.id)
+            django_rq.enqueue(send_reply, content.id, activity.fid)
         elif content.content_type == ContentType.SHARE:
-            django_rq.enqueue(send_share, content.id)
+            django_rq.enqueue(send_share, content.id, activity.fid)
         else:
             if content.visibility == Visibility.LIMITED and not recipient_id:
                 return
-            django_rq.enqueue(send_content, content.id, recipient_id=recipient_id)
+            django_rq.enqueue(send_content, content.id, activity.fid, recipient_id=recipient_id)
     except Exception as ex:
         logger.exception("Failed to federate_content %s: %s", content, ex)
