@@ -40,7 +40,7 @@ def content_post_save(instance, **kwargs):
         # Get an activity to be used when federating
         activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
         activity = instance.create_activity(activity_type)
-        transaction.on_commit(lambda: federate_content(instance, activity))
+        transaction.on_commit(lambda: federate_content(instance, activity=activity))
 
 
 @receiver(post_delete, sender=Content)
