@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.test import override_settings
-from federation.entities.base import Comment
+from federation.entities.base import Comment, Post
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
@@ -52,32 +52,40 @@ class TestSendContent(SocialhomeTestCase):
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None, autospec=True)
     def test_only_limited_and_public_content_calls_make_federable_content(self, mock_maker):
-        send_content(self.self_content.id)
+        send_content(self.self_content.id, "foo")
         self.assertTrue(mock_maker.called is False)
-        send_content(self.site_content.id)
+        send_content(self.site_content.id, "foo")
         self.assertTrue(mock_maker.called is False)
-        send_content(self.limited_content.id)
+        send_content(self.limited_content.id, self.limited_content.activities.first().fid)
         mock_maker.assert_called_once_with(self.limited_content)
         mock_maker.reset_mock()
-        send_content(self.public_content.id)
+        send_content(self.public_content.id, self.public_content.activities.first().fid)
         mock_maker.assert_called_once_with(self.public_content)
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_handle_send_is_called(self, mock_maker, mock_send):
-        send_content(self.public_content.id)
+        post = Post()
+        mock_maker.return_value = post
+        send_content(self.public_content.id, self.public_content.activities.first().fid)
         mock_send.assert_called_once_with(
-            "entity",
+            post,
             self.public_content.author.federable,
             [{'fid': 'https://relay.iliketoast.net/receive/public', 'public': True, 'protocol': 'diaspora'}],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_handle_send_is_called__limited_content(self, mock_maker, mock_send):
-        send_content(self.limited_content.id, recipient_id=self.remote_profile.id)
+        post = Post()
+        mock_maker.return_value = post
+        send_content(
+            self.limited_content.id,
+            self.limited_content.activities.first().fid,
+            recipient_id=self.remote_profile.id,
+        )
         mock_send.assert_called_once_with(
-            "entity",
+            post,
             self.limited_content.author.federable,
             [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
         )
@@ -85,13 +93,13 @@ class TestSendContent(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
     def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
-        send_content(self.public_content.id)
+        send_content(self.public_content.id, "foo")
         self.assertTrue(mock_logger.called)
 
     @override_settings(DEBUG=True)
     @patch("socialhome.federate.tasks.handle_send")
     def test_content_not_sent_in_debug_mode(self, mock_send):
-        send_content(self.public_content.id)
+        send_content(self.public_content.id, "foo")
         self.assertTrue(mock_send.called is False)
 
 
@@ -217,29 +225,35 @@ class TestSendReply(SocialhomeTestCase):
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_send_reply__limited_content(self, mock_make, mock_forward, mock_sender):
-        send_reply(self.limited_reply.id)
+        post = Post()
+        mock_make.return_value = post
+        send_reply(self.limited_reply.id, self.limited_reply.activities.first().fid)
         mock_sender.assert_called_once_with(
-            "entity",
+            post,
             self.limited_reply.author.federable,
             [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_send_reply_relaying_via_local_author(self, mock_make, mock_forward, mock_sender):
-        send_reply(self.reply.id)
-        mock_forward.assert_called_once_with("entity", self.public_content.id)
+        post = Post()
+        mock_make.return_value = post
+        send_reply(self.reply.id, self.reply.activities.first().fid)
+        mock_forward.assert_called_once_with(post, self.public_content.id)
         self.assertTrue(mock_sender.called is False)
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
-        send_reply(self.reply2.id)
-        mock_sender.assert_called_once_with("entity", self.reply2.author.federable, [
+        post = Post()
+        mock_make.return_value = post
+        send_reply(self.reply2.id, self.reply2.activities.first().fid)
+        mock_sender.assert_called_once_with(post, self.reply2.author.federable, [
             self.remote_content.author.get_recipient_for_visibility(self.reply2.visibility),
         ])
         self.assertTrue(mock_forward.called is False)
@@ -265,17 +279,19 @@ class TestSendShare(SocialhomeTestCase):
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     def test_only_public_share_calls_make_federable_content(self, mock_maker):
-        send_share(self.limited_share.id)
+        send_share(self.limited_share.id, "foo")
         self.assertTrue(mock_maker.called is False)
-        send_share(self.share.id)
+        send_share(self.share.id, self.share.activities.first().fid)
         mock_maker.assert_called_once_with(self.share)
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_handle_send_is_called(self, mock_maker, mock_send):
-        send_share(self.share.id)
+        post = Post()
+        mock_maker.return_value = post
+        send_share(self.share.id, self.share.activities.first().fid)
         mock_send.assert_called_once_with(
-            "entity",
+            post,
             self.share.author.federable,
             [self.content.author.get_recipient_for_visibility(self.share.visibility)],
         )
@@ -283,20 +299,22 @@ class TestSendShare(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
     @patch("socialhome.federate.tasks.logger.warning")
     def test_warning_is_logged_on_no_entity(self, mock_logger, mock_maker):
-        send_share(self.share.id)
+        send_share(self.share.id, "foo")
         self.assertTrue(mock_logger.called)
 
     @override_settings(DEBUG=True)
     @patch("socialhome.federate.tasks.handle_send")
     def test_content_not_sent_in_debug_mode(self, mock_send):
-        send_share(self.share.id)
+        send_share(self.share.id, "foo")
         self.assertTrue(mock_send.called is False)
 
     @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_content", return_value="entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_doesnt_send_to_local_share_author(self, mock_maker, mock_send):
-        send_share(self.local_share.id)
-        mock_send.assert_called_once_with("entity", self.local_share.author.federable, [])
+        post = Post()
+        mock_maker.return_value = post
+        send_share(self.local_share.id, self.local_share.activities.first().fid)
+        mock_send.assert_called_once_with(post, self.local_share.author.federable, [])
 
 
 class TestForwardEntity(TestCase):
