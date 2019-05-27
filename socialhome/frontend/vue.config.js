@@ -2,7 +2,11 @@
 const path = require("path")
 
 module.exports = {
+    chainWebpack: config => {
+        config.optimization.splitChunks(false)
+    },
     configureWebpack: {
+        output: {filename: "js/[name].js"},
         resolve: {
             alias: {
                 "%": path.resolve(__dirname, "tests"),
@@ -14,7 +18,10 @@ module.exports = {
             },
         },
     },
-    css: {loaderOptions: {postcss: {plugins: [require("autoprefixer")({})]}}},
+    css: {
+        extract: false,
+        loaderOptions: {postcss: {plugins: [require("autoprefixer")({})]}},
+    },
     outputDir: path.resolve(__dirname, "..", "static", "dist", "vue"),
     pwa: {
         iconPaths: {

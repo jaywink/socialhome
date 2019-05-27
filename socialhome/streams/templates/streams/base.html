@@ -37,7 +37,7 @@
     {% json_context %}
     {{ block.super }}
     <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
-    <script src="{% static 'dist/vue/app.js' %}"></script>
+    <script src="{% static 'dist/vue/js/app.js' %}"></script>
     {% include "streams/includes/_twitter_widget.html" %}
 {% endblock %}
 
