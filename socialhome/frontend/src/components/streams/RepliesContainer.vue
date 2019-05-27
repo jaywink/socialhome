@@ -12,7 +12,7 @@
       <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true" />
     </div>
     <div v-if="showReplyButton" class="content-actions">
-      <b-button variant="secondary" @click.prevent.stop="showReplyEditor">
+      <b-button variant="outline-dark" @click.prevent.stop="showReplyEditor">
         {{ translations.reply }}
       </b-button>
     </div>
@@ -27,10 +27,10 @@
   </div>
 </template>
 
-
 <script>
 import imagesLoaded from "vue-images-loaded"
 import "@/components/streams/ReplyEditor.vue"
+import "@/components/streams/StreamElement.vue"
 
 
 export default {
@@ -60,10 +60,8 @@ export default {
             }
             if (this.content.content_type === "content") {
                 return true
-            } if (this.content.content_type === "share" && this.content.reply_count > 0) {
-                return true
             }
-            return false
+            return this.content.content_type === "share" && this.content.reply_count > 0
         },
         showSpinner() {
             return this.isContent && this.$store.state.stream.pending.replies && this.content.reply_count > 0
@@ -96,9 +94,8 @@ export default {
 }
 </script>
 
-
 <style scoped>
-    .replies-spinner {
-        height: 42px;
-    }
+  .replies-spinner {
+    height: 42px;
+  }
 </style>

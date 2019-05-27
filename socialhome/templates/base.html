@@ -33,7 +33,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark navbar-toggleable-sm fixed-top bg-inverse">
+    <nav class="navbar navbar-dark navbar-expand-sm fixed-top bg-dark">
         <div class="container navbar-container">
             <button type="button" class="navbar-toggler navbar-toggler-right" data-toggle="collapse" data-target="#top-navbar" aria-controls="top-navbar" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fa fa-bars"></i>
@@ -106,7 +106,7 @@
                         <div class="input-group input-group-sm">
                             <input class="form-control" type="text" name="q" placeholder="{% trans "Search" %}" value="{{ request.GET.q }}">
                             <span class="input-group-btn">
-                                <button class="btn btn-secondary" type="submit" aria-label="{% trans "Search" %}" title="{% trans "Search" %}"><i class="fa fa-search"></i></button>
+                                <button class="btn btn-light" type="submit" aria-label="{% trans "Search" %}" title="{% trans "Search" %}"><i class="fa fa-search"></i></button>
                             </span>
                         </div>
                     </form>

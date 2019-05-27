@@ -6,17 +6,17 @@
     >
       <b-button
         v-if="!followingTag"
-        variant="secondary"
+        variant="outline-dark"
         class="tag-actions-button"
         :title="translations.follow"
         :aria-label="translations.follow"
         @click.prevent="onFollowClick"
       >
         <i class="fa fa-plus" />
-      </b-button>
+      </b-button>&nbsp;
       <b-button
         v-if="followingTag"
-        variant="secondary"
+        variant="outline-dark"
         class="tag-actions-button"
         :title="translations.unfollow"
         :aria-label="translations.unfollow"

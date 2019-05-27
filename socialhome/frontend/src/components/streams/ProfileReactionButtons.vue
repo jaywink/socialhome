@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="socialhome-profile-reaction-buttons">
     <b-button
       v-if="showProfileLink"
       :href="profile.url"
-      variant="secondary"
+      variant="outline-dark"
       :title="translations.profile"
       :aria-label="translations.profile"
     >
@@ -12,7 +12,7 @@
     <b-button
       v-if="!profile.is_local"
       :href="profile.home_url"
-      variant="secondary"
+      variant="outline-dark"
       :title="translations.home"
       :aria-label="translations.home"
     >
@@ -20,7 +20,7 @@
     </b-button>
     <b-button
       v-if="showUnfollowBtn"
-      variant="secondary"
+      variant="outline-dark"
       class="unfollow-btn"
       :title="translations.unfollow"
       :aria-label="translations.unfollow"
@@ -30,7 +30,7 @@
     </b-button>
     <b-button
       v-if="showFollowBtn"
-      variant="secondary"
+      variant="outline-dark"
       class="follow-btn"
       :title="translations.follow"
       :aria-label="translations.follow"
@@ -111,8 +111,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    .follow-btn,
-    .unfollow-btn {
-        cursor: pointer;
-    }
+  .socialhome-profile-reaction-buttons .btn:not(:last-child) {
+    margin-right: 0.5rem;
+  }
 </style>

@@ -1,14 +1,7 @@
 <template>
   <div>
-    <div
-      v-if="showProfileReactionButtons"
-      class="pull-right"
-    >
-      <ProfileReactionButtons
-        :profile="profile"
-        :show-profile-link="false"
-        :user-following="profile.user_following"
-      />
+    <div v-if="showProfileReactionButtons" class="pull-right">
+      <ProfileReactionButtons :profile="profile" :show-profile-link="false" :user-following="profile.user_following" />
     </div>
     <div class="clearfix" />
 
@@ -16,12 +9,8 @@
       v-if="showProfileButtons"
       class="pull-right text-right"
     >
-      <b-dropdown right>
-        <i
-          id="profile-menu-button"
-          slot="button-content"
-          class="fa fa-cog"
-        />
+      <b-dropdown right variant="outline-dark">
+        <i id="profile-menu-button" slot="button-content" class="fa fa-cog" />
         <b-dropdown-item
           :href="urls.pictureUpdate"
           :title="translations.changePicture"
@@ -47,27 +36,27 @@
       </b-dropdown>
       <div class="mt-1">
         <b-button
-          variant="secondary"
+          variant="outline-dark"
           :href="urls.contactsFollowed"
           :title="translations.following"
           :aria-label="translations.following"
         >
-          <i class="fa fa-user" />
-          <i class="fa fa-arrow-right" />
-          <i class="fa fa-users" />
+          <i class="fa fa-user" />&nbsp;
+          <i class="fa fa-arrow-right" />&nbsp;
+          <i class="fa fa-users" />&nbsp;
           &nbsp;{{ profile.following_count }}
         </b-button>
       </div>
       <div class="mt-1">
         <b-button
-          variant="secondary"
+          variant="outline-dark"
           :href="urls.contactsFollowers"
           :title="translations.followers"
           :aria-label="translations.followers"
         >
-          <i class="fa fa-users" />
-          <i class="fa fa-arrow-right" />
-          <i class="fa fa-user" />
+          <i class="fa fa-users" />&nbsp;
+          <i class="fa fa-arrow-right" />&nbsp;
+          <i class="fa fa-user" />&nbsp;
           &nbsp;{{ profile.followers_count }}
         </b-button>
       </div>
@@ -82,9 +71,9 @@
           :title="translations.following"
           :aria-label="translations.following"
         >
-          <i class="fa fa-user" />
-          <i class="fa fa-arrow-right" />
-          <i class="fa fa-users" />
+          <i class="fa fa-user" />&nbsp;
+          <i class="fa fa-arrow-right" />&nbsp;
+          <i class="fa fa-users" />&nbsp;
           &nbsp;{{ profile.following_count }}
         </span>
       </div>
@@ -93,20 +82,16 @@
           :title="translations.followers"
           :aria-label="translations.followers"
         >
-          <i class="fa fa-users" />
-          <i class="fa fa-arrow-right" />
-          <i class="fa fa-user" />
+          <i class="fa fa-users" />&nbsp;
+          <i class="fa fa-arrow-right" />&nbsp;
+          <i class="fa fa-user" />&nbsp;
           &nbsp;{{ profile.followers_count }}
         </span>
       </div>
     </div>
 
     <div class="d-inline-block">
-      <img
-        v-if="profile.image_url_large"
-        class="profile-stream-stamped-image"
-        :src="profile.image_url_large"
-      >
+      <img v-if="profile.image_url_large" class="profile-stream-stamped-image" :src="profile.image_url_large">
     </div>
     <div class="d-inline-block ml-3 align-center stamped-profile-info">
       <h1>{{ displayName }}</h1>
@@ -115,17 +100,10 @@
       </h3>
     </div>
     <div class="text-center">
-      <b-button
-        v-if="profile.has_pinned_content"
-        :variant="pinnedContentVariant"
-        :href="urls.pinnedContent"
-      >
+      <b-button v-if="profile.has_pinned_content" :variant="pinnedContentVariant" :href="urls.pinnedContent">
         {{ translations.pinnedContent }}
-      </b-button>
-      <b-button
-        :variant="profileContentVariant"
-        :href="urls.profileAllContent"
-      >
+      </b-button>&nbsp;
+      <b-button :variant="profileContentVariant" :href="urls.profileAllContent">
         {{ translations.profileAllContent }}
       </b-button>
     </div>
@@ -146,10 +124,10 @@ export default Vue.component("profile-stamped-element", {
             return this.profile.name ? this.profile.name : this.profile.fid
         },
         pinnedContentVariant() {
-            return this.profile.stream_type === "pinned" ? "primary" : "secondary"
+            return this.profile.stream_type === "pinned" ? "primary" : "outline-dark"
         },
         profileContentVariant() {
-            return this.profile.stream_type === "all_content" ? "primary" : "secondary"
+            return this.profile.stream_type === "all_content" ? "primary" : "outline-dark"
         },
         profile() {
             return this.$store.state.application.profile
@@ -193,7 +171,7 @@ export default Vue.component("profile-stamped-element", {
 </script>
 
 <style lang="scss">
-    .dropdown-menu-right {
-        right: auto;
-    }
+  .dropdown-menu-right {
+    right: auto;
+  }
 </style>

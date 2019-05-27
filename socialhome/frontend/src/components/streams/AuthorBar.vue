@@ -5,10 +5,7 @@
         <img :src="author.image_url_small" class="grid-item-author-bar-pic">
         {{ authorName }}
       </div>
-      <div
-        v-show="showProfileBox"
-        class="profile-box"
-      >
+      <div v-show="showProfileBox" class="profile-box">
         {{ authorFederationId }}
         <div class="pull-right">
           <profile-reaction-buttons :profile="author" :user-following="content.user_following_author" />

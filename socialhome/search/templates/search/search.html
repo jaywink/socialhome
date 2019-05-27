@@ -44,8 +44,8 @@
                                     <div class="col-2 align-self-center">
                                         {% if result.content_type == "users.profile" %}
                                             {% if request.user.is_authenticated %}
-                                                <button class="follower-button btn btn-secondary {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="unfollow" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
-                                                <button class="follower-button btn btn-secondary {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="follow" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
+                                                <button class="follower-button btn btn-outline-dark {% if not result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="unfollow" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Unfollow" %}" aria-label="{% trans "Unfollow" %}"><i class="fa fa-minus"></i></button>
+                                                <button class="follower-button btn btn-outline-dark {% if result.object.id in request.user.profile.following_ids %}hidden{% endif %}" data-action="follow" data-profileid="{{ request.user.profile.id }}" data-target="{{ result.object.uuid }}" title="{% trans "Follow" %}" aria-label="{% trans "Follow" %}"><i class="fa fa-plus"></i></button>
                                             {% endif %}
                                         {% endif %}
                                     </div>
@@ -58,9 +58,9 @@
                 </div>
                 {% if page_obj.has_previous or page_obj.has_next %}
                     <div class="text-center">
-                        {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}" class="btn btn-secondary">&laquo; {% trans "Previous" %}</a>{% endif %}
+                        {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}" class="btn btn-outline-dark">&laquo; {% trans "Previous" %}</a>{% endif %}
                         |
-                        {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}" class="btn btn-secondary">{% trans "Next" %} &raquo;</a>{% endif %}
+                        {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}" class="btn btn-outline-dark">{% trans "Next" %} &raquo;</a>{% endif %}
                     </div>
                 {% endif %}
             </div>

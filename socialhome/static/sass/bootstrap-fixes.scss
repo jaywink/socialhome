@@ -1,0 +1,44 @@
+// This file contains style fixes for regressions introduced by the migration of BS 4 from alpha to 4.3.1
+// It should be removed when UI is completely reworked
+
+body {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.navbar {
+  &.navbar-dark {
+    background-color: #292b2c !important;
+    color: #000;
+  }
+
+  .nav-link, .nav-link * {
+    &, &:active, &:hover, &:visited {
+      color: #fff !important;
+    }
+  }
+
+  #search-form .btn {
+    height: 100%;
+    padding: 1px 6px;
+  }
+}
+
+.btn-outline-dark:not(.disabled):not(:disabled) {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: black;
+
+  &:hover, &:active {
+    background-color: #e6e6e6;
+    border: 1px solid #ccc;
+    color: black;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem #adadad !important;
+  }
+}
+
+.table {
+  color: inherit;
+}

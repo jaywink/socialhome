@@ -73,6 +73,7 @@ module.exports = function (grunt) {
                     '<%= paths.dist %>/contacts.css': '<%= paths.sass %>/contacts.scss',
                     '<%= paths.dist %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.dist %>/search.css': '<%= paths.sass %>/search.scss',
+                    '<%= paths.dist %>/bootstrap-fixes.css': '<%= paths.sass %>/bootstrap-fixes.scss',
                 },
             },
             dist: {
@@ -87,6 +88,7 @@ module.exports = function (grunt) {
                     '<%= paths.dist %>/contacts.css': '<%= paths.sass %>/contacts.scss',
                     '<%= paths.dist %>/publisher.css': '<%= paths.sass %>/publisher.scss',
                     '<%= paths.dist %>/search.css': '<%= paths.sass %>/search.scss',
+                    '<%= paths.dist %>/bootstrap-fixes.css': '<%= paths.sass %>/bootstrap-fixes.scss',
                 },
             }
         },
@@ -118,6 +120,7 @@ module.exports = function (grunt) {
                     "<%= paths.dist %>/publisher.css",
                     "<%= paths.dist %>/contacts.css",
                     "<%= paths.dist %>/search.css",
+                    "<%= paths.dist %>/bootstrap-fixes.css",
                 ],
                 dest: "<%= paths.dist %>/project.css",
                 nonull: true,

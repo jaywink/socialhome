@@ -25,19 +25,19 @@
 
 .item-reaction {
   display: inline-block;
-  border: 1px solid #03adae;
+  border: 1px solid #03adae !important;
   border-radius: 3px;
   padding: 0 3px;
   cursor: pointer;
 }
 
 .item-reaction-counter-positive {
-  color: $active;
-  border-color: $active;
+  color: $active !important;
+  border-color: $active !important;
 }
 
 .item-reaction-shared {
-  background-color: $actionDone;
+  background-color: $actionDone !important;
 }
 
 .grid-item-author-bar {

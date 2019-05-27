@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
 import AuthorBar from "@/components/streams/AuthorBar.vue"
@@ -42,7 +43,7 @@ import ReactionsBar from "@/components/streams/ReactionsBar.vue"
 import NsfwShield from "@/components/streams/NsfwShield.vue"
 
 
-export default {
+const StreamElement = {
     name: "StreamElement",
     directives: {imagesLoaded},
     components: {NsfwShield, ReactionsBar, AuthorBar},
@@ -126,4 +127,10 @@ export default {
         },
     },
 }
+
+// StreamElement and RepliesContainer recursively source each other
+// Global registration is needed to prevent StreamElement being unknown when redering StreamContainer
+Vue.component(StreamElement.name, StreamElement)
+
+export default StreamElement
 </script>
