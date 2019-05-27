@@ -193,7 +193,7 @@ class Content(models.Model):
         from django.contrib.contenttypes.models import ContentType as DjangoContentType
         return Activity.objects.create(
             content_type=DjangoContentType.objects.get_for_model(Content),
-            fid=f"{self.author.fid}/activities/{uuid4()}",
+            fid=f"{self.author.fid}#activities/{uuid4()}",
             object_id=self.id,
             profile=self.author,
             type=activity_type,

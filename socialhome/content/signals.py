@@ -80,6 +80,11 @@ def on_commit_limited_visibilities(action, pks, instance):
     if action not in ("post_add", "post_remove"):
         return
 
+    # Get an activity to be used when federating
+    # TODO how to recognize UPDATE's?
+    activity_type = ActivityType.CREATE
+    activity = instance.create_activity(activity_type)
+
     for id in pks:
         # Send out federation only if remote profile
         if not Profile.objects.filter(id=id, user__isnull=True).exists():
@@ -88,7 +93,7 @@ def on_commit_limited_visibilities(action, pks, instance):
 
         if action == "post_add":
             try:
-                federate_content(instance, recipient=profile)
+                federate_content(instance, recipient=profile, activity=activity)
             except Exception:
                 logger.exception("Failed to federate limited visibility content %s to %s", instance.uuid, profile.uuid)
         elif action == "post_remove":
