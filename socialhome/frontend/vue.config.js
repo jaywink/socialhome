@@ -16,4 +16,13 @@ module.exports = {
     },
     css: {loaderOptions: {postcss: {plugins: [require("autoprefixer")({})]}}},
     outputDir: path.resolve(__dirname, "..", "static", "dist", "vue"),
+    pwa: {
+        iconPaths: {
+            favicon32: "static/images/logo/Socialhome-dark-16.png",
+            favicon16: "static/images/logo/Socialhome-dark-32.png",
+            appleTouchIcon: "static/images/logo/Socialhome-dark-300.png",
+            maskIcon: "static/images/logo/Socialhome-dark.svg",
+            msTileImage: "static/images/logo/Socialhome-light-300.png",
+        },
+    },
 }
