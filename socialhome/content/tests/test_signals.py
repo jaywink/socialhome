@@ -137,11 +137,13 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, parent=parent)
         self.assertTrue(content.local)
-        call_args = [
-            call(send_reply_notifications, content.id),
-            call(send_reply, content.id),
-        ]
-        self.assertEqual(mock_send.call_args_list, call_args)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args, (send_reply_notifications, content.id))
+        args, kwargs = mock_send.call_args_list[1]
+        self.assertEqual(args[0], send_reply)
+        self.assertEqual(args[1], content.id)
+        activity = content.activities.first()
+        self.assertEqual(args[2], activity.fid)
 
     @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
@@ -152,8 +154,11 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertTrue(content.local)
         self.assertEqual(mock_send.call_count, 1)
         args, kwargs = mock_send.call_args_list[0]
-        self.assertEqual(args, (send_content, content.id))
+        self.assertEqual(args[0], send_content)
+        self.assertEqual(args[1], content.id)
         self.assertEqual(kwargs, {'recipient_id': None})
+        activity = content.activities.first()
+        self.assertEqual(args[2], activity.fid)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     @patch("socialhome.content.signals.update_streams_with_content")
@@ -163,11 +168,13 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         share_of = ContentFactory(author=user2.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, share_of=share_of)
-        call_args = [
-            call(send_share_notification, content.id),
-            call(send_share, content.id),
-        ]
-        assert mock_send.call_args_list == call_args
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args, (send_share_notification, content.id))
+        args, kwargs = mock_send.call_args_list[1]
+        self.assertEqual(args[0], send_share)
+        self.assertEqual(args[1], content.id)
+        activity = content.activities.first()
+        self.assertEqual(args[2], activity.fid)
 
 
 class TestFederateContentRetraction(SocialhomeTestCase):

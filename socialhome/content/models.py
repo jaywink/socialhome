@@ -5,6 +5,7 @@ from uuid import uuid4
 import arrow
 from commonmark import commonmark
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Max
@@ -156,6 +157,9 @@ class Content(models.Model):
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
+
+    # Other relations
+    activities = GenericRelation(Activity)
 
     objects = ContentManager()
 
