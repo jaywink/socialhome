@@ -17,6 +17,7 @@
     "bootstrap-vue": "^2.0.0-rc.20",
     "easymde": "^2.6.0",
     "fork-awesome": "^1.1.7",
+    "js-cookie": "^2.2.0",
     "lodash": "^4.17.11",
     "popper.js": "^1.15.0",
     "register-service-worker": "^1.6.2",

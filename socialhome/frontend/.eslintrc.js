@@ -2,13 +2,8 @@ module.exports = {
     rules: {
         "arrow-parens": ["error", "as-needed"],
         indent: ["error", 4, {SwitchCase: 1}],
-        "import/extensions": "off",
-        "import/no-extraneous-dependencies": "off",
-        "import/no-unresolved": "off",
         "max-len": ["error", 120],
         "no-plusplus": ["error", {allowForLoopAfterthoughts: true}],
-        "no-return-assign": "off",
-        "no-unused-expressions": "off",
         "object-curly-spacing": ["error", "never"],
         "object-curly-newline": ["error", {
             ObjectExpression: {multiline: true},
@@ -28,6 +23,5 @@ module.exports = {
         interpolate: true,
         ngettext: true,
         Urls: true,
-        Cookies: true,
     },
 }

@@ -698,7 +698,7 @@ describe("streamStore", () => {
                 const dispatch = Sinon.stub()
                     .onCall(0).returns(Promise.resolve())
                     .onCall(1)
-                    .returns(Promise.reject("Fetch error"))
+                    .returns(Promise.reject(new Error("Fetch error")))
                     .onCall(2)
                     .returns(Promise.resolve())
 
@@ -711,7 +711,7 @@ describe("streamStore", () => {
                 const dispatch = Sinon.stub()
                     .onCall(0).returns(Promise.resolve())
                     .onCall(1)
-                    .returns(Promise.reject("Fetch error"))
+                    .returns(Promise.reject(new Error("Fetch error")))
                     .onCall(2)
                     .returns(Promise.resolve())
 

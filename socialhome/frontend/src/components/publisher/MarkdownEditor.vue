@@ -82,6 +82,7 @@
 <script>
 import EasyMDE from "easymde"
 import Popper from "popper.js"
+import Cookies from "js-cookie"
 import _debounce from "lodash/debounce"
 import _get from "lodash/get"
 
@@ -154,7 +155,7 @@ export default {
             autoDownloadFontAwesome: false,
             autofocus: true,
             element: this.$refs.easymde,
-            autosave: {enabled: this.autosave, uniqueId: this.$uuid},
+            autosave: {enabled: false},
             indentWithTabs: false,
             previewRender: debounced,
             promptURLs: true,
