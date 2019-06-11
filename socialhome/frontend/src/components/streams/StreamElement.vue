@@ -13,18 +13,16 @@
 
     <author-bar v-if="showAuthorBar" :content="content" />
     <reactions-bar :content="content">
-      <div class="mt-1">
+      <div class="mt-1 grid-item-bar-links">
         <a :href="content.url" :title="content.timestamp" class="unstyled-link">
           {{ timestampText }}
         </a>
-        &nbsp;
         <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
 
         <template v-if="content.user_is_author">
           <a :href="updateUrl">
             <i class="fa fa-pencil" title="Update" aria-label="Update" />
           </a>
-          &nbsp;
           <a :href="deleteUrl">
             <i class="fa fa-remove" title="Delete" aria-label="Delete" />
           </a>

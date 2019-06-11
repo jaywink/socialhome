@@ -21,14 +21,20 @@
   @media all and (max-width: $bsSmallDevice) {
     font-size: large;
   }
+  .grid-item-bar-links > a {
+    padding-right: 5px;
+  }
 }
 
-.item-reaction {
+button.item-reaction {
   display: inline-block;
-  border: 1px solid #03adae !important;
-  border-radius: 3px;
-  padding: 0 3px;
+  padding: 3px 5px;
   cursor: pointer;
+  margin-left: 5px;
+}
+
+.item-reaction-counter {
+  padding-left: 3px;
 }
 
 .item-reaction-counter-positive {
