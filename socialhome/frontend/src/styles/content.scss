@@ -1,0 +1,61 @@
+.markdownx-preview, .grid-item, .reply {
+  // Apply Bootstrap blockquote styling except for font-size change
+  blockquote {
+    padding: .5rem 1rem;
+    margin-bottom: 1rem;
+    border-left: .25rem solid #eceeef;
+  }
+}
+
+.markdownx-preview img {
+  max-width: 100%;
+}
+
+a.opengraph-card {
+  cursor: pointer;
+  text-decoration: none;
+  color: #373a3c;
+
+  .card {
+    .opengraph-card-image {
+      float: left;
+      margin-right: 1.25rem;
+    }
+  }
+
+  img {
+    max-height: 60px;
+    max-width: 60px;
+  }
+}
+
+.content-actions {
+  padding-top: 10px;
+
+  a, button {
+    width: 100%;
+    cursor: pointer;
+  }
+}
+
+.replies-container {
+  padding-left: 10px;
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.reply {
+  border-top: solid 1px $darkopacity;
+  margin-top: 7px;
+  padding-top: 6px;
+}
+
+a.btn, button.btn {
+  padding: 0.6rem 0.95rem;
+}
+
+.btn > i {
+  padding: 3px;
+}

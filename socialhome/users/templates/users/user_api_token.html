@@ -27,7 +27,7 @@
             </div>
         </div>
         <div>
-            <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-secondary">{% trans "Return to profile" %}</a>
+            <a href="{% url "users:detail" username=request.user.username %}" class="btn btn-outline-dark">{% trans "Return to profile" %}</a>
         </div>
     </form>
 {% endblock %}

@@ -1,0 +1,149 @@
+.grid-item {
+  background-color: $light;
+  color: $dark;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.grid-item-bar {
+  font-size: smaller;
+  opacity: 0.5;
+
+  @media all and (max-width: $largeDevice) {
+    font-size: small;
+  }
+  @media all and (max-width: $mediumDevice) {
+    font-size: medium;
+  }
+  @media all and (max-width: $bsSmallDevice) {
+    font-size: large;
+  }
+  .grid-item-bar-links > a {
+    padding-right: 5px;
+  }
+}
+
+button.item-reaction {
+  display: inline-block;
+  padding: 3px 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.item-reaction-counter {
+  padding-left: 3px;
+}
+
+.item-reaction-counter-positive {
+  color: $active !important;
+  border-color: $active !important;
+}
+
+.item-reaction-shared {
+  background-color: $actionDone !important;
+}
+
+.grid-item-author-bar {
+  margin-bottom: 3px;
+
+  .grid-item-author-bar-pic {
+    max-width: 24px;
+    max-height: 24px;
+    margin-right: 5px;
+  }
+
+  .grid-item-author-bar-pic-large {
+    max-width: 48px;
+    max-height: 48px;
+    margin-right: 5px;
+  }
+}
+
+// Responsive grid sizes
+.grid-sizer,
+.grid-item {
+  width: 100%;
+  padding: 2%;
+  margin-top: 10px;
+}
+@media all and (min-width: $mediumDevice) {
+  .grid-sizer,
+  .grid-item {
+    width: 49.5%;
+    padding: 1%;
+  }
+}
+@media all and (min-width: $largeDevice) {
+  .grid-sizer,
+  .grid-item {
+    width: 32.6%;
+    padding: 1%;
+  }
+}
+@media all and (min-width: $extraLargeDevice) {
+  .grid-sizer,
+  .grid-item {
+    width: 24.2%;
+    padding: 0.5%;
+  }
+}
+
+.grid-item-full {
+  width: 100%;
+  padding: 20px;
+}
+
+// Stamped element centered on top
+.stamped {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 10px;
+  padding: 2%;
+  overflow: visible;
+  background-color: $light;
+  color: $dark;
+}
+@media all and (min-width: $largeDevice) {
+  .stamped {
+    left: 0;
+    width: 66.2%;
+    padding: 1%;
+  }
+}
+@media all and (min-width: $extraLargeDevice) {
+  .stamped {
+    left: 25.2%;
+    width: 49.4%;
+    padding: 0.5%;
+  }
+}
+
+.gutter-sizer {
+  width: 1%;
+}
+
+.organize-content {
+  .card {
+    max-height: 100px;
+    overflow: hidden;
+    color: $dark;
+
+    .fa-arrows-alt {
+      opacity: 0.6;
+      cursor: move;
+    }
+  }
+}
+
+.profile-box-trigger {
+  cursor: pointer;
+}
+
+.profile-box {
+  margin-left: 29px;
+  padding-top: 0;
+}

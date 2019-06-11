@@ -1,0 +1,20 @@
+{
+  "name": "socialhome-front",
+  "short_name": "socialhome-front",
+  "icons": [
+    {
+      "src": "./img/icons/Socialhome-dark-96.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./img/icons/Socialhome-dark-600.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#4DBA87"
+}
