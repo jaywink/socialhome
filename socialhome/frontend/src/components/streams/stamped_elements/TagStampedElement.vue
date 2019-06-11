@@ -13,7 +13,7 @@
         @click.prevent="onFollowClick"
       >
         <i class="fa fa-plus" />
-      </b-button>&nbsp;
+      </b-button>
       <b-button
         v-if="followingTag"
         variant="outline-dark"

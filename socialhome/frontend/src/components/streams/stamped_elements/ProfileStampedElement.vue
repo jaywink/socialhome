@@ -41,10 +41,10 @@
           :title="translations.following"
           :aria-label="translations.following"
         >
-          <i class="fa fa-user" />&nbsp;
-          <i class="fa fa-arrow-right" />&nbsp;
-          <i class="fa fa-users" />&nbsp;
-          &nbsp;{{ profile.following_count }}
+          <i class="fa fa-user" />
+          <i class="fa fa-arrow-right" />
+          <i class="fa fa-users" />
+          {{ profile.following_count }}
         </b-button>
       </div>
       <div class="mt-1">
@@ -54,10 +54,10 @@
           :title="translations.followers"
           :aria-label="translations.followers"
         >
-          <i class="fa fa-users" />&nbsp;
-          <i class="fa fa-arrow-right" />&nbsp;
-          <i class="fa fa-user" />&nbsp;
-          &nbsp;{{ profile.followers_count }}
+          <i class="fa fa-users" />
+          <i class="fa fa-arrow-right" />
+          <i class="fa fa-user" />
+          {{ profile.followers_count }}
         </b-button>
       </div>
     </div>
@@ -71,10 +71,10 @@
           :title="translations.following"
           :aria-label="translations.following"
         >
-          <i class="fa fa-user" />&nbsp;
-          <i class="fa fa-arrow-right" />&nbsp;
-          <i class="fa fa-users" />&nbsp;
-          &nbsp;{{ profile.following_count }}
+          <i class="fa fa-user" />
+          <i class="fa fa-arrow-right" />
+          <i class="fa fa-users" />
+          {{ profile.following_count }}
         </span>
       </div>
       <div class="mt-1">
@@ -82,10 +82,10 @@
           :title="translations.followers"
           :aria-label="translations.followers"
         >
-          <i class="fa fa-users" />&nbsp;
-          <i class="fa fa-arrow-right" />&nbsp;
-          <i class="fa fa-user" />&nbsp;
-          &nbsp;{{ profile.followers_count }}
+          <i class="fa fa-users" />
+          <i class="fa fa-arrow-right" />
+          <i class="fa fa-user" />
+          {{ profile.followers_count }}
         </span>
       </div>
     </div>
@@ -102,7 +102,7 @@
     <div class="text-center">
       <b-button v-if="profile.has_pinned_content" :variant="pinnedContentVariant" :href="urls.pinnedContent">
         {{ translations.pinnedContent }}
-      </b-button>&nbsp;
+      </b-button>
       <b-button :variant="profileContentVariant" :href="urls.profileAllContent">
         {{ translations.profileAllContent }}
       </b-button>

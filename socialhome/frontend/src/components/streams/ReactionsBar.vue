@@ -13,9 +13,9 @@
           variant="outline-dark"
           @click.stop.prevent="expandShares"
         >
-          <i class="fa fa-refresh" title="Shares" aria-label="Shares" />&nbsp;
+          <i class="fa fa-refresh" title="Shares" aria-label="Shares" />
           <span class="item-reaction-counter">{{ content.shares_count }}</span>
-        </b-button>&nbsp;
+        </b-button>
         <b-button
           v-if="showReplyReactionIcon"
           :class="{'item-reaction-counter-positive': content.reply_count}"
@@ -24,7 +24,7 @@
           @click.stop.prevent="expandComments"
         >
           <span class="item-open-replies-action">
-            <i class="fa fa-comments" title="Replies" aria-label="Replies" />&nbsp;
+            <i class="fa fa-comments" title="Replies" aria-label="Replies" />
             <span class="item-reaction-counter">{{ content.reply_count }}</span>
           </span>
         </b-button>
