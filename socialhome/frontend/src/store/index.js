@@ -1,10 +1,11 @@
 import Vue from "vue"
 import Vuex from "vuex"
 
-import application from "./modules/application"
-import profile from "./modules/profile"
-import stream from "./modules/stream"
-import publisher from "./modules/publisher"
+import application from "@/store/modules/application"
+import contacts from "@/store/modules/contacts"
+import profile from "@/store/modules/profile"
+import publisher from "@/store/modules/publisher"
+import stream from "@/store/modules/stream"
 
 Vue.use(Vuex)
 
@@ -13,9 +14,10 @@ const debug = process.env.NODE_ENV !== "production"
 export default new Vuex.Store({
     modules: {
         application,
+        contacts,
         profile,
-        stream,
         publisher,
+        stream,
     },
     strict: debug,
 })

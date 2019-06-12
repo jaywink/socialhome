@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "ReconnectingWebSocket": "https://github.com/joewalnes/reconnecting-websocket.git#1.0.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.20",
     "easymde": "^2.6.0",
@@ -22,7 +22,9 @@
     "popper.js": "^1.15.0",
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.10",
+    "vue-axios": "^2.1.4",
     "vue-images-loaded": "^1.1.2",
+    "vue-infinite-loading": "^2.4.4",
     "vue-infinite-scroll": "^2.0.2",
     "vue-masonry": "^0.11.7",
     "vue-router": "^3.0.3",

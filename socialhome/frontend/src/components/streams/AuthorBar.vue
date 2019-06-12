@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import ProfileReactionButtons from "@/components/streams/ProfileReactionButtons.vue"
+import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
 
 export default {

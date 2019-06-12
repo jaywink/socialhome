@@ -114,7 +114,7 @@
 <script>
 import Vue from "vue"
 
-import ProfileReactionButtons from "@/components/streams/ProfileReactionButtons.vue"
+import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
 
 export default Vue.component("profile-stamped-element", {

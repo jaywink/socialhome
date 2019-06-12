@@ -12,7 +12,6 @@ from socialhome.streams.enums import StreamType
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
-from socialhome.users.tables import ContactTable
 from socialhome.users.tests.factories import (
     UserFactory, AdminUserFactory, ProfileFactory, PublicUserFactory, PublicProfileFactory)
 from socialhome.users.views import (
@@ -486,13 +485,6 @@ class TestContactsFollowedView(SocialhomeTestCase):
             self.get("users:contacts-followed")
         self.response_200()
 
-    def test_contains_table_object(self):
-        with self.login(self.user):
-            self.get("users:contacts-followed")
-        self.assertTrue(isinstance(self.context["followed_table"], ContactTable))
-        self.assertEqual(len(self.context["followed_table"].data), 1)
-        self.assertContext("profile", self.user.profile)
-
 
 class TestContactsFollowersView(SocialhomeTestCase):
     @classmethod
@@ -510,13 +502,6 @@ class TestContactsFollowersView(SocialhomeTestCase):
         with self.login(self.user):
             self.get("users:contacts-followers")
         self.response_200()
-
-    def test_contains_table_object(self):
-        with self.login(self.user):
-            self.get("users:contacts-followers")
-        self.assertTrue(isinstance(self.context["followers_table"], ContactTable))
-        self.assertEqual(len(self.context["followers_table"].data), 1)
-        self.assertContext("profile", self.user.profile)
 
 
 class TestUserAPITokenView(SocialhomeTestCase):

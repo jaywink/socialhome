@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load json_context %}
+{% load js_reverse %}
+{% load staticfiles %}
+
+{% block title %}{% trans page_title %}{% endblock %}
+
+{% block content %}
+    <div id="app">
+        <vue-snotify></vue-snotify>
+        <router-view/>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    {% json_context %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf-8">{% js_reverse_inline %}</script>
+    <script src="{% static 'dist/vue/js/app.js' %}"></script>
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+{% endblock %}

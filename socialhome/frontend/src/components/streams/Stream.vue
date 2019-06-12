@@ -31,7 +31,6 @@
 
 <script>
 import Vue from "vue"
-import VueScrollTo from "vue-scrollto"
 
 import StreamElement from "@/components/streams/StreamElement.vue"
 import PublicStampedElement from "@/components/streams/stamped_elements/PublicStampedElement.vue"
@@ -41,14 +40,14 @@ import LocalStampedElement from "@/components/streams/stamped_elements/LocalStam
 import TagStampedElement from "@/components/streams/stamped_elements/TagStampedElement.vue"
 import TagsStampedElement from "@/components/streams/stamped_elements/TagsStampedElement.vue"
 import ProfileStampedElement from "@/components/streams/stamped_elements/ProfileStampedElement.vue"
-import "@/components/streams/LoadingElement.vue"
+import LoadingElement from "@/components/common/LoadingElement.vue"
 
-Vue.use(VueScrollTo)
 
 export default Vue.component("stream", {
     components: {
         FollowedStampedElement,
         LimitedStampedElement,
+        LoadingElement,
         LocalStampedElement,
         ProfileStampedElement,
         PublicStampedElement,
