@@ -5,8 +5,9 @@ from socialhome.content.tests.factories import TagFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeAPITestCase
 from socialhome.users.models import Profile
+from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.tasks.exports import create_user_export
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory, ProfileFactory, UserWithContactFactory
 
 
 class TestUserViewSet(SocialhomeAPITestCase):
@@ -244,3 +245,39 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         with self.login(self.staff_user):
             self.get("api:profile-detail", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.data['user_following'], True)
+
+    def test_following(self):
+        self.user = UserWithContactFactory()
+        with self.login(self.user):
+            self.get("api:profile-following")
+        self.response_200()
+        expected = {LimitedProfileSerializer(x).data["fid"] for x in self.user.profile.following.all()}
+        self.assertEqual({x["fid"] for x in self.last_response.data["results"]}, expected)
+        self.assertEqual(len(expected), 3)
+
+    @override_settings(REST_FRAMEWORK={"PAGE_SIZE": 2})
+    def test_following_paginated(self):
+        self.user = UserWithContactFactory(count_following=4)
+        self.assertEquals(len(self.user.profile.following.all()), 4)
+        with self.login(self.user):
+            self.get("api:profile-following")
+        self.response_200()
+        self.assertEquals(len(self.last_response.data["results"]), 2)
+
+    def test_followers(self):
+        self.user = UserWithContactFactory()
+        with self.login(self.user):
+            self.get("api:profile-followers")
+        self.response_200()
+        expected = {LimitedProfileSerializer(x).data["fid"] for x in self.user.profile.followers.all()}
+        self.assertEqual({x["fid"] for x in self.last_response.data["results"]}, expected)
+        self.assertEqual(len(expected), 3)
+
+    @override_settings(REST_FRAMEWORK={"PAGE_SIZE": 2})
+    def test_followers_paginated(self):
+        self.user = UserWithContactFactory(count_followers=4)
+        self.assertEquals(len(self.user.profile.followers.all()), 4)
+        with self.login(self.user):
+            self.get("api:profile-followers")
+        self.response_200()
+        self.assertEquals(len(self.last_response.data["results"]), 2)

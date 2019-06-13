@@ -81,6 +81,20 @@ class AdminUserFactory(UserFactory):
     username = "admin"
 
 
+class UserWithContactFactory(UserFactory):
+    @classmethod
+    def _generate(cls, create, attrs):
+        count_following = attrs.pop("count_following", 3) if isinstance(attrs, dict) else 3
+        count_followers = attrs.pop("count_followers", 3) if isinstance(attrs, dict) else 3
+        following = [ProfileFactory() for _ in range(count_following)]
+        followers = [ProfileFactory() for _ in range(count_followers)]
+
+        user = super(UserWithContactFactory, cls)._generate(create, attrs)
+        user.profile.following.set(following)
+        user.profile.followers.set(followers)
+        return user
+
+
 class ProfileFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("safe_email")
     fid = factory.LazyAttribute(lambda o: f"{settings.SOCIALHOME_URL}/p/{o.uuid}/")
