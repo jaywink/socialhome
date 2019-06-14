@@ -15,7 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "tether": "~1.4.0",
     "fontawesome": "~4.7.0",
     "jquery-ui": "jqueryui#^1.12.1",
     "underscore": "^1.8.3",
