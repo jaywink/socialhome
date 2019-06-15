@@ -8,13 +8,13 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Max
+from django.template.defaultfilters import truncatechars
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.utils.text import truncate_letters
 from enumfields import EnumIntegerField
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
@@ -34,7 +34,7 @@ class OpenGraphCache(models.Model):
 
     def __str__(self):
         return "%s / %s" % (
-            self.url, truncate_letters(self.title, 30)
+            self.url, truncatechars(self.title, 30)
         )
 
 
@@ -158,7 +158,7 @@ class Content(models.Model):
     objects = ContentManager()
 
     def __str__(self):
-        return f"{truncate_letters(self.text, 30)} ({self.content_type}, {self.visibility}, {self.fid or self.guid})"
+        return f"{truncatechars(self.text, 30)} ({self.content_type}, {self.visibility}, {self.fid or self.guid})"
 
     def cache_data(self, commit=False):
         """Calculate some extra data."""
@@ -348,7 +348,7 @@ class Content(models.Model):
 
     @cached_property
     def short_text(self):
-        return truncate_letters(self.text, 50) or ""
+        return truncatechars(self.text, 50) or ""
 
     @property
     def short_text_inline(self):

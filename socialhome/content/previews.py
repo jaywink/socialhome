@@ -5,8 +5,8 @@ import re
 from django.db import DataError
 from django.db import IntegrityError
 from django.db import transaction
+from django.template.defaultfilters import truncatechars
 from django.utils.timezone import now
-from django_extensions.utils.text import truncate_letters
 from opengraph import OpenGraph
 from pyembed import core as pyembedcore  # Ugh, but pyembed itself doesn't have a __file__ attr
 from pyembed.core import PyEmbed, PyEmbedError
@@ -58,7 +58,7 @@ def fetch_og_preview(content, urls):
                 with transaction.atomic():
                     opengraph = OpenGraphCache.objects.create(
                         url=url,
-                        title=truncate_letters(safe_text(title), 250),
+                        title=truncatechars(safe_text(title), 250),
                         description=safe_text(description),
                         image=safe_text(image),
                     )
