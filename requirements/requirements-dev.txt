@@ -23,7 +23,7 @@ backcall==0.1.0
 backports-abc==0.5
 beautifulsoup4==4.7.1
 bleach==3.1.0
-certifi==2019.3.9
+certifi==2019.6.16
 cffi==1.12.3
 channels==1.1.8
 chardet==3.0.4
@@ -72,7 +72,7 @@ django-stubs==0.12.1      # via djangorestframework-stubs
 django-tables2==2.0.6
 django-test-plus==1.0.22
 django-versatileimagefield==1.10
-django==2.0.13
+django==2.1.9
 djangorestframework-stubs==0.4.2
 djangorestframework==3.9.4
 docutils==0.14            # via sphinx
