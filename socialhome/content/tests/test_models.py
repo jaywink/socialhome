@@ -3,10 +3,10 @@ from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import truncatechars
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.timezone import make_aware
-from django_extensions.utils.text import truncate_letters
 from freezegun import freeze_time
 
 from socialhome.content.enums import ContentType
@@ -186,7 +186,7 @@ class TestContentModel(SocialhomeTestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_short_text(self):
-        self.assertEqual(self.public_content.short_text, truncate_letters(self.public_content.text, 50))
+        self.assertEqual(self.public_content.short_text, truncatechars(self.public_content.text, 50))
 
     def test_short_text_inline(self):
         self.public_content.text = "foo\n\rbar"
@@ -415,7 +415,7 @@ class TestTagModel(SocialhomeTestCase):
 class TestOpenGraphCache(SocialhomeTestCase):
     def test_str(self):
         ogc = OpenGraphCache(url="https://example.com", title="x"*200, description="bar", image="https://example.com")
-        self.assertEqual(str(ogc), "https://example.com / %s..." % ("x"*30))
+        self.assertEqual(str(ogc), "https://example.com / %s..." % ("x"*27))
 
 
 class TestOEmbedCache(SocialhomeTestCase):
