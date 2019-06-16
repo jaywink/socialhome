@@ -166,13 +166,15 @@ class Profile(TimeStampedModel):
         """
         if visibility == Visibility.PUBLIC:
             return {
-                "fid": self.inbox_public,
+                "endpoint": self.inbox_public,
+                "fid": self.fid,
                 "public": True,
                 "protocol": self.protocol,
             }
         elif visibility == Visibility.LIMITED:
             return {
-                "fid": self.inbox_private,
+                "endpoint": self.inbox_private,
+                "fid": self.fid,
                 "public": False,
                 "protocol": self.protocol,
                 "public_key": self.key,

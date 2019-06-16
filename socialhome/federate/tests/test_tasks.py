@@ -349,12 +349,10 @@ class TestGetRemoteFollowers(TestCase):
 
     def test_all_remote_returned(self):
         followers = _get_remote_followers(self.user.profile, self.user.profile.visibility)
+        expected = {self.remote_follower.fid, self.remote_follower2.fid}
         self.assertEqual(
-            followers,
-            [
-                self.remote_follower.get_recipient_for_visibility(self.user.profile.visibility),
-                self.remote_follower2.get_recipient_for_visibility(self.user.profile.visibility),
-            ],
+            {follower["fid"] for follower in followers},
+            expected,
         )
 
     def test_exclude_is_excluded(self):
@@ -381,12 +379,11 @@ class TestGetLimitedRecipients(SocialhomeTestCase):
 
     def test_correct_recipients_returned(self):
         recipients = _get_limited_recipients(self.profile.fid, self.limited_content)
+        expected = {self.profile2.fid, self.profile3.fid}
+        print(recipients)
         self.assertEqual(
-            recipients,
-            [
-                self.profile2.get_recipient_for_visibility(Visibility.LIMITED),
-                self.profile3.get_recipient_for_visibility(Visibility.LIMITED),
-            ],
+            {recipient['fid'] for recipient in recipients},
+            expected,
         )
 
 
