@@ -255,15 +255,6 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         self.assertEqual({x["fid"] for x in self.last_response.data["results"]}, expected)
         self.assertEqual(len(expected), 3)
 
-    @override_settings(REST_FRAMEWORK={"PAGE_SIZE": 2})
-    def test_following_paginated(self):
-        self.user = UserWithContactFactory(count_following=4)
-        self.assertEquals(len(self.user.profile.following.all()), 4)
-        with self.login(self.user):
-            self.get("api:profile-following")
-        self.response_200()
-        self.assertEquals(len(self.last_response.data["results"]), 2)
-
     def test_followers(self):
         self.user = UserWithContactFactory()
         with self.login(self.user):
@@ -272,12 +263,3 @@ class TestProfileViewSet(SocialhomeAPITestCase):
         expected = {LimitedProfileSerializer(x).data["fid"] for x in self.user.profile.followers.all()}
         self.assertEqual({x["fid"] for x in self.last_response.data["results"]}, expected)
         self.assertEqual(len(expected), 3)
-
-    @override_settings(REST_FRAMEWORK={"PAGE_SIZE": 2})
-    def test_followers_paginated(self):
-        self.user = UserWithContactFactory(count_followers=4)
-        self.assertEquals(len(self.user.profile.followers.all()), 4)
-        with self.login(self.user):
-            self.get("api:profile-followers")
-        self.response_200()
-        self.assertEquals(len(self.last_response.data["results"]), 2)
