@@ -1,15 +1,19 @@
+from typing import Any
+
 import django_rq
 from django.http import HttpResponse
 from rest_framework import mixins, status
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import detail_route, list_route, action
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework.serializers import BaseSerializer
 from rest_framework.viewsets import GenericViewSet
 
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
-from socialhome.users.serializers import UserSerializer, ProfileSerializer
+from socialhome.users.serializers import UserSerializer, ProfileSerializer, LimitedProfileSerializer
 from socialhome.users.tasks.exports import create_user_export, UserExporter
 
 
@@ -54,6 +58,18 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             raise ValidationError("Cannot follow self!")
         profile.following.add(target_profile)
         return Response({"status": "Followed."})
+
+    @action(methods=["get"], detail=False, permission_classes=(IsAuthenticated,))
+    def following(self, request):
+        query_set = self.paginate_queryset(request.user.profile.following.all())
+        values = [LimitedProfileSerializer(x).data for x in query_set]
+        return self.get_paginated_response(values)
+
+    @action(methods=["get"], detail=False, permission_classes=(IsAuthenticated,))
+    def followers(self, request):
+        query_set = self.paginate_queryset(request.user.profile.followers.all())
+        values = [LimitedProfileSerializer(x).data for x in query_set]
+        return self.get_paginated_response(values)
 
     @list_route(methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
