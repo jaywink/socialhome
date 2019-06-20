@@ -109,6 +109,7 @@ module.exports = function (grunt) {
                     "<%= paths.js %>/contacts.js",
                     "<%= paths.js %>/publisher.js",
                     "<%= paths.js %>/search.js",
+                    "<%= paths.js %>/grids.js",
                 ],
                 dest: "<%= paths.dist %>/project.js",
                 nonull: true,
