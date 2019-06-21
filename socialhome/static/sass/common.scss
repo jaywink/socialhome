@@ -48,8 +48,9 @@
 }
 
 // Dark navbar tuning
-.navbar-toggler {
+.navbar-toggler.navbar-toggler-right {
   color: #fff;
+  border: none;
 }
 
 // Display django-debug-toolbar.
