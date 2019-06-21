@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
 
 
-def safe_text_for_markdown(text):
+def safe_text_for_markdown(text: str) -> str:
     """Clean the text using bleach but keep certain Markdown sections.
 
     Markdown code ie ` or ``` combos. For single `, do not allow line breaks between the tag.
@@ -19,7 +19,32 @@ def safe_text_for_markdown(text):
     text = re.sub(r"(^> )", "%%safe_quote_in_start%%", text)
     text = re.sub(r"(\n> )", "%%safe_quote_in_new_line%%", text, flags=re.DOTALL)
     # Nuke all html, scripts, etc
-    text = bleach.clean(text or "")
+    text = bleach.clean(
+        text or "",
+        # TODO move to settings
+        tags=[
+            'a',
+            'abbr',
+            'acronym',
+            'b',
+            'blockquote',
+            'code',
+            'em',
+            'i',
+            'li',
+            'ol',
+            'strong',
+            'ul',
+            'p',
+            'span',
+        ],
+        attributes={
+            'a': ['href', 'title'],
+            'abbr': ['title'],
+            'acronym': ['title'],
+            'span': ['class'],
+        },
+    )
     # Return quotes
     text = text.replace("%%safe_quote_in_start%%", "> ")
     text = text.replace("%%safe_quote_in_new_line%%", "\n> ")
