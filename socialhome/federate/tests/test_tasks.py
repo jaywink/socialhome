@@ -71,7 +71,8 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             post,
             self.public_content.author.federable,
-            [{'fid': 'https://relay.iliketoast.net/receive/public', 'public': True, 'protocol': 'diaspora'}],
+            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
+              'protocol': 'diaspora'}],
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -140,7 +141,8 @@ class TestSendContentRetraction(SocialhomeTestCase):
         mock_sender.assert_called_once_with(
             "entity",
             self.public_content.author.federable,
-            [{'fid': 'https://relay.iliketoast.net/receive/public', 'public': True, 'protocol': 'diaspora'}],
+            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
+              'protocol': 'diaspora'}],
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)

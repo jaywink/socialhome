@@ -86,7 +86,8 @@ def send_content(content_id, activity_fid, recipient_id=None):
         else:
             if content.visibility == Visibility.PUBLIC:
                 recipients.append({
-                    "fid": settings.SOCIALHOME_RELAY_ID,
+                    "endpoint": settings.SOCIALHOME_RELAY_ID,
+                    "fid": "",
                     "public": True,
                     "protocol": "diaspora"
                 })
@@ -213,7 +214,8 @@ def send_content_retraction(content, author_id):
             return
         if content.visibility == Visibility.PUBLIC:
             recipients = [{
-                "fid": settings.SOCIALHOME_RELAY_ID,
+                "endpoint": settings.SOCIALHOME_RELAY_ID,
+                "fid": "",
                 "public": True,
                 "protocol": "diaspora"
             }]
