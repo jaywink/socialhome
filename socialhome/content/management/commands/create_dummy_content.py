@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--amount", type=int, help="Amount to create, defaults to 100.", default=100)
-        parser.add_argument("--profile", type=str,
+        parser.add_argument("--user-email", type=str,
                             help="Provide an email for which a number of contact will be created", default=None)
 
     def handle(self, *args, **options):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
             content = PublicContentFactory()
             print("Created content: %s" % content)
 
-        user_email = options["profile"]
+        user_email = options["user-email"]
         if user_email is not None:
 
             user = User.objects.get(email=user_email)
@@ -32,13 +32,10 @@ class Command(BaseCommand):
                 nb_contacts = min(count, 500)
 
                 shuffle(all_profiles)
-                lst = all_profiles[:nb_contacts]
-                for profile in lst:
-                    print("Added %s to %s's followed contacts" % (profile, user_email))
-                    user.profile.following.add(profile)
+                user.profile.following.add(*all_profiles[:nb_contacts])
+                print("Added %s contacts to %s's followed contacts" % (nb_contacts, user_email))
 
                 shuffle(all_profiles)
-                lst = all_profiles[:nb_contacts]
-                for profile in lst:
-                    print("Added %s to %s's followers" % (profile, user_email))
-                    profile.following.add(user.profile)
+                profiles = all_profiles[:nb_contacts]
+                [profile.following.add(user.profile) for profile in profiles]
+                print("Added %s contacts to %s's followers" % (nb_contacts, user_email))

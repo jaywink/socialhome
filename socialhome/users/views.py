@@ -7,6 +7,7 @@ from django.views.generic import DetailView, ListView, UpdateView, TemplateView,
 from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
 
+
 from socialhome.content.models import Content
 from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
 from socialhome.streams.views import BaseStreamView
@@ -210,9 +211,9 @@ class BaseContactsView(LoginRequiredMixin, DetailView):
         }
 
 
-class ContactsFollowedView(BaseContactsView):
+class ContactsFollowingView(BaseContactsView):
     model = Profile
-    template_title = "Contacts - followed"
+    template_title = _("Contacts - following")
 
     def get_object(self, queryset=None):
         return self.request.user.profile
@@ -220,7 +221,7 @@ class ContactsFollowedView(BaseContactsView):
 
 class ContactsFollowersView(BaseContactsView):
     model = Profile
-    template_title = "Contacts - followers"
+    template_title = _("Contacts - followers")
 
     def get_object(self, queryset=None):
         return self.request.user.profile

@@ -9,8 +9,7 @@
         :img-src="item.image_url_large"
         :img-alt="contactAvatarAlt(item.name)"
         img-top
-        :class="`mb-${nbColumns}`"
-        class="socialhome-contact-card"
+        class="socialhome-contact-card mb-3"
       >
         <b-card-text>{{ item.handle }}</b-card-text>
 
@@ -30,20 +29,17 @@ import ProfileReactionButtons from "@/components/common/ProfileReactionButtons"
 
 export default {
     components: {ProfileReactionButtons},
-    data() {
-        return {avatar: "/static/images/pony300.png"}
-    },
     computed: {
         ...mapState("contacts", {
-            followed: state => state.followed,
-            followedPending: state => state.pending.followed,
+            following: state => state.following,
             followers: state => state.followers,
-            followersPending: state => state.pending.followers,
         }),
-        chunks() { return _chunk(this.contacts, this.nbColumns) },
-        contacts() { return [] },
-        infiniteScrollDisable() { return this.isLoading || !this.shouldLoadMore },
-        isLoading() { return this.followersPending || this.followedPending },
+        chunks() {
+            return _chunk(this.contacts, this.nbColumns)
+        },
+        contacts() {
+            return []
+        },
         nbColumns() {
             if (this.$deviceSize.isMinLg) {
                 return 4
@@ -56,7 +52,9 @@ export default {
         nextPage() { /* Override */
             return null
         },
-        pageSize() { return this.$route.query.page_size },
+        pageSize() {
+            return this.$route.query.page_size
+        },
         shouldLoadMore() { /* Override */
             return false
         },
@@ -64,17 +62,16 @@ export default {
             return ""
         },
     },
-    mounted() {
-    },
     methods: {
-        contactAvatarAlt(contactName) { return `${gettext("Avatar of")} ${contactName}` },
-        fetch() { /* Override */ },
+        contactAvatarAlt(contactName) {
+            return `${gettext("Avatar of")} ${contactName}`
+        },
+        fetch() { /* Override */
+        },
         async loadMore($state) {
             await this.fetch({params: {page: this.next, pageSize: this.pageSize}})
-            if ($state) {
-                await this.$nextTick()
-                this.shouldLoadMore ? $state.loaded() : $state.complete()
-            }
+            await this.$nextTick()
+            this.shouldLoadMore ? $state.loaded() : $state.complete()
         },
     },
 }

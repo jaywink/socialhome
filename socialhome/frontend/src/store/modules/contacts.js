@@ -1,27 +1,22 @@
 /* eslint-disable no-param-reassign */
-import Vue from "vue"
 import Vapi from "vuex-rest-api"
 
 import _isString from "lodash/isString"
 
 
-const state = {
-    followed: {
-        count: 1,
-        next: null,
-        contacts: [],
-    },
-    followers: {
-        count: 1,
-        next: null,
-        contacts: [],
-    },
-}
-
-const options = {
-    baseURL: "",
-    axios: Vue.axios,
-    state,
+function getState() {
+    return {
+        following: {
+            count: 1,
+            next: null,
+            contacts: [],
+        },
+        followers: {
+            count: 1,
+            next: null,
+            contacts: [],
+        },
+    }
 }
 
 function onSuccess(stateTarget, data) {
@@ -33,8 +28,12 @@ function onSuccess(stateTarget, data) {
 function getContactFn(key) {
     return ({page = undefined, pageSize = undefined} = {}) => {
         const params = []
-        if (page) params.push(`page=${page}`)
-        if (pageSize) params.push(`page_size=${pageSize}`)
+        if (page) {
+            params.push(`page=${page}`)
+        }
+        if (pageSize) {
+            params.push(`page_size=${pageSize}`)
+        }
 
         const url = Urls[key]()
 
@@ -42,20 +41,31 @@ function getContactFn(key) {
     }
 }
 
-const store = new Vapi(options)
-    .get({
-        action: "contactsFollowers",
-        path: getContactFn("api:profile-followers"),
-        property: "followers",
-        onSuccess: (localState, {data}) => onSuccess(localState.followers, data),
-    })
-    .get({
-        action: "contactsFollowed",
-        path: getContactFn("api:profile-followed"),
-        property: "followed",
-        onSuccess: (localState, {data}) => onSuccess(localState.followed, data),
-    })
-    .getStore()
+function getContactsStore(axios) {
+    const options = {
+        baseURL: "",
+        axios,
+        state: getState(),
+    }
 
-export default {namespaced: true, ...store}
+    const store = new Vapi(options)
+        .get({
+            action: "contactsFollowers",
+            path: getContactFn("api:profile-followers"),
+            property: "followers",
+            onSuccess: (localState, {data}) => onSuccess(localState.followers, data),
+        })
+        .get({
+            action: "contactsFollowing",
+            path: getContactFn("api:profile-following"),
+            property: "following",
+            onSuccess: (localState, {data}) => onSuccess(localState.following, data),
+        })
+        .getStore()
+
+    return {namespaced: true, ...store}
+}
+
+export {getContactsStore}
+export default getContactsStore
 /* eslint-enable no-param-reassign */

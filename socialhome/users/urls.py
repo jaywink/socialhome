@@ -38,9 +38,9 @@ urlpatterns = [
         name="profile-update"
     ),
     url(
-        regex=r"^p/~followed/$",
-        view=views.ContactsFollowedView.as_view(),
-        name="contacts-followed"
+        regex=r"^p/~following/$",
+        view=views.ContactsFollowingView.as_view(),
+        name="contacts-following"
     ),
     url(
         regex=r"^p/~followers/$",

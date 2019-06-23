@@ -246,10 +246,10 @@ class TestProfileViewSet(SocialhomeAPITestCase):
             self.get("api:profile-detail", uuid=self.profile.uuid)
         self.assertEqual(self.last_response.data['user_following'], True)
 
-    def test_followed(self):
+    def test_following(self):
         self.user = UserWithContactFactory()
         with self.login(self.user):
-            self.get("api:profile-followed")
+            self.get("api:profile-following")
         self.response_200()
         expected = {LimitedProfileSerializer(x).data["fid"] for x in self.user.profile.following.all()}
         self.assertEqual({x["fid"] for x in self.last_response.data["results"]}, expected)

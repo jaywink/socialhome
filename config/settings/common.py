@@ -56,7 +56,6 @@ THIRD_PARTY_APPS = (
     "rest_framework_swagger",
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
-    "django_tables2",
     "haystack",
     "versatileimagefield",
     "django_js_reverse",

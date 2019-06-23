@@ -27,7 +27,6 @@ django-robots
 django-rq<1.3.0  # Locked due to asgi-redis 1.x not compatible with redis 3.x
 django-secure
 django-settings-export
-django-tables2
 django-versatileimagefield
 django<2.2
 djangorestframework

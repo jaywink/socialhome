@@ -19,7 +19,7 @@ require("django-i18n")
 const Sinon = require("sinon").sandbox.create()
 
 // Trap calls to global library `Urls`
-const {Urls} = require(path.resolve(__dirname, "fixtures", "Url.js"))
+const {Urls} = require(path.resolve(__dirname, "fixtures", "Urls.js"))
 /* eslint-enable import/no-dynamic-require,import/newline-after-import */
 
 

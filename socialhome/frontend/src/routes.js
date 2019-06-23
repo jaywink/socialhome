@@ -1,8 +1,8 @@
 import VueRouter from "vue-router"
 import Stream from "@/components/streams/Stream.vue"
 import Publisher from "@/components/publisher/Publisher"
-import Followed from "@/components/contacts/Followed"
-import Followers from "@/components/contacts/Followers"
+import AppFollowing from "@/components/contacts/AppFollowing"
+import AppFollowers from "@/components/contacts/AppFollowers"
 
 
 function $$(props = {}) {
@@ -11,8 +11,8 @@ function $$(props = {}) {
 
 const routes = [
     // Contacts page
-    {path: "/p/~followed/", component: Followed},
-    {path: "/p/~followers/", component: Followers},
+    {path: "/p/~following/", component: AppFollowing},
+    {path: "/p/~followers/", component: AppFollowers},
 
     // TODO: Matching "/" is a bit tricky since the stream can be customized.
     // TODO: In the future, Stream can be replaced by a generic RootStream.vue that just delegates to another component

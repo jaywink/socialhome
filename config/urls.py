@@ -22,7 +22,8 @@ from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 # NOTE! If changing or adding API urls, don't forget to update the JS tests URL config fixtures as follows:
 #
 #    python manage.py collectstatic_js_reverse
-#    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/fixtures/Url.js
+#    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/unit/fixtures/Urls.js
+#    rm -rf staticfiles/django_js_reverse
 #
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)

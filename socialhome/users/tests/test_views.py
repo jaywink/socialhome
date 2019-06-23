@@ -478,11 +478,11 @@ class TestContactsFollowedView(SocialhomeTestCase):
 
     def test_login_required(self):
         # Not logged in, redirects to login
-        self.get("users:contacts-followed")
+        self.get("users:contacts-following")
         self.response_302()
         # Logged in
         with self.login(self.user):
-            self.get("users:contacts-followed")
+            self.get("users:contacts-following")
         self.response_200()
 
 

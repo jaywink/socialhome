@@ -62,7 +62,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return Response({"status": "Followed."})
 
     @action(methods=["get"], detail=False, permission_classes=(IsAuthenticated,))
-    def followed(self, request):
+    def following(self, request):
         query_set = self.paginate_queryset(request.user.profile.following.all())
         values = [LimitedProfileSerializer(x).data for x in query_set]
         return self.get_paginated_response(values)

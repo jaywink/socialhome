@@ -78,6 +78,6 @@
     "last 2 versions"
   ],
   "eslintIgnore": [
-    "tests/unit/fixtures/Url.js"
+    "tests/unit/fixtures/Urls.js"
   ]
 }
