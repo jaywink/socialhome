@@ -12,9 +12,7 @@ export default {
         next() { return this.followed.next },
         shouldLoadMore() { return this.followed.contacts.length < this.followed.count },
     },
-    methods: {
-        ...mapActions("contacts", {fetch: "contactsFollowed"}),
-    },
+    methods: {...mapActions("contacts", {fetch: "contactsFollowed"})},
 }
 </script>
 

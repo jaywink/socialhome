@@ -26,11 +26,10 @@ import {mapState} from "vuex"
 import _chunk from "lodash/chunk"
 
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons"
-import LoadingElement from "@/components/common/LoadingElement"
 
 
 export default {
-    components: {LoadingElement, ProfileReactionButtons},
+    components: {ProfileReactionButtons},
     data() {
         return {avatar: "/static/images/pony300.png"}
     },

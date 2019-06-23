@@ -1,4 +1,3 @@
-import Axios from "axios"
 import Moxios from "moxios"
 import Vue from "vue"
 import Vuex from "vuex"
@@ -9,6 +8,7 @@ import {mount} from "avoriaz"
 
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 import {getStore} from "%fixtures/store.fixtures"
+
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
@@ -59,10 +59,6 @@ describe("ProfileReactionButtons", () => {
 
     describe("methods", () => {
         beforeEach(() => {
-            Vue.prototype.$http = Axios.create({
-                xsrfCookieName: "csrftoken",
-                xsrfHeaderName: "X-CSRFToken",
-            })
             Moxios.install(Vue.prototype.$http)
         })
 

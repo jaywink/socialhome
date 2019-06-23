@@ -5,14 +5,10 @@
 <script>
 export default {
     name: "NoMoreDataEement",
-    props: {
-        text: {type: String, default: "No more data"},
-    },
+    props: {text: {type: String, default: "No more data"}},
     computed: {
         translations() {
-            return {
-                cardTitle: gettext(this.text),
-            }
+            return {cardTitle: gettext(this.text)}
         },
     },
 }

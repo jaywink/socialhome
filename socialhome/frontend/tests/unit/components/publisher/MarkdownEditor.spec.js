@@ -1,16 +1,7 @@
-import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
-import VueSnotify from "vue-snotify"
 import {mount} from "avoriaz"
 
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
-import filters from "@/filters"
-
-
-Vue.use(BootstrapVue)
-Vue.use(VueSnotify)
-// Prevent Vue from displaying filter related warnings
-Object.entries(filters).forEach(([key, value]) => Vue.filter(`${key}`, value))
 
 
 describe("MarkdownEditor", () => {
@@ -69,7 +60,7 @@ describe("MarkdownEditor", () => {
         const result = {data: {url: "http://localhost/01e25466-0a55-4f7d-951d-aefec9a22d4b"}}
 
         beforeEach(() => {
-            Vue.prototype.$http = {post: Sinon.stub().returns(Promise.resolve(result))}
+            Sinon.stub(Vue.prototype.$http, "post").returns(Promise.resolve(result))
         })
 
         afterEach(() => {

@@ -2,18 +2,23 @@ import Moxios from "moxios"
 import Vue from "vue"
 import Vuex from "vuex"
 import Axios from "axios"
-import VueSnotify from "vue-snotify"
 import uuid from "uuid"
 
 import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 import getState from "@/store/modules/stream.state"
 import {
+    actions,
     addHasLoadMore,
     fetchContentsSuccess,
     fetchNewContentSuccess,
     fetchRepliesSuccess,
-    fetchSharesSuccess, newRestAPI, onError, mutations, actions, getters,
+    fetchSharesSuccess,
+    getters,
+    mutations,
+    newRestAPI,
+    onError,
 } from "@/store/modules/stream"
+
 
 Vue.use(Vuex)
 
@@ -224,11 +229,6 @@ describe("streamStore", () => {
     })
 
     describe("onError", () => {
-        beforeEach(() => {
-            Vue.use(VueSnotify)
-            Vue.snotify = new Vue({}).$snotify
-        })
-
         it("should log an error", () => {
             Sinon.spy(Vue.snotify, "error")
             onError({}, "unknown error")
