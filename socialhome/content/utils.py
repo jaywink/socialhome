@@ -3,7 +3,7 @@ import re
 import bleach
 from bleach import callbacks
 from bs4 import BeautifulSoup
-
+from django.conf import settings
 
 ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
 
@@ -21,29 +21,8 @@ def safe_text_for_markdown(text: str) -> str:
     # Nuke all html, scripts, etc
     text = bleach.clean(
         text or "",
-        # TODO move to settings
-        tags=[
-            'a',
-            'abbr',
-            'acronym',
-            'b',
-            'blockquote',
-            'code',
-            'em',
-            'i',
-            'li',
-            'ol',
-            'strong',
-            'ul',
-            'p',
-            'span',
-        ],
-        attributes={
-            'a': ['href', 'title'],
-            'abbr': ['title'],
-            'acronym': ['title'],
-            'span': ['class'],
-        },
+        tags=settings.SOCIALHOME_CONTENT_SAFE_TAGS,
+        attributes=settings.SOCIALHOME_CONTENT_SAFE_ATTRS,
     )
     # Return quotes
     text = text.replace("%%safe_quote_in_start%%", "> ")

@@ -9,7 +9,7 @@ MARKDOWN_QUOTES_TEXT = "> foo\n> bar > foo"
 SCRIPT_TEXT = "<script>console.log</script>"
 MARKDOWN_CODE_TEXT = "`\n<script>alert('yup');</script>\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
                      "<script>alert('yap');</script>\n```"
-HTML_TEXT = "<a href='foo'>bar</a><b>cee</b><em>daaa<div>faa</div>"
+HTML_TEXT = "<a href='foo'>bar</a><b>cee</b><em>daaa<div><span class='jee'>faa</span></div>"
 
 
 class TestSafeTextForMarkdown(object):
@@ -28,8 +28,8 @@ class TestSafeTextForMarkdown(object):
         assert safe_text_for_markdown(SCRIPT_TEXT) == "&lt;script&gt;console.log&lt;/script&gt;"
 
     def test_text_with_html_is_cleaned(self):
-        assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;faa&lt' \
-                                                         ';/div&gt;</em>'
+        assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;<span ' \
+                                                    'class="jee">faa</span>&lt;/div&gt;</em>'
 
     def test_text_with_quotes_survives(self):
         assert safe_text_for_markdown(MARKDOWN_QUOTES_TEXT) == "> foo\n> bar &gt; foo"
