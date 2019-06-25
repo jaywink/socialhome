@@ -80,10 +80,7 @@ def on_commit_limited_visibilities(action, pks, instance):
     if action not in ("post_add", "post_remove"):
         return
 
-    # Get an activity to be used when federating
-    # TODO how to recognize UPDATE's?
-    activity_type = ActivityType.CREATE
-    activity = instance.create_activity(activity_type)
+    activity = instance.activities.order_by("-created").first()
 
     for id in pks:
         # Send out federation only if remote profile

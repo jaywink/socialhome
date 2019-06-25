@@ -1,6 +1,8 @@
 import json
 from unittest.mock import patch, Mock, call
 
+from federation.entities.activitypub.enums import ActivityType
+
 from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
@@ -144,6 +146,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertEqual(args[1], content.id)
         activity = content.activities.first()
         self.assertEqual(args[2], activity.fid)
+        self.assertEqual(activity.type, ActivityType.CREATE)
 
     @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
@@ -159,6 +162,25 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertEqual(kwargs, {'recipient_id': None})
         activity = content.activities.first()
         self.assertEqual(args[2], activity.fid)
+        self.assertEqual(activity.type, ActivityType.CREATE)
+
+    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
+    def test_local_content_update_gets_sent(self, mock_update, mock_send):
+        user = UserFactory()
+        content = ContentFactory(author=user.profile)
+        self.assertTrue(content.local)
+        mock_send.reset_mock()
+        content.text = "foobar edit"
+        content.save()
+        self.assertEqual(mock_send.call_count, 1)
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual(args[0], send_content)
+        self.assertEqual(args[1], content.id)
+        self.assertEqual(kwargs, {'recipient_id': None})
+        activity = content.activities.order_by('-created').first()
+        self.assertEqual(args[2], activity.fid)
+        self.assertEqual(activity.type, ActivityType.UPDATE)
 
     @patch("socialhome.content.signals.django_rq.enqueue")
     @patch("socialhome.content.signals.update_streams_with_content")
@@ -175,6 +197,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertEqual(args[1], content.id)
         activity = content.activities.first()
         self.assertEqual(args[2], activity.fid)
+        self.assertEqual(activity.type, ActivityType.CREATE)
 
 
 class TestFederateContentRetraction(SocialhomeTestCase):
@@ -190,7 +213,6 @@ class TestFederateContentRetraction(SocialhomeTestCase):
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
         mock_send.reset_mock()
-        content_id = content.id
         content.delete()
         mock_send.assert_called_once_with(send_content_retraction, content, content.author_id)
 
