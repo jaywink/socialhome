@@ -66,6 +66,7 @@ THIRD_PARTY_APPS = (
 )
 LOCAL_APPS = (
     "socialhome",
+    "socialhome.activities",
     "socialhome.users",
     "socialhome.federate",
     "socialhome.content",
@@ -329,6 +330,32 @@ SOCIALHOME_TOS_JURISDICTION = env("SOCIALHOME_TOS_JURISDICTION", default=None)
 SOCIALHOME_STREAMS_PRECACHE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE_SIZE", default=100)
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS = env.int("SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS", default=90)
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE", default=0)
+
+# Content
+# These attributes on tags are kept on save for untrusted users
+SOCIALHOME_CONTENT_SAFE_ATTRS = {
+    'a': ['href', 'title'],
+    'abbr': ['title'],
+    'acronym': ['title'],
+    'span': ['class'],
+}
+# These tags are kept on save for untrusted users
+SOCIALHOME_CONTENT_SAFE_TAGS = [
+    'a',
+    'abbr',
+    'acronym',
+    'b',
+    'blockquote',
+    'code',
+    'em',
+    'i',
+    'li',
+    'ol',
+    'p',
+    'span',
+    'strong',
+    'ul',
+]
 
 # Exports
 SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))

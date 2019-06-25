@@ -3,12 +3,12 @@ import re
 import bleach
 from bleach import callbacks
 from bs4 import BeautifulSoup
-
+from django.conf import settings
 
 ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
 
 
-def safe_text_for_markdown(text):
+def safe_text_for_markdown(text: str) -> str:
     """Clean the text using bleach but keep certain Markdown sections.
 
     Markdown code ie ` or ``` combos. For single `, do not allow line breaks between the tag.
@@ -19,7 +19,11 @@ def safe_text_for_markdown(text):
     text = re.sub(r"(^> )", "%%safe_quote_in_start%%", text)
     text = re.sub(r"(\n> )", "%%safe_quote_in_new_line%%", text, flags=re.DOTALL)
     # Nuke all html, scripts, etc
-    text = bleach.clean(text or "")
+    text = bleach.clean(
+        text or "",
+        tags=settings.SOCIALHOME_CONTENT_SAFE_TAGS,
+        attributes=settings.SOCIALHOME_CONTENT_SAFE_ATTRS,
+    )
     # Return quotes
     text = text.replace("%%safe_quote_in_start%%", "> ")
     text = text.replace("%%safe_quote_in_new_line%%", "\n> ")

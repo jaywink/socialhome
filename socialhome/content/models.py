@@ -5,6 +5,7 @@ from uuid import uuid4
 import arrow
 from commonmark import commonmark
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Max
@@ -16,9 +17,11 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from federation.entities.activitypub.enums import ActivityType
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
@@ -155,6 +158,9 @@ class Content(models.Model):
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
 
+    # Other relations
+    activities = GenericRelation(Activity)
+
     objects = ContentManager()
 
     def __str__(self):
@@ -183,6 +189,19 @@ class Content(models.Model):
             self.parent.cache_data(commit=True)
             if self.parent.share_of:
                 self.parent.share_of.cache_data(commit=True)
+
+    def create_activity(self, activity_type: ActivityType) -> Activity:
+        """
+        Create and link a matching activity.
+        """
+        from django.contrib.contenttypes.models import ContentType as DjangoContentType
+        return Activity.objects.create(
+            content_type=DjangoContentType.objects.get_for_model(Content),
+            fid=f"{self.author.fid}#activities/{uuid4()}",
+            object_id=self.id,
+            profile=self.author,
+            type=activity_type,
+        )
 
     def extract_mentions(self):
         # TODO locally created mentions should not have to be ripped out of text

@@ -52,7 +52,7 @@ def receive_task(request, uuid=None):
     process_entities(entities, receiving_profile=profile)
 
 
-def send_content(content_id, recipient_id=None):
+def send_content(content_id, activity_fid, recipient_id=None):
     """
     Handle sending a Content object out via the federation layer.
     """
@@ -76,6 +76,7 @@ def send_content(content_id, recipient_id=None):
         recipient = None
     entity = make_federable_content(content)
     if entity:
+        entity.activity_id = activity_fid
         if settings.DEBUG:
             # Don't send in development mode
             return
@@ -85,7 +86,8 @@ def send_content(content_id, recipient_id=None):
         else:
             if content.visibility == Visibility.PUBLIC:
                 recipients.append({
-                    "fid": settings.SOCIALHOME_RELAY_ID,
+                    "endpoint": settings.SOCIALHOME_RELAY_ID,
+                    "fid": "",
                     "public": True,
                     "protocol": "diaspora"
                 })
@@ -139,7 +141,7 @@ def _get_limited_recipients(sender: str, content: Content) -> List:
     ]
 
 
-def send_reply(content_id):
+def send_reply(content_id, activity_fid):
     """
     Handle sending a Content object that is a reply out via the federation layer.
     """
@@ -156,6 +158,7 @@ def send_reply(content_id):
     entity = make_federable_content(content)
     if not entity:
         logger.warning("send_reply - No entity for %s", content)
+    entity.activity_id = activity_fid
     if settings.DEBUG:
         # Don't send in development mode
         return
@@ -170,7 +173,7 @@ def send_reply(content_id):
         handle_send(entity, content.author.federable, recipients)
 
 
-def send_share(content_id):
+def send_share(content_id, activity_fid):
     """Handle sending a share of a Content object to the federation layer.
 
     Currently we only deliver public shares.
@@ -183,6 +186,7 @@ def send_share(content_id):
         return
     entity = make_federable_content(content)
     if entity:
+        entity.activity_id = activity_fid
         if settings.DEBUG:
             # Don't send in development mode
             return
@@ -210,7 +214,8 @@ def send_content_retraction(content, author_id):
             return
         if content.visibility == Visibility.PUBLIC:
             recipients = [{
-                "fid": settings.SOCIALHOME_RELAY_ID,
+                "endpoint": settings.SOCIALHOME_RELAY_ID,
+                "fid": "",
                 "public": True,
                 "protocol": "diaspora"
             }]

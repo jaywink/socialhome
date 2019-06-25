@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /
 
-RUN apt-get update && apt-get install python-dev python3-dev -y
+RUN apt-get update && apt-get install python-dev python3-dev less htop -y
 
 COPY requirements/requirements.txt ./
 
