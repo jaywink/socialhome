@@ -27,6 +27,8 @@ Added
 
 * User profile now has a link to a new followers contacts page. This is limited to the logged in user only.
 
+* Added a model for federation payloads for debugging purposes. If the "log all federation payloads" admin setting is on, incoming payloads will now also be available in the database via the admin pages, in addition to the log file.
+
 Changed
 .......
 
