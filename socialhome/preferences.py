@@ -11,5 +11,6 @@ class LogAllReceivePayloads(BooleanPreference):
     name = "log_all_receive_payloads"
     default = False
     verbose_name = _("Log all receive payloads")
-    help_text = _("If set to true, all received payloads will be written at DEBUG level to app logfile."
+    help_text = _("If set to true, all received payloads will be written at DEBUG level to app logfile "
+                  "and model federate.Payload (available in the admin). "
                   "This is a performance hit so should only be turned on for temporary debugging.")

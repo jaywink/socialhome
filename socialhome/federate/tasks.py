@@ -3,6 +3,7 @@ from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
 from django.conf import settings
+from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
@@ -11,6 +12,7 @@ from federation.outbound import handle_send
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
+from socialhome.federate.models import Payload
 from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher
 from socialhome.federate.utils import make_federable_profile
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
@@ -37,6 +39,17 @@ def receive_task(request, uuid=None):
             request, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
         )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
+        preferences = global_preferences_registry.manager()
+        if preferences["admin__log_all_receive_payloads"]:
+            Payload.objects.create(
+                body=request.body,
+                entities_found=len(entities),
+                headers=request.headers,
+                method=request.method,
+                protocol=protocol_name or "",
+                sender=sender or "",
+                url=request.url,
+            )
     except NoSuitableProtocolFoundError:
         logger.warning("No suitable protocol found for payload")
         return
