@@ -64,7 +64,7 @@ Changed
 
 * Global search now works also with ActivityPub ID's to fetch a remote profile
 
-* Added a few additional HTML elements to content cleanup whitelist: tags `span, p` and attribute `class` on `span`.
+* Added a few additional HTML elements to content cleanup whitelist: tags `span, p, br` and attribute `class` on `span`.
 
 Fixed
 .....

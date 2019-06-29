@@ -346,6 +346,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'acronym',
     'b',
     'blockquote',
+    'br',
     'code',
     'em',
     'i',
