@@ -1,14 +1,12 @@
 @import "variables";
 
-@media(min-width: $bsMediumDevice){
-  .markdownx {
+.markdownx {
+  display: flex;
+  .preview-panel {
     display: flex;
-    .preview-panel {
-      display: flex;
-      flex-flow: column;
-      .markdownx-preview {
-        flex: 1;
-      }
+    flex-flow: column;
+    .markdownx-preview {
+      flex: 1;
     }
   }
 }
@@ -22,5 +20,5 @@
 }
 
 .markdownx-preview {
-  min-height: 4rem
+  min-height: 4rem;
 }
