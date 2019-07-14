@@ -40,10 +40,12 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
             id=content.fid,
             actor_id=content.author.fid,
             target_id=content.parent.fid,
+            root_target_id=content.root_parent.fid,
             created_at=content.effective_modified,
             guid=str(content.uuid),
             handle=content.author.handle,
             target_guid=content.parent.guid,
+            root_target_guid=content.root_parent.guid,
         )
     except Exception as ex:
         logger.exception("_make_comment - Failed to convert %s: %s", content.fid, ex)

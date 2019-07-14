@@ -298,9 +298,13 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         cls.other_user = PublicUserFactory()
         cls.create_content_set()
         cls.public_reply = PublicContentFactory(parent=cls.public_content)
+        cls.public_reply_of_reply = PublicContentFactory(parent=cls.public_reply)
         cls.limited_reply = LimitedContentFactory(parent=cls.limited_content)
+        cls.limited_reply_of_reply = LimitedContentFactory(parent=cls.limited_reply)
         cls.self_reply = SelfContentFactory(parent=cls.self_content)
+        cls.self_reply_of_reply = SelfContentFactory(parent=cls.self_reply)
         cls.site_reply = SiteContentFactory(parent=cls.site_content)
+        cls.site_reply_of_reply = SiteContentFactory(parent=cls.site_reply)
         cls.public_share = PublicContentFactory(share_of=cls.public_content, author=cls.remote_profile)
         cls.limited_share = LimitedContentFactory(share_of=cls.limited_content, author=cls.remote_profile)
         cls.self_share = SelfContentFactory(share_of=cls.self_content, author=cls.remote_profile)
@@ -312,11 +316,12 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         cls.limited_content_user = UserFactory()
         cls.limited_content_profile = cls.limited_content_user.profile
         cls.limited_reply.limited_visibilities.add(cls.limited_content_profile)
+        cls.limited_reply_of_reply.limited_visibilities.add(cls.limited_content_profile)
         cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
 
     def test_children(self):
         contents = set(Content.objects.children(self.public_content.id, self.anonymous_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply, self.public_reply_of_reply})
         contents = set(Content.objects.children(self.limited_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.self_content.id, self.anonymous_user))
@@ -325,16 +330,16 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         self.assertEqual(contents, set())
 
         contents = set(Content.objects.children(self.public_content.id, self.other_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply, self.public_reply_of_reply})
         contents = set(Content.objects.children(self.limited_content.id, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.self_content.id, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.site_content.id, self.other_user))
-        self.assertEqual(contents, {self.site_reply, self.share_site_reply})
+        self.assertEqual(contents, {self.site_reply, self.share_site_reply, self.site_reply_of_reply})
 
         contents = set(Content.objects.children(self.limited_content.id, self.limited_content_user))
-        self.assertEqual(contents, {self.limited_reply})
+        self.assertEqual(contents, {self.limited_reply, self.limited_reply_of_reply})
 
 
 class TestContentQuerySetShares(SocialhomeTestCase):

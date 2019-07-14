@@ -122,7 +122,7 @@ def notify_listeners(content):
     data = json.dumps({"event": "new", "id": content.id})
     if content.content_type == ContentType.REPLY:
         # Content reply
-        StreamConsumer.group_send("streams_content__%s" % content.parent.channel_group_name, data)
+        StreamConsumer.group_send("streams_content__%s" % content.root_parent.channel_group_name, data)
     elif content.content_type == ContentType.SHARE:
         # Share
         # TODO do we need to do much?

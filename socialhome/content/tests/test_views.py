@@ -128,8 +128,8 @@ class TestContentUpdateViewCBV(SocialhomeCBVTestCase):
 
     def test_get_success_url_content_is_reply(self):
         self.view.object.content_type = ContentType.REPLY
-        self.view.object.parent = ContentFactory(author=self.content.author)
-        self.assertEqual(self.view.get_success_url(), self.view.object.parent.get_absolute_url())
+        self.view.object.root_parent = ContentFactory(author=self.content.author)
+        self.assertEqual(self.view.get_success_url(), self.view.object.root_parent.get_absolute_url())
 
 
 class TestContentUpdateView(SocialhomeTestCase):
@@ -322,7 +322,7 @@ class TestContentReplyView(SocialhomeTestCase):
             )
         self.assertEqual(response.status_code, 302)
         self.content.refresh_from_db()
-        self.assertEqual(self.content.children.count(), 1)
+        self.assertEqual(self.content.all_children.count(), 1)
 
     def test_form_valid__limited(self):
         with self.login(self.user):
@@ -331,6 +331,6 @@ class TestContentReplyView(SocialhomeTestCase):
             )
         self.assertEqual(response.status_code, 302)
         self.limited_content.refresh_from_db()
-        self.assertEqual(self.limited_content.children.count(), 1)
-        reply = self.limited_content.children.first()
+        self.assertEqual(self.limited_content.all_children.count(), 1)
+        reply = self.limited_content.all_children.first()
         self.assertEqual(reply.visibility, Visibility.LIMITED)

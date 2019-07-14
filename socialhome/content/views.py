@@ -143,7 +143,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
         return kwargs
 
     def get_success_url(self):
-        return self.object.parent.get_absolute_url() if self.is_reply else self.object.get_absolute_url()
+        return self.object.root_parent.get_absolute_url() if self.is_reply else self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -189,7 +189,7 @@ class ContentView(ContentVisibleForUserMixin, DetailView):
         if self.object.content_type == ContentType.SHARE:
             return HttpResponseRedirect(self.object.share_of.get_absolute_url())
         elif self.object.content_type == ContentType.REPLY:
-            return HttpResponseRedirect(self.object.parent.get_absolute_url())
+            return HttpResponseRedirect(self.object.root_parent.get_absolute_url())
         return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
