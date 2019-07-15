@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.urls import reverse
 from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, TemplateView, DeleteView
 from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
+
 
 from socialhome.content.models import Content
 from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
@@ -13,7 +14,6 @@ from socialhome.streams.views import BaseStreamView
 from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
-from socialhome.users.tables import ContactTable
 from socialhome.utils import get_full_url
 
 
@@ -193,31 +193,35 @@ class UserAPITokenView(LoginRequiredMixin, TemplateView):
         return redirect(self.get_success_url())
 
 
-class ContactsFollowedView(LoginRequiredMixin, DetailView):
+class BaseContactsView(LoginRequiredMixin, DetailView):
+    template_name = "users/contacts.html"
+    template_title = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = self.template_title
+        context["json_context"] = self.get_json_context()
+
+        return context
+
+    def get_json_context(self):
+        return {
+            "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+            "isUserAuthenticated": bool(self.request.user.is_authenticated),
+        }
+
+
+class ContactsFollowingView(BaseContactsView):
     model = Profile
-    template_name = "users/contacts_followed.html"
+    template_title = _("Contacts - following")
 
     def get_object(self, queryset=None):
         return self.request.user.profile
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table = ContactTable(self.object.following.all(), order_by=self.request.GET.get("sort"))
-        table.paginate(page=self.request.GET.get("page", 1), per_page=25)
-        context["followed_table"] = table
-        return context
 
-
-class ContactsFollowersView(LoginRequiredMixin, DetailView):
+class ContactsFollowersView(BaseContactsView):
     model = Profile
-    template_name = "users/contacts_followers.html"
+    template_title = _("Contacts - followers")
 
     def get_object(self, queryset=None):
         return self.request.user.profile
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table = ContactTable(self.object.followers.all(), order_by=self.request.GET.get("sort"))
-        table.paginate(page=self.request.GET.get("page", 1), per_page=25)
-        context["followers_table"] = table
-        return context

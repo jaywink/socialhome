@@ -5,10 +5,8 @@ from django.http import HttpResponse
 from rest_framework import mixins, status
 from rest_framework.decorators import detail_route, list_route, action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
-from rest_framework.serializers import BaseSerializer
 from rest_framework.viewsets import GenericViewSet
 
 from socialhome.enums import Visibility
@@ -39,6 +37,10 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
     serializer_class = ProfileSerializer
     permission_classes = (IsOwnProfileOrReadOnly,)
     lookup_field = 'uuid'
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.pagination_class.page_size_query_param = "page_size"
 
     def get_queryset(self):
         qs = Profile.objects.visible_for_user(self.request.user)

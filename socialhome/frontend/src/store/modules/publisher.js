@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import Vue from "vue"
 
+
 const state = {}
 const getters = {}
 const mutations = {}
@@ -16,7 +17,7 @@ const actions = {
             visibility,
         }
 
-        return Vue.prototype.$http
+        return Vue.axios
             .post(Urls["api:content-list"](), payload)
             .then(({data}) => Urls["content:view"]({pk: data.id}))
     },

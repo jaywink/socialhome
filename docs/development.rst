@@ -195,7 +195,7 @@ There is a dependency in the API route URL configurations with the new Vue based
 ::
 
     python manage.py collectstatic_js_reverse
-    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/fixtures/Url.js
+    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/unit/fixtures/Urls.js
 
 This updates the JavaScript fixtures with the new URL configuration.
 

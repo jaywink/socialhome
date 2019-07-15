@@ -69,7 +69,6 @@ django-rq==1.2.0
 django-secure==1.0.1
 django-settings-export==1.2.1
 django-stubs==0.12.1      # via djangorestframework-stubs
-django-tables2==2.0.6
 django-test-plus==1.0.22
 django-versatileimagefield==1.10
 django==2.1.9

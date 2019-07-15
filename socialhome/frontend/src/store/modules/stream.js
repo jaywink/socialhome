@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-import Axios from "axios"
 import Vue from "vue"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
@@ -75,13 +74,9 @@ export function onError() {
 export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 
-    Vue.prototype.$http = Axios.create({
-        xsrfCookieName: "csrftoken",
-        xsrfHeaderName: "X-CSRFToken",
-    })
     const options = {
         baseURL: "",
-        axios: Vue.prototype.$http,
+        axios: Vue.axios,
         state: getState(),
     }
 

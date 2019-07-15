@@ -37,7 +37,7 @@
       <div class="mt-1">
         <b-button
           variant="outline-dark"
-          :href="urls.contactsFollowed"
+          :href="urls.contactsFollowing"
           :title="translations.following"
           :aria-label="translations.following"
         >
@@ -114,7 +114,7 @@
 <script>
 import Vue from "vue"
 
-import ProfileReactionButtons from "@/components/streams/ProfileReactionButtons.vue"
+import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
 
 export default Vue.component("profile-stamped-element", {
@@ -157,7 +157,7 @@ export default Vue.component("profile-stamped-element", {
         },
         urls() {
             return {
-                contactsFollowed: Urls["users:contacts-followed"](),
+                contactsFollowing: Urls["users:contacts-following"](),
                 contactsFollowers: Urls["users:contacts-followers"](),
                 organizeProfileUrl: Urls["users:profile-organize"](),
                 pictureUpdate: Urls["users:picture-update"](),

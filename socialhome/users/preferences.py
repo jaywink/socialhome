@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
-from dynamic_preferences.types import Section, ChoicePreference
+from dynamic_preferences.types import Section, ChoicePreference, BooleanPreference
 from dynamic_preferences.users.registries import user_preferences_registry
 
 generic = Section("generic")
+content = Section("content")
 
 
 @user_preferences_registry.register

@@ -105,9 +105,9 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     rsa_public_key = fuzzy.FuzzyText()
 
     # Dummy image urls
-    image_url_small = "https://127.0.0.1:8000/foo/small.png"
-    image_url_medium = "https://127.0.0.1:8000/foo/medium.png"
-    image_url_large = "/foo/large.png"
+    image_url_small = "https://127.0.0.1:8000/static/images/pony50.png"
+    image_url_medium = "https://127.0.0.1:8000/static/images/pony100.png"
+    image_url_large = "/static/images/pony300.png"
 
     uuid = factory.Faker('uuid4')
 

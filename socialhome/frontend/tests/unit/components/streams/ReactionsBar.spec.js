@@ -1,7 +1,6 @@
-import Axios from "axios"
 import Moxios from "moxios"
 import Vuex from "vuex"
-import {shallowMount, createLocalVue} from "@vue/test-utils"
+import {createLocalVue, shallowMount} from "@vue/test-utils"
 import BootstrapVue from "bootstrap-vue"
 import VueSnotify from "vue-snotify"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -105,10 +104,6 @@ describe("ReactionsBar", () => {
 
     describe("methods", () => {
         beforeEach(() => {
-            localVue.prototype.$http = Axios.create({
-                xsrfCookieName: "csrftoken",
-                xsrfHeaderName: "X-CSRFToken",
-            })
             Moxios.install(localVue.prototype.$http)
         })
 

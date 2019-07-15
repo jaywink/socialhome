@@ -59,6 +59,8 @@ class TestObtainSocialhomeAuthToken(SocialhomeAPITestCase):
                           "home_url": self.user.profile.home_url,
                           "id": self.user.profile.id,
                           "fid": self.user.profile.fid,
+                          "image_url_large": self.user.profile.safer_image_url_large,
+                          "image_url_medium": self.user.profile.safer_image_url_medium,
                           "image_url_small": self.user.profile.safer_image_url_small,
                           "is_local": self.user.profile.is_local,
                           "name": self.user.profile.name,

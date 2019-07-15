@@ -4,7 +4,6 @@ import {mount, shallow} from "avoriaz"
 
 import Publisher from "@/components/publisher/Publisher"
 import store from "@/store"
-import Axios from "axios"
 
 
 Vue.use(BootstrapVue)
@@ -12,10 +11,6 @@ Vue.use(BootstrapVue)
 describe("Publisher", () => {
     beforeEach(() => {
         Sinon.restore()
-        Vue.prototype.$http = Axios.create({
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-        })
     })
 
     describe("computed", () => {
@@ -34,16 +29,18 @@ describe("Publisher", () => {
             const target = mount(Publisher, {propsData: {contentId: "12"}, store})
             Sinon.spy(target.instance().$store, "dispatch")
             target.instance().onPostForm()
-            target.instance().$store.dispatch.getCall(0).args.should.eql(["publisher/publishPost", {
-                federate: true,
-                includeFollowing: false,
-                parent: "12",
-                pinned: false,
-                recipients: "",
-                showPreview: true,
-                text: "",
-                visibility: 0,
-            }])
+            target.instance().$store.dispatch.getCall(0).args.should.eql([
+                "publisher/publishPost", {
+                    federate: true,
+                    includeFollowing: false,
+                    parent: "12",
+                    pinned: false,
+                    recipients: "",
+                    showPreview: true,
+                    text: "",
+                    visibility: 0,
+                },
+            ])
         })
     })
 })

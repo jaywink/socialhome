@@ -1,15 +1,11 @@
 import Vue from "vue"
 import Moxios from "moxios"
-import Axios from "axios"
 import publisher from "@/store/modules/publisher"
+
 
 describe("streamStore", () => {
     afterEach(() => {
         Sinon.restore()
-        Vue.prototype.$http = Axios.create({
-            xsrfCookieName: "csrftoken",
-            xsrfHeaderName: "X-CSRFToken",
-        })
         Moxios.install(Vue.prototype.$http)
     })
 
