@@ -157,6 +157,11 @@ class Content(models.Model):
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
+    # Indirect parent in the hierarchy
+    root_parent = models.ForeignKey(
+        "self", on_delete=models.CASCADE, verbose_name=_("Root parent"), related_name="all_children", null=True,
+        blank=True,
+    )
 
     # Other relations
     activities = GenericRelation(Activity)
@@ -173,7 +178,7 @@ class Content(models.Model):
         if self.pk:
             # Reply count
             share_ids = Content.objects.filter(share_of=self).values_list("id", flat=True)
-            self.reply_count = self.children.count() + Content.objects.filter(parent_id__in=share_ids).count()
+            self.reply_count = self.all_children.count() + Content.objects.filter(parent_id__in=share_ids).count()
             # Share count
             self.shares_count = self.shares.count()
             if commit:
@@ -189,6 +194,8 @@ class Content(models.Model):
             self.parent.cache_data(commit=True)
             if self.parent.share_of:
                 self.parent.share_of.cache_data(commit=True)
+        if self.root_parent:
+            self.root_parent.cache_data(commit=True)
 
     def create_activity(self, activity_type: ActivityType) -> Activity:
         """
@@ -274,9 +281,10 @@ class Content(models.Model):
 
         if self.parent:
             self.content_type = ContentType.REPLY
-            # Ensure replies have sane values
-            self.visibility = self.parent.visibility
+            # Ensure replies have sane
+            self.visibility = self.root.visibility
             self.pinned = False
+            self.root_parent = self.root
         elif self.share_of:
             self.content_type = ContentType.SHARE
 

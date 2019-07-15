@@ -125,7 +125,7 @@ class ContentForm(forms.ModelForm):
                 recipients = recipients | self.user.profile.following.all()
                 recipients = recipients.distinct()
         elif content.content_type == ContentType.REPLY:
-            recipients = content.parent.limited_visibilities.all()
+            recipients = content.root_parent.limited_visibilities.all()
         else:
             return content
 

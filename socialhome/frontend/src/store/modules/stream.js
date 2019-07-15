@@ -41,13 +41,13 @@ export function fetchRepliesSuccess(state, payload) {
     items.forEach(item => {
         const reply = Object.assign({}, item, {replyIds: [], shareIds: []})
         Vue.set(state.replies, reply.id, reply)
-        if (state.contents[reply.parent] !== undefined) {
-            if (state.contents[reply.parent].replyIds.indexOf(reply.id) === -1) {
-                state.contents[reply.parent].replyIds.push(reply.id)
+        if (state.contents[reply.root_parent] !== undefined) {
+            if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
+                state.contents[reply.root_parent].replyIds.push(reply.id)
             }
-        } else if (state.shares[reply.parent] !== undefined) {
-            if (state.shares[reply.parent].replyIds.indexOf(reply.id) === -1) {
-                state.shares[reply.parent].replyIds.push(reply.id)
+        } else if (state.shares[reply.root_parent] !== undefined) {
+            if (state.shares[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
+                state.shares[reply.root_parent].replyIds.push(reply.id)
             }
         }
     })

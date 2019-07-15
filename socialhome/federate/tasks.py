@@ -122,7 +122,7 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         participants = []
     if not include_remote and not target_content.local:
         return participants
-    replies = Content.objects.filter(parent_id=target_content.id, local=False)
+    replies = Content.objects.filter(root_parent_id=target_content.id, local=False, author__user__isnull=True)
     for reply in replies:
         if not exclude or (reply.author.fid != exclude and reply.author.handle != exclude):
             participants.append(reply.author.get_recipient_for_visibility(target_content.visibility))
@@ -175,15 +175,22 @@ def send_reply(content_id, activity_fid):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    # Send directly (remote parent) or as a relayable (local parent)
-    if content.parent.local:
-        forward_entity(entity, content.parent.id)
+    recipients = [content.root_parent.author.get_recipient_for_visibility(content.visibility)]
+    if content.visibility == Visibility.PUBLIC:
+        recipients.extend(
+            _get_remote_participants_for_content(content, exclude=content.author.fid, include_remote=True),
+        )
+        recipients.extend(_get_remote_followers(
+            content.author,
+            content.visibility,
+            exclude=content.author.fid,
+        ))
+    elif content.visibility == Visibility.LIMITED:
+        recipients.extend(_get_limited_recipients(content.author.fid, content))
     else:
-        # We only need to send to the original author
-        parent_author = content.parent.author
-        recipients = [parent_author.get_recipient_for_visibility(content.visibility)]
-        logger.debug("send_reply - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients)
+        return
+    logger.debug("send_reply - sending to recipients: %s", recipients)
+    handle_send(entity, content.author.federable, recipients)
 
 
 def send_share(content_id, activity_fid):

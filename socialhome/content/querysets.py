@@ -30,7 +30,7 @@ class ContentQuerySet(models.QuerySet):
         Returns the direct replies and all replies for shares.
         """
         qs = self.visible_for_user(user).filter(content_type=ContentType.REPLY).filter(
-            Q(parent_id=parent_id) | Q(parent__share_of_id=parent_id)
+            Q(root_parent_id=parent_id) | Q(root_parent__share_of_id=parent_id)
         )
         return qs.order_by("created")
 

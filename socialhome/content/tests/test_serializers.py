@@ -38,6 +38,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         content = Content.objects.order_by("id").last()
         self.assertEqual(content.text, "With parent")
         self.assertEqual(content.parent, self.content)
+        self.assertEqual(content.root_parent, self.content)
 
     def test_create_with_parent__user_cannot_see_parent(self):
         serializer = ContentSerializer(context={"request": Mock(user=self.user)}, data={
@@ -87,6 +88,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         # Inherits from parent
         self.assertEqual(content.visibility, Visibility.LIMITED)
         self.assertEqual(content.parent, self.limited_content2)
+        self.assertEqual(content.root_parent, self.limited_content2)
 
     def test_has_twitter_oembed(self):
         serializer = ContentSerializer(self.content)

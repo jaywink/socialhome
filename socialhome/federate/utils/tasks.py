@@ -135,12 +135,19 @@ def process_entity_comment(entity, profile, receiving_profile=None):
     except Content.DoesNotExist:
         logger.warning("No target found for comment: %s", entity)
         return
+    root_parent = parent
+    if entity.root_target_id:
+        try:
+            root_parent = Content.objects.fed(entity.root_target_id).get()
+        except Content.DoesNotExist:
+            pass
     values = {
         "text": safe_text_for_markdown(entity.raw_content),
         "author": profile,
         "visibility": parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "parent": parent,
+        "root_parent": root_parent,
     }
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     if getattr(entity, "guid", None):
@@ -157,7 +164,7 @@ def process_entity_comment(entity, profile, receiving_profile=None):
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
-        django_rq.enqueue(forward_entity, entity, parent.id)
+        django_rq.enqueue(forward_entity, entity, root_parent.id)
 
 
 def _embed_entity_images_to_post(children, text):

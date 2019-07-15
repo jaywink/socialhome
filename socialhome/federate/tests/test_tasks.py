@@ -241,16 +241,6 @@ class TestSendReply(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
     @patch("socialhome.federate.tasks.make_federable_content")
-    def test_send_reply_relaying_via_local_author(self, mock_make, mock_forward, mock_sender):
-        post = Post()
-        mock_make.return_value = post
-        send_reply(self.reply.id, self.reply.activities.first().fid)
-        mock_forward.assert_called_once_with(post, self.public_content.id)
-        self.assertTrue(mock_sender.called is False)
-
-    @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.forward_entity")
-    @patch("socialhome.federate.tasks.make_federable_content")
     def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
         post = Post()
         mock_make.return_value = post
@@ -341,9 +331,9 @@ class TestForwardEntity(TestCase):
         entity = Comment(actor_id=self.reply.author.fid, id=self.reply.fid)
         forward_entity(entity, self.public_content.id)
         mock_send.assert_called_once_with(entity, self.reply.author.federable, [
+            self.share_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
             self.remote_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
             self.share.author.get_recipient_for_visibility(Visibility.PUBLIC),
-            self.share_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
         ], parent_user=self.public_content.author.federable)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)

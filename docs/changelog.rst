@@ -75,6 +75,8 @@ Fixed
 
 * Timeout of the pre-calculated stream cache cleanup job has been extended so that it doesn't timeout on larger servers.
 
+* Nested replies are now correctly shown as replies to the root level content instead of being hidden from view.
+
 Internal changes
 ................
 
