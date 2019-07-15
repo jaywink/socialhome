@@ -113,8 +113,8 @@ describe("streamStore", () => {
         it("should append array payload to state", () => {
             const payload = {
                 data: [
-                    {id: "6", text: "foobar", content_type: "reply", parent: "1"},
-                    {id: "7", text: "blablabla", content_type: "reply", parent: "3"},
+                    {id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1"},
+                    {id: "7", text: "blablabla", content_type: "reply", parent: "3", root_parent: "3"},
                 ],
             }
 
@@ -135,15 +135,17 @@ describe("streamStore", () => {
                     2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
                 },
                 replies: {
-                    6: {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
-                    7: {id: "7", text: "blablabla", content_type: "reply", parent: "3", replyIds: [], shareIds: []},
+                    6: {id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1", replyIds: [],
+                        shareIds: []},
+                    7: {id: "7", text: "blablabla", content_type: "reply", parent: "3", root_parent: "3", replyIds: [],
+                        shareIds: []},
                 },
                 shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: ["7"]}},
             })
         })
 
         it("should append single item payload to state", () => {
-            const payload = {data: {id: "6", text: "foobar", content_type: "reply", parent: "1"}}
+            const payload = {data: {id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1"}}
 
             const state = {
                 contents: {
@@ -161,7 +163,8 @@ describe("streamStore", () => {
                     1: {id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"]},
                     2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
                 },
-                replies: {6: {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []}},
+                replies: {6: {id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1",
+                        replyIds: [], shareIds: []}},
                 shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: []}},
             })
         })
@@ -494,8 +497,8 @@ describe("streamStore", () => {
                 Moxios.stubRequest("/api/content/1/replies/", {
                     status: 200,
                     response: [
-                        {id: "6", text: "foobar", content_type: "reply", parent: "1"},
-                        {id: "7", text: "blablabla", content_type: "reply", parent: "1"},
+                        {id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1"},
+                        {id: "7", text: "blablabla", content_type: "reply", root_parent: "1", parent: "1"},
                     ],
                 })
 
@@ -505,8 +508,10 @@ describe("streamStore", () => {
                     target.state.contents.should
                         .eql({1: {id: "1", text: "content", replyIds: ["6", "7"], shareIds: []}})
                     target.state.replies.should.eql({
-                        6: {id: "6", text: "foobar", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", content_type: "reply", parent: "1", replyIds: [], shareIds: []},
+                        6: {id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1", replyIds: [],
+                            shareIds: []},
+                        7: {id: "7", text: "blablabla", content_type: "reply", parent: "1", root_parent: "1",
+                            replyIds: [], shareIds: []},
                     })
                     done()
                 })
@@ -567,7 +572,7 @@ describe("streamStore", () => {
                 Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
                 Moxios.stubRequest("/api/content/", {
                     status: 200,
-                    response: {id: "6", content_type: "reply", parent: "1", text: "a cool reply"},
+                    response: {id: "6", content_type: "reply", root_parent: "1", parent: "1", text: "a cool reply"},
                 })
 
                 target.dispatch("saveReply", {data: {contentId: 1, text: "a cool reply"}})
@@ -579,6 +584,7 @@ describe("streamStore", () => {
                             id: "6",
                             content_type: "reply",
                             parent: "1",
+                            root_parent: "1",
                             text: "a cool reply",
                             replyIds: [],
                             shareIds: [],
