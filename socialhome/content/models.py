@@ -158,7 +158,6 @@ class Content(models.Model):
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
     # Indirect parent in the hierarchy
-    # TODO add migration for existing data
     root_parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name=_("Root parent"), related_name="all_children", null=True,
         blank=True,
