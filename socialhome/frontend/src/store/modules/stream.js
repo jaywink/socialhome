@@ -5,6 +5,7 @@ import _defaults from "lodash/defaults"
 
 import getState from "@/store/modules/stream.state"
 import {streamActions, streamMutations, streamGetters} from "@/store/modules/stream.operations"
+import Axios from "axios"
 
 
 export function addHasLoadMore(state) {
@@ -74,9 +75,14 @@ export function onError() {
 export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 
+    const axios = Axios.create({
+        xsrfCookieName: "csrftoken",
+        xsrfHeaderName: "X-CSRFToken",
+    })
+
     const options = {
         baseURL: "",
-        axios: Vue.axios,
+        axios,
         state: getState(),
     }
 
