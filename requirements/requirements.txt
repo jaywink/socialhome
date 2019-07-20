@@ -5,7 +5,7 @@
 #    ./compile-requirements.sh
 #
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
--e git+https://git.feneas.org/jaywink/federation.git@761ae5c5deb131b14d87983da29433afb106a4a9#egg=federation==0.18.0-dev.1
+-e git+https://git.feneas.org/jaywink/federation.git@d9637a6ae59a1a790030adfba736cd81490f6aee#egg=federation==0.18.0-dev.1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
 arrow==0.14.2
 asgi-redis==1.4.3
