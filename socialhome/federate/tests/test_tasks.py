@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 from django.test import override_settings
 from federation.entities.base import Comment, Post
@@ -326,15 +326,20 @@ class TestForwardEntity(TestCase):
         cls.remote_limited_reply = LimitedContentFactory(parent=cls.limited_content)
         cls.limited_content.limited_visibilities.set((cls.limited_reply.author, cls.remote_limited_reply.author))
 
-    @patch("socialhome.federate.tasks.handle_send", return_value=None)
+    @patch("socialhome.federate.tasks.handle_send", return_value=None, autospec=True)
     def test_forward_entity(self, mock_send):
         entity = Comment(actor_id=self.reply.author.fid, id=self.reply.fid)
         forward_entity(entity, self.public_content.id)
-        mock_send.assert_called_once_with(entity, self.reply.author.federable, [
-            self.share_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
-            self.remote_reply.author.get_recipient_for_visibility(Visibility.PUBLIC),
-            self.share.author.get_recipient_for_visibility(Visibility.PUBLIC),
-        ], parent_user=self.public_content.author.federable)
+        expected = {
+            self.share_reply.author.get_recipient_for_visibility(Visibility.PUBLIC)["fid"],
+            self.remote_reply.author.get_recipient_for_visibility(Visibility.PUBLIC)["fid"],
+            self.share.author.get_recipient_for_visibility(Visibility.PUBLIC)["fid"],
+        }
+        mock_send.assert_called_once_with(
+            entity, self.reply.author.federable, ANY, parent_user=self.public_content.author.federable,
+        )
+        args, kwargs = mock_send.call_args_list[0]
+        self.assertEqual({recipient["fid"] for recipient in args[2]}, expected)
 
     @patch("socialhome.federate.tasks.handle_send", return_value=None)
     def test_forward_entity__limited_content(self, mock_send):
