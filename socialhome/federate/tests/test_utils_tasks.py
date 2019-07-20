@@ -322,6 +322,14 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
         cls.content = ContentFactory()
         cls.local_content = LocalContentFactory()
         cls.create_local_and_remote_user()
+        cls.reply = PublicContentFactory(
+            author=cls.content.author, content_type=ContentType.REPLY,
+            parent=cls.content,
+        )
+        cls.share = PublicContentFactory(
+            author=cls.content.author, content_type=ContentType.SHARE,
+            share_of=cls.content,
+        )
 
     def setUp(self):
         super().setUp()
@@ -352,13 +360,37 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
             "Content %s is not owned by remote retraction profile %s", self.content, remote_profile
         )
 
-    def test_deletes_content(self):
+    def test_deletes_content__content(self):
         process_entity_retraction(
             Mock(entity_type="Post", target_id=self.content.fid, actor_id=self.content.author.fid),
             self.content.author
         )
         with self.assertRaises(Content.DoesNotExist):
             Content.objects.get(id=self.content.id)
+
+    def test_deletes_content__object(self):
+        process_entity_retraction(
+            Mock(entity_type="Object", target_id=self.content.fid, actor_id=self.content.author.fid),
+            self.content.author
+        )
+        with self.assertRaises(Content.DoesNotExist):
+            Content.objects.get(id=self.content.id)
+
+    def test_deletes_content__reply(self):
+        process_entity_retraction(
+            Mock(entity_type="Comment", target_id=self.reply.fid, actor_id=self.reply.author.fid),
+            self.reply.author
+        )
+        with self.assertRaises(Content.DoesNotExist):
+            Content.objects.get(id=self.reply.id)
+
+    def test_deletes_content__share(self):
+        process_entity_retraction(
+            Mock(entity_type="Share", target_id=self.share.fid, actor_id=self.share.author.fid),
+            self.share.author
+        )
+        with self.assertRaises(Content.DoesNotExist):
+            Content.objects.get(id=self.share.id)
 
 
 class TestProcessEntityFollow(SocialhomeTransactionTestCase):

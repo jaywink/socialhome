@@ -239,7 +239,9 @@ def _retract_relationship(target_uuid, profile):
 def process_entity_retraction(entity, profile):
     """Process an entity of type Retraction."""
     entity_type = safe_text(entity.entity_type)
-    if entity_type in ("Post", "Comment", "Share"):
+    # TODO: Currently "Object" only tries Content - once we actually have other non-Content retractions - fix this!
+    #       It should try all possible retractable objects.
+    if entity_type in ("Post", "Comment", "Share", "Object"):
         target_fid = safe_text(entity.target_id)
         _retract_content(target_fid, profile)
     else:
