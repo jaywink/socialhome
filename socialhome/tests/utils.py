@@ -52,8 +52,8 @@ class SocialhomeTestBase(CreateDataMixin):
         CreateDataMixin.create_content_set(cls, author=author)
 
     @staticmethod
-    def get_request(user):
-        request = RequestFactory().get("/")
+    def get_request(user, path="/"):
+        request = RequestFactory().get(path)
         request.user = user
         request.site = get_current_site(request)
         return request

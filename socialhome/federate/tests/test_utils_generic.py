@@ -28,3 +28,10 @@ class TestQueuePayload(SocialhomeTestCase):
         queue_payload(self.request, uuid='1234')
         _args, kwargs = mock_enqueue.call_args
         self.assertEqual(kwargs['uuid'], '1234')
+
+    @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
+    def test_calls_enqueue__with_uuid_from_path(self, mock_enqueue):
+        request = self.get_request(None, path="/p/1234/inbox/")
+        queue_payload(request)
+        _args, kwargs = mock_enqueue.call_args
+        self.assertEqual(kwargs['uuid'], '1234')

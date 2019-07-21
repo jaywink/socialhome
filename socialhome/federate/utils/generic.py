@@ -1,6 +1,7 @@
 import datetime
 import logging
 import pickle
+import re
 
 import django_rq
 from django.conf import settings
@@ -79,6 +80,13 @@ def queue_payload(request: HttpRequest, uuid: str = None):
         preferences = global_preferences_registry.manager()
         if preferences["admin__log_all_receive_payloads"]:
             logger.debug("queue_payload - Request: %s", _request)
+
+        if not uuid:
+            # Check if profile path has an uuid
+            match = re.match(r"^/p/([0-9a-z-]+)/inbox/$", request.path)
+            if match:
+                uuid = match.groups()[0]
+
         django_rq.enqueue(receive_task, _request, uuid=uuid)
         return True
     except Exception:
