@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, List, Any
 
 import django_rq
 from federation.entities import base
@@ -8,6 +8,7 @@ from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
+from socialhome.federate.utils import get_profiles_from_receivers
 from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
 
@@ -36,10 +37,12 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     return sender_profile
 
 
-def process_entities(entities, receiving_profile=None):
+def process_entities(entities: List):
     """Process a list of entities."""
     for entity in entities:
         logger.info("Entity: %s", entity)
+        # noinspection PyProtectedMember
+        logger.info("Receivers: %s", entity._receivers)
         sender_id = entity.id if isinstance(entity, base.Profile) else entity.actor_id
         profile = get_sender_profile(sender_id)
         if not profile:
@@ -47,11 +50,11 @@ def process_entities(entities, receiving_profile=None):
             continue
         try:
             if isinstance(entity, base.Post):
-                process_entity_post(entity, profile, receiving_profile=receiving_profile)
+                process_entity_post(entity, profile)
             elif isinstance(entity, base.Retraction):
                 process_entity_retraction(entity, profile)
             elif isinstance(entity, base.Comment):
-                process_entity_comment(entity, profile, receiving_profile=receiving_profile)
+                process_entity_comment(entity, profile)
             elif isinstance(entity, base.Follow):
                 process_entity_follow(entity, profile)
             elif isinstance(entity, base.Profile):
@@ -98,20 +101,20 @@ def validate_against_old_content(fid, entity, profile):
     return True
 
 
-def process_entity_post(entity, profile, receiving_profile=None):
+# noinspection PyProtectedMember
+def process_entity_post(entity: Any, profile: Profile):
     """Process an entity of type Post."""
     fid = safe_text(entity.id)
     if not validate_against_old_content(fid, entity, profile):
         return
     values = {
         "fid": fid,
-        "text": safe_text_for_markdown(entity.raw_content),
+        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
-    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
     content, created = Content.objects.fed_update_or_create(fid, values)
@@ -120,12 +123,20 @@ def process_entity_post(entity, profile, receiving_profile=None):
         logger.info("Saved Content: %s", content)
     else:
         logger.info("Updated Content: %s", content)
-    if content.visibility != Visibility.PUBLIC and receiving_profile:
-        content.limited_visibilities.add(receiving_profile)
-        logger.info("Added visibility to Post %s to %s", content.fid, receiving_profile.fid)
+    if content.visibility == Visibility.LIMITED:
+        if entity._receivers:
+            receivers = get_profiles_from_receivers(entity._receivers)
+            if len(receivers):
+                content.limited_visibilities.set(receivers)
+                logger.info("Added visibility to Post %s to %s", content.fid, receivers)
+            else:
+                logger.warning("No local receivers found for limited Post %s", content.fid)
+        else:
+            logger.warning("No receivers for limited Post %s", content.fid)
 
 
-def process_entity_comment(entity, profile, receiving_profile=None):
+# noinspection PyProtectedMember
+def process_entity_comment(entity: Any, profile: Profile):
     """Process an entity of type Comment."""
     fid = safe_text(entity.id)
     if not validate_against_old_content(fid, entity, profile):
@@ -142,14 +153,13 @@ def process_entity_comment(entity, profile, receiving_profile=None):
         except Content.DoesNotExist:
             pass
     values = {
-        "text": safe_text_for_markdown(entity.raw_content),
+        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "parent": parent,
         "root_parent": root_parent,
     }
-    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
     content, created = Content.objects.fed_update_or_create(fid, values)
@@ -158,9 +168,19 @@ def process_entity_comment(entity, profile, receiving_profile=None):
         logger.info("Saved Content from comment entity: %s", content)
     else:
         logger.info("Updated Content from comment entity: %s", content)
-    if parent.visibility != Visibility.PUBLIC and receiving_profile:
-        content.limited_visibilities.add(receiving_profile)
-        logger.info("Added visibility to Comment %s to %s", content.uuid, receiving_profile.uuid)
+
+    # TODO we should respect the visibility of the comment instead here
+    if parent.visibility == Visibility.LIMITED:
+        if entity._receivers:
+            receivers = get_profiles_from_receivers(entity._receivers)
+            if len(receivers):
+                content.limited_visibilities.set(receivers)
+                logger.info("Added visibility to Comment %s to %s", content.fid, receivers)
+            else:
+                logger.warning("No local receivers found for limited Comment %s", content.fid)
+        else:
+            logger.warning("No receivers for limited Comment %s", content.fid)
+
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
