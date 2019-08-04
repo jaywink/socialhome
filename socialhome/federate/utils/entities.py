@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from Crypto.PublicKey.RSA import RsaKey
 from django.conf import settings
@@ -8,6 +8,7 @@ from django.db.models.query_utils import Q
 from django.http import HttpRequest
 from federation.entities import base
 from federation.entities.mixins import BaseEntity
+from federation.types import UserType, ReceiverVariant
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -101,6 +102,28 @@ def get_profile(**kwargs) -> base.Profile:
     kwargs.pop('request', None)
     profile = Profile.objects.select_related('user').get(**kwargs)
     return make_federable_profile(profile)
+
+
+def get_profiles_from_receivers(receivers: List[UserType]) -> List[Profile]:
+    """
+    Get a list of local Profile objects from a list of receivers in an entity.
+    """
+    profile_ids = set()
+    for receiver in receivers:
+        if receiver.receiver_variant == ReceiverVariant.ACTOR:
+            try:
+                profile = Profile.objects.fed(receiver.id, user__isnull=False).get()
+            except Profile.DoesNotExist:
+                continue
+            else:
+                profile_ids.add(profile.id)
+        elif receiver.receiver_variant == ReceiverVariant.FOLLOWERS:
+            sender = Profile.objects.fed(receiver.id, user__isnull=True)
+            receiver_ids = set(
+                Profile.objects.filter(user__isnull=False, following__in=sender).values_list("id", flat=True),
+            )
+            profile_ids = profile_ids.union(receiver_ids)
+    return Profile.objects.filter(id__in=profile_ids)
 
 
 def get_user_private_key(identifier: str) -> Optional[RsaKey]:

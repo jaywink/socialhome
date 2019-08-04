@@ -3,12 +3,14 @@ from unittest.mock import patch, Mock, call
 from django.db import IntegrityError, transaction
 from federation.entities import base
 from federation.tests.factories import entities
+from federation.types import UserType, ReceiverVariant
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.tests.factories import ContentFactory, LocalContentFactory, PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import forward_entity
+# noinspection PyProtectedMember
 from socialhome.federate.utils.tasks import (
     process_entities, get_sender_profile, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
@@ -40,13 +42,13 @@ class TestProcessEntities(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
     def test_process_entity_post_is_called(self, mock_sender, mock_process):
         process_entities([self.post])
-        mock_process.assert_called_once_with(self.post, "profile", receiving_profile=None)
+        mock_process.assert_called_once_with(self.post, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
     def test_process_entity_post_is_called__with_receiving_profile(self, mock_sender, mock_process):
-        process_entities([self.post], receiving_profile=self.receiving_profile)
-        mock_process.assert_called_once_with(self.post, "profile", receiving_profile=self.receiving_profile)
+        process_entities([self.post])
+        mock_process.assert_called_once_with(self.post, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_retraction")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -58,13 +60,13 @@ class TestProcessEntities(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
     def test_process_entity_comment_is_called(self, mock_sender, mock_process):
         process_entities([self.comment])
-        mock_process.assert_called_once_with(self.comment, "profile", receiving_profile=None)
+        mock_process.assert_called_once_with(self.comment, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_comment")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
     def test_process_entity_comment_is_called__with_receiving_profile(self, mock_sender, mock_process):
-        process_entities([self.comment], receiving_profile=self.receiving_profile)
-        mock_process.assert_called_once_with(self.comment, "profile", receiving_profile=self.receiving_profile)
+        process_entities([self.comment])
+        mock_process.assert_called_once_with(self.comment, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_follow")
     @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
@@ -130,6 +132,9 @@ class TestProcessEntityPost(SocialhomeTestCase):
         cls.profile = ProfileFactory()
         cls.receiving_user = UserFactory()
         cls.receiving_profile = cls.receiving_user.profile
+        cls.local_user = UserFactory()
+        cls.local_user2 = UserFactory()
+        cls.profile.followers.add(cls.local_user.profile, cls.local_user2.profile)
 
     def test_post_is_created_from_entity(self):
         entity = entities.PostFactory()
@@ -137,9 +142,20 @@ class TestProcessEntityPost(SocialhomeTestCase):
         content = Content.objects.get(fid=entity.id)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
+    def test_visibility_is_added_to_receiving_followers(self):
+        entity = entities.PostFactory(actor_id=self.profile.fid)
+        entity._receivers = [UserType(id=entity.actor_id, receiver_variant=ReceiverVariant.FOLLOWERS)]
+        process_entity_post(entity, self.profile)
+        content = Content.objects.get(fid=entity.id)
+        self.assertEqual(
+            set(content.limited_visibilities.all()),
+            {self.local_user.profile, self.local_user2.profile},
+        )
+
     def test_visibility_is_added_to_receiving_profile(self):
         entity = entities.PostFactory()
-        process_entity_post(entity, ProfileFactory(), receiving_profile=self.receiving_profile)
+        entity._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_post(entity, ProfileFactory())
         content = Content.objects.get(fid=entity.id)
         self.assertEqual(
             set(content.limited_visibilities.all()),
@@ -148,7 +164,8 @@ class TestProcessEntityPost(SocialhomeTestCase):
 
     def test_visibility_is_not_added_to_public_content(self):
         entity = entities.PostFactory(public=True)
-        process_entity_post(entity, ProfileFactory(), receiving_profile=self.receiving_profile)
+        entity._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_post(entity, ProfileFactory())
         content = Content.objects.get(fid=entity.id)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
@@ -205,6 +222,9 @@ class TestProcessEntityComment(SocialhomeTestCase):
         cls.receiving_user = UserFactory()
         cls.receiving_profile = cls.receiving_user.profile
         cls.profile = ProfileFactory()
+        cls.local_user = UserFactory()
+        cls.local_user2 = UserFactory()
+        cls.profile.followers.add(cls.local_user.profile, cls.local_user2.profile)
 
     def setUp(self):
         super().setUp()
@@ -227,8 +247,19 @@ class TestProcessEntityComment(SocialhomeTestCase):
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
+    def test_visibility_is_added_to_receiving_followers(self):
+        self.comment.actor_id = self.profile.fid
+        self.comment._receivers = [UserType(id=self.comment.actor_id, receiver_variant=ReceiverVariant.FOLLOWERS)]
+        process_entity_comment(self.comment, self.profile)
+        content = Content.objects.get(fid=self.comment.id)
+        self.assertEqual(
+            set(content.limited_visibilities.all()),
+            {self.local_user.profile, self.local_user2.profile},
+        )
+
     def test_visibility_is_added_to_receiving_profile(self):
-        process_entity_comment(self.comment, ProfileFactory(), receiving_profile=self.receiving_profile)
+        self.comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_comment(self.comment, ProfileFactory())
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(
             set(content.limited_visibilities.all()),
@@ -240,7 +271,8 @@ class TestProcessEntityComment(SocialhomeTestCase):
             id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
             actor_id="https://example.com/profile2",
         )
-        process_entity_comment(comment, ProfileFactory(), receiving_profile=self.receiving_profile)
+        comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_comment(comment, ProfileFactory())
         content = Content.objects.get(fid=comment.id, parent=self.public_content)
         self.assertEqual(content.limited_visibilities.count(), 0)
 

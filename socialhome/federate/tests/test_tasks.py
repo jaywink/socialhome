@@ -28,7 +28,7 @@ class TestReceiveTask(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]), autospec=True)
     def test_receive_task_runs(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar")
-        mock_process_entities.assert_called_with(["entity"], receiving_profile=None)
+        mock_process_entities.assert_called_with(["entity"])
 
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", []), autospec=True)
     def test_receive_task_returns_none_on_no_entities(self, mock_handle_receive, mock_process_entities):
@@ -38,7 +38,7 @@ class TestReceiveTask(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_receive", return_value=("sender", "diaspora", ["entity"]), autospec=True)
     def test_receive_task_with_uuid(self, mock_handle_receive, mock_process_entities):
         receive_task("foobar", uuid=self.user.profile.uuid)
-        mock_process_entities.assert_called_with(["entity"], receiving_profile=self.user.profile)
+        mock_process_entities.assert_called_with(["entity"])
 
 
 class TestSendContent(SocialhomeTestCase):

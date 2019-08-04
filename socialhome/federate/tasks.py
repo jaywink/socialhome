@@ -62,7 +62,7 @@ def receive_task(request, uuid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    process_entities(entities, receiving_profile=profile)
+    process_entities(entities)
 
 
 def send_content(content_id, activity_fid, recipient_id=None):
