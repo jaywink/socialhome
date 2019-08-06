@@ -278,6 +278,10 @@ def process_entity_share(entity, profile):
         target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
     except Content.DoesNotExist:
         # Try fetching. If found, process and then try again
+        logger.debug(
+            "process_entity_share - trying to fetch %s, %s, %s, %s, %s",
+            entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
+        )
         remote_target = retrieve_remote_content(
             entity.target_id,
             guid=entity.target_guid,
