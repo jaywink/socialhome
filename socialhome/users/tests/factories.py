@@ -97,7 +97,7 @@ class UserWithContactFactory(UserFactory):
 
 class ProfileFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("safe_email")
-    fid = factory.LazyAttribute(lambda o: f"{settings.SOCIALHOME_URL}/p/{o.uuid}/")
+    fid = "placeholder"
     name = factory.Faker("name")
 
     # Dummy strings as keys since generating these is expensive
@@ -120,6 +120,13 @@ class ProfileFactory(factory.django.DjangoModelFactory):
             guid=factory.Faker('uuid4'),
         )
 
+    @factory.post_generation
+    def set_fid(self, extracted, created, **kwargs):
+        if self.fid == "placeholder":
+            self.fid = f"{settings.SOCIALHOME_URL}/u/{self.user.username}/" \
+                if self.user else f"{settings.SOCIALHOME_URL}/p/{self.uuid}/"
+
+    # noinspection PyAttributeOutsideInit
     @factory.post_generation
     def set_handle(self, extracted, created, **kwargs):
         if extracted is False or self.handle:

@@ -3,6 +3,7 @@ import os
 from typing import Dict
 from uuid import uuid4
 
+# noinspection PyPackageRequirements
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -14,6 +15,7 @@ from enumfields import EnumIntegerField
 from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
+# noinspection PyProtectedMember
 from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
@@ -51,6 +53,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def url(self):
+        return f'{settings.SOCIALHOME_URL}{reverse("users:detail", kwargs={"username": self.username})}'
 
     def get_first_name(self):
         """Return User.first_name or part of User.name"""
@@ -222,7 +228,7 @@ class Profile(TimeStampedModel):
             if not self.guid:
                 self.guid = str(self.uuid)
             if not self.fid:
-                self.fid = self.url
+                self.fid = self.user.url
             # Default protocol for all new profiles
             self.protocol = "activitypub"
 
@@ -254,9 +260,9 @@ class Profile(TimeStampedModel):
         # Set default federation endpoints for local users
         if self.is_local:
             if not self.inbox_private:
-                self.inbox_private = f"{self.url}inbox/"
+                self.inbox_private = f"{self.fid}inbox/"
             if not self.inbox_public:
-                self.inbox_public = reverse("federate:receive-public")
+                self.inbox_public = f"{settings.SOCIALHOME_URL}{reverse('federate:receive-public')}"
 
         super().save(*args, **kwargs)
 
@@ -383,6 +389,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
+        # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
             "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public

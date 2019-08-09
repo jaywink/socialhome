@@ -84,7 +84,7 @@ def get_federable_object(request: HttpRequest) -> Optional[BaseEntity]:
         if content and content.visible_for_user(user):
             federable_content = make_federable_content(content)
             return federable_content
-    elif request.path.startswith('/p/') or request.path == '/':
+    elif request.path.startswith('/u/') or request.path == '/':
         if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
             profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
         else:

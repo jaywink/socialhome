@@ -27,6 +27,7 @@ class DeleteAccountView(DeleteView):
         return reverse("home")
 
 
+@method_decorator(activitypub_object_view, name='dispatch')
 class UserDetailView(DetailView):
     model = User
     slug_field = "username"
@@ -45,7 +46,6 @@ class UserAllContentView(UserDetailView):
         return ProfileAllContentView.as_view()(request, uuid=profile.uuid)
 
 
-@method_decorator(activitypub_object_view, name='dispatch')
 class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
     data = None
     model = Profile
