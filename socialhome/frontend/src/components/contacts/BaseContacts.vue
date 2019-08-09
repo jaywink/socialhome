@@ -5,15 +5,20 @@
       <b-card
         v-for="item in chunk"
         :key="item.fid"
-        :title="item.name"
+        :title="contactDesignation(item)"
         :img-src="item.image_url_large"
-        :img-alt="contactAvatarAlt(item.name)"
+        :img-alt="contactAvatarAlt(item)"
         img-top
         class="socialhome-contact-card mb-3"
       >
         <b-card-text>{{ item.handle }}</b-card-text>
 
-        <profile-reaction-buttons slot="footer" class="pull-right" :profile="item" :user-following="true" />
+        <profile-reaction-buttons
+          slot="footer"
+          class="pull-right"
+          :profile="item"
+          :user-following="item.user_following"
+        />
       </b-card>
     </b-card-group>
     <infinite-loading @infinite="loadMore" />
@@ -63,8 +68,11 @@ export default {
         },
     },
     methods: {
-        contactAvatarAlt(contactName) {
-            return `${gettext("Avatar of")} ${contactName}`
+        contactAvatarAlt(contact) {
+            return `${gettext("Avatar of")} ${this.contactDesignation(contact)}`
+        },
+        contactDesignation(contact) {
+            return contact.name || contact.handle || contact.fid
         },
         fetch() { /* Override */
         },

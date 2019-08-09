@@ -124,6 +124,7 @@ describe("ProfileReactionButtons", () => {
             })
 
             it("should show an error to the user if not logged in", () => {
+                store.state.application.isUserAuthenticated = false
                 const target = mount(ProfileReactionButtons, {
                     propsData: {
                         profile: store.content.author,
@@ -131,8 +132,6 @@ describe("ProfileReactionButtons", () => {
                     },
                     store,
                 })
-
-                target.instance().$store.state.application.isUserAuthenticated = false
 
                 Sinon.spy(target.instance().$snotify, "error")
                 target.instance().following.should.be.false
@@ -200,6 +199,7 @@ describe("ProfileReactionButtons", () => {
             })
 
             it("should show an error to the user if not logged in", () => {
+                store.state.application.isUserAuthenticated = false
                 const target = mount(ProfileReactionButtons, {
                     propsData: {
                         profile: store.content.author,
@@ -207,8 +207,6 @@ describe("ProfileReactionButtons", () => {
                     },
                     store,
                 })
-
-                target.instance().$store.state.application.isUserAuthenticated = false
 
                 Sinon.spy(target.instance().$snotify, "error")
                 target.instance().following.should.be.true

@@ -14,6 +14,8 @@ class LimitedProfileSerializer(ModelSerializer):
 
     For example for adding to serialized Content.
     """
+    user_following = SerializerMethodField()
+
     class Meta:
         model = Profile
         fields = (
@@ -28,6 +30,7 @@ class LimitedProfileSerializer(ModelSerializer):
             "is_local",
             "name",
             "url",
+            "user_following",
         )
         read_only_fields = (
             "fid",
@@ -41,7 +44,14 @@ class LimitedProfileSerializer(ModelSerializer):
             "is_local",
             "name",
             "url",
+            "user_following",
         )
+
+    def get_user_following(self, obj: Profile) -> bool:
+        request = self.context.get("request")
+        if not request:
+            return False
+        return bool(request.user.is_authenticated and obj.id in request.user.profile.following_ids)
 
 
 class ProfileSerializer(ModelSerializer):

@@ -64,13 +64,13 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
     @action(methods=["get"], detail=False, permission_classes=(IsAuthenticated,))
     def following(self, request):
         query_set = self.paginate_queryset(request.user.profile.following.all())
-        values = [LimitedProfileSerializer(x).data for x in query_set]
+        values = [LimitedProfileSerializer(x, context={'request': request}).data for x in query_set]
         return self.get_paginated_response(values)
 
     @action(methods=["get"], detail=False, permission_classes=(IsAuthenticated,))
     def followers(self, request):
         query_set = self.paginate_queryset(request.user.profile.followers.all())
-        values = [LimitedProfileSerializer(x).data for x in query_set]
+        values = [LimitedProfileSerializer(x, context={'request': request}).data for x in query_set]
         return self.get_paginated_response(values)
 
     @list_route(methods=["post"], permission_classes=(IsAuthenticated,))

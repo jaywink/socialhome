@@ -63,10 +63,10 @@ export default {
             return this.$store.state.application.isUserAuthenticated
         },
         showFollowBtn() {
-            return this.$store.state.application.isUserAuthenticated && !this.following
+            return this.isUserAuthenticated && !this.following
         },
         showUnfollowBtn() {
-            return this.$store.state.application.isUserAuthenticated && this.following
+            return this.isUserAuthenticated && this.following
         },
         translations() {
             return {
