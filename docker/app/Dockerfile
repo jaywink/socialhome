@@ -1,18 +1,10 @@
-FROM python:3.6
+FROM python:3.7-slim
 
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /
 
-RUN apt-get update && apt-get install python-dev python3-dev less htop -y
-
-COPY requirements/requirements.txt ./
-
-RUN pip install -U pip setuptools pip-tools
-
-RUN pip-sync requirements.txt
-
-RUN pip install gunicorn
+RUN apt-get update && apt-get install python3-dev less htop curl git build-essential -y
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -45,16 +37,28 @@ COPY . /app
 RUN ln -s /node_modules /app/node_modules
 RUN ln -s /bower_components /app/bower_components
 
+WORKDIR /app/socialhome/frontend
+
+RUN npm install
+
 WORKDIR /app
 
 RUN npm run build
 
 RUN rm -rf /node_modules
+RUN rm -rf /app/socialhome/frontend/node_modules
 RUN rm -rf /bower_components
+RUN rm -rf /root/.cache/Cypress
 
 RUN cp config/circus_docker.ini config/circus.ini
 
 RUN mkdir -p /logs
+
+RUN pip install -U pip setuptools pip-tools
+
+RUN pip install gunicorn
+
+RUN pip-sync requirements/requirements.txt
 
 ENV POSTGRES_PASSWORD postgres
 ENV RQWORKER_NUM 1
