@@ -13,8 +13,9 @@ urlpatterns = [
         name="all-content"
     ),
     url(
-        regex=r"^u/(?P<username>[\w.@+-]+)/$",
-        view=views.UserDetailView.as_view(),
+        regex=r"^u/(?P<username>[\w.@+-]+)/",
+        # CSRF exempt needed for POST to work for ActivityPub object inboxes
+        view=csrf_exempt(views.UserDetailView.as_view()),
         name="detail"
     ),
     url(
@@ -54,8 +55,7 @@ urlpatterns = [
     ),
     url(
         regex=r"^p/(?P<uuid>[^/]+)/",
-        # CSRF exempt needed for POST to work for ActivityPub object inboxes
-        view=csrf_exempt(views.ProfileDetailView.as_view()),
+        view=views.ProfileDetailView.as_view(),
         name="profile-detail"
     ),
     path('delete-account/', views.DeleteAccountView.as_view(), name="delete-account"),
