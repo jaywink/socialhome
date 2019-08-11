@@ -28,7 +28,7 @@ lint:
     paths:
       - node_modules/
       - bower_components/
-      - socialhome/frontend/node_module
+      - socialhome/frontend/node_modules/
   before_script:
     - npm install --ignore-scripts
     - node_modules/.bin/bower install --allow-root
@@ -66,7 +66,7 @@ test_frontend_unit:
     paths:
       - node_modules/
       - bower_components/
-      - socialhome/frontend/node_module
+      - socialhome/frontend/node_modules/
   before_script:
     - npm install --ignore-scripts
     - node_modules/.bin/bower install --allow-root
@@ -85,7 +85,7 @@ test_frontend_e2e:
     paths:
       - node_modules/
       - bower_components/
-      - socialhome/frontend/node_module
+      - socialhome/frontend/node_modules/
   before_script:
     - npm i --prefix=socialhome/frontend
   script:
