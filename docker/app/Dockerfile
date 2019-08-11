@@ -56,9 +56,9 @@ RUN mkdir -p /logs
 
 RUN pip install -U pip setuptools pip-tools
 
-RUN pip install gunicorn
-
 RUN pip-sync requirements/requirements.txt
+
+RUN pip install gunicorn
 
 ENV POSTGRES_PASSWORD postgres
 ENV RQWORKER_NUM 1
