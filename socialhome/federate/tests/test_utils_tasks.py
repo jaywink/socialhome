@@ -172,13 +172,13 @@ class TestProcessEntityPost(SocialhomeTestCase):
     def test_entity_images_are_prefixed_to_post_text(self):
         entity = entities.PostFactory(
             _children=[
-                base.Image(remote_path="foo", remote_name="bar"),
-                base.Image(remote_path="zoo", remote_name="dee"),
+                base.Image(url="foobar"),
+                base.Image(url="zoodee", name="foo"),
             ],
         )
         process_entity_post(entity, ProfileFactory())
         content = Content.objects.get(fid=entity.id)
-        assert content.text.index("![](foobar) ![](zoodee) \n\n%s" % entity.raw_content) == 0
+        assert content.text.index("![](foobar) ![foo](zoodee) \n\n%s" % entity.raw_content) == 0
 
     def test_post_is_updated_from_entity(self):
         entity = entities.PostFactory()
@@ -278,12 +278,13 @@ class TestProcessEntityComment(SocialhomeTestCase):
 
     def test_entity_images_are_prefixed_to_post_text(self):
         self.comment._children = [
-            base.Image(remote_path="foo", remote_name="bar"),
-            base.Image(remote_path="zoo", remote_name="dee"),
+            base.Image(url="foobar"),
+            base.Image(url="zoodee", name="foo"),
         ]
         process_entity_comment(self.comment, ProfileFactory())
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
-        self.assertEqual(content.text.index("![](foobar) ![](zoodee) \n\n%s" % self.comment.raw_content), 0)
+        print(content.text)
+        self.assertEqual(content.text.index("![](foobar) ![foo](zoodee) \n\n%s" % self.comment.raw_content), 0)
 
     def test_reply_is_updated_from_entity(self):
         author = ProfileFactory(fid=self.comment.actor_id)

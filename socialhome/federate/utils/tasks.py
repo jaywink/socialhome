@@ -199,10 +199,7 @@ def _embed_entity_images_to_post(children, text):
     images = []
     for child in children:
         if isinstance(child, base.Image):
-            image_url = "%s%s" % (
-                safe_text(child.remote_path), safe_text(child.remote_name)
-            )
-            images.append("![](%s) " % image_url)
+            images.append(f"![{safe_text(child.name)}]({safe_text(child.url)}) ")
     if images:
         return "%s\n\n%s" % (
             "".join(images), text
