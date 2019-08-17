@@ -87,6 +87,9 @@ test_frontend_e2e:
       - bower_components/
       - socialhome/frontend/node_modules/
   before_script:
+    - npm i --ignore-scripts
     - npm i --prefix=socialhome/frontend
+    - npm rebuild node-sass
+    - npm run build
   script:
     - npm run test:e2e:ci
