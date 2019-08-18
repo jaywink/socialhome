@@ -75,21 +75,21 @@ test_frontend_unit:
     - npm run build
   script:
     - npm run test:unit
-
-test_frontend_e2e:
-  stage: test_frontend
-  environment:
-    name: production
-  image: cypress/base:8
-  cache:
-    paths:
-      - node_modules/
-      - bower_components/
-      - socialhome/frontend/node_modules/
-  before_script:
-    - npm i --ignore-scripts
-    - npm i --prefix=socialhome/frontend
-    - npm rebuild node-sass
-    - npm run build
-  script:
-    - npm run test:e2e:ci
+#
+#test_frontend_e2e:
+#  stage: test_frontend
+#  environment:
+#    name: production
+#  image: cypress/base:8
+#  cache:
+#    paths:
+#      - node_modules/
+#      - bower_components/
+#      - socialhome/frontend/node_modules/
+#  before_script:
+#    - npm i --ignore-scripts
+#    - npm i --prefix=socialhome/frontend
+#    - npm rebuild node-sass
+#    - npm run build
+#  script:
+#    - npm run test:e2e:ci
