@@ -77,6 +77,8 @@ Fixed
 
 * Nested replies are now correctly shown as replies to the root level content instead of being hidden from view.
 
+* Removed unnecessary federation of replies to local root authors.
+
 Internal changes
 ................
 

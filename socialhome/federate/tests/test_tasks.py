@@ -228,6 +228,16 @@ class TestSendReply(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
     @patch("socialhome.federate.tasks.make_federable_content")
+    def test_send_reply__ignores_local_root_author(self, mock_make, mock_forward, mock_sender):
+        post = Post()
+        mock_make.return_value = post
+        send_reply(self.reply.id, self.reply.activities.first().fid)
+        self.assertTrue(mock_sender.called is False)
+        self.assertTrue(mock_forward.called is False)
+
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.forward_entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
     def test_send_reply__limited_content(self, mock_make, mock_forward, mock_sender):
         post = Post()
         mock_make.return_value = post
@@ -241,7 +251,7 @@ class TestSendReply(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
     @patch("socialhome.federate.tasks.make_federable_content")
-    def test_send_reply_to_remote_author(self, mock_make, mock_forward, mock_sender):
+    def test_send_reply__to_remote_author(self, mock_make, mock_forward, mock_sender):
         post = Post()
         mock_make.return_value = post
         send_reply(self.reply2.id, self.reply2.activities.first().fid)

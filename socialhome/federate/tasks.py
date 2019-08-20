@@ -175,7 +175,9 @@ def send_reply(content_id, activity_fid):
     if settings.DEBUG:
         # Don't send in development mode
         return
-    recipients = [content.root_parent.author.get_recipient_for_visibility(content.visibility)]
+    recipients = []
+    if not content.root_parent.author.is_local:
+        recipients.append(content.root_parent.author.get_recipient_for_visibility(content.visibility))
     if content.visibility == Visibility.PUBLIC:
         recipients.extend(
             _get_remote_participants_for_content(content, exclude=content.author.fid, include_remote=True),
@@ -188,6 +190,9 @@ def send_reply(content_id, activity_fid):
     elif content.visibility == Visibility.LIMITED:
         recipients.extend(_get_limited_recipients(content.author.fid, content))
     else:
+        return
+    if not recipients:
+        logger.debug("send_reply - no remote recipients for content: %s", content.id)
         return
     logger.debug("send_reply - sending to recipients: %s", recipients)
     handle_send(entity, content.author.federable, recipients)
