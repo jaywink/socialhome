@@ -79,6 +79,10 @@ Fixed
 
 * Removed unnecessary federation of replies to local root authors.
 
+* Removed quick reply possibility for non-public content. This fixes an issue of non-public replies created with the quick reply editor not federating.
+
+  While the API support is being added needed by the quick reply editor for non-public content, only the full editor can be used for non-public replies.
+
 Internal changes
 ................
 
