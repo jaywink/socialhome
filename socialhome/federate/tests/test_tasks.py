@@ -223,7 +223,10 @@ class TestSendReply(SocialhomeTestCase):
         cls.reply = ContentFactory(parent=cls.public_content, author=author.profile)
         cls.reply2 = ContentFactory(parent=cls.remote_content, author=author.profile)
         cls.limited_content = LimitedContentFactory(author=cls.remote_profile)
+        cls.limited_local_content = LimitedContentFactory(author=author.profile)
         cls.limited_reply = LimitedContentFactory(author=author.profile, parent=cls.limited_content)
+        cls.limited_local_reply = LimitedContentFactory(author=author.profile, parent=cls.limited_local_content)
+        cls.limited_local_reply.limited_visibilities.add(cls.remote_profile)
 
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.forward_entity")
@@ -257,6 +260,18 @@ class TestSendReply(SocialhomeTestCase):
         send_reply(self.reply2.id, self.reply2.activities.first().fid)
         mock_sender.assert_called_once_with(post, self.reply2.author.federable, [
             self.remote_content.author.get_recipient_for_visibility(self.reply2.visibility),
+        ])
+        self.assertTrue(mock_forward.called is False)
+
+    @patch("socialhome.federate.tasks.handle_send")
+    @patch("socialhome.federate.tasks.forward_entity")
+    @patch("socialhome.federate.tasks.make_federable_content")
+    def test_send_reply__to_remote_follower(self, mock_make, mock_forward, mock_sender):
+        post = Post()
+        mock_make.return_value = post
+        send_reply(self.limited_local_reply.id, self.limited_local_reply.activities.first().fid)
+        mock_sender.assert_called_once_with(post, self.limited_local_reply.author.federable, [
+            self.remote_profile.get_recipient_for_visibility(self.limited_local_reply.visibility),
         ])
         self.assertTrue(mock_forward.called is False)
 

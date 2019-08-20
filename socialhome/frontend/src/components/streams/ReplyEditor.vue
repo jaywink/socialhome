@@ -2,6 +2,7 @@
   <div>
     <div class="mt-2">
       <b-form-textarea
+        v-if="contentVisibility === 'public'"
         v-model="replyText"
         :max-rows="5"
         :placeholder="translations.replyText"
@@ -11,7 +12,10 @@
     <div class="pull-right">
       <a :href="fullEditorUrl" target="_blank" rel="noopener noreferrer">{{ translations.fullEditor }}</a>
     </div>
-    <div class="reply-save-button">
+    <div
+      v-if="contentVisibility === 'public'"
+      class="reply-save-button"
+    >
       <b-button variant="primary" @click.prevent.stop="saveReply">
         {{ translations.save }}
       </b-button>
@@ -24,7 +28,10 @@
 import Vue from "vue"
 
 export default Vue.component("reply-editor", {
-    props: {contentId: {type: Number, required: true}},
+    props: {
+        contentId: {type: Number, required: true},
+        contentVisibility: {type: String, required: true},
+    },
     data() {
         return {replyText: ""}
     },
@@ -33,8 +40,10 @@ export default Vue.component("reply-editor", {
             return Urls["content:reply"]({pk: this.contentId})
         },
         translations() {
+            const fullEditor = this.contentVisibility === "public" ? gettext("Full editor")
+                : gettext("Only full editor available for non-public replies at this time")
             return {
-                fullEditor: gettext("Full editor"),
+                fullEditor,
                 replyText: gettext("Reply text..."),
                 save: gettext("Save"),
             }

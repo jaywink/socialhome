@@ -25,7 +25,13 @@ describe("ReplyEditor", () => {
 
     describe("computed", () => {
         it("fullEditorUrl", () => {
-            const target = mount(ReplyEditor, {propsData: {contentId: store.content.id}, store})
+            const target = mount(ReplyEditor, {
+                propsData: {
+                    contentId: store.content.id,
+                    contentVisibility: store.content.visibility,
+                },
+                store,
+            })
             target.instance().fullEditorUrl.should.eql(`/content/${store.content.id}/~reply/`)
         })
     })
@@ -55,12 +61,24 @@ describe("ReplyEditor", () => {
 
     describe("template", () => {
         it("has a save button", () => {
-            const target = mount(ReplyEditor, {propsData: {contentId: store.content.id}, store})
+            const target = mount(ReplyEditor, {
+                propsData: {
+                    contentId: store.content.id,
+                    contentVisibility: store.content.visibility,
+                },
+                store,
+            })
             target.find("button").length.should.eql(1)
         })
 
         it("has a text area", () => {
-            const target = mount(ReplyEditor, {propsData: {contentId: store.content.id}, store})
+            const target = mount(ReplyEditor, {
+                propsData: {
+                    contentId: store.content.id,
+                    contentVisibility: store.content.visibility,
+                },
+                store,
+            })
             target.find("textarea").length.should.eql(1)
         })
     })

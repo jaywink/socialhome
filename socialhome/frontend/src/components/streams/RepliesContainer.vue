@@ -17,7 +17,7 @@
       </b-button>
     </div>
     <div v-if="replyEditorActive">
-      <reply-editor :content-id="content.id" />
+      <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
     </div>
     <div v-if="isContent">
       <div v-for="share in shares" :key="share.id">
