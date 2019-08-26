@@ -147,11 +147,11 @@ def _get_remote_followers(profile: Profile, visibility: Visibility, exclude=None
 
 
 def _get_limited_recipients(sender: str, content: Content) -> List:
-    return [
-        profile.get_recipient_for_visibility(content.visibility)
-        for profile in content.limited_visibilities.all()
-        if profile.fid != sender and profile.handle != sender and profile.guid != sender
-    ]
+    profiles = []
+    for profile in content.limited_visibilities.all():
+        if profile.fid != sender and profile.handle != sender and profile.guid != sender:
+            profiles.append(profile.get_recipient_for_visibility(content.visibility))
+    return profiles
 
 
 def send_reply(content_id, activity_fid):
@@ -248,7 +248,7 @@ def send_content_retraction(content, author_id):
                 _get_remote_followers(author, content.visibility)
             )
         else:
-            recipients = _get_limited_recipients(author.uuid, content)
+            recipients = _get_limited_recipients(author.fid, content)
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         handle_send(entity, author.federable, recipients)

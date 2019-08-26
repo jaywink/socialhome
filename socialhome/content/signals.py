@@ -3,7 +3,7 @@ import logging
 
 import django_rq
 from django.db import transaction
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_delete
 from django.dispatch import receiver
 from federation.entities.activitypub.enums import ActivityType
 
@@ -43,7 +43,7 @@ def content_post_save(instance, **kwargs):
         transaction.on_commit(lambda: federate_content(instance, activity=activity))
 
 
-@receiver(post_delete, sender=Content)
+@receiver(pre_delete, sender=Content)
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
     if instance.local:

@@ -83,6 +83,12 @@ Fixed
 
   While the API support is being added needed by the quick reply editor for non-public content, only the full editor can be used for non-public replies.
 
+* Fix retraction of limited visibility content sent out to the federation layer.
+
+  There was a bug where limited visibility content (added in 0.9.0) retractions were not sent out correctly. This was caused by the usage of the Django ``post_delete`` signal to handle the retraction. This works for public content since all the information is present immediately after the delete for the background jobs, even if the database entry has been deleted. Unfortunately for limited content this did not work since they store visibilities to the limited content in a separate table. Due to the (awesome!) way Django relations work, the entries for the visibilities got deleted from the database before the ``post_delete`` signal got fired.
+
+  Content retraction is now fired off into a background task in the Django ``pre_delete`` hook, which means the limited visibilities data is still available in the database.
+
 Internal changes
 ................
 
