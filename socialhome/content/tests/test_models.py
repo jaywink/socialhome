@@ -415,7 +415,7 @@ class TestTagModel(SocialhomeTestCase):
 class TestOpenGraphCache(SocialhomeTestCase):
     def test_str(self):
         ogc = OpenGraphCache(url="https://example.com", title="x"*200, description="bar", image="https://example.com")
-        self.assertEqual(str(ogc), "https://example.com / %s..." % ("x"*27))
+        self.assertEqual(str(ogc), "https://example.com / %s…" % ("x"*29))
 
 
 class TestOEmbedCache(SocialhomeTestCase):

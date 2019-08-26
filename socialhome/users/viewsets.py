@@ -3,7 +3,7 @@ from typing import Any
 import django_rq
 from django.http import HttpResponse
 from rest_framework import mixins, status
-from rest_framework.decorators import detail_route, list_route, action
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
@@ -49,7 +49,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             qs = qs.exclude(visibility=Visibility.LIMITED)
         return qs
 
-    @detail_route(methods=["post"])
+    @action(detail=True, methods=["post"])
     def follow(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
@@ -73,12 +73,12 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         values = [LimitedProfileSerializer(x, context={'request': request}).data for x in query_set]
         return self.get_paginated_response(values)
 
-    @list_route(methods=["post"], permission_classes=(IsAuthenticated,))
+    @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
         django_rq.enqueue(create_user_export, request.user.id)
         return Response({"status": "Data export job queued."})
 
-    @detail_route(methods=["post"])
+    @action(detail=True, methods=["post"])
     def unfollow(self, request, uuid=None):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
@@ -90,7 +90,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         profile.following.remove(target_profile)
         return Response({"status": "Unfollowed."})
 
-    @list_route(methods=["get"], permission_classes=(IsAuthenticated,))
+    @action(detail=False, methods=["get"], permission_classes=(IsAuthenticated,))
     def retrieve_export(self, request, pk=None):
         exporter = UserExporter(request.user)
         zipf = exporter.retrieve()

@@ -4,7 +4,8 @@
 codecov
 coverage
 ddt
-django-debug-toolbar
+# Breaks with user-panel on 2.0
+django-debug-toolbar<2.0
 django-debug-toolbar-user-panel
 django-querycount
 django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why

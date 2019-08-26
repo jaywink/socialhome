@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from rest_framework import exceptions, status
 from rest_framework import mixins
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -105,21 +105,21 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.profile)
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=["get"])
     def replies(self, request, *args, **kwargs):
         parent = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=["delete", "post"])
+    @action(detail=True, methods=["delete", "post"])
     def share(self, request, *args, **kwargs):
         if request.method == "POST":
             return self._share()
         elif request.method == "DELETE":
             return self._unshare()
 
-    @detail_route(methods=["get"])
+    @action(detail=True, methods=["get"])
     def shares(self, request, *args, **kwargs):
         content = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(share_of=content)).order_by("created")
@@ -149,7 +149,7 @@ class TagViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSe
     queryset = Tag.objects.all().order_by("name")
     serializer_class = TagSerializer
 
-    @detail_route(methods=["post"])
+    @action(detail=True, methods=["post"])
     def follow(self, request, uuid=None):
         if not request.user.is_authenticated:
             return Response({"detail": "Must be authenticated to follow a tag."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -157,7 +157,7 @@ class TagViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSe
         request.user.profile.followed_tags.add(tag)
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
-    @detail_route(methods=["post"])
+    @action(detail=True, methods=["post"])
     def unfollow(self, request, uuid=None):
         if not request.user.is_authenticated:
             return Response({"detail": "Must be authenticated to follow a tag."}, status=status.HTTP_401_UNAUTHORIZED)

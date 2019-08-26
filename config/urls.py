@@ -7,7 +7,6 @@ from django.views import defaults as default_views
 from django.views.i18n import JavaScriptCatalog
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from django_js_reverse.views import urls_js
 
 from socialhome.content.views import ContentBookmarkletView
@@ -32,7 +31,7 @@ router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
 
 # API docs
-schema_view = get_schema_view(title="Socialhome API", renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
+schema_view = get_schema_view(title="Socialhome API")
 
 urlpatterns = [
     url(r"", include("socialhome.federate.urls", namespace="federate")),

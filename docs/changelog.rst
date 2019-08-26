@@ -94,6 +94,7 @@ Internal changes
 
 * Removed ``User`` relationship fields. These were migrated to ``Profile`` a long time ago.
 * Heavy refactoring of Vue frontend store.
+* Django bumped to 2.2.
 
 0.9.3 (2018-08-29)
 ------------------
