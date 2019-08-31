@@ -2,6 +2,7 @@ import logging
 from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
+import django_rq
 from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
@@ -251,7 +252,8 @@ def send_content_retraction(content, author_id):
             recipients = _get_limited_recipients(author.fid, content)
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
-        handle_send(entity, author.federable, recipients)
+        # Queue to the background since sending could take a while
+        django_rq.enqueue(handle_send, entity, author.federable, recipients)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 

@@ -207,16 +207,16 @@ class TestFederateContentRetraction(SocialhomeTestCase):
         content.delete()
         self.assertTrue(mock_send.called is False)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.content.signals.send_content_retraction", autospec=True)
     def test_local_content_retraction_gets_sent(self, mock_send):
         user = UserFactory()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
         mock_send.reset_mock()
         content.delete()
-        mock_send.assert_called_once_with(send_content_retraction, content, content.author_id)
+        mock_send.assert_called_once_with(content, content.author_id)
 
-    @patch("socialhome.content.signals.django_rq.enqueue", side_effect=Exception)
+    @patch("socialhome.content.signals.send_content_retraction", autospec=True, side_effect=Exception)
     @patch("socialhome.content.signals.logger.exception")
     def test_exception_calls_logger(self, mock_logger, mock_send):
         user = UserFactory()

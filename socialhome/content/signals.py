@@ -49,7 +49,8 @@ def federate_content_retraction(instance, **kwargs):
     if instance.local:
         logger.debug('federate_content_retraction: Sending out Content retraction: %s', instance)
         try:
-            django_rq.enqueue(send_content_retraction, instance, instance.author_id)
+            # Process immediately since things wont be in the db otherwise
+            send_content_retraction(instance, instance.author_id)
         except Exception as ex:
             logger.exception("Failed to federate_content_retraction %s: %s", instance, ex)
 

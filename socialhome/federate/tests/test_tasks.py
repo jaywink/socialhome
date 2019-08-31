@@ -114,12 +114,12 @@ class TestSendContentRetraction(SocialhomeTestCase):
         cls.profile = cls.user.profile
         cls.limited_content2 = LimitedContentFactory(author=cls.profile)
 
-    @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks._get_limited_recipients")
-    @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
-    def test_limited_retraction_calls_get_recipients(self, mock_maker, mock_get, mock_send):
+    @patch("socialhome.federate.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.tasks._get_limited_recipients", autospec=True)
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity", autospec=True)
+    def test_limited_retraction_calls_get_recipients(self, mock_maker, mock_get, mock_enqueue):
         send_content_retraction(self.limited_content2, self.limited_content2.author.id)
-        self.assertTrue(mock_send.called is True)
+        self.assertTrue(mock_enqueue.called is True)
         self.assertTrue(mock_get.called is True)
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None, autospec=True)
@@ -134,11 +134,12 @@ class TestSendContentRetraction(SocialhomeTestCase):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
 
-    @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity")
-    def test_handle_create_payload_is_called(self, mock_maker, mock_sender):
+    @patch("socialhome.federate.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity", autospec=True)
+    def test_handle_create_payload_is_called(self, mock_maker, mock_enqueue):
         send_content_retraction(self.public_content, self.public_content.author_id)
-        mock_sender.assert_called_once_with(
+        mock_enqueue.assert_called_once_with(
+            ANY,
             "entity",
             self.public_content.author.federable,
             [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,

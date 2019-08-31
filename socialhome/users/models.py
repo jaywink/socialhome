@@ -183,7 +183,7 @@ class Profile(TimeStampedModel):
                 "fid": self.fid,
                 "public": False,
                 "protocol": self.protocol,
-                "public_key": self.key,
+                "public_key": self.rsa_public_key,
             }
         else:
             raise ValueError("get_recipient_for_visibility - Invalid visibility for federating, "
@@ -193,7 +193,7 @@ class Profile(TimeStampedModel):
     def federable(self):
         return UserType(
             id=self.fid or self.handle,
-            private_key=self.private_key,
+            private_key=self.rsa_private_key,
             handle=self.handle,
         )
 
