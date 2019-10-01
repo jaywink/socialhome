@@ -243,11 +243,18 @@ class TestContentModel(SocialhomeTestCase):
             "%s_%s" % (self.public_content.id, self.public_content.uuid),
         )
 
-    def test_reply_gets_parent_values(self):
-        # Try with other values
-        reply = ContentFactory(parent=self.public_content, visibility=Visibility.SELF, pinned=True)
+    def test_reply_gets_parent_values__if_not_set(self):
+        reply = ContentFactory(parent=self.public_content)
         self.assertEqual(reply.visibility, Visibility.PUBLIC)
         self.assertFalse(reply.pinned)
+
+    def test_reply_gets_parent_values__pinned(self):
+        reply = ContentFactory(parent=self.public_content, pinned=True)
+        self.assertFalse(reply.pinned)
+
+    def test_reply_gets_parent_values__visibility_is_respected_if_different(self):
+        reply = ContentFactory(parent=self.public_content, visibility=Visibility.LIMITED, pinned=True)
+        self.assertEqual(reply.visibility, Visibility.LIMITED)
 
     def test_get_absolute_url(self):
         self.assertEqual(self.public_content.get_absolute_url(),

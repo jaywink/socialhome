@@ -102,6 +102,10 @@ class ContentForm(forms.ModelForm):
         if not self.instance._state.adding and self.instance.limited_visibilities.count():
             previous_recipients = self.instance.limited_visibilities.values_list('id', flat=True)
 
+        if self.instance._state.adding and parent:
+            # HAXX to ensure visibility is empty when going in to save
+            self.instance.visibility = None
+
         if not self.instance.author_id:
             self.instance.author = self.user.profile
 

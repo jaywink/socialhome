@@ -281,8 +281,9 @@ class Content(models.Model):
 
         if self.parent:
             self.content_type = ContentType.REPLY
-            # Ensure replies have sane
-            self.visibility = self.root.visibility
+            # Ensure replies have sane values
+            if self.visibility is None:
+                self.visibility = self.root.visibility
             self.pinned = False
             self.root_parent = self.root
         elif self.share_of:
