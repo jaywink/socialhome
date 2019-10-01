@@ -137,6 +137,12 @@ def send_reply_notifications(content_id):
         "reply_text": content.text, "reply_rendered": content.rendered, "reply_url": content_url,
     })
     for participant in participants:
+        if not content.visible_for_user(participant):
+            logger.debug(
+                "send_reply_notifications - Skipping participant %s as content not visible to them",
+                participant.id,
+            )
+            continue
         context["name"] = participant.profile.name_or_handle
         logger.info("send_reply_notifications - Sending mail to %s", participant.email)
         send_mail(
