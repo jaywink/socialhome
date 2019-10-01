@@ -2,6 +2,7 @@ from unittest.mock import patch, Mock, call
 
 from django.db import IntegrityError, transaction
 from federation.entities import base
+from federation.entities.activitypub.entities import ActivitypubComment
 from federation.tests.factories import entities
 from federation.types import UserType, ReceiverVariant
 
@@ -247,7 +248,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.limited_visibilities.count(), 0)
 
-    def test_visibility_is_added_to_receiving_followers(self):
+    def test_visibility__added_to_receiving_followers(self):
         self.comment.actor_id = self.profile.fid
         self.comment._receivers = [UserType(id=self.comment.actor_id, receiver_variant=ReceiverVariant.FOLLOWERS)]
         process_entity_comment(self.comment, self.profile)
@@ -257,7 +258,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
             {self.local_user.profile, self.local_user2.profile},
         )
 
-    def test_visibility_is_added_to_receiving_profile(self):
+    def test_visibility__added_to_receiving_profile(self):
         self.comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
         process_entity_comment(self.comment, ProfileFactory())
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
@@ -266,10 +267,33 @@ class TestProcessEntityComment(SocialhomeTestCase):
             {self.receiving_profile},
         )
 
-    def test_visibility_is_not_added_if_public_parent_content(self):
+    def test_visibility__not_added_if_public_parent_content_if_no_visibility_on_comment(self):
         comment = base.Comment(
             id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
             actor_id="https://example.com/profile2",
+        )
+        comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_comment(comment, ProfileFactory())
+        content = Content.objects.get(fid=comment.id, parent=self.public_content)
+        self.assertEqual(content.limited_visibilities.count(), 0)
+
+    def test_visibility__added_if_public_parent_content_if_visibility_on_comment__non_public_comment(self):
+        comment = ActivitypubComment(
+            id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
+            actor_id="https://example.com/profile2", public=False,
+        )
+        comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
+        process_entity_comment(comment, ProfileFactory())
+        content = Content.objects.get(fid=comment.id, parent=self.public_content)
+        self.assertEqual(
+            set(content.limited_visibilities.all()),
+            {self.receiving_profile},
+        )
+
+    def test_visibility__not_added_if_public_parent_content_if_visibility_on_comment__public_comment(self):
+        comment = ActivitypubComment(
+            id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
+            actor_id="https://example.com/profile2", public=True,
         )
         comment._receivers = [UserType(id=self.receiving_profile.fid, receiver_variant=ReceiverVariant.ACTOR)]
         process_entity_comment(comment, ProfileFactory())

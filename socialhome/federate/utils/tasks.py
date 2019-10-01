@@ -152,10 +152,13 @@ def process_entity_comment(entity: Any, profile: Profile):
             root_parent = Content.objects.fed(entity.root_target_id).get()
         except Content.DoesNotExist:
             pass
+    visibility = None
+    if getattr(entity, "public", None) is not None:
+        visibility = Visibility.PUBLIC if entity.public else Visibility.LIMITED
     values = {
         "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
-        "visibility": parent.visibility,
+        "visibility": visibility if visibility is not None else parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "parent": parent,
         "root_parent": root_parent,
@@ -169,12 +172,11 @@ def process_entity_comment(entity: Any, profile: Profile):
     else:
         logger.info("Updated Content from comment entity: %s", content)
 
-    # TODO we should respect the visibility of the comment instead here
-    if parent.visibility == Visibility.LIMITED:
+    if visibility == Visibility.LIMITED or (visibility is None and parent.visibility == Visibility.LIMITED):
         if entity._receivers:
             receivers = get_profiles_from_receivers(entity._receivers)
             if len(receivers):
-                content.limited_visibilities.set(receivers)
+                content.limited_visibilities.add(*receivers)
                 logger.info("Added visibility to Comment %s to %s", content.fid, receivers)
             else:
                 logger.warning("No local receivers found for limited Comment %s", content.fid)
