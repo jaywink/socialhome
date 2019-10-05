@@ -5,13 +5,12 @@
 #    ./compile-requirements.sh
 #
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
--e git+https://git.feneas.org/jaywink/federation.git@041a44a525b25d1dad4bf4699c4c3e10df758f02#egg=federation==0.18.0-dev.1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
 arrow==0.14.5
 asgi-redis==1.4.3
 asgiref==1.1.2            # via asgi-redis, channels, daphne
 asn1crypto==0.24.0        # via cryptography
-attrs==19.1.0             # via automat, jsonschema, twisted
+attrs==19.1.0             # via automat, federation, jsonschema, twisted
 autobahn==19.8.1          # via daphne
 automat==0.7.0            # via twisted
 backcall==0.1.0           # via ipython
@@ -28,12 +27,12 @@ constantly==15.1.0        # via twisted
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
 croniter==0.3.30          # via rq-scheduler
-cryptography==2.7         # via autobahn
-cssselect==1.1.0
+cryptography==2.7         # via autobahn, federation
+cssselect==1.1.0          # via federation
 daphne==1.4.2             # via channels
 decorator==4.4.0          # via ipython, traitlets
 defusedxml==0.6.0         # via python3-openid
-dirty-validators==0.5.2
+dirty-validators==0.5.2   # via federation
 django-allauth==0.39.1
 django-autoslug==1.9.6
 django-braces==1.13.0
@@ -58,23 +57,24 @@ django-settings-export==1.2.1
 django-versatileimagefield==1.10
 django==2.2.4
 djangorestframework==3.10.2
+federation==0.18.0
 future==0.17.1            # via commonmark
 hyperlink==19.0.0         # via twisted
 idna==2.8                 # via hyperlink, requests
 incremental==17.5.0       # via twisted
 ipaddress==1.0.22         # via ipdata
-ipdata==3.2
+ipdata==3.2               # via federation
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.7.0
 isodate==0.6.0            # via python-xrd
-iteration-utilities==0.7.0
+iteration-utilities==0.7.0  # via federation
 itypes==1.1.0             # via coreapi
 jedi==0.15.1              # via ipython
 jinja2==2.10.1            # via coreschema
-jsonschema==3.0.2
+jsonschema==3.0.2         # via federation
 lxml==4.4.1
 markdown==3.1.1
-markdownify==0.4.1
+markdownify==0.4.1        # via federation
 markupsafe==1.1.1         # via jinja2
 msgpack-python==0.5.6     # via asgi-redis
 oauthlib==3.1.0           # via requests-oauthlib
@@ -89,21 +89,21 @@ psutil==5.6.3             # via circus
 psycopg2-binary==2.8.3
 ptyprocess==0.6.0         # via pexpect
 pycparser==2.19           # via cffi
-pycryptodome==3.8.2
+pycryptodome==3.8.2       # via federation
 pygments==2.4.2           # via ipython
 pyhamcrest==1.9.0         # via twisted
 pyrsistent==0.15.4        # via jsonschema
-python-dateutil==2.8.0    # via arrow, croniter
+python-dateutil==2.8.0    # via arrow, croniter, federation
 python-opengraph-jaywink==0.2.0
-python-xrd==0.1
+python-xrd==0.1           # via federation
 python3-openid==3.1.0     # via django-allauth
 pytz==2019.2
 pyzmq==16.0.4             # via circus
 raven==6.10.0
 redis==2.10.6
-requests-http-signature-jaywink==0.1.0.dev0
+requests-http-signature-jaywink==0.1.0.dev0  # via federation
 requests-oauthlib==1.2.0  # via django-allauth
-requests==2.22.0          # via coreapi, django-allauth, ipdata, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib
+requests==2.22.0          # via coreapi, django-allauth, federation, ipdata, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib
 rq-scheduler==0.8.3
 rq==0.12.0
 simplejson==3.16.0        # via django-rest-swagger
