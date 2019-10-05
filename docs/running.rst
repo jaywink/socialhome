@@ -127,6 +127,8 @@ To publish the documents, open them, review the text and then change the status 
 
 Published policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
 
+.. _configuration:
+
 Configuration
 -------------
 
@@ -379,7 +381,7 @@ SOCIALHOME_STREAMS_PRECACHE_SIZE
 
 Default: ``100``
 
-Amount of items to keep in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting. See :ref:`precaching`.
+Amount of items to keep in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting.
 
 Note the amount actually stored can temporarily go over the limit. Cache trimming is done as a daily job, not every time a new item needs to be added to the cache.
 

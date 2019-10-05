@@ -23,8 +23,6 @@ on what to do, check out the issues listed there. Some issues are
 `labeled as newcomer <https://git.feneas.org/socialhome/socialhome/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer>`_.
 These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
 
-See also our :ref:`architecture` for high level plans.
-
 Logging issues
 --------------
 

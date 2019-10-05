@@ -3,7 +3,7 @@
 Development
 ===========
 
-Socialhome is missing features and needs a lot of polish on the UI side. If you are familiar with Django (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
+Socialhome is missing features and needs a lot of polish on the UI side. If you are familiar with Django or Vue (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
 
 For guidelines how to contribute, please first read the :ref:`contributing` guide.
 

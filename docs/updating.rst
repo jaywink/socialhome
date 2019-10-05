@@ -3,9 +3,13 @@
 Updating
 ========
 
-There are certain steps that should always be done when updating your node to new code. This will be a generic list of what to do when updating which should be near enough the same whatever way the app is installed. Commands might vary depending on your OS below.
+If using the :ref:`installation-docker`, any actions required by an upgrade will be handled by
+just updating the image tag and recreating the container.
 
-If using the :ref:`installation-ubuntu-ansible` there is no need to do anything special. Just re-run the role!
+If using the :ref:`installation-ubuntu-ansible` there is no need to do anything special.
+Just re-run the role!
+
+For manual installs, see the following steps. Commands might vary depending on your OS.
 
 Check the changelog
 -------------------

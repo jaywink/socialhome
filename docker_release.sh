@@ -4,9 +4,11 @@
 # Release to Docker #
 #####################
 #
-# Builds the image and pushes it to Docker Hub.
+# Builds the image and pushes it to the Docker registry.
 #
-# Args: tag name, defaults to "latest"
+# Args:
+#   tag name
+#   "nolatest" if latest should not be updated as well.
 #
 
 set -e
@@ -17,7 +19,13 @@ else
     tag=$1
 fi
 
-docker login
+docker login registry.git.feneas.org
+docker build -f docker/app/Dockerfile -t registry.git.feneas.org/socialhome/socialhome:${tag} .
+docker push registry.git.feneas.org/socialhome/socialhome:${tag}
 
-docker build -f docker/app/Dockerfile -t jaywink/socialhome:${tag} .
-docker push jaywink/socialhome:${tag}
+if [[ "$2" == "nolatest" ]]; then
+    exit
+fi
+
+docker tag registry.git.feneas.org/socialhome/socialhome:${tag} registry.git.feneas.org/socialhome/socialhome:latest
+docker push registry.git.feneas.org/socialhome/socialhome:latest

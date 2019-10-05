@@ -8,9 +8,15 @@ Welcome to the documentation of Socialhome!
 Description
 -----------
 
-Socialhome is best described as a federated personal profile with social networking functionality. Users can create rich content using Markdown and even HTML/JS/CSS (if set as trusted user). All content can be pinned to the user profile and all content will federate to contacts in the federated social web. Currently federation happens using the `Diaspora protocol <https://diaspora.github.io/diaspora_federation/>`_ with future plans to include at least `ActivityPub <https://www.w3.org/TR/activitypub/>`_ as well. Federating using existing protocols means Socialhome users can interact with `tens of thousands <https://the-federation.info>`_ of other users.
+Socialhome is best described as a federated personal profile with social networking functionality.
+Users can create rich content using Markdown and even HTML/JS/CSS (if set as trusted user).
+All content can be pinned to the user profile and all content will federate to contacts in
+the federated social web. Currently federation happens using the
+`ActivityPub <https://activitypub.rocks/>`_ and
+`Diaspora <https://diaspora.github.io/diaspora_federation/>`_ protocols.
 
-Please check the official site for more information about features. Naturally, the official site is a Socialhome profile itself.
+Please check the official site for more information about features. Naturally, the official
+site is a Socialhome profile itself.
 
 Official site: https://socialhome.network
 
@@ -50,14 +56,12 @@ Table of contents
    :maxdepth: 3
 
    installation
-   install_guides
    updating
    running
    api
    clients
    community
    development
-   architecture
    contributing
    brand
    faq
