@@ -3,13 +3,21 @@
 Changelog
 =========
 
-0.10.0-dev (unreleased)
------------------------
+0.10.0 (2019-10-06)
+-------------------
 
 Added
 .....
 
 * Initial ActivityPub support has landed!
+
+  Basic federation support with the ActivityPub protocol. There are likely to be many
+  bugs and incompatibilities with this first release which will be ironed out in the
+  next few releases.
+
+  Importantly, Socialhome defaults to ActivityPub should a remote profile support both
+  ActivityPub and Diaspora protocols. This means federation across Socialhome instances
+  will use ActivityPub.
 
 * Added Tags API. In addition to listing Tag objects, it allows authenticated users to follow and unfollow tags.
 
@@ -34,7 +42,7 @@ Changed
 
   Code will still be mirrored to GitHub so participation through there is still very much welcome. So you can still fork the repository on GitHub and submit a pull request. Issues however will be available only on the GitLab server to avoid these getting out of sync between the servers.
 
-* New federation library version which prepares for adding ActivityPub support. Considerable effort was put into refactoring Socialhome internals to work with multiple protocols. The doors are now fully open to add support for federating with platforms like Mastodon, Pleroma, Pixelfed, PeerTube and many many more ActivityPub powered platforms hosting an estimated 600K monthly active users 🎉
+* New federation library version which prepares for adding ActivityPub support. Considerable effort was put into refactoring Socialhome internals to work with multiple protocols.
 
   This refactoring affects mostly the internals of Socialhome with only minor visual changes. Some of those include changes in URL's and fallback display names for non-local profiles.
 
