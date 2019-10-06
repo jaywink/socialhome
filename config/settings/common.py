@@ -550,7 +550,3 @@ FEDERATION = {
     "search_path": "/search/?q=",
     "tags_path": "/tag/:tag:/",
 }
-
-# TODO remove once AP support is more ready
-if env.bool("SOCIALHOME_ACTIVITYPUB_ALPHA", default=False):
-    FEDERATION["activitypub"] = True

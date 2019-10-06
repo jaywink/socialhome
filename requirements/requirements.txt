@@ -57,7 +57,7 @@ django-settings-export==1.2.1
 django-versatileimagefield==1.10
 django==2.2.4
 djangorestframework==3.10.2
-federation==0.18.0
+federation==0.18.1
 future==0.17.1            # via commonmark
 hyperlink==19.0.0         # via twisted
 idna==2.8                 # via hyperlink, requests
