@@ -9,6 +9,15 @@ if TYPE_CHECKING:
 
 
 class ProfileQuerySet(QuerySet):
+    def active_local(self) -> QuerySet:
+        """
+        Get profiles of active local users.
+        """
+        return self.filter(
+            user__isnull=False,
+            user__is_active=True,
+        )
+
     def fed(self, value: str, **params) -> QuerySet:
         """
         Get Profile by federated ID.
