@@ -54,7 +54,16 @@ class BaseStreamView(TemplateView):
 
     @property
     def stream_name(self):
-        return self.stream_type_value
+        name_base = f"{self.stream_type_value}"
+        if self.stream_name_extra:
+            name_base = f"{name_base}__{self.stream_name_extra}"
+        if self.request.user.is_authenticated:
+            return f"{name_base}__{self.request.user.id}"
+        return name_base
+
+    @property
+    def stream_name_extra(self):
+        return ""
 
     @property
     def stream_type_value(self):
@@ -102,6 +111,7 @@ class PublicStreamView(BaseStreamView):
 
 class TagStreamView(BaseStreamView):
     stream_class = TagStream
+    tag = None
 
     def dispatch(self, request, *args, **kwargs):
         self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
@@ -125,8 +135,8 @@ class TagStreamView(BaseStreamView):
         return meta
 
     @property
-    def stream_name(self):
-        return "%s__%s" % (self.stream_type_value, self.tag.channel_group_name)
+    def stream_name_extra(self):
+        return str(self.tag.id)
 
 
 class TagsStreamView(LoginRequiredMixin, BaseStreamView):
@@ -154,6 +164,3 @@ class FollowedStreamView(LoginRequiredMixin, BaseStreamView):
         })
         return meta
 
-    @property
-    def stream_name(self):
-        return "%s__%s" % (self.stream_type_value, self.request.user.username)

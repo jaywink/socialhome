@@ -89,8 +89,8 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
             self.data["stream_type"] = self.profile_stream_type
 
     @property
-    def stream_name(self):
-        return "%s__%s" % (self.stream_type_value, self.object.id)
+    def stream_name_extra(self):
+        return str(self.object.id)
 
 
 class ProfileDetailView(ProfileViewMixin):

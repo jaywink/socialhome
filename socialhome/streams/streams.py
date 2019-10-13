@@ -67,21 +67,19 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
     qs = get_precache_users_qs(acting_profile)
     cache_keys = []
     notify_keys = set()
-    # Cache for each active user
+    # Cache for each active user`
     for user in qs.iterator():
-        cache_keys, notify_keys = check_and_add_to_keys(
-            stream_cls, user, content, cache_keys, acting_profile, notify_keys,
-        )
+        check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
+                              through.content_type == ContentType.SHARE)
     # Cache also as anonymous user
     if stream_cls in CACHED_ANONYMOUS_STREAM_CLASSES:
-        cache_keys, notify_keys = check_and_add_to_keys(
-            stream_cls, AnonymousUser(), content, cache_keys, acting_profile, notify_keys,
-        )
+        check_and_add_to_keys(stream_cls, AnonymousUser(), content, cache_keys, acting_profile, set(),
+                              through.content_type == ContentType.SHARE)
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
 
-def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys):
+def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share):
     """Check if content should be added to this user stream and add to the keys if so.
 
     Also collect notify keys.
@@ -93,16 +91,17 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     :param acting_profile: The Profile object that caused this check. This could be either the one for the Content
         or a Profile doing a share.
     :param notify_keys: List of existing notify keys to add to.
-    :returns: Tuple of (list of stream keys, list of notify keys)
+    :param is_share: Boolean whether this is a shared content.
     """
     # noinspection PyCallingNonCallable
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
         if stream.should_cache_content(content):
-            if stream_cls in ALL_CACHED_STREAMS:
+            if stream_cls in CACHED_STREAM_CLASSES:
                 cache_keys.append(stream.key)
+            if is_share and not stream.notify_for_shares:
+                continue
             notify_keys.add(stream.notify_key)
-    return cache_keys, notify_keys
 
 
 def get_precache_users_qs(acting_profile):
@@ -138,19 +137,24 @@ def update_streams_with_content(content):
         keys = []
         notify_keys = set()
         for stream_cls in CACHED_STREAM_CLASSES:
-            keys, notify_keys = check_and_add_to_keys(
-                stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
-            )
+            check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
+                                  through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys)
     # Queue rest to RQ
     for stream_cls in ALL_STREAMS:
         django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__, acting_profile.id)
+    # Notify about reply separately
+    if content.content_type == ContentType.REPLY:
+        # Content reply
+        # TODO notify per user due to visibility
+        notify_listeners(content, {"streams_content__%s" % content.root_parent.channel_group_name})
 
 
 class BaseStream:
     last_id = None
     key_base = ["sh", "streams"]
+    notify_for_shares = True
     ordering = "-created"
     paginate_by = 15
     redis = None
@@ -283,12 +287,16 @@ class BaseStream:
         """
         Get stream notify key.
 
-        Format: ``streams_<streamtype>__<keyextra>``
+        Format: ``streams_<streamtype>__<notifykeyextra>``
         """
         key = f"streams_{self.stream_type.value}"
-        if self.key_extra:
-            key = f"{key}__{self.key_extra}"
+        if self.notify_key_extra:
+            key = f"{key}__{self.notify_key_extra}"
         return key
+
+    @property
+    def notify_key_extra(self):
+        return None
 
     def should_cache_content(self, content):
         return self.get_queryset().filter(id=content.id).exists()
@@ -300,6 +308,10 @@ class FollowedStream(BaseStream):
     def get_queryset(self):
         return Content.objects.followed(self.user)
 
+    @property
+    def notify_key_extra(self):
+        return self.user.id
+
 
 class LimitedStream(BaseStream):
     stream_type = StreamType.LIMITED
@@ -307,12 +319,21 @@ class LimitedStream(BaseStream):
     def get_queryset(self):
         return Content.objects.limited(self.user)
 
+    @property
+    def notify_key_extra(self):
+        return self.user.id
+
 
 class LocalStream(BaseStream):
+    notify_for_shares = False
     stream_type = StreamType.LOCAL
 
     def get_queryset(self):
         return Content.objects.local(self.user)
+
+    @property
+    def notify_key_extra(self):
+        return self.user.id
 
 
 class ProfileStreamBase(BaseStream):
@@ -328,6 +349,10 @@ class ProfileStreamBase(BaseStream):
     def key_extra(self):
         return str(self.profile.id)
 
+    @property
+    def notify_key_extra(self):
+        return f"{self.key_extra}__{self.user.id or 'anon'}"
+
 
 class ProfileAllStream(ProfileStreamBase):
     stream_type = StreamType.PROFILE_ALL
@@ -337,6 +362,7 @@ class ProfileAllStream(ProfileStreamBase):
 
 
 class ProfilePinnedStream(ProfileStreamBase):
+    notify_for_shares = False
     ordering = "order"
     paginate_by = 100  # The limit of pinned content visible
     stream_type = StreamType.PROFILE_PINNED
@@ -346,13 +372,19 @@ class ProfilePinnedStream(ProfileStreamBase):
 
 
 class PublicStream(BaseStream):
+    notify_for_shares = False
     stream_type = StreamType.PUBLIC
 
     def get_queryset(self):
         return Content.objects.public()
 
+    @property
+    def notify_key_extra(self):
+        return self.user.id
+
 
 class TagStream(BaseStream):
+    notify_for_shares = False
     stream_type = StreamType.TAG
 
     def __init__(self, tag, **kwargs):
@@ -372,12 +404,21 @@ class TagStream(BaseStream):
     def key_extra(self):
         return str(self.tag.id)
 
+    @property
+    def notify_key_extra(self):
+        return f"{self.key_extra}__{self.user.id or 'anon'}"
+
 
 class TagsStream(BaseStream):
+    notify_for_shares = False
     stream_type = StreamType.TAGS
 
     def get_queryset(self):
         return Content.objects.tags_followed_by_user(self.user)
+
+    @property
+    def notify_key_extra(self):
+        return self.user.id
 
 
 CACHED_STREAM_CLASSES = (
@@ -390,8 +431,6 @@ CACHED_ANONYMOUS_STREAM_CLASSES = (
     ProfileAllStream,
 )
 
-ALL_CACHED_STREAMS = CACHED_STREAM_CLASSES + CACHED_ANONYMOUS_STREAM_CLASSES
-
 NON_CACHED_STREAM_CLASSES = (
     LimitedStream,
     LocalStream,
@@ -400,4 +439,4 @@ NON_CACHED_STREAM_CLASSES = (
     TagStream,
 )
 
-ALL_STREAMS = ALL_CACHED_STREAMS + NON_CACHED_STREAM_CLASSES
+ALL_STREAMS = CACHED_STREAM_CLASSES + NON_CACHED_STREAM_CLASSES

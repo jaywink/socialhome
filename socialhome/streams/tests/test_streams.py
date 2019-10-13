@@ -111,14 +111,18 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
         cls.eggs_tag = Tag.objects.get(name="eggs")
 
     def test_adds_if_should_cache(self):
+        keys = []
+        check_and_add_to_keys(FollowedStream, self.user, self.remote_content, keys, self.remote_profile, set(), False)
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, [], self.remote_profile),
+            keys,
             ["sh:streams:followed:%s" % self.user.id],
         )
 
     def test_adds_to_multiple_stream_instances(self):
+        keys = []
+        check_and_add_to_keys(TagStream, self.user, self.tagged_content, keys, self.tagged_content.author, set(), False)
         self.assertEqual(
-            set(check_and_add_to_keys(TagStream, self.user, self.tagged_content, [], self.tagged_content.author)),
+            set(keys),
             {
                 "sh:streams:tag:%s:%s" % (self.spam_tag.id, self.user.id),
                 "sh:streams:tag:%s:%s" % (self.eggs_tag.id, self.user.id),
@@ -126,8 +130,10 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
         )
 
     def test_does_not_add_if_shouldnt_cache(self):
+        keys = []
+        check_and_add_to_keys(FollowedStream, self.user, self.content, keys, self.content.author, set(), False)
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.content, [], self.content.author),
+            keys,
             [],
         )
 
