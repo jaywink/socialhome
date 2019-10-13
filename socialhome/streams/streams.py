@@ -11,6 +11,7 @@ from django.utils.timezone import now
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
+from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
 from socialhome.users.models import User, Profile
 from socialhome.utils import get_redis_connection
@@ -40,22 +41,20 @@ def add_to_redis(content, through, keys):
 
 
 def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_profile_id):
-    """Add content to all user streams of one type.
+    """Add content to all user streams of one type and do notification of streams.
 
     Excludes author of content.
 
     This function is designed to be queued to RQ.
     """
     stream_cls = globals().get(stream_cls_name)
-    if stream_cls not in CACHED_STREAM_CLASSES:
-        return
     try:
-        content = Content.objects.exclude(content_type=ContentType.REPLY).get(id=content_id)
+        content = Content.objects.get(id=content_id)
     except Content.DoesNotExist:
         logger.warning("Stream.add_to_stream_for_users - content %s does not exist!", content_id)
         return
     try:
-        through = Content.objects.exclude(content_type=ContentType.REPLY).get(id=through_id)
+        through = Content.objects.get(id=through_id)
     except Content.DoesNotExist:
         logger.warning("Stream.add_to_stream_for_users - through content %s does not exist!", through_id)
         return
@@ -66,33 +65,44 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
         return
 
     qs = get_precache_users_qs(acting_profile)
-    keys = []
+    cache_keys = []
+    notify_keys = set()
     # Cache for each active user
     for user in qs.iterator():
-        keys = check_and_add_to_keys(stream_cls, user, content, keys, acting_profile)
+        cache_keys, notify_keys = check_and_add_to_keys(
+            stream_cls, user, content, cache_keys, acting_profile, notify_keys,
+        )
     # Cache also as anonymous user
     if stream_cls in CACHED_ANONYMOUS_STREAM_CLASSES:
-        keys = check_and_add_to_keys(stream_cls, AnonymousUser(), content, keys, acting_profile)
-    add_to_redis(content, through, keys)
+        cache_keys, notify_keys = check_and_add_to_keys(
+            stream_cls, AnonymousUser(), content, cache_keys, acting_profile, notify_keys,
+        )
+    add_to_redis(content, through, cache_keys)
+    notify_listeners(content, notify_keys)
 
 
-def check_and_add_to_keys(stream_cls, user, content, keys, acting_profile):
+def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys):
     """Check if content should be added to this user stream and add to the keys if so.
+
+    Also collect notify keys.
 
     :param stream_cls: Stream class to check against.
     :param user: User who to check with. This is the user who we're caching for, ie future stream viewing user.
     :param content: The Content object that we're checking for.
-    :param keys: List of existing stream keys to add to.
+    :param cache_keys: List of existing stream keys to add to.
     :param acting_profile: The Profile object that caused this check. This could be either the one for the Content
         or a Profile doing a share.
-    :returns: List of stream keys
+    :param notify_keys: List of existing notify keys to add to.
+    :returns: Tuple of (list of stream keys, list of notify keys)
     """
     # noinspection PyCallingNonCallable
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
         if stream.should_cache_content(content):
-            keys.append(stream.key)
-    return keys
+            if stream_cls in ALL_CACHED_STREAMS:
+                cache_keys.append(stream.key)
+            notify_keys.add(stream.notify_key)
+    return cache_keys, notify_keys
 
 
 def get_precache_users_qs(acting_profile):
@@ -116,9 +126,6 @@ def update_streams_with_content(content):
 
     First adds to the author streams, then queues the rest of the user streams to a background job.
     """
-    if content.content_type == ContentType.REPLY:
-        # No need to do these just now
-        return
     # Store current acting profile
     acting_profile = content.author
     # The original is the "through" always, has importance in shares
@@ -129,11 +136,15 @@ def update_streams_with_content(content):
     # Do author immediately
     if acting_profile.is_local:
         keys = []
+        notify_keys = set()
         for stream_cls in CACHED_STREAM_CLASSES:
-            keys = check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile)
+            keys, notify_keys = check_and_add_to_keys(
+                stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
+            )
         add_to_redis(content, through, keys)
+        notify_listeners(content, notify_keys)
     # Queue rest to RQ
-    for stream_cls in CACHED_STREAM_CLASSES:
+    for stream_cls in ALL_STREAMS:
         django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__, acting_profile.id)
 
 
@@ -240,6 +251,7 @@ class BaseStream:
         """
         parts = self.key_base + [self.stream_type.value]
         if self.key_extra:
+            # noinspection PyTypeChecker
             parts.append(self.key_extra)
         if isinstance(self.user, AnonymousUser):
             return ":".join(parts + ["anonymous"])
@@ -265,6 +277,18 @@ class BaseStream:
     @property
     def key_extra(self):
         return None
+
+    @property
+    def notify_key(self) -> str:
+        """
+        Get stream notify key.
+
+        Format: ``streams_<streamtype>__<keyextra>``
+        """
+        key = f"streams_{self.stream_type.value}"
+        if self.key_extra:
+            key = f"{key}__{self.key_extra}"
+        return key
 
     def should_cache_content(self, content):
         return self.get_queryset().filter(id=content.id).exists()
@@ -365,3 +389,15 @@ CACHED_STREAM_CLASSES = (
 CACHED_ANONYMOUS_STREAM_CLASSES = (
     ProfileAllStream,
 )
+
+ALL_CACHED_STREAMS = CACHED_STREAM_CLASSES + CACHED_ANONYMOUS_STREAM_CLASSES
+
+NON_CACHED_STREAM_CLASSES = (
+    LimitedStream,
+    LocalStream,
+    ProfilePinnedStream,
+    PublicStream,
+    TagStream,
+)
+
+ALL_STREAMS = ALL_CACHED_STREAMS + NON_CACHED_STREAM_CLASSES

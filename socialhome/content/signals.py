@@ -1,4 +1,3 @@
-import json
 import logging
 
 import django_rq
@@ -14,7 +13,6 @@ from socialhome.content.previews import fetch_content_preview
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
 from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
-from socialhome.streams.consumers import StreamConsumer
 from socialhome.streams.streams import update_streams_with_content
 from socialhome.users.models import Profile
 
@@ -30,7 +28,6 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     created = kwargs.get("created")
     if created:
-        notify_listeners(instance)
         if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
@@ -116,32 +113,6 @@ def render_content(content):
         content.render()
     except Exception as ex:
         logger.exception("Failed to render text for %s: %s", content, ex)
-
-
-def notify_listeners(content):
-    """Send out to listening consumers."""
-    data = json.dumps({"event": "new", "id": content.id})
-    if content.content_type == ContentType.REPLY:
-        # Content reply
-        StreamConsumer.group_send("streams_content__%s" % content.root_parent.channel_group_name, data)
-    elif content.content_type == ContentType.SHARE:
-        # Share
-        # TODO do we need to do much?
-        pass
-    else:
-        # Public stream
-        if content.visibility == Visibility.PUBLIC:
-            StreamConsumer.group_send("streams_public", data)
-        # Tag streams
-        for tag in content.tags.all():
-            StreamConsumer.group_send("streams_tag__%s" % tag.channel_group_name, data)
-        # Profile streams
-        StreamConsumer.group_send("streams_profile__%s" % content.author.id, data)
-        StreamConsumer.group_send("streams_profile_all__%s" % content.author.id, data)
-        # Followed stream
-        followed_qs = Profile.objects.followers(content.author).filter(user__isnull=False)
-        for username in followed_qs.values_list("user__username", flat=True):
-            StreamConsumer.group_send("streams_followed__%s" % username, data)
 
 
 def federate_content(content: Content, recipient: Profile = None, activity: Activity = None):
