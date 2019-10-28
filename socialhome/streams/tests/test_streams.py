@@ -6,7 +6,6 @@ from django.db.models import Max
 from django.test import override_settings
 from freezegun import freeze_time
 
-from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
 from socialhome.content.tests.factories import (
     ContentFactory, PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
@@ -63,7 +62,9 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
     @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
         add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
-        mock_check.assert_called_once_with(FollowedStream, self.user, self.content, [], self.content.author)
+        mock_check.assert_called_once_with(
+            FollowedStream, self.user, self.content, [], self.content.author, set(), False,
+        )
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
@@ -74,7 +75,9 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
             PublicUserFactory()
         add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
         # Would be called twice if inactives were not filtered out
-        mock_check.assert_called_once_with(ProfileAllStream, self.user, self.content, [], self.content.author)
+        mock_check.assert_called_once_with(
+            ProfileAllStream, self.user, self.content, [], self.content.author, set(), False,
+        )
 
     @patch("socialhome.streams.streams.check_and_add_to_keys")
     def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
@@ -82,20 +85,11 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         self.assertTrue(isinstance(mock_check.call_args_list[1][0][1], AnonymousUser))
 
     @patch("socialhome.streams.streams.Content.objects.filter")
-    def test_returns_on_no_content_or_reply(self, mock_filter):
+    def test_returns_on_no_content(self, mock_filter):
         add_to_stream_for_users(
             Content.objects.aggregate(max_id=Max("id")).get("max_id") + 1, Mock(), PublicStream, self.content.author.id,
         )
         self.assertFalse(mock_filter.called)
-        add_to_stream_for_users(self.reply.id, self.reply.id, PublicStream, self.reply.author.id)
-        self.assertFalse(mock_filter.called)
-
-    @patch("socialhome.streams.streams.check_and_add_to_keys", return_value=True)
-    def test_skips_if_not_cached_stream(self, mock_get):
-        add_to_stream_for_users(self.content.id, self.content.id, "SpamStream", self.content.author.id)
-        self.assertFalse(mock_get.called)
-        add_to_stream_for_users(self.content.id, self.content.id, "PublicStream", self.content.author.id)
-        self.assertFalse(mock_get.called)
 
 
 class TestCheckAndAddToKeys(SocialhomeTestCase):
@@ -111,14 +105,19 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
         cls.eggs_tag = Tag.objects.get(name="eggs")
 
     def test_adds_if_should_cache(self):
+        keys = []
+        check_and_add_to_keys(FollowedStream, self.user, self.remote_content, keys, self.remote_profile, set(), False)
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.remote_content, [], self.remote_profile),
+            keys,
             ["sh:streams:followed:%s" % self.user.id],
         )
 
+    @patch("socialhome.streams.streams.CACHED_STREAM_CLASSES", new=(TagStream,))
     def test_adds_to_multiple_stream_instances(self):
+        keys = []
+        check_and_add_to_keys(TagStream, self.user, self.tagged_content, keys, self.tagged_content.author, set(), False)
         self.assertEqual(
-            set(check_and_add_to_keys(TagStream, self.user, self.tagged_content, [], self.tagged_content.author)),
+            set(keys),
             {
                 "sh:streams:tag:%s:%s" % (self.spam_tag.id, self.user.id),
                 "sh:streams:tag:%s:%s" % (self.eggs_tag.id, self.user.id),
@@ -126,8 +125,10 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
         )
 
     def test_does_not_add_if_shouldnt_cache(self):
+        keys = []
+        check_and_add_to_keys(FollowedStream, self.user, self.content, keys, self.content.author, set(), False)
         self.assertEqual(
-            check_and_add_to_keys(FollowedStream, self.user, self.content, [], self.content.author),
+            keys,
             [],
         )
 
@@ -149,29 +150,6 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
         self.assertFalse(mock_add.called)
         update_streams_with_content(self.content)
         mock_add.assert_called_once_with(self.content, self.content, ["sh:streams:public:%s" % self.user.id])
-
-    @patch("socialhome.streams.streams.django_rq.enqueue")
-    def test_enqueues_each_stream_to_rq(self, mock_enqueue):
-        update_streams_with_content(self.content)
-        calls = [
-            call(add_to_stream_for_users, self.content.id, self.content.id, "FollowedStream", self.content.author.id),
-            call(add_to_stream_for_users, self.content.id, self.content.id, "ProfileAllStream", self.content.author.id),
-            call(add_to_stream_for_users, self.content.id, self.content.id, "TagsStream", self.content.author.id),
-        ]
-        self.assertEqual(mock_enqueue.call_args_list, calls)
-
-    @patch("socialhome.streams.streams.django_rq.enqueue")
-    def test_enqueues_each_stream_to_rq__share(self, mock_enqueue):
-        update_streams_with_content(self.share)
-        calls = [
-            call(add_to_stream_for_users, self.content.id, self.share.id, "FollowedStream", self.share.author.id),
-            call(add_to_stream_for_users, self.content.id, self.share.id, "ProfileAllStream", self.share.author.id),
-            call(add_to_stream_for_users, self.content.id, self.share.id, "TagsStream", self.share.author.id),
-        ]
-        self.assertEqual(mock_enqueue.call_args_list, calls)
-
-    def test_returns_if_reply(self):
-        self.assertIsNone(update_streams_with_content(Mock(content_type=ContentType.REPLY)))
 
 
 @patch("socialhome.streams.streams.BaseStream.get_queryset", return_value=Content.objects.all())

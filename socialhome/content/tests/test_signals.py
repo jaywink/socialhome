@@ -3,13 +3,16 @@ from unittest.mock import patch, Mock, call
 
 from federation.entities.activitypub.enums import ActivityType
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.federate.tasks import send_content, send_content_retraction, send_reply, send_share
+from socialhome.federate.tasks import send_content, send_reply, send_share
 from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
+from socialhome.streams.consumers import StreamConsumer
+from socialhome.streams.streams import update_streams_with_content
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
-from socialhome.users.tests.factories import UserFactory, ProfileFactory
+from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
 
 
 class TestContentMentionsChange(SocialhomeTransactionTestCase):
@@ -64,57 +67,105 @@ class TestContentPostSave(SocialhomeTransactionTestCase):
 
 
 class TestNotifyListeners(SocialhomeTestCase):
-    @patch("socialhome.content.signals.StreamConsumer")
-    def test_content_save_calls_streamconsumer_group_send(self, mock_consumer):
-        mock_consumer.group_send = Mock()
-        # Public post no tags or followers
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_send):
         content = ContentFactory()
+        update_streams_with_content(content)
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
-            call("streams_public", data),
-            call("streams_profile__%s" % content.author.id, data),
-            call("streams_profile_all__%s" % content.author.id, data),
+            call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
+            call(f"streams_public__{self.user.id}", data),
         ]
-        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
-        mock_consumer.group_send.reset_mock()
-        # Private post with tags
+        mock_send.assert_has_calls(calls, any_order=True)
+        self.assertEqual(mock_send.call_count, 2)
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_send):
+        PublicUserFactory()
+        self.profile.following.add(self.remote_profile)
+        content = ContentFactory(author=self.remote_profile, visibility=Visibility.LIMITED, text="#foobar #barfoo")
+        content.limited_visibilities.add(self.profile)
+        update_streams_with_content(content)
+        data = json.dumps({"event": "new", "id": content.id})
+        foobar_id = Tag.objects.get(name="foobar").id
+        barfoo_id = Tag.objects.get(name="barfoo").id
+        calls = [
+            call(f"streams_tag__{foobar_id}__{self.user.id}", data),
+            call(f"streams_tag__{barfoo_id}__{self.user.id}", data),
+            call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
+            call(f"streams_followed__{self.user.id}", data),
+            call(f"streams_limited__{self.user.id}", data),
+        ]
+        mock_send.assert_has_calls(calls, any_order=True)
+        print(mock_send.call_args_list)
+        self.assertEqual(mock_send.call_count, 5)
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__limited_no_followers(self, mock_send):
         content = ContentFactory(visibility=Visibility.LIMITED, text="#foobar #barfoo")
+        update_streams_with_content(content)
+        mock_send.assert_not_called()
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_send):
+        self.profile.following.add(self.remote_profile)
+        other_user = PublicUserFactory()
+        third_user = PublicUserFactory()
+        other_user.profile.following.add(self.remote_profile)
+        content = ContentFactory(author=self.remote_profile, text="#foobar #barfoo")
+        update_streams_with_content(content)
+        data = json.dumps({"event": "new", "id": content.id})
+        foobar_id = Tag.objects.get(name="foobar").id
+        barfoo_id = Tag.objects.get(name="barfoo").id
+        calls = [
+            call(f"streams_tag__{foobar_id}__{self.user.id}", data),
+            call(f"streams_tag__{foobar_id}__{other_user.id}", data),
+            call(f"streams_tag__{foobar_id}__{third_user.id}", data),
+            call(f"streams_tag__{barfoo_id}__{self.user.id}", data),
+            call(f"streams_tag__{barfoo_id}__{other_user.id}", data),
+            call(f"streams_tag__{barfoo_id}__{third_user.id}", data),
+            call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
+            call(f"streams_profile_all__{content.author.id}__{other_user.id}", data),
+            call(f"streams_profile_all__{content.author.id}__{third_user.id}", data),
+            call(f"streams_public__{self.user.id}", data),
+            call(f"streams_public__{other_user.id}", data),
+            call(f"streams_public__{third_user.id}", data),
+            call(f"streams_followed__{self.user.id}", data),
+            call(f"streams_followed__{other_user.id}", data),
+        ]
+        mock_send.assert_has_calls(calls, any_order=True)
+        self.assertEqual(mock_send.call_count, 14)
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_send):
+        self.profile.following.add(self.remote_profile)
+        other_user = PublicUserFactory()
+        other_profile = ProfileFactory()
+        content = ContentFactory(author=self.remote_profile)
+        share = ContentFactory(content_type=ContentType.SHARE, share_of=content, author=other_profile)
+        update_streams_with_content(share)
         data = json.dumps({"event": "new", "id": content.id})
         calls = [
-            call("streams_tag__%s_foobar" % Tag.objects.get(name="foobar").id, data),
-            call("streams_tag__%s_barfoo" % Tag.objects.get(name="barfoo").id, data),
-            call("streams_profile__%s" % content.author.id, data),
-            call("streams_profile_all__%s" % content.author.id, data),
+            call(f"streams_profile_all__{share.author.id}__{self.user.id}", data),
+            call(f"streams_profile_all__{share.author.id}__{other_user.id}", data),
+            call(f"streams_followed__{self.user.id}", data),
         ]
-        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
-        mock_consumer.group_send.reset_mock()
-        # Public post with followers
-        follower = UserFactory()
-        follower2 = UserFactory()
-        profile = ProfileFactory()
-        follower.profile.following.add(content.author)
-        follower2.profile.following.add(content.author)
-        profile.following.add(content.author)
-        content = ContentFactory(author=content.author)
-        data = json.dumps({"event": "new", "id": content.id})
-        calls = [
-            call("streams_public", data),
-            call("streams_profile__%s" % content.author.id, data),
-            call("streams_profile_all__%s" % content.author.id, data),
-            call("streams_followed__%s" % follower.username, data),
-            call("streams_followed__%s" % follower2.username, data),
-        ]
-        mock_consumer.group_send.assert_has_calls(calls, any_order=True)
-        mock_consumer.group_send.reset_mock()
-        # Replies
+        print(mock_send.call_args_list)
+        mock_send.assert_has_calls(calls, any_order=True)
+        self.assertEqual(mock_send.call_count, 3)
+
+    @patch.object(StreamConsumer, "group_send", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__replies(self, mock_send):
+        content = ContentFactory()
         reply = ContentFactory(parent=content)
+        update_streams_with_content(reply)
         data = json.dumps({"event": "new", "id": reply.id})
-        mock_consumer.group_send.assert_called_once_with("streams_content__%s" % content.channel_group_name, data)
-        mock_consumer.group_send.reset_mock()
-        # Update shouldn't cause a group send
-        content.text = "foo"
-        content.save()
-        self.assertFalse(mock_consumer.group_send.called)
+        mock_send.assert_called_once_with("streams_content__%s" % content.channel_group_name, data)
 
 
 class TestFederateContent(SocialhomeTransactionTestCase):
@@ -138,14 +189,17 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         parent = ContentFactory(author=user.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, parent=parent)
+        print(mock_send.call_args_list)
         self.assertTrue(content.local)
-        args, kwargs = mock_send.call_args_list[0]
-        self.assertEqual(args, (send_reply_notifications, content.id))
-        args, kwargs = mock_send.call_args_list[1]
-        self.assertEqual(args[0], send_reply)
-        self.assertEqual(args[1], content.id)
         activity = content.activities.first()
-        self.assertEqual(args[2], activity.fid)
+        send_reply_notifications_found = send_reply_found = False
+        for args, kwargs in mock_send.call_args_list:
+            if args == (send_reply_notifications, content.id):
+                send_reply_notifications_found = True
+            elif args[0] == send_reply and args[1] == content.id and args[2] == activity.fid:
+                send_reply_found = True
+        if not all([send_reply_notifications_found, send_reply_found]):
+            self.fail()
         self.assertEqual(activity.type, ActivityType.CREATE)
 
     @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)

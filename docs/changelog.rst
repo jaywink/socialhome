@@ -6,6 +6,16 @@ Changelog
 0.11.0-dev (unreleased)
 -----------------------
 
+Fixed
+.....
+
+* All streams now properly push out websocket notifications on new content.
+
+  Previously only certain streams knew how to push notifications on new content to the
+  client. Now all streams will know how to do this. Additionally they will respect user
+  preferences in the future when hiding of content from users is added. Shared content
+  also gets a notification pushed out as other content.
+
 0.10.0 (2019-10-06)
 -------------------
 

@@ -5,8 +5,8 @@ from django.test import Client
 from socialhome.content.tests.factories import ContentFactory, TagFactory, PublicContentFactory
 from socialhome.enums import Visibility
 from socialhome.streams.enums import StreamType
-from socialhome.streams.views import PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, \
-    LocalStreamView, TagsStreamView
+from socialhome.streams.views import (
+    PublicStreamView, TagStreamView, FollowedStreamView, LimitedStreamView, LocalStreamView, TagsStreamView)
 from socialhome.tests.utils import SocialhomeCBVTestCase
 from socialhome.users.serializers import ProfileSerializer
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
@@ -49,7 +49,7 @@ class TestFollowedStreamView(SocialhomeCBVTestCase):
     def test_stream_name(self):
         view = self.get_instance(FollowedStreamView, request=self.get_request(self.user))
         self.assertEqual(
-            view.stream_name, "%s__%s" % (StreamType.FOLLOWED.value, self.user.username)
+            view.stream_name, "%s__%s" % (StreamType.FOLLOWED.value, self.user.id)
         )
 
     def test_stream_type_value(self):
@@ -101,7 +101,8 @@ class TestLimitedStreamView(SocialhomeCBVTestCase):
 
     def test_stream_name(self):
         view = self.get_instance(LimitedStreamView)
-        self.assertEqual(view.stream_name, StreamType.LIMITED.value)
+        view.request = self.get_request(self.user)
+        self.assertEqual(view.stream_name, f"{StreamType.LIMITED.value}__{self.user.id}")
 
     def test_stream_type_value(self):
         view = self.get_instance(LimitedStreamView)
@@ -152,6 +153,7 @@ class TestLocalStreamView(SocialhomeCBVTestCase):
 
     def test_stream_name(self):
         view = self.get_instance(LocalStreamView)
+        view.request = self.get_request(AnonymousUser())
         self.assertEqual(view.stream_name, StreamType.LOCAL.value)
 
     def test_stream_type_value(self):
@@ -206,6 +208,7 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
 
     def test_stream_name(self):
         view = self.get_instance(PublicStreamView)
+        view.request = self.get_request(AnonymousUser())
         self.assertEqual(view.stream_name, StreamType.PUBLIC.value)
 
     def test_stream_type_value(self):
@@ -265,8 +268,9 @@ class TestTagStreamView(SocialhomeCBVTestCase):
     def test_stream_name(self):
         view = self.get_instance(TagStreamView)
         view.tag = self.content.tags.first()
+        view.request = self.get_request(self.user)
         self.assertEqual(
-            view.stream_name, "%s__%s" % (StreamType.TAG.value, view.tag.channel_group_name)
+            view.stream_name, f"{StreamType.TAG.value}__{view.tag.id}__{self.user.id}",
         )
 
     def test_stream_type_value(self):
@@ -313,7 +317,8 @@ class TestTagsStreamView(SocialhomeCBVTestCase):
 
     def test_stream_name(self):
         view = self.get_instance(TagsStreamView)
-        self.assertEqual(view.stream_name, StreamType.TAGS.value)
+        view.request = self.get_request(self.user)
+        self.assertEqual(view.stream_name, f"{StreamType.TAGS.value}__{self.user.id}")
 
     def test_stream_type_value(self):
         view = self.get_instance(TagsStreamView)
