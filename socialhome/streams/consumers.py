@@ -9,7 +9,6 @@ from socialhome.content.models import Content
 def notify_listeners(content: Content, keys: Set) -> None:
     """Send out to listening consumers."""
     data = json.dumps({"event": "new", "id": content.id})
-    # Other pre-calculated notify keys
     for key in keys:
         StreamConsumer.group_send(key, data)
 
