@@ -136,7 +136,7 @@ def update_streams_with_content(content):
     if acting_profile.is_local:
         keys = []
         notify_keys = set()
-        for stream_cls in CACHED_STREAM_CLASSES:
+        for stream_cls in ALL_STREAMS:
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
