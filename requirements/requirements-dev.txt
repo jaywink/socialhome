@@ -116,7 +116,7 @@ persisting-theory==0.2.1
 pexpect==4.7.0
 pickleshare==0.7.5
 pillow==5.4.1
-pip-tools==4.1.0
+pip-tools==4.2.0
 pluggy==0.12.0            # via pytest
 port_for==0.3.1           # via sphinx-autobuild
 prompt-toolkit==2.0.9
