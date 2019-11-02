@@ -2,7 +2,6 @@ import re
 
 import bleach
 from bleach import callbacks
-from bs4 import BeautifulSoup
 from django.conf import settings
 
 ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
@@ -58,25 +57,6 @@ def code_blocks_restore(code_blocks, text):
 def safe_text(text):
     """Clean text, stripping all tags, attributes and styles."""
     return bleach.clean(text or "", tags=[], attributes=[], styles=[], strip=True)
-
-
-def make_nsfw_safe(text):
-    """Make NSFW safer by adding click-to-show class to images."""
-    soup = BeautifulSoup(text, "lxml")
-    images = soup.find_all("img")
-
-    for image in images:
-        if image.get("class"):
-            image["class"] = "%s nsfw" % " ".join(image.get("class"))
-        else:
-            image["class"] = "nsfw"
-        image.replace_with(image)
-
-    result = str(soup)
-    # We don't want html/body, which BeautifulSoup kindly wraps our new HTML in
-    if result.startswith("<html><body>") and result.endswith("</body></html>"):
-        result = result[len("<html><body>"):-len("</body></html>")]
-    return result
 
 
 def process_text_links(text):

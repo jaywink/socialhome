@@ -24,7 +24,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
-from socialhome.content.utils import make_nsfw_safe, test_tag, process_text_links
+from socialhome.content.utils import test_tag, process_text_links
 from socialhome.enums import Visibility
 
 
@@ -400,8 +400,6 @@ class Content(models.Model):
         text = self.get_and_linkify_tags()
         rendered = commonmark(text).strip()
         rendered = process_text_links(rendered)
-        if self.is_nsfw:
-            rendered = make_nsfw_safe(rendered)
         if self.show_preview:
             if self.oembed:
                 rendered = "%s<br>%s" % (

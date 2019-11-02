@@ -34,23 +34,9 @@
   }
 }
 
-
-/* NSFW shield */
-.nsfw {
-  display: none;
-}
-
 .nsfw-shield {
   cursor: pointer;
   opacity: 0.5;
-}
-
-.nsfw-shield-return {
-  cursor: pointer;
-  opacity: 0.8;
-  font-size: 0.8em;
-  width: 100%;
-  text-align: center;
 }
 
 .streams-container {

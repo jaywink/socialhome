@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from socialhome.content.utils import (
-    safe_text_for_markdown, safe_text, make_nsfw_safe, find_urls_in_text, process_text_links)
+    safe_text_for_markdown, safe_text, find_urls_in_text, process_text_links)
 
 PLAIN_TEXT = "abcdefg kissa kävelee"
 MARKDOWN_TEXT = "## header\n\nFoo Bar. *fooo*"
@@ -51,36 +51,6 @@ class TestSafeText(object):
 
     def test_text_with_html_is_cleaned(self):
         assert safe_text(HTML_TEXT) == "barceedaaafaa"
-
-
-class TestMakeNSFWSafe(TestCase):
-    def setUp(self):
-        super(TestMakeNSFWSafe, self).setUp()
-        self.nsfw_text = '<div>FooBar</div><div><img src="localhost"/></div><div>#nsfw</div>'
-        self.nsfw_text_with_classes = '<div>FooBar</div><div><img class="foobar" src="localhost"/></div>' \
-                                      '<div>#nsfw</div>'
-        self.nsfw_text_empty_class = '<div>FooBar</div><div><img class="" src="localhost"/></div>' \
-                                     '<div>#nsfw</div>'
-        self.nsfw_text_many_classes = '<div>FooBar</div><div><img class="foo bar" src="localhost"/></div>' \
-                                      '<div>#nsfw</div>'
-
-    def test_adds_nsfw_class(self):
-        self.assertEqual(
-            make_nsfw_safe(self.nsfw_text),
-            '<div>FooBar</div><div><img class="nsfw" src="localhost"/></div><div>#nsfw</div>'
-        )
-        self.assertEqual(
-            make_nsfw_safe(self.nsfw_text_with_classes),
-            '<div>FooBar</div><div><img class="foobar nsfw" src="localhost"/></div><div>#nsfw</div>'
-        )
-        self.assertEqual(
-            make_nsfw_safe(self.nsfw_text_empty_class),
-            '<div>FooBar</div><div><img class="nsfw" src="localhost"/></div><div>#nsfw</div>'
-        )
-        self.assertEqual(
-            make_nsfw_safe(self.nsfw_text_many_classes),
-            '<div>FooBar</div><div><img class="foo bar nsfw" src="localhost"/></div><div>#nsfw</div>'
-        )
 
 
 class TestFindUrlsInText(TestCase):

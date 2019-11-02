@@ -282,11 +282,6 @@ class TestContentRendered(SocialhomeTestCase):
         content = ContentFactory(text="# Foobar <img src='localhost'>")
         self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"></h1>')
 
-    def test_renders_with_nsfw_shield(self):
-        content = ContentFactory(text="<img src='localhost'> #nsfw")
-        self.assertEqual(content.rendered, '<p><img class="nsfw" src="localhost"/> '
-                                           '<a href="/streams/tag/nsfw/">#nsfw</a></p>')
-
     def test_renders_with_oembed(self):
         content = ContentFactory(text="foobar", oembed=OEmbedCacheFactory())
         self.assertEqual(content.rendered, "<p>foobar</p><br>%s" % content.oembed.oembed)

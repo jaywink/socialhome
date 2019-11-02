@@ -28,7 +28,6 @@ class TestFetchOgPreview(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.content = ContentFactory()
-        cls.nsfw_content = ContentFactory(text="foo #nsfw")
         cls.urls = ["https://example.com"]
 
     def test_if_cached_already_dont_fetch(self):
@@ -63,15 +62,6 @@ class TestFetchOgPreview(SocialhomeTestCase):
     def test_opengraph_cache_created(self, og):
         og.return_value = MockOpenGraph({"title": "foo"})
         opengraph = fetch_og_preview(self.content, self.urls)
-        self.assertEqual(opengraph.title, "foo")
-        self.assertEqual(opengraph.description, "")
-        self.assertEqual(opengraph.image, "")
-        self.assertEqual(opengraph.url, self.urls[0])
-
-    @patch("socialhome.content.previews.OpenGraph")
-    def test_opengraph_cache_created_without_image_for_nsfw_content(self, og):
-        og.return_value = MockOpenGraph({"title": "foo", "image": "https://domain.tld/pic.png"})
-        opengraph = fetch_og_preview(self.nsfw_content, self.urls)
         self.assertEqual(opengraph.title, "foo")
         self.assertEqual(opengraph.description, "")
         self.assertEqual(opengraph.image, "")

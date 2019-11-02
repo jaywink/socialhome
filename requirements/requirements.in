@@ -1,6 +1,5 @@
 arrow
 asgi_redis<2.0  # Locked due to Channels 1.x
-beautifulsoup4
 bleach
 channels<2.0
 circus
