@@ -99,7 +99,7 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
         if stream.should_cache_content(content):
             if stream_cls in CACHED_STREAM_CLASSES:
                 cache_keys.append(stream.key)
-            if is_share and not stream.notify_for_shares:
+            if is_share and (not stream.notify_for_shares or acting_profile == getattr(user, "profile", None)):
                 continue
             notify_keys.add(stream.notify_key)
 
