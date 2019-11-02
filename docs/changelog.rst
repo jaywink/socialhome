@@ -6,6 +6,11 @@ Changelog
 0.11.0-dev (unreleased)
 -----------------------
 
+Added
+.....
+
+* Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
+
 Fixed
 .....
 

@@ -74,7 +74,7 @@ class GlobalSearchView(SearchView):
         """
         q = safe_text(request.GET.get("q"))
         if q:
-            q = q.strip().lower()
+            q = q.strip().lower().strip("@")
         self.q = q
         # Check if direct tag matches
         if q.startswith('#'):
