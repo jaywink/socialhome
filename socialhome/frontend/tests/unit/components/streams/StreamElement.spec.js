@@ -63,7 +63,7 @@ describe("StreamElement", () => {
         })
 
         it("showAuthorBar with other author", () => {
-            const otherContent = Object.assign({}, store.content)
+            const otherContent = {...store.content}
             otherContent.user_is_author = false
             const target = shallowMount(StreamElement, {propsData: {content: otherContent}, store, localVue})
             store.state.showAuthorBar = false

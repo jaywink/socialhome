@@ -132,7 +132,7 @@ export default {
                     _get(this.images.uploading[name], ["image", "size"], 0),
                     _get(this.images.uploading[name], ["uploadedSize"], 0),
                 ]).reduce((acc, curr) => [acc[0] + curr[0], acc[1] + curr[1]], [0, 0])
-            return Math.round(totalSize === 0 ? 100 : Math.min(uploadedSize * 100 / totalSize, 100))
+            return Math.round(totalSize === 0 ? 100 : Math.min((uploadedSize * 100) / totalSize, 100))
         },
     },
     mounted() {
@@ -317,7 +317,7 @@ export default {
                 formData.append("image", image, image.name)
 
                 return this.$http.post(Urls["api-image-upload"](), formData, {
-                    headers: Object.assign({}, this.$http.headers, {"content-type": "multipart/form-data"}),
+                    headers: {...this.$http.headers, "content-type": "multipart/form-data"},
                     onUploadProgress: e => this.$set(this.images.uploading[image.name], "uploadedSize", e.loaded),
                 }).then(({data}) => promiseSuccess(data, image), () => promiseFail(image)).finally(() => {
                     this.$delete(this.images.uploading, image.name)
