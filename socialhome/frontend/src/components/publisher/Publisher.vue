@@ -188,7 +188,7 @@ export default {
     },
     methods: {
         onPostForm() {
-            this.$store.dispatch("publisher/publishPost", Object.assign({}, this.model, {parent: this.contentId}))
+            this.$store.dispatch("publisher/publishPost", {...this.model, parent: this.contentId})
                 .then(url => window.location.replace(url))
                 .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
         },

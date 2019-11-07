@@ -3,7 +3,7 @@ import _get from "lodash/get"
 import _without from "lodash/without"
 import Vue from "vue"
 
-const state = Object.assign({}, _get(window, ["context", "ownProfile"], {}))
+const state = {..._get(window, ["context", "ownProfile"], {})}
 
 const getters = {}
 
