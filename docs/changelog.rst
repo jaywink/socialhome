@@ -11,6 +11,16 @@ Added
 
 * Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
 
+Changed
+.......
+
+* UI changes:
+
+  * The stamped element (the first stream element with information about the stream or
+    profile information) is now 100% wide in all situations. The profile picture has
+    also been made larger.
+  * The author bar has been moved from the bottom of the content to the top of the content.
+
 Fixed
 .....
 

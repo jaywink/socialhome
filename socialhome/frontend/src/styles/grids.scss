@@ -51,18 +51,13 @@ button.item-reaction {
 }
 
 .grid-item-author-bar {
-  margin-bottom: 3px;
+  margin-bottom: 8pt;
 
   .grid-item-author-bar-pic {
-    max-width: 24px;
-    max-height: 24px;
-    margin-right: 5px;
-  }
-
-  .grid-item-author-bar-pic-large {
-    max-width: 48px;
-    max-height: 48px;
-    margin-right: 5px;
+      max-width: 48px;
+      max-height: 48px;
+      margin-right: 8pt;
+      margin-left: 8pt;
   }
 }
 
