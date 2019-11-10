@@ -1,44 +1,44 @@
 <template>
-  <div class="socialhome-profile-reaction-buttons">
-    <b-button
-      v-if="showProfileLink"
-      :href="profile.url"
-      variant="outline-dark"
-      :title="translations.profile"
-      :aria-label="translations.profile"
-    >
-      <i class="fa fa-user" />
-    </b-button>
-    <b-button
-      v-if="!profile.is_local"
-      :href="profile.home_url"
-      variant="outline-dark"
-      :title="translations.home"
-      :aria-label="translations.home"
-    >
-      <i class="fa fa-home" />
-    </b-button>
-    <b-button
-      v-if="showUnfollowBtn"
-      variant="outline-dark"
-      class="unfollow-btn"
-      :title="translations.unfollow"
-      :aria-label="translations.unfollow"
-      @click.prevent.stop="unfollow"
-    >
-      <i class="fa fa-minus" />
-    </b-button>
-    <b-button
-      v-if="showFollowBtn"
-      variant="outline-dark"
-      class="follow-btn"
-      :title="translations.follow"
-      :aria-label="translations.follow"
-      @click.prevent.stop="follow"
-    >
-      <i class="fa fa-plus" />
-    </b-button>
-  </div>
+    <div class="socialhome-profile-reaction-buttons">
+        <b-button
+            v-if="showProfileLink"
+            :href="profile.url"
+            variant="outline-dark"
+            :title="translations.profile"
+            :aria-label="translations.profile"
+        >
+            <i class="fa fa-user" />
+        </b-button>
+        <b-button
+            v-if="!profile.is_local"
+            :href="profile.home_url"
+            variant="outline-dark"
+            :title="translations.home"
+            :aria-label="translations.home"
+        >
+            <i class="fa fa-home" />
+        </b-button>
+        <b-button
+            v-if="showUnfollowBtn"
+            variant="outline-dark"
+            class="unfollow-btn"
+            :title="translations.unfollow"
+            :aria-label="translations.unfollow"
+            @click.prevent.stop="unfollow"
+        >
+            <i class="fa fa-minus" />
+        </b-button>
+        <b-button
+            v-if="showFollowBtn"
+            variant="outline-dark"
+            class="follow-btn"
+            :title="translations.follow"
+            :aria-label="translations.follow"
+            @click.prevent.stop="follow"
+        >
+            <i class="fa fa-plus" />
+        </b-button>
+    </div>
 </template>
 
 <script>

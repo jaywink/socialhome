@@ -1,32 +1,40 @@
 <template>
-  <div :class="{ container: this.$store.state.stream.stream.single }">
-    <div v-show="$store.getters['stream/hasNewContent']" class="new-content-container">
-      <b-link class="new-content-load-link" @click.prevent.stop="onNewContentClick">
-        <b-badge pill variant="primary">
-          {{ translations.newPostsAvailables }}
-        </b-badge>
-      </b-link>
+    <div :class="{ container: this.$store.state.stream.stream.single }">
+        <div v-show="$store.getters['stream/hasNewContent']" class="new-content-container">
+            <b-link class="new-content-load-link" @click.prevent.stop="onNewContentClick">
+                <b-badge pill variant="primary">
+                    {{ translations.newPostsAvailables }}
+                </b-badge>
+            </b-link>
+        </div>
+        <div v-if="this.$store.state.stream.stream.single">
+            <stream-element class="grid-item grid-item-full" :content="singleContent" />
+        </div>
+        <div v-else>
+            <div class="stamped">
+                <component :is="stampedElement" />
+            </div>
+            <div
+                v-if="showProfileStreamButtons"
+                class="profile-stream-buttons"
+            >
+                <ProfileStreamButtons />
+            </div>
+            <div v-masonry class="grid" v-bind="masonryOptions">
+                <div class="grid-sizer" />
+                <div class="gutter-sizer" />
+                <stream-element
+                    v-for="content in $store.getters['stream/contentList']"
+                    :key="content.id"
+                    v-masonry-tile
+                    class="grid-item"
+                    :content="content"
+                    @loadmore="loadStream"
+                />
+            </div>
+        </div>
+        <loading-element v-show="$store.state.stream.pending.contents" />
     </div>
-    <div v-if="this.$store.state.stream.stream.single">
-      <stream-element class="grid-item grid-item-full" :content="singleContent" />
-    </div>
-    <div v-else v-masonry v-bind="masonryOptions">
-      <div class="stamped">
-        <component :is="stampedElement" />
-      </div>
-      <div class="grid-sizer" />
-      <div class="gutter-sizer" />
-      <stream-element
-        v-for="content in $store.getters['stream/contentList']"
-        :key="content.id"
-        v-masonry-tile
-        class="grid-item"
-        :content="content"
-        @loadmore="loadStream"
-      />
-    </div>
-    <loading-element v-show="$store.state.stream.pending.contents" />
-  </div>
 </template>
 
 <script>
@@ -41,7 +49,7 @@ import TagStampedElement from "@/components/streams/stamped_elements/TagStampedE
 import TagsStampedElement from "@/components/streams/stamped_elements/TagsStampedElement.vue"
 import ProfileStampedElement from "@/components/streams/stamped_elements/ProfileStampedElement.vue"
 import LoadingElement from "@/components/common/LoadingElement.vue"
-
+import ProfileStreamButtons from "@/components/streams/stamped_elements/ProfileStreamButtons"
 
 export default Vue.component("stream", {
     components: {
@@ -50,6 +58,7 @@ export default Vue.component("stream", {
         LoadingElement,
         LocalStampedElement,
         ProfileStampedElement,
+        ProfileStreamButtons,
         PublicStampedElement,
         StreamElement,
         TagStampedElement,
@@ -69,7 +78,6 @@ export default Vue.component("stream", {
                 "column-width": ".grid-sizer",
                 gutter: ".gutter-sizer",
                 "percent-position": true,
-                stamp: ".stamped",
                 "transition-duration": "0s",
                 stagger: 0,
             },
@@ -82,8 +90,11 @@ export default Vue.component("stream", {
             }
             return this.$store.state.stream.contents[this.$store.state.stream.singleContentId]
         },
+        showProfileStreamButtons() {
+            return this.streamName === "profile_all" || this.streamName === "profile_pinned"
+        },
         stampedElement() {
-            switch (this.$store.state.stream.stream.name) {
+            switch (this.streamName) {
                 case "followed":
                     return "FollowedStampedElement"
                 case "limited":
@@ -101,9 +112,12 @@ export default Vue.component("stream", {
                     return "ProfileStampedElement"
                 default:
                     // eslint-disable-next-line no-console
-                    console.error(`Unsupported stream name ${this.$store.state.stream.stream.name}`)
+                    console.error(`Unsupported stream name ${this.streamName}`)
                     return ""
             }
+        },
+        streamName() {
+            return this.$store.state.stream.stream.name
         },
         translations() {
             const ln = this.unfetchedContentIds.length

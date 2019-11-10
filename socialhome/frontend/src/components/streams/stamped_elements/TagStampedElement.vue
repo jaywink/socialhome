@@ -1,33 +1,33 @@
 <template>
-  <div>
-    <div
-      v-if="showTagActions"
-      class="pull-right"
-    >
-      <b-button
-        v-if="!followingTag"
-        variant="outline-dark"
-        class="tag-actions-button"
-        :title="translations.follow"
-        :aria-label="translations.follow"
-        @click.prevent="onFollowClick"
-      >
-        <i class="fa fa-plus" />
-      </b-button>
-      <b-button
-        v-if="followingTag"
-        variant="outline-dark"
-        class="tag-actions-button"
-        :title="translations.unfollow"
-        :aria-label="translations.unfollow"
-        @click.prevent="onUnFollowClick"
-      >
-        <i class="fa fa-minus" />
-      </b-button>
+    <div>
+        <div
+            v-if="showTagActions"
+            class="pull-right"
+        >
+            <b-button
+                v-if="!followingTag"
+                variant="outline-dark"
+                class="tag-actions-button"
+                :title="translations.follow"
+                :aria-label="translations.follow"
+                @click.prevent="onFollowClick"
+            >
+                <i class="fa fa-plus" />
+            </b-button>
+            <b-button
+                v-if="followingTag"
+                variant="outline-dark"
+                class="tag-actions-button"
+                :title="translations.unfollow"
+                :aria-label="translations.unfollow"
+                @click.prevent="onUnFollowClick"
+            >
+                <i class="fa fa-minus" />
+            </b-button>
+        </div>
+        <h2>{{ title }}</h2>
+        <p>{{ helpText }}</p>
     </div>
-    <h2>{{ title }}</h2>
-    <p>{{ helpText }}</p>
-  </div>
 </template>
 
 <script>

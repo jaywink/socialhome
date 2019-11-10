@@ -1,28 +1,28 @@
 <template>
-  <b-container>
-    <h1>{{ title | gettext }}</h1>
-    <b-card-group v-for="(chunk, index) in chunks" :key="index" class="socialhome-card-deck" deck>
-      <b-card
-        v-for="item in chunk"
-        :key="item.fid"
-        :title="contactDesignation(item)"
-        :img-src="item.image_url_large"
-        :img-alt="contactAvatarAlt(item)"
-        img-top
-        class="socialhome-contact-card mb-3"
-      >
-        <b-card-text>{{ item.handle }}</b-card-text>
+    <b-container>
+        <h1>{{ title | gettext }}</h1>
+        <b-card-group v-for="(chunk, index) in chunks" :key="index" class="socialhome-card-deck" deck>
+            <b-card
+                v-for="item in chunk"
+                :key="item.fid"
+                :title="contactDesignation(item)"
+                :img-src="item.image_url_large"
+                :img-alt="contactAvatarAlt(item)"
+                img-top
+                class="socialhome-contact-card mb-3"
+            >
+                <b-card-text>{{ item.handle }}</b-card-text>
 
-        <profile-reaction-buttons
-          slot="footer"
-          class="pull-right"
-          :profile="item"
-          :user-following="item.user_following"
-        />
-      </b-card>
-    </b-card-group>
-    <infinite-loading @infinite="loadMore" />
-  </b-container>
+                <profile-reaction-buttons
+                    slot="footer"
+                    class="pull-right"
+                    :profile="item"
+                    :user-following="item.user_following"
+                />
+            </b-card>
+        </b-card-group>
+        <infinite-loading @infinite="loadMore" />
+    </b-container>
 </template>
 
 <script>

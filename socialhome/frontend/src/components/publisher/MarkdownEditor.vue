@@ -1,81 +1,81 @@
 <!-- eslint-disable max-len -->
 <template>
-  <div class="socialhome-markdown-editor" :class="{fullscreen: fullscreen}">
-    <textarea v-show="false" ref="easymde" />
-    <small class="form-text text-muted image-upload-form-text">
-      {{ "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg/gif." | gettext }}
-    </small>
-    <b-progress v-show="isUploading" :value="uploadedSize" show-progress animated />
+    <div class="socialhome-markdown-editor" :class="{fullscreen: fullscreen}">
+        <textarea v-show="false" ref="easymde" />
+        <small class="form-text text-muted image-upload-form-text">
+            {{ "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg/gif." | gettext }}
+        </small>
+        <b-progress v-show="isUploading" :value="uploadedSize" show-progress animated />
 
-    <div v-show="showDropdowns.headings" class="editor-toolbar-dropdown editor-toolbar-heading-dropdown">
-      <ul>
-        <li>
-          <b-button @click="toggleHeading1">
-            <h1>{{ "Header 1" | gettext }}</h1>
-          </b-button>
-        </li>
-        <li>
-          <b-button @click="toggleHeading2">
-            <h2>{{ "Header 2" | gettext }}</h2>
-          </b-button>
-        </li>
-        <li>
-          <b-button @click="toggleHeading3">
-            <h3>{{ "Header 3" | gettext }}</h3>
-          </b-button>
-        </li>
-        <li>
-          <b-button @click="toggleHeading4">
-            <h4>{{ "Header 4" | gettext }}</h4>
-          </b-button>
-        </li>
-        <li>
-          <b-button @click="toggleHeading5">
-            <h5>{{ "Header 5" | gettext }}</h5>
-          </b-button>
-        </li>
-        <li>
-          <b-button @click="toggleHeading6">
-            <h6>{{ "Header 6" | gettext }}</h6>
-          </b-button>
-        </li>
-      </ul>
-    </div>
-    <div
-      v-show="showDropdowns.pictures"
-      v-if="uploadPicture"
-      class="editor-toolbar-dropdown editor-toolbar-picture-dropdown"
-    >
-      <ul>
-        <li>
-          <b-button block :title="translations.insertImage" @click.stop.prevent="embeddPictureLink">
-            {{ "Embedd link" | gettext }}
-          </b-button>
-        </li>
-        <li>
-          <b-button
-            block
-            :title="translations.uploadPicture"
-            @click.stop.prevent="onUploadPicture"
-          >
-            {{ "Upload picture" | gettext }}
-          </b-button>
-        </li>
-      </ul>
-    </div>
+        <div v-show="showDropdowns.headings" class="editor-toolbar-dropdown editor-toolbar-heading-dropdown">
+            <ul>
+                <li>
+                    <b-button @click="toggleHeading1">
+                        <h1>{{ "Header 1" | gettext }}</h1>
+                    </b-button>
+                </li>
+                <li>
+                    <b-button @click="toggleHeading2">
+                        <h2>{{ "Header 2" | gettext }}</h2>
+                    </b-button>
+                </li>
+                <li>
+                    <b-button @click="toggleHeading3">
+                        <h3>{{ "Header 3" | gettext }}</h3>
+                    </b-button>
+                </li>
+                <li>
+                    <b-button @click="toggleHeading4">
+                        <h4>{{ "Header 4" | gettext }}</h4>
+                    </b-button>
+                </li>
+                <li>
+                    <b-button @click="toggleHeading5">
+                        <h5>{{ "Header 5" | gettext }}</h5>
+                    </b-button>
+                </li>
+                <li>
+                    <b-button @click="toggleHeading6">
+                        <h6>{{ "Header 6" | gettext }}</h6>
+                    </b-button>
+                </li>
+            </ul>
+        </div>
+        <div
+            v-show="showDropdowns.pictures"
+            v-if="uploadPicture"
+            class="editor-toolbar-dropdown editor-toolbar-picture-dropdown"
+        >
+            <ul>
+                <li>
+                    <b-button block :title="translations.insertImage" @click.stop.prevent="embeddPictureLink">
+                        {{ "Embedd link" | gettext }}
+                    </b-button>
+                </li>
+                <li>
+                    <b-button
+                        block
+                        :title="translations.uploadPicture"
+                        @click.stop.prevent="onUploadPicture"
+                    >
+                        {{ "Upload picture" | gettext }}
+                    </b-button>
+                </li>
+            </ul>
+        </div>
 
-    <!-- "Hidden" form for image upload input -->
-    <form v-show="false" ref="uploadform" enctype="multipart/form-data">
-      <input
-        ref="uploadforminput"
-        type="file"
-        multiple
-        name="image"
-        accept="image/*"
-        @change.stop.prevent="() => processImages($refs.uploadforminput.files)"
-      >
-    </form>
-  </div>
+        <!-- "Hidden" form for image upload input -->
+        <form v-show="false" ref="uploadform" enctype="multipart/form-data">
+            <input
+                ref="uploadforminput"
+                type="file"
+                multiple
+                name="image"
+                accept="image/*"
+                @change.stop.prevent="() => processImages($refs.uploadforminput.files)"
+            >
+        </form>
+    </div>
 </template>
 <!-- eslint-enable max-len -->
 

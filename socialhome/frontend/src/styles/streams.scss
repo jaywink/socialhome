@@ -39,13 +39,10 @@
   opacity: 0.5;
 }
 
-.streams-container {
-  margin-top: -20px;
-}
-
 .profile-stream-stamped-image {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 300px;
+  max-height: 300px;
+  padding-left: 25%;
 }
 
 .profile-stream-stamped-header {
@@ -53,7 +50,8 @@
 }
 
 .stamped-profile-info {
-  word-break: break-all;
+    word-break: break-all;
+    margin-left: 4%;
 }
 
 @media all and (max-width: $largeDevice) {

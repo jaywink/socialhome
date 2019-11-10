@@ -1,26 +1,26 @@
 <template>
-  <div>
-    <div class="mt-2">
-      <b-form-textarea
-        v-if="contentVisibility === 'public'"
-        v-model="replyText"
-        :max-rows="5"
-        :placeholder="translations.replyText"
-        :rows="5"
-      />
+    <div>
+        <div class="mt-2">
+            <b-form-textarea
+                v-if="contentVisibility === 'public'"
+                v-model="replyText"
+                :max-rows="5"
+                :placeholder="translations.replyText"
+                :rows="5"
+            />
+        </div>
+        <div class="pull-right">
+            <a :href="fullEditorUrl" target="_blank" rel="noopener noreferrer">{{ translations.fullEditor }}</a>
+        </div>
+        <div
+            v-if="contentVisibility === 'public'"
+            class="reply-save-button"
+        >
+            <b-button variant="primary" @click.prevent.stop="saveReply">
+                {{ translations.save }}
+            </b-button>
+        </div>
     </div>
-    <div class="pull-right">
-      <a :href="fullEditorUrl" target="_blank" rel="noopener noreferrer">{{ translations.fullEditor }}</a>
-    </div>
-    <div
-      v-if="contentVisibility === 'public'"
-      class="reply-save-button"
-    >
-      <b-button variant="primary" @click.prevent.stop="saveReply">
-        {{ translations.save }}
-      </b-button>
-    </div>
-  </div>
 </template>
 
 

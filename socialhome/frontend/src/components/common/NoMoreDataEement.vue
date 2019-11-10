@@ -1,5 +1,5 @@
 <template>
-  <b-card :title="translations.cardTitle" class="socialhome-no-more-data" />
+    <b-card :title="translations.cardTitle" class="socialhome-no-more-data" />
 </template>
 
 <script>
