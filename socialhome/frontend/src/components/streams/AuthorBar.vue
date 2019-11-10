@@ -1,19 +1,19 @@
 <template>
-  <div>
-    <div class="grid-item-author-bar mt-1">
-      <div class="profilebox-trigger" @click.stop.prevent="profileBoxTrigger">
-        <img :src="author.image_url_small" class="grid-item-author-bar-pic">
-        {{ authorName }}
-      </div>
-      <div v-show="showProfileBox" class="profile-box">
-        {{ authorFederationId }}
-        <div class="pull-right">
-          <profile-reaction-buttons :profile="author" :user-following="content.user_following_author" />
+    <div>
+        <div class="grid-item-author-bar mt-1">
+            <div class="profilebox-trigger" @click.stop.prevent="profileBoxTrigger">
+                <img :src="author.image_url_small" class="grid-item-author-bar-pic">
+                {{ authorName }}
+            </div>
+            <div v-show="showProfileBox" class="profile-box">
+                {{ authorFederationId }}
+                <div class="pull-right">
+                    <profile-reaction-buttons :profile="author" :user-following="content.user_following_author" />
+                </div>
+                <div class="clearfix" />
+            </div>
         </div>
-        <div class="clearfix" />
-      </div>
     </div>
-  </div>
 </template>
 
 <script>

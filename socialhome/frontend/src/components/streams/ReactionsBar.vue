@@ -1,47 +1,47 @@
 <template>
-  <div>
-    <div class="grid-item-bar d-flex justify-content-start">
-      <slot />
-      <div class="ml-auto grid-item-reactions mt-1">
-        <b-button
-          v-if="showShareReactionIcon"
-          :class="{
-            'item-reaction-shared': content.user_has_shared,
-            'item-reaction-counter-positive': content.shares_count,
-          }"
-          class="item-reaction"
-          variant="outline-dark"
-          @click.stop.prevent="expandShares"
-        >
-          <i class="fa fa-refresh" title="Shares" aria-label="Shares" />
-          <span class="item-reaction-counter">{{ content.shares_count }}</span>
-        </b-button>
-        <b-button
-          v-if="showReplyReactionIcon"
-          :class="{'item-reaction-counter-positive': content.reply_count}"
-          class="item-reaction"
-          variant="outline-dark"
-          @click.stop.prevent="expandComments"
-        >
-          <span class="item-open-replies-action">
-            <i class="fa fa-comments" title="Replies" aria-label="Replies" />
-            <span class="item-reaction-counter">{{ content.reply_count }}</span>
-          </span>
-        </b-button>
-      </div>
+    <div>
+        <div class="grid-item-bar d-flex justify-content-start">
+            <slot />
+            <div class="ml-auto grid-item-reactions mt-1">
+                <b-button
+                    v-if="showShareReactionIcon"
+                    :class="{
+                        'item-reaction-shared': content.user_has_shared,
+                        'item-reaction-counter-positive': content.shares_count,
+                    }"
+                    class="item-reaction"
+                    variant="outline-dark"
+                    @click.stop.prevent="expandShares"
+                >
+                    <i class="fa fa-refresh" title="Shares" aria-label="Shares" />
+                    <span class="item-reaction-counter">{{ content.shares_count }}</span>
+                </b-button>
+                <b-button
+                    v-if="showReplyReactionIcon"
+                    :class="{'item-reaction-counter-positive': content.reply_count}"
+                    class="item-reaction"
+                    variant="outline-dark"
+                    @click.stop.prevent="expandComments"
+                >
+                    <span class="item-open-replies-action">
+                        <i class="fa fa-comments" title="Replies" aria-label="Replies" />
+                        <span class="item-reaction-counter">{{ content.reply_count }}</span>
+                    </span>
+                </b-button>
+            </div>
+        </div>
+        <div v-if="canShare && showSharesBox" class="content-actions">
+            <b-button v-if="content.user_has_shared" variant="outline-dark" @click.prevent.stop="unshare">
+                {{ translations.unshare }}
+            </b-button>
+            <b-button v-else variant="outline-dark" @click.prevent.stop="share">
+                {{ translations.share }}
+            </b-button>
+        </div>
+        <div v-if="showRepliesContainer">
+            <replies-container :content="content" />
+        </div>
     </div>
-    <div v-if="canShare && showSharesBox" class="content-actions">
-      <b-button v-if="content.user_has_shared" variant="outline-dark" @click.prevent.stop="unshare">
-        {{ translations.unshare }}
-      </b-button>
-      <b-button v-else variant="outline-dark" @click.prevent.stop="share">
-        {{ translations.share }}
-      </b-button>
-    </div>
-    <div v-if="showRepliesContainer">
-      <replies-container :content="content" />
-    </div>
-  </div>
 </template>
 
 <script>

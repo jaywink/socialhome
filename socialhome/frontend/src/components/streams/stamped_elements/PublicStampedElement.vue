@@ -1,8 +1,8 @@
 <template>
-  <base-stamped-element
-    :title="title"
-    :help-text="helpText"
-  />
+    <base-stamped-element
+        :title="title"
+        :help-text="helpText"
+    />
 </template>
 
 <script>

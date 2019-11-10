@@ -1,30 +1,30 @@
 <template>
-  <div v-images-loaded.on.progress="onImageLoad">
-    <div class="replies-container">
-      <stream-element
-        v-for="reply in replies"
-        :key="reply.id"
-        class="reply"
-        :content="reply"
-      />
+    <div v-images-loaded.on.progress="onImageLoad">
+        <div class="replies-container">
+            <stream-element
+                v-for="reply in replies"
+                :key="reply.id"
+                class="reply"
+                :content="reply"
+            />
+        </div>
+        <div v-show="showSpinner" class="replies-spinner text-center">
+            <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true" />
+        </div>
+        <div v-if="showReplyButton" class="content-actions">
+            <b-button variant="outline-dark" @click.prevent.stop="showReplyEditor">
+                {{ translations.reply }}
+            </b-button>
+        </div>
+        <div v-if="replyEditorActive">
+            <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
+        </div>
+        <div v-if="isContent">
+            <div v-for="share in shares" :key="share.id">
+                <replies-container :content="share" />
+            </div>
+        </div>
     </div>
-    <div v-show="showSpinner" class="replies-spinner text-center">
-      <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true" />
-    </div>
-    <div v-if="showReplyButton" class="content-actions">
-      <b-button variant="outline-dark" @click.prevent.stop="showReplyEditor">
-        {{ translations.reply }}
-      </b-button>
-    </div>
-    <div v-if="replyEditorActive">
-      <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
-    </div>
-    <div v-if="isContent">
-      <div v-for="share in shares" :key="share.id">
-        <replies-container :content="share" />
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
