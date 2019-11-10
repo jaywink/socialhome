@@ -20,15 +20,18 @@
             >
                 <ProfileStreamButtons />
             </div>
-            <div class="grid-sizer" />
-            <div class="gutter-sizer" />
-            <stream-element
-                v-for="content in $store.getters['stream/contentList']"
-                :key="content.id"
-                class="grid-item"
-                :content="content"
-                @loadmore="loadStream"
-            />
+            <div v-masonry class="grid" v-bind="masonryOptions">
+                <div class="grid-sizer" />
+                <div class="gutter-sizer" />
+                <stream-element
+                    v-for="content in $store.getters['stream/contentList']"
+                    :key="content.id"
+                    v-masonry-tile
+                    class="grid-item"
+                    :content="content"
+                    @loadmore="loadStream"
+                />
+            </div>
         </div>
         <loading-element v-show="$store.state.stream.pending.contents" />
     </div>
@@ -69,7 +72,16 @@ export default Vue.component("stream", {
         tag: {type: String, default: ""},
     },
     data() {
-        return {}
+        return {
+            masonryOptions: {
+                "item-selector": ".grid-item",
+                "column-width": ".grid-sizer",
+                gutter: ".gutter-sizer",
+                "percent-position": true,
+                "transition-duration": "0s",
+                stagger: 0,
+            },
+        }
     },
     computed: {
         singleContent() {

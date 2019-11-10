@@ -1,3 +1,7 @@
+.grid {
+    margin-top: -12px;
+}
+
 .grid-item {
   background-color: $light;
   color: $dark;
@@ -99,7 +103,7 @@ button.item-reaction {
 // Stamped element centered on top
 .stamped {
   width: 100%;
-  padding: 2%;
+  padding: 1%;
   overflow: visible;
   background-color: $light;
   color: $dark;
@@ -133,8 +137,4 @@ button.item-reaction {
 
 .card-block {
   padding: 15px;
-}
-
-.profile-stream-buttons {
-
 }

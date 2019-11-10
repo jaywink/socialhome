@@ -97,7 +97,7 @@
         <div class="d-inline-block">
             <img v-if="profile.image_url_large" class="profile-stream-stamped-image" :src="profile.image_url_large">
         </div>
-        <div class="d-inline-block ml-3 align-center stamped-profile-info">
+        <div class="d-inline-block align-center stamped-profile-info">
             <h1>{{ displayName }}</h1>
             <h3>
                 <cite :title="translations.userHandle">{{ profileHandle }}</cite>
@@ -156,7 +156,7 @@ export default Vue.component("profile-stamped-element", {
 </script>
 
 <style lang="scss">
-  .dropdown-menu-right {
-    right: auto;
-  }
+    .dropdown-menu-right {
+        right: auto;
+    }
 </style>
