@@ -3,7 +3,6 @@ import VueAxios from "vue-axios"
 import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm"
 import InfiniteLoading from "vue-infinite-loading"
 import VueInfiniteScroll from "vue-infinite-scroll"
-import {VueMasonryPlugin} from "vue-masonry"
 import VueRouter from "vue-router"
 import VueSnotify from "vue-snotify"
 import VueScrollTo from "vue-scrollto"
@@ -63,7 +62,6 @@ export default function (Vue) {
     Vue.use(BootstrapVue)
     Vue.use(VueInfiniteScroll)
 
-    Vue.use(VueMasonryPlugin)
     Vue.use(VueRouter)
     Vue.use(VueSnotify)
     Vue.use(VueScrollTo)

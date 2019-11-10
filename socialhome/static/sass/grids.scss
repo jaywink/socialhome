@@ -100,28 +100,11 @@ button.item-reaction {
 
 // Stamped element centered on top
 .stamped {
-  position: absolute;
   width: 100%;
-  left: 0;
-  top: 10px;
   padding: 2%;
   overflow: visible;
   background-color: $light;
   color: $dark;
-}
-@media all and (min-width: $largeDevice) {
-  .stamped {
-    left: 0;
-    width: 66.2%;
-    padding: 1%;
-  }
-}
-@media all and (min-width: $extraLargeDevice) {
-  .stamped {
-    left: 25.2%;
-    width: 49.4%;
-    padding: 0.5%;
-  }
 }
 
 .gutter-sizer {

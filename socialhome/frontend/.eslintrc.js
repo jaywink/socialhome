@@ -17,6 +17,7 @@ module.exports = {
             singleline: 5,
             multiline: {max: 1, allowFirstLine: false},
         }],
+        "vue/html-indent": ["error", 4],
     },
     globals: {
         gettext: true,
