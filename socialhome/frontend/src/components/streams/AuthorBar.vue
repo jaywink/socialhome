@@ -1,9 +1,19 @@
 <template>
     <div>
         <div class="grid-item-author-bar mt-1">
-            <div class="profilebox-trigger" @click.stop.prevent="profileBoxTrigger">
+            <div>
                 <img :src="author.image_url_small" class="grid-item-author-bar-pic">
-                {{ authorName }}
+                <div class="author-bar-name-container">
+                    <div class="profilebox-trigger" @click.stop.prevent="profileBoxTrigger">
+                        {{ authorName }}
+                    </div>
+                    <div class="author-bar-timestamp">
+                        <a :href="content.url" :title="content.timestamp" class="unstyled-link">
+                            {{ timestampText }}
+                        </a>
+                        <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
+                    </div>
+                </div>
             </div>
             <div v-show="showProfileBox" class="profile-box">
                 {{ authorFederationId }}
@@ -44,8 +54,16 @@ export default {
             }
             return this.author.fid
         },
+        isLimited() {
+            return this.content.visibility === "limited"
+        },
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
+        },
+        timestampText() {
+            return this.content.edited
+                ? `${this.content.humanized_timestamp} (${gettext("edited")})`
+                : this.content.humanized_timestamp
         },
     },
     updated() {
@@ -60,6 +78,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+    .author-bar-name-container {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .author-bar-timestamp {
+        color: #B39A96;
+    }
     .profilebox-trigger {
         cursor: pointer;
     }

@@ -4,6 +4,8 @@
             <div v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" />
         </div>
 
+        <author-bar v-if="showAuthorBar" :content="content" />
+
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div v-html="content.rendered" />
@@ -11,14 +13,8 @@
         <!-- eslint-disable-next-line vue/no-v-html -->
         <div v-else v-html="content.rendered" />
 
-        <author-bar v-if="showAuthorBar" :content="content" />
         <reactions-bar :content="content">
             <div class="mt-1 grid-item-bar-links">
-                <a :href="content.url" :title="content.timestamp" class="unstyled-link">
-                    {{ timestampText }}
-                </a>
-                <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
-
                 <template v-if="content.user_is_author">
                     <a :href="updateUrl">
                         <i class="fa fa-pencil" title="Update" aria-label="Update" />
@@ -52,14 +48,6 @@ const StreamElement = {
         },
         disableLoadMore() {
             return this.$store.state.stream.pending.contents || !this.content.hasLoadMore
-        },
-        isLimited() {
-            return this.content.visibility === "limited"
-        },
-        timestampText() {
-            return this.content.edited
-                ? `${this.content.humanized_timestamp} (${gettext("edited")})`
-                : this.content.humanized_timestamp
         },
         showAuthorBar() {
             if (this.content.content_type === "reply") {
