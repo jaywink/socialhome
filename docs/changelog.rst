@@ -35,6 +35,8 @@ Fixed
 
 * Don't show a share icon for own content, unless there is a counter to show.
 
+* Fix follow/unfollow of profiles from the search page.
+
 0.10.0 (2019-10-06)
 -------------------
 

@@ -9,8 +9,7 @@ $(document).ready(function() {
             var $elem = $(ev.currentTarget);
             var targetUuid = $elem.data("target");
             $.post({
-                url: "/api/profiles/" +$elem.data("profileid") + "/" + $elem.data("action") + "/",
-                data: { uuid: targetUuid },
+                url: "/api/profiles/" + targetUuid + "/" + $elem.data("action") + "/",
                 success: function () {
                     $(".follower-button[data-target='" + targetUuid + "']").toggleClass("hidden");
                 },
