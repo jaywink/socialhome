@@ -8,6 +8,7 @@
                     :class="{
                         'item-reaction-shared': content.user_has_shared,
                         'item-reaction-counter-positive': content.shares_count,
+                        'button-no-pointer': content.user_is_author,
                     }"
                     class="item-reaction"
                     variant="outline-dark"
@@ -70,7 +71,9 @@ export default {
         },
         showShareReactionIcon() {
             if (this.content.content_type === "content") {
-                return this.$store.state.application.isUserAuthenticated || this.content.shares_count > 0
+                return (
+                    this.$store.state.application.isUserAuthenticated && !this.content.user_is_author
+                ) || this.content.shares_count > 0
             }
             return false
         },

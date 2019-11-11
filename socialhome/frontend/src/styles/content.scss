@@ -59,3 +59,7 @@ a.btn, button.btn {
 .btn > i {
   padding: 3px;
 }
+
+.btn.button-no-pointer {
+    cursor: default;
+}

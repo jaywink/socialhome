@@ -33,6 +33,8 @@ Fixed
 
 * Don't process received shares if they point to a non-public content.
 
+* Don't show a share icon for own content, unless there is a counter to show.
+
 0.10.0 (2019-10-06)
 -------------------
 
