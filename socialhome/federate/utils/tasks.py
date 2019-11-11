@@ -299,14 +299,18 @@ def process_entity_share(entity, profile):
         else:
             logger.warning("No target found for share even after fetching from remote: %s", entity)
             return
+    if target_content.visibility != Visibility.PUBLIC:
+        # Don't process a share for non-public target content
+        logger.warning("Share '%s' target '%s' is not public - aborting", entity, target_content)
+        return
     values = {
         "text": safe_text_for_markdown(entity.raw_content),
         "author": profile,
-        # TODO: ensure visibility constraints depending on shared content?
-        "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
+        "visibility": Visibility.PUBLIC,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
+    # noinspection PyProtectedMember
     values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
     fid = safe_text(entity.id)
     if getattr(entity, "guid", None):

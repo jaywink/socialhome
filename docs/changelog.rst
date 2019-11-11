@@ -31,6 +31,8 @@ Fixed
   preferences in the future when hiding of content from users is added. Shared content
   also gets a notification pushed out as other content.
 
+* Don't process received shares if they point to a non-public content.
+
 0.10.0 (2019-10-06)
 -------------------
 

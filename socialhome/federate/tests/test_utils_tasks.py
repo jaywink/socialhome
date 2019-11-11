@@ -549,6 +549,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
         )
         mock_retrieve.return_value = entities.PostFactory(
             id=entity.target_id, actor_id=self.remote_profile2.fid,
+            public=True,
         )
         process_entity_share(entity, self.remote_profile)
         mock_retrieve.assert_called_once_with(
