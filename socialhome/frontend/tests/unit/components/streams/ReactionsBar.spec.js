@@ -60,9 +60,14 @@ describe("ReactionsBar", () => {
         describe("showShareReactionIcon", () => {
             it("should be true if user is authenticated or content has shares", () => {
                 store.state.stream.contents[content.id].shares_count = 0
+                content.user_is_author = false
                 store.state.application.isUserAuthenticated = true
                 let target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
                 target.vm.showShareReactionIcon.should.be.true
+
+                content.user_is_author = true
+                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target.vm.showShareReactionIcon.should.be.false
 
                 store.state.stream.contents[content.id].shares_count = 1
                 store.state.application.isUserAuthenticated = false
