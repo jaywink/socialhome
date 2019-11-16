@@ -40,6 +40,9 @@ Fixed
 * Don't raise a 500 error when Diaspora remotes try to fetch a content whose author has
   no ``handle``.
 
+* Don't raise a 500 error when an attempt is made to view a profile with an invalid
+  profile identifier
+
 0.10.0 (2019-10-06)
 -------------------
 

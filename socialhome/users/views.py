@@ -1,4 +1,7 @@
+import logging
+
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -7,7 +10,6 @@ from django.views.generic import DetailView, ListView, UpdateView, TemplateView,
 from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
 
-
 from socialhome.content.models import Content
 from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
 from socialhome.streams.views import BaseStreamView
@@ -15,6 +17,8 @@ from socialhome.users.forms import ProfileForm, UserPictureForm
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import ProfileSerializer
 from socialhome.utils import get_full_url
+
+logger = logging.getLogger("socialhome")
 
 
 class DeleteAccountView(DeleteView):
@@ -60,7 +64,10 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
 
         Redirect to login if not allowed to see profile.
         """
-        self.set_object_and_data()
+        try:
+            self.set_object_and_data()
+        except ValidationError as ex:
+            logger.debug("ProfileViewMixin.dispatch - failed at set_object_and_data: %s", ex)
         if self.data:
             return super().dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
