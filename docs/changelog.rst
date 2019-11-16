@@ -37,6 +37,9 @@ Fixed
 
 * Fix follow/unfollow of profiles from the search page.
 
+* Don't raise a 500 error when Diaspora remotes try to fetch a content whose author has
+  no ``handle``.
+
 0.10.0 (2019-10-06)
 -------------------
 

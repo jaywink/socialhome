@@ -149,6 +149,8 @@ def content_fetch_view(request, objtype, guid):
         raise Http404()
     content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
     if not content.local:
+        if content.author.handle is None:
+            raise Http404()
         url = "https://%s/fetch/%s/%s" % (
             content.author.handle.split("@")[1], objtype, guid
         )
