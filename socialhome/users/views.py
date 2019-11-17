@@ -66,7 +66,7 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
         """
         try:
             self.set_object_and_data()
-        except ValidationError as ex:
+        except (ValidationError, ValueError) as ex:
             logger.debug("ProfileViewMixin.dispatch - failed at set_object_and_data: %s", ex)
         if self.data:
             return super().dispatch(request, *args, **kwargs)
