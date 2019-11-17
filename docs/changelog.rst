@@ -11,6 +11,9 @@ Added
 
 * Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
 
+* Stream API results now contain a ``through_author`` object in the case that the content is
+  in the stream via share.
+
 Changed
 .......
 

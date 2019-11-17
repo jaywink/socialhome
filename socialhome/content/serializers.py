@@ -16,6 +16,7 @@ class ContentSerializer(serializers.ModelSerializer):
     user_has_shared = SerializerMethodField()
     tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
+    through_author = SerializerMethodField()
     visibility = EnumField(Visibility, lenient=True, ints_as_names=True, required=False)
 
     class Meta:
@@ -43,6 +44,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "tags",
             "text",
             "through",
+            "through_author",
             "timestamp",
             "url",
             "user_following_author",
@@ -68,6 +70,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "shares_count",
             "tags",
             "through",
+            "through_author",
             "timestamp",
             "url",
             "user_following_author",
@@ -75,12 +78,41 @@ class ContentSerializer(serializers.ModelSerializer):
             "user_has_shared",
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cache_through_authors()
+
+    def cache_through_authors(self):
+        """
+        If we have 'throughs', cache author information here for all of them.
+
+        Only do this for authenticated users.
+        """
+        request = self.context.get("request")
+        if not self.context.get("throughs") or not request or not request.user.is_authenticated:
+            self.context["throughs_authors"] = {}
+            return
+        throughs_ids = self.context["throughs"]
+        ids = {value for _key, value in throughs_ids.items()}
+        through_to_id = {value: key for key, value in throughs_ids.items()}
+        throughs = Content.objects.visible_for_user(request.user).select_related("author").filter(id__in=list(ids))
+        self.context["throughs_authors"] = {through_to_id.get(c.id, c.id): c.author for c in throughs}
+
     def get_through(self, obj):
         """Through is generally required only for serializing content for streams."""
         throughs = self.context.get("throughs")
         if not throughs:
             return obj.id
         return throughs.get(obj.id, obj.id)
+
+    def get_through_author(self, obj):
+        throughs_authors = self.context.get("throughs_authors")
+        if not throughs_authors:
+            return {}
+        through_author = throughs_authors.get(obj.id, obj.author)
+        if through_author != obj.author:
+            return LimitedProfileSerializer(instance=through_author, read_only=True).data
+        return {}
 
     def get_user_following_author(self, obj):
         request = self.context.get("request")
