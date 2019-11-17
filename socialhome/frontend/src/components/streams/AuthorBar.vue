@@ -13,6 +13,12 @@
                         </a>
                         <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
                     </div>
+                    <div v-if="isShared">
+                        <a :href="throughAuthorUrl" class="unstyled-link">
+                            <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" />
+                            {{ throughAuthorName }}
+                        </a>
+                    </div>
                 </div>
             </div>
             <div v-show="showProfileBox" class="profile-box">
@@ -57,8 +63,23 @@ export default {
         isLimited() {
             return this.content.visibility === "limited"
         },
+        isShared() {
+            return this.content.through !== this.content.id
+        },
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
+        },
+        throughAuthorName() {
+            const throughAuthor = this.content.through_author
+            if (throughAuthor.name) {
+                return throughAuthor.name
+            } if (throughAuthor.handle) {
+                return throughAuthor.handle
+            }
+            return throughAuthor.fid || ""
+        },
+        throughAuthorUrl() {
+            return this.content.through_author.url || "#"
         },
         timestampText() {
             return this.content.edited
@@ -82,7 +103,7 @@ export default {
         display: inline-block;
         vertical-align: middle;
     }
-    .author-bar-timestamp {
+    .author-bar-timestamp, .shared-icon {
         color: #B39A96;
     }
     .profilebox-trigger {

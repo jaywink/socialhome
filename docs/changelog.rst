@@ -14,6 +14,8 @@ Added
 * Stream API results now contain a ``through_author`` object in the case that the content is
   in the stream via share.
 
+* Shared content in the streams now contain the name and link to the profile of the sharer.
+
 Changed
 .......
 
