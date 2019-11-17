@@ -106,7 +106,10 @@ class ProfileDetailView(ProfileViewMixin):
 
     def dispatch(self, request, *args, **kwargs):
         """Ensure we have pinned content. If not, render all content instead."""
-        self.set_object_and_data()
+        try:
+            self.set_object_and_data()
+        except (ValidationError, ValueError) as ex:
+            logger.debug("ProfileDetailView.dispatch - failed at set_object_and_data: %s", ex)
         if self.data and not self.data["has_pinned_content"]:
             return ProfileAllContentView.as_view()(request, uuid=self.kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
