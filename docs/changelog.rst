@@ -48,6 +48,13 @@ Fixed
 * Don't raise a 500 error when an attempt is made to view a profile with an invalid
   profile identifier
 
+* Fix a major race issue with the ``through`` value calculation for shared content in streams (`#558 <https://git.feneas.org/socialhome/socialhome/issues/558>`_)
+
+  When calculating ``through`` values (ie what share caused a content to appear in the stream),
+  there was a race condition between processing the saved share and a remote fetched shared content.
+  Values are now correctly calculates irregardless of saving order to provide correct "shared by"
+  information for streams.
+
 0.10.0 (2019-10-06)
 -------------------
 

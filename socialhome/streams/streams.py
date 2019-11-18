@@ -30,9 +30,15 @@ def add_to_redis(content, through, keys):
         return
     r = get_redis_connection()
     for key in keys:
-        # Only add if not in the set already
-        # This stops shares popping up more than once, for example
-        if not r.zrank(key, content.id):
+        rank = r.zrank(key, content.id)
+        if rank:
+            # If through is not content, update
+            if content.id != through.id:
+                throughs_key = BaseStream.get_throughs_key(key)
+                r.hset(throughs_key, content.id, through.id)
+        else:
+            # Only add if not in the set already
+            # This stops shares popping up more than once, for example
             r.zadd(key, int(time.time()), content.id)
             r.expire(key, settings.REDIS_DEFAULT_EXPIRY)
             throughs_key = BaseStream.get_throughs_key(key)
