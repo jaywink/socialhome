@@ -1,4 +1,7 @@
+import logging
+
 from braces.views import UserPassesTestMixin, LoginRequiredMixin
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http.response import Http404
@@ -15,6 +18,8 @@ from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType
 from socialhome.utils import get_full_url
+
+logger = logging.getLogger("socialhome")
 
 
 class ContentVisibleForUserMixin(UserPassesTestMixin):
@@ -195,7 +200,11 @@ class ContentView(ContentVisibleForUserMixin, DetailView):
     def get_object(self, queryset=None):
         uuid = self.kwargs.get("uuid")
         if uuid:
-            return get_object_or_404(Content, uuid=uuid)
+            try:
+                return get_object_or_404(Content, uuid=uuid)
+            except ValidationError as ex:
+                logger.debug("ContentView.get_object - failed at get_object_or_404: %s", ex)
+                raise Http404()
         return super().get_object(queryset=queryset)
 
     def get_context_data(self, **kwargs):

@@ -55,6 +55,8 @@ Fixed
   Values are now correctly calculates irregardless of saving order to provide correct "shared by"
   information for streams.
 
+* Don't raise a 500 error on fetch of content using a malformed identifier
+
 0.10.0 (2019-10-06)
 -------------------
 
