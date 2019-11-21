@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div v-show="showProfileBox" class="profile-box">
+            <div v-if="showProfileBox" class="profile-box">
                 {{ authorFederationId }}
                 <div class="pull-right">
                     <profile-reaction-buttons :profile="author" :user-following="content.user_following_author" />

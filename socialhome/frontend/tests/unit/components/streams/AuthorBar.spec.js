@@ -37,7 +37,7 @@ describe("AuthorBar", () => {
             it("should hide profilebox by default", () => {
                 const target = mount(AuthorBar, {propsData: {content}, store})
                 target.instance().showProfileBox.should.be.false
-                target.find(".profile-box")[0].hasStyle("display", "none").should.be.true
+                target.find(".profile-box").length.should.eql(0)
             })
 
             it("should show profilebox when the author's name is clicked", () => {
