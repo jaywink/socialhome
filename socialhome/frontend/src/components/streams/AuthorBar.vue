@@ -14,10 +14,20 @@
                         <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
                     </div>
                     <div v-if="isShared">
-                        <a :href="throughAuthorUrl" class="unstyled-link">
-                            <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" />
+                        <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" />
+                        <div class="profilebox-trigger" @click.stop.prevent="throughBoxTrigger">
                             {{ throughAuthorName }}
-                        </a>
+                        </div>
+                        <div v-if="showThroughProfileBox" class="profile-box">
+                            <div class="pull-right">
+                                <!-- TODO this needs client side figuring out -->
+                                <profile-reaction-buttons
+                                    :profile="content.through_author"
+                                    :user-following="false"
+                                />
+                            </div>
+                            <div class="clearfix" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -40,7 +50,10 @@ export default {
     components: {ProfileReactionButtons},
     props: {content: {type: Object, required: true}},
     data() {
-        return {showProfileBox: false}
+        return {
+            showProfileBox: false,
+            showThroughProfileBox: false,
+        }
     },
     computed: {
         author() {
@@ -93,6 +106,9 @@ export default {
     methods: {
         profileBoxTrigger() {
             this.showProfileBox = !this.showProfileBox
+        },
+        throughBoxTrigger() {
+            this.showThroughProfileBox = !this.showThroughProfileBox
         },
     },
 }
