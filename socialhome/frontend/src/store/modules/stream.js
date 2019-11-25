@@ -72,6 +72,15 @@ export function onError() {
     Vue.snotify.error(gettext("An error happened while fetching new content"))
 }
 
+export const profilesPlugin = store => {
+    // called when the store is initialized
+    store.subscribe(({type, payload}) => {
+        if (/^stream\/GET[A-Z_]*SUCCEEDED$/.test(type)) {
+            store.commit("profiles/setProfilesFromContentList", payload.payload.data)
+        }
+    })
+}
+
 export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
 

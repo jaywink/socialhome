@@ -16,8 +16,7 @@
                 <profile-reaction-buttons
                     slot="footer"
                     class="pull-right"
-                    :profile="item"
-                    :user-following="item.user_following"
+                    :profile-uuid="item.uuid"
                 />
             </b-card>
         </b-card-group>

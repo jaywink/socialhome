@@ -20,10 +20,8 @@
                         </div>
                         <div v-if="showThroughProfileBox" class="profile-box">
                             <div class="pull-right">
-                                <!-- TODO this needs client side figuring out -->
                                 <profile-reaction-buttons
-                                    :profile="content.through_author"
-                                    :user-following="false"
+                                    :profile-uuid="content.through_author.uuid"
                                 />
                             </div>
                             <div class="clearfix" />
@@ -34,7 +32,7 @@
             <div v-if="showProfileBox" class="profile-box">
                 {{ authorFederationId }}
                 <div class="pull-right">
-                    <profile-reaction-buttons :profile="author" :user-following="content.user_following_author" />
+                    <profile-reaction-buttons :profile-uuid="author.uuid" />
                 </div>
                 <div class="clearfix" />
             </div>

@@ -1,5 +1,5 @@
 <template>
-    <div class="socialhome-profile-reaction-buttons">
+    <div v-if="profile" class="socialhome-profile-reaction-buttons">
         <b-button
             v-if="showProfileLink"
             :href="profile.url"
@@ -45,12 +45,8 @@
 export default {
     name: "ProfileReactionButtons",
     props: {
-        userFollowing: {type: Boolean, default: false},
-        profile: {type: Object, required: true},
+        profileUuid: {type: String, required: true},
         showProfileLink: {type: Boolean, default: true},
-    },
-    data() {
-        return {following: this.userFollowing}
     },
     computed: {
         currentBrowsingProfileId() {
@@ -62,11 +58,14 @@ export default {
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
         },
+        profile() {
+            return this.$store.state.profiles.all[this.profileUuid] || null
+        },
         showFollowBtn() {
-            return this.isUserAuthenticated && !this.following
+            return this.isUserAuthenticated && this.profile && !this.profile.user_following
         },
         showUnfollowBtn() {
-            return this.isUserAuthenticated && this.following
+            return this.isUserAuthenticated && this.profile && this.profile.user_following
         },
         translations() {
             return {
@@ -83,8 +82,14 @@ export default {
             }
         },
     },
+    created() {
+        if (this.$store.state.profiles.all[this.profileUuid] === undefined) {
+            this.$store.dispatch("profiles/getProfile", {uuid: this.profileUuid})
+        }
+    },
     methods: {
         follow() {
+            // TODO convert to a dispatch
             if (!this.isUserAuthenticated) {
                 this.$snotify.error(gettext("You must be logged in to follow someone"))
                 return
@@ -96,6 +101,7 @@ export default {
                 ))
         },
         unfollow() {
+            // TODO convert to a dispatch
             if (!this.isUserAuthenticated) {
                 this.$snotify.error(gettext("You must be logged in to unfollow someone"))
                 return
