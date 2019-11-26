@@ -11,7 +11,6 @@ from socialhome.users.serializers import LimitedProfileSerializer
 class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
-    user_following_author = SerializerMethodField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
     tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
@@ -47,7 +46,6 @@ class ContentSerializer(serializers.ModelSerializer):
             "through_author",
             "timestamp",
             "url",
-            "user_following_author",
             "user_is_author",
             "user_has_shared",
             "visibility",
@@ -73,7 +71,6 @@ class ContentSerializer(serializers.ModelSerializer):
             "through_author",
             "timestamp",
             "url",
-            "user_following_author",
             "user_is_author",
             "user_has_shared",
         )
@@ -111,14 +108,12 @@ class ContentSerializer(serializers.ModelSerializer):
             return {}
         through_author = throughs_authors.get(obj.id, obj.author)
         if through_author != obj.author:
-            return LimitedProfileSerializer(instance=through_author, read_only=True).data
+            return LimitedProfileSerializer(
+                instance=through_author,
+                read_only=True,
+                context={"request": self.context.get("request")},
+            ).data
         return {}
-
-    def get_user_following_author(self, obj):
-        request = self.context.get("request")
-        if not request:
-            return False
-        return bool(request.user.is_authenticated and obj.author_id in request.user.profile.following_ids)
 
     def get_user_is_author(self, obj):
         request = self.context.get("request")

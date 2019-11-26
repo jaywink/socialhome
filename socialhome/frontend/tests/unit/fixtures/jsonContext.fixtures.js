@@ -13,6 +13,7 @@ const getFakeAuthor = function getFakeAuthor(args = {}) {
         name: faker.name.findName(),
         url: "https://127.0.0.1",
         fid: `https://127.0.0.1/profile/${faker.random.uuid()}`,
+        user_followingr: faker.random.boolean(),
     })
 }
 
@@ -32,7 +33,6 @@ const getFakeContent = function getFakeContent(args = {}) {
         shares_count: faker.random.number(),
         timestamp: faker.date.recent().toString(),
         url: "https://127.0.0.1",
-        user_following_author: faker.random.boolean(),
         user_is_author: faker.random.boolean(),
         user_has_shared: faker.random.boolean(),
         visibility: "public",

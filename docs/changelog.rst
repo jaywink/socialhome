@@ -11,9 +11,6 @@ Added
 
 * Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
 
-* Stream API results now contain a ``through_author`` object in the case that the content is
-  in the stream via share.
-
 * Shared content in the streams now contain the name and link to the profile of the sharer.
 
 Changed
@@ -56,6 +53,15 @@ Fixed
   information for streams.
 
 * Don't raise a 500 error on fetch of content using a malformed identifier
+
+API changes
+...........
+
+* **Backwards incompatible**: Removed duplicated ``user_following_author`` from the
+  Content API since it is included in the serialized ``author`` as ``user_following``.
+
+* Stream API results now contain a ``through_author`` object in the case that the content is
+  in the stream via share.
 
 0.10.0 (2019-10-06)
 -------------------
