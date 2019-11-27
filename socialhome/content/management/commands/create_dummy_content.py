@@ -20,7 +20,7 @@ class Command(BaseCommand):
             content = PublicContentFactory()
             print("Created content: %s" % content)
 
-        user_email = options["user-email"]
+        user_email = options["user_email"]
         if user_email is not None:
 
             user = User.objects.get(email=user_email)

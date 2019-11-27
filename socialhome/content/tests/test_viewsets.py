@@ -178,14 +178,14 @@ class TestContentViewSet(SocialhomeAPITestCase):
             self.post("api:content-list", data=data)
             self.response_201()
 
-    def test_post__not_allowed_as_limited(self):
+    def test_post___limited(self):
         data = {
             "text": "Test", "pinned": False, "order": 1, "service_label": "", "visibility": Visibility.LIMITED,
             "author": self.user.profile.id,
         }
         with self.login(self.user):
             self.post("api:content-list", data=data)
-            self.response_400()
+            self.response_201()
 
     def test_post_creates_as_request_user(self):
         data = {
