@@ -54,6 +54,12 @@ Fixed
 
 * Don't raise a 500 error on fetch of content using a malformed identifier
 
+* Fix inbound federation timing issue with ActivityPub platforms (`#563 <https://git.feneas.org/socialhome/socialhome/issues/563>`_)
+
+  Signature verification time delta check if a background worker didn't process the
+  inbound payload fast enough, which led to rejected payloads. Time delta check has
+  now been relaxed to allow at most 24 hour old signatures.
+
 API changes
 ...........
 
