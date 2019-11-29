@@ -105,21 +105,21 @@ class ContentQuerySet(models.QuerySet):
         if not profile.visible_to_user(user):
             return Content.objects.none()
         qs = self.top_level()
+        ids = qs.filter(author=profile).values_list("id", flat=True)
         if include_shares:
-            # Get the right through for the content for shares
-            share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
-            qs = qs.filter(
-                Q(shares__author=profile) | Q(author=profile)
-            ).annotate(
-                through=Subquery(share.values("id")[:1])
-            ).annotate(
-                through=Case(
-                    When(through__isnull=False, then='through'),
-                    default='id',
-                )
+            ids = list(ids) + list(Content.objects.filter(shares__author=profile).values_list("id", flat=True))
+        # Get the right through for the content for shares
+        share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
+        qs = qs.filter(
+            Q(id__in=ids) | Q(share_of_id__in=ids)
+        ).annotate(
+            through=Subquery(share.values("id")[:1])
+        ).annotate(
+            through=Case(
+                When(through__isnull=False, then='through'),
+                default='id',
             )
-        else:
-            qs = qs.filter(author=profile)
+        )
         return qs.visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user, include_shares=True):
