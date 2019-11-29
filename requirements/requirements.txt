@@ -13,6 +13,7 @@ asgiref==1.1.2            # via asgi-redis, channels, daphne
 attrs==19.3.0             # via automat, jsonschema, twisted
 autobahn==19.11.1         # via daphne
 automat==0.8.0            # via twisted
+autopep8==1.4.4           # via django-silk
 backcall==0.1.0           # via ipython
 beautifulsoup4==4.8.1     # via markdownify, python-opengraph-jaywink
 bleach==3.1.0
@@ -54,9 +55,11 @@ django-robots==3.1.0
 django-rq==1.2.0
 django-secure==1.0.1
 django-settings-export==1.2.1
+django-silk==3.0.4
 django-versatileimagefield==1.11
 django==2.2.7
 djangorestframework==3.10.3
+gprof2dot==2017.9.19      # via django-silk
 hyperlink==19.0.0         # via twisted
 idna==2.8                 # via hyperlink, requests
 importlib-metadata==0.23  # via jsonschema
@@ -69,7 +72,7 @@ isodate==0.6.0            # via python-xrd
 iteration-utilities==0.9.0
 itypes==1.1.0             # via coreapi
 jedi==0.15.1              # via ipython
-jinja2==2.10.3            # via coreschema
+jinja2==2.10.3            # via coreschema, django-silk
 jsonschema==3.1.1
 lxml==4.4.1
 markdown==3.1.1
@@ -88,12 +91,13 @@ prompt-toolkit==2.0.10    # via ipython
 psutil==5.6.5             # via circus
 psycopg2-binary==2.8.4
 ptyprocess==0.6.0         # via pexpect
+pycodestyle==2.5.0        # via autopep8
 pycparser==2.19           # via cffi
 pycryptodome==3.9.1
-pygments==2.4.2           # via ipython
+pygments==2.4.2           # via django-silk, ipython
 pyhamcrest==1.9.0         # via twisted
 pyrsistent==0.15.5        # via jsonschema
-python-dateutil==2.8.1    # via arrow, croniter
+python-dateutil==2.8.1    # via arrow, croniter, django-silk
 python-magic==0.4.15      # via django-versatileimagefield
 python-opengraph-jaywink==0.2.0
 python-xrd==0.1
@@ -104,13 +108,13 @@ raven==6.10.0
 redis==2.10.6
 requests-http-signature-jaywink==0.1.0.dev0
 requests-oauthlib==1.3.0  # via django-allauth
-requests==2.22.0          # via coreapi, django-allauth, ipdata, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib
+requests==2.22.0          # via coreapi, django-allauth, django-silk, ipdata, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib
 rq-scheduler==0.8.3
 rq==0.12.0
 simplejson==3.16.0        # via django-rest-swagger
 six==1.13.0               # via asgi-redis, asgiref, autobahn, automat, bleach, circus, cryptography, django-dynamic-preferences, django-extensions, isodate, jsonschema, markdownify, prompt-toolkit, pyhamcrest, pyrsistent, python-dateutil, traitlets, txaio, unicode-slugify
 soupsieve==1.9.5          # via beautifulsoup4
-sqlparse==0.3.0           # via django
+sqlparse==0.3.0           # via django, django-silk
 tornado==4.5.3            # via circus
 traitlets==4.3.3          # via ipython
 twisted==19.7.0           # via daphne

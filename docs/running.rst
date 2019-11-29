@@ -369,6 +369,14 @@ If set to ``True``, allows showing the server admins to users and in server meta
 
 .. _configuration-statistics:
 
+SOCIALHOME_SILKY
+................
+
+Default: ``False``
+
+Set to ``True`` to enable the `Django-Silk <https://github.com/jazzband/django-silk>`_ debugging tool.
+Information about requests will be available at ``/_silk/``.
+
 SOCIALHOME_STATISTICS
 .....................
 

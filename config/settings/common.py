@@ -77,6 +77,8 @@ LOCAL_APPS = (
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
+
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
@@ -89,6 +91,20 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
 )
+
+# SILK
+# ----
+def is_silky_request(request):
+    path = request.path.strip('/')
+    if path.startswith('_') or path.startswith('admin') or path.startswith('static') or path.startswith('jsi18n') or \
+            path.startswith('jsreverse'):
+        return False
+    return True
+
+if SILKY_INSTALLED:
+    SILKY_INTERCEPT_FUNC = is_silky_request
+    INSTALLED_APPS = INSTALLED_APPS + ("silk",)
+    MIDDLEWARE = ("silk.middleware.SilkyMiddleware",) + MIDDLEWARE
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------

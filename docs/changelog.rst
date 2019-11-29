@@ -11,6 +11,10 @@ Added
 
 * Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
 
+* Django-Silk is now available for developers to turn on for their instance.
+
+  To turn on, set the environment variable ``SOCIALHOME_SILKY=True``.
+
 Changed
 .......
 
