@@ -65,7 +65,7 @@ Fixed
   now been relaxed to allow at most 24 hour old signatures.
 
 * Improve performance of profile streams and fetching of replies by splitting the
-  database queries into multiple queries instead of one larger one.
+  database queries into multiple queries instead of one larger one. (`#562 <https://git.feneas.org/socialhome/socialhome/issues/562>`_)
 
 API changes
 ...........
