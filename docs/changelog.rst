@@ -64,8 +64,8 @@ Fixed
   inbound payload fast enough, which led to rejected payloads. Time delta check has
   now been relaxed to allow at most 24 hour old signatures.
 
-* Improve performance of profile streams by splitting the database queries into multiple
-  queries instead of one larger one.
+* Improve performance of profile streams and fetching of replies by splitting the
+  database queries into multiple queries instead of one larger one.
 
 API changes
 ...........
