@@ -49,12 +49,6 @@ export default {
         showProfileLink: {type: Boolean, default: true},
     },
     computed: {
-        currentBrowsingProfileId() {
-            return this.$store.state.application.currentBrowsingProfileId
-        },
-        displayName() {
-            return this.profile.name ? this.profile.name : this.profile.fid
-        },
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
         },
@@ -75,12 +69,6 @@ export default {
                 unfollow: gettext("Unfollow"),
             }
         },
-        urls() {
-            return {
-                followUrl: Urls["api:profile-follow"]({uuid: this.profile.uuid}),
-                unfollowUrl: Urls["api:profile-unfollow"]({uuid: this.profile.uuid}),
-            }
-        },
     },
     created() {
         if (this.$store.state.profiles.all[this.profileUuid] === undefined) {
@@ -89,28 +77,10 @@ export default {
     },
     methods: {
         follow() {
-            // TODO convert to a dispatch
-            if (!this.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to follow someone"))
-                return
-            }
-            this.$http.post(this.urls.followUrl)
-                .then(() => this.following = true)
-                .catch(() => this.$snotify.error(
-                    `${gettext("An error happened while trying to follow")} ${this.displayName}`,
-                ))
+            this.$store.dispatch("profiles/follow", {uuid: this.profile.uuid})
         },
         unfollow() {
-            // TODO convert to a dispatch
-            if (!this.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to unfollow someone"))
-                return
-            }
-            this.$http.post(this.urls.unfollowUrl)
-                .then(() => this.following = false)
-                .catch(() => this.$snotify.error(
-                    `${gettext("An error happened while trying to unfollow")} ${this.displayName}`,
-                ))
+            this.$store.dispatch("profiles/unFollow", {uuid: this.profile.uuid})
         },
     },
 }

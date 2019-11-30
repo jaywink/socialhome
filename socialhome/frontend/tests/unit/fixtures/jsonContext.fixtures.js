@@ -13,7 +13,7 @@ const getFakeAuthor = function getFakeAuthor(args = {}) {
         name: faker.name.findName(),
         url: "https://127.0.0.1",
         fid: `https://127.0.0.1/profile/${faker.random.uuid()}`,
-        user_followingr: faker.random.boolean(),
+        user_following: faker.random.boolean(),
     })
 }
 

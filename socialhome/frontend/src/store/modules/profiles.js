@@ -18,14 +18,33 @@ const getters = {
 }
 
 const actions = {
+    follow({commit}, {uuid}) {
+        return Vue.axios
+            .post(Urls["api:profile-follow"]({uuid}))
+            .then(() => commit("setFollow", {uuid, status: true}))
+            .catch(() => {
+                commit("application/setErrorMessage", gettext("An error happened while trying to follow."))
+            })
+    },
     getProfile({commit}, {uuid}) {
         return Vue.axios
             .get(Urls["api:profile-detail"]({uuid}))
             .then(result => commit("setProfile", result.data))
     },
+    unFollow({commit}, {uuid}) {
+        return Vue.axios
+            .post(Urls["api:profile-unfollow"]({uuid}))
+            .then(() => commit("setFollow", {uuid, status: false}))
+            .catch(() => {
+                commit("application/setErrorMessage", gettext("An error happened while trying to unfollow."))
+            })
+    },
 }
 
 const mutations = {
+    setFollow(state, {uuid, status}) {
+        Vue.set(state.all[uuid], "user_following", status)
+    },
     setProfile(state, profile) {
         Vue.set(state.all, profile.uuid, profile)
         if (state.index.indexOf(profile.uuid) === -1) {
