@@ -75,7 +75,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
     @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
-        django_rq.enqueue(create_user_export, request.user.id)
+        django_rq.enqueue(create_user_export, request.user.id, timeout=1200)
         return Response({"status": "Data export job queued."})
 
     @action(detail=True, methods=["post"])
