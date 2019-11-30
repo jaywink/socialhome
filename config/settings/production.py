@@ -138,3 +138,9 @@ if env('SENTRY_DSN', default=None):
         'handlers': [log_target],
         'propagate': False,
     }
+
+# SILK
+# ----
+if SILKY_INSTALLED:
+    SILKY_AUTHENTICATION = True
+    SILKY_AUTHORISATION = True

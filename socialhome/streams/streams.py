@@ -233,7 +233,7 @@ class BaseStream:
             throughs[item["id"]] = item["through"]
         return ids, throughs
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwars):
         raise NotImplemented
 
     @classmethod
@@ -305,14 +305,14 @@ class BaseStream:
         return None
 
     def should_cache_content(self, content):
-        return self.get_queryset().filter(id=content.id).exists()
+        return self.get_queryset(single_id=content.id)
 
 
 class FollowedStream(BaseStream):
     stream_type = StreamType.FOLLOWED
 
-    def get_queryset(self):
-        return Content.objects.followed(self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.followed(self.user, single_id=single_id)
 
     @property
     def notify_key_extra(self):
@@ -322,8 +322,8 @@ class FollowedStream(BaseStream):
 class LimitedStream(BaseStream):
     stream_type = StreamType.LIMITED
 
-    def get_queryset(self):
-        return Content.objects.limited(self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.limited(self.user, single_id=single_id)
 
     @property
     def notify_key_extra(self):
@@ -334,8 +334,8 @@ class LocalStream(BaseStream):
     notify_for_shares = False
     stream_type = StreamType.LOCAL
 
-    def get_queryset(self):
-        return Content.objects.local(self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.local(self.user, single_id=single_id)
 
     @property
     def notify_key_extra(self):
@@ -363,8 +363,8 @@ class ProfileStreamBase(BaseStream):
 class ProfileAllStream(ProfileStreamBase):
     stream_type = StreamType.PROFILE_ALL
 
-    def get_queryset(self):
-        return Content.objects.profile(self.profile, self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.profile(self.profile, self.user, single_id=single_id)
 
 
 class ProfilePinnedStream(ProfileStreamBase):
@@ -373,16 +373,16 @@ class ProfilePinnedStream(ProfileStreamBase):
     paginate_by = 100  # The limit of pinned content visible
     stream_type = StreamType.PROFILE_PINNED
 
-    def get_queryset(self):
-        return Content.objects.profile_pinned(self.profile, self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.profile_pinned(self.profile, self.user, single_id=single_id)
 
 
 class PublicStream(BaseStream):
     notify_for_shares = False
     stream_type = StreamType.PUBLIC
 
-    def get_queryset(self):
-        return Content.objects.public()
+    def get_queryset(self, single_id=None):
+        return Content.objects.public(single_id=single_id)
 
     @property
     def notify_key_extra(self):
@@ -397,10 +397,10 @@ class TagStream(BaseStream):
         super().__init__(**kwargs)
         self.tag = tag
 
-    def get_queryset(self):
+    def get_queryset(self, single_id=None):
         if not self.tag:
             raise AttributeError("TagStream is missing tag.")
-        return Content.objects.tag(self.tag, self.user)
+        return Content.objects.tag(self.tag, self.user, single_id=single_id)
 
     @classmethod
     def get_target_streams(cls, content, user, acting_profile):
@@ -419,8 +419,8 @@ class TagsStream(BaseStream):
     notify_for_shares = False
     stream_type = StreamType.TAGS
 
-    def get_queryset(self):
-        return Content.objects.tags_followed_by_user(self.user)
+    def get_queryset(self, single_id=None):
+        return Content.objects.tags_followed_by_user(self.user, single_id=single_id)
 
     @property
     def notify_key_extra(self):

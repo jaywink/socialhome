@@ -13,6 +13,10 @@ Added
 
 * Shared content in the streams now contain the name and link to the profile of the sharer.
 
+* Django-Silk is now available for developers to turn on for their instance.
+
+  To turn on, set the environment variable ``SOCIALHOME_SILKY=True``.
+
 Changed
 .......
 
@@ -59,6 +63,9 @@ Fixed
   Signature verification time delta check if a background worker didn't process the
   inbound payload fast enough, which led to rejected payloads. Time delta check has
   now been relaxed to allow at most 24 hour old signatures.
+
+* Improve performance of profile streams by splitting the database queries into multiple
+  queries instead of one larger one.
 
 API changes
 ...........

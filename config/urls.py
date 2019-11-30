@@ -94,8 +94,12 @@ urlpatterns = [
         {'document_type': PolicyDocumentType.TERMS_OF_SERVICE},
         name="terms-of-service"
     ),
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.SILKY_INSTALLED:
+    urlpatterns += [
+        url(r'^_silk/', include('silk.urls', namespace='silk')),
+    ]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

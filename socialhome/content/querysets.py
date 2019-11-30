@@ -43,7 +43,7 @@ class ContentQuerySet(models.QuerySet):
         ).filter(**params)
 
     def fed_update_or_create(
-        self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict = None
     ) -> Tuple['Content', bool]:
         """
         Update or create by federated ID.
@@ -65,7 +65,7 @@ class ContentQuerySet(models.QuerySet):
             content.save()
             return content, False
 
-    def followed(self, user):
+    def followed(self, user, single_id: int = None):
         """Get content from followed users.
 
         This includes content shared by the followed users.
@@ -74,7 +74,10 @@ class ContentQuerySet(models.QuerySet):
         profile = user.profile
         following_ids = profile.following.values_list("id", flat=True)
         share = Content.objects.filter(share_of=OuterRef("id")).order_by('-id')
-        qs = self.top_level().filter(
+        qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        qs = qs.filter(
             Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids)
         ).annotate(
             through=Subquery(share.values("id")[:1])
@@ -87,39 +90,49 @@ class ContentQuerySet(models.QuerySet):
         )
         return qs.visible_for_user(user)
 
-    def limited(self, user):
-        return self.top_level().visible_for_user(user).filter(visibility=Visibility.LIMITED)
+    def limited(self, user, single_id: int = None):
+        qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        return qs.visible_for_user(user).filter(visibility=Visibility.LIMITED)
 
-    def local(self, user):
-        return self.top_level().visible_for_user(user).filter(local=True)
+    def local(self, user, single_id: int = None):
+        qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        return qs.visible_for_user(user).filter(local=True)
 
     def pinned(self):
         return self.filter(pinned=True)
 
-    def profile(self, profile, user, include_shares=True):
+    def profile(self, profile, user, include_shares=True, single_id: int = None):
         """Filter for a user profile.
 
         Ensures if the profile is not visible to the user, no content will be returned.
+
+        If "single_id" given, check is done against that content only.
         """
         from socialhome.content.models import Content
         if not profile.visible_to_user(user):
             return Content.objects.none()
         qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        ids = qs.filter(author=profile).values_list("id", flat=True)
         if include_shares:
-            # Get the right through for the content for shares
-            share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
-            qs = qs.filter(
-                Q(shares__author=profile) | Q(author=profile)
-            ).annotate(
-                through=Subquery(share.values("id")[:1])
-            ).annotate(
-                through=Case(
-                    When(through__isnull=False, then='through'),
-                    default='id',
-                )
+            ids = list(ids) + list(Content.objects.filter(shares__author=profile).values_list("id", flat=True))
+        # Get the right through for the content for shares
+        share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
+        qs = qs.filter(
+            Q(id__in=ids) | Q(share_of_id__in=ids)
+        ).annotate(
+            through=Subquery(share.values("id")[:1])
+        ).annotate(
+            through=Case(
+                When(through__isnull=False, then='through'),
+                default='id',
             )
-        else:
-            qs = qs.filter(author=profile)
+        )
         return qs.visible_for_user(user)
 
     def profile_by_attr(self, attr, value, user, include_shares=True):
@@ -136,23 +149,29 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         return self.profile(profile, user, include_shares=include_shares)
 
-    def profile_pinned(self, profile, user):
+    def profile_pinned(self, profile, user, single_id: int = None):
         """Get profile content user has chosen to pin on profile."""
-        return self.profile(profile, user, include_shares=False).pinned()
+        return self.profile(profile, user, include_shares=False, single_id=single_id).pinned()
 
     def profile_pinned_by_attr(self, attr, value, user):
         """Get profile content user has chosen to pin on profile."""
         return self.profile_by_attr(attr, value, user, include_shares=False).pinned()
 
-    def public(self):
-        return self.top_level().filter(visibility=Visibility.PUBLIC)
+    def public(self, single_id: int = None):
+        qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        return qs.filter(visibility=Visibility.PUBLIC)
 
     def shares(self, share_of_id, user):
         qs = self.visible_for_user(user).filter(share_of_id=share_of_id)
         return qs.order_by("created")
 
-    def tag(self, tag, user):
-        return self.top_level().visible_for_user(user).filter(tags=tag)
+    def tag(self, tag, user, single_id: int = None):
+        qs = self.top_level()
+        if single_id:
+            qs = qs.filter(id=single_id)
+        return qs.visible_for_user(user).filter(tags=tag)
 
     def tag_by_name(self, tag, user):
         from socialhome.content.models import Tag, Content
@@ -162,11 +181,13 @@ class ContentQuerySet(models.QuerySet):
             return Content.objects.none()
         return self.tag(tag, user)
 
-    def tags_followed_by_user(self, user):
-        # type: (User) -> ContentQuerySet
+    def tags_followed_by_user(self, user, single_id=None):
+        # type: (User, int) -> ContentQuerySet
         if not user.is_authenticated:
             return self.none()
         qs = self.top_level().visible_for_user(user)
+        if single_id:
+            qs = qs.filter(id=single_id)
         return qs.filter(tags__in=user.profile.followed_tags.all())
 
     def top_level(self):
