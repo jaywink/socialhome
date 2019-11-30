@@ -36,7 +36,7 @@ import Vue from "vue"
 export default Vue.component("tag-stamped-element", {
     computed: {
         followingTag() {
-            return this.$store.state.profile.followed_tags.includes(this.name)
+            return this.$store.state.user.followed_tags.includes(this.name)
         },
         name() {
             return this.$store.state.stream.tag.name
@@ -60,12 +60,12 @@ export default Vue.component("tag-stamped-element", {
     methods: {
         onFollowClick() {
             this.$store.dispatch("stream/followTag", {params: {uuid: this.$store.state.stream.tag.uuid}}).then(() => {
-                this.$store.dispatch("profile/followTag", this.name)
+                this.$store.dispatch("user/followTag", this.name)
             })
         },
         onUnFollowClick() {
             this.$store.dispatch("stream/unfollowTag", {params: {uuid: this.$store.state.stream.tag.uuid}}).then(() => {
-                this.$store.dispatch("profile/unfollowTag", this.name)
+                this.$store.dispatch("user/unfollowTag", this.name)
             })
         },
     },
