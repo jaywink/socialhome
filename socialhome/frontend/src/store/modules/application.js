@@ -5,19 +5,13 @@ const state = {
     isUserAuthenticated: _get(window, ["context", "isUserAuthenticated"], false),
     currentBrowsingProfileId: _get(window, ["context", "currentBrowsingProfileId"]),
     profile: _get(window, ["context", "profile"]),
-    errorMessage: null,
 }
 
 const getters = {}
 
 const actions = {}
 
-const mutations = {
-    setErrorMessage(state, message) {
-        // eslint-disable-next-line no-param-reassign
-        state.errorMessage = message
-    },
-}
+const mutations = {}
 
 export default {
     namespaced: true,

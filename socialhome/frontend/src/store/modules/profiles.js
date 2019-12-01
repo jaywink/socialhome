@@ -23,7 +23,7 @@ const actions = {
             .post(Urls["api:profile-follow"]({uuid}))
             .then(() => commit("setFollow", {uuid, status: true}))
             .catch(() => {
-                commit("application/setErrorMessage", gettext("An error happened while trying to follow."))
+                Vue.snotify.error(gettext("An error happened while trying to follow."))
             })
     },
     getProfile({commit}, {uuid}) {
@@ -36,7 +36,7 @@ const actions = {
             .post(Urls["api:profile-unfollow"]({uuid}))
             .then(() => commit("setFollow", {uuid, status: false}))
             .catch(() => {
-                commit("application/setErrorMessage", gettext("An error happened while trying to unfollow."))
+                Vue.snotify.error(gettext("An error happened while trying to unfollow."))
             })
     },
 }

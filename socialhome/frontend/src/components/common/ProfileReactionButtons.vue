@@ -57,9 +57,11 @@ export default {
         },
         showFollowBtn() {
             return this.isUserAuthenticated && this.profile && !this.profile.user_following
+                && this.profile.id !== this.$store.state.application.currentBrowsingProfileId
         },
         showUnfollowBtn() {
             return this.isUserAuthenticated && this.profile && this.profile.user_following
+                && this.profile.id !== this.$store.state.application.currentBrowsingProfileId
         },
         translations() {
             return {

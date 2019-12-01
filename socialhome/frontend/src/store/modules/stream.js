@@ -76,7 +76,7 @@ export const profilesPlugin = store => {
     // called when the store is initialized
     store.subscribe(({type, payload}) => {
         if (/^stream\/GET[A-Z_]*SUCCEEDED$/.test(type)) {
-            store.commit("profiles/setProfilesFromContentList", payload.payload.data)
+            store.commit("profiles/setProfilesFromContentList", payload.payload.data, {root: true})
         }
     })
 }

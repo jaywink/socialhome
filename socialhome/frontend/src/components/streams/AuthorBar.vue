@@ -4,9 +4,21 @@
             <div>
                 <img :src="author.image_url_small" class="grid-item-author-bar-pic">
                 <div class="author-bar-name-container">
-                    <div class="profilebox-trigger" @click.stop.prevent="profileBoxTrigger">
-                        {{ authorName }}
-                    </div>
+                    <popper
+                        trigger="clickToToggle"
+                        :options="{
+                            placement: 'bottom',
+                            modifiers: { offset: { offset: '0,10px' } }
+                        }"
+                    >
+                        <div class="popper">
+                            {{ authorFederationId }}
+                            <profile-reaction-buttons :profile-uuid="author.uuid" />
+                        </div>
+                        <div slot="reference" class="pointer">
+                            {{ authorName }}
+                        </div>
+                    </popper>
                     <div class="author-bar-timestamp">
                         <a :href="content.url" :title="content.timestamp" class="unstyled-link">
                             {{ timestampText }}
@@ -14,45 +26,38 @@
                         <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
                     </div>
                     <div v-if="isShared">
-                        <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" />
-                        <div class="profilebox-trigger" @click.stop.prevent="throughBoxTrigger">
-                            {{ throughAuthorName }}
-                        </div>
-                        <div v-if="showThroughProfileBox" class="profile-box">
-                            <div class="pull-right">
+                        <popper
+                            trigger="clickToToggle"
+                            :options="{
+                                placement: 'bottom',
+                                modifiers: { offset: { offset: '0,10px' } }
+                            }"
+                        >
+                            <div class="popper">
+                                {{ throughAuthorFederationId }}
                                 <profile-reaction-buttons
                                     :profile-uuid="content.through_author.uuid"
                                 />
                             </div>
-                            <div class="clearfix" />
-                        </div>
+                            <div slot="reference" class="pointer">
+                                <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" /> {{ throughAuthorName }}
+                            </div>
+                        </popper>
                     </div>
                 </div>
-            </div>
-            <div v-if="showProfileBox" class="profile-box">
-                {{ authorFederationId }}
-                <div class="pull-right">
-                    <profile-reaction-buttons :profile-uuid="author.uuid" />
-                </div>
-                <div class="clearfix" />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import Popper from "vue-popperjs"
+import "vue-popperjs/dist/vue-popper.css"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
-
 export default {
-    components: {ProfileReactionButtons},
+    components: {Popper, ProfileReactionButtons},
     props: {content: {type: Object, required: true}},
-    data() {
-        return {
-            showProfileBox: false,
-            showThroughProfileBox: false,
-        }
-    },
     computed: {
         author() {
             return this.content.author
@@ -77,8 +82,12 @@ export default {
         isShared() {
             return this.content.through !== this.content.id
         },
-        isUserAuthenticated() {
-            return this.$store.state.application.isUserAuthenticated
+        throughAuthorFederationId() {
+            const throughAuthor = this.content.through_author
+            if (throughAuthor.handle) {
+                return throughAuthor.handle
+            }
+            return throughAuthor.fid
         },
         throughAuthorName() {
             const throughAuthor = this.content.through_author
@@ -89,9 +98,6 @@ export default {
             }
             return throughAuthor.fid || ""
         },
-        throughAuthorUrl() {
-            return this.content.through_author.url || "#"
-        },
         timestampText() {
             return this.content.edited
                 ? `${this.content.humanized_timestamp} (${gettext("edited")})`
@@ -100,14 +106,6 @@ export default {
     },
     updated() {
         this.$redrawVueMasonry()
-    },
-    methods: {
-        profileBoxTrigger() {
-            this.showProfileBox = !this.showProfileBox
-        },
-        throughBoxTrigger() {
-            this.showThroughProfileBox = !this.showThroughProfileBox
-        },
     },
 }
 </script>
@@ -119,8 +117,5 @@ export default {
     }
     .author-bar-timestamp, .shared-icon {
         color: #B39A96;
-    }
-    .profilebox-trigger {
-        cursor: pointer;
     }
 </style>
