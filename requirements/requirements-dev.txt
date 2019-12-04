@@ -71,7 +71,7 @@ django-silk==3.0.4
 django-stubs==1.1.0
 django-test-plus==1.0.22
 django-versatileimagefield==1.11
-django==2.2.7
+django==2.2.8
 djangorestframework-stubs==1.0.0
 djangorestframework==3.10.3
 docutils==0.15.2          # via sphinx
@@ -190,5 +190,5 @@ zipp==0.6.0
 zope.interface==4.6.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip==19.3.1
-# setuptools==42.0.1        # via ipdb, ipython, jsonschema, markdown, pyhamcrest, sphinx, zope.interface
+# pip
+# setuptools

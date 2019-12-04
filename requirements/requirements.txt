@@ -57,7 +57,7 @@ django-secure==1.0.1
 django-settings-export==1.2.1
 django-silk==3.0.4
 django-versatileimagefield==1.11
-django==2.2.7
+django==2.2.8
 djangorestframework==3.10.3
 gprof2dot==2017.9.19      # via django-silk
 hyperlink==19.0.0         # via twisted
@@ -132,5 +132,5 @@ zipp==0.6.0               # via importlib-metadata
 zope.interface==4.6.0     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip==19.3.1
-# setuptools==42.0.1        # via ipython, jsonschema, markdown, pyhamcrest, zope.interface
+# pip
+# setuptools
