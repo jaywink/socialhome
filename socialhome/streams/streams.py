@@ -1,6 +1,7 @@
 import datetime
 import logging
 import time
+from typing import List, Tuple, Dict
 
 import django_rq
 from django.conf import settings
@@ -158,6 +159,7 @@ def update_streams_with_content(content):
 
 
 class BaseStream:
+    accept_ids = None
     last_id = None
     key_base = ["sh", "streams"]
     notify_for_shares = True
@@ -166,12 +168,25 @@ class BaseStream:
     redis = None
     stream_type = None
 
-    def __init__(self, last_id=None, user=None, **kwargs):
+    def __init__(self, last_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
+        self.accept_ids = accept_ids or []
         self.last_id = last_id
         self.user = user
 
     def __str__(self):
         return "%s (%s)" % (self.__class__.__name__, self.user)
+
+    def get_accept_ids_content_ids(self) -> Tuple[List, Dict]:
+        self.init_redis_connection()
+        ids = []
+        throughs = {}
+        qs = self.get_queryset()
+        ids_throughs = qs.filter(id__in=self.accept_ids).values("id", "through").order_by(self.ordering)
+        for item in ids_throughs:
+            ids.append(item["id"])
+            # TODO fetch from redis?
+            throughs[item["id"]] = item["through"]
+        return ids, throughs
 
     def get_cached_content_ids(self):
         self.init_redis_connection()
@@ -204,7 +219,10 @@ class BaseStream:
 
         Keep ordering as returned by the list of content id's.
         """
-        ids, throughs = self.get_content_ids()
+        if self.accept_ids:
+            ids, throughs = self.get_accept_ids_content_ids()
+        else:
+            ids, throughs = self.get_content_ids()
         # Case/When tip thanks to https://stackoverflow.com/a/37648265/1489738
         preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
         content = Content.objects.filter(id__in=ids)\

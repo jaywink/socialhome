@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,max-len */
 import Vue from "vue"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
@@ -89,6 +89,7 @@ export const profilesPlugin = store => {
 
 export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
+    const getAcceptIdsParam = acceptIds => (acceptIds ? `?accept_ids=${acceptIds.toString()}` : "")
 
     const axios = Axios.create({
         xsrfCookieName: "csrftoken",
@@ -110,28 +111,28 @@ export function newRestAPI() {
         })
         .get({
             action: "getPublicStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getFollowedStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLimitedStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLocalStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -145,21 +146,21 @@ export function newRestAPI() {
         })
         .get({
             action: "getTagStream",
-            path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
+            path: ({name, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getTagsStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getProfileAll",
-            path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}`,
+            path: ({uuid, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -167,8 +168,8 @@ export function newRestAPI() {
         .get({
             action: "getProfilePinned",
             path: (
-                {uuid, lastId = undefined},
-            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}`,
+                {uuid, lastId = undefined, acceptIds = undefined},
+            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,

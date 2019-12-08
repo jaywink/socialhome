@@ -2,6 +2,7 @@
 import Vue from "vue"
 import _concat from "lodash/concat"
 import _difference from "lodash/difference"
+import _upperFirst from "lodash/upperFirst"
 
 const streamMutations = {
     disableLoadMore(state, contentId) {
@@ -38,22 +39,11 @@ const streamActions = {
         commit("setLayoutDoneAfterTwitterOEmbeds", status)
     },
     newContentAck({commit, dispatch, state}) {
-        const promises = []
         const unfetchedContentIds = _concat([], state.unfetchedContentIds)
 
         commit("newContentAck")
-
-        unfetchedContentIds.forEach(pk => {
-            // Force the promise to resolve in all cases
-            const reAddAndResolve = () => {
-                state.unfetchedContentIds.push(pk)
-                return Promise.resolve()
-            }
-            const promise = dispatch("getNewContent", {params: {pk}})
-                .then(Promise.resolve(), reAddAndResolve)
-            promises.push(promise)
-        })
-        return Promise.all(promises)
+        const dispatchName = `get${_upperFirst(state.stream.name)}Stream`
+        dispatch(dispatchName, {params: {acceptIds: unfetchedContentIds}})
     },
 }
 
