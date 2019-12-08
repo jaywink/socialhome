@@ -7,8 +7,7 @@
                     <popper
                         trigger="clickToToggle"
                         :options="{
-                            placement: 'bottom',
-                            modifiers: { offset: { offset: '0,10px' } }
+                            placement: 'bottom-start'
                         }"
                     >
                         <div class="popper">
@@ -29,8 +28,7 @@
                         <popper
                             trigger="clickToToggle"
                             :options="{
-                                placement: 'bottom',
-                                modifiers: { offset: { offset: '0,10px' } }
+                                placement: 'bottom-start'
                             }"
                         >
                             <div class="popper">
