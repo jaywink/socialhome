@@ -119,23 +119,6 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         serializer = ContentSerializer(self.share)
         self.assertEqual(serializer.data["share_of"], self.content.id)
 
-    def test_user_following_author_false_if_no_request(self):
-        serializer = ContentSerializer()
-        self.assertFalse(serializer.get_user_following_author(None))
-
-    def test_user_following_author_false_if_not_authenticated(self):
-        serializer = ContentSerializer(context={"request": Mock(user=AnonymousUser())})
-        self.assertFalse(serializer.get_user_following_author(None))
-
-    def test_user_following_author_false_if_not_following(self):
-        serializer = ContentSerializer(context={"request": Mock(user=self.user)})
-        self.assertFalse(serializer.get_user_following_author(self.content))
-
-    def test_user_following_author_true_if_following(self):
-        self.profile.following.add(self.remote_profile)
-        serializer = ContentSerializer(context={"request": Mock(user=self.user)})
-        self.assertTrue(serializer.get_user_following_author(self.content))
-
     def test_user_is_author_false_if_no_request(self):
         serializer = ContentSerializer()
         self.assertFalse(serializer.get_user_is_author(None))
