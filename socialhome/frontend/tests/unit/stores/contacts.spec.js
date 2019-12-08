@@ -67,7 +67,11 @@ describe("contacts", () => {
                 done()
             })
 
-            target.dispatch("contactsFollowers", {params: {page: 2, pageSize: 2000}}).catch(done)
+            target.dispatch("contactsFollowers", {
+                params: {
+                    page: 2, pageSize: 2000,
+                },
+            }).catch(done)
         })
 
         it("should update the state after success", async () => {
@@ -136,7 +140,11 @@ describe("contacts", () => {
                 done()
             })
 
-            target.dispatch("contactsFollowing", {params: {page: 2, pageSize: 2000}}).catch(done)
+            target.dispatch("contactsFollowing", {
+                params: {
+                    page: 2, pageSize: 2000,
+                },
+            }).catch(done)
         })
 
         it("should update the state after success", async () => {

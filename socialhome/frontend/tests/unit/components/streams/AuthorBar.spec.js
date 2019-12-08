@@ -31,7 +31,9 @@ describe("AuthorBar", () => {
     describe("lifecycle", () => {
         describe("updated", () => {
             it("should redraw VueMasonry", done => {
-                const target = mount(AuthorBar, {propsData: {content}, store})
+                const target = mount(AuthorBar, {
+                    propsData: {content}, store,
+                })
                 Sinon.spy(Vue.prototype, "$redrawVueMasonry")
                 target.update()
                 target.vm.$nextTick().then(() => {

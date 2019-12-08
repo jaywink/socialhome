@@ -21,7 +21,9 @@ const actions = {
     follow({commit}, {uuid}) {
         return Vue.axios
             .post(Urls["api:profile-follow"]({uuid}))
-            .then(() => commit("setFollow", {uuid, status: true}))
+            .then(() => commit("setFollow", {
+                uuid, status: true,
+            }))
             .catch(() => {
                 Vue.snotify.error(gettext("An error happened while trying to follow."))
             })
@@ -34,7 +36,9 @@ const actions = {
     unFollow({commit}, {uuid}) {
         return Vue.axios
             .post(Urls["api:profile-unfollow"]({uuid}))
-            .then(() => commit("setFollow", {uuid, status: false}))
+            .then(() => commit("setFollow", {
+                uuid, status: false,
+            }))
             .catch(() => {
                 Vue.snotify.error(gettext("An error happened while trying to unfollow."))
             })

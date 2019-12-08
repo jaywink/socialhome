@@ -36,23 +36,31 @@ describe("ReactionsBar", () => {
             it("should be true if user is authenticated or content has replies", () => {
                 store.state.stream.contents[content.id].reply_count = 0
                 store.state.application.isUserAuthenticated = true
-                let target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                let target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showReplyReactionIcon.should.be.true
 
                 store.state.stream.contents[content.id].reply_count = 1
                 store.state.application.isUserAuthenticated = false
-                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showReplyReactionIcon.should.be.true
 
                 store.state.stream.contents[content.id].reply_count = 0
                 store.state.application.isUserAuthenticated = false
-                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showReplyReactionIcon.should.be.false
             })
 
             it("should be false if content is not of type content", () => {
                 content.content_type = "reply"
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showReplyReactionIcon.should.be.false
             })
         })
@@ -62,27 +70,37 @@ describe("ReactionsBar", () => {
                 store.state.stream.contents[content.id].shares_count = 0
                 content.user_is_author = false
                 store.state.application.isUserAuthenticated = true
-                let target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                let target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showShareReactionIcon.should.be.true
 
                 content.user_is_author = true
-                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showShareReactionIcon.should.be.false
 
                 store.state.stream.contents[content.id].shares_count = 1
                 store.state.application.isUserAuthenticated = false
-                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showShareReactionIcon.should.be.true
 
                 store.state.stream.contents[content.id].shares_count = 0
                 store.state.application.isUserAuthenticated = false
-                target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showShareReactionIcon.should.be.false
             })
 
             it("should be false if content is not of type content", () => {
                 content.content_type = "reply"
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.showShareReactionIcon.should.be.false
             })
         })
@@ -91,7 +109,9 @@ describe("ReactionsBar", () => {
     describe("lifecycle", () => {
         context("updated", () => {
             it("redraws masonry if not single stream", () => {
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm, "$redrawVueMasonry")
                 target.vm.$forceUpdate()
                 target.vm.$redrawVueMasonry.called.should.be.true
@@ -99,7 +119,9 @@ describe("ReactionsBar", () => {
 
             it("does not redraw masonry if single stream", () => {
                 store.state.stream.stream.single = true
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm, "$redrawVueMasonry")
                 target.vm.$forceUpdate()
                 target.vm.$redrawVueMasonry.called.should.be.false
@@ -118,7 +140,9 @@ describe("ReactionsBar", () => {
 
         describe("expandShares", () => {
             it("should toggle showSharesBox", () => {
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 target.vm.expandShares()
                 target.vm.showSharesBox.should.be.true
                 target.vm.expandShares()
@@ -131,7 +155,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].isUserAuthor = false
                 const target = shallowMount(ReactionsBar, {
-                    propsData: {content, showRepliesBox: true},
+                    propsData: {
+                        content, showRepliesBox: true,
+                    },
                     store,
                     localVue,
                 })
@@ -144,7 +170,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
 
                 // Ensure data
                 target.vm.expandShares()
@@ -157,7 +185,9 @@ describe("ReactionsBar", () => {
                 Moxios.wait(() => {
                     Moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: {status: "ok", content_id: 123},
+                        response: {
+                            status: "ok", content_id: 123,
+                        },
                     }).then(() => {
                         target.vm.$data.showSharesBox.should.be.false
                         target.vm.$store.state.stream.contents[content.id].user_has_shared.should.be.true
@@ -171,7 +201,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.share()
@@ -189,7 +221,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = false
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.share()
@@ -201,7 +235,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = true
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.share()
@@ -215,7 +251,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = true
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
 
                 // Ensure data
                 target.vm.expandShares()
@@ -243,7 +281,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.unshare()
@@ -261,7 +301,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = false
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = false
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.unshare()
@@ -273,7 +315,9 @@ describe("ReactionsBar", () => {
                 store.state.application.isUserAuthenticated = true
                 store.state.stream.contents[content.id].user_has_shared = false
                 store.state.stream.contents[content.id].user_is_author = true
-                const target = shallowMount(ReactionsBar, {propsData: {content}, store, localVue})
+                const target = shallowMount(ReactionsBar, {
+                    propsData: {content}, store, localVue,
+                })
                 Sinon.spy(target.vm.$snotify, "error")
 
                 target.vm.unshare()

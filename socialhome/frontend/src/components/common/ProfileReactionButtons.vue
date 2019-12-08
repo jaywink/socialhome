@@ -45,8 +45,12 @@
 export default {
     name: "ProfileReactionButtons",
     props: {
-        profileUuid: {type: String, required: true},
-        showProfileLink: {type: Boolean, default: true},
+        profileUuid: {
+            type: String, required: true,
+        },
+        showProfileLink: {
+            type: Boolean, default: true,
+        },
     },
     computed: {
         isUserAuthenticated() {

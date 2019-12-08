@@ -8,9 +8,15 @@ const getStore = () => {
     store.state.profile = {}
     store.state.application = {}
     store.content = getFakeContent()
-    store.reply = getFakeContent({parent: store.content.id, content_type: "reply"})
-    store.share = getFakeContent({share_of: store.content.id, content_type: "share"})
-    store.shareReply = getFakeContent({share_of: store.share.id, content_type: "reply"})
+    store.reply = getFakeContent({
+        parent: store.content.id, content_type: "reply",
+    })
+    store.share = getFakeContent({
+        share_of: store.content.id, content_type: "share",
+    })
+    store.shareReply = getFakeContent({
+        share_of: store.share.id, content_type: "reply",
+    })
 
     store.content.replyIds = [store.reply.id]
     store.share.replyIds = [store.shareReply.id]
@@ -46,7 +52,7 @@ const getStore = () => {
             store.reply.author.uuid,
             store.share.author.uuid,
             store.shareReply.author.uuid,
-        ]
+        ],
     }
     store.state.profiles.all[store.profile.uuid] = store.profile
     store.state.profiles.all[store.content.author.uuid] = store.content.author

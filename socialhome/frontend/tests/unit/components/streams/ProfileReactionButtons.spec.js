@@ -1,4 +1,3 @@
-import Moxios from "moxios"
 import Vue from "vue"
 import Vuex from "vuex"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -30,9 +29,7 @@ describe("ProfileReactionButtons", () => {
                 store.content.author.user_following = false
                 store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profileUuid: store.content.author.uuid,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
                 target.instance().showFollowBtn.should.be.true
@@ -45,9 +42,7 @@ describe("ProfileReactionButtons", () => {
                 store.content.author.user_following = true
                 store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profileUuid: store.content.author.uuid,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
                 target.instance().showFollowBtn.should.be.false
@@ -61,9 +56,7 @@ describe("ProfileReactionButtons", () => {
         describe("follow", () => {
             it("should dispatch a follow action", () => {
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profileUuid: store.content.author.uuid,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
 
@@ -78,9 +71,7 @@ describe("ProfileReactionButtons", () => {
         describe("unfollow", () => {
             it("should dispatch an unfollow action", () => {
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profileUuid: store.content.author.uuid,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
 

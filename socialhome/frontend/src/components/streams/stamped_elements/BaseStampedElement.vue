@@ -11,8 +11,12 @@ import Vue from "vue"
 
 export default Vue.component("base-stamped-element", {
     props: {
-        title: {type: String, required: true},
-        helpText: {type: String, required: true},
+        title: {
+            type: String, required: true,
+        },
+        helpText: {
+            type: String, required: true,
+        },
     },
 })
 </script>

@@ -27,7 +27,11 @@ import imagesLoaded from "vue-images-loaded"
 export default {
     name: "NsfwShield",
     directives: {imagesLoaded},
-    props: {tags: {type: Array, required: true}},
+    props: {
+        tags: {
+            type: Array, required: true,
+        },
+    },
     data() {
         return {showNsfwContent: false}
     },

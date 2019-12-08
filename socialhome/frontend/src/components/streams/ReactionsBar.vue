@@ -52,7 +52,11 @@ import RepliesContainer from "@/components/streams/RepliesContainer.vue"
 export default {
     name: "ReactionsBar",
     components: {RepliesContainer},
-    props: {content: {type: Object, required: true}},
+    props: {
+        content: {
+            type: Object, required: true,
+        },
+    },
     data() {
         return {
             showSharesBox: false,

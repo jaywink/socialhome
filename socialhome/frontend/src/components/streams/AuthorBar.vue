@@ -54,8 +54,14 @@ import "vue-popperjs/dist/vue-popper.css"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
 export default {
-    components: {Popper, ProfileReactionButtons},
-    props: {content: {type: Object, required: true}},
+    components: {
+        Popper, ProfileReactionButtons,
+    },
+    props: {
+        content: {
+            type: Object, required: true,
+        },
+    },
     computed: {
         author() {
             return this.content.author

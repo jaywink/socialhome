@@ -76,7 +76,11 @@ export default {
         fetch() { /* Override */
         },
         async loadMore($state) {
-            await this.fetch({params: {page: this.next, pageSize: this.pageSize}})
+            await this.fetch({
+                params: {
+                    page: this.next, pageSize: this.pageSize,
+                },
+            })
             await this.$nextTick()
             this.shouldLoadMore ? $state.loaded() : $state.complete()
         },

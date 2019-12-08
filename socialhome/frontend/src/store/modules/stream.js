@@ -22,7 +22,9 @@ export function addHasLoadMore(state) {
 export function fetchContentsSuccess(state, payload) {
     let newItems = 0
     payload.data.forEach(item => {
-        const content = {...item, replyIds: [], shareIds: []}
+        const content = {
+            ...item, replyIds: [], shareIds: [],
+        }
         Vue.set(state.contents, content.id, content)
         if (state.contentIds.indexOf(content.id) === -1) {
             state.contentIds.push(content.id)
@@ -40,7 +42,9 @@ export function fetchRepliesSuccess(state, payload) {
         items = [payload.data]
     }
     items.forEach(item => {
-        const reply = {...item, replyIds: [], shareIds: []}
+        const reply = {
+            ...item, replyIds: [], shareIds: [],
+        }
         Vue.set(state.replies, reply.id, reply)
         if (state.contents[reply.root_parent] !== undefined) {
             if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
@@ -56,7 +60,9 @@ export function fetchRepliesSuccess(state, payload) {
 
 export function fetchSharesSuccess(state, payload) {
     payload.data.forEach(item => {
-        const share = {...item, replyIds: []}
+        const share = {
+            ...item, replyIds: [],
+        }
         Vue.set(state.shares, share.id, share)
         if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
             state.contents[share.share_of].shareIds.push(share.id)

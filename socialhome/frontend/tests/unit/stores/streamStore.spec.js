@@ -31,9 +31,13 @@ describe("streamStore", () => {
 
     describe("addHasLoadMore", () => {
         it("adds flag on fifth last content", () => {
-            const state = {contentIds: [...new Array(7).keys()].map(i => i), contents: {}}
+            const state = {
+                contentIds: [...new Array(7).keys()].map(i => i), contents: {},
+            }
             state.contentIds.forEach(id => {
-                state.contents[id] = getFakeContent({id, hasLoadMore: false})
+                state.contents[id] = getFakeContent({
+                    id, hasLoadMore: false,
+                })
             })
             addHasLoadMore(state)
             state.contents[state.contentIds[0]].hasLoadMore.should.be.false
@@ -46,9 +50,13 @@ describe("streamStore", () => {
         })
 
         it("adds flag to last if under 5 contents", () => {
-            const state = {contentIds: [...new Array(4).keys()].map(i => i), contents: {}}
+            const state = {
+                contentIds: [...new Array(4).keys()].map(i => i), contents: {},
+            }
             state.contentIds.forEach(id => {
-                state.contents[id] = getFakeContent({id, hasLoadMore: false})
+                state.contents[id] = getFakeContent({
+                    id, hasLoadMore: false,
+                })
             })
             addHasLoadMore(state)
             state.contents[state.contentIds[0]].hasLoadMore.should.be.false
@@ -64,7 +72,9 @@ describe("streamStore", () => {
                 layoutDoneAfterTwitterOEmbeds: true,
             }
             state.contentIds.forEach(id => {
-                state.contents[id] = getFakeContent({id, hasLoadMore: false})
+                state.contents[id] = getFakeContent({
+                    id, hasLoadMore: false,
+                })
             })
             addHasLoadMore(state)
             state.layoutDoneAfterTwitterOEmbeds.should.be.false
@@ -75,16 +85,24 @@ describe("streamStore", () => {
         it("should append payload to state", () => {
             const payload = {
                 data: [
-                    {id: "6", text: "foobar", content_type: "content"},
-                    {id: "7", text: "blablabla", content_type: "content"},
+                    {
+                        id: "6", text: "foobar", content_type: "content",
+                    },
+                    {
+                        id: "7", text: "blablabla", content_type: "content",
+                    },
                 ],
             }
 
             const state = {
                 contentIds: ["1", "2"],
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {},
                 shares: {},
@@ -95,9 +113,15 @@ describe("streamStore", () => {
             state.should.eql({
                 contentIds: ["1", "2", "6", "7"],
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
-                    6: {id: "6", text: "foobar", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
+                    6: {
+                        id: "6", text: "foobar", content_type: "content", replyIds: [], shareIds: [],
+                    },
                     7: {
                         id: "7",
                         text: "blablabla",
@@ -118,26 +142,42 @@ describe("streamStore", () => {
         it("should append array payload to state", () => {
             const payload = {
                 data: [
-                    {id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1"},
-                    {id: "7", text: "blablabla", content_type: "reply", parent: "3", root_parent: "3"},
+                    {
+                        id: "6", text: "foobar", content_type: "reply", parent: "1", root_parent: "1",
+                    },
+                    {
+                        id: "7", text: "blablabla", content_type: "reply", parent: "3", root_parent: "3",
+                    },
                 ],
             }
 
             const state = {
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"]},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {},
-                shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: []}},
+                shares: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: [],
+                    },
+                },
             }
 
             fetchRepliesSuccess(state, payload)
 
             state.should.eql({
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"]},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {
                     6: {
@@ -159,28 +199,48 @@ describe("streamStore", () => {
                         shareIds: [],
                     },
                 },
-                shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: ["7"]}},
+                shares: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: ["7"],
+                    },
+                },
             })
         })
 
         it("should append single item payload to state", () => {
-            const payload = {data: {id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1"}}
+            const payload = {
+                data: {
+                    id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1",
+                },
+            }
 
             const state = {
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"]},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {},
-                shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: []}},
+                shares: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: [],
+                    },
+                },
             }
 
             fetchRepliesSuccess(state, payload)
 
             state.should.eql({
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"]},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {
                     6: {
@@ -193,7 +253,11 @@ describe("streamStore", () => {
                         shareIds: [],
                     },
                 },
-                shares: {3: {id: "3", content_type: "share", share_of: "1", replyIds: []}},
+                shares: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: [],
+                    },
+                },
             })
         })
     })
@@ -202,15 +266,23 @@ describe("streamStore", () => {
         it("should append payload to state", () => {
             const payload = {
                 data: [
-                    {id: "6", content_type: "share", share_of: "1"},
-                    {id: "7", content_type: "share", share_of: "2"},
+                    {
+                        id: "6", content_type: "share", share_of: "1",
+                    },
+                    {
+                        id: "7", content_type: "share", share_of: "2",
+                    },
                 ],
             }
 
             const state = {
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: []},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: []},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
+                    },
                 },
                 replies: {},
                 shares: {},
@@ -220,13 +292,21 @@ describe("streamStore", () => {
 
             state.should.eql({
                 contents: {
-                    1: {id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["6"]},
-                    2: {id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: ["7"]},
+                    1: {
+                        id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["6"],
+                    },
+                    2: {
+                        id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: ["7"],
+                    },
                 },
                 replies: {},
                 shares: {
-                    6: {id: "6", content_type: "share", share_of: "1", replyIds: []},
-                    7: {id: "7", content_type: "share", share_of: "2", replyIds: []},
+                    6: {
+                        id: "6", content_type: "share", share_of: "1", replyIds: [],
+                    },
+                    7: {
+                        id: "7", content_type: "share", share_of: "2", replyIds: [],
+                    },
                 },
             })
         })
@@ -234,12 +314,20 @@ describe("streamStore", () => {
 
     describe("fetchNewContentSuccess", () => {
         it("should append fetched content to contents", () => {
-            const payload = {data: {id: "6", text: "Yolo"}}
+            const payload = {
+                data: {
+                    id: "6", text: "Yolo",
+                },
+            }
 
             const state = {
                 contents: {
-                    1: {id: "1", text: "Plop"},
-                    2: {id: "2", text: "Hello!"},
+                    1: {
+                        id: "1", text: "Plop",
+                    },
+                    2: {
+                        id: "2", text: "Hello!",
+                    },
                 },
                 unfetchedContentIds: ["6"],
             }
@@ -247,9 +335,15 @@ describe("streamStore", () => {
             fetchNewContentSuccess(state, payload)
 
             state.contents.should.eql({
-                1: {id: "1", text: "Plop"},
-                2: {id: "2", text: "Hello!"},
-                6: {id: "6", text: "Yolo"},
+                1: {
+                    id: "1", text: "Plop",
+                },
+                2: {
+                    id: "2", text: "Hello!",
+                },
+                6: {
+                    id: "6", text: "Yolo",
+                },
             })
         })
     })
@@ -273,11 +367,17 @@ describe("streamStore", () => {
             response = {
                 status: 200,
                 response: [
-                    {id: "6", text: "foobar"},
-                    {id: "7", text: "blablabla"},
+                    {
+                        id: "6", text: "foobar",
+                    },
+                    {
+                        id: "7", text: "blablabla",
+                    },
                 ],
             }
-            target = new Vuex.Store(newRestAPI({state, baseURL: "", axios: Axios}))
+            target = new Vuex.Store(newRestAPI({
+                state, baseURL: "", axios: Axios,
+            }))
         })
 
         afterEach(() => {
@@ -296,8 +396,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -310,8 +414,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -342,8 +450,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -356,8 +468,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -378,7 +494,9 @@ describe("streamStore", () => {
 
         context("when requesting tag stream", () => {
             beforeEach(() => {
-                state.stream = {name: "tag", id: "yolo"}
+                state.stream = {
+                    name: "tag", id: "yolo",
+                }
             })
 
             it("should handle tag stream request", done => {
@@ -388,8 +506,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -398,12 +520,20 @@ describe("streamStore", () => {
             it("should handle tag stream request with lastId", done => {
                 Moxios.stubRequest("/api/streams/tag/yolo/?last_id=8", response)
 
-                target.dispatch("getTagStream", {params: {name: "yolo", lastId: 8}})
+                target.dispatch("getTagStream", {
+                    params: {
+                        name: "yolo", lastId: 8,
+                    },
+                })
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -434,8 +564,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -444,12 +578,20 @@ describe("streamStore", () => {
             it("should handle profile all stream request with lastId", done => {
                 Moxios.stubRequest(`/api/streams/profile-all/${UUID}/?last_id=8`, response)
 
-                target.dispatch("getProfileAll", {params: {uuid: UUID, lastId: 8}})
+                target.dispatch("getProfileAll", {
+                    params: {
+                        uuid: UUID, lastId: 8,
+                    },
+                })
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -480,8 +622,12 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -490,12 +636,20 @@ describe("streamStore", () => {
             it("should handle profile pinned stream request with lastId", done => {
                 Moxios.stubRequest(`/api/streams/profile-pinned/${UUID}/?last_id=8`, response)
 
-                target.dispatch("getProfilePinned", {params: {uuid: UUID, lastId: 8}})
+                target.dispatch("getProfilePinned", {
+                    params: {
+                        uuid: UUID, lastId: 8,
+                    },
+                })
 
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
-                        6: {id: "6", text: "foobar", replyIds: [], shareIds: []},
-                        7: {id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true},
+                        6: {
+                            id: "6", text: "foobar", replyIds: [], shareIds: [],
+                        },
+                        7: {
+                            id: "7", text: "blablabla", replyIds: [], shareIds: [], hasLoadMore: true,
+                        },
                     })
                     done()
                 })
@@ -516,12 +670,18 @@ describe("streamStore", () => {
 
         context("when requesting replies", () => {
             it("should handle request", done => {
-                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Vue.set(target.state.contents, "1", {
+                    id: "1", text: "content", replyIds: [], shareIds: [],
+                })
                 Moxios.stubRequest("/api/content/1/replies/", {
                     status: 200,
                     response: [
-                        {id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1"},
-                        {id: "7", text: "blablabla", content_type: "reply", root_parent: "1", parent: "1"},
+                        {
+                            id: "6", text: "foobar", content_type: "reply", root_parent: "1", parent: "1",
+                        },
+                        {
+                            id: "7", text: "blablabla", content_type: "reply", root_parent: "1", parent: "1",
+                        },
                     ],
                 })
 
@@ -529,7 +689,11 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should
-                        .eql({1: {id: "1", text: "content", replyIds: ["6", "7"], shareIds: []}})
+                        .eql({
+                            1: {
+                                id: "1", text: "content", replyIds: ["6", "7"], shareIds: [],
+                            },
+                        })
                     target.state.replies.should.eql({
                         6: {
                             id: "6",
@@ -569,12 +733,18 @@ describe("streamStore", () => {
 
         context("when requesting shares", () => {
             it("should handle request", done => {
-                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Vue.set(target.state.contents, "1", {
+                    id: "1", text: "content", replyIds: [], shareIds: [],
+                })
                 Moxios.stubRequest("/api/content/1/shares/", {
                     status: 200,
                     response: [
-                        {id: "6", content_type: "share", share_of: "1"},
-                        {id: "7", content_type: "share", share_of: "1"},
+                        {
+                            id: "6", content_type: "share", share_of: "1",
+                        },
+                        {
+                            id: "7", content_type: "share", share_of: "1",
+                        },
                     ],
                 })
 
@@ -582,10 +752,18 @@ describe("streamStore", () => {
 
                 Moxios.wait(() => {
                     target.state.contents.should
-                        .eql({1: {id: "1", text: "content", replyIds: [], shareIds: ["6", "7"]}})
+                        .eql({
+                            1: {
+                                id: "1", text: "content", replyIds: [], shareIds: ["6", "7"],
+                            },
+                        })
                     target.state.shares.should.eql({
-                        6: {id: "6", content_type: "share", share_of: "1", replyIds: []},
-                        7: {id: "7", content_type: "share", share_of: "1", replyIds: []},
+                        6: {
+                            id: "6", content_type: "share", share_of: "1", replyIds: [],
+                        },
+                        7: {
+                            id: "7", content_type: "share", share_of: "1", replyIds: [],
+                        },
                     })
                     done()
                 })
@@ -606,16 +784,28 @@ describe("streamStore", () => {
 
         context("when posting reply", () => {
             it("should handle request", done => {
-                Vue.set(target.state.contents, "1", {id: "1", text: "content", replyIds: [], shareIds: []})
+                Vue.set(target.state.contents, "1", {
+                    id: "1", text: "content", replyIds: [], shareIds: [],
+                })
                 Moxios.stubRequest("/api/content/", {
                     status: 200,
-                    response: {id: "6", content_type: "reply", root_parent: "1", parent: "1", text: "a cool reply"},
+                    response: {
+                        id: "6", content_type: "reply", root_parent: "1", parent: "1", text: "a cool reply",
+                    },
                 })
 
-                target.dispatch("saveReply", {data: {contentId: 1, text: "a cool reply"}})
+                target.dispatch("saveReply", {
+                    data: {
+                        contentId: 1, text: "a cool reply",
+                    },
+                })
 
                 Moxios.wait(() => {
-                    target.state.contents.should.eql({1: {id: "1", text: "content", replyIds: ["6"], shareIds: []}})
+                    target.state.contents.should.eql({
+                        1: {
+                            id: "1", text: "content", replyIds: ["6"], shareIds: [],
+                        },
+                    })
                     target.state.replies.should.eql({
                         6: {
                             id: "6",
@@ -639,13 +829,19 @@ describe("streamStore", () => {
 
                 Moxios.stubRequest("/api/content/6/", {
                     status: 200,
-                    response: {id: "6", text: "Yolo"},
+                    response: {
+                        id: "6", text: "Yolo",
+                    },
                 })
 
                 target.dispatch("getNewContent", {params: {pk: "6"}})
 
                 Moxios.wait(() => {
-                    target.state.contents.should.eql({6: {id: "6", text: "Yolo"}})
+                    target.state.contents.should.eql({
+                        6: {
+                            id: "6", text: "Yolo",
+                        },
+                    })
                     done()
                 })
             })
@@ -655,7 +851,15 @@ describe("streamStore", () => {
     describe("mutations", () => {
         describe("disableLoadMore", () => {
             it("should turn off hasLoadMore flag", () => {
-                const state = {contents: {1: {id: getFakeContent({id: 1, hasLoadMore: true})}}}
+                const state = {
+                    contents: {
+                        1: {
+                            id: getFakeContent({
+                                id: 1, hasLoadMore: true,
+                            }),
+                        },
+                    },
+                }
                 mutations.disableLoadMore(state, "1")
                 state.contents["1"].hasLoadMore.should.be.false
             })
@@ -671,18 +875,24 @@ describe("streamStore", () => {
 
         describe("newContentAck", () => {
             it("should add all elements from 'state.unfetchedContentIds' to 'state.contentIds'", () => {
-                const state = {unfetchedContentIds: ["6"], contentIds: []}
+                const state = {
+                    unfetchedContentIds: ["6"], contentIds: [],
+                }
                 mutations.newContentAck(state)
                 state.contentIds.should.eql(["6"])
             })
             it("should not create duplicates in 'state.contentIds'", () => {
-                const state = {unfetchedContentIds: ["6"], contentIds: ["6"]}
+                const state = {
+                    unfetchedContentIds: ["6"], contentIds: ["6"],
+                }
                 mutations.newContentAck(state)
                 state.contentIds.should.eql(["6"])
             })
 
             it("should remove all ids from unfetched ids content list", () => {
-                const state = {unfetchedContentIds: ["6", "7", "8"], contentIds: []}
+                const state = {
+                    unfetchedContentIds: ["6", "7", "8"], contentIds: [],
+                }
                 mutations.newContentAck(state)
                 state.unfetchedContentIds.should.eql([])
             })
@@ -721,7 +931,9 @@ describe("streamStore", () => {
                 const state = {unfetchedContentIds: []}
                 const commit = Sinon.spy()
                 const dispatch = Sinon.spy()
-                actions.newContentAck({commit, state, dispatch})
+                actions.newContentAck({
+                    commit, state, dispatch,
+                })
                 commit.getCall(0).args[0].should.equal("newContentAck")
             })
 
@@ -729,7 +941,9 @@ describe("streamStore", () => {
                 const state = {unfetchedContentIds: [1, 2, 3]}
                 const commit = Sinon.spy()
                 const dispatch = Sinon.stub().returns(new Promise(resolve => resolve()))
-                actions.newContentAck({commit, state, dispatch})
+                actions.newContentAck({
+                    commit, state, dispatch,
+                })
                 dispatch.getCall(0).args.should.eql(["getNewContent", {params: {pk: 1}}])
                 dispatch.getCall(1).args.should.eql(["getNewContent", {params: {pk: 2}}])
                 dispatch.getCall(2).args.should.eql(["getNewContent", {params: {pk: 3}}])
@@ -745,11 +959,15 @@ describe("streamStore", () => {
                     .onCall(2)
                     .returns(Promise.resolve())
 
-                actions.newContentAck({commit, state, dispatch}).should.be.fulfilled.notify(done)
+                actions.newContentAck({
+                    commit, state, dispatch,
+                }).should.be.fulfilled.notify(done)
             })
 
             it("should re-add ID if one dispatch operation fails", done => {
-                const state = {unfetchedContentIds: [1, 2, 3], contentIds: []}
+                const state = {
+                    unfetchedContentIds: [1, 2, 3], contentIds: [],
+                }
                 const commit = name => mutations[name](state)
                 const dispatch = Sinon.stub()
                     .onCall(0).returns(Promise.resolve())
@@ -758,7 +976,9 @@ describe("streamStore", () => {
                     .onCall(2)
                     .returns(Promise.resolve())
 
-                actions.newContentAck({commit, state, dispatch}).then(() => {
+                actions.newContentAck({
+                    commit, state, dispatch,
+                }).then(() => {
                     state.unfetchedContentIds.should.eql([2])
                     done()
                 })
@@ -796,8 +1016,12 @@ describe("streamStore", () => {
             it("returns replies for correct content", () => {
                 const state = {
                     contents: {
-                        1: {id: "1", replyIds: ["2", "4"]},
-                        3: {id: "3", replyIds: ["5"]},
+                        1: {
+                            id: "1", replyIds: ["2", "4"],
+                        },
+                        3: {
+                            id: "3", replyIds: ["5"],
+                        },
                     },
                     replies: {
                         2: {id: "2"},
@@ -805,11 +1029,21 @@ describe("streamStore", () => {
                         5: {id: "5"},
                         7: {id: "7"},
                     },
-                    shares: {6: {id: "6", replyIds: ["7"]}},
+                    shares: {
+                        6: {
+                            id: "6", replyIds: ["7"],
+                        },
+                    },
                 }
-                getters.replies(state)({id: "1", content_type: "content"}).should.eql([{id: "2"}, {id: "4"}])
-                getters.replies(state)({id: "3", content_type: "content"}).should.eql([{id: "5"}])
-                getters.replies(state)({id: "6", content_type: "share"}).should.eql([{id: "7"}])
+                getters.replies(state)({
+                    id: "1", content_type: "content",
+                }).should.eql([{id: "2"}, {id: "4"}])
+                getters.replies(state)({
+                    id: "3", content_type: "content",
+                }).should.eql([{id: "5"}])
+                getters.replies(state)({
+                    id: "6", content_type: "share",
+                }).should.eql([{id: "7"}])
             })
         })
 
@@ -817,8 +1051,12 @@ describe("streamStore", () => {
             it("returns shares for correct content", () => {
                 const state = {
                     contents: {
-                        1: {id: "1", shareIds: ["2", "4"]},
-                        3: {id: "3", shareIds: ["5"]},
+                        1: {
+                            id: "1", shareIds: ["2", "4"],
+                        },
+                        3: {
+                            id: "3", shareIds: ["5"],
+                        },
                     },
                     shares: {
                         2: {id: "2"},

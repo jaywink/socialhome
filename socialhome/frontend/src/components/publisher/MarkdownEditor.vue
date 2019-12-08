@@ -89,9 +89,15 @@ import _get from "lodash/get"
 export default {
     name: "MarkdownEditor",
     props: {
-        autosave: {type: Boolean, default: false},
-        uploadPicture: {type: Boolean, default: true},
-        value: {type: String, default: ""},
+        autosave: {
+            type: Boolean, default: false,
+        },
+        uploadPicture: {
+            type: Boolean, default: true,
+        },
+        value: {
+            type: String, default: "",
+        },
     },
     data() {
         return {
@@ -274,7 +280,9 @@ export default {
             const cursor = this.$editor.codemirror.getCursor()
             const line = this.$editor.codemirror.getLine(cursor.line)
             const prefix = line.trim().length > 0 ? "  \n" : ""
-            const from = line.trim().length !== line.length ? {line: cursor.line, ch: 0} : cursor
+            const from = line.trim().length !== line.length ? {
+                line: cursor.line, ch: 0,
+            } : cursor
             const to = line.trim().length !== line.length ? cursor : undefined
             const mkdImg = `${prefix}![](${url})  \n`
             this.$editor.codemirror.replaceRange(mkdImg, from, to)
@@ -293,7 +301,9 @@ export default {
         processImages(fileList) {
             for (let i = 0; i < fileList.length; i++) {
                 if (fileList[i].type.startsWith("image")) {
-                    this.$set(this.images.uploading, fileList[i].name, {image: fileList[i], uploadedSize: 0})
+                    this.$set(this.images.uploading, fileList[i].name, {
+                        image: fileList[i], uploadedSize: 0,
+                    })
                 }
             }
 
@@ -317,7 +327,9 @@ export default {
                 formData.append("image", image, image.name)
 
                 return this.$http.post(Urls["api-image-upload"](), formData, {
-                    headers: {...this.$http.headers, "content-type": "multipart/form-data"},
+                    headers: {
+                        ...this.$http.headers, "content-type": "multipart/form-data",
+                    },
                     onUploadProgress: e => this.$set(this.images.uploading[image.name], "uploadedSize", e.loaded),
                 }).then(({data}) => promiseSuccess(data, image), () => promiseFail(image)).finally(() => {
                     this.$delete(this.images.uploading, image.name)

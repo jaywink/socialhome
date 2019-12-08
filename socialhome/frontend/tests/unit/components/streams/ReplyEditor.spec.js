@@ -39,19 +39,27 @@ describe("ReplyEditor", () => {
     describe("methods", () => {
         context("saveReply", () => {
             it("dispatches saveReply", () => {
-                const target = mount(ReplyEditor, {propsData: {contentId: store.content.id}, store})
+                const target = mount(ReplyEditor, {
+                    propsData: {contentId: store.content.id}, store,
+                })
                 target.setData({replyText: "\"Code without tests doesn't exist\" -Albert Einstein"})
                 target.instance().saveReply()
                 store.dispatch.callCount.should.eql(1)
                 store.dispatch.args[0].should.eql([
                     "stream/saveReply",
-                    {data: {parent: store.content.id, text: "\"Code without tests doesn't exist\" -Albert Einstein"}},
+                    {
+                        data: {
+                            parent: store.content.id, text: "\"Code without tests doesn't exist\" -Albert Einstein",
+                        },
+                    },
                 ])
                 target.data().replyText.should.eql("")
             })
 
             it("does not dispatch saveReply if replyText is empty ", () => {
-                const target = mount(ReplyEditor, {propsData: {contentId: store.content.id}, store})
+                const target = mount(ReplyEditor, {
+                    propsData: {contentId: store.content.id}, store,
+                })
                 target.setData({replyText: ""})
                 target.instance().saveReply()
                 store.dispatch.callCount.should.eql(0)
