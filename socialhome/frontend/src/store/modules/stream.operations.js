@@ -9,7 +9,9 @@ const streamMutations = {
         Vue.set(state.contents[contentId], "hasLoadMore", false)
     },
     receivedNewContent(state, contentId) {
-        state.unfetchedContentIds.push(contentId)
+        if (state.unfetchedContentIds.indexOf(contentId) === -1) {
+            state.unfetchedContentIds.push(contentId)
+        }
     },
     setLayoutDoneAfterTwitterOEmbeds(state, status) {
         state.layoutDoneAfterTwitterOEmbeds = status
