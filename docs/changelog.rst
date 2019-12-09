@@ -26,6 +26,9 @@ Changed
     profile information) is now 100% wide in all situations. The profile picture has
     also been made larger.
   * The author bar has been moved from the bottom of the content to the top of the content.
+  * Clicking a profile name in the author bar now pops up the author federation ID and
+    reaction buttons instead of expanding them. This saves having to re-render the whole
+    stream grid.
 
 Fixed
 .....
@@ -75,6 +78,10 @@ API changes
 
 * Stream API results now contain a ``through_author`` object in the case that the content is
   in the stream via share.
+
+* The Stream API endpoints now accept an `accept_ids` query parameter, which should be a list
+  of content ID's to fetch from this particular stream. This allows filling the stream with
+  new items in the stream context without making multiple fetches.
 
 0.10.0 (2019-10-06)
 -------------------
