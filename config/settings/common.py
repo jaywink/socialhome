@@ -43,13 +43,13 @@ DJANGO_APPS = (
     "django.forms",  # Required by FORM_RENDERER = TemplatesSetting
 )
 THIRD_PARTY_APPS = (
+    "channels",
     "crispy_forms",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "markdownx",
     "django_extensions",
-    "channels",
     "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
@@ -392,15 +392,15 @@ MANAGERS = ADMINS
 # http://channels.readthedocs.org/en/latest/deploying.html#setting-up-a-channel-backend
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
                 "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB)
             ],
         },
-        "ROUTING": "config.routing.channel_routing",
     },
 }
+ASGI_APPLICATION = "config.routing.application"
 
 # MARKDOWN
 # --------

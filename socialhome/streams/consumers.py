@@ -1,21 +1,32 @@
 import json
 from typing import Set
 
-from channels.generic.websockets import WebsocketConsumer
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
+from channels.layers import get_channel_layer
 
 from socialhome.content.models import Content
 
 
 def notify_listeners(content: Content, keys: Set) -> None:
     """Send out to listening consumers."""
-    data = json.dumps({"event": "new", "id": content.id})
+    channel_layer = get_channel_layer()
+    data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
     for key in keys:
-        StreamConsumer.group_send(key, data)
+        async_to_sync(channel_layer.group_send)(key, data)
 
 
 class StreamConsumer(WebsocketConsumer):
-    http_user = True
-    channel_session_user = True
+    def connect(self):
+        async_to_sync(self.channel_layer.group_add)(self.get_stream_name(), self.channel_name)
+        super().connect()
 
-    def connection_groups(self, **kwargs):
-        return ["streams_%s" % kwargs.get("stream")]
+    def disconnect(self, code):
+        async_to_sync(self.channel_layer.group_discard)(self.get_stream_name(), self.channel_name)
+        super().disconnect(code)
+
+    def get_stream_name(self) -> str:
+        return f"streams_{self.scope['url_route']['kwargs']['stream']}"
+
+    def notification(self, event):
+        self.send(text_data=json.dumps(event["payload"]))

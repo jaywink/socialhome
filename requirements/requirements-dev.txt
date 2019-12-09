@@ -8,12 +8,12 @@
 -e git+https://git.feneas.org/jaywink/federation.git@33f1e4c70732cfc8d63bf2d7975aa12363430ef2#egg=federation==0.19.0-dev1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
+aioredis==1.3.1
 alabaster==0.7.12         # via sphinx
 argh==0.26.2              # via sphinx-autobuild, watchdog
 arrow==0.15.4
-asgi-redis==1.4.3
-asgiref==1.1.2
-atomicwrites==1.3.0       # via pytest
+asgiref==3.2.3
+async-timeout==3.0.1
 attrs==19.3.0
 autobahn==19.11.1
 automat==0.8.0
@@ -22,9 +22,10 @@ babel==2.7.0              # via sphinx
 backcall==0.1.0
 beautifulsoup4==4.8.1
 bleach==3.1.0
-certifi==2019.9.11
+certifi==2019.11.28
 cffi==1.13.2
-channels==1.1.8
+channels-redis==2.4.1
+channels==2.3.1
 chardet==3.0.4
 circus==0.15.0
 click==7.0
@@ -37,8 +38,8 @@ coverage==4.5.4
 croniter==0.3.30
 cryptography==2.8
 cssselect==1.1.0
-daphne==1.4.2
-ddt==1.2.1
+daphne==2.4.0
+ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.6.0
 dirty-validators==0.5.2
@@ -46,7 +47,7 @@ django-allauth==0.40.0
 django-autoslug==1.9.6
 django-braces==1.13.0
 django-coverage-plugin==1.6.0
-django-crispy-forms==1.8.0
+django-crispy-forms==1.8.1
 django-debug-toolbar-user-panel==1.1.1
 django-debug-toolbar==1.11
 django-dynamic-preferences==1.5.1
@@ -54,57 +55,58 @@ django-enumfields==1.0.0
 django-environ==0.4.5
 django-extensions==2.2.5
 django-floppyforms==1.8.0
-django-fsm==2.6.1
+django-fsm==2.7.0
 django-haystack==2.8.1
 django-js-reverse==0.9.1
-django-memoize==2.2.0
+django-memoize==2.2.1
 django-model-utils==3.2.0
 django-querycount==0.7.0
 django-redis==4.10.0
 django-rest-swagger==2.2.0
-django-reversion==3.0.4
+django-reversion==3.0.5
 django-robots==3.1.0
-django-rq==1.2.0
+django-rq==2.2.0
 django-secure==1.0.1
 django-settings-export==1.2.1
 django-silk==3.0.4
 django-stubs==1.1.0
 django-test-plus==1.0.22
 django-versatileimagefield==1.11
-django==2.2.7
+django==2.2.8
 djangorestframework-stubs==1.0.0
 djangorestframework==3.10.3
 docutils==0.15.2          # via sphinx
 entrypoints==0.3          # via flake8
 factory-boy==2.12.0
-faker==2.0.3
+faker==3.0.0
 flake8==3.7.9
 freezegun==0.3.12
-gprof2dot==2017.9.19
+gprof2dot==2019.11.30
+hiredis==1.0.1
 hyperlink==19.0.0
 idna==2.8
 imagesize==1.1.0          # via sphinx
-importlib-metadata==0.23
+importlib-metadata==1.2.0
 incremental==17.5.0
 ipaddress==1.0.23
 ipdata==3.2
-ipdb==0.12.2
+ipdb==0.12.3
 ipython-genutils==0.2.0
-ipython==7.9.0
+ipython==7.10.1
 isodate==0.6.0
-iteration-utilities==0.9.0
+iteration-utilities==0.10.1
 itypes==1.1.0
 jedi==0.15.1
 jinja2==2.10.3
-jsonschema==3.1.1
+jsonschema==3.2.0
 livereload==2.6.1         # via sphinx-autobuild
-lxml==4.4.1
+lxml==4.4.2
 markdown==3.1.1
 markdownify==0.4.1
 markupsafe==1.1.1
 mccabe==0.6.1             # via flake8
-more-itertools==7.2.0
-msgpack-python==0.5.6
+more-itertools==8.0.2
+msgpack==0.6.2
 mypy-extensions==0.4.3    # via mypy
 mypy==0.720               # via django-stubs, djangorestframework-stubs
 oauthlib==3.1.0
@@ -116,50 +118,54 @@ persisting-theory==0.2.1
 pexpect==4.7.0
 pickleshare==0.7.5
 pillow==6.2.1
-pip-tools==4.2.0
-pluggy==0.13.0            # via pytest
+pip-tools==4.3.0
+pluggy==0.13.1            # via pytest
 port_for==0.3.1           # via sphinx-autobuild
-prompt-toolkit==2.0.10
-psutil==5.6.5
+prompt-toolkit==3.0.2
+psutil==5.6.7
 psycopg2-binary==2.8.4
 ptyprocess==0.6.0
 py==1.8.0                 # via pytest
+pyasn1-modules==0.2.7
+pyasn1==0.4.8
 pycodestyle==2.5.0
 pycparser==2.19
-pycryptodome==3.9.1
+pycryptodome==3.9.4
 pyflakes==2.1.1           # via flake8
-pygments==2.4.2
+pygments==2.5.2
 pyhamcrest==1.9.0
-pyparsing==2.4.4          # via packaging
-pyrsistent==0.15.5
+pyopenssl==19.1.0
+pyparsing==2.4.5          # via packaging
+pyrsistent==0.15.6
 pytest-blockage==0.2.2
 pytest-cov==2.8.1
-pytest-django==3.6.0
+pytest-django==3.7.0
 pytest-env==0.6.2
 pytest-profiling==1.7.0
 pytest-sugar==0.9.2
-pytest==5.2.2
+pytest==5.3.1
 python-dateutil==2.8.1
 python-magic==0.4.15
 python-opengraph-jaywink==0.2.0
 python-xrd==0.1
 python3-openid==3.1.0
 pytz==2019.3
-pyyaml==5.1.2             # via sphinx-autobuild, watchdog
+pyyaml==5.2               # via sphinx-autobuild, watchdog
 pyzmq==16.0.4
 raven==6.10.0
-redis==2.10.6
+redis==3.3.11
 requests-http-signature-jaywink==0.1.0.dev0
 requests-oauthlib==1.3.0
 requests==2.22.0
-rq-scheduler==0.8.3
-rq==0.12.0
-simplejson==3.16.0
+rq-scheduler==0.9.1
+rq==1.1.0
+service-identity==18.1.0
+simplejson==3.17.0
 six==1.13.0
 snowballstemmer==2.0.0    # via sphinx
 soupsieve==1.9.5
 sphinx-autobuild==0.7.1
-sphinx==2.2.1
+sphinx==2.2.2
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.2  # via sphinx
@@ -171,14 +177,14 @@ termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.3       # via faker
 tornado==4.5.3
 traitlets==4.3.3
-twisted==19.7.0
+twisted[tls]==19.10.0
 txaio==18.8.1
 typed-ast==1.4.0          # via mypy
 typing-extensions==3.7.4.1  # via django-stubs, djangorestframework-stubs, mypy
 unicode-slugify==0.1.3
 unidecode==1.1.1
 uritemplate==3.0.0
-urllib3==1.25.6
+urllib3==1.25.7
 uwsgi==2.0.18
 watchdog==0.9.0           # via sphinx-autobuild
 wcwidth==0.1.7
@@ -187,8 +193,8 @@ werkzeug==0.16.0
 whitenoise==4.1.4
 whoosh==2.7.4
 zipp==0.6.0
-zope.interface==4.6.0
+zope.interface==4.7.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip==19.3.1
-# setuptools==42.0.1        # via ipdb, ipython, jsonschema, markdown, pyhamcrest, sphinx, zope.interface
+# pip
+# setuptools

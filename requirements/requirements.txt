@@ -7,19 +7,21 @@
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
 -e git+https://git.feneas.org/jaywink/federation.git@33f1e4c70732cfc8d63bf2d7975aa12363430ef2#egg=federation==0.19.0-dev1
 -e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
+aioredis==1.3.1           # via channels-redis
 arrow==0.15.4
-asgi-redis==1.4.3
-asgiref==1.1.2            # via asgi-redis, channels, daphne
-attrs==19.3.0             # via automat, jsonschema, twisted
+asgiref==3.2.3            # via channels, channels-redis, daphne
+async-timeout==3.0.1      # via aioredis
+attrs==19.3.0             # via automat, jsonschema, service-identity, twisted
 autobahn==19.11.1         # via daphne
 automat==0.8.0            # via twisted
 autopep8==1.4.4           # via django-silk
 backcall==0.1.0           # via ipython
 beautifulsoup4==4.8.1     # via markdownify, python-opengraph-jaywink
 bleach==3.1.0
-certifi==2019.9.11        # via requests
+certifi==2019.11.28       # via requests
 cffi==1.13.2              # via cryptography
-channels==1.1.8
+channels-redis==2.4.1
+channels==2.3.1
 chardet==3.0.4            # via requests
 circus==0.15.0
 click==7.0                # via rq
@@ -28,58 +30,59 @@ constantly==15.1.0        # via twisted
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
 croniter==0.3.30          # via rq-scheduler
-cryptography==2.8         # via autobahn
+cryptography==2.8         # via autobahn, pyopenssl, service-identity
 cssselect==1.1.0
-daphne==1.4.2             # via channels
+daphne==2.4.0             # via channels
 decorator==4.4.1          # via ipython, traitlets
 defusedxml==0.6.0         # via python3-openid
 dirty-validators==0.5.2
 django-allauth==0.40.0
 django-autoslug==1.9.6
 django-braces==1.13.0
-django-crispy-forms==1.8.0
+django-crispy-forms==1.8.1
 django-dynamic-preferences==1.5.1
 django-enumfields==1.0.0
 django-environ==0.4.5
 django-extensions==2.2.5
 django-floppyforms==1.8.0
-django-fsm==2.6.1
+django-fsm==2.7.0
 django-haystack==2.8.1
 django-js-reverse==0.9.1
-django-memoize==2.2.0
+django-memoize==2.2.1
 django-model-utils==3.2.0
 django-redis==4.10.0
 django-rest-swagger==2.2.0
-django-reversion==3.0.4
+django-reversion==3.0.5
 django-robots==3.1.0
-django-rq==1.2.0
+django-rq==2.2.0
 django-secure==1.0.1
 django-settings-export==1.2.1
 django-silk==3.0.4
 django-versatileimagefield==1.11
-django==2.2.7
+django==2.2.8
 djangorestframework==3.10.3
-gprof2dot==2017.9.19      # via django-silk
+gprof2dot==2019.11.30     # via django-silk
+hiredis==1.0.1            # via aioredis
 hyperlink==19.0.0         # via twisted
-idna==2.8                 # via hyperlink, requests
-importlib-metadata==0.23  # via jsonschema
+idna==2.8                 # via hyperlink, requests, twisted
+importlib-metadata==1.2.0  # via jsonschema
 incremental==17.5.0       # via twisted
 ipaddress==1.0.23         # via ipdata
 ipdata==3.2
 ipython-genutils==0.2.0   # via traitlets
-ipython==7.9.0
+ipython==7.10.1
 isodate==0.6.0            # via python-xrd
-iteration-utilities==0.9.0
+iteration-utilities==0.10.1
 itypes==1.1.0             # via coreapi
 jedi==0.15.1              # via ipython
 jinja2==2.10.3            # via coreschema, django-silk
-jsonschema==3.1.1
-lxml==4.4.1
+jsonschema==3.2.0
+lxml==4.4.2
 markdown==3.1.1
 markdownify==0.4.1
 markupsafe==1.1.1         # via jinja2
-more-itertools==7.2.0     # via zipp
-msgpack-python==0.5.6     # via asgi-redis
+more-itertools==8.0.2     # via zipp
+msgpack==0.6.2            # via channels-redis
 oauthlib==3.1.0           # via requests-oauthlib
 openapi-codec==1.3.2      # via django-rest-swagger
 parso==0.5.1              # via jedi
@@ -87,16 +90,19 @@ persisting-theory==0.2.1  # via django-dynamic-preferences
 pexpect==4.7.0            # via ipython
 pickleshare==0.7.5        # via ipython
 pillow==6.2.1
-prompt-toolkit==2.0.10    # via ipython
-psutil==5.6.5             # via circus
+prompt-toolkit==3.0.2     # via ipython
+psutil==5.6.7             # via circus
 psycopg2-binary==2.8.4
 ptyprocess==0.6.0         # via pexpect
+pyasn1-modules==0.2.7     # via service-identity
+pyasn1==0.4.8             # via pyasn1-modules, service-identity
 pycodestyle==2.5.0        # via autopep8
 pycparser==2.19           # via cffi
-pycryptodome==3.9.1
-pygments==2.4.2           # via django-silk, ipython
+pycryptodome==3.9.4
+pygments==2.5.2           # via django-silk, ipython
 pyhamcrest==1.9.0         # via twisted
-pyrsistent==0.15.5        # via jsonschema
+pyopenssl==19.1.0         # via twisted
+pyrsistent==0.15.6        # via jsonschema
 python-dateutil==2.8.1    # via arrow, croniter, django-silk
 python-magic==0.4.15      # via django-versatileimagefield
 python-opengraph-jaywink==0.2.0
@@ -105,32 +111,33 @@ python3-openid==3.1.0     # via django-allauth
 pytz==2019.3
 pyzmq==16.0.4             # via circus
 raven==6.10.0
-redis==2.10.6
+redis==3.3.11
 requests-http-signature-jaywink==0.1.0.dev0
 requests-oauthlib==1.3.0  # via django-allauth
 requests==2.22.0          # via coreapi, django-allauth, django-silk, ipdata, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib
-rq-scheduler==0.8.3
-rq==0.12.0
-simplejson==3.16.0        # via django-rest-swagger
-six==1.13.0               # via asgi-redis, asgiref, autobahn, automat, bleach, circus, cryptography, django-dynamic-preferences, django-extensions, isodate, jsonschema, markdownify, prompt-toolkit, pyhamcrest, pyrsistent, python-dateutil, traitlets, txaio, unicode-slugify
+rq-scheduler==0.9.1
+rq==1.1.0
+service-identity==18.1.0  # via twisted
+simplejson==3.17.0        # via django-rest-swagger
+six==1.13.0               # via autobahn, automat, bleach, circus, cryptography, django-dynamic-preferences, django-extensions, isodate, jsonschema, markdownify, pyhamcrest, pyopenssl, pyrsistent, python-dateutil, traitlets, txaio, unicode-slugify
 soupsieve==1.9.5          # via beautifulsoup4
 sqlparse==0.3.0           # via django, django-silk
 tornado==4.5.3            # via circus
 traitlets==4.3.3          # via ipython
-twisted==19.7.0           # via daphne
+twisted[tls]==19.10.0     # via daphne
 txaio==18.8.1             # via autobahn
 unicode-slugify==0.1.3
 unidecode==1.1.1          # via unicode-slugify
 uritemplate==3.0.0        # via coreapi
-urllib3==1.25.6           # via requests
+urllib3==1.25.7           # via requests
 uwsgi==2.0.18
 wcwidth==0.1.7            # via prompt-toolkit
 webencodings==0.5.1       # via bleach
 whitenoise==4.1.4
 whoosh==2.7.4
 zipp==0.6.0               # via importlib-metadata
-zope.interface==4.6.0     # via twisted
+zope.interface==4.7.1     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip==19.3.1
-# setuptools==42.0.1        # via ipython, jsonschema, markdown, pyhamcrest, zope.interface
+# pip
+# setuptools

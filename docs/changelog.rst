@@ -83,6 +83,15 @@ API changes
   of content ID's to fetch from this particular stream. This allows filling the stream with
   new items in the stream context without making multiple fetches.
 
+Internal changes
+................
+
+* Django Channels upgraded from 1.x to 2.x version. This freed up various pinned
+  dependencies like Redis and RQ to be upgraded to their latest versions. This
+  also makes it unnecessary to run a Channels worker process as before. That
+  has already been removed from the ``circus.ini`` file. If you run the processes
+  manually, the process does not need executing any more.
+
 0.10.0 (2019-10-06)
 -------------------
 
