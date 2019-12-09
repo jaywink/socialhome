@@ -928,7 +928,10 @@ describe("streamStore", () => {
 
         describe("newContentAck", () => {
             it("should commit with the correct parameters", () => {
-                const state = {unfetchedContentIds: []}
+                const state = {
+                    unfetchedContentIds: [],
+                    stream: {name: "foobar"},
+                }
                 const commit = Sinon.spy()
                 const dispatch = Sinon.spy()
                 actions.newContentAck({
@@ -938,50 +941,16 @@ describe("streamStore", () => {
             })
 
             it("should dispatch 'streamOperations.getNewContent' for every unfetched ID", () => {
-                const state = {unfetchedContentIds: [1, 2, 3]}
-                const commit = Sinon.spy()
-                const dispatch = Sinon.stub().returns(new Promise(resolve => resolve()))
-                actions.newContentAck({
-                    commit, state, dispatch,
-                })
-                dispatch.getCall(0).args.should.eql(["getNewContent", {params: {pk: 1}}])
-                dispatch.getCall(1).args.should.eql(["getNewContent", {params: {pk: 2}}])
-                dispatch.getCall(2).args.should.eql(["getNewContent", {params: {pk: 3}}])
-            })
-
-            it("should always resolve even if one dispatch operation fails", done => {
-                const state = {unfetchedContentIds: [1, 2, 3]}
-                const commit = Sinon.spy()
-                const dispatch = Sinon.stub()
-                    .onCall(0).returns(Promise.resolve())
-                    .onCall(1)
-                    .returns(Promise.reject(new Error("Fetch error")))
-                    .onCall(2)
-                    .returns(Promise.resolve())
-
-                actions.newContentAck({
-                    commit, state, dispatch,
-                }).should.be.fulfilled.notify(done)
-            })
-
-            it("should re-add ID if one dispatch operation fails", done => {
                 const state = {
-                    unfetchedContentIds: [1, 2, 3], contentIds: [],
+                    unfetchedContentIds: [1, 2, 3],
+                    stream: {name: "foobar"},
                 }
-                const commit = name => mutations[name](state)
+                const commit = Sinon.spy()
                 const dispatch = Sinon.stub()
-                    .onCall(0).returns(Promise.resolve())
-                    .onCall(1)
-                    .returns(Promise.reject(new Error("Fetch error")))
-                    .onCall(2)
-                    .returns(Promise.resolve())
-
                 actions.newContentAck({
                     commit, state, dispatch,
-                }).then(() => {
-                    state.unfetchedContentIds.should.eql([2])
-                    done()
                 })
+                dispatch.getCall(0).args.should.eql(["getFoobarStream", {params: {acceptIds: [1, 2, 3]}}])
             })
         })
 
