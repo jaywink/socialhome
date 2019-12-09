@@ -23,7 +23,6 @@ export default function () {
     const streamSplits = streamName.split("__")
     const stream = {
         id: streamSplits.length ? streamSplits[1] : "",
-        isProfile: streamName.startsWith("profile_"),
         name: streamSplits[0],
         single: streamSplits[0] === "content",
     }
@@ -42,7 +41,7 @@ export default function () {
         newContentLengh: 0,
         replies,
         shares,
-        showAuthorBar: !stream.isProfile,
+        showAuthorBar: stream.name !== "profile_pinned",
         singleContentId,
         stream,
         streamName,

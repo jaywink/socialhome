@@ -14,6 +14,9 @@
         <div v-else v-html="content.rendered" />
 
         <reactions-bar :content="content">
+            <div v-if="!showAuthorBar" class="stream-element-content-timestamp mr-2">
+                <content-timestamp :content="content" />
+            </div>
             <div class="mt-1 grid-item-bar-links">
                 <template v-if="content.user_is_author">
                     <a :href="updateUrl">
@@ -33,15 +36,15 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
 import AuthorBar from "@/components/streams/AuthorBar.vue"
+import ContentTimestamp from "@/components/streams/ContentTimestamp"
 import ReactionsBar from "@/components/streams/ReactionsBar.vue"
 import NsfwShield from "@/components/streams/NsfwShield.vue"
-
 
 const StreamElement = {
     name: "StreamElement",
     directives: {imagesLoaded},
     components: {
-        NsfwShield, ReactionsBar, AuthorBar,
+        ContentTimestamp, NsfwShield, ReactionsBar, AuthorBar,
     },
     props: {
         content: {
@@ -126,3 +129,9 @@ Vue.component(StreamElement.name, StreamElement)
 
 export default StreamElement
 </script>
+
+<style lang="scss">
+    .stream-element-content-timestamp, .grid-item-bar-links {
+        align-self: center;
+    }
+</style>

@@ -36,7 +36,6 @@ const getStore = () => {
     }
 
     store.state.stream.stream.id = ""
-    store.state.stream.stream.isProfile = false
     store.state.stream.stream.name = "public"
     store.state.stream.stream.single = false
 

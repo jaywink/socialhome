@@ -18,12 +18,7 @@
                             {{ authorName }}
                         </div>
                     </popper>
-                    <div class="author-bar-timestamp">
-                        <a :href="content.url" :title="content.timestamp" class="unstyled-link">
-                            {{ timestampText }}
-                        </a>
-                        <i v-if="isLimited" class="fa fa-lock mr-2" aria-hidden="true" />
-                    </div>
+                    <content-timestamp :content="content" />
                     <div v-if="isShared">
                         <popper
                             trigger="clickToToggle"
@@ -51,11 +46,14 @@
 <script>
 import Popper from "vue-popperjs"
 import "vue-popperjs/dist/vue-popper.css"
+import ContentTimestamp from "@/components/streams/ContentTimestamp"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 
 export default {
     components: {
-        Popper, ProfileReactionButtons,
+        ContentTimestamp,
+        Popper,
+        ProfileReactionButtons,
     },
     props: {
         content: {
@@ -80,9 +78,6 @@ export default {
             }
             return this.author.fid
         },
-        isLimited() {
-            return this.content.visibility === "limited"
-        },
         isShared() {
             return this.content.through !== this.content.id
         },
@@ -102,11 +97,6 @@ export default {
             }
             return throughAuthor.fid || ""
         },
-        timestampText() {
-            return this.content.edited
-                ? `${this.content.humanized_timestamp} (${gettext("edited")})`
-                : this.content.humanized_timestamp
-        },
     },
     updated() {
         this.$redrawVueMasonry()
@@ -119,7 +109,7 @@ export default {
         display: inline-block;
         vertical-align: middle;
     }
-    .author-bar-timestamp, .shared-icon {
+    .shared-icon {
         color: #B39A96;
     }
 </style>
