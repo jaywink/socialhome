@@ -11,7 +11,9 @@ const HTML = `<!doctype html>
         </body>
 </html>`
 
-require("jsdom-global")(HTML, {pretendToBeVisual: true, url: "http://localhost"})
+require("jsdom-global")(HTML, {
+    pretendToBeVisual: true, url: "http://localhost",
+})
 require("chai/register-should")
 require("chai").use(require("chai-as-promised")).use(require("sinon-chai"))
 // Django's gettext and other i18n functions

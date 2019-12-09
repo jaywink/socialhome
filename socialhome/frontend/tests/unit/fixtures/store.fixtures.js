@@ -8,9 +8,15 @@ const getStore = () => {
     store.state.profile = {}
     store.state.application = {}
     store.content = getFakeContent()
-    store.reply = getFakeContent({parent: store.content.id, content_type: "reply"})
-    store.share = getFakeContent({share_of: store.content.id, content_type: "share"})
-    store.shareReply = getFakeContent({share_of: store.share.id, content_type: "reply"})
+    store.reply = getFakeContent({
+        parent: store.content.id, content_type: "reply",
+    })
+    store.share = getFakeContent({
+        share_of: store.content.id, content_type: "share",
+    })
+    store.shareReply = getFakeContent({
+        share_of: store.share.id, content_type: "reply",
+    })
 
     store.content.replyIds = [store.reply.id]
     store.share.replyIds = [store.shareReply.id]
@@ -37,6 +43,22 @@ const getStore = () => {
     store.state.application.currentBrowsingProfileId = store.profile.id
     store.state.application.isUserAuthenticated = true
     store.state.application.profile = store.profile
+
+    store.state.profiles = {
+        all: {},
+        index: [
+            store.profile.uuid,
+            store.content.author.uuid,
+            store.reply.author.uuid,
+            store.share.author.uuid,
+            store.shareReply.author.uuid,
+        ],
+    }
+    store.state.profiles.all[store.profile.uuid] = store.profile
+    store.state.profiles.all[store.content.author.uuid] = store.content.author
+    store.state.profiles.all[store.reply.author.uuid] = store.reply.author
+    store.state.profiles.all[store.share.author.uuid] = store.share.author
+    store.state.profiles.all[store.shareReply.author.uuid] = store.shareReply.author
 
     store.getters = {
         "stream/replies": getters.replies,

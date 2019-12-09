@@ -66,10 +66,18 @@ export default Vue.component("stream", {
     },
     // TODO: Seperate Stream.vue into TagStream.vue, GuidProfile.vue and UsernameProfile.vue, etc. in the future
     props: {
-        contentId: {type: String, default: ""},
-        uuid: {type: String, default: ""},
-        user: {type: String, default: ""},
-        tag: {type: String, default: ""},
+        contentId: {
+            type: String, default: "",
+        },
+        uuid: {
+            type: String, default: "",
+        },
+        user: {
+            type: String, default: "",
+        },
+        tag: {
+            type: String, default: "",
+        },
     },
     data() {
         return {

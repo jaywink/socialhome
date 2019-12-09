@@ -2,9 +2,8 @@
     <div>
         <div v-if="showProfileReactionButtons" class="pull-right">
             <ProfileReactionButtons
-                :profile="profile"
+                :profile-uuid="profile.uuid"
                 :show-profile-link="false"
-                :user-following="profile.user_following"
             />
         </div>
         <div class="clearfix" />

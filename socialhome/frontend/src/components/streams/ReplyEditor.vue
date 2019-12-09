@@ -29,8 +29,12 @@ import Vue from "vue"
 
 export default Vue.component("reply-editor", {
     props: {
-        contentId: {type: Number, required: true},
-        contentVisibility: {type: String, required: true},
+        contentId: {
+            type: Number, required: true,
+        },
+        contentVisibility: {
+            type: String, required: true,
+        },
     },
     data() {
         return {replyText: ""}
@@ -53,7 +57,11 @@ export default Vue.component("reply-editor", {
         saveReply() {
             if (this.replyText) {
                 this.$store.dispatch(
-                    "stream/saveReply", {data: {parent: this.contentId, text: this.replyText}},
+                    "stream/saveReply", {
+                        data: {
+                            parent: this.contentId, text: this.replyText,
+                        },
+                    },
                 )
                 this.replyText = ""
             }

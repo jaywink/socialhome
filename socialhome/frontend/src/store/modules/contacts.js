@@ -63,7 +63,9 @@ function getContactsStore(axios) {
         })
         .getStore()
 
-    return {namespaced: true, ...store}
+    return {
+        namespaced: true, ...store,
+    }
 }
 
 export {getContactsStore}

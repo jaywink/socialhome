@@ -6,16 +6,24 @@ module.exports = {
         "no-plusplus": ["error", {allowForLoopAfterthoughts: true}],
         "object-curly-spacing": ["error", "never"],
         "object-curly-newline": ["error", {
-            ObjectExpression: {multiline: true},
+            ObjectExpression: {
+                multiline: true, minProperties: 2,
+            },
             ObjectPattern: {multiline: true},
-            ImportDeclaration: {multiline: true, minProperties: 6},
-            ExportDeclaration: {multiline: true, minProperties: 6},
+            ImportDeclaration: {
+                multiline: true, minProperties: 6,
+            },
+            ExportDeclaration: {
+                multiline: true, minProperties: 6,
+            },
         }],
         quotes: ["error", "double", {avoidEscape: true}],
         semi: ["error", "never"],
         "vue/max-attributes-per-line": ["error", {
             singleline: 5,
-            multiline: {max: 1, allowFirstLine: false},
+            multiline: {
+                max: 1, allowFirstLine: false,
+            },
         }],
         "vue/html-indent": ["error", 4],
     },

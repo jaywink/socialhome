@@ -24,7 +24,11 @@ describe("Main", () => {
             describe("onWebsocketMessage", () => {
                 it("should dispatch receivedNewContent to store when serveur sends a next message", () => {
                     Sinon.spy(main.$store, "dispatch")
-                    main.onWebsocketMessage({data: JSON.stringify({event: "new", id: 4})})
+                    main.onWebsocketMessage({
+                        data: JSON.stringify({
+                            event: "new", id: 4,
+                        }),
+                    })
                     main.$store.dispatch.getCall(0).args
                         .should.eql(["stream/receivedNewContent", 4])
                 })
@@ -55,9 +59,17 @@ describe("Main", () => {
 
             it("should initialize `main.$websocket.onmessage`", () => {
                 Sinon.spy(main, "onWebsocketMessage")
-                const msg = {data: JSON.stringify({event: "new", id: 4})}
+                const msg = {
+                    data: JSON.stringify({
+                        event: "new", id: 4,
+                    }),
+                }
                 main.$websocket.onmessage(msg)
-                main.onWebsocketMessage.getCall(0).args.should.eql([{data: JSON.stringify({event: "new", id: 4})}])
+                main.onWebsocketMessage.getCall(0).args.should.eql([{
+                    data: JSON.stringify({
+                        event: "new", id: 4,
+                    }),
+                }])
             })
 
             it("should initialize `Vue.snotify`", () => {

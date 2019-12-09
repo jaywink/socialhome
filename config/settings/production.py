@@ -19,6 +19,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Production middleware
 # ------------------------------------------------------------------------------
 PRODUCTION_MIDDLEWARE = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 )

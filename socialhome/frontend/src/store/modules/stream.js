@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,max-len */
 import Vue from "vue"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
@@ -22,7 +22,9 @@ export function addHasLoadMore(state) {
 export function fetchContentsSuccess(state, payload) {
     let newItems = 0
     payload.data.forEach(item => {
-        const content = {...item, replyIds: [], shareIds: []}
+        const content = {
+            ...item, replyIds: [], shareIds: [],
+        }
         Vue.set(state.contents, content.id, content)
         if (state.contentIds.indexOf(content.id) === -1) {
             state.contentIds.push(content.id)
@@ -40,7 +42,9 @@ export function fetchRepliesSuccess(state, payload) {
         items = [payload.data]
     }
     items.forEach(item => {
-        const reply = {...item, replyIds: [], shareIds: []}
+        const reply = {
+            ...item, replyIds: [], shareIds: [],
+        }
         Vue.set(state.replies, reply.id, reply)
         if (state.contents[reply.root_parent] !== undefined) {
             if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
@@ -56,7 +60,9 @@ export function fetchRepliesSuccess(state, payload) {
 
 export function fetchSharesSuccess(state, payload) {
     payload.data.forEach(item => {
-        const share = {...item, replyIds: []}
+        const share = {
+            ...item, replyIds: [],
+        }
         Vue.set(state.shares, share.id, share)
         if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
             state.contents[share.share_of].shareIds.push(share.id)
@@ -72,8 +78,18 @@ export function onError() {
     Vue.snotify.error(gettext("An error happened while fetching new content"))
 }
 
+export const profilesPlugin = store => {
+    // called when the store is initialized
+    store.subscribe(({type, payload}) => {
+        if (/^stream\/GET[A-Z_]*SUCCEEDED$/.test(type)) {
+            store.commit("profiles/setProfilesFromContentList", payload.payload.data, {root: true})
+        }
+    })
+}
+
 export function newRestAPI() {
     const getLastIdParam = lastId => (lastId ? `?last_id=${lastId}` : "")
+    const getAcceptIdsParam = acceptIds => (acceptIds ? `?accept_ids=${acceptIds.toString()}` : "")
 
     const axios = Axios.create({
         xsrfCookieName: "csrftoken",
@@ -95,28 +111,28 @@ export function newRestAPI() {
         })
         .get({
             action: "getPublicStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getFollowedStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLimitedStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLocalStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -130,21 +146,21 @@ export function newRestAPI() {
         })
         .get({
             action: "getTagStream",
-            path: ({name, lastId = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}`,
+            path: ({name, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getTagsStream",
-            path: ({lastId = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getProfileAll",
-            path: ({uuid, lastId = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}`,
+            path: ({uuid, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -152,8 +168,8 @@ export function newRestAPI() {
         .get({
             action: "getProfilePinned",
             path: (
-                {uuid, lastId = undefined},
-            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}`,
+                {uuid, lastId = undefined, acceptIds = undefined},
+            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,

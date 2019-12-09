@@ -26,7 +26,9 @@ describe("Publisher", () => {
 
     describe("onPostForm", () => {
         it("should publish post", () => {
-            const target = mount(Publisher, {propsData: {contentId: "12"}, store})
+            const target = mount(Publisher, {
+                propsData: {contentId: "12"}, store,
+            })
             Sinon.spy(target.instance().$store, "dispatch")
             target.instance().onPostForm()
             target.instance().$store.dispatch.getCall(0).args.should.eql([

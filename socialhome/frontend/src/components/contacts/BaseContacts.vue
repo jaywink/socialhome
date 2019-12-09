@@ -16,8 +16,7 @@
                 <profile-reaction-buttons
                     slot="footer"
                     class="pull-right"
-                    :profile="item"
-                    :user-following="item.user_following"
+                    :profile-uuid="item.uuid"
                 />
             </b-card>
         </b-card-group>
@@ -77,7 +76,11 @@ export default {
         fetch() { /* Override */
         },
         async loadMore($state) {
-            await this.fetch({params: {page: this.next, pageSize: this.pageSize}})
+            await this.fetch({
+                params: {
+                    page: this.next, pageSize: this.pageSize,
+                },
+            })
             await this.$nextTick()
             this.shouldLoadMore ? $state.loaded() : $state.complete()
         },

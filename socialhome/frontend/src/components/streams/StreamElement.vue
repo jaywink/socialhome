@@ -40,8 +40,14 @@ import NsfwShield from "@/components/streams/NsfwShield.vue"
 const StreamElement = {
     name: "StreamElement",
     directives: {imagesLoaded},
-    components: {NsfwShield, ReactionsBar, AuthorBar},
-    props: {content: {type: Object, required: true}},
+    components: {
+        NsfwShield, ReactionsBar, AuthorBar,
+    },
+    props: {
+        content: {
+            type: Object, required: true,
+        },
+    },
     computed: {
         deleteUrl() {
             return Urls["content:delete"]({pk: this.content.id})

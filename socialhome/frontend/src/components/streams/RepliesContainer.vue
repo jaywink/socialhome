@@ -36,7 +36,11 @@ import "@/components/streams/StreamElement.vue"
 export default {
     name: "RepliesContainer",
     directives: {imagesLoaded},
-    props: {content: {type: Object, required: true}},
+    props: {
+        content: {
+            type: Object, required: true,
+        },
+    },
     data() {
         return {replyEditorActive: false}
     },

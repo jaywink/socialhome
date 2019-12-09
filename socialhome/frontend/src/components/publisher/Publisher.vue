@@ -129,16 +129,28 @@ import _get from "lodash/get"
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
 
 const VISIBILITY_OPTIONS = Object.freeze({
-    PUBLIC: {value: 0, text: gettext("Public")},
-    LIMITED: {value: 1, text: gettext("Limited (not supported yet)"), disabled: true},
-    SITE: {value: 2, text: gettext("Site")},
-    SELF: {value: 3, text: gettext("Self")},
+    PUBLIC: {
+        value: 0, text: gettext("Public"),
+    },
+    LIMITED: {
+        value: 1, text: gettext("Limited (not supported yet)"), disabled: true,
+    },
+    SITE: {
+        value: 2, text: gettext("Site"),
+    },
+    SELF: {
+        value: 3, text: gettext("Self"),
+    },
 })
 
 export default {
     name: "Publisher",
     components: {MarkdownEditor},
-    props: {contentId: {type: String, default: null}},
+    props: {
+        contentId: {
+            type: String, default: null,
+        },
+    },
     data() {
         return {
             model: {
@@ -188,7 +200,9 @@ export default {
     },
     methods: {
         onPostForm() {
-            this.$store.dispatch("publisher/publishPost", {...this.model, parent: this.contentId})
+            this.$store.dispatch("publisher/publishPost", {
+                ...this.model, parent: this.contentId,
+            })
                 .then(url => window.location.replace(url))
                 .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
         },

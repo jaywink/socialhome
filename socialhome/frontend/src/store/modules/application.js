@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import _get from "lodash/get"
 
 const state = {

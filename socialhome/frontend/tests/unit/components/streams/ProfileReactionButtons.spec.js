@@ -1,4 +1,3 @@
-import Moxios from "moxios"
 import Vue from "vue"
 import Vuex from "vuex"
 import {VueMasonryPlugin} from "vue-masonry"
@@ -27,12 +26,10 @@ describe("ProfileReactionButtons", () => {
         describe("showFollowBtn and showUnfollowBtn", () => {
             it("should show the follow button when the user can and is not following the author", () => {
                 store.content.user_is_author = false
+                store.content.author.user_following = false
                 store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: false,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
                 target.instance().showFollowBtn.should.be.true
@@ -42,12 +39,10 @@ describe("ProfileReactionButtons", () => {
 
             it("should show the unfollow button when the user can and is not following the author", () => {
                 store.content.user_is_author = false
+                store.content.author.user_following = true
                 store.state.application.isUserAuthenticated = true
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: true,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
                 target.instance().showFollowBtn.should.be.false
@@ -58,175 +53,34 @@ describe("ProfileReactionButtons", () => {
     })
 
     describe("methods", () => {
-        beforeEach(() => {
-            Moxios.install(Vue.prototype.$http)
-        })
-
-        afterEach(() => {
-            Moxios.uninstall()
-        })
-
         describe("follow", () => {
-            it("should send an HTTP request with the right parameters", () => {
+            it("should dispatch a follow action", () => {
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: false,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
 
-                Sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$store, "dispatch")
                 target.instance().follow()
-                target.instance().$http.post.getCall(0).args
-                    .should.eql([`/api/profiles/${store.content.author.uuid}/follow/`])
-            })
-
-            it("should show that user is following author when the HTTP request succeeds", done => {
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: false,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$http, "post")
-                target.instance().following.should.be.false
-                target.instance().follow()
-                Moxios.wait(() => {
-                    Moxios.requests.mostRecent().respondWith({status: 200}).then(() => {
-                        target.instance().following.should.be.true
-                        done()
-                    })
-                })
-            })
-
-            it("should show an error to the user if request fails", done => {
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: false,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().following.should.be.false
-                target.instance().follow()
-                Moxios.wait(() => {
-                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
-                        target.instance().$snotify.error.getCall(0).args[0]
-                            .should.eq(`An error happened while trying to follow ${store.content.author.name}`)
-                        done()
-                    })
-                })
-            })
-
-            it("should show an error to the user if not logged in", () => {
-                store.state.application.isUserAuthenticated = false
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: false,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().following.should.be.false
-                target.instance().follow()
-
-                target.instance().$snotify.error.getCall(0).args[0].should.eq("You must be logged in to follow someone")
+                target.instance().$store.dispatch.getCall(0).args.should.eql([
+                    "profiles/follow", {uuid: store.content.author.uuid},
+                ])
             })
         })
 
         describe("unfollow", () => {
-            it("should send an HTTP request with the right parameters", () => {
+            it("should dispatch an unfollow action", () => {
                 const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: true,
-                    },
+                    propsData: {profileUuid: store.content.author.uuid},
                     store,
                 })
 
-                Sinon.spy(target.instance().$http, "post")
+                Sinon.spy(target.instance().$store, "dispatch")
                 target.instance().unfollow()
-                target.instance().$http.post.getCall(0).args
-                    .should.eql([`/api/profiles/${store.content.author.uuid}/unfollow/`])
+                target.instance().$store.dispatch.getCall(0).args.should.eql([
+                    "profiles/unFollow", {uuid: store.content.author.uuid},
+                ])
             })
-
-            it("should show that user is not following author when the HTTP request succeeds", done => {
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: true,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$http, "post")
-                target.instance().following.should.be.true
-                target.instance().unfollow()
-                Moxios.wait(() => {
-                    Moxios.requests.mostRecent().respondWith({status: 200}).then(() => {
-                        target.instance().following.should.be.false
-                        done()
-                    })
-                })
-            })
-
-            it("should show an error to the user if request fails", done => {
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: true,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().following.should.be.true
-                target.instance().unfollow()
-                Moxios.wait(() => {
-                    Moxios.requests.mostRecent().respondWith({status: 500}).then(() => {
-                        target.instance().$snotify.error.getCall(0).args[0]
-                            .should.eq(`An error happened while trying to unfollow ${store.content.author.name}`)
-                        done()
-                    })
-                })
-            })
-
-            it("should show an error to the user if not logged in", () => {
-                store.state.application.isUserAuthenticated = false
-                const target = mount(ProfileReactionButtons, {
-                    propsData: {
-                        profile: store.content.author,
-                        userFollowing: true,
-                    },
-                    store,
-                })
-
-                Sinon.spy(target.instance().$snotify, "error")
-                target.instance().following.should.be.true
-                target.instance().unfollow()
-
-                target.instance().$snotify.error.getCall(0).args[0]
-                    .should.eq("You must be logged in to unfollow someone")
-            })
-        })
-    })
-
-    describe("render", () => {
-        it("renders with content author object", () => {
-            const target = mount(ProfileReactionButtons, {propsData: {profile: store.content.author}, store})
-            target.instance().following.should.be.false
-        })
-
-        it("renders with profile object", () => {
-            const target = mount(ProfileReactionButtons, {propsData: {profile: store.profile}, store})
-            target.instance().following.should.be.false
         })
     })
 })

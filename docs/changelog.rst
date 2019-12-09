@@ -11,6 +11,8 @@ Added
 
 * Searching of users on the ActivityPub protocol now works using a handle (ie ``user@domain.tld``).
 
+* Shared content in the streams now contain the name and link to the profile of the sharer.
+
 * Django-Silk is now available for developers to turn on for their instance.
 
   To turn on, set the environment variable ``SOCIALHOME_SILKY=True``.
@@ -24,6 +26,9 @@ Changed
     profile information) is now 100% wide in all situations. The profile picture has
     also been made larger.
   * The author bar has been moved from the bottom of the content to the top of the content.
+  * Clicking a profile name in the author bar now pops up the author federation ID and
+    reaction buttons instead of expanding them. This saves having to re-render the whole
+    stream grid.
 
 Fixed
 .....
@@ -47,6 +52,15 @@ Fixed
 * Don't raise a 500 error when an attempt is made to view a profile with an invalid
   profile identifier
 
+* Fix a major race issue with the ``through`` value calculation for shared content in streams (`#558 <https://git.feneas.org/socialhome/socialhome/issues/558>`_)
+
+  When calculating ``through`` values (ie what share caused a content to appear in the stream),
+  there was a race condition between processing the saved share and a remote fetched shared content.
+  Values are now correctly calculates irregardless of saving order to provide correct "shared by"
+  information for streams.
+
+* Don't raise a 500 error on fetch of content using a malformed identifier
+
 * Fix inbound federation timing issue with ActivityPub platforms (`#563 <https://git.feneas.org/socialhome/socialhome/issues/563>`_)
 
   Signature verification time delta check if a background worker didn't process the
@@ -55,6 +69,19 @@ Fixed
 
 * Improve performance of profile streams and fetching of replies by splitting the
   database queries into multiple queries instead of one larger one. (`#562 <https://git.feneas.org/socialhome/socialhome/issues/562>`_)
+
+API changes
+...........
+
+* **Backwards incompatible**: Removed duplicated ``user_following_author`` from the
+  Content API since it is included in the serialized ``author`` as ``user_following``.
+
+* Stream API results now contain a ``through_author`` object in the case that the content is
+  in the stream via share.
+
+* The Stream API endpoints now accept an `accept_ids` query parameter, which should be a list
+  of content ID's to fetch from this particular stream. This allows filling the stream with
+  new items in the stream context without making multiple fetches.
 
 0.10.0 (2019-10-06)
 -------------------

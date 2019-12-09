@@ -1,5 +1,5 @@
 <template>
-    <div class="socialhome-profile-reaction-buttons">
+    <div v-if="profile" class="socialhome-profile-reaction-buttons">
         <b-button
             v-if="showProfileLink"
             :href="profile.url"
@@ -45,28 +45,27 @@
 export default {
     name: "ProfileReactionButtons",
     props: {
-        userFollowing: {type: Boolean, default: false},
-        profile: {type: Object, required: true},
-        showProfileLink: {type: Boolean, default: true},
-    },
-    data() {
-        return {following: this.userFollowing}
+        profileUuid: {
+            type: String, required: true,
+        },
+        showProfileLink: {
+            type: Boolean, default: true,
+        },
     },
     computed: {
-        currentBrowsingProfileId() {
-            return this.$store.state.application.currentBrowsingProfileId
-        },
-        displayName() {
-            return this.profile.name ? this.profile.name : this.profile.fid
-        },
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
         },
+        profile() {
+            return this.$store.state.profiles.all[this.profileUuid] || null
+        },
         showFollowBtn() {
-            return this.isUserAuthenticated && !this.following
+            return this.isUserAuthenticated && this.profile && !this.profile.user_following
+                && this.profile.id !== this.$store.state.application.currentBrowsingProfileId
         },
         showUnfollowBtn() {
-            return this.isUserAuthenticated && this.following
+            return this.isUserAuthenticated && this.profile && this.profile.user_following
+                && this.profile.id !== this.$store.state.application.currentBrowsingProfileId
         },
         translations() {
             return {
@@ -76,35 +75,18 @@ export default {
                 unfollow: gettext("Unfollow"),
             }
         },
-        urls() {
-            return {
-                followUrl: Urls["api:profile-follow"]({uuid: this.profile.uuid}),
-                unfollowUrl: Urls["api:profile-unfollow"]({uuid: this.profile.uuid}),
-            }
-        },
+    },
+    created() {
+        if (this.$store.state.profiles.all[this.profileUuid] === undefined) {
+            this.$store.dispatch("profiles/getProfile", {uuid: this.profileUuid})
+        }
     },
     methods: {
         follow() {
-            if (!this.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to follow someone"))
-                return
-            }
-            this.$http.post(this.urls.followUrl)
-                .then(() => this.following = true)
-                .catch(() => this.$snotify.error(
-                    `${gettext("An error happened while trying to follow")} ${this.displayName}`,
-                ))
+            this.$store.dispatch("profiles/follow", {uuid: this.profile.uuid})
         },
         unfollow() {
-            if (!this.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to unfollow someone"))
-                return
-            }
-            this.$http.post(this.urls.unfollowUrl)
-                .then(() => this.following = false)
-                .catch(() => this.$snotify.error(
-                    `${gettext("An error happened while trying to unfollow")} ${this.displayName}`,
-                ))
+            this.$store.dispatch("profiles/unFollow", {uuid: this.profile.uuid})
         },
     },
 }

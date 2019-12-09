@@ -43,7 +43,7 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:followed")
-        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, user=self.user, accept_ids=None)
 
 
 class TestLimitedStreamAPIView(SocialhomeAPITestCase):
@@ -73,7 +73,7 @@ class TestLimitedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:limited")
-        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, user=self.user, accept_ids=None)
 
 
 class TestLocalStreamAPIView(SocialhomeAPITestCase):
@@ -111,7 +111,7 @@ class TestLocalStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:local")
-        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, user=self.user, accept_ids=None)
 
 
 class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
@@ -136,7 +136,7 @@ class TestProfileAllStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:profile-all", uuid=self.content.author.uuid)
-        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user, accept_ids=None)
 
 
 class TestProfilePinnedStreamAPIView(SocialhomeAPITestCase):
@@ -160,7 +160,7 @@ class TestProfilePinnedStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:profile-pinned", uuid=self.content.author.uuid)
-        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, profile=self.content.author, user=self.user, accept_ids=None)
 
 
 class TestPublicStreamAPIView(SocialhomeAPITestCase):
@@ -188,7 +188,7 @@ class TestPublicStreamAPIView(SocialhomeAPITestCase):
     def test_users_correct_stream_class(self, mock_stream):
         mock_stream.return_value = MockStream()
         self.get("api-streams:public")
-        mock_stream.assert_called_once_with(last_id=None)
+        mock_stream.assert_called_once_with(last_id=None, accept_ids=None)
 
 
 class TestTagStreamAPIView(SocialhomeAPITestCase):
@@ -211,7 +211,9 @@ class TestTagStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:tag", name="foobar")
-        mock_stream.assert_called_once_with(last_id=None, tag=self.content.tags.first(), user=self.user)
+        mock_stream.assert_called_once_with(
+            last_id=None, tag=self.content.tags.first(), user=self.user, accept_ids=None,
+        )
 
 
 class TestTagsStreamAPIView(SocialhomeAPITestCase):
@@ -241,4 +243,4 @@ class TestTagsStreamAPIView(SocialhomeAPITestCase):
         mock_stream.return_value = MockStream()
         with self.login(self.user):
             self.get("api-streams:tags")
-        mock_stream.assert_called_once_with(last_id=None, user=self.user)
+        mock_stream.assert_called_once_with(last_id=None, user=self.user, accept_ids=None)
