@@ -82,11 +82,9 @@ class ContentSerializer(serializers.ModelSerializer):
     def cache_through_authors(self):
         """
         If we have 'throughs', cache author information here for all of them.
-
-        Only do this for authenticated users.
         """
         request = self.context.get("request")
-        if not self.context.get("throughs") or not request or not request.user.is_authenticated:
+        if not self.context.get("throughs") or not request:
             self.context["throughs_authors"] = {}
             return
         throughs_ids = self.context["throughs"]
