@@ -17,6 +17,7 @@ class TestGetFullMediaUrl(SocialhomeTestCase):
 
 class TestGetRedisConnection(TestCase):
     @patch("socialhome.utils.redis.StrictRedis")
+    @patch("socialhome.utils.redis_connection", new=None)
     def test_get_redis_connection(self, mock_redis):
         get_redis_connection()
         self.assertTrue(mock_redis.called)

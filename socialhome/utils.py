@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.utils.timezone import make_aware
 
+redis_connection = None
+
 
 def get_full_url(path):
     return "%s%s" % (settings.SOCIALHOME_URL, path)
@@ -19,9 +21,13 @@ def get_full_media_url(path):
 
 
 def get_redis_connection():
-    return redis.StrictRedis(
+    global redis_connection
+    if redis_connection:
+        return redis_connection
+    redis_connection = redis.StrictRedis(
         host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASSWORD,
     )
+    return redis_connection
 
 
 def is_dst(zonename):
