@@ -15,6 +15,7 @@ from socialhome.content.models import Content
 from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
 from socialhome.users.models import User, Profile
+from socialhome.users.utils import get_recently_active_user_ids
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -74,19 +75,22 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
     qs = get_precache_users_qs(acting_profile)
     cache_keys = []
     notify_keys = set()
+    recently_active_users = get_recently_active_user_ids()
     # Cache for each active user`
     for user in qs.iterator():
         check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
-                              through.content_type == ContentType.SHARE)
+                              through.content_type == ContentType.SHARE, recently_active_users)
     # Cache also as anonymous user
     if stream_cls in CACHED_ANONYMOUS_STREAM_CLASSES:
         check_and_add_to_keys(stream_cls, AnonymousUser(), content, cache_keys, acting_profile, set(),
-                              through.content_type == ContentType.SHARE)
+                              through.content_type == ContentType.SHARE, recently_active_users)
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
 
-def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share):
+def check_and_add_to_keys(
+        stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share, recently_active_users,
+):
     """Check if content should be added to this user stream and add to the keys if so.
 
     Also collect notify keys.
@@ -99,7 +103,12 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
         or a Profile doing a share.
     :param notify_keys: List of existing notify keys to add to.
     :param is_share: Boolean whether this is a shared content.
+    :param recently_active_users: List of user ID's recently seen on site.
     """
+    if stream_cls not in CACHED_STREAM_CLASSES and user.id not in recently_active_users:
+        # Abort early to avoid unnecessary work if we're not intending to cache for this user
+        # and we're also not intending to notify them
+        return
     # noinspection PyCallingNonCallable
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
@@ -108,7 +117,8 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
                 cache_keys.append(stream.key)
             if is_share and (not stream.notify_for_shares or acting_profile == getattr(user, "profile", None)):
                 continue
-            notify_keys.add(stream.notify_key)
+            if user.id in recently_active_users:
+                notify_keys.add(stream.notify_key)
 
 
 def get_precache_users_qs(acting_profile):
@@ -145,7 +155,7 @@ def update_streams_with_content(content):
         notify_keys = set()
         for stream_cls in ALL_STREAMS:
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
-                                  through.content_type == ContentType.SHARE)
+                                  through.content_type == ContentType.SHARE, [acting_profile.user.id])
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys)
     # Queue rest to RQ

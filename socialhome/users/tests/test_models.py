@@ -1,4 +1,4 @@
-from unittest import skip
+from unittest import skip, mock
 from unittest.mock import Mock, patch
 
 from django.conf import settings
@@ -20,6 +20,9 @@ class TestUser(SocialhomeTestCase):
 
     def test__str__(self):
         self.assertEqual(self.user.__str__(), self.user.username)
+
+    def test_activity_key(self):
+        self.assertEqual(self.user.activity_key, f"sh:users:activity:{self.user.id}")
 
     def test_get_absolute_url(self):
         assert self.user.get_absolute_url() == "/u/%s/" % self.user.username
@@ -67,6 +70,21 @@ class TestUser(SocialhomeTestCase):
         self.assertEqual(self.profile.image_url_small, "http://127.0.0.1:8000/media/small")
         self.assertEqual(self.profile.image_url_medium, "http://127.0.0.1:8000/media/medium")
         self.assertEqual(self.profile.image_url_large, "http://127.0.0.1:8000/media/large")
+
+    @patch("socialhome.users.models.get_redis_connection", autospec=True)
+    def test_mark_recently_active(self, mock_conn):
+        mock_r = Mock()
+        mock_conn.return_value = mock_r
+        self.user.mark_recently_active()
+        mock_r.set.assert_called_once_with(self.user.activity_key, mock.ANY)
+        mock_r.expire.assert_called_once_with(self.user.activity_key, settings.SOCIALHOME_USER_ACTIVITY_SECONDS)
+
+    @patch("socialhome.users.models.get_redis_connection", autospec=True)
+    def test_recently_active(self, mock_conn):
+        mock_r = Mock()
+        mock_conn.return_value = mock_r
+        self.user.recently_active()
+        mock_r.exists.assert_called_once_with(self.user.activity_key)
 
 
 class TestProfile(SocialhomeTestCase):
