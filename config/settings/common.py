@@ -376,6 +376,9 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
 # Exports
 SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
 
+# How many seconds since we saw user activity do we consider the user have been recently active?
+SOCIALHOME_USER_ACTIVITY_SECONDS = 300
+
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins

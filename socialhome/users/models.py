@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from typing import Dict
 from uuid import uuid4
 
@@ -24,7 +25,7 @@ from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls, generate_rsa_private_key
-from socialhome.utils import get_full_media_url
+from socialhome.utils import get_full_media_url, get_redis_connection
 
 logger = logging.getLogger("socialhome")
 
@@ -53,6 +54,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def activity_key(self) -> str:
+        return f"sh:users:activity:{self.id}"
 
     @property
     def url(self):
@@ -98,6 +103,22 @@ class User(AbstractUser):
             image_attr="picture",
         )
         picture_warmer.warm()
+
+    def mark_recently_active(self) -> None:
+        """
+        Flag the user as currently active.
+        """
+        r = get_redis_connection()
+        r.set(self.activity_key, int(time.time()))
+        r.expire(self.activity_key, settings.SOCIALHOME_USER_ACTIVITY_SECONDS)
+
+    @property
+    def recently_active(self) -> bool:
+        """
+        Return True if the user is marked as "active recently"
+        """
+        r = get_redis_connection()
+        return r.exists(self.activity_key)
 
 
 # noinspection PyCallingNonCallable
