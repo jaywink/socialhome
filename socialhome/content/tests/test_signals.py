@@ -70,8 +70,10 @@ class TestNotifyListeners(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
 
+    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_async):
+    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_async, mock_users):
+        mock_users.return_value = [self.user.id]
         mock_send = Mock()
         mock_async.return_value = mock_send
         content = ContentFactory()
@@ -84,8 +86,21 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 2)
 
+    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_async):
+    def test_content_save_calls_streamconsumer_group_send__user_not_recently_active(self, mock_async, mock_users):
+        mock_users.return_value = []
+        mock_send = Mock()
+        mock_async.return_value = mock_send
+        content = ContentFactory()
+        update_streams_with_content(content)
+        print(mock_send.call_args_list)
+        mock_send.assert_not_called()
+
+    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_async, mock_users):
+        mock_users.return_value = [self.user.id]
         mock_send = Mock()
         mock_async.return_value = mock_send
         PublicUserFactory()
@@ -115,13 +130,15 @@ class TestNotifyListeners(SocialhomeTestCase):
         update_streams_with_content(content)
         mock_send.assert_not_called()
 
+    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_async):
+    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_async, mock_users):
         mock_send = Mock()
         mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         third_user = PublicUserFactory()
+        mock_users.return_value = [self.user.id, other_user.id, third_user.id]
         other_user.profile.following.add(self.remote_profile)
         content = ContentFactory(author=self.remote_profile, text="#foobar #barfoo")
         update_streams_with_content(content)
@@ -147,13 +164,15 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 14)
 
+    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_async):
+    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_async, mock_users):
         mock_send = Mock()
         mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         other_profile = ProfileFactory()
+        mock_users.return_value = [self.user.id, other_user.id]
         content = ContentFactory(author=self.remote_profile)
         share = ContentFactory(content_type=ContentType.SHARE, share_of=content, author=other_profile)
         update_streams_with_content(share)
@@ -163,7 +182,6 @@ class TestNotifyListeners(SocialhomeTestCase):
             call(f"streams_profile_all__{share.author.id}__{other_user.id}", data),
             call(f"streams_followed__{self.user.id}", data),
         ]
-        print(mock_send.call_args_list)
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 3)
 
