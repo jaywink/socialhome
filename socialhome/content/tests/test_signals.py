@@ -1,4 +1,3 @@
-import json
 from unittest.mock import patch, Mock, call
 
 from federation.entities.activitypub.enums import ActivityType
@@ -9,7 +8,6 @@ from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_reply, send_share
 from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
-from socialhome.streams.consumers import StreamConsumer
 from socialhome.streams.streams import update_streams_with_content
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
@@ -72,11 +70,13 @@ class TestNotifyListeners(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         content = ContentFactory()
         update_streams_with_content(content)
-        data = json.dumps({"event": "new", "id": content.id})
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         calls = [
             call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
             call(f"streams_public__{self.user.id}", data),
@@ -84,14 +84,16 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 2)
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         PublicUserFactory()
         self.profile.following.add(self.remote_profile)
         content = ContentFactory(author=self.remote_profile, visibility=Visibility.LIMITED, text="#foobar #barfoo")
         content.limited_visibilities.add(self.profile)
         update_streams_with_content(content)
-        data = json.dumps({"event": "new", "id": content.id})
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
         calls = [
@@ -105,21 +107,25 @@ class TestNotifyListeners(SocialhomeTestCase):
         print(mock_send.call_args_list)
         self.assertEqual(mock_send.call_count, 5)
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__limited_no_followers(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__limited_no_followers(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         content = ContentFactory(visibility=Visibility.LIMITED, text="#foobar #barfoo")
         update_streams_with_content(content)
         mock_send.assert_not_called()
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         third_user = PublicUserFactory()
         other_user.profile.following.add(self.remote_profile)
         content = ContentFactory(author=self.remote_profile, text="#foobar #barfoo")
         update_streams_with_content(content)
-        data = json.dumps({"event": "new", "id": content.id})
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
         calls = [
@@ -141,15 +147,17 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 14)
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         other_profile = ProfileFactory()
         content = ContentFactory(author=self.remote_profile)
         share = ContentFactory(content_type=ContentType.SHARE, share_of=content, author=other_profile)
         update_streams_with_content(share)
-        data = json.dumps({"event": "new", "id": content.id})
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         calls = [
             call(f"streams_profile_all__{share.author.id}__{self.user.id}", data),
             call(f"streams_profile_all__{share.author.id}__{other_user.id}", data),
@@ -159,12 +167,14 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 3)
 
-    @patch.object(StreamConsumer, "group_send", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__replies(self, mock_send):
+    @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
+    def test_content_save_calls_streamconsumer_group_send__replies(self, mock_async):
+        mock_send = Mock()
+        mock_async.return_value = mock_send
         content = ContentFactory()
         reply = ContentFactory(parent=content)
         update_streams_with_content(reply)
-        data = json.dumps({"event": "new", "id": reply.id})
+        data = {"type": "notification", "payload": {"event": "new", "id": reply.id}}
         mock_send.assert_called_once_with("streams_content__%s" % content.channel_group_name, data)
 
 

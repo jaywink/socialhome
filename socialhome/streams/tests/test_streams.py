@@ -26,8 +26,8 @@ class TestAddToRedis(SocialhomeTestCase):
         mock_get.return_value = Mock(hset=mock_hset, zadd=mock_zadd, zrank=Mock(return_value=None))
         add_to_redis(Mock(id=2), Mock(id=1), ["spam", "eggs"])
         calls = [
-            call("spam", 123, 2),
-            call("eggs", 123, 2),
+            call("spam", {2: 123}),
+            call("eggs", {2: 123}),
         ]
         self.assertEqual(mock_zadd.call_args_list, calls)
         calls = [

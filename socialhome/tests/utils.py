@@ -2,7 +2,6 @@ import tempfile
 from unittest.mock import Mock
 
 from PIL import Image
-from channels.test import ChannelTestCase
 from django.contrib.sites.shortcuts import get_current_site
 from django.test import override_settings, TransactionTestCase, RequestFactory
 from rest_framework.test import APITestCase
@@ -77,10 +76,6 @@ class SocialhomeCBVTestCase(SocialhomeTestBase, CBVTestCase):
 
 
 class SocialhomeAPITestCase(SocialhomeTestBase, APITestCase, TestCase):
-    pass
-
-
-class SocialhomeChannelTestCase(SocialhomeTestBase, ChannelTestCase):
     pass
 
 

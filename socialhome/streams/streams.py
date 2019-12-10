@@ -40,7 +40,7 @@ def add_to_redis(content, through, keys):
         else:
             # Only add if not in the set already
             # This stops shares popping up more than once, for example
-            r.zadd(key, int(time.time()), content.id)
+            r.zadd(key, {content.id: int(time.time())})
             r.expire(key, settings.REDIS_DEFAULT_EXPIRY)
             throughs_key = BaseStream.get_throughs_key(key)
             r.hset(throughs_key, content.id, through.id)
@@ -184,7 +184,6 @@ class BaseStream:
         ids_throughs = qs.filter(id__in=self.accept_ids).values("id", "through").order_by(self.ordering)
         for item in ids_throughs:
             ids.append(item["id"])
-            # TODO fetch from redis?
             throughs[item["id"]] = item["through"]
         return ids, throughs
 

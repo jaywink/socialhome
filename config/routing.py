@@ -1,7 +1,13 @@
-from channels import route_class
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+from django.urls import path
 
 from socialhome.streams.consumers import StreamConsumer
 
-channel_routing = [
-    route_class(StreamConsumer, path=r'^/ch/streams/(?P<stream>[^/]+)/$'),
-]
+application = ProtocolTypeRouter({
+    "websocket": AuthMiddlewareStack(
+        URLRouter([
+            path("ch/streams/<str:stream>/", StreamConsumer),
+        ])
+    ),
+})

@@ -38,7 +38,7 @@ class TestGroomRedisPrecaches(SocialhomeTestCase):
         super().setUp()
         self.r = get_redis_connection()
         for x in range(10):
-            self.r.zadd("sh:streams:spamandeggs:736353:%s" % self.user.id, x, str(x**x))
+            self.r.zadd("sh:streams:spamandeggs:736353:%s" % self.user.id, {str(x**x): x})
         for x in range(10):
             self.r.hset("sh:streams:spamandeggs:736353:%s:throughs" % self.user.id, str(x**x), x**x+1)
 
