@@ -3,7 +3,6 @@ from typing import List
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
-from memoize import memoize
 
 from socialhome.utils import get_redis_connection
 
@@ -24,7 +23,6 @@ def get_pony_urls():
     ]
 
 
-@memoize(30)
 def get_recently_active_user_ids() -> List[int]:
     """
     Returns a list of ID's for User objects that have been recently active.

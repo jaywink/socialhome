@@ -59,15 +59,13 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         mock_add.assert_called_once_with(self.content, self.content, [stream.key])
 
     @patch("socialhome.streams.streams.check_and_add_to_keys", autospec=True)
-    @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
         add_to_stream_for_users(self.content.id, self.content.id, "FollowedStream", self.content.author.id)
         mock_check.assert_called_once_with(
-            FollowedStream, self.user, self.content, [], self.content.author, set(), False, [],
+            FollowedStream, self.user, self.content, [], self.content.author, set(), False,
         )
 
     @patch("socialhome.streams.streams.check_and_add_to_keys", autospec=True)
-    @patch("socialhome.streams.streams.CACHED_ANONYMOUS_STREAM_CLASSES", new=tuple())
     @override_settings(SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS=2)
     @freeze_time('2018-02-01')
     def test_calls_check_and_add_to_keys_for_each_user__skipping_inactives(self, mock_check):
@@ -76,13 +74,8 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
         # Would be called twice if inactives were not filtered out
         mock_check.assert_called_once_with(
-            ProfileAllStream, self.user, self.content, [], self.content.author, set(), False, [],
+            ProfileAllStream, self.user, self.content, [], self.content.author, set(), False,
         )
-
-    @patch("socialhome.streams.streams.check_and_add_to_keys")
-    def test_includes_anonymous_user_for_anonymous_user_streams(self, mock_check):
-        add_to_stream_for_users(self.content.id, self.content.id, "ProfileAllStream", self.content.author.id)
-        self.assertTrue(isinstance(mock_check.call_args_list[1][0][1], AnonymousUser))
 
     @patch("socialhome.streams.streams.Content.objects.filter")
     def test_returns_on_no_content(self, mock_filter):
@@ -107,7 +100,7 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
     def test_adds_if_should_cache(self):
         keys = []
         check_and_add_to_keys(
-            FollowedStream, self.user, self.remote_content, keys, self.remote_profile, set(), False, [self.user.id],
+            FollowedStream, self.user, self.remote_content, keys, self.remote_profile, set(), False,
         )
         self.assertEqual(
             keys,
@@ -118,7 +111,7 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
     def test_adds_to_multiple_stream_instances(self):
         keys = []
         check_and_add_to_keys(
-            TagStream, self.user, self.tagged_content, keys, self.tagged_content.author, set(), False, [self.user.id],
+            TagStream, self.user, self.tagged_content, keys, self.tagged_content.author, set(), False,
         )
         self.assertEqual(
             set(keys),
@@ -131,7 +124,7 @@ class TestCheckAndAddToKeys(SocialhomeTestCase):
     def test_does_not_add_if_shouldnt_cache(self):
         keys = []
         check_and_add_to_keys(
-            FollowedStream, self.user, self.content, keys, self.content.author, set(), False, [self.user.id],
+            FollowedStream, self.user, self.content, keys, self.content.author, set(), False,
         )
         self.assertEqual(
             keys,
@@ -394,8 +387,6 @@ class TestLocalStream(SocialhomeTestCase):
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:local:%s" % self.other_user.id)
-        stream = LocalStream(user=AnonymousUser())
-        self.assertEqual(stream.key, "sh:streams:local:anonymous")
 
     def test_only_local_content_returned(self):
         qs, _throughs = self.stream.get_content()
@@ -496,8 +487,6 @@ class TestPublicStream(SocialhomeTestCase):
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:public:%s" % self.user.id)
-        stream = PublicStream(user=AnonymousUser())
-        self.assertEqual(stream.key, "sh:streams:public:anonymous")
 
     def test_only_public_content_returned(self):
         qs, _throughs = self.stream.get_content()
@@ -544,8 +533,6 @@ class TestTagStream(SocialhomeTestCase):
 
     def test_key(self):
         self.assertEqual(self.stream.key, "sh:streams:tag:%s:%s" % (self.tag.id, self.user.id))
-        stream = TagStream(tag=self.tag, user=AnonymousUser())
-        self.assertEqual(stream.key, "sh:streams:tag:%s:anonymous" % self.tag.id)
 
     def test_only_tagged_content_returned(self):
         qs, _throughs = self.anon_stream.get_content()

@@ -1,3 +1,4 @@
+from unittest import mock
 from unittest.mock import patch, Mock, call
 
 from federation.entities.activitypub.enums import ActivityType
@@ -70,14 +71,13 @@ class TestNotifyListeners(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
 
-    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_async, mock_users):
-        mock_users.return_value = [self.user.id]
+    def test_content_save_calls_streamconsumer_group_send__public_no_tags_no_followers(self, mock_async):
         mock_send = Mock()
         mock_async.return_value = mock_send
         content = ContentFactory()
-        update_streams_with_content(content)
+        with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
+            update_streams_with_content(content)
         data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         calls = [
             call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
@@ -86,28 +86,24 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 2)
 
-    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__user_not_recently_active(self, mock_async, mock_users):
-        mock_users.return_value = []
+    def test_content_save_calls_streamconsumer_group_send__user_not_recently_active(self, mock_async):
         mock_send = Mock()
         mock_async.return_value = mock_send
         content = ContentFactory()
         update_streams_with_content(content)
-        print(mock_send.call_args_list)
         mock_send.assert_not_called()
 
-    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_async, mock_users):
-        mock_users.return_value = [self.user.id]
+    def test_content_save_calls_streamconsumer_group_send__limited_tags_and_followers(self, mock_async):
         mock_send = Mock()
         mock_async.return_value = mock_send
         PublicUserFactory()
         self.profile.following.add(self.remote_profile)
         content = ContentFactory(author=self.remote_profile, visibility=Visibility.LIMITED, text="#foobar #barfoo")
         content.limited_visibilities.add(self.profile)
-        update_streams_with_content(content)
+        with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
+            update_streams_with_content(content)
         data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
@@ -119,7 +115,6 @@ class TestNotifyListeners(SocialhomeTestCase):
             call(f"streams_limited__{self.user.id}", data),
         ]
         mock_send.assert_has_calls(calls, any_order=True)
-        print(mock_send.call_args_list)
         self.assertEqual(mock_send.call_count, 5)
 
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
@@ -130,18 +125,17 @@ class TestNotifyListeners(SocialhomeTestCase):
         update_streams_with_content(content)
         mock_send.assert_not_called()
 
-    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_async, mock_users):
+    def test_content_save_calls_streamconsumer_group_send__public_with_followers(self, mock_async):
         mock_send = Mock()
         mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         third_user = PublicUserFactory()
-        mock_users.return_value = [self.user.id, other_user.id, third_user.id]
         other_user.profile.following.add(self.remote_profile)
         content = ContentFactory(author=self.remote_profile, text="#foobar #barfoo")
-        update_streams_with_content(content)
+        with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
+            update_streams_with_content(content)
         data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
@@ -164,18 +158,17 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 14)
 
-    @patch("socialhome.streams.streams.get_recently_active_user_ids", autospec=True)
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
-    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_async, mock_users):
+    def test_content_save_calls_streamconsumer_group_send__public_share_with_followers(self, mock_async):
         mock_send = Mock()
         mock_async.return_value = mock_send
         self.profile.following.add(self.remote_profile)
         other_user = PublicUserFactory()
         other_profile = ProfileFactory()
-        mock_users.return_value = [self.user.id, other_user.id]
         content = ContentFactory(author=self.remote_profile)
         share = ContentFactory(content_type=ContentType.SHARE, share_of=content, author=other_profile)
-        update_streams_with_content(share)
+        with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
+            update_streams_with_content(share)
         data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
         calls = [
             call(f"streams_profile_all__{share.author.id}__{self.user.id}", data),

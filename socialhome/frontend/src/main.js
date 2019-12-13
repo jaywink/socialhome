@@ -43,7 +43,7 @@ const main = new Vue({
         onWebsocketOpen() {
             this.pingTimer = setInterval(() => {
                 this.$websocket.send(JSON.stringify({event: "ping"}))
-            }, 140000)
+            }, 60000)
         },
         websocketPath() {
             const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws"

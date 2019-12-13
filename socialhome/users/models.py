@@ -112,7 +112,7 @@ class User(AbstractUser):
         r.set(self.activity_key, int(time.time()))
         r.expire(self.activity_key, settings.SOCIALHOME_USER_ACTIVITY_SECONDS)
 
-    @property
+    @cached_property
     def recently_active(self) -> bool:
         """
         Return True if the user is marked as "active recently"

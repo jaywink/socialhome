@@ -377,7 +377,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
 SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
 
 # How many seconds since we saw user activity do we consider the user have been recently active?
-SOCIALHOME_USER_ACTIVITY_SECONDS = 300
+SOCIALHOME_USER_ACTIVITY_SECONDS = 130
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
