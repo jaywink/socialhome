@@ -17,6 +17,8 @@ Added
 
   To turn on, set the environment variable ``SOCIALHOME_SILKY=True``.
 
+* Users API now has an admin endpoint to return recently active users.
+
 Changed
 .......
 

@@ -1,11 +1,11 @@
 from typing import Any
 
 import django_rq
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -13,6 +13,7 @@ from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer, LimitedProfileSerializer
 from socialhome.users.tasks.exports import create_user_export, UserExporter
+from socialhome.users.utils import get_recently_active_user_ids
 
 
 class IsOwnProfileOrReadOnly(BasePermission):
@@ -110,3 +111,11 @@ class UserViewSet(mixins.RetrieveModelMixin, GenericViewSet):
         if self.request.user.is_staff:
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
+
+    @action(detail=False, methods=["get"], permission_classes=(IsAdminUser,))
+    def recently_active(self, request):
+        user_ids = get_recently_active_user_ids()
+        users = User.objects.filter(id__in=user_ids)
+        users = [UserSerializer(instance=user).data for user in users]
+        return JsonResponse(users, safe=False)
+
