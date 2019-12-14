@@ -31,7 +31,8 @@ class TestFetchOgPreview(SocialhomeTestCase):
         cls.urls = ["https://example.com"]
 
     def test_if_cached_already_dont_fetch(self):
-        opengraph = OpenGraphCacheFactory(url=self.urls[0])
+        with freeze_time(datetime.date.today() - datetime.timedelta(days=3)):
+            opengraph = OpenGraphCacheFactory(url=self.urls[0])
         result = fetch_og_preview(self.content, self.urls)
         self.assertTrue(result)
         self.content.refresh_from_db()
