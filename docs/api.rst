@@ -10,7 +10,9 @@ Note, some parts of the API are still work in progress and thus changes could st
 API routes
 ----------
 
-The API methods and data can be browsed using the endpoint ``/api/``. Shown endpoints and data depends on your user credentials (log-in using the menu if not already).
+The API methods and data can be browsed using the ReDoc docs endpoint ``/api/``. Shown endpoints and
+data depends on your user credentials (log-in using the menu if not already). If you prefer
+Swagger docs, you can find them at ``/api/swagger/``.
 
 Authenticating
 --------------

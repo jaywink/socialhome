@@ -85,6 +85,10 @@ API changes
   of content ID's to fetch from this particular stream. This allows filling the stream with
   new items in the stream context without making multiple fetches.
 
+* Replaced deprecated ``django-rest-swagger`` API docs module with ``drf-yasg``. The new module
+  provides not only Swagger but also ReDoc API docs. We've chosen ReDoc for the default docs
+  mounted at ``/api/`` on each instance. Swagger is still available at ``/api/swagger/``. (`#537 <https://git.feneas.org/socialhome/socialhome/issues/537>`_)
+
 Internal changes
 ................
 

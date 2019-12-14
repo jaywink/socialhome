@@ -20,7 +20,6 @@ django-memoize
 # Lock due to some regression with date fields, investigate later
 django-model-utils<4
 django-redis
-django-rest-swagger
 django-reversion
 django-robots
 django-rq
@@ -30,6 +29,7 @@ django-silk
 django-versatileimagefield
 django<3
 djangorestframework
+drf-yasg
 #federation
 ipython
 lxml

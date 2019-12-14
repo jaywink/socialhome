@@ -53,7 +53,6 @@ THIRD_PARTY_APPS = (
     "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
-    "rest_framework_swagger",
     "dynamic_preferences",
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "haystack",
@@ -62,6 +61,7 @@ THIRD_PARTY_APPS = (
     "memoize",
     "robots",
     "reversion",
+    "drf_yasg",
 )
 LOCAL_APPS = (
     "socialhome",
@@ -515,13 +515,6 @@ REST_FRAMEWORK = {
         "content_create": "100/day",
     },
     "DEFAULT_VERSION": "0.1",
-}
-
-# REST SWAGGER
-# ------------
-SWAGGER_SETTINGS = {
-    "APIS_SORTER": "alpha",
-    "DOC_EXPANSION": "list",
 }
 
 # DYNAMIC PREFERENCES
