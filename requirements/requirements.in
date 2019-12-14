@@ -17,7 +17,8 @@ django-fsm
 django-haystack
 django-js-reverse
 django-memoize
-django-model-utils
+# Lock due to some regression with date fields, investigate later
+django-model-utils<4
 django-redis
 django-rest-swagger
 django-reversion
@@ -44,6 +45,7 @@ unicode-slugify
 uwsgi
 whitenoise
 whoosh
+pyyaml
 
 # Own markdownx fork for some tweaks:
 # - disable tab when ctrl down (https://github.com/neutronX/django-markdownx/pull/85)

@@ -8,9 +8,7 @@ ddt
 django-debug-toolbar<2.0
 django-debug-toolbar-user-panel
 django-querycount
-# Lock django-stubs because of https://github.com/typeddjango/djangorestframework-stubs/issues/35
-# This is not a direct requirement - remove once that is fixed
-django-stubs<1.2.0
+django-stubs
 django-test-plus<1.1.0  # Some problems running pytest with 1.1.0, figure out why
 django_coverage_plugin
 djangorestframework-stubs
