@@ -1,5 +1,6 @@
 from braces.views import LoginRequiredMixin
 from django.conf import settings
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
@@ -114,7 +115,13 @@ class TagStreamView(BaseStreamView):
     tag = None
 
     def dispatch(self, request, *args, **kwargs):
-        self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
+        if kwargs.get("name"):
+            arguments = {"name": kwargs.get("name")}
+        elif kwargs.get("uuid"):
+            arguments = {"uuid": kwargs.get("uuid")}
+        else:
+            raise Http404
+        self.tag = get_object_or_404(Tag, **arguments)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

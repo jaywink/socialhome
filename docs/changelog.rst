@@ -6,6 +6,15 @@ Changelog
 0.12.0-dev (unreleased)
 -----------------------
 
+Fixed
+.....
+
+* Support tag streams for non-ascii tags. (`#517 <https://git.feneas.org/socialhome/socialhome/issues/517>`_)
+
+  Tags which fail to generate a slugified name (ie for example Russian alphabet tags) are now supported
+  as streams. This also fixes the search internal server error when searching for a tag which fails to
+  generate a stream URL.
+
 0.11.0 (2019-12-15)
 -------------------
 

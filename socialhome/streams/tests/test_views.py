@@ -233,6 +233,7 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         cls.user = PublicUserFactory()
         cls.content = ContentFactory(text="#tag")
         cls.tag_no_content = TagFactory(name="tagnocontent")
+        cls.russian_tag = TagFactory(name="тег")
         cls.client = Client()
 
     def test_get_json_context(self):
@@ -263,6 +264,10 @@ class TestTagStreamView(SocialhomeCBVTestCase):
 
     def test_renders(self):
         response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
+        assert response.status_code == 200
+
+    def test_renders__by_uuid(self):
+        response = self.client.get(reverse("streams:tag-by-uuid", kwargs={"uuid": self.russian_tag.uuid}))
         assert response.status_code == 200
 
     def test_stream_name(self):
