@@ -536,6 +536,7 @@ HAYSTACK_CONNECTIONS = {
     "default": {
         "ENGINE": "haystack.backends.whoosh_backend.WhooshEngine",
         "PATH": str(ROOT_DIR("var", "whoosh")),
+        "BATCH_SIZE": 100,
     },
 }
 HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
