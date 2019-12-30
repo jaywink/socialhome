@@ -3,8 +3,13 @@
 Changelog
 =========
 
-0.12.0-dev (unreleased)
------------------------
+0.11.1 (2019-12-30)
+-------------------
+
+Security
+........
+
+* Upgrade Django to fix CVE-2019-19844.
 
 Fixed
 .....
