@@ -1,38 +1,41 @@
 import BootstrapVue from "bootstrap-vue"
 import {shallowMount, createLocalVue} from "@vue/test-utils"
-
-import Publisher from "@/components/publisher/Publisher"
-import store from "@/store"
+import ReplyPublisher from "@/components/publisher/ReplyPublisher"
+import {getStore} from "%fixtures/store.fixtures"
 
 
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 
-describe("Publisher", () => {
+describe("ReplyPublisher", () => {
+    let store
+
     beforeEach(() => {
         Sinon.restore()
+        store = getStore()
     })
 
     describe("computed", () => {
         it("should display the correct title", () => {
-            shallowMount(Publisher, {localVue}).instance().titleText.should.eq("Reply")
+            shallowMount(ReplyPublisher, {localVue}).vm.titleText.should.eq("Reply")
         })
     })
 
     describe("onPostForm", () => {
         it("should publish post", () => {
-            const target = shallowMount(Publisher, {store, localVue})
-            Sinon.spy(target.instance().$store, "dispatch")
-            target.instance().onPostForm()
-            target.instance().$store.dispatch.getCall(0).args.should.eql([
-                "publisher/publishPost", {
-                    federate: true,
-                    includeFollowing: false,
-                    pinned: false,
-                    recipients: "",
+            store.dispatch = Sinon.stub()
+            store.dispatch.returns(Promise.resolve())
+            const target = shallowMount(ReplyPublisher, {
+                propsData: {parentId: 12},
+                store,
+                localVue,
+            })
+            target.vm.onPostForm()
+            store.dispatch.getCall(0).args.should.eql([
+                "publisher/publishReply", {
+                    parent: 12,
                     showPreview: true,
                     text: "",
-                    visibility: 0,
                 },
             ])
         })

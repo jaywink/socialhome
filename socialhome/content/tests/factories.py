@@ -34,6 +34,27 @@ class LimitedContentFactory(ContentFactory):
     author = factory.SubFactory(LimitedProfileFactory)
 
 
+class LimitedContentWithRecipientsFactory(ContentFactory):
+    visibility = Visibility.LIMITED
+    author = factory.SubFactory(LimitedProfileFactory)
+
+    @classmethod
+    def _generate(cls, strategy, params):
+        recipients = params.pop("recipients", None)
+        content = super()._generate(strategy, params)
+
+        if recipients is not None:
+            content.limited_visibilities.clear()
+            content.limited_visibilities.set(recipients)
+        else:
+            recipient1 = PublicProfileFactory()
+            recipient2 = PublicProfileFactory()
+            content.limited_visibilities.clear()
+            content.limited_visibilities.set([recipient1, recipient2])
+
+        return content
+
+
 class SiteContentFactory(ContentFactory):
     visibility = Visibility.SITE
     author = factory.SubFactory(SiteProfileFactory)

@@ -2,25 +2,24 @@ import BootstrapVue from "bootstrap-vue"
 import faker from "faker"
 
 import {createLocalVue, shallowMount} from "@vue/test-utils"
-import EditPublisher from "@/components/publisher/EditPublisher"
-import {getStore} from "%fixtures/store.fixtures"
+import EditDispatcher from "@/components/publisher/EditDispatcher"
 
 
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 
-describe("EditPublisher", () => {
-    let store
-    let context
+describe("EditDispatcher", () => {
+    let contentId
 
     beforeEach(() => {
         Sinon.restore()
-        store = getStore()
-        context = {
+        contentId = faker.random.word()
+        window.context = {
             isReply: faker.random.boolean(),
             federate: faker.random.boolean(),
             includeFollowing: faker.random.boolean(),
             recipients: faker.random.word(),
+            parent: faker.random.word(),
             pinned: faker.random.boolean(),
             showPreview: faker.random.boolean(),
             text: faker.lorem.paragraphs(4),
@@ -29,37 +28,47 @@ describe("EditPublisher", () => {
     })
 
     describe("computed", () => {
-        it("should display the correct title", () => {
-            shallowMount(EditPublisher, {localVue}).vm.titleText.should.eq("Edit")
-        })
-    })
-
-    describe("onPostForm", () => {
-        it("should publish post", () => {
-            store.dispatch = Sinon.stub()
-            store.dispatch.returns(Promise.resolve())
-            const target = shallowMount(EditPublisher, {
-                propsData: {
-                    contentId: 12,
-                    ...context,
-                },
-                store,
+        it("should display the correct component", () => {
+            let target
+            window.context.isReply = false
+            target = shallowMount(EditDispatcher, {
                 localVue,
+                propsData: {contentId},
             })
+            target.vm.component.should.eq("EditPublisher")
+            window.context.isReply = true
+            target = shallowMount(EditDispatcher, {
+                localVue,
+                propsData: {contentId},
+            })
+            target.vm.component.should.eq("EditReplyPublisher")
+        })
 
-            target.vm.onPostForm()
-            store.dispatch.getCall(0).args.should.eql([
-                "publisher/editPost", {
-                    contentId: 12,
-                    federate: context.federate,
-                    includeFollowing: context.includeFollowing,
-                    pinned: context.pinned,
-                    recipients: context.recipients,
-                    showPreview: context.showPreview,
-                    text: context.text,
-                    visibility: context.visibility,
-                },
-            ])
+        it("should display the correctly pass data to the components", () => {
+            window.context.isReply = false
+            shallowMount(EditDispatcher, {
+                localVue,
+                propsData: {contentId},
+            }).vm.boundValues.should.eql({
+                contentId,
+                federate: window.context.federate,
+                includeFollowing: window.context.includeFollowing,
+                pinned: window.context.pinned,
+                recipients: window.context.recipients,
+                showPreview: window.context.showPreview,
+                text: window.context.text,
+                visibility: window.context.visibility,
+            })
+            window.context.isReply = true
+            shallowMount(EditDispatcher, {
+                localVue,
+                propsData: {contentId},
+            }).vm.boundValues.should.eql({
+                contentId,
+                parentId: window.context.parent,
+                showPreview: window.context.showPreview,
+                text: window.context.text,
+            })
         })
     })
 })

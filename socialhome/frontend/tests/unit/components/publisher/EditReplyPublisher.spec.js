@@ -1,23 +1,35 @@
 import BootstrapVue from "bootstrap-vue"
-import {shallowMount, createLocalVue} from "@vue/test-utils"
-import ReplyPublisher from "@/components/publisher/ReplyPublisher"
+import faker from "faker"
+
+import {createLocalVue, shallowMount} from "@vue/test-utils"
+import EditReplyPublisher from "@/components/publisher/EditReplyPublisher"
 import {getStore} from "%fixtures/store.fixtures"
 
 
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 
-describe("ReplyPublisher", () => {
+describe("EditReplyPublisher", () => {
     let store
+    let propsData
 
     beforeEach(() => {
         Sinon.restore()
         store = getStore()
+        propsData = {
+            contentId: "12",
+            parentId: `${faker.random.number()}`,
+            showPreview: faker.random.boolean(),
+            text: faker.lorem.paragraphs(4),
+        }
     })
 
     describe("computed", () => {
         it("should display the correct title", () => {
-            shallowMount(ReplyPublisher, {localVue}).vm.titleText.should.eq("Reply")
+            shallowMount(EditReplyPublisher, {
+                localVue,
+                propsData,
+            }).vm.titleText.should.eq("Update reply")
         })
     })
 
@@ -25,18 +37,18 @@ describe("ReplyPublisher", () => {
         it("should publish post", () => {
             store.dispatch = Sinon.stub()
             store.dispatch.returns(Promise.resolve())
-            const target = shallowMount(ReplyPublisher, {propsData: {contentId: 12}, store, localVue})
+            const target = shallowMount(EditReplyPublisher, {
+                propsData,
+                store,
+                localVue,
+            })
             target.vm.onPostForm()
             store.dispatch.getCall(0).args.should.eql([
-                "publisher/publishPost", {
-                    federate: true,
-                    includeFollowing: false,
-                    parent: 12,
-                    pinned: false,
-                    recipients: "",
-                    showPreview: true,
-                    text: "",
-                    visibility: 0,
+                "publisher/editReply", {
+                    contentId: "12",
+                    parent: propsData.parentId,
+                    showPreview: propsData.showPreview,
+                    text: propsData.text,
                 },
             ])
         })
