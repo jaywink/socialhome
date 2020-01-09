@@ -1,0 +1,10 @@
+body {
+    .btn:disabled, .btn.disabled {
+        &, &:active, &:focus, &:hover {
+            cursor: not-allowed;
+            background-color: $disabledgrey;
+            border-color: darken($disabledgrey, 20%);
+            box-shadow: 0 0 0 .2rem darken($disabledgrey, 20%);
+        }
+    }
+}

@@ -23,11 +23,15 @@
                 </b-col>
             </b-row>
             <b-button
-                class="w-100 pointer"
+                class="socialhome-publisher-submit-btn w-100 pointer"
                 type="submit"
                 variant="primary"
+                :disabled="isPosting"
             >
-                {{ "Save" | gettext }}
+                <div v-show="!isPosting">
+                    {{ "Save" | gettext }}
+                </div>
+                <simple-loading-element v-show="isPosting" />
             </b-button>
         </b-form>
     </div>
@@ -51,12 +55,13 @@ export default {
         },
     },
     methods: {
-        onPostForm() {
-            this.$store.dispatch("publisher/publishReply", {
-                ...this.model, parent: this.parentId,
-            })
-                .then(url => window.location.replace(url))
-                .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
+        postFormRequest() {
+            const payload = {
+                ...this.model,
+                parent: this.parentId,
+            }
+
+            return this.$store.dispatch("publisher/publishReply", payload)
         },
     },
 }

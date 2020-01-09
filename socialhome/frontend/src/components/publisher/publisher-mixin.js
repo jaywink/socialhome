@@ -1,4 +1,5 @@
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
+import SimpleLoadingElement from "@/components/common/SimpleLoadingElement"
 
 
 const VISIBILITY_OPTIONS = Object.freeze({
@@ -25,7 +26,9 @@ const VISIBILITY_OPTIONS = Object.freeze({
 })
 
 const publisherMixin = {
-    components: {MarkdownEditor},
+    components: {
+        MarkdownEditor, SimpleLoadingElement,
+    },
     data() {
         return {
             baseModel: {
@@ -34,6 +37,7 @@ const publisherMixin = {
             },
             extendedModel: {},
             errors: {recipientsErrors: ""},
+            isPosting: false,
         }
     },
     computed: {
@@ -78,8 +82,18 @@ const publisherMixin = {
         },
     },
     methods: {
+        postFormRequest() {
+            throw new Error("`postFormRequest` must be overriden")
+        },
         onPostForm() {
-            throw new Error("`onPostForm` must be overriden")
+            if (this.isPosting === true) return
+            this.isPosting = true
+            this.postFormRequest()
+                .then(url => window.location.replace(url))
+                .catch(() => {
+                    this.isPosting = false
+                    this.$snotify.error(this.translations.postUploadError, {timeout: 10000})
+                })
         },
     },
 }

@@ -29,14 +29,14 @@ export default {
         this.baseModel.showPreview = this.showPreview
     },
     methods: {
-        onPostForm() {
-            this.$store.dispatch("publisher/editReply", {
+        postFormRequest() {
+            const payload = {
                 ...this.model,
                 contentId: this.contentId,
                 parent: this.parentId,
-            })
-                .then(url => window.location.replace(url))
-                .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
+            }
+
+            return this.$store.dispatch("publisher/editReply", payload)
         },
     },
 }

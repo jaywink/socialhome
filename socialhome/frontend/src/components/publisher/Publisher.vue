@@ -109,11 +109,15 @@
                 </b-col>
             </b-row>
             <b-button
-                class="w-100 pointer"
+                class="socialhome-publisher-submit-btn w-100 pointer"
                 type="submit"
                 variant="primary"
+                :disabled="isPosting"
             >
-                {{ "Save" | gettext }}
+                <div v-show="!isPosting">
+                    {{ "Save" | gettext }}
+                </div>
+                <simple-loading-element v-show="isPosting" />
             </b-button>
         </b-form>
     </div>
@@ -143,10 +147,8 @@ export default {
         },
     },
     methods: {
-        onPostForm() {
-            this.$store.dispatch("publisher/publishPost", this.model)
-                .then(url => window.location.replace(url))
-                .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
+        postFormRequest() {
+            return this.$store.dispatch("publisher/publishPost", this.model)
         },
     },
 }
@@ -156,6 +158,11 @@ export default {
     .socialhome-publisher {
         .text-muted {
             color: white !important; // Overrides BS' defaults
+        }
+        .socialhome-publisher-submit-btn {
+            &:disabled, &.disabled {
+                cursor: wait !important; // Overrides BS' defaults
+            }
         }
     }
 </style>

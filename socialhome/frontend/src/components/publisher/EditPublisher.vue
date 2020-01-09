@@ -47,12 +47,13 @@ export default {
         this.extendedModel.visibility = this.visibility
     },
     methods: {
-        onPostForm() {
-            this.$store.dispatch("publisher/editPost", {
-                ...this.model, contentId: this.contentId,
-            })
-                .then(url => window.location.replace(url))
-                .catch(() => this.$snotify.error(this.translations.postUploadError, {timeout: 10000}))
+        postFormRequest() {
+            const payload = {
+                ...this.model,
+                contentId: this.contentId,
+            }
+
+            return this.$store.dispatch("publisher/editPost", payload)
         },
     },
 }
