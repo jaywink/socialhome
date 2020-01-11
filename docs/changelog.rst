@@ -6,6 +6,11 @@ Changelog
 0.12.0-dev (unreleased)
 -----------------------
 
+Fixed
+.....
+
+* Fix regression in Diaspora follows introduced in 0.11.0.
+
 0.11.1 (2019-12-30)
 -------------------
 
