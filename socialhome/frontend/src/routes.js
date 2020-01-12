@@ -1,8 +1,10 @@
 import VueRouter from "vue-router"
 import Stream from "@/components/streams/Stream.vue"
 import Publisher from "@/components/publisher/Publisher"
+import ReplyPublisher from "@/components/publisher/ReplyPublisher"
 import AppFollowing from "@/components/contacts/AppFollowing"
 import AppFollowers from "@/components/contacts/AppFollowers"
+import EditDispatcher from "@/components/publisher/EditDispatcher"
 
 
 function $$(props = {}) {
@@ -61,7 +63,12 @@ const routes = [
         path: "/content/create", component: Publisher,
     },
     {
-        path: "/content/:contentId/~reply/", component: Publisher, props: $$(),
+        path: "/content/:contentId/~reply/",
+        component: ReplyPublisher,
+        props: route => ({parentId: route.params.contentId}),
+    },
+    {
+        path: "/content/:contentId/~edit/", component: EditDispatcher, props: $$(),
     },
 
     {

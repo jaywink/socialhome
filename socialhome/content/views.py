@@ -78,7 +78,6 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         return {
             "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
-            "isReply": self.is_reply,
         }
 
     def get_initial(self):
@@ -158,11 +157,26 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
         return context
 
     def get_json_context(self):
-        return {
+        context = {
             "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
             "isReply": self.is_reply,
+            "federate": self.object.federate,
+            "includeFollowing": self.object.include_following,
+            "pinned": self.object.pinned,
+            "showPreview": self.object.show_preview,
+            "visibility": self.object.visibility.value
         }
+
+        parent_id = getattr(getattr(self.object, "parent"), "id", None)
+        if parent_id is not None:
+            context["parent"] = parent_id
+
+        serialized = ContentSerializer(self.object, context={"request": self.request}).data
+        context["recipients"] = serialized.get("recipients", "")
+        context["text"] = serialized.get("text", "")
+
+        return context
 
     def get_template_names(self):
         return ["content/edit-vue.html"] if self.vue else super().get_template_names()

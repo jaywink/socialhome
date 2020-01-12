@@ -3,7 +3,7 @@
     <div class="socialhome-markdown-editor" :class="{fullscreen: fullscreen}">
         <textarea v-show="false" ref="easymde" />
         <small class="form-text text-muted image-upload-form-text">
-            {{ "You can upload images using the camera icon or by dragging them to the text area. Valid file types: png/jpg/svg/gif." | gettext }}
+            {{ translations.publisherHelpText }}
         </small>
         <b-progress v-show="isUploading" :value="uploadedSize" show-progress animated />
 
@@ -43,22 +43,22 @@
         </div>
         <div
             v-show="showDropdowns.pictures"
-            v-if="uploadPicture"
+            v-if="uploadImage"
             class="editor-toolbar-dropdown editor-toolbar-picture-dropdown"
         >
             <ul>
                 <li>
-                    <b-button block :title="translations.insertImage" @click.stop.prevent="embeddPictureLink">
-                        {{ "Embedd link" | gettext }}
+                    <b-button block :title="translations.insertImage" @click.stop.prevent="embedPictureLink">
+                        {{ "By url" | gettext }}
                     </b-button>
                 </li>
                 <li>
                     <b-button
                         block
-                        :title="translations.uploadPicture"
-                        @click.stop.prevent="onUploadPicture"
+                        :title="translations.uploadImage"
+                        @click.stop.prevent="onUploadImage"
                     >
-                        {{ "Upload picture" | gettext }}
+                        {{ translations.uploadImage }}
                     </b-button>
                 </li>
             </ul>
@@ -92,7 +92,7 @@ export default {
         autosave: {
             type: Boolean, default: false,
         },
-        uploadPicture: {
+        uploadImage: {
             type: Boolean, default: true,
         },
         value: {
@@ -124,11 +124,13 @@ export default {
                 guide: gettext("Markdown guide"),
                 heading: gettext("Heading"),
                 imageUploadFail: imageName => interpolate(gettext("The image %s couldn't be uploaded"), [imageName]),
-                insertImage: gettext("Insert link (Ctrl-Alt-I)"),
+                insertImage: gettext("add an image using an url (Ctrl-Alt-I)"),
                 loading: gettext("Loading..."),
                 picture: gettext("Insert image"),
                 preview: gettext("Toggle preview (Ctrl-P)"),
-                uploadPicture: gettext("Upload image"),
+                publisherHelpText: gettext("You can upload images using the camera icon or by dragging them "
+                    + "to the text area. Valid file types: png/jpg/svg/gif."),
+                uploadImage: gettext("Upload image"),
                 sideBySide: gettext("Toggle side by side (F9)"),
             }
         },
@@ -238,7 +240,7 @@ export default {
             this.$headingDropdown = new Popper(node1, popper1, {placement: "bottom"})
 
             // Create image upload dropdown
-            if (this.uploadPicture !== undefined) {
+            if (this.uploadImage !== undefined) {
                 const node2 = this.$el.querySelectorAll(".picture-dropdown-button")[0]
                 const popper2 = this.$el.querySelectorAll(".editor-toolbar-picture-dropdown")[0]
                 this.$pictureDropdown = new Popper(node2, popper2, {placement: "bottom"})
@@ -269,7 +271,7 @@ export default {
                 this.hideDropdowns()
             }
         },
-        embeddPictureLink() {
+        embedPictureLink() {
             this.hideDropdowns()
             setTimeout(() => this.$nextTick(() => this.$editor.drawImage()), 5)
         },
@@ -292,7 +294,7 @@ export default {
             this.processImages(event.dataTransfer.files)
         },
         pictureClickAction() {
-            if (this.uploadPicture) {
+            if (this.uploadImage) {
                 this.togglePictureDropdown()
             } else {
                 this.$editor.drawImage()
@@ -394,7 +396,7 @@ export default {
                 this.$nextTick(this.$pictureDropdown.update)
             }
         },
-        onUploadPicture() {
+        onUploadImage() {
             this.$refs.uploadforminput.click()
             this.hideDropdowns()
         },
