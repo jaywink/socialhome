@@ -27,7 +27,7 @@ django-secure
 django-settings-export
 django-silk
 django-versatileimagefield
-django<3
+django<4
 djangorestframework
 drf-yasg
 #federation
