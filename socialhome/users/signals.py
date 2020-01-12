@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed, post_delete, pre_delete
 from django.dispatch import receiver
+from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.federate.tasks import send_follow_change, send_profile, send_profile_retraction
 from socialhome.notifications.tasks import send_follow_notification
@@ -31,15 +32,21 @@ def user_post_save(sender, **kwargs):
 
 
 def on_commit_profile_following_change(action, pks, instance):
-    for id in pks:
+    for _id in pks:
+        if instance.user:
+            # Create an activity
+            # UNDO is a bit silly, but that is the activity that is done in AP
+            # Maybe we should use local activity verbs instead of the federation library?
+            activity_type = ActivityType.FOLLOW if action == "post_add" else ActivityType.UNDO
+            instance.create_activity(activity_type, object_id=_id)
         # Send out on the federation layer if local follower, remote followed/unfollowed
-        if Profile.objects.filter(id=id, user__isnull=True).exists() and instance.user:
+        if Profile.objects.filter(id=_id, user__isnull=True).exists() and instance.user:
             django_rq.enqueue(
-                send_follow_change, instance.id, id, True if action == "post_add" else False
+                send_follow_change, instance.id, _id, True if action == "post_add" else False
             )
         # Send out notification if local followed
-        if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False):
-            django_rq.enqueue(send_follow_notification, instance.id, id)
+        if action == "post_add" and Profile.objects.filter(id=_id, user__isnull=False):
+            django_rq.enqueue(send_follow_notification, instance.id, _id)
 
 
 @receiver(m2m_changed, sender=Profile.following.through)

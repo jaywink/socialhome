@@ -2,7 +2,9 @@ from unittest.mock import patch, call, Mock
 
 from django.conf import settings
 from django.test import TransactionTestCase, override_settings
+from federation.entities.activitypub.enums import ActivityType
 
+from socialhome.activities.models import Activity
 from socialhome.federate.tasks import send_follow_change, send_profile
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User
@@ -44,6 +46,18 @@ class TestProfileFollowingChange(TransactionTestCase):
         self.profile = ProfileFactory()
 
     @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_adding_follower__local_actor__creates_activity(self, mock_enqueue):
+        self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.FOLLOW).count(), 0)
+        self.profile2.following.add(self.profile)
+        self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.FOLLOW).count(), 1)
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_adding_follower__remote_actor__does_not_create_activity(self, mock_enqueue):
+        self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.FOLLOW).count(), 0)
+        self.profile.following.add(self.profile2)
+        self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.FOLLOW).count(), 0)
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
     def test_adding_remote_follower_triggers_federation_event(self, mock_enqueue):
         self.profile2.following.add(self.profile)
         self.assertEqual(
@@ -52,6 +66,20 @@ class TestProfileFollowingChange(TransactionTestCase):
                 call(send_follow_change, self.profile2.id, self.profile.id, True),
             ]
         )
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_removing_follower__local_actor__creates_activity(self, mock_enqueue):
+        self.profile2.following.add(self.profile)
+        self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.UNDO).count(), 0)
+        self.profile2.following.remove(self.profile)
+        self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.UNDO).count(), 1)
+
+    @patch("socialhome.users.signals.django_rq.enqueue")
+    def test_removing_follower__remote_actor__does_not_create_activity(self, mock_enqueue):
+        self.profile.following.add(self.profile2)
+        self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.UNDO).count(), 0)
+        self.profile.following.remove(self.profile2)
+        self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.UNDO).count(), 0)
 
     @patch("socialhome.users.signals.django_rq.enqueue")
     def test_removing_remote_follower_triggers_federation_event(self, mock_enqueue):

@@ -9,7 +9,16 @@ Changelog
 Fixed
 .....
 
-* Fix regression in Diaspora follows introduced in 0.11.0.
+* Fix regression in Diaspora follows introduced in 0.11.0. Due to stricter validation
+  that was added to outbound payload sending, follows to the Diaspora protocol side broke
+  in 0.11.0 (from 11th of October in the development branch). All follows/unfollows during
+  this period towards remote Diaspora protocol profiles have failed and should be retriggered.
+
+Internal changes
+................
+
+* Store an Activity on follow/unfollow. This allows retriggering follows/unfollows in
+  the event of a regression.
 
 0.11.1 (2019-12-30)
 -------------------

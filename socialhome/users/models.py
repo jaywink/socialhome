@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
+from federation.entities.activitypub.enums import ActivityType
 from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
@@ -21,6 +22,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
+from socialhome.activities.models import Activity
 from socialhome.content.utils import safe_text
 from socialhome.enums import Visibility
 from socialhome.users.querysets import ProfileQuerySet
@@ -183,6 +185,19 @@ class Profile(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.fid or self.handle})"
+
+    def create_activity(self, activity_type: ActivityType, object_id: int = None) -> Activity:
+        """
+        Create and link a matching activity.
+        """
+        from django.contrib.contenttypes.models import ContentType as DjangoContentType
+        return Activity.objects.create(
+            content_type=DjangoContentType.objects.get_for_model(Profile),
+            fid=f"{self.fid}#activities/{uuid4()}",
+            object_id=object_id or self.id,
+            profile=self,
+            type=activity_type,
+        )
 
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
