@@ -6,6 +6,16 @@ Changelog
 0.12.0-dev (unreleased)
 -----------------------
 
+Added
+.....
+
+* The Content API now has full support for all visibility levels, including specifying recipients
+  for limited content.
+
+* The new publisher written in Vue is now feature complete with the current one. If you would like
+  to try it out, go to your account settings and enable the new publisher. After a short trial period,
+  it will become default and the old Django template code will be removed.
+
 Fixed
 .....
 
