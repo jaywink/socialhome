@@ -171,13 +171,6 @@ Default: ``socialhome.local``
 
 Domain that is used for this instance. Must be set to the right domain. Note, it's not a good idea to use a sub-domain wildcard for www, ie ``.`` as per Django docs. Federated sites work better with only one absolute domain.
 
-DJANGO_DEFAULT_FROM_EMAIL
-.........................
-
-Default: ``noreply@socialhome.local``
-
-Set this to the email address that emails should be sent out as.
-
 .. _email-config:
 
 DJANGO_EMAIL_BACKEND
@@ -185,9 +178,9 @@ DJANGO_EMAIL_BACKEND
 
 Default: ``django.core.mail.backends.console.EmailBackend``
 
-Must be set to some real email backend if you wish to send emails. See `docs <https://docs.djangoproject.com/en/1.11/ref/settings/#email-backend>`_ for backend options and additional configuration help.
+Must be set to some real email backend if you wish to send emails. See `docs <https://docs.djangoproject.com/en/2.2/ref/settings/#email-backend>`_ for backend options and additional configuration help.
 
-The possible email related additional settings are as follows:
+The possible other email related additional settings are as follows. Please see Django documentation link above for details.
 
 * ``DJANGO_EMAIL_HOST`` (default ``localhost``)
 * ``DJANGO_EMAIL_PORT`` (default ``587``)
@@ -199,7 +192,8 @@ The possible email related additional settings are as follows:
 * ``DJANGO_EMAIL_SSL_KEYFILE`` (default '')
 * ``DJANGO_EMAIL_SSL_CERTFILE`` (default '')
 * ``DJANGO_EMAIL_SUBJECT_PREFIX`` (default ``[Socialhome]``)
-* ``DJANGO_SERVER_EMAIL`` (default ``noreply@socialhome.local``)
+* ``DJANGO_DEFAULT_FROM_EMAIL`` (default ``noreply@socialhome.local``)
+* ``DJANGO_SERVER_EMAIL`` (defaults to ``DJANGO_DEFAULT_FROM_EMAIL`` value)
 
 Note, email *is* required for signing up. Users will **not** be able to sign up if the instance does not have working email sending.
 
