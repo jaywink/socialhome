@@ -35,6 +35,9 @@ export default Vue.component("reply-editor", {
         contentVisibility: {
             type: String, required: true,
         },
+        toggleReplyEditor: {
+            type: Function, default: () => {},
+        },
     },
     data() {
         return {replyText: ""}
@@ -64,6 +67,7 @@ export default Vue.component("reply-editor", {
                     },
                 )
                 this.replyText = ""
+                this.toggleReplyEditor()
             }
         },
     },

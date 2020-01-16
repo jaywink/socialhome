@@ -4,6 +4,14 @@
             <slot />
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
+                    v-if="showReplyAction"
+                    variant="link"
+                    class="text-decoration-none p-0"
+                    @click.stop.prevent="toggleReplyEditor"
+                >
+                    <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
+                </b-button>
+                <b-button
                     v-if="showShareReactionIcon"
                     :class="{
                         'item-reaction-shared': content.user_has_shared,
@@ -29,18 +37,14 @@
                         <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
-                <b-button
-                    v-if="showReplyAction"
-                    variant="link"
-                    class="text-decoration-none p-0"
-                    @click.stop.prevent="showReplyEditor"
-                >
-                    <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
-                </b-button>
             </div>
         </div>
         <div v-if="replyEditorActive">
-            <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
+            <reply-editor
+                :content-id="content.id"
+                :content-visibility="content.visibility"
+                :toggle-reply-editor="toggleReplyEditor"
+            />
         </div>
         <div v-if="canShare && showSharesBox" class="content-actions">
             <b-button v-if="content.user_has_shared" variant="outline-dark" @click.prevent.stop="unshare">
@@ -62,7 +66,9 @@ import ReplyEditor from "@/components/streams/ReplyEditor"
 
 export default {
     name: "ReactionsBar",
-    components: {RepliesContainer, ReplyEditor},
+    components: {
+        RepliesContainer, ReplyEditor,
+    },
     props: {
         content: {
             type: Object, required: true,
@@ -86,8 +92,14 @@ export default {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
         showReplyAction() {
+            if (!this.$store.state.application.isUserAuthenticated) {
+                return false
+            }
             if (this.content.content_type === "reply") {
-                return this.$store.state.application.isUserAuthenticated
+                return true
+            }
+            if (this.content.content_type === "content" && this.showRepliesContainer) {
+                return true
             }
             return false
         },
@@ -143,8 +155,8 @@ export default {
                 })
                 .catch(() => this.$snotify.error(gettext("An error happened while resharing the content")))
         },
-        showReplyEditor() {
-            this.replyEditorActive = true
+        toggleReplyEditor() {
+            this.replyEditorActive = !this.replyEditorActive
         },
         unshare() {
             if (!this.canShare) {
