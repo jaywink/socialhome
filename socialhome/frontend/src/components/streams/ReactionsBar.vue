@@ -6,7 +6,7 @@
                 <b-button
                     v-if="showReplyAction"
                     variant="link"
-                    class="text-decoration-none p-0 mr-1 reply-action"
+                    class="reaction-icons"
                     @click.stop.prevent="toggleReplyEditor"
                 >
                     <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
@@ -14,27 +14,25 @@
                 <b-button
                     v-if="showShareReactionIcon"
                     :class="{
-                        'item-reaction-shared': content.user_has_shared,
-                        'item-reaction-counter-positive': content.shares_count,
+                        'reaction-shared': content.user_has_shared,
                         'button-no-pointer': content.user_is_author,
                     }"
-                    class="item-reaction"
-                    variant="outline-dark"
+                    variant="link"
+                    class="reaction-icons"
                     @click.stop.prevent="expandShares"
                 >
                     <i class="fa fa-refresh" title="Shares" aria-label="Shares" />
-                    <span class="item-reaction-counter">{{ content.shares_count }}</span>
+                    <span class="reaction-counter">{{ content.shares_count }}</span>
                 </b-button>
                 <b-button
                     v-if="showExpandRepliesIcon"
-                    :class="{'item-reaction-counter-positive': content.reply_count}"
-                    class="item-reaction"
-                    variant="outline-dark"
+                    variant="link"
+                    class="reaction-icons"
                     @click.stop.prevent="expandComments"
                 >
                     <span class="item-open-replies-action">
                         <i class="fa fa-comments" title="Replies" aria-label="Replies" />
-                        <span class="item-reaction-counter">{{ content.reply_count }}</span>
+                        <span class="reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
             </div>
@@ -174,8 +172,18 @@ export default {
 }
 </script>
 
-<style scoped>
-  .reply-action {
-    color: rgb(55, 58, 60);
+<style type="text/scss" scoped>
+  .reaction-icons {
+    color: #0d1012;
+    padding: 3px 5px;
+    margin-left: 5px;
+    text-decoration: none;
+  }
+  .reaction-counter {
+    padding-left: 3px;
+  }
+  .reaction-shared {
+    color: #a85f00;
+    font-weight: 900;
   }
 </style>
