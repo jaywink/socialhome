@@ -18,7 +18,7 @@
                     <span class="item-reaction-counter">{{ content.shares_count }}</span>
                 </b-button>
                 <b-button
-                    v-if="showReplyReactionIcon"
+                    v-if="showExpandRepliesIcon"
                     :class="{'item-reaction-counter-positive': content.reply_count}"
                     class="item-reaction"
                     variant="outline-dark"
@@ -29,7 +29,18 @@
                         <span class="item-reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
+                <b-button
+                    v-if="showReplyAction"
+                    variant="link"
+                    class="text-decoration-none p-0"
+                    @click.stop.prevent="showReplyEditor"
+                >
+                    <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
+                </b-button>
             </div>
+        </div>
+        <div v-if="replyEditorActive">
+            <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
         </div>
         <div v-if="canShare && showSharesBox" class="content-actions">
             <b-button v-if="content.user_has_shared" variant="outline-dark" @click.prevent.stop="unshare">
@@ -61,15 +72,22 @@ export default {
         return {
             showSharesBox: false,
             showRepliesBox: false,
+            replyEditorActive: false,
         }
     },
     computed: {
+        showExpandRepliesIcon() {
+            if (this.content.content_type === "content") {
+                return this.$store.state.application.isUserAuthenticated || this.content.reply_count > 0
+            }
+            return false
+        },
         showRepliesContainer() {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
-        showReplyReactionIcon() {
-            if (this.content.content_type === "content") {
-                return this.$store.state.application.isUserAuthenticated || this.content.reply_count > 0
+        showReplyAction() {
+            if (this.content.content_type === "reply") {
+                return this.$store.state.application.isUserAuthenticated
             }
             return false
         },
@@ -86,6 +104,7 @@ export default {
         },
         translations() {
             return {
+                reply: gettext("reply"),
                 share: gettext("Share"),
                 unshare: gettext("Unshare"),
             }
@@ -123,6 +142,9 @@ export default {
                     this.content.user_has_shared = true
                 })
                 .catch(() => this.$snotify.error(gettext("An error happened while resharing the content")))
+        },
+        showReplyEditor() {
+            this.replyEditorActive = true
         },
         unshare() {
             if (!this.canShare) {
