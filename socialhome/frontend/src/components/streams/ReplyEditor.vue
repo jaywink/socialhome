@@ -17,7 +17,7 @@
             class="reply-save-button"
         >
             <b-button variant="primary" @click.prevent.stop="saveReply">
-                {{ translations.save }}
+                {{ translations.replySave }}
             </b-button>
         </div>
     </div>
@@ -51,8 +51,8 @@ export default Vue.component("reply-editor", {
                 : gettext("Only full editor available for non-public replies at this time")
             return {
                 fullEditor,
+                replySave: gettext("Reply"),
                 replyText: gettext("Reply text..."),
-                save: gettext("Save"),
             }
         },
     },
