@@ -28,7 +28,7 @@
                     v-if="showExpandRepliesIcon"
                     variant="link"
                     class="reaction-icons"
-                    @click.stop.prevent="expandComments"
+                    @click.stop.prevent="expandReplies"
                 >
                     <span class="item-open-replies-action">
                         <i class="fa fa-comments" title="Replies" aria-label="Replies" />
@@ -123,7 +123,7 @@ export default {
         }
     },
     methods: {
-        expandComments() {
+        expandReplies() {
             this.showRepliesBox = !this.showRepliesBox
         },
         expandShares() {
@@ -149,6 +149,9 @@ export default {
         },
         toggleReplyEditor() {
             this.replyEditorActive = !this.replyEditorActive
+            if (!this.showRepliesBox) {
+                this.expandReplies()
+            }
         },
         unshare() {
             if (!this.canShare) {
