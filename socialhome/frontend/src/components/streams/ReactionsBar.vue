@@ -58,11 +58,11 @@
 
 <script>
 import RepliesContainer from "@/components/streams/RepliesContainer.vue"
-
+import ReplyEditor from "@/components/streams/ReplyEditor"
 
 export default {
     name: "ReactionsBar",
-    components: {RepliesContainer},
+    components: {RepliesContainer, ReplyEditor},
     props: {
         content: {
             type: Object, required: true,
