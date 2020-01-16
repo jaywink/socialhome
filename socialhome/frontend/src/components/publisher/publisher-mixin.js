@@ -1,3 +1,7 @@
+import _isString from "lodash/isString"
+import _isObject from "lodash/isObject"
+import _get from "lodash/get"
+
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
 import SimpleLoadingElement from "@/components/common/SimpleLoadingElement"
 
@@ -36,7 +40,12 @@ const publisherMixin = {
                 text: "",
             },
             extendedModel: {},
-            errors: {recipientsErrors: ""},
+            errors: {
+                recipientsErrors: "",
+                includeFollowingErrors: "",
+                recipientsNotFoundErrors: [],
+            },
+            wasValidated: null,
             isPosting: false,
         }
     },
@@ -75,6 +84,10 @@ const publisherMixin = {
                 showPreview: gettext("Show OEmbed or OpenGraph preview"),
                 showPreviewHelp: gettext("Disable to turn off fetching and showing an OEmbed or "
                     + "OpenGraph preview using the links in the text."),
+                limitedVisibilityError: gettext("When visibility is set to 'Limited', you must either "
+                    + "specify recipients or include your followers."),
+                recipientsNotFoundError: gettext("Some recipients couldn't be found."),
+                validationError: gettext("Validation error"),
             }
         },
         visibilityOptions() {
@@ -82,18 +95,44 @@ const publisherMixin = {
         },
     },
     methods: {
+        // eslint-disable-next-line no-unused-vars
+        handleRequestErrors(code, message, payload = {}) {
+            this.$snotify.error(message, {timeout: 10000})
+        },
         postFormRequest() {
             throw new Error("`postFormRequest` must be overriden")
         },
-        onPostForm() {
+        async onPostForm() {
             if (this.isPosting === true) return
+
             this.isPosting = true
-            this.postFormRequest()
-                .then(url => window.location.replace(url))
-                .catch(() => {
-                    this.isPosting = false
-                    this.$snotify.error(this.translations.postUploadError, {timeout: 10000})
-                })
+            try {
+                const url = await this.postFormRequest()
+                window.location.replace(url)
+            } catch (error) {
+                this.isPosting = false
+
+                const data = _get(error, ["response", "data"])
+                let {message} = error
+
+                if (_isObject(data)) {
+                    const errObject = _get(Object.values(data), "[0]")
+                    const {code, payload} = errObject
+
+                    if (_isString(code)) {
+                        message = errObject.message
+                        this.handleRequestErrors(code, message, payload)
+                        return
+                    }
+                }
+
+                if (_isString(message)) {
+                    this.$snotify.error(message, {timeout: 10000})
+                    return
+                }
+
+                this.$snotify.error(this.translations.postUploadError, {timeout: 10000})
+            }
         },
     },
 }

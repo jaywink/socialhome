@@ -21,7 +21,7 @@ describe("EditPublisher", () => {
             isReply: faker.random.boolean(),
             federate: faker.random.boolean(),
             includeFollowing: faker.random.boolean(),
-            recipients: faker.random.word(),
+            recipients: Array(faker.random.number(5)).map(() => faker.random.email()),
             pinned: faker.random.boolean(),
             showPreview: faker.random.boolean(),
             text: faker.lorem.paragraphs(4),

@@ -173,7 +173,7 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
             context["parent"] = parent_id
 
         serialized = ContentSerializer(self.object, context={"request": self.request}).data
-        context["recipients"] = serialized.get("recipients", "")
+        context["recipients"] = serialized.get("recipients", [])
         context["text"] = serialized.get("text", "")
 
         return context

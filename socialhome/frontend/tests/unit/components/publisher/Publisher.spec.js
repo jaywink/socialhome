@@ -36,7 +36,7 @@ describe("Publisher", () => {
                     federate: true,
                     includeFollowing: false,
                     pinned: false,
-                    recipients: "",
+                    recipients: [],
                     showPreview: true,
                     text: "",
                     visibility: 0,

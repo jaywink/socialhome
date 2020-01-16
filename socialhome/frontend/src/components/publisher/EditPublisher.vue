@@ -20,7 +20,7 @@ export default {
             type: Boolean, default: false,
         },
         recipients: {
-            type: String, default: "",
+            type: Array, default: () => [],
         },
         showPreview: {
             type: Boolean, default: true,
