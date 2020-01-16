@@ -6,7 +6,7 @@
                 <b-button
                     v-if="showReplyAction"
                     variant="link"
-                    class="text-decoration-none p-0"
+                    class="text-decoration-none p-0 mr-1 reply-action"
                     @click.stop.prevent="toggleReplyEditor"
                 >
                     <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
@@ -84,7 +84,7 @@ export default {
     computed: {
         showExpandRepliesIcon() {
             if (this.content.content_type === "content") {
-                return this.$store.state.application.isUserAuthenticated || this.content.reply_count > 0
+                return this.content.reply_count > 0
             }
             return false
         },
@@ -92,16 +92,10 @@ export default {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
         showReplyAction() {
-            if (!this.$store.state.application.isUserAuthenticated) {
+            if (!this.$store.state.application.isUserAuthenticated || this.content.content_type === "share") {
                 return false
             }
-            if (this.content.content_type === "reply") {
-                return true
-            }
-            if (this.content.content_type === "content" && this.showRepliesContainer) {
-                return true
-            }
-            return false
+            return true
         },
         showShareReactionIcon() {
             if (this.content.content_type === "content") {
@@ -179,3 +173,9 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+  .reply-action {
+    color: rgb(55, 58, 60);
+  }
+</style>
