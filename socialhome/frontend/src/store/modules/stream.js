@@ -83,7 +83,7 @@ function shareContentError() {
 }
 
 function shareContentSuccess(state, payload, axios, {params}) {
-    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id] + 1)
+    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count + 1)
     Vue.set(state.contents[params.id], "user_has_shared", true)
 }
 
@@ -92,7 +92,7 @@ function unshareContentError() {
 }
 
 function unshareContentSuccess(state, payload, axios, {params}) {
-    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id] - 1)
+    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count - 1)
     Vue.set(state.contents[params.id], "user_has_shared", false)
 }
 
