@@ -42,6 +42,10 @@ Changed
   Socialhome more compatible with other platforms like the microblogging side of the Fediverse.
   Feedback on these is most welcome!
 
+* Improve rendering of outgoing mentions towards the ActivityPub network. (`#572 <https://git.feneas.org/socialhome/socialhome/issues/572>`_)
+
+  Mentions from Socialhome now get rendered as links in outbound HTML format payloads.
+
 Fixed
 .....
 

@@ -52,7 +52,7 @@ pyyaml
 # - GIF upload (upstream rejected)
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
 
--e git+https://git.feneas.org/jaywink/federation.git@4c665e874330b047010bd9b33e97a12210ad687a#egg=federation==0.20.0-dev1
+-e git+https://git.feneas.org/jaywink/federation.git@5ab541440d3854de54b99803edc867de28059cab#egg=federation==0.20.0-dev1
 
 # Own pyembed fork for some tweaks:
 # - passing additional options (TODO make PR)
