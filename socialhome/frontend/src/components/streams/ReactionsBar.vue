@@ -2,15 +2,12 @@
     <div>
         <div class="grid-item-bar d-flex justify-content-start">
             <slot />
+            <reply-button
+                v-if="content.content_type === 'content'"
+                :content-type="content.content_type"
+                :toggle-reply-editor="toggleReplyEditor"
+            />
             <div class="ml-auto grid-item-reactions mt-1">
-                <b-button
-                    v-if="showReplyAction"
-                    variant="link"
-                    class="reaction-icons"
-                    @click.stop.prevent="toggleReplyEditor"
-                >
-                    <i class="fa fa-comment" aria-disabled="true" /> {{ translations.reply }}
-                </b-button>
                 <b-button
                     v-if="showShareReactionIcon"
                     :class="{
@@ -35,6 +32,11 @@
                         <span class="reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
+                <reply-button
+                    v-if="content.content_type === 'reply'"
+                    :content-type="content.content_type"
+                    :toggle-reply-editor="toggleReplyEditor"
+                />
             </div>
         </div>
         <div v-if="replyEditorActive">
@@ -60,12 +62,15 @@
 
 <script>
 import RepliesContainer from "@/components/streams/RepliesContainer.vue"
+import ReplyButton from "@/components/buttons/ReplyButton"
 import ReplyEditor from "@/components/streams/ReplyEditor"
 
 export default {
     name: "ReactionsBar",
     components: {
-        RepliesContainer, ReplyEditor,
+        ReplyButton,
+        RepliesContainer,
+        ReplyEditor,
     },
     props: {
         content: {
@@ -89,12 +94,6 @@ export default {
         showRepliesContainer() {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
-        showReplyAction() {
-            if (!this.$store.state.application.isUserAuthenticated || this.content.content_type === "share") {
-                return false
-            }
-            return true
-        },
         showShareReactionIcon() {
             if (this.content.content_type === "content") {
                 return (
@@ -108,7 +107,6 @@ export default {
         },
         translations() {
             return {
-                reply: gettext("reply"),
                 share: gettext("Share"),
                 unshare: gettext("Unshare"),
             }
@@ -176,12 +174,6 @@ export default {
 </script>
 
 <style type="text/scss" scoped>
-  .reaction-icons {
-    color: #0d1012;
-    padding: 3px 5px;
-    margin-left: 5px;
-    text-decoration: none;
-  }
   .reaction-counter {
     padding-left: 3px;
   }

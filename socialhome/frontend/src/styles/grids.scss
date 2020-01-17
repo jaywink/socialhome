@@ -75,6 +75,20 @@
   padding: 20px;
 }
 
+.reaction-icons {
+    color: #0d1012;
+    padding: 3px 5px;
+    text-decoration: none;
+    &:hover {
+        color: #0d1012;
+        text-decoration: none;
+    }
+    &:focus {
+        color: #0d1012;
+        text-decoration: none;
+    }
+}
+
 // Stamped element centered on top
 .stamped {
   width: 100%;
