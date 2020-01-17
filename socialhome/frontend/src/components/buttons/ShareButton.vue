@@ -31,35 +31,14 @@ export default {
                 // eslint-disable-next-line object-curly-newline
             }
         },
-        urls() {
-            return {share: Urls["api:content-share"]({pk: this.content.id})}
-        },
     },
     methods: {
-        share() {
-            /* TODO move to store */
-            this.$http.post(this.urls.share)
-                .then(() => {
-                    this.content.shares_count += 1
-                    this.content.user_has_shared = true
-                })
-                .catch(() => this.$snotify.error(gettext("An error happened while sharing the content")))
-        },
         toggleShare() {
             if (this.content.user_has_shared) {
-                this.unshare()
+                this.$store.dispatch("stream/unshareContent", {params: {id: this.content.id}})
             } else {
-                this.share()
+                this.$store.dispatch("stream/shareContent", {params: {id: this.content.id}})
             }
-        },
-        unshare() {
-            /* TODO move to store */
-            this.$http.delete(this.urls.share)
-                .then(() => {
-                    this.content.shares_count -= 1
-                    this.content.user_has_shared = false
-                })
-                .catch(() => this.$snotify.error(gettext("An error happened while unsharing the content")))
         },
     },
 }
