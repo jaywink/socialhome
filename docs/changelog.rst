@@ -16,6 +16,29 @@ Added
   to try it out, go to your account settings and enable the new publisher. After a short trial period,
   it will become default and the old Django template code will be removed.
 
+Changed
+.......
+
+* Content interaction actions and icons have been fully redesigned to improve readability and to
+  make it easier to interact with other peoples content. (`#574 <https://git.feneas.org/socialhome/socialhome/issues/574>`_)
+
+  * Root level content now has "reply" and "share" actions more clearly on the left hand side of
+    the content interactions area below the content text.
+  * The new shares action now immediately shares (or unshares, if shared) instead of requiring
+    a second action click.
+  * The shares counter no longer acts as a share action.
+  * Both the reply action and the replies counter expand the replies container.
+  * Each reply now has a reply action as well. This is located on the right hand side of the
+    content interactions area below the reply. This allows users to target their reply to
+    a particular reply.
+  * Replies now automatically insert mentions into the reply editor. For replies on root content,
+    the root content author is mentioned. For replies on replies, both the root content author
+    and the replied reply author are mentioned. The mentions can of course be removed.
+
+  Hopefully these changes will make not only interacting easier, but also make interactions from
+  Socialhome more compatible with other platforms like the microblogging side of the Fediverse.
+  Feedback on these is most welcome!
+
 Fixed
 .....
 
