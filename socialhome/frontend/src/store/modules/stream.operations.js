@@ -50,6 +50,7 @@ const streamActions = {
 }
 
 const streamGetters = {
+    contentById: state => contentId => state.contents[contentId],
     contentList(state) {
         const contents = []
         state.contentIds.forEach(id => {

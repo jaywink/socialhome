@@ -48,6 +48,7 @@
             <reply-editor
                 :content-id="content.id"
                 :content-visibility="content.visibility"
+                :prefilled-text="prefillOnReply"
                 :toggle-reply-editor="toggleReplyEditor"
             />
         </div>
@@ -58,6 +59,8 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex"
+
 import RepliesContainer from "@/components/streams/RepliesContainer.vue"
 import ReplyButton from "@/components/buttons/ReplyButton"
 import ReplyEditor from "@/components/streams/ReplyEditor"
@@ -83,6 +86,23 @@ export default {
         }
     },
     computed: {
+        ...mapGetters("stream", [
+            "contentById",
+        ]),
+        prefillOnReply() {
+            let prefill = this.content.author.fid
+                ? `@{${this.content.author.fid}}` : `@{${this.content.author.handle}}`
+            if (this.content.content_type === "reply") {
+                // Find root
+                let {content} = this
+                while (content.parent) {
+                    content = this.contentById(content.parent)
+                }
+                prefill += " "
+                prefill += content.author.fid ? `@{${content.author.fid}}` : `@{${content.author.handle}}`
+            }
+            return prefill += " "
+        },
         showExpandRepliesIcon() {
             if (this.content.content_type === "content") {
                 return this.content.reply_count > 0
