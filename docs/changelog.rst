@@ -16,6 +16,9 @@ Added
   to try it out, go to your account settings and enable the new publisher. After a short trial period,
   it will become default and the old Django template code will be removed.
 
+* Admins can now disable the Django admin error emails by setting the environment value
+  ``SOCIALHOME_LOG_DISABLE_ADMIN_EMAILS=True``.
+
 Changed
 .......
 

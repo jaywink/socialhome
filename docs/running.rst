@@ -307,6 +307,13 @@ Default: ``True``
 
 Force HTTPS. There should be no reason to turn this off.
 
+SOCIALHOME_LOG_DISABLE_ADMIN_EMAILS
+...................................
+
+Default: ``False``
+
+Set this to ``True`` to disable the Django admin error emails in production.
+
 .. _config-log-target:
 
 SOCIALHOME_LOG_TARGET
