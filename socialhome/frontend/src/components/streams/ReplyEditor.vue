@@ -7,6 +7,7 @@
                 :max-rows="5"
                 :placeholder="translations.replyText"
                 :rows="5"
+                autofocus
             />
         </div>
         <div class="pull-right">
@@ -35,12 +36,15 @@ export default Vue.component("reply-editor", {
         contentVisibility: {
             type: String, required: true,
         },
+        prefilledText: {
+            type: String, required: false, default: "",
+        },
         toggleReplyEditor: {
             type: Function, default: () => {},
         },
     },
     data() {
-        return {replyText: ""}
+        return {replyText: this.prefilledText}
     },
     computed: {
         fullEditorUrl() {
