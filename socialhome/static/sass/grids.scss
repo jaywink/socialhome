@@ -28,26 +28,6 @@
   }
 }
 
-button.item-reaction {
-  display: inline-block;
-  padding: 3px 5px;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-.item-reaction-counter {
-  padding-left: 3px;
-}
-
-.item-reaction-counter-positive {
-  color: $active !important;
-  border-color: $active !important;
-}
-
-.item-reaction-shared {
-  background-color: $actionDone !important;
-}
-
 .grid-item-author-bar {
   margin-bottom: 8pt;
 

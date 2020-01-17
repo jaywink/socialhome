@@ -11,14 +11,6 @@
         <div v-show="showSpinner" class="replies-spinner text-center">
             <i class="fa fa-spinner fa-spin fa-2x" aria-hidden="true" />
         </div>
-        <div v-if="showReplyButton" class="content-actions">
-            <b-button variant="outline-dark" @click.prevent.stop="showReplyEditor">
-                {{ translations.reply }}
-            </b-button>
-        </div>
-        <div v-if="replyEditorActive">
-            <reply-editor :content-id="content.id" :content-visibility="content.visibility" />
-        </div>
         <div v-if="isContent">
             <div v-for="share in shares" :key="share.id">
                 <replies-container :content="share" />
@@ -29,7 +21,6 @@
 
 <script>
 import imagesLoaded from "vue-images-loaded"
-import "@/components/streams/ReplyEditor.vue"
 import "@/components/streams/StreamElement.vue"
 
 
@@ -40,9 +31,6 @@ export default {
         content: {
             type: Object, required: true,
         },
-    },
-    data() {
-        return {replyEditorActive: false}
     },
     computed: {
         isContent() {
@@ -57,21 +45,8 @@ export default {
         shares() {
             return this.$store.getters["stream/shares"](this.content.id)
         },
-        showReplyButton() {
-            if (!this.isUserAuthenticated || this.replyEditorActive || (
-                this.$store.state.stream.pending.replies && this.content.reply_count > 0)) {
-                return false
-            }
-            if (this.content.content_type === "content") {
-                return true
-            }
-            return this.content.content_type === "share" && this.content.reply_count > 0
-        },
         showSpinner() {
             return this.isContent && this.$store.state.stream.pending.replies && this.content.reply_count > 0
-        },
-        translations() {
-            return {reply: this.isContent ? gettext("Reply") : gettext("Reply to share")}
         },
     },
     mounted() {
@@ -90,9 +65,6 @@ export default {
             if (!this.$store.state.stream.stream.single) {
                 this.$redrawVueMasonry()
             }
-        },
-        showReplyEditor() {
-            this.replyEditorActive = true
         },
     },
 }

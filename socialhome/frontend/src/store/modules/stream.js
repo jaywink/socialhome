@@ -78,6 +78,24 @@ export function onError() {
     Vue.snotify.error(gettext("An error happened while fetching new content"))
 }
 
+function shareContentError() {
+    Vue.snotify.error(gettext("An error happened while sharing the content"))
+}
+
+function shareContentSuccess(state, payload, axios, {params}) {
+    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id] + 1)
+    Vue.set(state.contents[params.id], "user_has_shared", true)
+}
+
+function unshareContentError() {
+    Vue.snotify.error(gettext("An error happened while unsharing the content"))
+}
+
+function unshareContentSuccess(state, payload, axios, {params}) {
+    Vue.set(state.contents[params.id], "shares_count", state.contents[params.id] - 1)
+    Vue.set(state.contents[params.id], "user_has_shared", false)
+}
+
 export const profilesPlugin = store => {
     // called when the store is initialized
     store.subscribe(({type, payload}) => {
@@ -196,10 +214,22 @@ export function newRestAPI() {
             onError,
         })
         .post({
+            action: "shareContent",
+            path: ({id}) => Urls["api:content-share"]({pk: id}),
+            onSuccess: shareContentSuccess,
+            onError: shareContentError,
+        })
+        .post({
             action: "unfollowTag",
             path: ({uuid = undefined}) => `${Urls["api:tag-unfollow"]({uuid})}`,
             onSuccess: () => {},
             onError,
+        })
+        .delete({
+            action: "unshareContent",
+            path: ({id}) => Urls["api:content-share"]({pk: id}),
+            onSuccess: unshareContentSuccess,
+            onError: unshareContentError,
         })
         .getStore()
 }
