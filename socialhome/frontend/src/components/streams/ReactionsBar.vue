@@ -13,7 +13,7 @@
             />
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
-                    v-if="showShareReactionIcon"
+                    v-if="showSharesCountIcon"
                     variant="link"
                     class="reaction-icons button-no-pointer"
                 >
@@ -92,7 +92,7 @@ export default {
         showRepliesContainer() {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
-        showShareReactionIcon() {
+        showSharesCountIcon() {
             if (this.content.content_type === "content") {
                 return this.content.shares_count > 0
             }

@@ -3,8 +3,8 @@ import Moxios from "moxios"
 import publisher from "@/store/modules/publisher"
 
 
-describe("streamStore", () => {
-    afterEach(() => {
+describe("publisher", () => {
+    beforeEach(() => {
         Sinon.restore()
         Moxios.install(Vue.prototype.$http)
     })
