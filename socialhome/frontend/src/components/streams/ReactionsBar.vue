@@ -7,19 +7,20 @@
                 :content-type="content.content_type"
                 :toggle-reply-editor="toggleReplyEditor"
             />
+            <share-button
+                v-if="content.content_type === 'content'"
+                :content="content"
+            />
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
                     v-if="showShareReactionIcon"
-                    :class="{
-                        'reaction-shared': content.user_has_shared,
-                        'button-no-pointer': content.user_is_author,
-                    }"
                     variant="link"
-                    class="reaction-icons"
-                    @click.stop.prevent="expandShares"
+                    class="reaction-icons button-no-pointer"
                 >
-                    <i class="fa fa-refresh" title="Shares" aria-label="Shares" />
-                    <span class="reaction-counter">{{ content.shares_count }}</span>
+                    <span :title="translations.shares" :aria-label="translations.shares">
+                        <i class="fa fa-refresh" />
+                        <span class="reaction-counter">{{ content.shares_count }}</span>
+                    </span>
                 </b-button>
                 <b-button
                     v-if="showExpandRepliesIcon"
@@ -27,8 +28,12 @@
                     class="reaction-icons"
                     @click.stop.prevent="expandReplies"
                 >
-                    <span class="item-open-replies-action">
-                        <i class="fa fa-comments" title="Replies" aria-label="Replies" />
+                    <span
+                        class="item-open-replies-action"
+                        :title="translations.replies"
+                        :aria-label="translations.replies"
+                    >
+                        <i class="fa fa-comments" />
                         <span class="reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
@@ -46,14 +51,6 @@
                 :toggle-reply-editor="toggleReplyEditor"
             />
         </div>
-        <div v-if="canShare && showSharesBox" class="content-actions">
-            <b-button v-if="content.user_has_shared" variant="outline-dark" @click.prevent.stop="unshare">
-                {{ translations.unshare }}
-            </b-button>
-            <b-button v-else variant="outline-dark" @click.prevent.stop="share">
-                {{ translations.share }}
-            </b-button>
-        </div>
         <div v-if="showRepliesContainer">
             <replies-container :content="content" />
         </div>
@@ -64,6 +61,7 @@
 import RepliesContainer from "@/components/streams/RepliesContainer.vue"
 import ReplyButton from "@/components/buttons/ReplyButton"
 import ReplyEditor from "@/components/streams/ReplyEditor"
+import ShareButton from "@/components/buttons/ShareButton"
 
 export default {
     name: "ReactionsBar",
@@ -71,6 +69,7 @@ export default {
         ReplyButton,
         RepliesContainer,
         ReplyEditor,
+        ShareButton,
     },
     props: {
         content: {
@@ -79,7 +78,6 @@ export default {
     },
     data() {
         return {
-            showSharesBox: false,
             showRepliesBox: false,
             replyEditorActive: false,
         }
@@ -96,23 +94,15 @@ export default {
         },
         showShareReactionIcon() {
             if (this.content.content_type === "content") {
-                return (
-                    this.$store.state.application.isUserAuthenticated && !this.content.user_is_author
-                ) || this.content.shares_count > 0
+                return this.content.shares_count > 0
             }
             return false
         },
-        canShare() {
-            return !this.content.user_is_author && this.content.visibility === "public"
-        },
         translations() {
             return {
-                share: gettext("Share"),
-                unshare: gettext("Unshare"),
+                replies: gettext("Replies"),
+                shares: gettext("Shares"),
             }
-        },
-        urls() {
-            return {share: Urls["api:content-share"]({pk: this.content.id})}
         },
     },
     updated() {
@@ -124,50 +114,11 @@ export default {
         expandReplies() {
             this.showRepliesBox = !this.showRepliesBox
         },
-        expandShares() {
-            this.showSharesBox = !this.showSharesBox
-        },
-        share() {
-            if (!this.canShare) {
-                this.$snotify.error(gettext("Unable to reshare own post"))
-                return
-            }
-            if (!this.$store.state.application.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to reshare"))
-                return
-            }
-
-            this.$http.post(this.urls.share)
-                .then(() => {
-                    this.showSharesBox = false
-                    this.content.shares_count += 1
-                    this.content.user_has_shared = true
-                })
-                .catch(() => this.$snotify.error(gettext("An error happened while resharing the content")))
-        },
         toggleReplyEditor() {
             this.replyEditorActive = !this.replyEditorActive
             if (!this.showRepliesBox) {
                 this.expandReplies()
             }
-        },
-        unshare() {
-            if (!this.canShare) {
-                this.$snotify.error(gettext("Unable to unshare own post"))
-                return
-            }
-            if (!this.$store.state.application.isUserAuthenticated) {
-                this.$snotify.error(gettext("You must be logged in to unshare"))
-                return
-            }
-
-            this.$http.delete(this.urls.share)
-                .then(() => {
-                    this.showSharesBox = false
-                    this.content.shares_count -= 1
-                    this.content.user_has_shared = false
-                })
-                .catch(() => this.$snotify.error(gettext("An error happened while unsharing the content")))
         },
     },
 }
@@ -176,9 +127,5 @@ export default {
 <style type="text/scss" scoped>
   .reaction-counter {
     padding-left: 3px;
-  }
-  .reaction-shared {
-    color: #a85f00;
-    font-weight: 900;
   }
 </style>
