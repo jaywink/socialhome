@@ -144,6 +144,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
             self.public_content.author.federable,
             [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
               'protocol': 'diaspora'}],
+            job_timeout=10000,
         )
 
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value=None)
