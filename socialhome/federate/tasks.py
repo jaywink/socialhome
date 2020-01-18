@@ -253,7 +253,7 @@ def send_content_retraction(content, author_id):
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         # Queue to the background since sending could take a while
-        django_rq.enqueue(handle_send, entity, author.federable, recipients)
+        django_rq.enqueue(handle_send, entity, author.federable, recipients, job_timeout=10000)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 

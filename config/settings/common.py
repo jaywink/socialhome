@@ -282,7 +282,7 @@ RQ_QUEUES = {
         "PORT": REDIS_PORT,
         "DB": REDIS_DB,
         "PASSWORD": REDIS_PASSWORD,
-        "DEFAULT_TIMEOUT": 120,
+        "DEFAULT_TIMEOUT": 600,
     },
 }
 RQ_SHOW_ADMIN_LINK = True
