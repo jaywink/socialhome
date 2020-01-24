@@ -64,11 +64,11 @@ const streamGetters = {
         const replies = []
         if (content.content_type === "content") {
             state.contents[content.id].replyIds.forEach(id => {
-                replies.push(state.replies[id])
+                replies.push(state.contents[id])
             })
         } else if (content.content_type === "share") {
-            state.shares[content.id].replyIds.forEach(id => {
-                replies.push(state.replies[id])
+            state.contents[content.id].replyIds.forEach(id => {
+                replies.push(state.contents[id])
             })
         }
         return replies
@@ -76,7 +76,7 @@ const streamGetters = {
     shares: state => contentId => {
         const shares = []
         state.contents[contentId].shareIds.forEach(id => {
-            shares.push(state.shares[id])
+            shares.push(state.contents[id])
         })
         return shares
     },

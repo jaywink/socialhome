@@ -45,14 +45,10 @@ export function fetchRepliesSuccess(state, payload) {
         const reply = {
             ...item, replyIds: [], shareIds: [],
         }
-        Vue.set(state.replies, reply.id, reply)
+        Vue.set(state.contents, reply.id, reply)
         if (state.contents[reply.root_parent] !== undefined) {
             if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
                 state.contents[reply.root_parent].replyIds.push(reply.id)
-            }
-        } else if (state.shares[reply.root_parent] !== undefined) {
-            if (state.shares[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
-                state.shares[reply.root_parent].replyIds.push(reply.id)
             }
         }
     })
@@ -63,7 +59,7 @@ export function fetchSharesSuccess(state, payload) {
         const share = {
             ...item, replyIds: [],
         }
-        Vue.set(state.shares, share.id, share)
+        Vue.set(state.contents, share.id, share)
         if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
             state.contents[share.share_of].shareIds.push(share.id)
         }

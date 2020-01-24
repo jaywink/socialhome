@@ -4,10 +4,10 @@ import _get from "lodash/get"
 export default function () {
     // The top level content ID's loaded into the stream
     const currentContentIds = []
+    // All content objects, including replies
+    const allContentIds = []
     const unfetchedContentIds = []
     const contents = {}
-    const replies = {}
-    const shares = {}
 
     // Handle single content if exists
     const content = _get(window, ["context", "content"], undefined)
@@ -37,11 +37,10 @@ export default function () {
     return {
         contents,
         currentContentIds,
+        allContentIds,
         hasNewContent: false,
         layoutDoneAfterTwitterOEmbeds: false,
         newContentLengh: 0,
-        replies,
-        shares,
         showAuthorBar: stream.name !== "profile_pinned",
         singleContentId,
         stream,
