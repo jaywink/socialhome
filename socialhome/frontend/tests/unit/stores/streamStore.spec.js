@@ -32,46 +32,46 @@ describe("streamStore", () => {
     describe("addHasLoadMore", () => {
         it("adds flag on fifth last content", () => {
             const state = {
-                contentIds: [...new Array(7).keys()].map(i => i), contents: {},
+                currentContentIds: [...new Array(7).keys()].map(i => i), contents: {},
             }
-            state.contentIds.forEach(id => {
+            state.currentContentIds.forEach(id => {
                 state.contents[id] = getFakeContent({
                     id, hasLoadMore: false,
                 })
             })
             addHasLoadMore(state)
-            state.contents[state.contentIds[0]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[1]].hasLoadMore.should.be.true
-            state.contents[state.contentIds[2]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[3]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[4]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[5]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[6]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[0]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[1]].hasLoadMore.should.be.true
+            state.contents[state.currentContentIds[2]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[3]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[4]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[5]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[6]].hasLoadMore.should.be.false
         })
 
         it("adds flag to last if under 5 contents", () => {
             const state = {
-                contentIds: [...new Array(4).keys()].map(i => i), contents: {},
+                currentContentIds: [...new Array(4).keys()].map(i => i), contents: {},
             }
-            state.contentIds.forEach(id => {
+            state.currentContentIds.forEach(id => {
                 state.contents[id] = getFakeContent({
                     id, hasLoadMore: false,
                 })
             })
             addHasLoadMore(state)
-            state.contents[state.contentIds[0]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[1]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[2]].hasLoadMore.should.be.false
-            state.contents[state.contentIds[3]].hasLoadMore.should.be.true
+            state.contents[state.currentContentIds[0]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[1]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[2]].hasLoadMore.should.be.false
+            state.contents[state.currentContentIds[3]].hasLoadMore.should.be.true
         })
 
         it("sets layoutDoneAfterTwitterOEmbeds to false", () => {
             const state = {
-                contentIds: [...new Array(7).keys()].map(i => i),
+                currentContentIds: [...new Array(7).keys()].map(i => i),
                 contents: {},
                 layoutDoneAfterTwitterOEmbeds: true,
             }
-            state.contentIds.forEach(id => {
+            state.currentContentIds.forEach(id => {
                 state.contents[id] = getFakeContent({
                     id, hasLoadMore: false,
                 })
@@ -95,7 +95,7 @@ describe("streamStore", () => {
             }
 
             const state = {
-                contentIds: ["1", "2"],
+                currentContentIds: ["1", "2"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
@@ -111,7 +111,7 @@ describe("streamStore", () => {
             fetchContentsSuccess(state, payload)
 
             state.should.eql({
-                contentIds: ["1", "2", "6", "7"],
+                currentContentIds: ["1", "2", "6", "7"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
@@ -874,24 +874,24 @@ describe("streamStore", () => {
         })
 
         describe("newContentAck", () => {
-            it("should add all elements from 'state.unfetchedContentIds' to 'state.contentIds'", () => {
+            it("should add all elements from 'state.unfetchedContentIds' to 'state.currentContentIds'", () => {
                 const state = {
-                    unfetchedContentIds: ["6"], contentIds: [],
+                    unfetchedContentIds: ["6"], currentContentIds: [],
                 }
                 mutations.newContentAck(state)
-                state.contentIds.should.eql(["6"])
+                state.currentContentIds.should.eql(["6"])
             })
-            it("should not create duplicates in 'state.contentIds'", () => {
+            it("should not create duplicates in 'state.currentContentIds'", () => {
                 const state = {
-                    unfetchedContentIds: ["6"], contentIds: ["6"],
+                    unfetchedContentIds: ["6"], currentContentIds: ["6"],
                 }
                 mutations.newContentAck(state)
-                state.contentIds.should.eql(["6"])
+                state.currentContentIds.should.eql(["6"])
             })
 
             it("should remove all ids from unfetched ids content list", () => {
                 const state = {
-                    unfetchedContentIds: ["6", "7", "8"], contentIds: [],
+                    unfetchedContentIds: ["6", "7", "8"], currentContentIds: [],
                 }
                 mutations.newContentAck(state)
                 state.unfetchedContentIds.should.eql([])
@@ -970,7 +970,7 @@ describe("streamStore", () => {
         describe("currentContentList", () => {
             it("should only return existing posts", () => {
                 const state = {
-                    contentIds: ["1", "2", "3", "4", "5"],
+                    currentContentIds: ["1", "2", "3", "4", "5"],
                     contents: {
                         1: {id: "1"},
                         3: {id: "3"},

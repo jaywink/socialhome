@@ -2,8 +2,8 @@ import _get from "lodash/get"
 
 
 export default function () {
-    const contentIds = []
-
+    // The top level content ID's loaded into the stream
+    const currentContentIds = []
     const unfetchedContentIds = []
     const contents = {}
     const replies = {}
@@ -16,7 +16,7 @@ export default function () {
         singleContentId = content.id
         content.replyIds = []
         content.shareIds = []
-        contentIds.push(content.id)
+        currentContentIds.push(content.id)
         contents[content.id] = content
     }
 
@@ -36,7 +36,7 @@ export default function () {
 
     return {
         contents,
-        contentIds,
+        currentContentIds,
         hasNewContent: false,
         layoutDoneAfterTwitterOEmbeds: false,
         newContentLengh: 0,

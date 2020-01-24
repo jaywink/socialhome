@@ -21,7 +21,7 @@ const getStore = () => {
     store.content.replyIds = [store.reply.id]
     store.share.replyIds = [store.shareReply.id]
     store.content.shareIds = [store.share.id]
-    store.state.stream.contentIds.push(store.content.id)
+    store.state.stream.currentContentIds.push(store.content.id)
 
     store.profile = getProfile()
 

@@ -9,12 +9,12 @@ import {streamActions, streamMutations, streamGetters} from "@/store/modules/str
 
 
 export function addHasLoadMore(state) {
-    const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
+    const loadMoreContentId = state.currentContentIds[state.currentContentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
     } else {
     // Add to the last to be sure we always add it
-        Vue.set(state.contents[state.contentIds[state.contentIds.length - 1]], "hasLoadMore", true)
+        Vue.set(state.contents[state.currentContentIds[state.currentContentIds.length - 1]], "hasLoadMore", true)
     }
     state.layoutDoneAfterTwitterOEmbeds = false
 }
@@ -26,8 +26,8 @@ export function fetchContentsSuccess(state, payload) {
             ...item, replyIds: [], shareIds: [],
         }
         Vue.set(state.contents, content.id, content)
-        if (state.contentIds.indexOf(content.id) === -1) {
-            state.contentIds.push(content.id)
+        if (state.currentContentIds.indexOf(content.id) === -1) {
+            state.currentContentIds.push(content.id)
             newItems += 1
         }
     })

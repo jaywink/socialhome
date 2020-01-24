@@ -24,7 +24,7 @@ describe("AuthorBar", () => {
         })
         window.context = getContext({currentBrowsingProfileId: 26}, 0)
         store = getStore()
-        store.state.stream.contentIds.push(content.id)
+        store.state.stream.currentContentIds.push(content.id)
         Vue.set(store.state.stream.contents, content.id, content)
     })
 
