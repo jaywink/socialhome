@@ -51,7 +51,7 @@ const streamActions = {
 
 const streamGetters = {
     contentById: state => contentId => state.contents[contentId],
-    contentList(state) {
+    currentContentList(state) {
         const contents = []
         state.contentIds.forEach(id => {
             if (state.contents[id] !== undefined) {

@@ -3,6 +3,7 @@ import _get from "lodash/get"
 
 export default function () {
     const contentIds = []
+
     const unfetchedContentIds = []
     const contents = {}
     const replies = {}

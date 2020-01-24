@@ -967,7 +967,7 @@ describe("streamStore", () => {
     })
 
     describe("getters", () => {
-        describe("contentList", () => {
+        describe("currentContentList", () => {
             it("should only return existing posts", () => {
                 const state = {
                     contentIds: ["1", "2", "3", "4", "5"],
@@ -977,7 +977,7 @@ describe("streamStore", () => {
                         5: {id: "5"},
                     },
                 }
-                getters.contentList(state).should.eql([{id: "1"}, {id: "3"}, {id: "5"}])
+                getters.currentContentList(state).should.eql([{id: "1"}, {id: "3"}, {id: "5"}])
             })
         })
 

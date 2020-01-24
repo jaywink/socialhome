@@ -24,7 +24,7 @@
                 <div class="grid-sizer" />
                 <div class="gutter-sizer" />
                 <stream-element
-                    v-for="content in $store.getters['stream/contentList']"
+                    v-for="content in $store.getters['stream/currentContentList']"
                     :key="content.id"
                     v-masonry-tile
                     class="grid-item"
