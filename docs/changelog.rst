@@ -46,6 +46,8 @@ Changed
 
   Mentions from Socialhome now get rendered as links in outbound HTML format payloads.
 
+* Render URL's in outgoing payloads towards the ActivityPub network as proper links. (`#572 <https://git.feneas.org/socialhome/socialhome/issues/572>`_)
+
 Fixed
 .....
 
@@ -62,6 +64,8 @@ Internal changes
 
 * Store an Activity on follow/unfollow. This allows retriggering follows/unfollows in
   the event of a regression.
+
+* Move `socialhome.content.utils.process_text_links` to the `federation` library.
 
 0.11.1 (2019-12-30)
 -------------------

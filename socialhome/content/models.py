@@ -18,13 +18,14 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
+from federation.utils.text import process_text_links
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
-from socialhome.content.utils import test_tag, process_text_links
+from socialhome.content.utils import test_tag
 from socialhome.enums import Visibility
 
 
