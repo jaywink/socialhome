@@ -713,13 +713,14 @@ class TestMakeFederableProfile(SocialhomeTestCase):
         self.assertEqual(entity.id, profile.fid)
         self.assertEqual(entity.raw_content, "")
         self.assertEqual(entity.public, True)
-        self.assertEqual(entity.name, profile.name)
+        self.assertEqual(entity.name, profile.name_or_handle)
         self.assertEqual(entity.public_key, profile.rsa_public_key)
         self.assertEqual(entity.image_urls, {
             "small": profile.safer_image_url_small,
             "medium": profile.safer_image_url_medium,
             "large": profile.safer_image_url_large,
         })
+
 
 class TestSenderKeyFetcher(SocialhomeTestCase):
     @classmethod

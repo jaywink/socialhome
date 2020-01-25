@@ -183,25 +183,23 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
 def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
-    if not profile.is_local:
-        return
     try:
         return base.Profile(
             raw_content="",
             public=True,  # A profile is public in the context of federation if it is sent outwards
-            name=profile.name,
+            name=profile.name_or_handle,
             image_urls={
                 "small": profile.safer_image_url_small,
                 "medium": profile.safer_image_url_medium,
                 "large": profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
-            url=profile.local_url,
+            url=profile.url,
             created_at=profile.created,
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
             handle=profile.handle or "",
-            guid=str(profile.uuid),
+            guid=str(profile.uuid) if profile.is_local else profile.guid if profile.guid else "",
             inboxes={
                 "private": profile.inbox_private,
                 "public": profile.inbox_public,
