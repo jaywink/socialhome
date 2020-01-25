@@ -95,6 +95,7 @@ describe("streamStore", () => {
             }
 
             const state = {
+                allContentIds: ["1", "2"],
                 currentContentIds: ["1", "2"],
                 contents: {
                     1: {
@@ -104,13 +105,12 @@ describe("streamStore", () => {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
                 },
-                replies: {},
-                shares: {},
             }
 
             fetchContentsSuccess(state, payload)
 
             state.should.eql({
+                allContentIds: ["1", "2", "6", "7"],
                 currentContentIds: ["1", "2", "6", "7"],
                 contents: {
                     1: {
@@ -131,8 +131,6 @@ describe("streamStore", () => {
                         hasLoadMore: true,
                     },
                 },
-                replies: {},
-                shares: {},
                 layoutDoneAfterTwitterOEmbeds: false,
             })
         })
@@ -152,6 +150,7 @@ describe("streamStore", () => {
             }
 
             const state = {
+                allContentIds: ["1", "2", "3"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"],
@@ -159,9 +158,6 @@ describe("streamStore", () => {
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
-                },
-                replies: {},
-                shares: {
                     3: {
                         id: "3", content_type: "share", share_of: "1", replyIds: [],
                     },
@@ -171,6 +167,7 @@ describe("streamStore", () => {
             fetchRepliesSuccess(state, payload)
 
             state.should.eql({
+                allContentIds: ["1", "2", "3", "6", "7"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
@@ -178,8 +175,9 @@ describe("streamStore", () => {
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
-                },
-                replies: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: ["7"],
+                    },
                     6: {
                         id: "6",
                         text: "foobar",
@@ -199,11 +197,6 @@ describe("streamStore", () => {
                         shareIds: [],
                     },
                 },
-                shares: {
-                    3: {
-                        id: "3", content_type: "share", share_of: "1", replyIds: ["7"],
-                    },
-                },
             })
         })
 
@@ -215,6 +208,7 @@ describe("streamStore", () => {
             }
 
             const state = {
+                allContentIds: ["1", "2", "3"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["3"],
@@ -222,9 +216,6 @@ describe("streamStore", () => {
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
-                },
-                replies: {},
-                shares: {
                     3: {
                         id: "3", content_type: "share", share_of: "1", replyIds: [],
                     },
@@ -234,6 +225,7 @@ describe("streamStore", () => {
             fetchRepliesSuccess(state, payload)
 
             state.should.eql({
+                allContentIds: ["1", "2", "3", "6"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
@@ -241,8 +233,9 @@ describe("streamStore", () => {
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
-                },
-                replies: {
+                    3: {
+                        id: "3", content_type: "share", share_of: "1", replyIds: [],
+                    },
                     6: {
                         id: "6",
                         text: "foobar",
@@ -251,11 +244,6 @@ describe("streamStore", () => {
                         root_parent: "1",
                         replyIds: [],
                         shareIds: [],
-                    },
-                },
-                shares: {
-                    3: {
-                        id: "3", content_type: "share", share_of: "1", replyIds: [],
                     },
                 },
             })
@@ -276,6 +264,7 @@ describe("streamStore", () => {
             }
 
             const state = {
+                allContentIds: ["1", "2"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: [],
@@ -284,13 +273,12 @@ describe("streamStore", () => {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
                     },
                 },
-                replies: {},
-                shares: {},
             }
 
             fetchSharesSuccess(state, payload)
 
             state.should.eql({
+                allContentIds: ["1", "2", "6", "7"],
                 contents: {
                     1: {
                         id: "1", text: "Plop", content_type: "content", replyIds: [], shareIds: ["6"],
@@ -298,9 +286,6 @@ describe("streamStore", () => {
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: ["7"],
                     },
-                },
-                replies: {},
-                shares: {
                     6: {
                         id: "6", content_type: "share", share_of: "1", replyIds: [],
                     },
@@ -321,6 +306,7 @@ describe("streamStore", () => {
             }
 
             const state = {
+                allContentIds: ["1", "2"],
                 contents: {
                     1: {
                         id: "1", text: "Plop",
@@ -334,6 +320,7 @@ describe("streamStore", () => {
 
             fetchNewContentSuccess(state, payload)
 
+            state.allContentIds.should.eql(["1", "2", "6"])
             state.contents.should.eql({
                 1: {
                     id: "1", text: "Plop",
@@ -693,39 +680,25 @@ describe("streamStore", () => {
                             1: {
                                 id: "1", text: "content", replyIds: ["6", "7"], shareIds: [],
                             },
+                            6: {
+                                id: "6",
+                                text: "foobar",
+                                content_type: "reply",
+                                parent: "1",
+                                root_parent: "1",
+                                replyIds: [],
+                                shareIds: [],
+                            },
+                            7: {
+                                id: "7",
+                                text: "blablabla",
+                                content_type: "reply",
+                                parent: "1",
+                                root_parent: "1",
+                                replyIds: [],
+                                shareIds: [],
+                            },
                         })
-                    target.state.replies.should.eql({
-                        6: {
-                            id: "6",
-                            text: "foobar",
-                            content_type: "reply",
-                            parent: "1",
-                            root_parent: "1",
-                            replyIds: [],
-                            shareIds: [],
-                        },
-                        7: {
-                            id: "7",
-                            text: "blablabla",
-                            content_type: "reply",
-                            parent: "1",
-                            root_parent: "1",
-                            replyIds: [],
-                            shareIds: [],
-                        },
-                    })
-                    done()
-                })
-            })
-
-            it("should handle error", done => {
-                Moxios.stubRequest("/api/content/1/replies/", {status: 500})
-
-                target.dispatch("getReplies", {params: {id: 1}})
-
-                Moxios.wait(() => {
-                    target.state.error.replies.should.exist
-                    target.state.replies.should.eql({})
                     done()
                 })
             })
@@ -756,27 +729,13 @@ describe("streamStore", () => {
                             1: {
                                 id: "1", text: "content", replyIds: [], shareIds: ["6", "7"],
                             },
+                            6: {
+                                id: "6", content_type: "share", share_of: "1", replyIds: [],
+                            },
+                            7: {
+                                id: "7", content_type: "share", share_of: "1", replyIds: [],
+                            },
                         })
-                    target.state.shares.should.eql({
-                        6: {
-                            id: "6", content_type: "share", share_of: "1", replyIds: [],
-                        },
-                        7: {
-                            id: "7", content_type: "share", share_of: "1", replyIds: [],
-                        },
-                    })
-                    done()
-                })
-            })
-
-            it("should handle error", done => {
-                Moxios.stubRequest("/api/content/1/shares/", {status: 500})
-
-                target.dispatch("getShares", {params: {id: 1}})
-
-                Moxios.wait(() => {
-                    target.state.error.shares.should.exist
-                    target.state.shares.should.eql({})
                     done()
                 })
             })
@@ -805,8 +764,6 @@ describe("streamStore", () => {
                         1: {
                             id: "1", text: "content", replyIds: ["6"], shareIds: [],
                         },
-                    })
-                    target.state.replies.should.eql({
                         6: {
                             id: "6",
                             content_type: "reply",
@@ -991,14 +948,10 @@ describe("streamStore", () => {
                         3: {
                             id: "3", replyIds: ["5"],
                         },
-                    },
-                    replies: {
                         2: {id: "2"},
                         4: {id: "4"},
                         5: {id: "5"},
                         7: {id: "7"},
-                    },
-                    shares: {
                         6: {
                             id: "6", replyIds: ["7"],
                         },
@@ -1026,8 +979,6 @@ describe("streamStore", () => {
                         3: {
                             id: "3", shareIds: ["5"],
                         },
-                    },
-                    shares: {
                         2: {id: "2"},
                         4: {id: "4"},
                         5: {id: "5"},

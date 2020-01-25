@@ -22,13 +22,17 @@ const getStore = () => {
     store.share.replyIds = [store.shareReply.id]
     store.content.shareIds = [store.share.id]
     store.state.stream.currentContentIds.push(store.content.id)
+    store.state.stream.allContentIds.push(store.content.id)
+    store.state.stream.allContentIds.push(store.reply.id)
+    store.state.stream.allContentIds.push(store.share.id)
+    store.state.stream.allContentIds.push(store.shareReply.id)
 
     store.profile = getProfile()
 
     store.state.stream.contents[store.content.id] = store.content
-    store.state.stream.replies[store.reply.id] = store.reply
-    store.state.stream.shares[store.share.id] = store.share
-    store.state.stream.replies[store.shareReply.id] = store.shareReply
+    store.state.stream.contents[store.reply.id] = store.reply
+    store.state.stream.contents[store.share.id] = store.share
+    store.state.stream.contents[store.shareReply.id] = store.shareReply
     store.state.stream.pending = {
         contents: false,
         replies: false,

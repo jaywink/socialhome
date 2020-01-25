@@ -30,6 +30,9 @@ export function fetchContentsSuccess(state, payload) {
             state.currentContentIds.push(content.id)
             newItems += 1
         }
+        if (state.allContentIds.indexOf(content.id) === -1) {
+            state.allContentIds.push(content.id)
+        }
     })
     if (newItems > 0) {
         addHasLoadMore(state)
@@ -51,6 +54,9 @@ export function fetchRepliesSuccess(state, payload) {
                 state.contents[reply.root_parent].replyIds.push(reply.id)
             }
         }
+        if (state.allContentIds.indexOf(reply.id) === -1) {
+            state.allContentIds.push(reply.id)
+        }
     })
 }
 
@@ -63,11 +69,17 @@ export function fetchSharesSuccess(state, payload) {
         if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
             state.contents[share.share_of].shareIds.push(share.id)
         }
+        if (state.allContentIds.indexOf(share.id) === -1) {
+            state.allContentIds.push(share.id)
+        }
     })
 }
 
 export function fetchNewContentSuccess(state, payload) {
     Vue.set(state.contents, payload.data.id, payload.data)
+    if (state.allContentIds.indexOf(payload.data.id) === -1) {
+        state.allContentIds.push(payload.data.id)
+    }
 }
 
 export function onError() {
@@ -79,6 +91,7 @@ function shareContentError() {
 }
 
 function shareContentSuccess(state, payload, axios, {params}) {
+    // TODO: we should just fetch the share instead and refetch the content?
     Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count + 1)
     Vue.set(state.contents[params.id], "user_has_shared", true)
 }
@@ -88,6 +101,7 @@ function unshareContentError() {
 }
 
 function unshareContentSuccess(state, payload, axios, {params}) {
+    // TODO: we should just delete the share instead and refetch the content?
     Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count - 1)
     Vue.set(state.contents[params.id], "user_has_shared", false)
 }

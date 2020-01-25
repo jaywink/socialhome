@@ -17,6 +17,7 @@ export default function () {
         content.replyIds = []
         content.shareIds = []
         currentContentIds.push(content.id)
+        allContentIds.push(content.id)
         contents[content.id] = content
     }
 
