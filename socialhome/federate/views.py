@@ -165,7 +165,7 @@ def content_fetch_view(request, objtype, guid):
         return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
     except TypeError as ex:
         logger.warning("content_fetch_view - failed to generate document: %s", ex)
-        return HttpResponseServerError("Failed to generate a document")
+        raise Http404()
 
 
 class ReceivePublicView(View):
