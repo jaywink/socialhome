@@ -54,6 +54,9 @@ Fixed
   in 0.11.0 (from 11th of October in the development branch). All follows/unfollows during
   this period towards remote Diaspora protocol profiles have failed and should be retriggered.
 
+* Don't crash loudly incompatible content is fetched via the Diaspora protocol fetch view and
+  a document fails to validate.
+
 Internal changes
 ................
 

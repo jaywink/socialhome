@@ -5,7 +5,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.http.response import Http404, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http.response import Http404, JsonResponse, HttpResponseRedirect, HttpResponseNotFound, \
+    HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.views.generic import View
@@ -155,12 +156,16 @@ def content_fetch_view(request, objtype, guid):
             content.author.handle.split("@")[1], objtype, guid
         )
         return HttpResponseRedirect(url)
-    entity = make_federable_content(content)
-    message = get_full_xml_representation(entity, content.author.private_key)
-    document = MagicEnvelope(
-        message=message, private_key=content.author.private_key, author_handle=content.author.handle
-    )
-    return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
+    try:
+        entity = make_federable_content(content)
+        message = get_full_xml_representation(entity, content.author.private_key)
+        document = MagicEnvelope(
+            message=message, private_key=content.author.private_key, author_handle=content.author.handle
+        )
+        return HttpResponse(document.render(), content_type="application/magic-envelope+xml")
+    except TypeError as ex:
+        logger.warning("content_fetch_view - failed to generate document: %s", ex)
+        return HttpResponseServerError("Failed to generate a document")
 
 
 class ReceivePublicView(View):
