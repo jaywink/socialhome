@@ -33,7 +33,7 @@ describe("Stream", () => {
         describe("loadStream", () => {
             context("store.dispatch without contents", () => {
                 beforeEach(() => {
-                    store.state.stream.contentIds = []
+                    store.state.stream.currentContentIds = []
                     store.state.application = {profile: {uuid: UUID}}
                 })
 
@@ -80,7 +80,7 @@ describe("Stream", () => {
 
             context("store.dispatch with contents", () => {
                 beforeEach(() => {
-                    store.state.stream.contentIds = ["1", "2"]
+                    store.state.stream.currentContentIds = ["1", "2"]
                     store.state.stream.contents = {
                         1: {through: "3"}, 2: {through: "4"},
                     }

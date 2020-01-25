@@ -24,7 +24,7 @@
                 <div class="grid-sizer" />
                 <div class="gutter-sizer" />
                 <stream-element
-                    v-for="content in $store.getters['stream/contentList']"
+                    v-for="content in $store.getters['stream/currentContentList']"
                     :key="content.id"
                     v-masonry-tile
                     class="grid-item"
@@ -150,7 +150,9 @@ export default Vue.component("stream", {
         },
         loadStream() {
             const options = {params: {}}
-            const lastContentId = this.$store.state.stream.contentIds[this.$store.state.stream.contentIds.length - 1]
+            const lastContentId = this.$store.state.stream.currentContentIds[
+                this.$store.state.stream.currentContentIds.length - 1
+            ]
             if (lastContentId && this.$store.state.stream.contents[lastContentId]) {
                 options.params.lastId = this.$store.state.stream.contents[lastContentId].through
             }

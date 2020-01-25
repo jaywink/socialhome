@@ -9,12 +9,12 @@ import {streamActions, streamMutations, streamGetters} from "@/store/modules/str
 
 
 export function addHasLoadMore(state) {
-    const loadMoreContentId = state.contentIds[state.contentIds.length - 6]
+    const loadMoreContentId = state.currentContentIds[state.currentContentIds.length - 6]
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
     } else {
     // Add to the last to be sure we always add it
-        Vue.set(state.contents[state.contentIds[state.contentIds.length - 1]], "hasLoadMore", true)
+        Vue.set(state.contents[state.currentContentIds[state.currentContentIds.length - 1]], "hasLoadMore", true)
     }
     state.layoutDoneAfterTwitterOEmbeds = false
 }
@@ -26,9 +26,12 @@ export function fetchContentsSuccess(state, payload) {
             ...item, replyIds: [], shareIds: [],
         }
         Vue.set(state.contents, content.id, content)
-        if (state.contentIds.indexOf(content.id) === -1) {
-            state.contentIds.push(content.id)
+        if (state.currentContentIds.indexOf(content.id) === -1) {
+            state.currentContentIds.push(content.id)
             newItems += 1
+        }
+        if (state.allContentIds.indexOf(content.id) === -1) {
+            state.allContentIds.push(content.id)
         }
     })
     if (newItems > 0) {
@@ -45,15 +48,14 @@ export function fetchRepliesSuccess(state, payload) {
         const reply = {
             ...item, replyIds: [], shareIds: [],
         }
-        Vue.set(state.replies, reply.id, reply)
+        Vue.set(state.contents, reply.id, reply)
         if (state.contents[reply.root_parent] !== undefined) {
             if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
                 state.contents[reply.root_parent].replyIds.push(reply.id)
             }
-        } else if (state.shares[reply.root_parent] !== undefined) {
-            if (state.shares[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
-                state.shares[reply.root_parent].replyIds.push(reply.id)
-            }
+        }
+        if (state.allContentIds.indexOf(reply.id) === -1) {
+            state.allContentIds.push(reply.id)
         }
     })
 }
@@ -63,15 +65,21 @@ export function fetchSharesSuccess(state, payload) {
         const share = {
             ...item, replyIds: [],
         }
-        Vue.set(state.shares, share.id, share)
+        Vue.set(state.contents, share.id, share)
         if (state.contents[share.share_of].shareIds.indexOf(share.id) === -1) {
             state.contents[share.share_of].shareIds.push(share.id)
+        }
+        if (state.allContentIds.indexOf(share.id) === -1) {
+            state.allContentIds.push(share.id)
         }
     })
 }
 
 export function fetchNewContentSuccess(state, payload) {
     Vue.set(state.contents, payload.data.id, payload.data)
+    if (state.allContentIds.indexOf(payload.data.id) === -1) {
+        state.allContentIds.push(payload.data.id)
+    }
 }
 
 export function onError() {
@@ -83,6 +91,7 @@ function shareContentError() {
 }
 
 function shareContentSuccess(state, payload, axios, {params}) {
+    // TODO: we should just fetch the share instead and refetch the content?
     Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count + 1)
     Vue.set(state.contents[params.id], "user_has_shared", true)
 }
@@ -92,6 +101,7 @@ function unshareContentError() {
 }
 
 function unshareContentSuccess(state, payload, axios, {params}) {
+    // TODO: we should just delete the share instead and refetch the content?
     Vue.set(state.contents[params.id], "shares_count", state.contents[params.id].shares_count - 1)
     Vue.set(state.contents[params.id], "user_has_shared", false)
 }

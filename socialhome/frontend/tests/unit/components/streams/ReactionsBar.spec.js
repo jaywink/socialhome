@@ -26,7 +26,7 @@ describe("ReactionsBar", () => {
         content = getFakeContent({id: 1})
         window.context = getContext()
         store = getStore()
-        store.state.stream.contentIds.push(content.id)
+        store.state.stream.currentContentIds.push(content.id)
         localVue.set(store.state.stream.contents, content.id, content)
     })
 
