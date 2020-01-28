@@ -120,7 +120,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
     def test_save__collects_recipients(self):
         serializer = ContentSerializer(
             instance=self.limited_content, partial=True, context={"request": Mock(user=self.user)}, data={
-                "recipients": f"{self.user_recipient.handle},{self.user_recipient2.handle}",
+                "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
                 "visibility": Visibility.LIMITED.value
             },
         )
@@ -135,7 +135,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             partial=True,
             context={"request": Mock(user=self.user)},
             data={
-                "recipients": f"{self.user_recipient.handle},{self.user_recipient2.handle}",
+                "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
                 "visibility": Visibility.LIMITED.value
             },
         )
@@ -144,7 +144,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         content = serializer.save()
 
         actual = set(content.limited_visibilities.all().order_by("id"))
-        self.assertSetEqual(actual, {self.user_recipient, self.user_recipient2})
+        self.assertSetEqual({self.user_recipient, self.user_recipient2}, actual)
 
     def test_save__removes_removed_recipients(self):
         serializer = ContentSerializer(
@@ -152,7 +152,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             partial=True,
             context={"request": Mock(user=self.user)},
             data={
-                "recipients": f"{self.user_recipient.handle},{self.user_recipient2.handle}",
+                "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
                 "visibility": Visibility.LIMITED.value,
             },
         )
@@ -169,7 +169,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             partial=True,
             context={"request": Mock(user=self.user)},
             data={
-                "recipients": f"{self.user_recipient.handle}",
+                "recipients": [self.user_recipient.handle],
                 "visibility": Visibility.LIMITED.value
             },
         )
@@ -186,7 +186,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             partial=True,
             context={"request": Mock(user=user)},
             data={
-                "recipients": f"{self.user_recipient.handle},{self.user_recipient2.handle}",
+                "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
                 "visibility": Visibility.LIMITED.value,
                 "include_following": True,
             })
@@ -218,10 +218,10 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         expected_recipients_list = set(
             limited_content.limited_visibilities.all().order_by("id").values_list("handle", flat=True)
         )
-        self.assertEqual(serializer.data["recipients"], ",".join(expected_recipients_list))
+        self.assertEqual(expected_recipients_list, set(serializer.data["recipients"]))
 
         serializer = ContentSerializer(limited_content, context={"request": Mock(user=PublicUserFactory())})
-        self.assertEqual(serializer.data["recipients"], "")
+        self.assertEqual(set(serializer.data["recipients"]), set())
 
     def test_user_is_author_false_if_no_request(self):
         serializer = ContentSerializer()
@@ -285,7 +285,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
     def test_validate_recipients(self):
         serializer = ContentSerializer(
             instance=self.limited_content, partial=True, context={"request": Mock(user=self.user)}, data={
-                "recipients": f"{self.user_recipient.handle},{self.user_recipient2.handle}",
+                "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
                 "visibility": Visibility.LIMITED.value
             },
         )
@@ -296,7 +296,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
     def test_validate_recipients__fails_bad_recipients(self):
         serializer = ContentSerializer(
             instance=self.limited_content, partial=True, context={"request": Mock(user=self.user)}, data={
-                "recipients": f"{self.user_recipient.handle}+bad_ext,{self.user_recipient2.handle}+bad_ext",
+                "recipients": [f"{self.user_recipient.handle}+bad_ext", f"{self.user_recipient2.handle}+bad_ext"],
                 "visibility": Visibility.LIMITED.value
             },
         )

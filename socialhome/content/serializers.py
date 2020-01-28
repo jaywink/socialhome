@@ -1,7 +1,8 @@
 import re
-from typing import Dict, Any, Set
+from typing import Dict, Any, Set, List
 
 from django.db.models import Q
+from django.utils.translation import ngettext as _
 from enumfields.drf import EnumField
 from federation.utils.text import validate_handle
 from rest_framework import serializers
@@ -21,7 +22,7 @@ class RecipientsField(serializers.Field):
             return set()
 
         raw_recipients = set()
-        for r in dictionary.get("recipients", "").split(","):
+        for r in dictionary.get("recipients", ""):
             r2 = r.strip()
             if len(r2) > 0:
                 raw_recipients.add(r2)
@@ -42,8 +43,8 @@ class RecipientsField(serializers.Field):
     def to_internal_value(self, data: Set[str]) -> Set[str]:
         return data
 
-    def to_representation(self, value: Set[str]) -> str:
-        return ",".join(value)
+    def to_representation(self, value: Set[str]) -> List[str]:
+        return list(value)
 
 
 class ContentSerializer(serializers.ModelSerializer):
@@ -277,9 +278,24 @@ class ContentSerializer(serializers.ModelSerializer):
 
         user = self.context.get("request").user
 
+        validation_errors = []
         for recipient in value:
             if not validate_handle(recipient) and not re.match(r"https?://", recipient):
-                raise serializers.ValidationError(f"Recipient {recipient} is not in the correct format.")
+                validation_errors.append(recipient)
+
+        if len(validation_errors) > 0:
+            msg = _(
+                "This recipient couldn't be found (please check the format).",
+                "These recipients couldn't be found (please check the format).",
+                len(validation_errors)
+            )
+
+            raise serializers.ValidationError({
+                "code": "recipients_not_found_error",
+                "message": msg,
+                "payload": validation_errors,
+            })
+
         recipient_profiles = Profile.objects.filter(
             Q(handle__in=value) | Q(fid__in=value)
         ).visible_for_user(user)
