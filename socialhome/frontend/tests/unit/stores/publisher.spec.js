@@ -1,12 +1,15 @@
-import Vue from "vue"
+import {createLocalVue} from "@vue/test-utils"
 import Moxios from "moxios"
-import publisher from "@/store/modules/publisher"
+import {getPublisherStore} from "@/store/modules/publisher"
+
+const localVue = createLocalVue()
+const publisher = getPublisherStore(localVue.axios)
 
 
 describe("publisher", () => {
     beforeEach(() => {
         Sinon.restore()
-        Moxios.install(Vue.prototype.$http)
+        Moxios.install(localVue.prototype.$http)
     })
 
     afterEach(() => {

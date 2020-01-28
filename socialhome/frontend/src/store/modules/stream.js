@@ -5,7 +5,7 @@ import _defaults from "lodash/defaults"
 
 import Axios from "axios"
 import getState from "@/store/modules/stream.state"
-import {streamActions, streamMutations, streamGetters} from "@/store/modules/stream.operations"
+import {streamActions, streamGetters, streamMutations} from "@/store/modules/stream.operations"
 
 
 export function addHasLoadMore(state) {
@@ -13,7 +13,7 @@ export function addHasLoadMore(state) {
     if (loadMoreContentId) {
         Vue.set(state.contents[loadMoreContentId], "hasLoadMore", true)
     } else {
-    // Add to the last to be sure we always add it
+        // Add to the last to be sure we always add it
         Vue.set(state.contents[state.currentContentIds[state.currentContentIds.length - 1]], "hasLoadMore", true)
     }
     state.layoutDoneAfterTwitterOEmbeds = false
@@ -139,28 +139,36 @@ export function newRestAPI() {
         })
         .get({
             action: "getPublicStream",
-            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:public"]()}${getLastIdParam(
+                lastId,
+            )}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getFollowedStream",
-            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:followed"]()}${getLastIdParam(
+                lastId,
+            )}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLimitedStream",
-            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:limited"]()}${getLastIdParam(
+                lastId,
+            )}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getLocalStream",
-            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:local"]()}${getLastIdParam(
+                lastId,
+            )}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -174,21 +182,27 @@ export function newRestAPI() {
         })
         .get({
             action: "getTagStream",
-            path: ({name, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tag"]({name})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({name, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tag"](
+                {name},
+            )}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getTagsStream",
-            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:tags"]()}${getLastIdParam(
+                lastId,
+            )}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
         })
         .get({
             action: "getProfileAll",
-            path: ({uuid, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:profile-all"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            path: ({uuid, lastId = undefined, acceptIds = undefined}) => `${Urls["api-streams:profile-all"](
+                {uuid},
+            )}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -197,7 +211,9 @@ export function newRestAPI() {
             action: "getProfilePinned",
             path: (
                 {uuid, lastId = undefined, acceptIds = undefined},
-            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(acceptIds)}`,
+            ) => `${Urls["api-streams:profile-pinned"]({uuid})}${getLastIdParam(lastId)}${getAcceptIdsParam(
+                acceptIds,
+            )}`,
             property: "contents",
             onSuccess: fetchContentsSuccess,
             onError,
@@ -245,18 +261,32 @@ export function newRestAPI() {
 }
 
 const streamsAPI = newRestAPI()
-
 const {state} = streamsAPI
+const getters = _defaults({}, streamGetters, streamsAPI.getters)
+const actions = _defaults({}, streamActions, streamsAPI.actions)
+const mutations = _defaults({}, streamMutations, streamsAPI.mutations)
 
-export const getters = _defaults({}, streamGetters, streamsAPI.getters)
-
-export const actions = _defaults({}, streamActions, streamsAPI.actions)
-
-export const mutations = _defaults({}, streamMutations, streamsAPI.mutations)
+function getStreamStore() {
+    const store = newRestAPI()
+    return {
+        namespaced: true,
+        state: store.state,
+        getters,
+        actions,
+        mutations,
+    }
+}
 
 export default {
     namespaced: true,
     state,
+    getters,
+    actions,
+    mutations,
+}
+
+export {
+    getStreamStore,
     getters,
     actions,
     mutations,

@@ -18,7 +18,7 @@ require("chai/register-should")
 require("chai").use(require("chai-as-promised")).use(require("sinon-chai"))
 // Django's gettext and other i18n functions
 require("django-i18n")
-const Sinon = require("sinon").sandbox.create()
+const Sinon = require("sinon").createSandbox()
 
 // Trap calls to global library `Urls`
 const {Urls} = require(path.resolve(__dirname, "fixtures", "Urls.js"))
