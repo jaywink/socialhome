@@ -135,6 +135,7 @@
 import _difference from "lodash/difference"
 
 import publisherMixin, {VISIBILITY_OPTIONS} from "@/components/publisher/publisher-mixin"
+import bookmarkletMixin from "@/components/publisher/bookmarklet-mixin"
 
 const ERRORS = Object.freeze({
     FOLLOWING_AND_RECIPIENTS: "FOLLOWING_AND_RECIPIENTS",
@@ -144,7 +145,7 @@ const ERRORS = Object.freeze({
 
 export default {
     name: "Publisher",
-    mixins: [publisherMixin],
+    mixins: [publisherMixin, bookmarkletMixin],
     data() {
         return {
             extendedModel: {

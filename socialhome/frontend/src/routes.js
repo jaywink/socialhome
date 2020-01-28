@@ -1,4 +1,6 @@
 import VueRouter from "vue-router"
+import _isString from "lodash/isString"
+
 import Stream from "@/components/streams/Stream.vue"
 import Publisher from "@/components/publisher/Publisher"
 import ReplyPublisher from "@/components/publisher/ReplyPublisher"
@@ -11,6 +13,17 @@ function $$(props = {}) {
     return route => ({
         ...(route.params), ...props,
     })
+}
+
+function publisherProps(route) {
+    if (_isString(route.query.url) && _isString(route.query.title)) {
+        return {
+            shareUrl: route.query.url,
+            shareTitle: route.query.title,
+            shareNotes: route.query.notes !== undefined ? route.query.notes : "",
+        }
+    }
+    return {}
 }
 
 const routes = [
@@ -60,7 +73,10 @@ const routes = [
 
     // Publisher
     {
-        path: "/content/create", component: Publisher,
+        path: "/content/create",
+        component: Publisher,
+        props: publisherProps,
+        alias: "/bookmarklet",
     },
     {
         path: "/content/:contentId/~reply/",
