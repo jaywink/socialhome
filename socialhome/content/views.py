@@ -102,6 +102,21 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
 class ContentBookmarkletView(ContentCreateView):
     template_name = "content/bookmarklet.html"
+    vue = False
+
+    def dispatch(self, request, *args, **kwargs):
+        use_vue_parameter = request.GET.get("vue", None)
+        if use_vue_parameter is not None:
+            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
+        else:
+            self.vue = (
+                hasattr(request.user, "preferences") and
+                request.user.preferences.get("content__use_new_publisher")
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
 
 
 class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
