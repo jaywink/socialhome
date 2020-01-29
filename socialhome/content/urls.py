@@ -5,7 +5,7 @@ from socialhome.content import views
 app_name = 'content'
 
 urlpatterns = [
-    url(r"^bookmarklet/$", views.ContentBookmarkletView.as_view(), name="bookmarklet"),
+    url(r"^bookmarklet/$", views.ContentCreateView.as_view(), name="bookmarklet"),
     url(r"^create/$", views.ContentCreateView.as_view(), name="create"),
     url(r"^(?P<pk>[0-9]+)/~edit/$", views.ContentUpdateView.as_view(), name="update"),
     url(r"^(?P<pk>[0-9]+)/~delete/$", views.ContentDeleteView.as_view(), name="delete"),

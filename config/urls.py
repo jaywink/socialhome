@@ -11,7 +11,7 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from django_js_reverse.views import urls_js
 
-from socialhome.content.views import ContentBookmarkletView
+from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
 from socialhome.viewsets import ImageUploadView
@@ -66,7 +66,7 @@ urlpatterns = [
     # Content
     url(r"^content/", include("socialhome.content.urls", namespace="content")),
     # Fallback for bookmarklet route for cross-project support
-    url(r"^bookmarklet/", ContentBookmarkletView.as_view(), name="bookmarklet"),
+    url(r"^bookmarklet/", ContentCreateView.as_view(), name="bookmarklet"),
 
     # JavaScript translations
     path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome']), name="javascript-catalog"),
