@@ -1,21 +1,26 @@
-import Vue from "vue"
+import {createLocalVue} from "@vue/test-utils"
+import {getMainInstance} from "@/main"
 
-import main from "@/main"
 
+let localVue
+let main
 
 describe("Main", () => {
     beforeEach(() => {
         Sinon.restore()
+        window.context = {streamName: "public"}
+        localVue = createLocalVue()
+        main = getMainInstance(localVue)
     })
 
     it("should initialize Axios library with correct parameters", () => {
-        Vue.prototype.$http.should.exist
-        Vue.prototype.$http.defaults.xsrfCookieName.should.equal("csrftoken")
-        Vue.prototype.$http.defaults.xsrfHeaderName.should.equal("X-CSRFToken")
+        localVue.prototype.$http.should.exist
+        localVue.prototype.$http.defaults.xsrfCookieName.should.equal("csrftoken")
+        localVue.prototype.$http.defaults.xsrfHeaderName.should.equal("X-CSRFToken")
     })
 
-    it("VueMasonry is correctly initialized is defined", () => {
-        Vue.prototype.$redrawVueMasonry.should.be.a("function")
+    it("should correclty define VueMasonry", () => {
+        localVue.prototype.$redrawVueMasonry.should.be.a("function")
         main.$redrawVueMasonry.should.be.a("function")
     })
 
@@ -50,7 +55,21 @@ describe("Main", () => {
                 })
             })
         })
+
+        describe("$websocket", () => {
+            it("should initialize a ReconnectingWebsocket when a stream name is defined", () => {
+                main.$websocket.should.exist
+            })
+
+            it("should not initialize a ReconnectingWebsocket when no stream name is defined", () => {
+                window.context = undefined
+                localVue = createLocalVue()
+                main = getMainInstance(localVue);
+                (typeof main.$websocket).should.equal(typeof undefined)
+            })
+        })
     })
+
     describe("Lifecycle", () => {
         describe("created", () => {
             it("should initialize `main.$websocket`", () => {
@@ -65,15 +84,17 @@ describe("Main", () => {
                     }),
                 }
                 main.$websocket.onmessage(msg)
-                main.onWebsocketMessage.getCall(0).args.should.eql([{
-                    data: JSON.stringify({
-                        event: "new", id: 4,
-                    }),
-                }])
+                main.onWebsocketMessage.getCall(0).args.should.eql([
+                    {
+                        data: JSON.stringify({
+                            event: "new", id: 4,
+                        }),
+                    },
+                ])
             })
 
             it("should initialize `Vue.snotify`", () => {
-                Vue.snotify.should.exist
+                localVue.snotify.should.exist
             })
         })
 
