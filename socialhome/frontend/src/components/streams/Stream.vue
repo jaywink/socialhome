@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ container: this.$store.state.stream.stream.single }">
+    <div :class="{ container: streamDetails.single }">
         <div v-show="$store.getters['stream/hasNewContent']" class="new-content-container">
             <b-link class="new-content-load-link" @click.prevent.stop="onNewContentClick">
                 <b-badge pill variant="primary">
@@ -7,7 +7,7 @@
                 </b-badge>
             </b-link>
         </div>
-        <div v-if="this.$store.state.stream.stream.single">
+        <div v-if="streamDetails.single">
             <stream-element class="grid-item grid-item-full" :content="singleContent" />
         </div>
         <div v-else>
@@ -50,6 +50,8 @@ import TagsStampedElement from "@/components/streams/stamped_elements/TagsStampe
 import ProfileStampedElement from "@/components/streams/stamped_elements/ProfileStampedElement.vue"
 import LoadingElement from "@/components/common/LoadingElement.vue"
 import ProfileStreamButtons from "@/components/streams/stamped_elements/ProfileStreamButtons"
+import {STREAM_NAMES} from "@/utils/constants"
+import {streamLoadableMixin} from "@/components/streams/stream-loadable-mixin"
 
 export default Vue.component("stream", {
     components: {
@@ -64,6 +66,7 @@ export default Vue.component("stream", {
         TagStampedElement,
         TagsStampedElement,
     },
+    mixins: [streamLoadableMixin],
     // TODO: Seperate Stream.vue into TagStream.vue, GuidProfile.vue and UsernameProfile.vue, etc. in the future
     props: {
         contentId: {
@@ -103,29 +106,26 @@ export default Vue.component("stream", {
         },
         stampedElement() {
             switch (this.streamName) {
-                case "followed":
+                case STREAM_NAMES.FOLLOWED:
                     return "FollowedStampedElement"
-                case "limited":
+                case STREAM_NAMES.LIMITED:
                     return "LimitedStampedElement"
-                case "local":
+                case STREAM_NAMES.LOCAL:
                     return "LocalStampedElement"
-                case "public":
+                case STREAM_NAMES.PUBLIC:
                     return "PublicStampedElement"
-                case "tag":
+                case STREAM_NAMES.TAG:
                     return "TagStampedElement"
-                case "tags":
+                case STREAM_NAMES.TAGS:
                     return "TagsStampedElement"
-                case "profile_all":
-                case "profile_pinned":
+                case STREAM_NAMES.PROFILE_ALL:
+                case STREAM_NAMES.PROFILE_PINNED:
                     return "ProfileStampedElement"
                 default:
                     // eslint-disable-next-line no-console
                     console.error(`Unsupported stream name ${this.streamName}`)
                     return ""
             }
-        },
-        streamName() {
-            return this.$store.state.stream.stream.name
         },
         translations() {
             const ln = this.unfetchedContentIds.length
@@ -136,7 +136,7 @@ export default Vue.component("stream", {
         },
     },
     beforeMount() {
-        if (!this.$store.state.stream.stream.single) {
+        if (!this.streamDetails.single) {
             this.loadStream()
         }
     },
@@ -147,47 +147,6 @@ export default Vue.component("stream", {
                     () => this.$scrollTo("body"),
                 ),
             )
-        },
-        loadStream() {
-            const options = {params: {}}
-            const lastContentId = this.$store.state.stream.currentContentIds[
-                this.$store.state.stream.currentContentIds.length - 1
-            ]
-            if (lastContentId && this.$store.state.stream.contents[lastContentId]) {
-                options.params.lastId = this.$store.state.stream.contents[lastContentId].through
-            }
-
-            switch (this.$store.state.stream.stream.name) {
-                case "followed":
-                    this.$store.dispatch("stream/getFollowedStream", options)
-                    break
-                case "limited":
-                    this.$store.dispatch("stream/getLimitedStream", options)
-                    break
-                case "local":
-                    this.$store.dispatch("stream/getLocalStream", options)
-                    break
-                case "public":
-                    this.$store.dispatch("stream/getPublicStream", options)
-                    break
-                case "tag":
-                    options.params.name = this.tag
-                    this.$store.dispatch("stream/getTagStream", options)
-                    break
-                case "tags":
-                    this.$store.dispatch("stream/getTagsStream", options)
-                    break
-                case "profile_all":
-                    options.params.uuid = this.$store.state.application.profile.uuid
-                    this.$store.dispatch("stream/getProfileAll", options)
-                    break
-                case "profile_pinned":
-                    options.params.uuid = this.$store.state.application.profile.uuid
-                    this.$store.dispatch("stream/getProfilePinned", options)
-                    break
-                default:
-                    break
-            }
         },
     },
 })

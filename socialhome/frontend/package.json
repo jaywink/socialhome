@@ -21,6 +21,7 @@
     "lodash": "^4.17.15",
     "popper.js": "^1.16.0",
     "register-service-worker": "^1.6.2",
+    "snake-case": "^3.0.3",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
     "vue-images-loaded": "^1.1.2",
@@ -31,6 +32,7 @@
     "vue-router": "^3.1.3",
     "vue-scrollto": "^2.17.1",
     "vue-snotify": "^3.2.1",
+    "vuedraggable": "^2.23.2",
     "vuex": "^3.1.1",
     "vuex-rest-api": "^2.11.0"
   },

@@ -22,6 +22,7 @@
 <script>
 import imagesLoaded from "vue-images-loaded"
 import "@/components/streams/StreamElement.vue"
+import {mapGetters} from "vuex"
 
 
 export default {
@@ -33,6 +34,7 @@ export default {
         },
     },
     computed: {
+        ...mapGetters("stream", ["streamDetails"]),
         isContent() {
             return this.content.content_type === "content"
         },
@@ -56,13 +58,13 @@ export default {
         }
     },
     updated() {
-        if (!this.$store.state.stream.stream.single) {
+        if (!this.streamDetails.single) {
             this.$redrawVueMasonry()
         }
     },
     methods: {
         onImageLoad() {
-            if (!this.$store.state.stream.stream.single) {
+            if (!this.streamDetails.single) {
                 this.$redrawVueMasonry()
             }
         },

@@ -1,0 +1,40 @@
+.socialhome-organize-content {
+    .socialhome-organize-content-title-bar {
+        background-color: $black;
+        left: 0;
+        padding: 0 15px 0 15px;
+        position: fixed;
+        right: 0;
+        top: 46px;
+        z-index: 1020;
+
+        .stamped {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 9px;
+
+            h1 {
+                display: inline;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .socialhome-organize-content-items {
+        margin-top: 175px;
+        .card {
+            color: $dark;
+            margin-bottom: 15px;
+            max-height: 100px;
+            overflow: hidden;
+
+            .fa-arrows-alt {
+                opacity: 0.6;
+                cursor: move;
+            }
+        }
+    }
+}

@@ -20,14 +20,7 @@ export default function () {
         allContentIds.push(content.id)
         contents[content.id] = content
     }
-
-    const streamName = _get(window, ["context", "streamName"], "")
-    const streamSplits = streamName.split("__")
-    const stream = {
-        id: streamSplits.length ? streamSplits[1] : "",
-        name: streamSplits[0],
-        single: streamSplits[0] === "content",
-    }
+    const streamFullName = _get(window, ["context", "streamName"], "")
     // Only defined if on a tag stream
     const tagContext = _get(window, ["context", "tag"], {})
     const tag = {
@@ -42,10 +35,9 @@ export default function () {
         hasNewContent: false,
         layoutDoneAfterTwitterOEmbeds: false,
         newContentLengh: 0,
-        showAuthorBar: stream.name !== "profile_pinned",
+        showAuthorBar: streamFullName.startsWith("profile_pinned"),
         singleContentId,
-        stream,
-        streamName,
+        streamFullName,
         tag,
         unfetchedContentIds,
     }

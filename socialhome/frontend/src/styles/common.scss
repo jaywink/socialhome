@@ -7,4 +7,13 @@ body {
             box-shadow: 0 0 0 .2rem darken($disabledgrey, 20%);
         }
     }
+
+    // Stamped element centered on top
+    .stamped {
+        width: 100%;
+        padding: 1%;
+        overflow: visible;
+        background-color: $light;
+        color: $dark;
+    }
 }

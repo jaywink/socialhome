@@ -188,69 +188,6 @@ class TestProfileDetailView(SocialhomeTestCase):
         self.assertEqual(view.stream_type_value, StreamType.PROFILE_PINNED.value)
 
 
-class TestOrganizeContentUserDetailView(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.user = PublicUserFactory()
-
-    def _get_request_view_and_content(self, create_content=True):
-        request = RequestFactory().get("/")
-        request.user = self.user
-        profile = self.user.profile
-
-        contents = []
-        if create_content:
-            contents.extend([
-                ContentFactory(author=profile, order=3, pinned=True),
-                ContentFactory(author=profile, order=2, pinned=True),
-                ContentFactory(author=profile, order=1, pinned=True),
-            ])
-            Content.objects.filter(id=contents[0].id).update(order=3)
-            Content.objects.filter(id=contents[1].id).update(order=2)
-            Content.objects.filter(id=contents[2].id).update(order=1)
-        view = OrganizeContentProfileDetailView(request=request)
-        view.profile = profile
-        view.kwargs = {"uuid": profile.uuid}
-        return request, view, contents, profile
-
-    def test_view_renders(self):
-        with self.login(self.user):
-            self.get("users:profile-organize")
-        self.response_200()
-
-    def test_save_sort_order_updates_order(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        qs = view.get_queryset()
-        self.assertEqual(qs[0].id, contents[2].id)
-        self.assertEqual(qs[1].id, contents[1].id)
-        self.assertEqual(qs[2].id, contents[0].id)
-        # Run id's via str() because request.POST gives them like that
-        view._save_sort_order([str(contents[0].id), str(contents[1].id), str(contents[2].id)])
-        qs = view.get_queryset()
-        self.assertEqual(qs[0].id, contents[0].id)
-        self.assertEqual(qs[1].id, contents[1].id)
-        self.assertEqual(qs[2].id, contents[2].id)
-
-    def test_save_sort_order_skips_non_qs_contents(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        other_user = UserFactory()
-        other_content = ContentFactory(author=other_user.profile, pinned=True)
-        Content.objects.filter(id=other_content.id).update(order=100)
-        view._save_sort_order([other_content.id])
-        other_content.refresh_from_db()
-        assert other_content.order == 100
-
-    def test_get_success_url(self):
-        request, view, contents, profile = self._get_request_view_and_content()
-        assert view.get_success_url() == "/u/%s/" % profile.user.username
-
-    def test_login_required(self):
-        self.user = AnonymousUser()
-        response = self.get('users:profile-organize')
-        assert response.status_code == 302
-
-
 @pytest.mark.usefixtures("admin_user", "client")
 class TestProfileVisibilityForAnonymous:
     def test_visible_to_self_profile_requires_login_for_anonymous(self, admin_user, client):

@@ -218,6 +218,13 @@ export function newRestAPI() {
             onSuccess: fetchContentsSuccess,
             onError,
         })
+        .patch({
+            action: "updateProfilePinned",
+            path: ({uuid}) => `${Urls["api-streams:profile-pinned"]({uuid})}`,
+            property: "contents",
+            onSuccess: () => {},
+            onError: () => Vue.snotify.error(gettext("An error happened while saving new pinned post order")),
+        })
         .get({
             action: "getReplies",
             path: ({id}) => Urls["api:content-replies"]({pk: id}),

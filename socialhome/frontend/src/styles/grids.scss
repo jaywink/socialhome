@@ -89,38 +89,8 @@
     }
 }
 
-// Stamped element centered on top
-.stamped {
-  width: 100%;
-  padding: 1%;
-  overflow: visible;
-  background-color: $light;
-  color: $dark;
-}
-
 .gutter-sizer {
   width: 1%;
-}
-
-.organize-content {
-  .card {
-    max-height: 100px;
-    overflow: hidden;
-    color: $dark;
-
-    .fa-arrows-alt {
-      opacity: 0.6;
-      cursor: move;
-    }
-  }
-}
-
-.profile-box-trigger {
-  cursor: pointer;
-}
-
-.profile-box {
-  padding-top: 0;
 }
 
 .card-block {

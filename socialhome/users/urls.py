@@ -2,7 +2,8 @@ from django.conf.urls import url
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 
-from . import views
+from socialhome.users import views
+from socialhome.views import SocialHomeTemplateView
 
 app_name = 'users'
 
@@ -30,7 +31,7 @@ urlpatterns = [
     ),
     url(
         regex=r"^p/~organize/$",
-        view=views.OrganizeContentProfileDetailView.as_view(),
+        view=SocialHomeTemplateView.as_view(),
         name="profile-organize"
     ),
     url(

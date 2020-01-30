@@ -35,6 +35,7 @@
 import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
+import {mapGetters} from "vuex"
 import AuthorBar from "@/components/streams/AuthorBar.vue"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
 import ReactionsBar from "@/components/streams/ReactionsBar.vue"
@@ -52,6 +53,7 @@ const StreamElement = {
         },
     },
     computed: {
+        ...mapGetters("stream", ["streamDetails"]),
         deleteUrl() {
             return Urls["content:delete"]({pk: this.content.id})
         },
@@ -78,7 +80,7 @@ const StreamElement = {
         this.layoutAfterTwitterOEmbeds()
     },
     updated() {
-        if (!this.$store.state.stream.stream.single) {
+        if (!this.streamDetails.single) {
             this.$redrawVueMasonry()
         }
     },
@@ -116,7 +118,7 @@ const StreamElement = {
             this.$emit("loadmore")
         },
         onImageLoad() {
-            if (!this.$store.state.stream.stream.single) {
+            if (!this.streamDetails.single) {
                 this.$redrawVueMasonry()
             }
         },

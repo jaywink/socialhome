@@ -66,6 +66,7 @@ import ReplyButton from "@/components/buttons/ReplyButton"
 import ReplyEditor from "@/components/streams/ReplyEditor"
 import ShareButton from "@/components/buttons/ShareButton"
 
+
 export default {
     name: "ReactionsBar",
     components: {
@@ -88,6 +89,7 @@ export default {
     computed: {
         ...mapGetters("stream", [
             "contentById",
+            "streamDetails",
         ]),
         prefillOnReply() {
             let prefill = this.content.author.fid
@@ -110,7 +112,7 @@ export default {
             return false
         },
         showRepliesContainer() {
-            return this.showRepliesBox || this.$store.state.stream.stream.single
+            return this.showRepliesBox || this.streamDetails.single
         },
         showSharesCountIcon() {
             if (this.content.content_type === "content") {
@@ -126,7 +128,7 @@ export default {
         },
     },
     updated() {
-        if (!this.$store.state.stream.stream.single) {
+        if (!this.streamDetails.single) {
             this.$redrawVueMasonry()
         }
     },
@@ -145,7 +147,7 @@ export default {
 </script>
 
 <style type="text/scss" scoped>
-  .reaction-counter {
-    padding-left: 3px;
-  }
+    .reaction-counter {
+        padding-left: 3px;
+    }
 </style>

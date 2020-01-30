@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template import Template, Context
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from django.templatetags.static import static
 from federation.entities.activitypub.django.views import activitypub_object_view
 from markdownx.utils import markdownify
 from markdownx.views import ImageUploadView
@@ -17,13 +18,48 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.views import APIView
+from django.utils.translation import ugettext_lazy as _
 
 from socialhome.forms import MarkdownXImageForm
 from socialhome.models import PolicyDocument
 from socialhome.streams.views import FollowedStreamView, PublicStreamView
 from socialhome.users.models import Profile
-from socialhome.users.serializers import LimitedProfileSerializer
+from socialhome.users.serializers import LimitedProfileSerializer, ProfileSerializer
 from socialhome.users.views import ProfileDetailView, ProfileAllContentView
+from socialhome.utils import get_full_url
+
+
+class SocialHomeTemplateView(LoginRequiredMixin, TemplateView):
+    template_name = "streams/base.html"
+
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super().get_context_data(**kwargs)
+        context["json_context"] = self.get_json_context()
+        context["meta"] = self.get_page_meta()
+
+        return context
+
+    def get_json_context(self):
+        if self.request.user.is_authenticated:
+            profile = ProfileSerializer(self.request.user.profile, context={'request': self.request}).data
+        else:
+            profile = {}
+        return {
+            "currentBrowsingProfileId": getattr(getattr(self.request.user, "profile", None), "id", None),
+            "isUserAuthenticated": bool(self.request.user.is_authenticated),
+            "profile": profile,
+        }
+
+    def get_page_meta(self):
+        return {
+            "title": self.request.site.name,
+            "type": "website",
+            "url": settings.SOCIALHOME_URL,
+            "image": get_full_url(static("images/logo/Socialhome-dark-300.png")),
+            "description": _("A federated social home."),
+            "author_url": "",
+        }
 
 
 @method_decorator(activitypub_object_view, name='get')

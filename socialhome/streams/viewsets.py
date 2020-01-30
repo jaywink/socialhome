@@ -1,5 +1,10 @@
+from typing import Any
+
+from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -72,6 +77,9 @@ class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
             last_id=self.last_id, profile=self.profile, user=self.request.user, accept_ids=self.accept_ids,
         )
         return stream.get_content()
+
+    def patch(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
 class PublicStreamAPIView(StreamsAPIBaseView):

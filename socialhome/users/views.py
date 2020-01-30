@@ -10,7 +10,6 @@ from django.views.generic import DetailView, ListView, UpdateView, TemplateView,
 from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
 
-from socialhome.content.models import Content
 from socialhome.streams.streams import ProfilePinnedStream, ProfileAllStream
 from socialhome.streams.views import BaseStreamView
 from socialhome.users.forms import ProfileForm, UserPictureForm
@@ -132,32 +131,6 @@ class ProfileAllContentView(ProfileViewMixin):
             "url": get_full_url(reverse("users:profile-all-content", kwargs={"uuid": self.object.uuid})),
         })
         return meta
-
-
-class OrganizeContentProfileDetailView(LoginRequiredMixin, ListView):
-    model = Content
-    template_name = "users/profile_detail_organize.html"
-
-    def get_queryset(self):
-        profile = get_object_or_404(Profile, user=self.request.user)
-        return Content.objects.profile_pinned(profile, self.request.user).order_by("order")
-
-    def post(self, request, *args, **kwargs):
-        """Save sort order."""
-        self._save_sort_order(request.POST.get("sort_order").split(","))
-        return redirect(self.get_success_url())
-
-    def _save_sort_order(self, card_ids):
-        """Update Content `order` values according to sort order."""
-        qs_ids = self.get_queryset().values_list("id", flat=True)
-        for i in range(0, len(card_ids)):
-            # Only allow updating cards that are in our qs
-            card_id = int(card_ids[i])
-            if card_id in qs_ids:
-                Content.objects.filter(id=card_id).update(order=i)
-
-    def get_success_url(self):
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):

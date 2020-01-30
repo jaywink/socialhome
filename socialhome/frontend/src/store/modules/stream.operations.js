@@ -4,7 +4,11 @@ import _concat from "lodash/concat"
 import _difference from "lodash/difference"
 import _upperFirst from "lodash/upperFirst"
 
+
 const streamMutations = {
+    setStreamFullName(state, streamName) {
+        state.streamFullName = streamName
+    },
     disableLoadMore(state, contentId) {
         Vue.set(state.contents[contentId], "hasLoadMore", false)
     },
@@ -17,7 +21,7 @@ const streamMutations = {
         state.layoutDoneAfterTwitterOEmbeds = status
     },
     newContentAck(state) {
-    /*
+        /*
          * First, get all IDs present in unfetchedContentIds and absent in currentContentIds
          * This is neccessary since content ids that could not be fetched due to
          * network errors are not removed from `state.unfetchedContentIds`. In this
@@ -79,6 +83,14 @@ const streamGetters = {
             shares.push(state.contents[id])
         })
         return shares
+    },
+    streamDetails(state) {
+        const streamSplits = state.streamFullName.split("__")
+        return {
+            id: streamSplits.length ? streamSplits[1] : "",
+            name: streamSplits[0],
+            single: streamSplits[0] === "content",
+        }
     },
     hasNewContent(state) {
         return state.unfetchedContentIds.length > 0 && !state.pending.contents
