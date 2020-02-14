@@ -16,7 +16,7 @@ variables:
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
   POSTGRES_DB: "postgres"
-  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_PASSWORD: ""
   POSTGRES_USER: "postgres"
 
 stages:
