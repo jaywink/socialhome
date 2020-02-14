@@ -20,7 +20,7 @@
     "bower": "~1.8.8",
     "connect-livereload": "~0.6.1",
     "cssnano": "~4.1.10",
-    "eslint": "^6.6.0",
+    "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "faker": "^4.1.0",
     "grunt": "~1.0.4",
@@ -32,7 +32,7 @@
     "grunt-sass": "<3.0.0",
     "load-grunt-tasks": "~5.1.0",
     "node-sass": "^4.13.1",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "pixrem": "~5.0.0",
     "time-grunt": "~2.0.0"
   },

@@ -3,9 +3,9 @@ import {mount} from "avoriaz"
 import BootstrapVue from "bootstrap-vue"
 import Vue from "vue"
 import Vuex from "vuex"
+import ProfileStampedElement from "@/components/streams/stamped_elements/ProfileStampedElement.vue"
 import {getContext} from "%fixtures/jsonContext.fixtures"
 
-import ProfileStampedElement from "@/components/streams/stamped_elements/ProfileStampedElement.vue"
 import {getStore} from "../../../fixtures/store.fixtures"
 
 

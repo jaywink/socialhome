@@ -1,6 +1,6 @@
-import {getFakeContent, getProfile} from "%fixtures/jsonContext.fixtures"
 import getStreamState from "@/store/modules/stream.state"
 import {getters} from "@/store/modules/stream"
+import {getFakeContent, getProfile} from "%fixtures/jsonContext.fixtures"
 
 const getStore = () => {
     const store = {state: {}}
