@@ -4,7 +4,7 @@ services:
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
-  DATABASE_URL: "postgres://postgres@postgres:5432/postgres"
+  DATABASE_URL: "postgres://postgres:postgres@postgres:5432/postgres"
   DJANGO_SETTINGS_MODULE: "config.settings.local"
   DJANGO_ALLOWED_HOSTS: "*"
   DJANGO_SECURE_SSL_REDIRECT: "False"
@@ -16,7 +16,7 @@ variables:
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
   POSTGRES_DB: "postgres"
-  POSTGRES_PASSWORD: ""
+  POSTGRES_PASSWORD: "postgres"
   POSTGRES_USER: "postgres"
 
 stages:
