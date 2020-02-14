@@ -15,6 +15,9 @@ variables:
   DJANGO_SECRET_KEY: "foobar"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
+  POSTGRES_DB: "postgres"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_USER: "postgres"
 
 stages:
   - lint
