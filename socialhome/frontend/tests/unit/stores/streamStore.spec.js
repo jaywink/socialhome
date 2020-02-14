@@ -4,7 +4,6 @@ import Vuex from "vuex"
 import Axios from "axios"
 import uuid from "uuid"
 
-import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 import getState from "@/store/modules/stream.state"
 import {
     actions,
@@ -18,6 +17,7 @@ import {
     newRestAPI,
     onError,
 } from "@/store/modules/stream"
+import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 
 
 Vue.use(Vuex)

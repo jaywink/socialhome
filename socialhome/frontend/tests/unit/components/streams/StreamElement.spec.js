@@ -4,9 +4,9 @@ import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
 
+import StreamElement from "@/components/streams/StreamElement.vue"
 import {getStore} from "%fixtures/store.fixtures"
 import {getFakeContent} from "%fixtures/jsonContext.fixtures"
-import StreamElement from "@/components/streams/StreamElement.vue"
 
 
 const localVue = createLocalVue()

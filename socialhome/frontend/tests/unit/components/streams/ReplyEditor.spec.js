@@ -4,8 +4,8 @@ import Vuex from "vuex"
 import BootstrapVue from "bootstrap-vue"
 import {VueMasonryPlugin} from "vue-masonry"
 
-import {getStore} from "%fixtures/store.fixtures"
 import ReplyEditor from "@/components/streams/ReplyEditor.vue"
+import {getStore} from "%fixtures/store.fixtures"
 
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
