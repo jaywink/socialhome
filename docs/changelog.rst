@@ -52,6 +52,8 @@ Changed
 
 * Stop rendering link previews for HTML style mentions that come from ActivityPub networks.
 
+* Truncate link preview description to max 500 characters.
+
 Fixed
 .....
 
