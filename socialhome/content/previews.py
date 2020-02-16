@@ -58,8 +58,8 @@ def fetch_og_preview(content, urls):
                 with transaction.atomic():
                     opengraph = OpenGraphCache.objects.create(
                         url=url,
-                        title=truncatechars(safe_text(title), 250),
-                        description=safe_text(description),
+                        title=truncatechars(safe_text(title), 120),
+                        description=truncatechars(safe_text(description), 500),
                         image=safe_text(image),
                     )
             except DataError:

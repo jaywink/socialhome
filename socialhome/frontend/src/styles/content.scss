@@ -20,12 +20,17 @@ a.opengraph-card {
     .opengraph-card-image {
       float: left;
       margin-right: 1.25rem;
+      width: 200px;
+    }
+    .opengraph-card-url {
+        float: right;
+        padding-left: 20px;
+        color: $darkopacity;
     }
   }
 
   img {
-    max-height: 60px;
-    max-width: 60px;
+    max-height: 200px;
   }
 }
 

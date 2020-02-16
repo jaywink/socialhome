@@ -48,6 +48,16 @@ Changed
 
 * Render URL's in outgoing payloads towards the ActivityPub network as proper links. (`#572 <https://git.feneas.org/socialhome/socialhome/issues/572>`_)
 
+* Make link preview images larger and ensure images have a title attribute.
+
+* Stop rendering link previews for HTML style mentions that come from ActivityPub networks.
+
+* Truncate link preview description to max 500 characters.
+
+* Add a truncated link preview url to the link preview card.
+
+* Don't render link preview image if the same image is already in the content text.
+
 Fixed
 .....
 
