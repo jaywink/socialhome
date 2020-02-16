@@ -93,11 +93,11 @@ def find_urls_in_text(text):
     urls = []
 
     def link_collector(attrs, new=False):
-        href_key = (None, "href")
-        url = attrs.get(href_key)
+        if "mention" in attrs.get((None, "class"), []):
+            return
+        url = attrs.get((None, "href"))
         if url not in urls:
             urls.append(url)
-        return None
 
     bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
     return urls

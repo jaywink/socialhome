@@ -68,6 +68,11 @@ class TestFindUrlsInText(TestCase):
                                 "[waat](https://example.org)"
         cls.without_protocol = "example.org"
         cls.many_for_ordered = "http://spam.com http://eggs.com http://spam.com"
+        cls.with_mention = '<a href="https://example.com" class="mention">foo</a> https://example.net'
+
+    def test_ignores_mention(self):
+        urls = find_urls_in_text(self.with_mention)
+        self.assertEqual(urls, ["https://example.net"])
 
     def test_returns_in_order_without_duplicates(self):
         urls = find_urls_in_text(self.many_for_ordered)
