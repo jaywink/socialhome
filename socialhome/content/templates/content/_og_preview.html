@@ -6,11 +6,6 @@
                     <img src="{{ opengraph.image }}" alt="{{ opengraph.title | default:"" }}">
                 </div>
             {% endif %}
-            <div class="opengraph-card-url">
-                <p class="card-text">
-                    {{ opengraph.url | truncatechars:"40" }}
-                </p>
-            </div>
             <div class="opengraph-card-text">
                 <p class="card-text">
                     {% if opengraph.title %}
@@ -19,6 +14,11 @@
                     {% if opengraph.description and opengraph.description != opengraph.title %}
                         <br>{{ opengraph.description }}
                     {% endif %}
+                </p>
+            </div>
+            <div class="opengraph-card-url">
+                <p class="card-text">
+                    {{ opengraph.url | truncatechars:"40" }}
                 </p>
             </div>
             <div class="clearfix"></div>
