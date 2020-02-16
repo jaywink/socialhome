@@ -1,7 +1,7 @@
 <a class="opengraph-card" href="{{ opengraph.url }}" target="_blank" rel="noopener">
     <div class="card">
         <div class="card-block">
-            {% if opengraph.image %}
+            {% if opengraph.image and not image_in_text %}
                 <div class="opengraph-card-image">
                     <img src="{{ opengraph.image }}" alt="{{ opengraph.title | default:"" }}">
                 </div>

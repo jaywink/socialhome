@@ -56,6 +56,8 @@ Changed
 
 * Add a truncated link preview url to the link preview card.
 
+* Don't render link preview image if the same image is already in the content text.
+
 Fixed
 .....
 

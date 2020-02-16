@@ -410,9 +410,13 @@ class Content(models.Model):
                     rendered, self.oembed.oembed
                 )
             if self.opengraph:
+                image_in_text = self.opengraph.image and self.text.find(self.opengraph.image) > -1
                 rendered = "%s%s" % (
                     rendered,
-                    render_to_string("content/_og_preview.html", {"opengraph": self.opengraph})
+                    render_to_string("content/_og_preview.html", {
+                        "image_in_text": image_in_text,
+                        "opengraph": self.opengraph,
+                    })
                 )
         self.rendered = rendered
         Content.objects.filter(id=self.id).update(rendered=rendered)
