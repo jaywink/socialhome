@@ -3,7 +3,7 @@
         <div class="card-block">
             {% if opengraph.image %}
                 <div class="opengraph-card-image">
-                    <img src="{{ opengraph.image }}">
+                    <img src="{{ opengraph.image }}" alt="{{ opengraph.title | default:"" }}">
                 </div>
             {% endif %}
             <div class="opengraph-card-text">
