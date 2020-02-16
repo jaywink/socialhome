@@ -54,6 +54,8 @@ Changed
 
 * Truncate link preview description to max 500 characters.
 
+* Add a truncated link preview url to the link preview card.
+
 Fixed
 .....
 

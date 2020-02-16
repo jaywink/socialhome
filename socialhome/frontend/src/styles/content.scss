@@ -22,6 +22,12 @@ a.opengraph-card {
       margin-right: 1.25rem;
       width: 200px;
     }
+    .opengraph-card-url {
+        float: right;
+        padding-left: 20px;
+        padding-bottom: 10px;
+        color: $darkopacity;
+    }
   }
 
   img {
