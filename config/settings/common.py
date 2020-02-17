@@ -561,5 +561,5 @@ FEDERATION = {
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",
     "search_path": "/search/?q=",
-    "tags_path": "/tag/:tag:/",
+    "tags_path": "/streams/tag/:tag:/",
 }
