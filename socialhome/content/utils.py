@@ -4,8 +4,6 @@ import bleach
 from bleach import callbacks
 from django.conf import settings
 
-ILLEGAL_TAG_CHARS = "!#$%^&*+.,@£/()=?`'\\{[]}~;:\"’”—\xa0"
-
 
 def safe_text_for_markdown(text: str) -> str:
     """Clean the text using bleach but keep certain Markdown sections.
@@ -101,13 +99,3 @@ def find_urls_in_text(text):
 
     bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
     return urls
-
-
-def test_tag(tag):
-    """Test a word whether it could be accepted as a tag."""
-    if not tag:
-        return False
-    for char in ILLEGAL_TAG_CHARS:
-        if char in tag:
-            return False
-    return True

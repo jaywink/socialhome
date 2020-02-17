@@ -11,21 +11,19 @@ from django.db import models
 from django.db.models.aggregates import Max
 from django.template.defaultfilters import truncatechars
 from django.template.loader import render_to_string
-from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
-from federation.utils.text import process_text_links
+from federation.utils.text import process_text_links, find_tags
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
-from socialhome.content.utils import test_tag
 from socialhome.enums import Visibility
 
 
@@ -426,51 +424,12 @@ class Content(models.Model):
 
         Save found tags to the content.
         """
-        found_tags = set()
-        lines = self.text.splitlines(keepends=True)
-        final_words = []
-        code_block = False
-        # Check each line separately
-        for line in lines:
-            if line[0:3] == "```":
-                code_block = not code_block
-            # noinspection PyTypeChecker
-            if line.find("#") == -1 or line[0:4] == "    " or code_block:
-                # Just add the whole line
-                final_words.append(line)
-                continue
-            # Check each word separately
-            # noinspection PyTypeChecker
-            words = line.split(" ")
-            for word in words:
-                # noinspection PyTypeChecker
-                candidate = word.strip().strip("([]),.!?:")
-                # noinspection PyTypeChecker
-                if candidate.startswith("#"):
-                    # noinspection PyTypeChecker
-                    candidate = candidate.strip("#")
-                    if test_tag(candidate.lower()):
-                        # Tag
-                        found_tags.add(candidate.lower())
-                        try:
-                            # noinspection PyTypeChecker
-                            tag_word = word.replace(
-                                "#%s" % candidate,
-                                "[#%s](%s)" % (
-                                    candidate,
-                                    reverse("streams:tag", kwargs={"name": candidate.lower()})
-                                )
-                            )
-                            final_words.append(tag_word)
-                        except NoReverseMatch:
-                            # Don't linkify, seems we can't generate an url for it
-                            final_words.append(word)
-                    else:
-                        # Not tag
-                        final_words.append(word)
-                else:
-                    final_words.append(word)
-        text = " ".join(final_words)
+        def linkifier(tag: str) -> str:
+            return "[#%s](%s)" % (
+                tag,
+                reverse("streams:tag", kwargs={"name": tag.lower()})
+            )
+        found_tags, text = find_tags(self.text, replacer=linkifier)
         self.save_tags(found_tags)
         return text
 
