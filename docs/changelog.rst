@@ -75,7 +75,9 @@ Internal changes
 * Store an Activity on follow/unfollow. This allows retriggering follows/unfollows in
   the event of a regression.
 
-* Move `socialhome.content.utils.process_text_links` to the `federation` library.
+* Move ``socialhome.content.utils.process_text_links`` to the ``federation`` library.
+
+* Move the tags extraction logic from ``Conten`` model to the ``federation`` library.
 
 0.11.1 (2019-12-30)
 -------------------
