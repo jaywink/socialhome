@@ -73,6 +73,7 @@ class TestSendContent(SocialhomeTestCase):
             self.public_content.author.federable,
             [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
               'protocol': 'diaspora'}],
+            payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -89,6 +90,7 @@ class TestSendContent(SocialhomeTestCase):
             post,
             self.limited_content.author.federable,
             [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
+            payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -144,6 +146,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
             self.public_content.author.federable,
             [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
               'protocol': 'diaspora'}],
+            payload_logger=None,
             job_timeout=10000,
         )
 
@@ -189,6 +192,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             [
                 self.remote_profile.get_recipient_for_visibility(Visibility.PUBLIC),
             ],
+            payload_logger=None,
         )
 
     def test_limited_profile_retraction_not_sent_to_relay(self, mock_make, mock_send):
@@ -199,6 +203,7 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             [
                 self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED),
             ],
+            payload_logger=None,
         )
 
     def test_non_local_profile_does_not_get_sent(self, mock_make, mock_send):
@@ -251,6 +256,7 @@ class TestSendReply(SocialhomeTestCase):
             post,
             self.limited_reply.author.federable,
             [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
+            payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -262,7 +268,7 @@ class TestSendReply(SocialhomeTestCase):
         send_reply(self.reply2.id, self.reply2.activities.first().fid)
         mock_sender.assert_called_once_with(post, self.reply2.author.federable, [
             self.remote_content.author.get_recipient_for_visibility(self.reply2.visibility),
-        ])
+        ], payload_logger=None)
         self.assertTrue(mock_forward.called is False)
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -274,7 +280,7 @@ class TestSendReply(SocialhomeTestCase):
         send_reply(self.limited_local_reply.id, self.limited_local_reply.activities.first().fid)
         mock_sender.assert_called_once_with(post, self.limited_local_reply.author.federable, [
             self.remote_profile.get_recipient_for_visibility(self.limited_local_reply.visibility),
-        ])
+        ], payload_logger=None)
         self.assertTrue(mock_forward.called is False)
 
 
@@ -313,6 +319,7 @@ class TestSendShare(SocialhomeTestCase):
             post,
             self.share.author.federable,
             [self.content.author.get_recipient_for_visibility(self.share.visibility)],
+            payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -333,7 +340,7 @@ class TestSendShare(SocialhomeTestCase):
         post = Post()
         mock_maker.return_value = post
         send_share(self.local_share.id, self.local_share.activities.first().fid)
-        mock_send.assert_called_once_with(post, self.local_share.author.federable, [])
+        mock_send.assert_called_once_with(post, self.local_share.author.federable, [], payload_logger=None)
 
 
 class TestForwardEntity(TestCase):
@@ -364,6 +371,7 @@ class TestForwardEntity(TestCase):
         }
         mock_send.assert_called_once_with(
             entity, self.reply.author.federable, ANY, parent_user=self.public_content.author.federable,
+            payload_logger=None,
         )
         args, kwargs = mock_send.call_args_list[0]
         self.assertEqual({recipient["fid"] for recipient in args[2]}, expected)
@@ -374,7 +382,7 @@ class TestForwardEntity(TestCase):
         forward_entity(entity, self.limited_content.id)
         mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [
             self.remote_limited_reply.author.get_recipient_for_visibility(Visibility.LIMITED),
-        ], parent_user=self.limited_content.author.federable)
+        ], parent_user=self.limited_content.author.federable, payload_logger=None)
 
 
 class TestGetRemoteFollowers(TestCase):
@@ -448,6 +456,7 @@ class TestSendFollow(TestCase):
             "entity",
             self.profile.federable,
             [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
+            payload_logger=None,
         )
         mock_profile.assert_called_once_with(self.profile.id, recipients=[
             self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED),
@@ -474,7 +483,7 @@ class TestSendProfile(SocialhomeTestCase):
         mock_get.return_value = recipients
         send_profile(self.profile.id)
         mock_send.assert_called_once_with(
-            "profile", self.profile.federable, recipients,
+            "profile", self.profile.federable, recipients, payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_profile")
@@ -487,4 +496,4 @@ class TestSendProfile(SocialhomeTestCase):
     def test_send_to_given_recipients_only(self, mock_federable, mock_send):
         recipients = [self.remote_profile.fid]
         send_profile(self.profile.id, recipients=recipients)
-        mock_send.assert_called_once_with("profile", self.profile.federable, recipients)
+        mock_send.assert_called_once_with("profile", self.profile.federable, recipients, payload_logger=None)

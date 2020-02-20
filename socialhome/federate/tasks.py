@@ -15,7 +15,7 @@ from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.models import Payload
 from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher
-from socialhome.federate.utils import make_federable_profile
+from socialhome.federate.utils import make_federable_profile, get_outbound_payload_logger
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.users.models import Profile
 
@@ -44,6 +44,7 @@ def receive_task(request, uuid=None):
         if preferences["admin__log_all_receive_payloads"]:
             Payload.objects.create(
                 body=request.body,
+                direction="inbound",
                 entities_found=len(entities),
                 headers=request.headers,
                 method=request.method,
@@ -108,7 +109,7 @@ def send_content(content_id, activity_fid, recipient_id=None):
             recipients.extend(_get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients)
+        handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
         logger.warning("send_content - No entity for %s", content)
 
@@ -196,7 +197,7 @@ def send_reply(content_id, activity_fid):
         logger.debug("send_reply - no remote recipients for content: %s", content.id)
         return
     logger.debug("send_reply - sending to recipients: %s", recipients)
-    handle_send(entity, content.author.federable, recipients)
+    handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
 
 
 def send_share(content_id, activity_fid):
@@ -221,7 +222,7 @@ def send_share(content_id, activity_fid):
             # Send to original author
             recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients)
+        handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
         logger.warning("send_share - No entity for %s", content)
 
@@ -253,7 +254,10 @@ def send_content_retraction(content, author_id):
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         # Queue to the background since sending could take a while
-        django_rq.enqueue(handle_send, entity, author.federable, recipients, job_timeout=10000)
+        django_rq.enqueue(
+            handle_send, entity, author.federable, recipients, payload_logger=get_outbound_payload_logger(),
+            job_timeout=10000,
+        )
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 
@@ -276,7 +280,7 @@ def send_profile_retraction(profile):
             return
         recipients = _get_remote_followers(profile, profile.visibility)
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
-        handle_send(entity, profile.federable, recipients)
+        handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
@@ -315,7 +319,10 @@ def forward_entity(entity, target_content_id):
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
-    handle_send(entity, content.author.federable, recipients, parent_user=target_content.author.federable)
+    handle_send(
+        entity, content.author.federable, recipients, parent_user=target_content.author.federable,
+        payload_logger=get_outbound_payload_logger(),
+    )
 
 
 def send_follow_change(profile_id, followed_id, follow):
@@ -344,7 +351,7 @@ def send_follow_change(profile_id, followed_id, follow):
     # Explicitly use limited visibility to force private endpoint
     recipients = [remote_profile.get_recipient_for_visibility(Visibility.LIMITED)]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
-    handle_send(entity, profile.federable, recipients)
+    handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     # Also trigger a profile send
     send_profile(profile_id, recipients=recipients)
 
@@ -370,4 +377,4 @@ def send_profile(profile_id, recipients=None):
     if not recipients:
         recipients = _get_remote_followers(profile, profile.visibility)
     logger.debug("send_profile - sending to recipients: %s", recipients)
-    handle_send(entity, profile.federable, recipients)
+    handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
