@@ -2,6 +2,7 @@ import datetime
 import logging
 import pickle
 import re
+from typing import Union, Dict, Optional
 
 import django_rq
 from django.conf import settings
@@ -13,6 +14,7 @@ from federation.types import RequestType
 
 from socialhome import __version__ as version
 from socialhome.content.enums import ContentType
+from socialhome.federate.models import Payload
 
 logger = logging.getLogger("socialhome")
 
@@ -51,6 +53,31 @@ def get_nodeinfo2_data():
             "name": settings.ADMINS[0][0],
         }})
     return data
+
+
+def get_outbound_payload_logger() -> Optional[callable]:
+    """
+    Return a function to log outbound payloads, if enabled in admin preferences.
+    """
+    preferences = global_preferences_registry.manager()
+    if preferences["admin__log_all_outbound_payloads"]:
+        return outbound_payload_logger
+
+
+def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: str) -> None:
+    """
+    Log an outbound payload.
+    """
+    Payload.objects.create(
+        body=str(payload),
+        direction="outbound",
+        entities_found=1,
+        headers="",
+        method="",
+        protocol=protocol,
+        sender=sender,
+        url="",
+    )
 
 
 def queue_payload(request: HttpRequest, uuid: str = None):

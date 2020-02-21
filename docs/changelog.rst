@@ -19,6 +19,10 @@ Added
 * Admins can now disable the Django admin error emails by setting the environment value
   ``SOCIALHOME_LOG_DISABLE_ADMIN_EMAILS=True``.
 
+* Outbound payloads can now also be logged by toggling the relevant preference in the admin.
+  When enabled, all outbound payloads will be saved for debugging purposes in the "Payloads"
+  model and available via the admin.
+
 Changed
 .......
 
