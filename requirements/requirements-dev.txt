@@ -21,7 +21,7 @@ autopep8==1.5
 babel==2.8.0              # via sphinx
 backcall==0.1.0
 beautifulsoup4==4.8.2
-bleach==3.1.0
+bleach==3.1.1
 certifi==2019.11.28
 cffi==1.14.0
 channels-redis==2.4.1
@@ -86,7 +86,6 @@ hiredis==1.0.1
 hyperlink==19.0.0
 idna==2.8
 imagesize==1.2.0          # via sphinx
-importlib-metadata==1.5.0
 incremental==17.5.0
 inflection==0.3.1
 ipaddress==1.0.23
@@ -193,7 +192,6 @@ webencodings==0.5.1
 werkzeug==1.0.0
 whitenoise==5.0.1
 whoosh==2.7.4
-zipp==2.2.0
 zope.interface==4.7.1
 
 # The following packages are considered to be unsafe in a requirements file:

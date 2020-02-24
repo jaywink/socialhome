@@ -17,7 +17,7 @@ automat==0.8.0            # via twisted
 autopep8==1.5             # via django-silk
 backcall==0.1.0           # via ipython
 beautifulsoup4==4.8.2     # via markdownify, python-opengraph-jaywink
-bleach==3.1.0
+bleach==3.1.1
 certifi==2019.11.28       # via requests
 cffi==1.14.0              # via cryptography
 channels-redis==2.4.1
@@ -65,7 +65,6 @@ gprof2dot==2019.11.30     # via django-silk
 hiredis==1.0.1            # via aioredis
 hyperlink==19.0.0         # via twisted
 idna==2.8                 # via hyperlink, requests, twisted
-importlib-metadata==1.5.0  # via jsonschema
 incremental==17.5.0       # via twisted
 inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.23         # via ipdata
@@ -138,7 +137,6 @@ wcwidth==0.1.8            # via prompt-toolkit
 webencodings==0.5.1       # via bleach
 whitenoise==5.0.1
 whoosh==2.7.4
-zipp==2.2.0               # via importlib-metadata
 zope.interface==4.7.1     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
