@@ -73,6 +73,9 @@ Fixed
 * Don't crash loudly incompatible content is fetched via the Diaspora protocol fetch view and
   a document fails to validate.
 
+* Fix an issue in the OEmbed library that caused unnecessary fetches to Spotify OEmbed
+  endpoint. Thanks to Alain for reporting this issue. (`upstream issue <https://github.com/pyembed/pyembed/issues/64>`_)
+
 Internal changes
 ................
 

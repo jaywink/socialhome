@@ -4,197 +4,197 @@
 #
 #    ./compile-requirements.sh
 #
--e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
--e git+https://git.feneas.org/jaywink/federation.git@bdc44ac59c281df13921c0945c453edac1279286#egg=federation==0.20.0-dev1
--e git+https://github.com/jaywink/pyembed.git@6f8c1cc98d61ee3083e9803255e4b2cc90b5a0dd#egg=pyembed==1.3.3.1
--e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
-aioredis==1.3.1
+-e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1  # via -r requirements/requirements.txt (line 7)
+-e git+https://git.feneas.org/jaywink/federation.git@bdc44ac59c281df13921c0945c453edac1279286#egg=federation==0.20.0-dev1  # via -r requirements/requirements.txt (line 8)
+-e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1  # via -r requirements/requirements.txt (line 9)
+-e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0  # via -r requirements/requirements-dev.in (line 33)
+aioredis==1.3.1           # via -r requirements/requirements.txt (line 10), channels-redis
 alabaster==0.7.12         # via sphinx
 argh==0.26.2              # via sphinx-autobuild
-arrow==0.15.5
-asgiref==3.2.3
-async-timeout==3.0.1
-attrs==19.3.0
-autobahn==20.2.1
-automat==20.2.0
-autopep8==1.5
+arrow==0.15.5             # via -r requirements/requirements.txt (line 11)
+asgiref==3.2.3            # via -r requirements/requirements.txt (line 12), channels, channels-redis, daphne
+async-timeout==3.0.1      # via -r requirements/requirements.txt (line 13), aioredis
+attrs==19.3.0             # via -r requirements/requirements.txt (line 14), automat, federation, jsonschema, pytest, service-identity, twisted
+autobahn==20.2.1          # via -r requirements/requirements.txt (line 15), daphne
+automat==20.2.0           # via -r requirements/requirements.txt (line 16), twisted
+autopep8==1.5             # via -r requirements/requirements.txt (line 17), django-silk
 babel==2.8.0              # via sphinx
-backcall==0.1.0
-beautifulsoup4==4.8.2
-bleach==3.1.1
-certifi==2019.11.28
-cffi==1.14.0
-channels-redis==2.4.2
-channels==2.4.0
-chardet==3.0.4
-circus==0.16.1
-click==7.0
-codecov==2.0.16
-commonmark==0.9.1
-constantly==15.1.0
-coreapi==2.3.3
-coreschema==0.0.4
-coverage==5.0.3
-croniter==0.3.31
-cryptography==2.8
-cssselect==1.1.0
-daphne==2.4.1
-ddt==1.2.2
-decorator==4.4.1
-defusedxml==0.6.0
-dirty-validators==0.5.3
-django-allauth==0.41.0
-django-autoslug==1.9.6
-django-braces==1.14.0
-django-coverage-plugin==1.8.0
-django-crispy-forms==1.8.1
-django-debug-toolbar-user-panel==1.1.1
-django-debug-toolbar==1.11
-django-dynamic-preferences==1.5.1
-django-enumfields==2.0.0
-django-environ==0.4.5
-django-extensions==2.2.8
-django-floppyforms==1.8.0
-django-fsm==2.7.0
-django-haystack==2.8.1
-django-js-reverse==0.9.1
-django-memoize==2.2.1
-django-model-utils==3.2.0
-django-querycount==0.7.0
-django-redis==4.11.0
-django-reversion==3.0.7
-django-robots==4.0
-django-rq==2.3.0
-django-secure==1.0.1
-django-settings-export==1.2.1
-django-silk==4.0.0
-django-stubs==1.4.0
-django-test-plus==1.0.22
-django-versatileimagefield==2.0
-django==2.2.10
-djangorestframework-stubs==1.1.0
-djangorestframework==3.11.0
-docutils==0.16            # via sphinx
-drf-yasg==1.17.1
+backcall==0.1.0           # via -r requirements/requirements.txt (line 18), ipython
+beautifulsoup4==4.8.2     # via -r requirements/requirements.txt (line 19), markdownify, pyembed, python-opengraph-jaywink
+bleach==3.1.1             # via -r requirements/requirements.txt (line 20), federation
+certifi==2019.11.28       # via -r requirements/requirements.txt (line 21), requests
+cffi==1.14.0              # via -r requirements/requirements.txt (line 22), cryptography
+channels-redis==2.4.2     # via -r requirements/requirements.txt (line 23)
+channels==2.4.0           # via -r requirements/requirements.txt (line 24), channels-redis
+chardet==3.0.4            # via -r requirements/requirements.txt (line 25), requests
+circus==0.16.1            # via -r requirements/requirements.txt (line 26)
+click==7.0                # via -r requirements/requirements.txt (line 27), pip-tools, rq
+codecov==2.0.16           # via -r requirements/requirements-dev.in (line 4)
+commonmark==0.9.1         # via -r requirements/requirements.txt (line 28), federation, recommonmark
+constantly==15.1.0        # via -r requirements/requirements.txt (line 29), twisted
+coreapi==2.3.3            # via -r requirements/requirements.txt (line 30), drf-yasg
+coreschema==0.0.4         # via -r requirements/requirements.txt (line 31), coreapi, drf-yasg
+coverage==5.0.3           # via -r requirements/requirements-dev.in (line 5), codecov, django-coverage-plugin, pytest-cov
+croniter==0.3.31          # via -r requirements/requirements.txt (line 32), rq-scheduler
+cryptography==2.8         # via -r requirements/requirements.txt (line 33), autobahn, federation, pyopenssl, service-identity
+cssselect==1.1.0          # via -r requirements/requirements.txt (line 34), federation
+daphne==2.4.1             # via -r requirements/requirements.txt (line 35), channels
+ddt==1.2.2                # via -r requirements/requirements-dev.in (line 6)
+decorator==4.4.1          # via -r requirements/requirements.txt (line 36), ipython, traitlets
+defusedxml==0.6.0         # via -r requirements/requirements.txt (line 37), python3-openid
+dirty-validators==0.5.3   # via -r requirements/requirements.txt (line 38), federation
+django-allauth==0.41.0    # via -r requirements/requirements.txt (line 39)
+django-autoslug==1.9.6    # via -r requirements/requirements.txt (line 40)
+django-braces==1.14.0     # via -r requirements/requirements.txt (line 41)
+django-coverage-plugin==1.8.0  # via -r requirements/requirements-dev.in (line 13)
+django-crispy-forms==1.8.1  # via -r requirements/requirements.txt (line 42)
+django-debug-toolbar-user-panel==1.1.1  # via -r requirements/requirements-dev.in (line 9)
+django-debug-toolbar==1.11  # via -r requirements/requirements-dev.in (line 8)
+django-dynamic-preferences==1.5.1  # via -r requirements/requirements.txt (line 43)
+django-enumfields==2.0.0  # via -r requirements/requirements.txt (line 44)
+django-environ==0.4.5     # via -r requirements/requirements.txt (line 45)
+django-extensions==2.2.8  # via -r requirements/requirements.txt (line 46)
+django-floppyforms==1.8.0  # via -r requirements/requirements.txt (line 47)
+django-fsm==2.7.0         # via -r requirements/requirements.txt (line 48)
+django-haystack==2.8.1    # via -r requirements/requirements.txt (line 49)
+django-js-reverse==0.9.1  # via -r requirements/requirements.txt (line 50)
+django-memoize==2.2.1     # via -r requirements/requirements.txt (line 51)
+django-model-utils==3.2.0  # via -r requirements/requirements.txt (line 52)
+django-querycount==0.7.0  # via -r requirements/requirements-dev.in (line 10)
+django-redis==4.11.0      # via -r requirements/requirements.txt (line 53)
+django-reversion==3.0.7   # via -r requirements/requirements.txt (line 54)
+django-robots==4.0        # via -r requirements/requirements.txt (line 55)
+django-rq==2.3.0          # via -r requirements/requirements.txt (line 56)
+django-secure==1.0.1      # via -r requirements/requirements.txt (line 57)
+django-settings-export==1.2.1  # via -r requirements/requirements.txt (line 58)
+django-silk==4.0.0        # via -r requirements/requirements.txt (line 59)
+django-stubs==1.4.0       # via -r requirements/requirements-dev.in (line 11), djangorestframework-stubs
+django-test-plus==1.0.22  # via -r requirements/requirements-dev.in (line 12)
+django-versatileimagefield==2.0  # via -r requirements/requirements.txt (line 60)
+django==2.2.10            # via -r requirements/requirements.txt (line 61), channels, django-allauth, django-braces, django-debug-toolbar, django-dynamic-preferences, django-haystack, django-js-reverse, django-markdownx, django-memoize, django-model-utils, django-redis, django-reversion, django-rq, django-secure, django-settings-export, django-silk, django-stubs, djangorestframework, drf-yasg
+djangorestframework-stubs==1.1.0  # via -r requirements/requirements-dev.in (line 14)
+djangorestframework==3.11.0  # via -r requirements/requirements.txt (line 62), drf-yasg
+docutils==0.16            # via recommonmark, sphinx
+drf-yasg==1.17.1          # via -r requirements/requirements.txt (line 63)
 entrypoints==0.3          # via flake8
-factory-boy==2.12.0
-faker==4.0.1
-flake8==3.7.9
-freezegun==0.3.15
-gprof2dot==2019.11.30
-hiredis==1.0.1
-hyperlink==19.0.0
-idna==2.9
+factory-boy==2.12.0       # via -r requirements/requirements-dev.in (line 15)
+faker==4.0.1              # via -r requirements/requirements-dev.in (line 16), factory-boy
+flake8==3.7.9             # via -r requirements/requirements-dev.in (line 17)
+freezegun==0.3.15         # via -r requirements/requirements-dev.in (line 18)
+gprof2dot==2019.11.30     # via -r requirements/requirements.txt (line 64), django-silk, pytest-profiling
+hiredis==1.0.1            # via -r requirements/requirements.txt (line 65), aioredis
+hyperlink==19.0.0         # via -r requirements/requirements.txt (line 66), twisted
+idna==2.9                 # via -r requirements/requirements.txt (line 67), hyperlink, requests, twisted
 imagesize==1.2.0          # via sphinx
-importlib-metadata==1.5.0
-incremental==17.5.0
-inflection==0.3.1
-ipaddress==1.0.23
-ipdata==3.2
-ipdb==0.12.3
-ipython-genutils==0.2.0
-ipython==7.12.0
-isodate==0.6.0
-iteration-utilities==0.10.1
-itypes==1.1.0
-jedi==0.16.0
-jinja2==2.11.1
-jsonschema==3.2.0
+importlib-metadata==1.5.0  # via -r requirements/requirements.txt (line 68), jsonschema, pluggy, pytest
+incremental==17.5.0       # via -r requirements/requirements.txt (line 69), twisted
+inflection==0.3.1         # via -r requirements/requirements.txt (line 70), drf-yasg
+ipaddress==1.0.23         # via -r requirements/requirements.txt (line 71), ipdata
+ipdata==3.2               # via -r requirements/requirements.txt (line 72), federation
+ipdb==0.12.3              # via -r requirements/requirements-dev.in (line 19)
+ipython-genutils==0.2.0   # via -r requirements/requirements.txt (line 73), traitlets
+ipython==7.12.0           # via -r requirements/requirements.txt (line 74), ipdb
+isodate==0.6.0            # via -r requirements/requirements.txt (line 75), python-xrd
+iteration-utilities==0.10.1  # via -r requirements/requirements.txt (line 76), federation
+itypes==1.1.0             # via -r requirements/requirements.txt (line 77), coreapi
+jedi==0.16.0              # via -r requirements/requirements.txt (line 78), ipython
+jinja2==2.11.1            # via -r requirements/requirements.txt (line 79), coreschema, django-silk, sphinx
+jsonschema==3.2.0         # via -r requirements/requirements.txt (line 80), federation
 livereload==2.6.1         # via sphinx-autobuild
-lxml==4.5.0
-markdown==3.2.1
-markdownify==0.4.1
-markupsafe==1.1.1
+lxml==4.5.0               # via -r requirements/requirements.txt (line 81), federation
+markdown==3.2.1           # via -r requirements/requirements.txt (line 82), django-markdownx
+markdownify==0.4.1        # via -r requirements/requirements.txt (line 83), federation
+markupsafe==1.1.1         # via -r requirements/requirements.txt (line 84), jinja2
 mccabe==0.6.1             # via flake8
 more-itertools==8.2.0     # via pytest
-msgpack==0.6.2
+msgpack==0.6.2            # via -r requirements/requirements.txt (line 85), channels-redis
 mypy-extensions==0.4.3    # via mypy
 mypy==0.761               # via django-stubs, djangorestframework-stubs
-oauthlib==3.1.0
-packaging==20.1
-parso==0.6.1
+oauthlib==3.1.0           # via -r requirements/requirements.txt (line 86), requests-oauthlib
+packaging==20.1           # via -r requirements/requirements.txt (line 87), drf-yasg, pytest, pytest-sugar, sphinx
+parso==0.6.1              # via -r requirements/requirements.txt (line 88), jedi
 pathtools==0.1.2          # via sphinx-autobuild, watchdog
-persisting-theory==0.2.1
-pexpect==4.8.0
-pickleshare==0.7.5
-pillow==7.0.0
-pip-tools==4.5.0
+persisting-theory==0.2.1  # via -r requirements/requirements.txt (line 89), django-dynamic-preferences
+pexpect==4.8.0            # via -r requirements/requirements.txt (line 90), ipython
+pickleshare==0.7.5        # via -r requirements/requirements.txt (line 91), ipython
+pillow==7.0.0             # via -r requirements/requirements.txt (line 92), django-markdownx, django-versatileimagefield
+pip-tools==4.5.0          # via -r requirements/requirements-dev.in (line 20)
 pluggy==0.13.1            # via pytest
 port_for==0.3.1           # via sphinx-autobuild
-prompt-toolkit==3.0.3
-psutil==5.7.0
-psycopg2-binary==2.8.4
-ptyprocess==0.6.0
+prompt-toolkit==3.0.3     # via -r requirements/requirements.txt (line 93), ipython
+psutil==5.7.0             # via -r requirements/requirements.txt (line 94), circus
+psycopg2-binary==2.8.4    # via -r requirements/requirements.txt (line 95)
+ptyprocess==0.6.0         # via -r requirements/requirements.txt (line 96), pexpect
 py==1.8.1                 # via pytest
-pyasn1-modules==0.2.8
-pyasn1==0.4.8
-pycodestyle==2.5.0
-pycparser==2.19
-pycryptodome==3.9.7
+pyasn1-modules==0.2.8     # via -r requirements/requirements.txt (line 97), service-identity
+pyasn1==0.4.8             # via -r requirements/requirements.txt (line 98), pyasn1-modules, service-identity
+pycodestyle==2.5.0        # via -r requirements/requirements.txt (line 99), autopep8, flake8
+pycparser==2.19           # via -r requirements/requirements.txt (line 100), cffi
+pycryptodome==3.9.7       # via -r requirements/requirements.txt (line 101), federation
 pyflakes==2.1.1           # via flake8
-pygments==2.5.2
-pyhamcrest==2.0.0
-pyopenssl==19.1.0
-pyparsing==2.4.6
-pyrsistent==0.15.7
-pytest-blockage==0.2.2
-pytest-cov==2.8.1
-pytest-django==3.8.0
-pytest-env==0.6.2
-pytest-profiling==1.7.0
-pytest-sugar==0.9.2
-pytest==5.3.5
-python-dateutil==2.8.1
-python-magic==0.4.15
-python-opengraph-jaywink==0.2.0
-python-xrd==0.1
-python3-openid==3.1.0
-pytz==2019.3
-pyyaml==5.3
-pyzmq==18.1.1
-raven==6.10.0
-redis==3.4.1
-requests-http-signature-jaywink==0.1.0.dev0
-requests-oauthlib==1.3.0
-requests==2.23.0
-rq-scheduler==0.9.1
-rq==1.2.2
-ruamel.yaml.clib==0.2.0
-ruamel.yaml==0.16.10
-service-identity==18.1.0
-six==1.14.0
+pygments==2.5.2           # via -r requirements/requirements.txt (line 102), django-silk, ipython, sphinx
+pyhamcrest==2.0.0         # via -r requirements/requirements.txt (line 103), twisted
+pyopenssl==19.1.0         # via -r requirements/requirements.txt (line 104), twisted
+pyparsing==2.4.6          # via -r requirements/requirements.txt (line 105), packaging
+pyrsistent==0.15.7        # via -r requirements/requirements.txt (line 106), jsonschema
+pytest-blockage==0.2.2    # via -r requirements/requirements-dev.in (line 22)
+pytest-cov==2.8.1         # via -r requirements/requirements-dev.in (line 23)
+pytest-django==3.8.0      # via -r requirements/requirements-dev.in (line 24)
+pytest-env==0.6.2         # via -r requirements/requirements-dev.in (line 25)
+pytest-profiling==1.7.0   # via -r requirements/requirements-dev.in (line 26)
+pytest-sugar==0.9.2       # via -r requirements/requirements-dev.in (line 27)
+pytest==5.3.5             # via -r requirements/requirements-dev.in (line 21), pytest-blockage, pytest-cov, pytest-django, pytest-env, pytest-profiling, pytest-sugar
+python-dateutil==2.8.1    # via -r requirements/requirements.txt (line 107), arrow, croniter, django-silk, faker, federation, freezegun
+python-magic==0.4.15      # via -r requirements/requirements.txt (line 108), django-versatileimagefield
+python-opengraph-jaywink==0.2.0  # via -r requirements/requirements.txt (line 109)
+python-xrd==0.1           # via -r requirements/requirements.txt (line 110), federation
+python3-openid==3.1.0     # via -r requirements/requirements.txt (line 111), django-allauth
+pytz==2019.3              # via -r requirements/requirements.txt (line 112), babel, django, django-silk, federation
+pyyaml==5.3               # via -r requirements/requirements.txt (line 113), sphinx-autobuild
+pyzmq==18.1.1             # via -r requirements/requirements.txt (line 114), circus
+raven==6.10.0             # via -r requirements/requirements.txt (line 115)
+redis==3.4.1              # via -r requirements/requirements.txt (line 116), django-redis, django-rq, rq
+requests-http-signature-jaywink==0.1.0.dev0  # via -r requirements/requirements.txt (line 117), federation
+requests-oauthlib==1.3.0  # via -r requirements/requirements.txt (line 118), django-allauth
+requests==2.23.0          # via -r requirements/requirements.txt (line 119), codecov, coreapi, django-allauth, django-silk, federation, ipdata, pyembed, python-opengraph-jaywink, requests-http-signature-jaywink, requests-oauthlib, sphinx
+rq-scheduler==0.9.1       # via -r requirements/requirements.txt (line 120)
+rq==1.2.2                 # via -r requirements/requirements.txt (line 121), django-rq, rq-scheduler
+ruamel.yaml.clib==0.2.0   # via -r requirements/requirements.txt (line 122), ruamel.yaml
+ruamel.yaml==0.16.10      # via -r requirements/requirements.txt (line 123), drf-yasg
+service-identity==18.1.0  # via -r requirements/requirements.txt (line 124), twisted
+six==1.14.0               # via -r requirements/requirements.txt (line 125), automat, bleach, circus, cryptography, django-braces, django-coverage-plugin, django-dynamic-preferences, django-extensions, drf-yasg, freezegun, isodate, jsonschema, livereload, markdownify, packaging, pip-tools, pyopenssl, pyrsistent, pytest-profiling, python-dateutil, traitlets, txaio, unicode-slugify
 snowballstemmer==2.0.0    # via sphinx
-soupsieve==2.0
-sphinx-autobuild==0.7.1
-sphinx==2.4.3
+soupsieve==2.0            # via -r requirements/requirements.txt (line 126), beautifulsoup4
+sphinx-autobuild==0.7.1   # via -r requirements/requirements-dev.in (line 29)
+sphinx==2.4.3             # via -r requirements/requirements-dev.in (line 28), recommonmark
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
 sphinxcontrib-jsmath==1.0.1  # via sphinx
 sphinxcontrib-qthelp==1.0.2  # via sphinx
 sphinxcontrib-serializinghtml==1.1.3  # via sphinx
-sqlparse==0.3.0
+sqlparse==0.3.0           # via -r requirements/requirements.txt (line 127), django, django-debug-toolbar, django-silk
 termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.3       # via faker
-tornado==4.5.3
-traitlets==4.3.3
-twisted[tls]==19.10.0
-txaio==20.1.1
+tornado==4.5.3            # via -r requirements/requirements.txt (line 128), circus, livereload, sphinx-autobuild
+traitlets==4.3.3          # via -r requirements/requirements.txt (line 129), ipython
+twisted[tls]==19.10.0     # via -r requirements/requirements.txt (line 130), daphne
+txaio==20.1.1             # via -r requirements/requirements.txt (line 131), autobahn
 typed-ast==1.4.1          # via mypy
 typing-extensions==3.7.4.1  # via django-stubs, djangorestframework-stubs, mypy
-unicode-slugify==0.1.3
-unidecode==1.1.1
-uritemplate==3.0.1
-urllib3==1.25.8
-uwsgi==2.0.18
+unicode-slugify==0.1.3    # via -r requirements/requirements.txt (line 132)
+unidecode==1.1.1          # via -r requirements/requirements.txt (line 133), unicode-slugify
+uritemplate==3.0.1        # via -r requirements/requirements.txt (line 134), coreapi, drf-yasg
+urllib3==1.25.8           # via -r requirements/requirements.txt (line 135), requests
+uwsgi==2.0.18             # via -r requirements/requirements.txt (line 136)
 watchdog==0.10.2          # via sphinx-autobuild
-wcwidth==0.1.8
-webencodings==0.5.1
-werkzeug==1.0.0
-whitenoise==5.0.1
-whoosh==2.7.4
-zipp==3.0.0
-zope.interface==4.7.1
+wcwidth==0.1.8            # via -r requirements/requirements.txt (line 137), prompt-toolkit, pytest
+webencodings==0.5.1       # via -r requirements/requirements.txt (line 138), bleach
+werkzeug==1.0.0           # via -r requirements/requirements-dev.in (line 30)
+whitenoise==5.0.1         # via -r requirements/requirements.txt (line 139)
+whoosh==2.7.4             # via -r requirements/requirements.txt (line 140)
+zipp==3.0.0               # via -r requirements/requirements.txt (line 141), importlib-metadata
+zope.interface==4.7.1     # via -r requirements/requirements.txt (line 142), twisted
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
