@@ -45,3 +45,16 @@ As admin, how do I delete a local user or block a remote spambot?
 -----------------------------------------------------------------
 
 Please see :ref:`delete-user-or-profile` section for instructions.
+
+I accidentally shared someones content and it's stuck on my profile stream!
+---------------------------------------------------------------------------
+
+This is a `known issue with stream caching <https://git.feneas.org/socialhome/socialhome/issues/567>`_.
+Until it is fixed, ask your instance admin to manually clear your profile cache. It can be done with
+the following command, on the machine where Redis is running.
+
+::
+
+    redis-cli --scan --pattern 'sh:streams:profile_all:<profile.id>:*' | xargs redis-cli del
+
+Where ``<profile.id>`` should be replaced by the profile ID found via the Socialhome admin view.
