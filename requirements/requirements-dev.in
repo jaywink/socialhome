@@ -18,7 +18,8 @@ flake8
 freezegun
 ipdb
 pip-tools
-pytest
+# Lock because of https://github.com/Teemu/pytest-sugar/issues/187
+pytest<5.4
 pytest-blockage
 pytest-cov
 pytest-django
