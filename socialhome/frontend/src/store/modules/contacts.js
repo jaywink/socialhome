@@ -64,7 +64,11 @@ function getContactsStore(axios) {
         .getStore()
 
     return {
-        namespaced: true, ...store,
+        namespaced: true,
+        state: store.state,
+        getters: store.getters,
+        actions: store.actions,
+        mutations: store.mutations,
     }
 }
 
