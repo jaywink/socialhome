@@ -23,6 +23,9 @@ Added
   When enabled, all outbound payloads will be saved for debugging purposes in the "Payloads"
   model and available via the admin.
 
+* Fetching of unknown remote content using ActivityPub URL id's now works. Just paste the remote
+  ActivityPub content URL to the search bar to fetch it from compatible platforms.
+
 Changed
 .......
 
