@@ -122,11 +122,11 @@ class GlobalSearchView(SearchView):
                     return super().get(request, *args, **kwargs)
                 if remote_content:
                     process_entities([remote_content])
-                # Try again
-                try:
-                    content = Content.objects.visible_for_user(request.user).fed(remote_content.id).get()
-                except Content.DoesNotExist:
-                    return super().get(request, *args, **kwargs)
+                    # Try again
+                    try:
+                        content = Content.objects.visible_for_user(request.user).fed(remote_content.id).get()
+                    except Content.DoesNotExist:
+                        return super().get(request, *args, **kwargs)
         if content:
             return redirect(reverse("content:view", kwargs={"pk": content.id}))
         try:
