@@ -65,6 +65,8 @@ Changed
 
 * Don't render link preview image if the same image is already in the content text.
 
+* OEmbed for Twitter profile streams is now skipped. Only single tweets will be embedded.
+
 Fixed
 .....
 

@@ -104,6 +104,10 @@ def fetch_oembed_preview(content, urls):
         # Fetch oembed
         options = {}
         if url.startswith("https://twitter.com/"):
+            if len(url.split('/')) < 5:
+                # Skip, not enough sections to be a tweet
+                # We don't want to oembed profile streams
+                continue
             # This probably has little effect since we fetch these on the backend...
             # But, DNT is always good to communicate if possible :)
             options = {"dnt": "true", "omit_script": "true"}

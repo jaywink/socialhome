@@ -139,8 +139,8 @@ class TestFetchOEmbedPreview(SocialhomeTestCase):
 
     @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
     def test_adds_dnt_flag_to_twitter_oembed(self, embed):
-        fetch_oembed_preview(self.content, ["https://twitter.com/foobar"])
-        embed.assert_called_once_with("https://twitter.com/foobar", dnt="true", omit_script="true")
+        fetch_oembed_preview(self.content, ["https://twitter.com/foobar/12345"])
+        embed.assert_called_once_with("https://twitter.com/foobar/12345", dnt="true", omit_script="true")
 
     def test_cache_not_updated_if_previous_found(self):
         OEmbedCacheFactory(url=self.urls[0])
@@ -165,6 +165,13 @@ class TestFetchOEmbedPreview(SocialhomeTestCase):
             with patch("socialhome.content.previews.PyEmbed.embed", side_effect=error):
                 result = fetch_oembed_preview(self.content, self.urls)
                 self.assertFalse(result)
+
+    @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
+    def test_skips_twitter_profile_stream_oembeds(self, embed):
+        fetch_oembed_preview(self.content, ["https://twitter.com/foobar"])
+        self.assertFalse(embed.called)
+        self.content.refresh_from_db()
+        self.assertIsNone(self.content.oembed)
 
     @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
     def test_empty_oembed_skipped(self, embed):
