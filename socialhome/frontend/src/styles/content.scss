@@ -1,9 +1,10 @@
 .markdownx-preview, .grid-item, .reply {
   // Apply Bootstrap blockquote styling except for font-size change
   blockquote {
-    padding: .5rem 1rem;
-    margin-bottom: 1rem;
-    border-left: .25rem solid #eceeef;
+      padding: .5rem 1rem;
+      margin-bottom: 1rem;
+      border-left: .25rem solid $darkopacity;
+      font-style: italic;
   }
 }
 
