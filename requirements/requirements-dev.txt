@@ -5,7 +5,7 @@
 #    ./compile-requirements.sh
 #
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1  # via -r requirements/requirements.txt
--e git+https://git.feneas.org/jaywink/federation.git@aa0ecfb680379c7b4d8b9df437e8608e262104e4#egg=federation==0.20.0-dev1  # via -r requirements/requirements.txt
+-e git+https://git.feneas.org/jaywink/federation.git@13f0cf0db667755dc85d24e840534abb51769b80#egg=federation==0.20.0-dev1  # via -r requirements/requirements.txt
 -e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1  # via -r requirements/requirements.txt
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0  # via -r requirements/requirements-dev.in
 aioredis==1.3.1           # via -r requirements/requirements.txt, channels-redis
@@ -20,7 +20,7 @@ automat==20.2.0           # via -r requirements/requirements.txt, twisted
 autopep8==1.5.1           # via -r requirements/requirements.txt, django-silk
 babel==2.8.0              # via sphinx
 backcall==0.1.0           # via -r requirements/requirements.txt, ipython
-beautifulsoup4==4.9.0     # via -r requirements/requirements.txt, markdownify, pyembed, python-opengraph-jaywink
+beautifulsoup4==4.9.0     # via -r requirements/requirements.txt, pyembed, python-opengraph-jaywink
 bleach==3.1.4             # via -r requirements/requirements.txt, federation
 certifi==2020.4.5.1       # via -r requirements/requirements.txt, requests
 cffi==1.14.0              # via -r requirements/requirements.txt, cryptography
@@ -103,7 +103,6 @@ jsonschema==3.2.0         # via -r requirements/requirements.txt, federation
 livereload==2.6.1         # via sphinx-autobuild
 lxml==4.5.0               # via -r requirements/requirements.txt, federation
 markdown==3.2.1           # via -r requirements/requirements.txt, django-markdownx
-markdownify==0.4.1        # via -r requirements/requirements.txt, federation
 markupsafe==1.1.1         # via -r requirements/requirements.txt, jinja2
 mccabe==0.6.1             # via flake8
 more-itertools==8.2.0     # via pytest
@@ -162,7 +161,7 @@ rq==1.3.0                 # via -r requirements/requirements.txt, django-rq, rq-
 ruamel.yaml.clib==0.2.0   # via -r requirements/requirements.txt, ruamel.yaml
 ruamel.yaml==0.16.10      # via -r requirements/requirements.txt, drf-yasg
 service-identity==18.1.0  # via -r requirements/requirements.txt, twisted
-six==1.14.0               # via -r requirements/requirements.txt, automat, bleach, circus, cryptography, django-braces, django-coverage-plugin, django-dynamic-preferences, django-extensions, drf-yasg, freezegun, isodate, jsonschema, livereload, markdownify, packaging, pip-tools, pyopenssl, pyrsistent, pytest-profiling, python-dateutil, traitlets, unicode-slugify
+six==1.14.0               # via -r requirements/requirements.txt, automat, bleach, circus, cryptography, django-braces, django-coverage-plugin, django-dynamic-preferences, django-extensions, drf-yasg, freezegun, isodate, jsonschema, livereload, packaging, pip-tools, pyopenssl, pyrsistent, pytest-profiling, python-dateutil, traitlets, unicode-slugify
 snowballstemmer==2.0.0    # via sphinx
 soupsieve==2.0            # via -r requirements/requirements.txt, beautifulsoup4
 sphinx-autobuild==0.7.1   # via -r requirements/requirements-dev.in
