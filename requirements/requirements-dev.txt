@@ -17,12 +17,12 @@ async-timeout==3.0.1      # via -r requirements/requirements.txt, aioredis
 attrs==19.3.0             # via -r requirements/requirements.txt, automat, federation, jsonschema, pytest, service-identity, twisted
 autobahn==20.4.1          # via -r requirements/requirements.txt, daphne
 automat==20.2.0           # via -r requirements/requirements.txt, twisted
-autopep8==1.5             # via -r requirements/requirements.txt, django-silk
+autopep8==1.5.1           # via -r requirements/requirements.txt, django-silk
 babel==2.8.0              # via sphinx
 backcall==0.1.0           # via -r requirements/requirements.txt, ipython
-beautifulsoup4==4.8.2     # via -r requirements/requirements.txt, markdownify, pyembed, python-opengraph-jaywink
+beautifulsoup4==4.9.0     # via -r requirements/requirements.txt, markdownify, pyembed, python-opengraph-jaywink
 bleach==3.1.4             # via -r requirements/requirements.txt, federation
-certifi==2019.11.28       # via -r requirements/requirements.txt, requests
+certifi==2020.4.5.1       # via -r requirements/requirements.txt, requests
 cffi==1.14.0              # via -r requirements/requirements.txt, cryptography
 channels-redis==2.4.2     # via -r requirements/requirements.txt
 channels==2.4.0           # via -r requirements/requirements.txt, channels-redis
@@ -64,7 +64,7 @@ django-querycount==0.7.0  # via -r requirements/requirements-dev.in
 django-redis==4.11.0      # via -r requirements/requirements.txt
 django-reversion==3.0.7   # via -r requirements/requirements.txt
 django-robots==4.0        # via -r requirements/requirements.txt
-django-rq==2.3.0          # via -r requirements/requirements.txt
+django-rq==2.3.1          # via -r requirements/requirements.txt
 django-secure==1.0.2      # via -r requirements/requirements.txt
 django-settings-export==1.2.1  # via -r requirements/requirements.txt
 django-silk==4.0.1        # via -r requirements/requirements.txt
@@ -88,7 +88,7 @@ idna==2.9                 # via -r requirements/requirements.txt, hyperlink, req
 imagesize==1.2.0          # via sphinx
 importlib-metadata==1.6.0  # via -r requirements/requirements.txt, jsonschema, pluggy, pytest
 incremental==17.5.0       # via -r requirements/requirements.txt, twisted
-inflection==0.3.1         # via -r requirements/requirements.txt, drf-yasg
+inflection==0.4.0         # via -r requirements/requirements.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/requirements.txt, ipdata
 ipdata==3.2               # via -r requirements/requirements.txt, federation
 ipdb==0.13.2              # via -r requirements/requirements-dev.in
@@ -123,7 +123,7 @@ pluggy==0.13.1            # via pytest
 port_for==0.3.1           # via sphinx-autobuild
 prompt-toolkit==3.0.5     # via -r requirements/requirements.txt, ipython
 psutil==5.7.0             # via -r requirements/requirements.txt, circus
-psycopg2-binary==2.8.4    # via -r requirements/requirements.txt
+psycopg2-binary==2.8.5    # via -r requirements/requirements.txt
 ptyprocess==0.6.0         # via -r requirements/requirements.txt, pexpect
 py==1.8.1                 # via pytest
 pyasn1-modules==0.2.8     # via -r requirements/requirements.txt, service-identity
@@ -135,7 +135,7 @@ pyflakes==2.1.1           # via flake8
 pygments==2.6.1           # via -r requirements/requirements.txt, django-silk, ipython, sphinx
 pyhamcrest==2.0.2         # via -r requirements/requirements.txt, twisted
 pyopenssl==19.1.0         # via -r requirements/requirements.txt, twisted
-pyparsing==2.4.6          # via -r requirements/requirements.txt, packaging
+pyparsing==2.4.7          # via -r requirements/requirements.txt, packaging
 pyrsistent==0.16.0        # via -r requirements/requirements.txt, jsonschema
 pytest-blockage==0.2.2    # via -r requirements/requirements-dev.in
 pytest-cov==2.8.1         # via -r requirements/requirements-dev.in
@@ -166,7 +166,7 @@ six==1.14.0               # via -r requirements/requirements.txt, automat, bleac
 snowballstemmer==2.0.0    # via sphinx
 soupsieve==2.0            # via -r requirements/requirements.txt, beautifulsoup4
 sphinx-autobuild==0.7.1   # via -r requirements/requirements-dev.in
-sphinx==2.4.4             # via -r requirements/requirements-dev.in, recommonmark
+sphinx==3.0.1             # via -r requirements/requirements-dev.in, recommonmark
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -194,7 +194,7 @@ werkzeug==1.0.1           # via -r requirements/requirements-dev.in
 whitenoise==5.0.1         # via -r requirements/requirements.txt
 whoosh==2.7.4             # via -r requirements/requirements.txt
 zipp==3.1.0               # via -r requirements/requirements.txt, importlib-metadata
-zope.interface==5.0.2     # via -r requirements/requirements.txt, twisted
+zope.interface==5.1.0     # via -r requirements/requirements.txt, twisted
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

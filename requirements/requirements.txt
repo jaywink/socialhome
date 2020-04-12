@@ -14,11 +14,11 @@ async-timeout==3.0.1      # via aioredis
 attrs==19.3.0             # via automat, federation, jsonschema, service-identity, twisted
 autobahn==20.4.1          # via daphne
 automat==20.2.0           # via twisted
-autopep8==1.5             # via django-silk
+autopep8==1.5.1           # via django-silk
 backcall==0.1.0           # via ipython
-beautifulsoup4==4.8.2     # via markdownify, pyembed, python-opengraph-jaywink
+beautifulsoup4==4.9.0     # via markdownify, pyembed, python-opengraph-jaywink
 bleach==3.1.4             # via -r requirements/requirements.in, federation
-certifi==2019.11.28       # via requests
+certifi==2020.4.5.1       # via requests
 cffi==1.14.0              # via cryptography
 channels-redis==2.4.2     # via -r requirements/requirements.in
 channels==2.4.0           # via -r requirements/requirements.in, channels-redis
@@ -53,7 +53,7 @@ django-model-utils==3.2.0  # via -r requirements/requirements.in
 django-redis==4.11.0      # via -r requirements/requirements.in
 django-reversion==3.0.7   # via -r requirements/requirements.in
 django-robots==4.0        # via -r requirements/requirements.in
-django-rq==2.3.0          # via -r requirements/requirements.in
+django-rq==2.3.1          # via -r requirements/requirements.in
 django-secure==1.0.2      # via -r requirements/requirements.in
 django-settings-export==1.2.1  # via -r requirements/requirements.in
 django-silk==4.0.1        # via -r requirements/requirements.in
@@ -67,7 +67,7 @@ hyperlink==19.0.0         # via twisted
 idna==2.9                 # via hyperlink, requests, twisted
 importlib-metadata==1.6.0  # via jsonschema
 incremental==17.5.0       # via twisted
-inflection==0.3.1         # via drf-yasg
+inflection==0.4.0         # via drf-yasg
 ipaddress==1.0.23         # via ipdata
 ipdata==3.2               # via federation
 ipython-genutils==0.2.0   # via traitlets
@@ -92,7 +92,7 @@ pickleshare==0.7.5        # via ipython
 pillow==7.1.1             # via -r requirements/requirements.in, django-markdownx, django-versatileimagefield
 prompt-toolkit==3.0.5     # via ipython
 psutil==5.7.0             # via circus
-psycopg2-binary==2.8.4    # via -r requirements/requirements.in
+psycopg2-binary==2.8.5    # via -r requirements/requirements.in
 ptyprocess==0.6.0         # via pexpect
 pyasn1-modules==0.2.8     # via service-identity
 pyasn1==0.4.8             # via pyasn1-modules, service-identity
@@ -102,7 +102,7 @@ pycryptodome==3.9.7       # via federation
 pygments==2.6.1           # via django-silk, ipython
 pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via twisted
-pyparsing==2.4.6          # via packaging
+pyparsing==2.4.7          # via packaging
 pyrsistent==0.16.0        # via jsonschema
 python-dateutil==2.8.1    # via arrow, croniter, django-silk, federation
 python-magic==0.4.15      # via django-versatileimagefield
@@ -139,7 +139,7 @@ webencodings==0.5.1       # via bleach
 whitenoise==5.0.1         # via -r requirements/requirements.in
 whoosh==2.7.4             # via -r requirements/requirements.in
 zipp==3.1.0               # via importlib-metadata
-zope.interface==5.0.2     # via twisted
+zope.interface==5.1.0     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
