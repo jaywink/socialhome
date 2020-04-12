@@ -4,6 +4,7 @@
 #
 #    ./compile-requirements.sh
 #
+-e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1  # via -r requirements/requirements.in
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1  # via -r requirements/requirements.in
 -e git+https://git.feneas.org/jaywink/federation.git@13f0cf0db667755dc85d24e840534abb51769b80#egg=federation==0.20.0-dev1  # via -r requirements/requirements.in
 -e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1  # via -r requirements/requirements.in
@@ -25,7 +26,6 @@ channels==2.4.0           # via -r requirements/requirements.in, channels-redis
 chardet==3.0.4            # via requests
 circus==0.16.1            # via -r requirements/requirements.in
 click==7.1.1              # via rq
-commonmark==0.9.1         # via -r requirements/requirements.in, federation
 constantly==15.1.0        # via twisted
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
