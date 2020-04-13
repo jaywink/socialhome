@@ -255,16 +255,6 @@ export default {
         this.$el.querySelector(".CodeMirror-wrap").removeEventListener("drop", this.onImageDrop)
     },
     methods: {
-        asyncParseMarkdown(plainText) {
-            const formData = new FormData()
-            formData.append("content", plainText)
-            formData.append("csrfmiddlewaretoken", Cookies.get("csrftoken"))
-
-            return this.$http
-                .post(Urls.markdownx_markdownify(), formData, {headers: {"content-type": "multipart/form-data"}})
-                .then(({data}) => data)
-                .catch(() => this.rendered)
-        },
         bodyClickEventListener(event) {
             if (event.target.closest(".editor-toolbar-dropdown") === null
                 && event.target.closest(".editor-toolbar") === null) {
