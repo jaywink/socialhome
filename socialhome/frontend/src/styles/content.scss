@@ -11,8 +11,10 @@
   }
 }
 
-.markdownx-preview img {
-  max-width: 100%;
+.markdownx-preview, .editor-preview {
+    img {
+        max-width: 100%;
+    }
 }
 
 a.opengraph-card {
