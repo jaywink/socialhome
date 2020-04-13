@@ -10,9 +10,11 @@ SCRIPT_TEXT = "<script>console.log</script>"
 MARKDOWN_CODE_TEXT = "`\n<script>alert('yup');</script>\n`\n\n`<script>alert('yup');</script>`\n\n```\n" \
                      "<script>alert('yap');</script>\n```"
 HTML_TEXT = "<a href='foo'>bar</a><b>cee</b><em>daaa<div><span class='jee'>faa</span></div>"
+HTML_TEXT_WITH_MENTION_LINK = '<p><span class="h-card"><a href="https://dev.jasonrobinson.me/u/jaywink/" ' \
+                              'class="u-url mention">@<span>jaywink</span></a></span> boom</p>'
 
 
-class TestSafeTextForMarkdown(object):
+class TestSafeTextForMarkdown:
     def test_plain_text_survives(self):
         assert safe_text_for_markdown(PLAIN_TEXT) == PLAIN_TEXT
 
@@ -31,11 +33,16 @@ class TestSafeTextForMarkdown(object):
         assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;<span ' \
                                                     'class="jee">faa</span>&lt;/div&gt;</em>'
 
+    def test_text_with_html_is_cleaned__mention_link_classes_preserved(self):
+        assert safe_text_for_markdown(HTML_TEXT_WITH_MENTION_LINK) == \
+           '<p><span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/"' \
+           '>@<span>jaywink</span></a></span> boom</p>'
+
     def test_text_with_quotes_survives(self):
         assert safe_text_for_markdown(MARKDOWN_QUOTES_TEXT) == "> foo\n> bar &gt; foo"
 
 
-class TestSafeText(object):
+class TestSafeText:
     def test_plain_text_survives(self):
         assert safe_text(PLAIN_TEXT) == PLAIN_TEXT
 
@@ -52,11 +59,14 @@ class TestSafeText(object):
     def test_text_with_html_is_cleaned(self):
         assert safe_text(HTML_TEXT) == "barceedaaafaa"
 
+    def test_text_with_html_is_cleaned__mention_link_removed(self):
+        assert safe_text(HTML_TEXT_WITH_MENTION_LINK) == '@jaywink boom'
+
 
 class TestFindUrlsInText(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(TestFindUrlsInText, cls).setUpTestData()
+        super().setUpTestData()
         cls.starts_with_url = "https://example.com/foobar"
         cls.http_starts_with_url = "http://example.com/foobar"
         cls.numbers = "http://foo123.633.com"
