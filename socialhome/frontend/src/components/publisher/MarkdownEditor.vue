@@ -200,25 +200,25 @@ export default {
                 {
                     name: "guide",
                     action: "https://www.markdownguide.org/basic-syntax/",
-                    className: "fa fa-question-circle pull-right",
+                    className: "fa fa-question-circle",
                     title: this.translations.guide,
                 },
                 {
                     name: "fullscreen",
                     action: () => this.$editor.toggleFullScreen(),
-                    className: "fa fa-arrows-alt no-disable no-mobile pull-right",
+                    className: "fa fa-arrows-alt no-disable no-mobile",
                     title: this.translations.fullscreen,
                 },
                 {
                     name: "side-by-side",
                     action: () => this.$editor.toggleSideBySide(),
-                    className: "fa fa-columns no-disable no-mobile pull-right",
+                    className: "fa fa-columns no-disable no-mobile",
                     title: this.translations.sideBySide,
                 },
                 {
                     name: "preview",
                     action: () => this.$editor.togglePreview(),
-                    className: "fa fa-eye no-disable pull-right",
+                    className: "fa fa-eye no-disable",
                     title: this.translations.preview,
                 },
             ],
@@ -255,16 +255,6 @@ export default {
         this.$el.querySelector(".CodeMirror-wrap").removeEventListener("drop", this.onImageDrop)
     },
     methods: {
-        asyncParseMarkdown(plainText) {
-            const formData = new FormData()
-            formData.append("content", plainText)
-            formData.append("csrfmiddlewaretoken", Cookies.get("csrftoken"))
-
-            return this.$http
-                .post(Urls.markdownx_markdownify(), formData, {headers: {"content-type": "multipart/form-data"}})
-                .then(({data}) => data)
-                .catch(() => this.rendered)
-        },
         bodyClickEventListener(event) {
             if (event.target.closest(".editor-toolbar-dropdown") === null
                 && event.target.closest(".editor-toolbar") === null) {
@@ -461,6 +451,10 @@ export default {
     .editor-toolbar-picture-dropdown ul {
       padding: 0;
       margin: 0;
+    }
+
+    .editor-preview {
+        color: #000;
     }
   }
 </style>

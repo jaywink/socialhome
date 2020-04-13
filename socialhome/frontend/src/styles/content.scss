@@ -1,4 +1,4 @@
-.markdownx-preview, .grid-item, .reply {
+.markdownx-preview, .editor-preview, .grid-item, .reply {
   blockquote {
       padding: .5rem 1rem;
       margin-bottom: 1rem;
@@ -11,8 +11,10 @@
   }
 }
 
-.markdownx-preview img {
-  max-width: 100%;
+.markdownx-preview, .editor-preview {
+    img {
+        max-width: 100%;
+    }
 }
 
 a.opengraph-card {
