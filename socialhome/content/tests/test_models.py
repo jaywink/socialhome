@@ -49,6 +49,9 @@ class TestContentModel(SocialhomeTestCase):
             text="foo @{bar; %s} bar @{foo; %s}" % (cls.user.profile.handle, cls.remote_profile.handle),
             author=cls.local_user.profile,
         )
+        cls.content_with_url = ContentFactory(
+            text="<p>https://example.com/foobar yay</p>", author=cls.local_user.profile,
+        )
 
     def setUp(self):
         super().setUp()
@@ -190,10 +193,13 @@ class TestContentModel(SocialhomeTestCase):
 
     def test_short_text_inline(self):
         self.public_content.text = "foo\n\rbar"
-        self.assertEqual(self.public_content.short_text_inline, "foo bar")
+        self.assertEqual(self.public_content.short_text_inline, "foo  bar")
 
     def test_slug(self):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
+
+    def test_slug__strips_urls_and_html(self):
+        self.assertEqual(self.content_with_url.slug, 'yay')
 
     def test_visible_for_user_unauthenticated_user(self):
         self.assertTrue(self.public_content.visible_for_user(Mock(is_authenticated=False, profile=None)))

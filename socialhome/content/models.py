@@ -3,6 +3,7 @@ import re
 from uuid import uuid4
 
 import arrow
+import bleach
 from commonmark import commonmark
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -378,7 +379,11 @@ class Content(models.Model):
 
     @cached_property
     def short_text(self):
-        return truncatechars(self.text, 50) or ""
+        # Remove html
+        cleaned_text = bleach.clean(self.text, strip=True)
+        # Remove urls
+        cleaned_text = re.sub(r"http\S+", "", cleaned_text)
+        return truncatechars(cleaned_text, 50) or ""
 
     @property
     def short_text_inline(self):
