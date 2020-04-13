@@ -462,5 +462,9 @@ export default {
       padding: 0;
       margin: 0;
     }
+
+    .editor-preview {
+        color: #000;
+    }
   }
 </style>
