@@ -315,7 +315,7 @@ class TestContentSaveTags(SocialhomeTestCase):
             text="#starting and #MixED with some #line\nendings also tags can\n#start on new line"
         )
         cls.invalid = ContentFactory(
-            text="#a!a #a#a #a$a #a%a #a^a #a&a #a*a #a+a #a.a #a,a #a@a #a£a #a/a #a(a #a)a #a=a #a?a #a`a #a'a #a\\a "
+            text="#a!a #a#a #a$a #a%a #a^a #a&a #a*a #a+a #a.a #a,a #a@a #a£a #a(a #a)a #a=a #a?a #a`a #a'a #a\\a "
                  "#a{a #a[a #a]a #a}a #a~a #a;a #a:a #a\"a #a’a #a”a #\xa0cd"
         )
         cls.endings = ContentFactory(text="#parenthesis) #exp! #list]")

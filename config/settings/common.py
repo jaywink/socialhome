@@ -349,7 +349,7 @@ SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE
 # Content
 # These attributes on tags are kept on save for untrusted users
 SOCIALHOME_CONTENT_SAFE_ATTRS = {
-    'a': ['href', 'title'],
+    'a': ['class', 'href', 'title'],
     'abbr': ['title'],
     'acronym': ['title'],
     'span': ['class'],

@@ -400,7 +400,7 @@ class Content(models.Model):
     def render(self):
         """Pre-render text to Content.rendered."""
         text = self.get_and_linkify_tags()
-        rendered = commonmark(text).strip()
+        rendered = commonmark(text, ignore_html_blocks=True).strip()
         rendered = process_text_links(rendered)
         if self.show_preview:
             if self.oembed:

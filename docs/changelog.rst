@@ -81,6 +81,8 @@ Fixed
 * Fix an issue in the OEmbed library that caused unnecessary fetches to Spotify OEmbed
   endpoint. Thanks to Alain for reporting this issue. (`upstream issue <https://github.com/pyembed/pyembed/issues/64>`_)
 
+* Fix rendering of quotes. Now rendered in italic and clearly marked as quote.
+
 Internal changes
 ................
 

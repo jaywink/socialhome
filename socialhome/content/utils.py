@@ -1,7 +1,6 @@
 import re
 
 import bleach
-from bleach import callbacks
 from django.conf import settings
 
 
@@ -55,29 +54,6 @@ def code_blocks_restore(code_blocks, text):
 def safe_text(text):
     """Clean text, stripping all tags, attributes and styles."""
     return bleach.clean(text or "", tags=[], attributes=[], styles=[], strip=True)
-
-
-def process_text_links(text):
-    """Process links in text, adding some attributes and linkifying textual links."""
-    link_callbacks = [callbacks.nofollow, callbacks.target_blank]
-
-    def link_attributes(attrs, new=False):
-        """Run standard callbacks except for internal links."""
-        href_key = (None, "href")
-        if attrs.get(href_key).startswith("/"):
-            return attrs
-
-        # Run the standard callbacks
-        for callback in link_callbacks:
-            attrs = callback(attrs, new)
-        return attrs
-
-    return bleach.linkify(
-        text,
-        callbacks=[link_attributes],
-        parse_email=False,
-        skip_tags=["code"],
-    )
 
 
 def find_urls_in_text(text):
