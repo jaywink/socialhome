@@ -427,8 +427,11 @@ LOGGING = {
     "disable_existing_loggers": False,
     "filters": {
         "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse"
-        }
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
     },
     "formatters": {
         "verbose": {
@@ -445,6 +448,7 @@ LOGGING = {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
+            "filters": ["require_debug_true"],
             "formatter": "verbose",
         },
         "file": {
@@ -465,7 +469,11 @@ LOGGING = {
         "django.security.DisallowedHost": {
             "level": "ERROR",
             "handlers": ["console", log_target],
-            "propagate": True
+            "propagate": True,
+        },
+        "django": {
+            "level": "ERROR",
+            "handlers": [log_target, "mail_admins"],
         },
         "socialhome": {
             "level": "DEBUG",
@@ -491,7 +499,7 @@ if log_target == "syslog":
         "class": "logging.handlers.SysLogHandler",
         "facility": env("SOCIALHOME_SYSLOG_FACILITY", default="local7"),
         "formatter": "verbose",
-        "address" : "/dev/log",
+        "address": "/dev/log",
     }
 
 # REST FRAMEWORK

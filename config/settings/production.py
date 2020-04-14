@@ -143,8 +143,8 @@ if env('SENTRY_DSN', default=None):
 # Logging other
 # -------------
 if env.bool("SOCIALHOME_LOG_DISABLE_ADMIN_EMAILS", False):
-    # Set these to go to the console instead
-    LOGGING["handlers"]["mail_admins"]["email_backend"] = "django.core.mail.backends.console.EmailBackend"
+    # Remove mail_admins handler
+    LOGGING["loggers"]["django"]["handlers"] = [log_target]
 
 # SILK
 # ----
