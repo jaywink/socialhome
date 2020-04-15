@@ -6,6 +6,28 @@ from django.utils.timezone import now
 from socialhome.utils import get_redis_connection
 
 
+def delete_redis_keys(pattern: str, only_without_expiry: bool = True):
+    """
+    Delete any keys matching pattern. Defaults to only those without expiry.
+    """
+    r = get_redis_connection()
+    keys = r.keys(pattern)
+    to_delete = []
+
+    for key in keys:
+        if only_without_expiry:
+            delete = r.ttl(key) == -1
+        else:
+            delete = True
+        if delete:
+            to_delete.append(key)
+        if len(to_delete) > 1000:
+            r.delete(*to_delete)
+
+    if to_delete:
+        r.delete(*to_delete)
+
+
 def get_precache_trim_size(user_activities, key):
     """
     Get user activity to decide what kind of trimming we need.
@@ -70,6 +92,15 @@ def groom_redis_precaches():
 
 
 def streams_tasks(scheduler):
+    # Clean up RQ jobs without expiry
+    scheduler.schedule(
+        scheduled_time=datetime.utcnow(),
+        func=delete_redis_keys,
+        args=["rq:*"],
+        interval=60*60*24,  # every 24 hours
+        timeout=60*60*2,  # 2 hours
+    )
+    # Groom redis precaches
     scheduler.schedule(
         scheduled_time=datetime.utcnow(),
         func=groom_redis_precaches,

@@ -26,6 +26,8 @@ Added
 * Fetching of unknown remote content using ActivityPub URL id's now works. Just paste the remote
   ActivityPub content URL to the search bar to fetch it from compatible platforms.
 
+* Add a scheduled task to clean up old scheduled jobs in Redis.
+
 Changed
 .......
 
