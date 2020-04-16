@@ -20,6 +20,7 @@ django-memoize
 # Lock due to some regression with date fields, investigate later
 django-model-utils<4
 django-redis
+django-redisboard
 django-reversion
 django-robots
 django-rq

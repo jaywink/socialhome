@@ -28,6 +28,9 @@ Added
 
 * Add a scheduled task to clean up old scheduled jobs in Redis.
 
+* Added Django-Redisboard. This gives admins some visibility into the way Socialhome uses Redis
+  via the admin pages.
+
 Changed
 .......
 

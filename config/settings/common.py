@@ -59,6 +59,7 @@ THIRD_PARTY_APPS = (
     "versatileimagefield",
     "django_js_reverse",
     "memoize",
+    "redisboard",
     "robots",
     "reversion",
     "drf_yasg",
