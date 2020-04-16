@@ -96,7 +96,7 @@ def streams_tasks(scheduler):
     scheduler.schedule(
         scheduled_time=datetime.utcnow(),
         func=delete_redis_keys,
-        args=["rq:*"],
+        args=["rq:job:*"],
         interval=60*60*24,  # every 24 hours
         timeout=60*60*2,  # 2 hours
     )
