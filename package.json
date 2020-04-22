@@ -7,7 +7,7 @@
     "dev": "./node_modules/grunt/bin/grunt dev && npm run --prefix=socialhome/frontend build",
     "watch": "./node_modules/grunt/bin/grunt dev && npm run --prefix=socialhome/frontend watch",
     "test": "npm run test:all",
-    "test:all": "npm run test:unit && npm run test:e2e:ci",
+    "test:all": "npm run test:unit",
     "test:unit": "npm run --prefix=socialhome/frontend test:unit",
     "test:e2e": "npm run --prefix=socialhome/frontend test:e2e",
     "test:e2e:ci": "npm run --prefix=socialhome/frontend test:e2e -- --headless",
