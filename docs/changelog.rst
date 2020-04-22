@@ -72,6 +72,9 @@ Changed
 
 * OEmbed for Twitter profile streams is now skipped. Only single tweets will be embedded.
 
+* Whitelist some more HTML tags for use in formatting content. All the tags that are purely for
+  visual formatting or structuring (like div, table, dd) are now whitelisted.
+
 Fixed
 .....
 

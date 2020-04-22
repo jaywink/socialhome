@@ -30,8 +30,8 @@ class TestSafeTextForMarkdown:
         assert safe_text_for_markdown(SCRIPT_TEXT) == "&lt;script&gt;console.log&lt;/script&gt;"
 
     def test_text_with_html_is_cleaned(self):
-        assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa&lt;div&gt;<span ' \
-                                                    'class="jee">faa</span>&lt;/div&gt;</em>'
+        assert safe_text_for_markdown(HTML_TEXT) == '<a href="foo">bar</a><b>cee</b><em>daaa<div><span ' \
+                                                    'class="jee">faa</span></div></em>'
 
     def test_text_with_html_is_cleaned__mention_link_classes_preserved(self):
         assert safe_text_for_markdown(HTML_TEXT_WITH_MENTION_LINK) == \
