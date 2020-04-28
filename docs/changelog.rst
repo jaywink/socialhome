@@ -75,6 +75,10 @@ Changed
 * Whitelist some more HTML tags for use in formatting content. All the tags that are purely for
   visual formatting or structuring (like div, table, dd) are now whitelisted.
 
+* Totally rewritten publisher! The new publisher is now a part of the VueJS based frontend code and
+  is based on the EasyMDE editor. There are some additional features like full-screen mode added,
+  for those long blog post type content pieces. Thanks to Christophe Henry for work on this.
+
 Fixed
 .....
 
