@@ -10,6 +10,8 @@ from django.template.loader import render_to_string
 from django.templatetags.static import static
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic.base import TemplateView
+from django.views.generic.detail import SingleObjectMixin
 from federation.entities.activitypub.django.views import activitypub_object_view
 
 from socialhome.content.enums import ContentType
@@ -42,36 +44,16 @@ class UserOwnsContentMixin(UserPassesTestMixin):
         )
 
 
-class ContentCreateView(LoginRequiredMixin, CreateView):
+class ContentCreateView(LoginRequiredMixin, TemplateView):
     model = Content
-    form_class = ContentForm
-    template_name = "content/edit.html"
+    template_name = "content/vue.html"
     is_reply = False
-    vue = False
-
-    def dispatch(self, request, *args, **kwargs):
-        use_vue_parameter = request.GET.get("vue", None)
-        if use_vue_parameter is not None:
-            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
-        else:
-            self.vue = (
-                hasattr(request.user, "preferences") and
-                request.user.preferences.get("content__use_new_publisher")
-            )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        """Add user to form kwargs."""
-        kwargs = super(ContentCreateView, self).get_form_kwargs()
-        kwargs.update({"user": self.request.user, "is_reply": self.is_reply})
-        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["bookmarklet"] = render_to_string("content/bookmarklet.min.js", {}, request=self.request)
         context["is_reply"] = self.is_reply
-        if self.vue:
-            context["json_context"] = self.get_json_context()
+        context["json_context"] = self.get_json_context()
         return context
 
     def get_json_context(self):
@@ -80,95 +62,28 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
         }
 
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["text"] = self._get_text_initial_from_parameters()
-        return initial
 
-    def _get_text_initial_from_parameters(self):
-        parameters = {}
-        if self.request.GET.get("url"):
-            parameters["url"] = self.request.GET.get("url")
-        if self.request.GET.get("title"):
-            parameters["title"] = self.request.GET.get("title")
-        if self.request.GET.get("notes"):
-            parameters["notes"] = self.request.GET.get("notes")
-        if parameters:
-            return render_to_string("content/_bookmarklet_initial.html", parameters, request=self.request)
-
-    def get_template_names(self):
-        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
-
-
-class ContentBookmarkletView(ContentCreateView):
-    template_name = "content/bookmarklet.html"
-    vue = False
-
-    def dispatch(self, request, *args, **kwargs):
-        use_vue_parameter = request.GET.get("vue", None)
-        if use_vue_parameter is not None:
-            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
-        else:
-            self.vue = (
-                hasattr(request.user, "preferences") and
-                request.user.preferences.get("content__use_new_publisher")
-            )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_template_names(self):
-        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
-
-
-class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView):
+class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObjectMixin):
     is_reply = True
 
     def dispatch(self, request, *args, **kwargs):
         content_id = kwargs.get("pk")
+        self.object = self.get_object()
         self.parent = get_object_or_404(Content, id=content_id)
         return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        self.object = form.save(parent=self.parent)
-        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return self.parent.get_absolute_url()
 
 
-class ContentUpdateView(UserOwnsContentMixin, UpdateView):
+class ContentUpdateView(UserOwnsContentMixin, DetailView):
     model = Content
-    form_class = ContentForm
-    template_name = "content/edit.html"
-    vue = False
-
-    def dispatch(self, request, *args, **kwargs):
-        use_vue_parameter = request.GET.get("vue", None)
-        if use_vue_parameter is not None:
-            self.vue = str(use_vue_parameter).lower() not in ("false", "no", "0")
-        else:
-            self.vue = (
-                hasattr(request.user, "preferences") and
-                request.user.preferences.get("content__use_new_publisher")
-            )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super(ContentUpdateView, self).get_form_kwargs()
-        kwargs.update({
-            "instance": self.object,
-            "user": self.request.user,
-            "is_reply": self.is_reply,
-        })
-        return kwargs
-
-    def get_success_url(self):
-        return self.object.root_parent.get_absolute_url() if self.is_reply else self.object.get_absolute_url()
+    template_name = "content/vue.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["is_reply"] = self.is_reply
-        if self.vue:
-            context["json_context"] = self.get_json_context()
+        context["json_context"] = self.get_json_context()
         return context
 
     def get_json_context(self):
@@ -193,14 +108,12 @@ class ContentUpdateView(UserOwnsContentMixin, UpdateView):
 
         return context
 
-    def get_template_names(self):
-        return ["content/edit-vue.html"] if self.vue else super().get_template_names()
-
     @property
     def is_reply(self):
         return True if self.object.content_type == ContentType.REPLY else False
 
 
+# TODO: Implement on front
 class ContentDeleteView(UserOwnsContentMixin, DeleteView):
     model = Content
     template_name = "content/delete.html"

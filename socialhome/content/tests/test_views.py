@@ -26,17 +26,6 @@ class TestContentCreateView(SocialhomeCBVTestCase):
         self.req = RequestFactory().get("/")
         self.req.user = self.user
 
-    def test_form_valid(self):
-        view = self.get_instance(ContentCreateView, request=self.req)
-        form = ContentForm(data={"text": "barfoo", "visibility": Visibility.PUBLIC.value}, user=self.user)
-        form.full_clean()
-        response = view.form_valid(form)
-        assert response.status_code == 302
-        content = Content.objects.first()
-        assert content.text == "barfoo"
-        assert content.author == self.user.profile
-        assert content.visibility == Visibility.PUBLIC
-
     def test_view_renders(self):
         with self.login(self.user):
             response = self.client.get(reverse("content:create"))
@@ -53,17 +42,6 @@ class TestContentCreateView(SocialhomeCBVTestCase):
         with self.login(self.user):
             response = self.client.get(reverse("content:create"))
         self.assertIsNotNone(response.context["bookmarklet"])
-
-    def test_get_initial(self):
-        request = RequestFactory().get("/")
-        view = self.get_instance(ContentCreateView, request=request)
-        initial = view.get_initial()
-        self.assertIsNone(initial.get("text"))
-        view.request = RequestFactory().get("/?url=url&title=title&notes=notes&dummy=dummy")
-        initial = view.get_initial()
-        self.assertEqual(initial.get("text"), render_to_string("content/_bookmarklet_initial.html", {
-            "title": "title", "notes": "notes", "url": "url",
-        }))
 
 
 class TestContentBookmarkletView(SocialhomeTestCase):
@@ -93,24 +71,6 @@ class TestContentUpdateViewCBV(SocialhomeCBVTestCase):
         self.view = self.get_instance(ContentUpdateView, request=self.request, pk=self.content.id)
         self.view.object = self.content
 
-    def test_get_form_kwargs(self):
-        kwargs = self.view.get_form_kwargs()
-        self.assertEqual(kwargs["instance"], self.content)
-
-    def test_form_valid(self):
-        form = ContentForm(
-            data={"text": "barfoo", "visibility": Visibility.PUBLIC.value},
-            instance=self.content,
-            user=self.user,
-        )
-        form.full_clean()
-        response = self.view.form_valid(form)
-        self.assertEqual(response.status_code, 302)
-        content = Content.objects.first()
-        self.assertEqual(content.author, self.user.profile)
-        self.assertEqual(content.visibility, Visibility.PUBLIC)
-        self.assertEqual(content.text, "barfoo")
-
     def test_untrusted_editor_text_is_cleaned(self):
         self.user.trusted_editor = False
         self.user.save()
@@ -121,15 +81,6 @@ class TestContentUpdateViewCBV(SocialhomeCBVTestCase):
         )
         form.full_clean()
         self.assertEqual(form.cleaned_data["text"], "&lt;script&gt;console.log&lt;/script&gt;")
-
-    def test_get_success_url_content_is_not_reply(self):
-        self.view.object.content_type = ContentType.CONTENT
-        self.assertEqual(self.view.get_success_url(), self.view.object.get_absolute_url())
-
-    def test_get_success_url_content_is_reply(self):
-        self.view.object.content_type = ContentType.REPLY
-        self.view.object.root_parent = ContentFactory(author=self.content.author)
-        self.assertEqual(self.view.get_success_url(), self.view.object.root_parent.get_absolute_url())
 
 
 class TestContentUpdateView(SocialhomeTestCase):
@@ -169,21 +120,6 @@ class TestContentUpdateView(SocialhomeTestCase):
                 pk=self.content.id,
             )
         self.response_404()
-
-    def test_update_view_updates_content(self):
-        with self.login(self.user):
-            self.post(
-                "content:update",
-                data={
-                    "text": "foobar",
-                    "visibility": Visibility.SITE.value,
-                },
-                pk=self.content.id,
-            )
-        self.response_302()
-        self.content.refresh_from_db()
-        self.assertEqual(self.content.text, "foobar")
-        self.assertEqual(self.content.visibility, Visibility.SITE)
 
 
 @pytest.mark.usefixtures("admin_client", "rf")
@@ -314,23 +250,3 @@ class TestContentReplyView(SocialhomeTestCase):
     def test_redirects_to_login_if_not_logged_in(self):
         response = self.client.get(reverse("content:reply", kwargs={"pk": self.content.id}))
         self.assertEqual(response.status_code, 302)
-
-    def test_form_valid(self):
-        with self.login(self.content.author.user):
-            response = self.client.post(
-                reverse("content:reply", kwargs={"pk": self.content.id}), {"text": "foobar"},
-            )
-        self.assertEqual(response.status_code, 302)
-        self.content.refresh_from_db()
-        self.assertEqual(self.content.all_children.count(), 1)
-
-    def test_form_valid__limited(self):
-        with self.login(self.user):
-            response = self.client.post(
-                reverse("content:reply", kwargs={"pk": self.limited_content.id}), {"text": "foobar"},
-            )
-        self.assertEqual(response.status_code, 302)
-        self.limited_content.refresh_from_db()
-        self.assertEqual(self.limited_content.all_children.count(), 1)
-        reply = self.limited_content.all_children.first()
-        self.assertEqual(reply.visibility, Visibility.LIMITED)

@@ -9,12 +9,14 @@
                 <b-col>
                     <b-form-group label-for="show-preview">
                         <template slot="label">
-                            {{ translations.showPreview }}<br>
                             <b-form-checkbox
                                 id="show-preview"
                                 v-model="baseModel.showPreview"
                                 name="show_preview"
-                            />
+                                switch
+                            >
+                                {{ translations.showPreview }}
+                            </b-form-checkbox>
                             <b-form-text>
                                 {{ translations.showPreviewHelp }}
                             </b-form-text>
