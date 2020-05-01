@@ -115,9 +115,11 @@ def process_entity_post(entity: Any, profile: Profile):
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
+    extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
-    content, created = Content.objects.fed_update_or_create(fid, values)
+        extra_lookups["guid"] = values["guid"]
+    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
@@ -163,9 +165,11 @@ def process_entity_comment(entity: Any, profile: Profile):
         "parent": parent,
         "root_parent": root_parent,
     }
+    extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
-    content, created = Content.objects.fed_update_or_create(fid, values)
+        extra_lookups["guid"] = values["guid"]
+    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
