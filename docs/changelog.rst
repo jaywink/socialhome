@@ -95,6 +95,10 @@ Fixed
 
 * Fix rendering of quotes. Now rendered in italic and clearly marked as quote.
 
+* Stop creating duplicate content items from remote content delivered by both ActivityPub
+  and Diaspora protocols. When these refer to each other, they will be merged to avoid
+  duplicate content items.
+
 Internal changes
 ................
 
