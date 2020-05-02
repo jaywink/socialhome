@@ -99,6 +99,9 @@ Fixed
   and Diaspora protocols. When these refer to each other, they will be merged to avoid
   duplicate content items.
 
+* When receiving profiles, try to match them to an existing profile using both ActivityPub
+  and Diaspora protocol identifiers, to not create duplicate profiles per protocol.
+
 Internal changes
 ................
 
