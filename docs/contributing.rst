@@ -20,7 +20,7 @@ Finding things to do
 
 We have an `issue tracker <https://git.feneas.org/socialhome/socialhome/issues>`_ on GitHub. If you don't already have an idea
 on what to do, check out the issues listed there. Some issues are
-`labeled as newcomer <https://git.feneas.org/socialhome/socialhome/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer>`_.
+`labeled as newcomer <https://git.feneas.org/socialhome/socialhome/-/boards/32?&label_name[]=newcomer>`_.
 These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
 
 Logging issues
