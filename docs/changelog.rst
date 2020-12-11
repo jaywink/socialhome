@@ -3,8 +3,8 @@
 Changelog
 =========
 
-0.12.0-dev (unreleased)
------------------------
+0.12.0 (2019-12-12)
+-------------------
 
 Added
 .....
@@ -107,7 +107,7 @@ Internal changes
 
 * Move ``socialhome.content.utils.process_text_links`` to the ``federation`` library.
 
-* Move the tags extraction logic from ``Conten`` model to the ``federation`` library.
+* Move the tags extraction logic from ``Content`` model to the ``federation`` library.
 
 0.11.1 (2019-12-30)
 -------------------
