@@ -3,7 +3,15 @@
 Changelog
 =========
 
-0.12.0 (2019-12-12)
+0.12.1 (2020-12-12)
+-------------------
+
+Fixed
+.....
+
+* Fix build broken by some Eslint dependencies needing update.
+
+0.12.0 (2020-12-12)
 -------------------
 
 Added
