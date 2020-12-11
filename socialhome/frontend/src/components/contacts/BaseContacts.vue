@@ -30,7 +30,6 @@ import _chunk from "lodash/chunk"
 
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons"
 
-
 export default {
     components: {ProfileReactionButtons},
     computed: {

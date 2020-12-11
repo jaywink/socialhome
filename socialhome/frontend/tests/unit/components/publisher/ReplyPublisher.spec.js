@@ -3,7 +3,6 @@ import {shallowMount, createLocalVue} from "@vue/test-utils"
 import ReplyPublisher from "@/components/publisher/ReplyPublisher"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 

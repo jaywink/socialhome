@@ -24,7 +24,6 @@
     </div>
 </template>
 
-
 <script>
 import Vue from "vue"
 
@@ -77,7 +76,6 @@ export default Vue.component("reply-editor", {
     },
 })
 </script>
-
 
 <style scoped lang="scss">
     .reply-save-button {

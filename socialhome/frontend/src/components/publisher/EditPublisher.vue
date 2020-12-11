@@ -2,7 +2,6 @@
 import Publisher from "@/components/publisher/Publisher"
 import {VISIBILITY_OPTIONS} from "@/components/publisher/publisher-mixin"
 
-
 export default {
     name: "EditPublisher",
     extends: Publisher,

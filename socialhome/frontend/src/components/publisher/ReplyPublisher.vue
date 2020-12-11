@@ -42,7 +42,6 @@
 <script>
 import publisherMixin from "@/components/publisher/publisher-mixin"
 
-
 export default {
     name: "ReplyPublisher",
     mixins: [publisherMixin],

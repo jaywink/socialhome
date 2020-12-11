@@ -7,7 +7,6 @@ import Axios from "axios"
 import getState from "@/store/modules/stream.state"
 import {streamActions, streamGetters, streamMutations} from "@/store/modules/stream.operations"
 
-
 export function addHasLoadMore(state) {
     const loadMoreContentId = state.currentContentIds[state.currentContentIds.length - 6]
     if (loadMoreContentId) {

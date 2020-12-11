@@ -1,6 +1,5 @@
 import _get from "lodash/get"
 
-
 export default function () {
     // The top level content ID's loaded into the stream
     const currentContentIds = []

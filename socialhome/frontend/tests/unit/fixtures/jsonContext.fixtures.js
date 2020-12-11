@@ -1,7 +1,6 @@
 import _ from "lodash"
 import faker from "faker"
 
-
 const getFakeAuthor = function getFakeAuthor(args = {}) {
     return _.defaults({}, args, {
         uuid: faker.random.uuid(),
@@ -39,7 +38,6 @@ const getFakeContent = function getFakeContent(args = {}) {
         through_author: {},
     })
 }
-
 
 const getProfile = function getProfile(args = {}) {
     return _.defaults({}, args, {

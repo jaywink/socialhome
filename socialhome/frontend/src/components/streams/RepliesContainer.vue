@@ -23,7 +23,6 @@
 import imagesLoaded from "vue-images-loaded"
 import "@/components/streams/StreamElement.vue"
 
-
 export default {
     name: "RepliesContainer",
     directives: {imagesLoaded},

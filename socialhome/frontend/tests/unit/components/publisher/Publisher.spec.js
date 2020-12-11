@@ -4,7 +4,6 @@ import {createLocalVue, shallowMount} from "@vue/test-utils"
 import Publisher from "@/components/publisher/Publisher"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 

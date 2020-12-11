@@ -5,7 +5,6 @@ import {createLocalVue, shallowMount} from "@vue/test-utils"
 import EditReplyPublisher from "@/components/publisher/EditReplyPublisher"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 

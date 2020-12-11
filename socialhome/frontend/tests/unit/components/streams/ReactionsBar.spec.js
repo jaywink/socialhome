@@ -8,7 +8,6 @@ import ReactionsBar from "@/components/streams/ReactionsBar.vue"
 import {getContext, getFakeContent} from "%fixtures/jsonContext.fixtures"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 
 localVue.use(BootstrapVue)

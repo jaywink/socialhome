@@ -5,7 +5,6 @@ import _get from "lodash/get"
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
 import SimpleLoadingElement from "@/components/common/SimpleLoadingElement"
 
-
 const VISIBILITY_OPTIONS = Object.freeze({
     PUBLIC: {
         value: 0,

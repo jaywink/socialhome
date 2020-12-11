@@ -8,7 +8,6 @@ import StreamElement from "@/components/streams/StreamElement.vue"
 import {getStore} from "%fixtures/store.fixtures"
 import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 localVue.use(infiniteScroll)

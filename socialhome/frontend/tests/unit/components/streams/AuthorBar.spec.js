@@ -7,7 +7,6 @@ import AuthorBar from "@/components/streams/AuthorBar.vue"
 import {getContext, getFakeContent, getFakeAuthor} from "%fixtures/jsonContext.fixtures"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 

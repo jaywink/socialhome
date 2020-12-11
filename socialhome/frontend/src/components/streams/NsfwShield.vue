@@ -23,7 +23,6 @@
 <script>
 import imagesLoaded from "vue-images-loaded"
 
-
 export default {
     name: "NsfwShield",
     directives: {imagesLoaded},

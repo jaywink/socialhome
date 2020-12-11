@@ -1,7 +1,6 @@
 import {createLocalVue} from "@vue/test-utils"
 import {getMainInstance} from "@/main"
 
-
 let localVue
 let main
 

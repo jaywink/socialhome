@@ -19,7 +19,6 @@ import {
 } from "@/store/modules/stream"
 import {getFakeContent} from "%fixtures/jsonContext.fixtures"
 
-
 Vue.use(Vuex)
 
 const UUID = uuid()

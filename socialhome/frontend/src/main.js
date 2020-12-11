@@ -10,7 +10,6 @@ import getStore from "@/store"
 
 import "@/styles/index.scss"
 
-
 function getMainInstance(LocalVue) {
     initVue(LocalVue)
 
