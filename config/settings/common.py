@@ -408,6 +408,10 @@ SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
 # How many seconds since we saw user activity do we consider the user have been recently active?
 SOCIALHOME_USER_ACTIVITY_SECONDS = 130
 
+# Matrix support
+# NOTE! Incomplete, alpha, here be dragons, requires Dendrite, etc
+SOCIALHOME_MATRIX_ENABLED = env.bool("SOCIALHOME_MATRIX_ENABLED", default=False)
+
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
@@ -600,3 +604,5 @@ FEDERATION = {
     "search_path": "/search/?q=",
     "tags_path": "/streams/tag/:tag:/",
 }
+if SOCIALHOME_MATRIX_ENABLED:
+    FEDERATION["matrix_config_function"] = "socialhome.federate.utils.generic.get_matrix_config"

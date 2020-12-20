@@ -6,6 +6,16 @@ Changelog
 unreleased
 ----------
 
+Added
+.....
+
+* Start adding Matrix support 🎉 Currently added functionality in this release,
+  if ``SOCIALHOME_MATRIX_ENABLED`` set to ``true``:
+
+  * Client and server well-known files are automatically generated.
+
+  See docs at :ref:`matrix-protocol-support` for more information.
+
 0.12.1 (2020-12-12)
 -------------------
 
