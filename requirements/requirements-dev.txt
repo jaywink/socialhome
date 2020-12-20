@@ -118,7 +118,7 @@ persisting-theory==0.2.1  # via -r requirements/requirements.txt, django-dynamic
 pexpect==4.8.0            # via -r requirements/requirements.txt, ipython
 pickleshare==0.7.5        # via -r requirements/requirements.txt, ipython
 pillow==7.1.1             # via -r requirements/requirements.txt, django-markdownx, django-versatileimagefield
-pip-tools==4.5.1          # via -r requirements/requirements-dev.in
+pip-tools==5.4.0          # via -r requirements/requirements-dev.in
 pluggy==0.13.1            # via pytest
 port_for==0.3.1           # via sphinx-autobuild
 prompt-toolkit==3.0.5     # via -r requirements/requirements.txt, ipython
