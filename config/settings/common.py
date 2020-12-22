@@ -411,6 +411,7 @@ SOCIALHOME_USER_ACTIVITY_SECONDS = 130
 # Matrix support
 # NOTE! Incomplete, alpha, here be dragons, requires Dendrite, etc
 SOCIALHOME_MATRIX_ENABLED = env.bool("SOCIALHOME_MATRIX_ENABLED", default=False)
+SOCIALHOME_MATRIX_APPSERVICE_TOKEN = env("SOCIALHOME_MATRIX_APPSERVICE_TOKEN", default=None)
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
