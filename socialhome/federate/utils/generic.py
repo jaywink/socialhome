@@ -28,7 +28,7 @@ def get_matrix_config() -> Optional[Dict]:
             "homeserver_base_url": f"https://matrix.{settings.SOCIALHOME_DOMAIN}",
             "homeserver_domain_with_port": f"matrix.{settings.SOCIALHOME_DOMAIN}:443",
             "appservice": {
-                "id": "socialhome-network",
+                "id": "socialhome",
                 "sender_localpart": "_socialhome",
                 "token": settings.SOCIALHOME_MATRIX_APPSERVICE_TOKEN,
             },
