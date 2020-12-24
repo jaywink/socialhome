@@ -210,7 +210,7 @@ class Profile(TimeStampedModel):
                 "endpoint": settings.SOCIALHOME_MATRIX_APPSERVICE_BASE_URL,
                 "fid": self.mxid,
                 "public": self.visibility == Visibility.PUBLIC,
-                "protocol": self.protocol,
+                "protocol": "matrix",
             }
 
     def get_recipient_for_visibility(self, visibility: Visibility) -> Dict:
