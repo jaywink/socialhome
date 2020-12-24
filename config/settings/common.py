@@ -411,7 +411,14 @@ SOCIALHOME_USER_ACTIVITY_SECONDS = 130
 # Matrix support
 # NOTE! Incomplete, alpha, here be dragons, requires Dendrite, etc
 SOCIALHOME_MATRIX_ENABLED = env.bool("SOCIALHOME_MATRIX_ENABLED", default=False)
+# **REQUIRED** if Matrix support is enabled:
+# This is a secret token to communicate with the Matrix homeserver. Never give it to anyone!
 SOCIALHOME_MATRIX_APPSERVICE_TOKEN = env("SOCIALHOME_MATRIX_APPSERVICE_TOKEN", default=None)
+# An ID for the appservice, **should never change after creating**.
+SOCIALHOME_MATRIX_APPSERVICE_ID = env("SOCIALHOME_MATRIX_APPSERVICE_ID", default=None)
+# **OPTIONAL** to change from defaults:
+# Shortcode for the socialhome instance. Only a-z, used for namespacing things.
+SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE", default="socialhome")
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
