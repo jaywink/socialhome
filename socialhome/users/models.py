@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import time
-from typing import Dict
+from typing import Dict, Optional
 from uuid import uuid4
 
 # noinspection PyPackageRequirements
@@ -204,6 +204,15 @@ class Profile(TimeStampedModel):
     def get_absolute_url(self):
         return reverse("users:profile-detail", kwargs={"uuid": self.uuid})
 
+    def get_recipient_for_matrix_appservice(self) -> Optional[Dict]:
+        if settings.SOCIALHOME_MATRIX_ENABLED:
+            return {
+                "endpoint": settings.SOCIALHOME_MATRIX_APPSERVICE_BASE_URL,
+                "fid": self.mxid,
+                "public": self.visibility == Visibility.PUBLIC,
+                "protocol": self.protocol,
+            }
+
     def get_recipient_for_visibility(self, visibility: Visibility) -> Dict:
         """
         Get a recipient dictionary based on visibility.
@@ -233,6 +242,7 @@ class Profile(TimeStampedModel):
             id=self.fid or self.handle,
             private_key=self.rsa_private_key,
             handle=self.handle,
+            mxid=self.mxid,
         )
 
     @property
@@ -249,7 +259,9 @@ class Profile(TimeStampedModel):
         return self.url
 
     @property
-    def mxid(self) -> str:
+    def mxid(self) -> Optional[str]:
+        if not settings.SOCIALHOME_MATRIX_ENABLED:
+            return None
         if self.is_local:
             return f"@{self.username_part}:{settings.SOCIALHOME_DOMAIN}"
         # Remote is a bit trickier, we want our shortcode namespace and a globally unique username part
