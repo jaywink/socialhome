@@ -419,6 +419,10 @@ SOCIALHOME_MATRIX_APPSERVICE_ID = env("SOCIALHOME_MATRIX_APPSERVICE_ID", default
 # **OPTIONAL** to change from defaults:
 # Shortcode for the socialhome instance. Only a-z, used for namespacing things.
 SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE", default="socialhome")
+# **NOT TO BE MODIFIED**
+SOCIALHOME_MATRIX_HOMESERVER = f"matrix.{SOCIALHOME_DOMAIN}"
+SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}"
+SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------

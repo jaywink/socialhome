@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import time
 from typing import Dict
 from uuid import uuid4
@@ -17,7 +18,8 @@ from federation.entities.activitypub.enums import ActivityType
 from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
 from model_utils.models import TimeStampedModel
-# noinspection PyProtectedMember
+# noinspection PyPackageRequirements
+from slugify import slugify
 from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
@@ -245,6 +247,23 @@ class Profile(TimeStampedModel):
         if self.is_local:
             return f"{settings.SOCIALHOME_URL}{self.user.get_absolute_url()}"
         return self.url
+
+    @property
+    def mxid(self) -> str:
+        if self.is_local:
+            return f"@{self.username_part}:{settings.SOCIALHOME_DOMAIN}"
+        # Remote is a bit trickier, we want our shortcode namespace and a globally unique username part
+        template = f"@_{settings.SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE}_%%USERNAME%%:{settings.SOCIALHOME_DOMAIN}"
+        max_username_part_length = 255 - len(template) + 10  # Leave a few chars for safety
+        # Also replace '@' with '_' to not have it fully filtered out.
+        handle_or_fid = (self.handle or self.fid).replace("@", "_")
+        # And filter out any protocol part
+        handle_or_fid = re.sub(r"https?://", "", handle_or_fid)
+        # Then replace rest of /'s with _'s
+        handle_or_fid = handle_or_fid.replace("/", "_")
+        # Compile
+        remote_username_part = slugify(handle_or_fid, only_ascii=True, ok='._=-')[:max_username_part_length]
+        return template.replace("%%USERNAME%%", remote_username_part)
 
     @property
     def name_or_handle(self):
