@@ -145,9 +145,6 @@ def _get_remote_followers(profile: Profile, visibility: Visibility, exclude=None
     for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if not exclude or (follower.fid != exclude and follower.handle != exclude):
             followers.append(follower.get_recipient_for_visibility(visibility))
-    # If we have Matrix support enabled, also add the appservice
-    if settings.SOCIALHOME_MATRIX_ENABLED:
-        followers.append(profile.get_recipient_for_matrix_appservice())
     return followers
 
 
@@ -379,5 +376,9 @@ def send_profile(profile_id, recipients=None):
         return
     if not recipients:
         recipients = _get_remote_followers(profile, profile.visibility)
+        # If we have Matrix support enabled, also add the appservice
+        if settings.SOCIALHOME_MATRIX_ENABLED:
+            recipients.append(profile.get_recipient_for_matrix_appservice())
+
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
