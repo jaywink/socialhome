@@ -18,6 +18,7 @@ variables:
   POSTGRES_DB: "postgres"
   POSTGRES_PASSWORD: "postgres"
   POSTGRES_USER: "postgres"
+  SOCIALHOME_MATRIX_ENABLED: "True"
 
 stages:
   - lint
