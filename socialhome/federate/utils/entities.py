@@ -29,6 +29,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
             created_at=content.effective_modified,
             guid=str(content.uuid),
             handle=content.author.handle,
+            mxid=content.author.mxid,
         )
     except Exception as ex:
         logger.exception("_make_post - Failed to convert %s: %s", content.fid, ex)

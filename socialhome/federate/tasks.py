@@ -100,6 +100,9 @@ def send_content(content_id, activity_fid, recipient_id=None):
             recipients.append(recipient.get_recipient_for_visibility(content.visibility))
         else:
             if content.visibility == Visibility.PUBLIC:
+                # If we have Matrix support enabled, also add the appservice
+                if settings.SOCIALHOME_MATRIX_ENABLED:
+                    recipients.append(content.author.get_recipient_for_matrix_appservice())
                 recipients.append({
                     "endpoint": settings.SOCIALHOME_RELAY_ID,
                     "fid": "",
