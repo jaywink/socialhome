@@ -376,5 +376,9 @@ def send_profile(profile_id, recipients=None):
         return
     if not recipients:
         recipients = _get_remote_followers(profile, profile.visibility)
+        # If we have Matrix support enabled, also add the appservice
+        if settings.SOCIALHOME_MATRIX_ENABLED:
+            recipients.append(profile.get_recipient_for_matrix_appservice())
+
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())

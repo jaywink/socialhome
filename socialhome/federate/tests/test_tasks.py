@@ -472,9 +472,9 @@ class TestSendProfile(SocialhomeTestCase):
         cls.remote_profile = ProfileFactory()
         cls.remote_profile2 = ProfileFactory()
 
-    @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks._get_remote_followers")
-    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
+    @patch("socialhome.federate.tasks.handle_send", autospec=True)
+    @patch("socialhome.federate.tasks._get_remote_followers", autospec=True)
+    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile", autospec=True)
     def test_send_local_profile(self, mock_federable, mock_get, mock_send):
         recipients = [
             self.remote_profile.fid,
@@ -483,7 +483,11 @@ class TestSendProfile(SocialhomeTestCase):
         mock_get.return_value = recipients
         send_profile(self.profile.id)
         mock_send.assert_called_once_with(
-            "profile", self.profile.federable, recipients, payload_logger=None,
+            "profile", self.profile.federable, [
+                self.remote_profile.fid,
+                self.remote_profile2.fid,
+                self.profile.get_recipient_for_matrix_appservice(),
+            ], payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_profile")

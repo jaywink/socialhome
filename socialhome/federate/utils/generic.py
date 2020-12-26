@@ -25,11 +25,12 @@ def get_matrix_config() -> Optional[Dict]:
     """
     if settings.SOCIALHOME_MATRIX_ENABLED:
         return {
-            "homeserver_base_url": f"https://matrix.{settings.SOCIALHOME_DOMAIN}",
-            "homeserver_domain_with_port": f"matrix.{settings.SOCIALHOME_DOMAIN}:443",
+            "homeserver_base_url": settings.SOCIALHOME_MATRIX_APPSERVICE_BASE_URL,
+            "homeserver_name": settings.SOCIALHOME_DOMAIN,
+            "homeserver_domain_with_port": settings.SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT,
             "appservice": {
-                "id": "socialhome",
-                "sender_localpart": "_socialhome",
+                "id": settings.SOCIALHOME_MATRIX_APPSERVICE_ID,
+                "shortcode": settings.SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE,
                 "token": settings.SOCIALHOME_MATRIX_APPSERVICE_TOKEN,
             },
         }

@@ -205,6 +205,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
                 "public": profile.inbox_public,
             },
             username=profile.username_part,
+            mxid=profile.mxid or "",
         )
     except Exception as ex:
         logger.exception("_make_profile - Failed to convert %s: %s", profile.uuid, ex)
