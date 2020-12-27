@@ -71,8 +71,12 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             post,
             self.public_content.author.federable,
-            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
-              'protocol': 'diaspora'}],
+            [
+                {'endpoint': 'https://matrix.127.0.0.1:8000', 'fid': self.public_content.author.mxid, 'public': True,
+                 'protocol': 'matrix'},
+                {'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
+                 'protocol': 'diaspora'},
+            ],
             payload_logger=None,
         )
 
@@ -484,9 +488,9 @@ class TestSendProfile(SocialhomeTestCase):
         send_profile(self.profile.id)
         mock_send.assert_called_once_with(
             "profile", self.profile.federable, [
+                self.profile.get_recipient_for_matrix_appservice(),
                 self.remote_profile.fid,
                 self.remote_profile2.fid,
-                self.profile.get_recipient_for_matrix_appservice(),
             ], payload_logger=None,
         )
 
