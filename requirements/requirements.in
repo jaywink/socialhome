@@ -1,6 +1,7 @@
 arrow
 bleach
-channels
+# 3.x: This is a major version change requiring updates to consumers and middleware.
+channels<3
 channels_redis
 circus
 #CommonMark

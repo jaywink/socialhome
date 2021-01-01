@@ -7,14 +7,14 @@ from socialhome.users.tests.factories import ProfileFactory, UserFactory, Public
     LimitedProfileFactory, SelfProfileFactory
 
 
-class TagFactory(factory.DjangoModelFactory):
+class TagFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Tag
 
     name = factory.Faker("user_name")
 
 
-class ContentFactory(factory.DjangoModelFactory):
+class ContentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Content
 
@@ -73,7 +73,7 @@ class LocalContentFactory(ContentFactory):
         self.save()
 
 
-class OEmbedCacheFactory(factory.DjangoModelFactory):
+class OEmbedCacheFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = OEmbedCache
 
@@ -81,7 +81,7 @@ class OEmbedCacheFactory(factory.DjangoModelFactory):
     oembed = factory.Faker("text")
 
 
-class OpenGraphCacheFactory(factory.DjangoModelFactory):
+class OpenGraphCacheFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = OpenGraphCache
 

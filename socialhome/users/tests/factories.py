@@ -4,10 +4,17 @@ import factory
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from factory import fuzzy
+from faker import Faker
 
 from federation.entities import base
 
 from socialhome.enums import Visibility
+
+
+def get_random_image_url(width: int, height: int) -> str:
+    # Faker.seed(0)
+    fake = Faker()
+    return fake.image_url(width=width, height=height)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -173,9 +180,9 @@ class BaseProfileFactory(factory.Factory):
     public_key = factory.Faker("sha1")
     public = factory.Faker("pybool")
     image_urls = {
-        "small": factory.Faker("image_url", width=30, height=30).generate({}),
-        "medium": factory.Faker("image_url", width=100, height=100).generate({}),
-        "large": factory.Faker("image_url", width=300, height=300).generate({}),
+        "small": get_random_image_url(width=30, height=30),
+        "medium": get_random_image_url(width=100, height=100),
+        "large": get_random_image_url(width=300, height=300),
     }
     tag_list = factory.Faker("words", nb=4)
 
