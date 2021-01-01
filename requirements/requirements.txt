@@ -86,7 +86,9 @@ cssselect==1.1.0
 daphne==2.5.0
     # via channels
 decorator==4.4.2
-    # via ipython
+    # via
+    #   ipython
+    #   traitlets
 defusedxml==0.6.0
     # via python3-openid
 dirty-validators==0.5.4
@@ -339,6 +341,7 @@ six==1.15.0
     #   jsonschema
     #   pyopenssl
     #   python-dateutil
+    #   traitlets
     #   unicode-slugify
 soupsieve==2.1
     # via beautifulsoup4
@@ -350,8 +353,10 @@ toml==0.10.2
     # via autopep8
 tornado==6.1
     # via circus
-traitlets==5.0.5
-    # via ipython
+traitlets==4.3.3
+    # via
+    #   -r requirements/requirements.in
+    #   ipython
 twisted[tls]==20.3.0
     # via daphne
 txaio==20.12.1

@@ -144,6 +144,7 @@ decorator==4.4.2
     # via
     #   -r requirements/requirements.txt
     #   ipython
+    #   traitlets
 defusedxml==0.6.0
     # via
     #   -r requirements/requirements.txt
@@ -582,6 +583,7 @@ six==1.15.0
     #   pyopenssl
     #   pytest-profiling
     #   python-dateutil
+    #   traitlets
     #   unicode-slugify
 snowballstemmer==2.0.0
     # via sphinx
@@ -628,7 +630,7 @@ tornado==6.1
     #   -r requirements/requirements.txt
     #   circus
     #   livereload
-traitlets==5.0.5
+traitlets==4.3.3
     # via
     #   -r requirements/requirements.txt
     #   ipython
