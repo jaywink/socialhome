@@ -183,7 +183,7 @@ inflection==0.5.1
     # via drf-yasg
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.19.0
+ipython==7.15.0
     # via -r requirements/requirements.in
 isodate==0.6.0
     # via python-xrd
@@ -191,9 +191,10 @@ iteration-utilities==0.11.0
     # via federation
 itypes==1.2.0
     # via coreapi
-# See https://github.com/ipython/ipython/issues/12740
 jedi==0.17.2
-    # via ipython
+    # via
+    #   -r requirements/requirements.in
+    #   ipython
 jinja2==2.11.2
     # via
     #   coreschema
@@ -218,7 +219,7 @@ packaging==20.8
     # via
     #   bleach
     #   drf-yasg
-parso==0.8.1
+parso==0.7.1
     # via jedi
 persisting-theory==0.2.1
     # via django-dynamic-preferences

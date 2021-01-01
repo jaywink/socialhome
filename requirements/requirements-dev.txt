@@ -295,7 +295,7 @@ ipython-genutils==0.2.0
     # via
     #   -r requirements/requirements.txt
     #   traitlets
-ipython==7.19.0
+ipython==7.15.0
     # via
     #   -r requirements/requirements.txt
     #   ipdb
@@ -367,7 +367,7 @@ packaging==20.8
     #   pytest
     #   pytest-sugar
     #   sphinx
-parso==0.8.1
+parso==0.7.1
     # via
     #   -r requirements/requirements.txt
     #   jedi
