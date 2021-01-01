@@ -1,7 +1,9 @@
 arrow
 bleach
-channels
-channels_redis
+# 3.x: This is a major version change requiring updates to consumers and middleware.
+channels<3
+# 3.x requires Redis 5.x
+channels_redis<3
 circus
 #CommonMark
 django-allauth
@@ -32,7 +34,8 @@ django<3
 djangorestframework
 drf-yasg
 #federation
-ipython
+# 7.15 is the last version supporting Python 3.6
+ipython<7.16
 lxml
 Pillow
 psycopg2-binary
@@ -59,3 +62,9 @@ pyyaml
 
 # Fork to allow ignoring HTML blocks, needs upstream PR
 -e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
+
+## NON-DIRECT requirements locked here due to issues
+#https://github.com/ipython/ipython/issues/12740
+jedi==0.17.2
+# Python 3.6 support dropped
+traitlets<5
