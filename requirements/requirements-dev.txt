@@ -79,7 +79,7 @@ cffi==1.14.4
     # via
     #   -r requirements/requirements.txt
     #   cryptography
-channels-redis==3.2.0
+channels-redis==2.4.2
     # via -r requirements/requirements.txt
 channels==2.4.0
     # via
@@ -342,7 +342,7 @@ markupsafe==1.1.1
     #   jinja2
 mccabe==0.6.1
     # via flake8
-msgpack==1.0.2
+msgpack==0.6.2
     # via
     #   -r requirements/requirements.txt
     #   channels-redis

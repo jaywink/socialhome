@@ -2,7 +2,8 @@ arrow
 bleach
 # 3.x: This is a major version change requiring updates to consumers and middleware.
 channels<3
-channels_redis
+# 3.x requires Redis 5.x
+channels_redis<3
 circus
 #CommonMark
 django-allauth
