@@ -74,8 +74,6 @@ class TestSendContent(SocialhomeTestCase):
             [
                 {'endpoint': 'https://matrix.127.0.0.1:8000', 'fid': self.public_content.author.mxid, 'public': True,
                  'protocol': 'matrix'},
-                {'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
-                 'protocol': 'diaspora'},
             ],
             payload_logger=None,
         )
@@ -148,8 +146,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
             ANY,
             "entity",
             self.public_content.author.federable,
-            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
-              'protocol': 'diaspora'}],
+            [],
             payload_logger=None,
             job_timeout=10000,
         )

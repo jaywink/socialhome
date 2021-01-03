@@ -16,6 +16,14 @@ Added
 
   See docs at :ref:`matrix-protocol-support` for more information.
 
+Changed
+.......
+
+* Stop delivering public content to the Diaspora relay system by default. It's still
+  possible to configure this by explicitly setting ``SOCIALHOME_RELAY_ID`` to the chosen
+  relay endpoint, however by default it is now unset. Also change the default value of
+  ``SOCIALHOME_RELAY_SCOPE`` from ``all`` to ``none`` (ie not subscribing to relays).
+
 0.12.1 (2020-12-12)
 -------------------
 
