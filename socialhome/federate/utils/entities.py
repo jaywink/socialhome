@@ -163,17 +163,22 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             }.get(obj.content_type)
             actor_id = author.fid
             handle = author.handle
+            if obj.content_type == ContentType.SHARE:
+                target_id = obj.activities.first().fid
+            else:
+                target_id = obj.fid
         elif isinstance(obj, Profile):
             entity_type = "Profile"
             actor_id = obj.fid
             handle = obj.handle
+            target_id = obj.fid
         else:
             logger.warning("make_federable_retraction - Unknown object type %s", obj)
             return
         return base.Retraction(
             entity_type=entity_type,
             actor_id=actor_id,
-            target_id=obj.fid,
+            target_id=target_id,
             handle=handle,
             target_guid=obj.guid,
         )

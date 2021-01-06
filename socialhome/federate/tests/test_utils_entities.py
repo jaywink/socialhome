@@ -2,8 +2,9 @@ from django.conf import settings
 from django.test import override_settings, RequestFactory
 from federation.entities import base
 
-from socialhome.content.tests.factories import PublicContentFactory, SiteContentFactory
-from socialhome.federate.utils import get_federable_object, get_profile, make_federable_profile
+from socialhome.content.tests.factories import PublicContentFactory, SiteContentFactory, ContentFactory
+from socialhome.federate.utils import get_federable_object, get_profile, make_federable_profile, \
+    make_federable_retraction
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, SiteUserFactory
 
@@ -95,3 +96,19 @@ class TestGetProfile(SocialhomeTestCase):
         maked = make_federable_profile(self.profile)
         self.assertEqual(returned.id, maked.id)
         self.assertTrue(isinstance(returned, base.Profile))
+
+
+class TestMakeFederableRetraction(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.content = ContentFactory(author=cls.remote_profile)
+        cls.share = ContentFactory(share_of=cls.content, author=cls.profile)
+
+    def test_target_id_correct_for_share(self):
+        obj = make_federable_retraction(self.share, author=self.profile)
+        print(obj)
+        print(obj.target_id)
+        self.assertEqual(obj.target_id, self.share.activities.first().fid)
+        # assert 1 == 2

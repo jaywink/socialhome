@@ -24,6 +24,11 @@ Changed
   relay endpoint, however by default it is now unset. Also change the default value of
   ``SOCIALHOME_RELAY_SCOPE`` from ``all`` to ``none`` (ie not subscribing to relays).
 
+Fixed
+.....
+
+* Fix share retraction towards ActivityPub platforms.
+
 0.12.1 (2020-12-12)
 -------------------
 
