@@ -22,7 +22,7 @@
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
-    "vue-axios": "^2.1.5",
+    "vue-axios": "^3.2.2",
     "vue-images-loaded": "^1.1.2",
     "vue-infinite-loading": "^2.4.5",
     "vue-infinite-scroll": "^2.0.2",
