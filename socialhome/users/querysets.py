@@ -46,6 +46,10 @@ class ProfileQuerySet(QuerySet):
                 if key in ('fid', 'guid', 'handle'):
                     continue
                 setattr(profile, key, value)
+            # Switch profile to ActivityPub if Diaspora and we got an ActivityPub payload,
+            # indicating this is a multi-protocol remote
+            if profile.protocol == "diaspora" and profile.fid:
+                profile.protocol = "activitypub"
             profile.save()
             return profile, False
 

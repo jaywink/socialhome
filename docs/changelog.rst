@@ -24,6 +24,12 @@ Changed
   relay endpoint, however by default it is now unset. Also change the default value of
   ``SOCIALHOME_RELAY_SCOPE`` from ``all`` to ``none`` (ie not subscribing to relays).
 
+* When receiving profiles, try to match them to an existing profile using both ActivityPub
+  and Diaspora protocol identifiers, to not create duplicate profiles per protocol.
+
+* When receiving profiles, if the profile was previously set from Diaspora protocol, but
+  it now also has an ActivityPub ID, switch it to be an ActivityPub profile.
+
 Fixed
 .....
 
@@ -132,9 +138,6 @@ Fixed
 * Stop creating duplicate content items from remote content delivered by both ActivityPub
   and Diaspora protocols. When these refer to each other, they will be merged to avoid
   duplicate content items.
-
-* When receiving profiles, try to match them to an existing profile using both ActivityPub
-  and Diaspora protocol identifiers, to not create duplicate profiles per protocol.
 
 Internal changes
 ................
