@@ -15,7 +15,7 @@
     "axios": "^0.21.1",
     "bootstrap": "4.5.3",
     "bootstrap-vue": "2.21.2",
-    "easymde": "^2.10.1",
+    "easymde": "^2.13.0",
     "fork-awesome": "^1.1.7",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
