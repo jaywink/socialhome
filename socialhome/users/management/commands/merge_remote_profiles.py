@@ -93,21 +93,21 @@ class Command(BaseCommand):
             try:
                 with transaction.atomic():
                     # - Re-assign all content
-                    for content in Content.objects.filter(author_id=dupe.id).iterator():
-                        print(f"   - reassigning content: {content}")
-                        content.author_id = profile.id
-                        content.save()
-                        counts["contents_moved"] += 1
+                    updated = Content.objects.filter(author_id=dupe.id).update(author_id=profile.id)
+                    print(f"   - reassigned {updated} content items")
+                    counts["contents_moved"] += updated
 
                     # - Re-assign followers and following
-                    for follower in dupe.followers.all():
-                        print(f"   - reassigning follower: {follower}")
-                        profile.followers.add(follower)
-                        counts["followers_moved"] += 1
-                    for following in dupe.following.all():
-                        print(f"   - reassigning following: {following}")
-                        profile.following.add(following)
-                        counts["following_moved"] += 1
+                    followers = dupe.followers.all()
+                    followers_count = dupe.followers.count()
+                    profile.followers.add(*followers)
+                    print(f"   - reassigned {followers_count} followers")
+                    counts["followers_moved"] += followers_count
+                    following = dupe.following.all()
+                    following_count = dupe.following.count()
+                    profile.following.add(*following)
+                    print(f"   - reassigned {following_count} following")
+                    counts["following_moved"] += following_count
 
                     # Store info
                     profile.guid = dupe.guid
