@@ -7,7 +7,6 @@ from django.db.migrations import RunPython
 def forward(apps, schema_editor):
     # noinspection PyPep8Naming
     Profile = apps.get_model("users", "Profile")
-
     Content = apps.get_model("content", "Content")
     for profile in Profile.objects.filter(user__isnull=True, protocol="activitypub").iterator():
         dupes = Profile.objects.filter(
@@ -25,11 +24,9 @@ def forward(apps, schema_editor):
             content.author_id = profile.id
             content.save()
         # - Re-assign followers and following
-        followers = Profile.objects.filter(followers__in=profile.id)
-        for follower in followers:
+        for follower in dupe.followers.all():
             profile.followers.add(follower)
-        following = Profile.objects.filter(following__in=profile.id)
-        for following in following:
+        for following in dupe.following.all():
             profile.following.add(following)
         # Store info
         guid = dupe.guid
