@@ -35,6 +35,9 @@ Fixed
 
 * Fix share retraction towards ActivityPub platforms.
 
+* Avoid unnecessary Profile object saves when finding sender profiles and nothing for the
+  remote profile has changed.
+
 0.12.1 (2020-12-12)
 -------------------
 
