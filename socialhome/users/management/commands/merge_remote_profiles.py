@@ -46,6 +46,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        max_merges = int(options["max"])
         kwargs = {
             "user__isnull": True,
             "protocol": "activitypub",
@@ -127,8 +128,8 @@ class Command(BaseCommand):
                 counts["error_saving"] += 1
                 lists["error_saving"].append((profile, dupe))
 
-            if counts["merged"] >= options["max"]:
-                print(f"\n\nReached MAX {options.max}, aborting...")
+            if counts["merged"] >= max_merges:
+                print(f"\n\nReached MAX {max_merges}, aborting...")
                 break
 
         print("\n\n-----------------------------------------------------------\n\n")
