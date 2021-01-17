@@ -19,6 +19,23 @@ from socialhome.federate.models import Payload
 logger = logging.getLogger("socialhome")
 
 
+def get_matrix_config() -> Optional[Dict]:
+    """
+    Matrix configuration object for the federation library.
+    """
+    if settings.SOCIALHOME_MATRIX_ENABLED:
+        return {
+            "homeserver_base_url": settings.SOCIALHOME_MATRIX_APPSERVICE_BASE_URL,
+            "homeserver_name": settings.SOCIALHOME_DOMAIN,
+            "homeserver_domain_with_port": settings.SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT,
+            "appservice": {
+                "id": settings.SOCIALHOME_MATRIX_APPSERVICE_ID,
+                "shortcode": settings.SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE,
+                "token": settings.SOCIALHOME_MATRIX_APPSERVICE_TOKEN,
+            },
+        }
+
+
 def get_nodeinfo2_data():
     """
     Return data set for a NodeInfo2 document.

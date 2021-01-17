@@ -315,8 +315,8 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     domain=SOCIALHOME_DOMAIN
 )
 # Relay to send public content to
-SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default="https://relay.iliketoast.net/receive/public")
-SOCIALHOME_RELAY_SCOPE = env("SOCIALHOME_RELAY_SCOPE", default="all")
+SOCIALHOME_RELAY_ID = env("SOCIALHOME_RELAY_ID", default=None)
+SOCIALHOME_RELAY_SCOPE = env("SOCIALHOME_RELAY_SCOPE", default="none")
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.
@@ -407,6 +407,22 @@ SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
 
 # How many seconds since we saw user activity do we consider the user have been recently active?
 SOCIALHOME_USER_ACTIVITY_SECONDS = 130
+
+# Matrix support
+# NOTE! Incomplete, alpha, here be dragons, requires Dendrite, etc
+SOCIALHOME_MATRIX_ENABLED = env.bool("SOCIALHOME_MATRIX_ENABLED", default=False)
+# **REQUIRED** if Matrix support is enabled:
+# This is a secret token to communicate with the Matrix homeserver. Never give it to anyone!
+SOCIALHOME_MATRIX_APPSERVICE_TOKEN = env("SOCIALHOME_MATRIX_APPSERVICE_TOKEN", default=None)
+# An ID for the appservice, **should never change after creating**.
+SOCIALHOME_MATRIX_APPSERVICE_ID = env("SOCIALHOME_MATRIX_APPSERVICE_ID", default=None)
+# **OPTIONAL** to change from defaults:
+# Shortcode for the socialhome instance. Only a-z, used for namespacing things.
+SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE", default="socialhome")
+# **NOT TO BE MODIFIED**
+SOCIALHOME_MATRIX_HOMESERVER = f"matrix.{SOCIALHOME_DOMAIN}"
+SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}"
+SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -600,3 +616,5 @@ FEDERATION = {
     "search_path": "/search/?q=",
     "tags_path": "/streams/tag/:tag:/",
 }
+if SOCIALHOME_MATRIX_ENABLED:
+    FEDERATION["matrix_config_function"] = "socialhome.federate.utils.generic.get_matrix_config"

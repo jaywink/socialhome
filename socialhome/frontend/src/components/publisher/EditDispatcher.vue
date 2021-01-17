@@ -8,7 +8,6 @@ import {VISIBILITY_OPTIONS} from "@/components/publisher/publisher-mixin"
 import EditPublisher from "@/components/publisher/EditPublisher"
 import EditReplyPublisher from "@/components/publisher/EditReplyPublisher"
 
-
 export default {
     name: "EditDispatcher",
     components: {

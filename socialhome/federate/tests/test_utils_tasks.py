@@ -692,7 +692,7 @@ class TestMakeFederableContent(SocialhomeTestCase):
 
 class TestMakeFederableRetraction(SocialhomeTestCase):
     def test_returns_entity(self):
-        content = ContentFactory()
+        content = PublicContentFactory()
         entity = make_federable_retraction(content, content.author)
         self.assertEqual(entity.entity_type, "Post")
         self.assertEqual(entity.target_id, content.fid)

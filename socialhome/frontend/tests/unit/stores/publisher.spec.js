@@ -5,7 +5,6 @@ import {getPublisherStore} from "@/store/modules/publisher"
 const localVue = createLocalVue()
 const publisher = getPublisherStore(localVue.axios)
 
-
 describe("publisher", () => {
     beforeEach(() => {
         Sinon.restore()

@@ -7,7 +7,6 @@ import profiles from "@/store/modules/profiles"
 import {getPublisherStore} from "@/store/modules/publisher"
 import {profilesPlugin, getStreamStore} from "@/store/modules/stream"
 
-
 const debug = process.env.NODE_ENV !== "production"
 
 function getStore(Vue) {

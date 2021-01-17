@@ -3,8 +3,42 @@
 Changelog
 =========
 
-0.12.0-dev (unreleased)
------------------------
+unreleased
+----------
+
+Added
+.....
+
+* Start adding Matrix support 🎉 Currently added functionality in this release,
+  if ``SOCIALHOME_MATRIX_ENABLED`` set to ``true``:
+
+  * Client and server well-known files are automatically generated.
+
+  See docs at :ref:`matrix-protocol-support` for more information.
+
+Changed
+.......
+
+* Stop delivering public content to the Diaspora relay system by default. It's still
+  possible to configure this by explicitly setting ``SOCIALHOME_RELAY_ID`` to the chosen
+  relay endpoint, however by default it is now unset. Also change the default value of
+  ``SOCIALHOME_RELAY_SCOPE`` from ``all`` to ``none`` (ie not subscribing to relays).
+
+Fixed
+.....
+
+* Fix share retraction towards ActivityPub platforms.
+
+0.12.1 (2020-12-12)
+-------------------
+
+Fixed
+.....
+
+* Fix build broken by some Eslint dependencies needing update.
+
+0.12.0 (2020-12-12)
+-------------------
 
 Added
 .....
@@ -110,7 +144,7 @@ Internal changes
 
 * Move ``socialhome.content.utils.process_text_links`` to the ``federation`` library.
 
-* Move the tags extraction logic from ``Conten`` model to the ``federation`` library.
+* Move the tags extraction logic from ``Content`` model to the ``federation`` library.
 
 0.11.1 (2019-12-30)
 -------------------

@@ -5,6 +5,7 @@ import django_rq
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
@@ -238,8 +239,12 @@ def _retract_content(target_fid, profile):
     try:
         content = Content.objects.fed(target_fid, local=False).get()
     except Content.DoesNotExist:
-        logger.warning("Retracted remote content %s cannot be found", target_fid)
-        return
+        # Try by shared activity fid
+        try:
+            content = Content.objects.get(activities__fid=target_fid, local=False, content_type=ContentType.SHARE)
+        except Content.DoesNotExist:
+            logger.warning("Retracted remote content %s cannot be found", target_fid)
+            return
     if content.author != profile:
         logger.warning("Content %s is not owned by remote retraction profile %s", content, profile)
         return

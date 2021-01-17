@@ -92,7 +92,18 @@ class TestProfile(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.profile = ProfileFactory()
-        cls.user = UserFactory()
+        cls.profile_with_handle = ProfileFactory(
+            fid="https://example.com/randomremote",
+            handle="randomremote@example.com",
+        )
+        cls.profile_without_handle = ProfileFactory(
+            fid="https://example.com/randomremote2",
+        )
+        cls.profile_without_handle.handle = None
+        cls.profile_without_handle.save()
+        cls.user = UserFactory(
+            username="randomlocal",
+        )
 
     def test_generate_new_rsa_key(self):
         profile = ProfileFactory()
@@ -120,6 +131,20 @@ class TestProfile(SocialhomeTestCase):
         self.assertEqual(self.profile.local_url, self.profile.url)
         self.assertEqual(
             self.user.profile.local_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.get_absolute_url()),
+        )
+
+    def test_mxid(self):
+        self.assertEqual(
+            self.profile_with_handle.mxid,
+            "@_socialhome_randomremote_example.com:127.0.0.1:8000",
+        )
+        self.assertEqual(
+            self.profile_without_handle.mxid,
+            "@_socialhome_example.com_randomremote2:127.0.0.1:8000",
+        )
+        self.assertEqual(
+            self.user.profile.mxid,
+            "@randomlocal:127.0.0.1:8000",
         )
 
     def test_name_or_handle(self):

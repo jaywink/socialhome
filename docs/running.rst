@@ -127,6 +127,31 @@ To publish the documents, open them, review the text and then change the status 
 
 Published policy documents are shown to both authenticated and unauthenticated users via the navigation bar cogs menu.
 
+.. _matrix-protocol-support:
+
+Matrix protocol support
+-----------------------
+
+*Note! Extremely alpha, work on progress, non-functional*
+
+After getting excited about `Cerulean <https://matrix.org/blog/2020/12/18/introducing-cerulean>`_, work has
+started to integrate the Matrix protocol into Socialhome. While for Diaspora and ActivityPub protocols, Socialhome
+is fully in server mode, for Matrix we will be taking a different route. Making Socialhome into a full homeserver
+would be overkill to integrate Socialhome with the Matrix network, so instead Socialhome will become a multi-person
+client towards other Matrix servers.
+
+To run Socialhome with Matrix support, you will need to also run a `Dendrite <https://github.com/matrix-org/dendrite>`_
+server. This should be a dedicated instance for Socialhome alone as it will be tightly integrated.
+
+When setting up the Dendrite server currently the following assumptions are made:
+
+* the server name is the domain of the Socialhome instance (for example ``domain.tld``)
+* the homeserver is reachable via ``matrix.domain.tld`` port 443. Socialhome will handle the
+  well-known delegation for you.
+
+Once you have this Dendrite running, you can set ``SOCIALHOME_MATRIX_ENABLED`` to ``true``. It currently
+wont do much else than serve the well-known files, but things will start appearing.
+
 .. _configuration:
 
 Configuration
@@ -343,16 +368,21 @@ URL to make signup link go to in the case that signups are closed.
 SOCIALHOME_RELAY_ID
 ...................
 
-Default: ``relay@relay.iliketoast.net``
+Default: not set
 
-Which relay instance ID to send outgoing content to. For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
+Configure an optional relay instance endpoint to send outgoing content to,
+for example ``https://relay.domain.tld/receive/public``.
+
+For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
 
 SOCIALHOME_RELAY_SCOPE
 ......................
 
-Default: ``all``
+Default: ``none``
 
-Possible values ``all`` or ``none``. Defines at which level the defined relay is subscribed with. Set to ``none`` to disable the relay incoming subscription. For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
+Possible values ``all`` or ``none``. Defines at which level the defined relay is subscribed with.
+Set to ``none`` to disable the relay incoming subscription.
+For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
 
 SOCIALHOME_ROOT_PROFILE
 .......................

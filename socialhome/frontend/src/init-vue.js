@@ -12,7 +12,6 @@ import filters from "@/filters"
 import LoadingElement from "@/components/common/LoadingElement"
 import NoMoreDataEement from "@/components/common/NoMoreDataEement"
 
-
 const VueDeviceSize = Object.freeze({
     // eslint-disable-next-line object-curly-newline
     install(Vue, {smSize = 576, mdSize = 768, lgSize = 992, xlSize = 1200} = {}) {

@@ -1,7 +1,6 @@
 <script>
 import ReplyPublisher from "@/components/publisher/ReplyPublisher"
 
-
 export default {
     name: "EditReplyPublisher",
     extends: ReplyPublisher,

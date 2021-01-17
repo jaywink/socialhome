@@ -100,12 +100,16 @@ def send_content(content_id, activity_fid, recipient_id=None):
             recipients.append(recipient.get_recipient_for_visibility(content.visibility))
         else:
             if content.visibility == Visibility.PUBLIC:
-                recipients.append({
-                    "endpoint": settings.SOCIALHOME_RELAY_ID,
-                    "fid": "",
-                    "public": True,
-                    "protocol": "diaspora"
-                })
+                # If we have Matrix support enabled, also add the appservice
+                if settings.SOCIALHOME_MATRIX_ENABLED:
+                    recipients.append(content.author.get_recipient_for_matrix_appservice())
+                if settings.SOCIALHOME_RELAY_ID:
+                    recipients.append({
+                        "endpoint": settings.SOCIALHOME_RELAY_ID,
+                        "fid": "",
+                        "public": True,
+                        "protocol": "diaspora"
+                    })
             recipients.extend(_get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
@@ -240,12 +244,14 @@ def send_content_retraction(content, author_id):
             # Don't send in development mode
             return
         if content.visibility == Visibility.PUBLIC:
-            recipients = [{
-                "endpoint": settings.SOCIALHOME_RELAY_ID,
-                "fid": "",
-                "public": True,
-                "protocol": "diaspora"
-            }]
+            recipients = []
+            if settings.SOCIALHOME_RELAY_ID:
+                recipients.append({
+                    "endpoint": settings.SOCIALHOME_RELAY_ID,
+                    "fid": "",
+                    "public": True,
+                    "protocol": "diaspora"
+                })
             recipients.extend(
                 _get_remote_followers(author, content.visibility)
             )
@@ -375,6 +381,12 @@ def send_profile(profile_id, recipients=None):
         # Don't send in development mode
         return
     if not recipients:
-        recipients = _get_remote_followers(profile, profile.visibility)
+        # If we have Matrix support enabled, also add the appservice
+        if settings.SOCIALHOME_MATRIX_ENABLED:
+            recipients = [profile.get_recipient_for_matrix_appservice()]
+        else:
+            recipients = []
+        recipients.extend(_get_remote_followers(profile, profile.visibility))
+
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())

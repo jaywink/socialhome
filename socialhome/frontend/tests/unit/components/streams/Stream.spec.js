@@ -9,7 +9,6 @@ import "@/components/streams/stamped_elements/PublicStampedElement.vue"
 import "@/components/streams/stamped_elements/FollowedStampedElement.vue"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 localVue.use(VueMasonryPlugin)

@@ -3,7 +3,6 @@ import Vapi from "vuex-rest-api"
 
 import _isString from "lodash/isString"
 
-
 function getState() {
     return {
         following: {

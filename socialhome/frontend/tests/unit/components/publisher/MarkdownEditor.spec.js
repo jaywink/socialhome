@@ -3,7 +3,6 @@ import {mount} from "avoriaz"
 
 import MarkdownEditor from "@/components/publisher/MarkdownEditor"
 
-
 describe("MarkdownEditor", () => {
     beforeEach(() => {
         Sinon.restore()

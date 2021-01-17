@@ -8,7 +8,6 @@ import {mount} from "avoriaz"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 Vue.use(BootstrapVue)
 Vue.use(VueMasonryPlugin)
 Vue.use(VueSnotify)

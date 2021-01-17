@@ -2,7 +2,6 @@
 import {mapActions} from "vuex"
 import BaseContacts from "@/components/contacts/BaseContacts"
 
-
 export default {
     name: "AppFollowing",
     extends: BaseContacts,

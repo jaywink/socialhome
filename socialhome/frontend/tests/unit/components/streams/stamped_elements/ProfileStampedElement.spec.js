@@ -8,7 +8,6 @@ import {getContext} from "%fixtures/jsonContext.fixtures"
 
 import {getStore} from "../../../fixtures/store.fixtures"
 
-
 Vue.use(BootstrapVue)
 Vue.use(Vuex)
 

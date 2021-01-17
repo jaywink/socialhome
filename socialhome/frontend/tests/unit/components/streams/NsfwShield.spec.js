@@ -7,12 +7,10 @@ import {VueMasonryPlugin} from "vue-masonry"
 import NsfwShield from "@/components/streams/NsfwShield.vue"
 import {getStore} from "%fixtures/store.fixtures"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 localVue.use(VueMasonryPlugin)
 localVue.use(Vuex)
-
 
 describe("NsfwShield", () => {
     let store

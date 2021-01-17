@@ -8,7 +8,6 @@ import AppFollowing from "@/components/contacts/AppFollowing"
 import AppFollowers from "@/components/contacts/AppFollowers"
 import EditDispatcher from "@/components/publisher/EditDispatcher"
 
-
 function $$(props = {}) {
     return route => ({
         ...(route.params), ...props,

@@ -4,7 +4,6 @@ import faker from "faker"
 import {createLocalVue, shallowMount} from "@vue/test-utils"
 import EditDispatcher from "@/components/publisher/EditDispatcher"
 
-
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 

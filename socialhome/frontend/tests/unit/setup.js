@@ -24,7 +24,6 @@ const Sinon = require("sinon").createSandbox()
 const {Urls} = require(path.resolve(__dirname, "fixtures", "Urls.js"))
 /* eslint-enable import/no-dynamic-require,import/newline-after-import */
 
-
 // JSDOM fixes
 // See https://github.com/jsdom/jsdom/issues/317
 const createRange = () => ({

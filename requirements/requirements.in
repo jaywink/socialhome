@@ -1,7 +1,9 @@
 arrow
 bleach
-channels
-channels_redis
+# 3.x: This is a major version change requiring updates to consumers and middleware.
+channels<3
+# 3.x requires Redis 5.x
+channels_redis<3
 circus
 #CommonMark
 django-allauth
@@ -32,7 +34,8 @@ django<3
 djangorestframework
 drf-yasg
 #federation
-ipython
+# 7.15 is the last version supporting Python 3.6
+ipython<7.16
 lxml
 Pillow
 psycopg2-binary
@@ -53,9 +56,15 @@ pyyaml
 # - GIF upload (upstream rejected)
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
 
--e git+https://git.feneas.org/jaywink/federation.git@bbaac0383beeec9c306700656741808be925d7d8#egg=federation==0.20.0-dev1
+-e git+https://git.feneas.org/jaywink/federation.git@cc6dd1cc43deb2adda1300263fe3f614e5f5a18d#egg=federation==0.22.0-dev.1
 
 -e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1
 
 # Fork to allow ignoring HTML blocks, needs upstream PR
 -e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
+
+## NON-DIRECT requirements locked here due to issues
+#https://github.com/ipython/ipython/issues/12740
+jedi==0.17.2
+# Python 3.6 support dropped
+traitlets<5

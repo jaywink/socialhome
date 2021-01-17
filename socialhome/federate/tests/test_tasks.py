@@ -71,8 +71,10 @@ class TestSendContent(SocialhomeTestCase):
         mock_send.assert_called_once_with(
             post,
             self.public_content.author.federable,
-            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
-              'protocol': 'diaspora'}],
+            [
+                {'endpoint': 'https://matrix.127.0.0.1:8000', 'fid': self.public_content.author.mxid, 'public': True,
+                 'protocol': 'matrix'},
+            ],
             payload_logger=None,
         )
 
@@ -144,8 +146,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
             ANY,
             "entity",
             self.public_content.author.federable,
-            [{'endpoint': 'https://relay.iliketoast.net/receive/public', 'fid': '', 'public': True,
-              'protocol': 'diaspora'}],
+            [],
             payload_logger=None,
             job_timeout=10000,
         )
@@ -472,9 +473,9 @@ class TestSendProfile(SocialhomeTestCase):
         cls.remote_profile = ProfileFactory()
         cls.remote_profile2 = ProfileFactory()
 
-    @patch("socialhome.federate.tasks.handle_send")
-    @patch("socialhome.federate.tasks._get_remote_followers")
-    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
+    @patch("socialhome.federate.tasks.handle_send", autospec=True)
+    @patch("socialhome.federate.tasks._get_remote_followers", autospec=True)
+    @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile", autospec=True)
     def test_send_local_profile(self, mock_federable, mock_get, mock_send):
         recipients = [
             self.remote_profile.fid,
@@ -483,7 +484,11 @@ class TestSendProfile(SocialhomeTestCase):
         mock_get.return_value = recipients
         send_profile(self.profile.id)
         mock_send.assert_called_once_with(
-            "profile", self.profile.federable, recipients, payload_logger=None,
+            "profile", self.profile.federable, [
+                self.profile.get_recipient_for_matrix_appservice(),
+                self.remote_profile.fid,
+                self.remote_profile2.fid,
+            ], payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_profile")

@@ -6,7 +6,6 @@ import getContactsStore from "@/store/modules/contacts"
 
 import {getContactsFollowersResponse, getContactsFollowingResponse} from "%fixtures/contacts.fixtures"
 
-
 const localVue = createLocalVue()
 initVue(localVue)
 localVue.use(Vuex)
