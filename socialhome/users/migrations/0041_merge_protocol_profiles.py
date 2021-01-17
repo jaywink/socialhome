@@ -7,18 +7,38 @@ from django.db.migrations import RunPython
 def forward(apps, schema_editor):
     # noinspection PyPep8Naming
     Profile = apps.get_model("users", "Profile")
-    for profile in Profile.objects.filter(user__isnull=True).iterator():
-        # How do we recognize that there could be a dupe?
-        # - Username match from fid and handle?
-        # If dupe found:
-        # - Do a remote lookup. Check id and guid
-        # If found profiles match:
-        # - Choose the older version
+    Content = apps.get_model("content", "Content")
+    for profile in Profile.objects.filter(user__isnull=True, protocol="activitypub").iterator():
+        dupes = Profile.objects.filter(
+            rsa_public_key__contains=profile.rsa_public_key.strip(),
+            user__isnull=True,
+            protocol="diaspora",
+        )
+        if not dupes:
+            continue
+        # If dupes found
+        # There should only be one dupe, since we've only 2 protocols
+        dupe = dupes[0]
         # - Re-assign all content
+        for content in Content.objects.filter(author_id=dupe.id):
+            content.author_id = profile.id
+            content.save()
         # - Re-assign followers and following
-        # - Set fid or guid, depending on which is missing
+        for follower in dupe.followers:
+            profile.followers.add(follower)
+        for following in dupe.following:
+            profile.following.add(following)
+        # Store info
+        guid = dupe.guid
+        handle = dupe.handle
         # - Delete the dupe
-        pass
+        dupe.delete()
+        # - Set guid and handle, if missing
+        if not profile.guid and guid:
+            profile.giod = guid
+        if not profile.handle and handle:
+            profile.handle = handle
+        profile.save()
 
 
 class Migration(migrations.Migration):
