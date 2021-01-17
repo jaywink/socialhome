@@ -480,6 +480,10 @@ class Profile(TimeStampedModel):
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
         logger.debug("from_remote_profile - values %s", values)
-        profile, created = Profile.objects.fed_update_or_create(fid, values)
+        if values["guid"]:
+            extra_lookups = {"guid": values["guid"]}
+        else:
+            extra_lookups = {}
+        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

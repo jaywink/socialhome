@@ -27,7 +27,7 @@ class ProfileQuerySet(QuerySet):
         ).filter(**params)
 
     def fed_update_or_create(
-        self, fid: str, values: Dict[str, Any], extra_lookups: Dict=None
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict = None
     ) -> Tuple['Profile', bool]:
         """
         Update or create by federated ID.
@@ -42,11 +42,20 @@ class ProfileQuerySet(QuerySet):
             values.update(extra_lookups)
             return self.create(**values), True
         else:
+            changed = False
             for key, value in values.items():
                 if key in ('fid', 'guid', 'handle'):
                     continue
+                if getattr(profile, key, None) != value:
+                    changed = True
                 setattr(profile, key, value)
-            profile.save()
+            # Switch profile to ActivityPub if Diaspora and we got an ActivityPub payload,
+            # indicating this is a multi-protocol remote
+            if profile.protocol == "diaspora" and profile.fid:
+                profile.protocol = "activitypub"
+                changed = True
+            if changed:
+                profile.save()
             return profile, False
 
     def followers(self, profile):

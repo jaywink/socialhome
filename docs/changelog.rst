@@ -16,6 +16,12 @@ Added
 
   See docs at :ref:`matrix-protocol-support` for more information.
 
+* Add ``merge_remote_profiles`` management command
+
+  Attempts to merge remote profiles where the profile has both a Diaspora protocol
+  identifier and ActivityPub protocol identifier. The profile will be made primarily
+  ActivityPub. All content will be migrated to the other profile and the dupe deleted.
+
 Changed
 .......
 
@@ -24,10 +30,19 @@ Changed
   relay endpoint, however by default it is now unset. Also change the default value of
   ``SOCIALHOME_RELAY_SCOPE`` from ``all`` to ``none`` (ie not subscribing to relays).
 
+* When receiving profiles, try to match them to an existing profile using both ActivityPub
+  and Diaspora protocol identifiers, to not create duplicate profiles per protocol.
+
+* When receiving profiles, if the profile was previously set from Diaspora protocol, but
+  it now also has an ActivityPub ID, switch it to be an ActivityPub profile.
+
 Fixed
 .....
 
 * Fix share retraction towards ActivityPub platforms.
+
+* Avoid unnecessary Profile object saves when finding sender profiles and nothing for the
+  remote profile has changed.
 
 0.12.1 (2020-12-12)
 -------------------
