@@ -4,43 +4,6 @@ from django.db import migrations
 from django.db.migrations import RunPython
 
 
-def forward(apps, schema_editor):
-    # noinspection PyPep8Naming
-    Profile = apps.get_model("users", "Profile")
-    Content = apps.get_model("content", "Content")
-    for profile in Profile.objects.filter(user__isnull=True, protocol="activitypub").iterator():
-        dupes = Profile.objects.filter(
-            rsa_public_key__contains=profile.rsa_public_key.strip(),
-            user__isnull=True,
-            protocol="diaspora",
-        )
-        if not dupes:
-            continue
-        # If dupes found
-        # There should only be one dupe, since we've only 2 protocols
-        dupe = dupes[0]
-        # - Re-assign all content
-        for content in Content.objects.filter(author_id=dupe.id):
-            content.author_id = profile.id
-            content.save()
-        # - Re-assign followers and following
-        for follower in dupe.followers.all():
-            profile.followers.add(follower)
-        for following in dupe.following.all():
-            profile.following.add(following)
-        # Store info
-        guid = dupe.guid
-        handle = dupe.handle
-        # - Delete the dupe
-        dupe.delete()
-        # - Set guid and handle, if missing
-        if not profile.guid and guid:
-            profile.giod = guid
-        if not profile.handle and handle:
-            profile.handle = handle
-        profile.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -48,5 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        RunPython(forward, RunPython.noop)
+        RunPython(RunPython.noop, RunPython.noop)
     ]
