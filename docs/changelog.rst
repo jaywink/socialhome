@@ -16,6 +16,12 @@ Added
 
   See docs at :ref:`matrix-protocol-support` for more information.
 
+* Add ``merge_remote_profiles`` management command
+
+  Attempts to merge remote profiles where the profile has both a Diaspora protocol
+  identifier and ActivityPub protocol identifier. The profile will be made primarily
+  ActivityPub. All content will be migrated to the other profile and the dupe deleted.
+
 Changed
 .......
 
