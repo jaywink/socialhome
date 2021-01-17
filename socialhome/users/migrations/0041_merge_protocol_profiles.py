@@ -24,9 +24,11 @@ def forward(apps, schema_editor):
             content.author_id = profile.id
             content.save()
         # - Re-assign followers and following
-        for follower in dupe.followers:
+        followers = Profile.objects.filter(followers_id__in=profile.id)
+        for follower in followers:
             profile.followers.add(follower)
-        for following in dupe.following:
+        following = Profile.objects.filter(following_id__in=profile.id)
+        for following in following:
             profile.following.add(following)
         # Store info
         guid = dupe.guid
