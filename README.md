@@ -24,8 +24,7 @@ Documentation: http://socialhome.readthedocs.io/
 Joining
 -------
 
-Yes! The official server is open for registrations. [
-Sign up](https://socialhome.network/accounts/signup/) and play around!
+Please check https://the-federation.info/socialhome for servers with open registration, if you don't want to run your own.
 
 Please see the [community](http://socialhome.readthedocs.io/en/latest/community.html) 
 pages for how to interact with the community.
