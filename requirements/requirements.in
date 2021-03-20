@@ -1,4 +1,6 @@
 arrow
+# Not a direct requirement, remove once upgraded from Python 3.6
+autobahn<=21.2.1
 bleach
 # 3.x: This is a major version change requiring updates to consumers and middleware.
 channels<3

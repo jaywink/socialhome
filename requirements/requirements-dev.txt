@@ -44,7 +44,7 @@ attrs==20.3.0
     #   pytest
     #   service-identity
     #   twisted
-autobahn==21.3.1
+autobahn==21.2.1
     # via
     #   -r requirements/requirements.txt
     #   daphne

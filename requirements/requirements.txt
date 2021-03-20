@@ -32,8 +32,10 @@ attrs==20.3.0
     #   jsonschema
     #   service-identity
     #   twisted
-autobahn==21.3.1
-    # via daphne
+autobahn==21.2.1
+    # via
+    #   -r requirements/requirements.in
+    #   daphne
 automat==20.2.0
     # via twisted
 autopep8==1.5.6
