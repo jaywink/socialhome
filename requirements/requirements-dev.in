@@ -16,7 +16,8 @@ factory_boy
 Faker
 flake8
 freezegun
-ipdb
+# https://github.com/gotcha/ipdb/blob/master/HISTORY.txt#L24
+ipdb<0.13.5
 pip-tools
 pytest
 pytest-blockage
