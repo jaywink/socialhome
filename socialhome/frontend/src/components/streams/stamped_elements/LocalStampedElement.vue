@@ -9,7 +9,7 @@
 import Vue from "vue"
 import "@/components/streams/stamped_elements/BaseStampedElement.vue"
 
-export default Vue.component("local-stamped-element", {
+export default Vue.component("LocalStampedElement", {
     computed: {
         title() {
             return gettext("Local")

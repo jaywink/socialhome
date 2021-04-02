@@ -8,7 +8,7 @@
 <script>
 import Vue from "vue"
 
-export default Vue.component("tags-stamped-element", {
+export default Vue.component("TagsStampedElement", {
     computed: {
         title() {
             return gettext("Followed tags")

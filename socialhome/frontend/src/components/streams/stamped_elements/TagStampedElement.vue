@@ -33,7 +33,7 @@
 <script>
 import Vue from "vue"
 
-export default Vue.component("tag-stamped-element", {
+export default Vue.component("TagStampedElement", {
     computed: {
         followingTag() {
             return this.$store.state.user.followed_tags.includes(this.name)

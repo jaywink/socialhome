@@ -10,7 +10,7 @@ import Vue from "vue"
 
 import "@/components/streams/stamped_elements/BaseStampedElement.vue"
 
-export default Vue.component("public-stamped-element", {
+export default Vue.component("PublicStampedElement", {
     computed: {
         title() {
             return gettext("Public")

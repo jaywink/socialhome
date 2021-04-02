@@ -9,7 +9,7 @@
 import Vue from "vue"
 import "@/components/streams/stamped_elements/BaseStampedElement.vue"
 
-export default Vue.component("followed-stamped-element", {
+export default Vue.component("FollowedStampedElement", {
     computed: {
         title() {
             return gettext("Followed")

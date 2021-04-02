@@ -8,7 +8,7 @@
 <script>
 import Vue from "vue"
 
-export default Vue.component("base-stamped-element", {
+export default Vue.component("BaseStampedElement", {
     props: {
         title: {
             type: String, required: true,
