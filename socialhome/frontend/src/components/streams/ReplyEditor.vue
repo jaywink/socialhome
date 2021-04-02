@@ -27,7 +27,7 @@
 <script>
 import Vue from "vue"
 
-export default Vue.component("reply-editor", {
+export default Vue.component("ReplyEditor", {
     props: {
         contentId: {
             type: Number, required: true,

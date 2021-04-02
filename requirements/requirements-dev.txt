@@ -120,11 +120,11 @@ coverage==5.5
     #   codecov
     #   django-coverage-plugin
     #   pytest-cov
-croniter==1.0.8
+croniter==1.0.10
     # via
     #   -r requirements/requirements.txt
     #   rq-scheduler
-cryptography==3.4.6
+cryptography==3.4.7
     # via
     #   -r requirements/requirements.txt
     #   autobahn
@@ -142,7 +142,7 @@ daphne==2.5.0
     #   channels
 ddt==1.4.2
     # via -r requirements/requirements-dev.in
-decorator==4.4.2
+decorator==5.0.3
     # via
     #   -r requirements/requirements.txt
     #   ipython
@@ -163,7 +163,7 @@ django-braces==1.14.0
     # via -r requirements/requirements.txt
 django-coverage-plugin==1.8.0
     # via -r requirements/requirements-dev.in
-django-crispy-forms==1.11.1
+django-crispy-forms==1.11.2
     # via -r requirements/requirements.txt
 django-debug-toolbar-user-panel==1.1.1
     # via -r requirements/requirements-dev.in
@@ -199,7 +199,7 @@ django-reversion==3.0.9
     # via -r requirements/requirements.txt
 django-robots==4.0
     # via -r requirements/requirements.txt
-django-rq==2.4.0
+django-rq==2.4.1
     # via -r requirements/requirements.txt
 django-secure==1.0.2
     # via -r requirements/requirements.txt
@@ -240,7 +240,7 @@ django==2.2.19
     #   drf-yasg
 djangorestframework-stubs==1.4.0
     # via -r requirements/requirements-dev.in
-djangorestframework==3.12.2
+djangorestframework==3.12.4
     # via
     #   -r requirements/requirements.txt
     #   drf-yasg
@@ -252,7 +252,7 @@ drf-yasg==1.20.0
     # via -r requirements/requirements.txt
 factory-boy==3.2.0
     # via -r requirements/requirements-dev.in
-faker==6.6.2
+faker==7.0.1
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
@@ -260,16 +260,12 @@ flake8==3.9.0
     # via -r requirements/requirements-dev.in
 freezegun==1.1.0
     # via -r requirements/requirements-dev.in
-future==0.18.2
-    # via
-    #   -r requirements/requirements.txt
-    #   croniter
 gprof2dot==2021.2.21
     # via
     #   -r requirements/requirements.txt
     #   django-silk
     #   pytest-profiling
-hiredis==1.1.0
+hiredis==2.0.0
     # via
     #   -r requirements/requirements.txt
     #   aioredis
@@ -334,7 +330,7 @@ jsonschema==3.2.0
     #   federation
 livereload==2.6.3
     # via sphinx-autobuild
-lxml==4.6.2
+lxml==4.6.3
     # via
     #   -r requirements/requirements.txt
     #   federation
@@ -358,10 +354,6 @@ mypy==0.812
     # via
     #   django-stubs
     #   djangorestframework-stubs
-natsort==7.1.1
-    # via
-    #   -r requirements/requirements.txt
-    #   croniter
 oauthlib==3.1.0
     # via
     #   -r requirements/requirements.txt
@@ -392,7 +384,7 @@ pickleshare==0.7.5
     # via
     #   -r requirements/requirements.txt
     #   ipython
-pillow==8.1.2
+pillow==8.2.0
     # via
     #   -r requirements/requirements.txt
     #   django-markdownx
@@ -401,7 +393,7 @@ pip-tools==6.0.1
     # via -r requirements/requirements-dev.in
 pluggy==0.13.1
     # via pytest
-prompt-toolkit==3.0.17
+prompt-toolkit==3.0.18
     # via
     #   -r requirements/requirements.txt
     #   ipython
@@ -439,7 +431,7 @@ pycryptodome==3.10.1
     # via
     #   -r requirements/requirements.txt
     #   federation
-pyflakes==2.3.0
+pyflakes==2.3.1
     # via flake8
 pygments==2.8.1
     # via
@@ -556,7 +548,7 @@ requests==2.25.1
     #   sphinx
 rq-scheduler==0.11.0
     # via -r requirements/requirements.txt
-rq==1.7.0
+rq==1.8.0
     # via
     #   -r requirements/requirements.txt
     #   django-rq
@@ -565,7 +557,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/requirements.txt
     #   ruamel.yaml
-ruamel.yaml==0.16.13
+ruamel.yaml==0.17.2
     # via
     #   -r requirements/requirements.txt
     #   drf-yasg
@@ -685,7 +677,7 @@ whitenoise==5.2.0
     # via -r requirements/requirements.txt
 whoosh==2.7.4
     # via -r requirements/requirements.txt
-zope.interface==5.2.0
+zope.interface==5.3.0
     # via
     #   -r requirements/requirements.txt
     #   twisted

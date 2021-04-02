@@ -9,7 +9,7 @@
 import Vue from "vue"
 import "@/components/streams/stamped_elements/BaseStampedElement.vue"
 
-export default Vue.component("limited-stamped-element", {
+export default Vue.component("LimitedStampedElement", {
     computed: {
         title() {
             return gettext("Limited")

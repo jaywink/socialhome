@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ container: this.$store.state.stream.stream.single }">
+    <div :class="{ container: $store.state.stream.stream.single }">
         <div v-show="$store.getters['stream/hasNewContent']" class="new-content-container">
             <b-link class="new-content-load-link" @click.prevent.stop="onNewContentClick">
                 <b-badge pill variant="primary">
@@ -7,7 +7,7 @@
                 </b-badge>
             </b-link>
         </div>
-        <div v-if="this.$store.state.stream.stream.single">
+        <div v-if="$store.state.stream.stream.single">
             <stream-element class="grid-item grid-item-full" :content="singleContent" />
         </div>
         <div v-else>
@@ -51,7 +51,7 @@ import ProfileStampedElement from "@/components/streams/stamped_elements/Profile
 import LoadingElement from "@/components/common/LoadingElement.vue"
 import ProfileStreamButtons from "@/components/streams/stamped_elements/ProfileStreamButtons"
 
-export default Vue.component("stream", {
+export default Vue.component("Stream", {
     components: {
         FollowedStampedElement,
         LimitedStampedElement,
