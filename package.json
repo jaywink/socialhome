@@ -32,7 +32,7 @@
     "grunt-sass": "<3.0.0",
     "load-grunt-tasks": "~5.1.0",
     "node-sass": "<5.0.0",
-    "npm-check-updates": "^11.3.0",
+    "npm-check-updates": "^11.5.4",
     "nyc": "^15.1.0",
     "pixrem": "~5.0.0",
     "time-grunt": "~2.0.0"
