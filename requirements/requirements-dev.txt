@@ -23,9 +23,9 @@ aioredis==1.3.1
     #   channels-redis
 alabaster==0.7.12
     # via sphinx
-arrow==1.0.3
+arrow==1.1.0
     # via -r requirements/requirements.txt
-asgiref==3.3.1
+asgiref==3.3.4
     # via
     #   -r requirements/requirements.txt
     #   channels
@@ -120,7 +120,7 @@ coverage==5.5
     #   codecov
     #   django-coverage-plugin
     #   pytest-cov
-croniter==1.0.10
+croniter==1.0.12
     # via
     #   -r requirements/requirements.txt
     #   rq-scheduler
@@ -142,7 +142,7 @@ daphne==2.5.0
     #   channels
 ddt==1.4.2
     # via -r requirements/requirements-dev.in
-decorator==5.0.3
+decorator==5.0.7
     # via
     #   -r requirements/requirements.txt
     #   ipython
@@ -167,7 +167,7 @@ django-crispy-forms==1.11.2
     # via -r requirements/requirements.txt
 django-debug-toolbar-user-panel==1.1.1
     # via -r requirements/requirements-dev.in
-django-debug-toolbar==1.11
+django-debug-toolbar==1.11.1
     # via -r requirements/requirements-dev.in
 django-dynamic-preferences==1.5.1
     # via -r requirements/requirements.txt
@@ -175,7 +175,7 @@ django-enumfields==2.1.1
     # via -r requirements/requirements.txt
 django-environ==0.4.5
     # via -r requirements/requirements.txt
-django-extensions==3.1.1
+django-extensions==3.1.3
     # via -r requirements/requirements.txt
 django-floppyforms==1.9.0
     # via -r requirements/requirements.txt
@@ -207,7 +207,9 @@ django-settings-export==1.2.1
     # via -r requirements/requirements.txt
 django-silk==4.1.0
     # via -r requirements/requirements.txt
-django-stubs==1.7.0
+django-stubs-ext==0.2.0
+    # via django-stubs
+django-stubs==1.8.0
     # via
     #   -r requirements/requirements-dev.in
     #   djangorestframework-stubs
@@ -215,7 +217,7 @@ django-test-plus==1.4.0
     # via -r requirements/requirements-dev.in
 django-versatileimagefield==2.0
     # via -r requirements/requirements.txt
-django==2.2.19
+django==2.2.20
     # via
     #   -r requirements/requirements.txt
     #   channels
@@ -223,6 +225,7 @@ django==2.2.19
     #   django-braces
     #   django-debug-toolbar
     #   django-dynamic-preferences
+    #   django-extensions
     #   django-haystack
     #   django-js-reverse
     #   django-markdownx
@@ -236,6 +239,7 @@ django==2.2.19
     #   django-settings-export
     #   django-silk
     #   django-stubs
+    #   django-stubs-ext
     #   djangorestframework
     #   drf-yasg
 djangorestframework-stubs==1.4.0
@@ -252,11 +256,11 @@ drf-yasg==1.20.0
     # via -r requirements/requirements.txt
 factory-boy==3.2.0
     # via -r requirements/requirements-dev.in
-faker==7.0.1
+faker==8.1.1
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-flake8==3.9.0
+flake8==3.9.1
     # via -r requirements/requirements-dev.in
 freezegun==1.1.0
     # via -r requirements/requirements-dev.in
@@ -389,7 +393,7 @@ pillow==8.2.0
     #   -r requirements/requirements.txt
     #   django-markdownx
     #   django-versatileimagefield
-pip-tools==6.0.1
+pip-tools==6.1.0
     # via -r requirements/requirements-dev.in
 pluggy==0.13.1
     # via pytest
@@ -439,7 +443,7 @@ pygments==2.8.1
     #   django-silk
     #   ipython
     #   sphinx
-pyjwt[crypto]==2.0.1
+pyjwt[crypto]==2.1.0
     # via
     #   -r requirements/requirements.txt
     #   django-allauth
@@ -459,7 +463,7 @@ pytest-blockage==0.2.2
     # via -r requirements/requirements-dev.in
 pytest-cov==2.11.1
     # via -r requirements/requirements-dev.in
-pytest-django==4.1.0
+pytest-django==4.2.0
     # via -r requirements/requirements-dev.in
 pytest-env==0.6.2
     # via -r requirements/requirements-dev.in
@@ -467,7 +471,7 @@ pytest-profiling==1.7.0
     # via -r requirements/requirements-dev.in
 pytest-sugar==0.9.4
     # via -r requirements/requirements-dev.in
-pytest==6.2.2
+pytest==6.2.3
     # via
     #   -r requirements/requirements-dev.in
     #   pytest-blockage
@@ -557,7 +561,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/requirements.txt
     #   ruamel.yaml
-ruamel.yaml==0.17.2
+ruamel.yaml==0.17.4
     # via
     #   -r requirements/requirements.txt
     #   drf-yasg
@@ -589,7 +593,7 @@ soupsieve==2.2.1
     #   beautifulsoup4
 sphinx-autobuild==2021.3.14
     # via -r requirements/requirements-dev.in
-sphinx==3.5.3
+sphinx==3.5.4
     # via
     #   -r requirements/requirements-dev.in
     #   recommonmark
@@ -639,7 +643,7 @@ txaio==21.2.1
     # via
     #   -r requirements/requirements.txt
     #   autobahn
-typed-ast==1.4.2
+typed-ast==1.4.3
     # via mypy
 typing-extensions==3.7.4.3
     # via
@@ -677,7 +681,7 @@ whitenoise==5.2.0
     # via -r requirements/requirements.txt
 whoosh==2.7.4
     # via -r requirements/requirements.txt
-zope.interface==5.3.0
+zope.interface==5.4.0
     # via
     #   -r requirements/requirements.txt
     #   twisted

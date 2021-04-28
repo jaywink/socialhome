@@ -16,9 +16,9 @@
     # via -r requirements/requirements.in
 aioredis==1.3.1
     # via channels-redis
-arrow==1.0.3
+arrow==1.1.0
     # via -r requirements/requirements.in
-asgiref==3.3.1
+asgiref==3.3.4
     # via
     #   channels
     #   channels-redis
@@ -74,7 +74,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-croniter==1.0.10
+croniter==1.0.12
     # via rq-scheduler
 cryptography==3.4.7
     # via
@@ -87,7 +87,7 @@ cssselect==1.1.0
     # via federation
 daphne==2.5.0
     # via channels
-decorator==5.0.3
+decorator==5.0.7
     # via
     #   ipython
     #   traitlets
@@ -109,7 +109,7 @@ django-enumfields==2.1.1
     # via -r requirements/requirements.in
 django-environ==0.4.5
     # via -r requirements/requirements.in
-django-extensions==3.1.1
+django-extensions==3.1.3
     # via -r requirements/requirements.in
 django-floppyforms==1.9.0
     # via -r requirements/requirements.in
@@ -141,13 +141,14 @@ django-silk==4.1.0
     # via -r requirements/requirements.in
 django-versatileimagefield==2.0
     # via -r requirements/requirements.in
-django==2.2.19
+django==2.2.20
     # via
     #   -r requirements/requirements.in
     #   channels
     #   django-allauth
     #   django-braces
     #   django-dynamic-preferences
+    #   django-extensions
     #   django-haystack
     #   django-js-reverse
     #   django-markdownx
@@ -258,7 +259,7 @@ pygments==2.8.1
     # via
     #   django-silk
     #   ipython
-pyjwt[crypto]==2.0.1
+pyjwt[crypto]==2.1.0
     # via django-allauth
 pyopenssl==20.0.1
     # via twisted
@@ -325,7 +326,7 @@ rq==1.8.0
     #   rq-scheduler
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml
-ruamel.yaml==0.17.2
+ruamel.yaml==0.17.4
     # via drf-yasg
 service-identity==18.1.0
     # via twisted
@@ -379,7 +380,7 @@ whitenoise==5.2.0
     # via -r requirements/requirements.in
 whoosh==2.7.4
     # via -r requirements/requirements.in
-zope.interface==5.3.0
+zope.interface==5.4.0
     # via twisted
 
 # The following packages are considered to be unsafe in a requirements file:
