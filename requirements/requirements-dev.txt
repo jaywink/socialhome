@@ -35,7 +35,7 @@ async-timeout==3.0.1
     # via
     #   -r requirements/requirements.txt
     #   aioredis
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   -r requirements/requirements.txt
     #   automat
@@ -52,11 +52,11 @@ automat==20.2.0
     # via
     #   -r requirements/requirements.txt
     #   twisted
-autopep8==1.5.6
+autopep8==1.5.7
     # via
     #   -r requirements/requirements.txt
     #   django-silk
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via
@@ -120,7 +120,7 @@ coverage==5.5
     #   codecov
     #   django-coverage-plugin
     #   pytest-cov
-croniter==1.0.12
+croniter==1.0.13
     # via
     #   -r requirements/requirements.txt
     #   rq-scheduler
@@ -215,7 +215,7 @@ django-test-plus==1.4.0
     # via -r requirements/requirements-dev.in
 django-versatileimagefield==2.0
     # via -r requirements/requirements.txt
-django==2.2.20
+django==2.2.22
     # via
     #   -r requirements/requirements.txt
     #   channels
@@ -254,11 +254,11 @@ drf-yasg==1.20.0
     # via -r requirements/requirements.txt
 factory-boy==3.2.0
     # via -r requirements/requirements-dev.in
-faker==8.1.1
+faker==8.1.2
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-flake8==3.9.1
+flake8==3.9.2
     # via -r requirements/requirements-dev.in
 freezegun==1.1.0
     # via -r requirements/requirements-dev.in
@@ -435,7 +435,7 @@ pycryptodome==3.10.1
     #   federation
 pyflakes==2.3.1
     # via flake8
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   -r requirements/requirements.txt
     #   django-silk
@@ -469,7 +469,7 @@ pytest-profiling==1.7.0
     # via -r requirements/requirements-dev.in
 pytest-sugar==0.9.4
     # via -r requirements/requirements-dev.in
-pytest==6.2.3
+pytest==6.2.4
     # via
     #   -r requirements/requirements-dev.in
     #   pytest-blockage
@@ -494,7 +494,7 @@ python-magic==0.4.22
     #   django-versatileimagefield
 python-opengraph-jaywink==0.2.0
     # via -r requirements/requirements.txt
-python-slugify==5.0.0
+python-slugify==5.0.2
     # via
     #   -r requirements/requirements.txt
     #   federation
@@ -571,7 +571,7 @@ service-identity==18.1.0
     # via
     #   -r requirements/requirements.txt
     #   twisted
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/requirements.txt
     #   automat
@@ -649,7 +649,7 @@ txaio==21.2.1
     #   autobahn
 typed-ast==1.4.3
     # via mypy
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via
     #   django-stubs
     #   djangorestframework-stubs

@@ -25,7 +25,7 @@ asgiref==3.3.4
     #   daphne
 async-timeout==3.0.1
     # via aioredis
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   automat
     #   federation
@@ -38,7 +38,7 @@ autobahn==21.2.1
     #   daphne
 automat==20.2.0
     # via twisted
-autopep8==1.5.6
+autopep8==1.5.7
     # via django-silk
 backcall==0.2.0
     # via ipython
@@ -74,7 +74,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-croniter==1.0.12
+croniter==1.0.13
     # via rq-scheduler
 cryptography==3.4.7
     # via
@@ -139,7 +139,7 @@ django-silk==4.1.0
     # via -r requirements/requirements.in
 django-versatileimagefield==2.0
     # via -r requirements/requirements.in
-django==2.2.20
+django==2.2.22
     # via
     #   -r requirements/requirements.in
     #   channels
@@ -253,7 +253,7 @@ pycparser==2.20
     # via cffi
 pycryptodome==3.10.1
     # via federation
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   django-silk
     #   ipython
@@ -276,7 +276,7 @@ python-magic==0.4.22
     # via django-versatileimagefield
 python-opengraph-jaywink==0.2.0
     # via -r requirements/requirements.in
-python-slugify==5.0.0
+python-slugify==5.0.2
     # via
     #   -r requirements/requirements.in
     #   federation
@@ -332,7 +332,7 @@ ruamel.yaml==0.17.4
     # via drf-yasg
 service-identity==18.1.0
     # via twisted
-six==1.15.0
+six==1.16.0
     # via
     #   automat
     #   bleach
