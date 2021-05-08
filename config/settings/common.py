@@ -264,9 +264,6 @@ LOGIN_REDIRECT_URL = "home"
 LOGIN_URL = "account_login"
 LOGOUT_URL = "account_logout"
 
-# SLUGLIFIER
-AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
-
 # REDIS
 # -----
 REDIS_HOST = env("REDIS_HOST", default="localhost")

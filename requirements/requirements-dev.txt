@@ -157,8 +157,6 @@ dirty-validators==0.5.4
     #   federation
 django-allauth==0.44.0
     # via -r requirements/requirements.txt
-django-autoslug==1.9.8
-    # via -r requirements/requirements.txt
 django-braces==1.14.0
     # via -r requirements/requirements.txt
 django-coverage-plugin==1.8.0
@@ -588,7 +586,6 @@ six==1.15.0
     #   pytest-profiling
     #   python-dateutil
     #   traitlets
-    #   unicode-slugify
 snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2.1
@@ -657,12 +654,6 @@ typing-extensions==3.7.4.3
     #   django-stubs
     #   djangorestframework-stubs
     #   mypy
-unicode-slugify==0.1.3
-    # via -r requirements/requirements.txt
-unidecode==1.2.0
-    # via
-    #   -r requirements/requirements.txt
-    #   unicode-slugify
 uritemplate==3.0.1
     # via
     #   -r requirements/requirements.txt

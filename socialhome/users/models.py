@@ -274,7 +274,7 @@ class Profile(TimeStampedModel):
         # Then replace rest of /'s with _'s
         handle_or_fid = handle_or_fid.replace("/", "_")
         # Compile
-        remote_username_part = slugify(handle_or_fid, only_ascii=True, ok='._=-')[:max_username_part_length]
+        remote_username_part = slugify(handle_or_fid, regex_pattern='^[a-z\\._=-]$')[:max_username_part_length]
         return template.replace("%%USERNAME%%", remote_username_part)
 
     @property

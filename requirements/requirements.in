@@ -9,7 +9,6 @@ channels_redis<3
 circus
 #CommonMark
 django-allauth
-django-autoslug
 django-braces
 django-crispy-forms
 django-dynamic-preferences<1.6  # Some breaking changes there
@@ -42,12 +41,12 @@ lxml
 Pillow
 psycopg2-binary
 python-opengraph-jaywink
+python-slugify
 pytz
 raven
 redis
 rq
 rq-scheduler
-unicode-slugify
 uwsgi
 whitenoise
 whoosh
