@@ -20,10 +20,10 @@
             <div class="mt-1 grid-item-bar-links">
                 <template v-if="content.user_is_author">
                     <a :href="updateUrl">
-                        <i class="fa fa-pencil" title="Update" aria-label="Update" />
+                        <i class="fa fa-pencil" :title="translations.update" :aria-label="translations.update" />
                     </a>
                     <a :href="deleteUrl">
-                        <i class="fa fa-remove" title="Delete" aria-label="Delete" />
+                        <i class="fa fa-remove" :title="translations.delete" :aria-label="translations.delete" />
                     </a>
                 </template>
             </div>
@@ -72,6 +72,12 @@ const StreamElement = {
         },
         updateUrl() {
             return Urls["content:update"]({pk: this.content.id})
+        },
+        translations() {
+            return {
+                delete: gettext("Delete"),
+                update: gettext("Update"),
+            }
         },
     },
     mounted() {

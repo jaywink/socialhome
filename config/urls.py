@@ -69,7 +69,7 @@ urlpatterns = [
     url(r"^bookmarklet/", ContentCreateView.as_view(), name="bookmarklet"),
 
     # JavaScript translations
-    path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome']), name="javascript-catalog"),
+    path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome'], domain="django") , name="javascript-catalog"),
 
     # Django URLs in JS
     url(r"^jsreverse/$", urls_js, name="js_reverse"),
