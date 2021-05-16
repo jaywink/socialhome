@@ -28,4 +28,9 @@ pybabel extract -F babel.cfg -o socialhome/locale/django.pot .
 TODO
 ----
 
-Weblate setup
+Weblate setup.
+
+Compile translations
+--------------------
+
+django-admin compilemessages
