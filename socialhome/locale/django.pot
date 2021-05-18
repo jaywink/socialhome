@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-11 19:37+0000\n"
+"POT-Creation-Date: 2021-05-18 13:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,25 +29,25 @@ msgstr ""
 msgid "Send email update to all users"
 msgstr ""
 
-#: socialhome/enums.py:10
+#: socialhome/enums.py:10 socialhome/templates/base.html:100
 msgid "Terms of service"
 msgstr ""
 
-#: socialhome/enums.py:11
+#: socialhome/enums.py:11 socialhome/templates/base.html:97
 msgid "Privacy policy"
 msgstr ""
 
 #: socialhome/enums.py:21
 #: socialhome/frontend/src/components/publisher/publisher-mixin.js:11
 #: socialhome/frontend/src/components/streams/stamped_elements/PublicStampedElement.vue:16
-#: socialhome/streams/enums.py:25
+#: socialhome/streams/enums.py:25 socialhome/templates/base.html:54
 msgid "Public"
 msgstr ""
 
 #: socialhome/enums.py:22
 #: socialhome/frontend/src/components/publisher/publisher-mixin.js:16
 #: socialhome/frontend/src/components/streams/stamped_elements/LimitedStampedElement.vue:15
-#: socialhome/streams/enums.py:21
+#: socialhome/streams/enums.py:21 socialhome/templates/base.html:50
 msgid "Limited"
 msgstr ""
 
@@ -89,6 +89,7 @@ msgstr ""
 
 #: socialhome/content/enums.py:18
 #: socialhome/content/templates/content/_edit_title.html:7
+#: socialhome/frontend/src/components/buttons/ReplyButton.vue:34
 #: socialhome/frontend/src/components/publisher/publisher-mixin.js:73
 #: socialhome/frontend/src/components/streams/ReplyEditor.vue:57
 msgid "Reply"
@@ -204,7 +205,7 @@ msgstr ""
 
 #: socialhome/content/models.py:127
 #: socialhome/search/templates/search/search.html:68
-#: socialhome/streams/enums.py:27
+#: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
 msgid "Tags"
 msgstr ""
 
@@ -247,7 +248,7 @@ msgstr ""
 
 #: socialhome/content/models.py:159
 #: socialhome/frontend/src/components/streams/stamped_elements/LocalStampedElement.vue:15
-#: socialhome/streams/enums.py:22
+#: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
 msgstr ""
 
@@ -271,51 +272,19 @@ msgstr ""
 msgid "This recipient couldn't be found (please check the format)."
 msgstr ""
 
-#: socialhome/content/templates/content/vue.html:18
-#: socialhome/content/urls.py:9
-msgid "bookmarklet"
-msgstr ""
-
-#: socialhome/content/urls.py:10
-msgid "create"
-msgstr ""
-
-#: socialhome/content/urls.py:11
-msgid "update"
-msgstr ""
-
-#: socialhome/content/urls.py:12
-msgid "delete"
-msgstr ""
-
-#: socialhome/content/urls.py:13
-#: socialhome/frontend/src/components/buttons/ReplyButton.vue:34
-msgid "reply"
-msgstr ""
-
-#: socialhome/content/urls.py:19
-msgid "view"
-msgstr ""
-
-#: socialhome/content/urls.py:20
-msgid "view-by-slug"
-msgstr ""
-
-#: socialhome/content/urls.py:21
-msgid "view-by-uuid"
-msgstr ""
-
 #: socialhome/content/templates/content/_edit_title.html:5
 #: socialhome/frontend/src/components/publisher/publisher-mixin.js:74
 msgid "Update reply"
 msgstr ""
 
 #: socialhome/content/templates/content/_edit_title.html:10
+#: socialhome/frontend/src/components/streams/StreamElement.vue:79
 msgid "Update"
 msgstr ""
 
 #: socialhome/content/templates/content/_edit_title.html:12
 #: socialhome/frontend/src/components/publisher/publisher-mixin.js:63
+#: socialhome/templates/base.html:59
 msgid "Create"
 msgstr ""
 
@@ -325,6 +294,7 @@ msgid "Confirm delete"
 msgstr ""
 
 #: socialhome/content/templates/content/delete.html:17
+#: socialhome/frontend/src/components/streams/StreamElement.vue:78
 msgid "Delete"
 msgstr ""
 
@@ -334,6 +304,10 @@ msgstr ""
 
 #: socialhome/content/templates/content/vue.html:18
 msgid "Tip! Share pages easily by bookmarking our"
+msgstr ""
+
+#: socialhome/content/templates/content/vue.html:18
+msgid "bookmarklet"
 msgstr ""
 
 #: socialhome/frontend/src/components/buttons/ShareButton.vue:30
@@ -519,7 +493,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: socialhome/frontend/src/components/streams/stamped_elements/FollowedStampedElement.vue:15
-#: socialhome/streams/enums.py:20
+#: socialhome/streams/enums.py:20 socialhome/templates/base.html:48
 msgid "Followed"
 msgstr ""
 
@@ -740,6 +714,7 @@ msgstr ""
 #: socialhome/search/templates/search/search.html:5
 #: socialhome/search/templates/search/search.html:8
 #: socialhome/search/templates/search/search.html:15
+#: socialhome/templates/base.html:107 socialhome/templates/base.html:109
 msgid "Search"
 msgstr ""
 
@@ -788,7 +763,8 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: socialhome/streams/views.py:52
+#: socialhome/streams/views.py:52 socialhome/templates/base.html:13
+#: socialhome/templates/base.html:16
 msgid "A federated social home."
 msgstr ""
 
@@ -824,6 +800,370 @@ msgstr ""
 
 #: socialhome/streams/views.py:168 socialhome/users/preferences.py:17
 msgid "Followed stream"
+msgstr ""
+
+#: socialhome/templates/base.html:45
+msgid "Streams"
+msgstr ""
+
+#: socialhome/templates/base.html:49
+msgid "My content"
+msgstr ""
+
+#: socialhome/templates/base.html:62
+msgid "Contacts"
+msgstr ""
+
+#: socialhome/templates/base.html:65
+msgid "My Profile"
+msgstr ""
+
+#: socialhome/templates/account/signup.html:12
+#: socialhome/templates/account/signup.html:22
+#: socialhome/templates/base.html:70
+msgid "Sign Up"
+msgstr ""
+
+#: socialhome/templates/base.html:74
+msgid "Log In"
+msgstr ""
+
+#: socialhome/templates/base.html:80
+msgid "Menu"
+msgstr ""
+
+#: socialhome/templates/account/email.html:6 socialhome/templates/base.html:84
+#: socialhome/templates/dynamic_preferences/form.html:6
+#: socialhome/templates/dynamic_preferences/form.html:9
+msgid "Account"
+msgstr ""
+
+#: socialhome/templates/base.html:85
+#: socialhome/users/templates/users/user_api_token.html:4
+#: socialhome/users/templates/users/user_api_token.html:7
+msgid "API token"
+msgstr ""
+
+#: socialhome/templates/base.html:86
+msgid "Emails"
+msgstr ""
+
+#: socialhome/templates/base.html:89
+msgid "Admin"
+msgstr ""
+
+#: socialhome/templates/base.html:90
+msgid "Task queue"
+msgstr ""
+
+#: socialhome/templates/base.html:93
+#: socialhome/templates/rest_framework_swagger/index.html:27
+msgid "Logout"
+msgstr ""
+
+#: socialhome/templates/account/email.html:11
+msgid "E-mail Addresses"
+msgstr ""
+
+#: socialhome/templates/account/email.html:13
+msgid "The following e-mail addresses are associated with your account:"
+msgstr ""
+
+#: socialhome/templates/account/email.html:27
+msgid "Verified"
+msgstr ""
+
+#: socialhome/templates/account/email.html:29
+msgid "Unverified"
+msgstr ""
+
+#: socialhome/templates/account/email.html:31
+msgid "Primary"
+msgstr ""
+
+#: socialhome/templates/account/email.html:37
+msgid "Make Primary"
+msgstr ""
+
+#: socialhome/templates/account/email.html:38
+msgid "Re-send Verification"
+msgstr ""
+
+#: socialhome/templates/account/email.html:39
+msgid "Remove"
+msgstr ""
+
+#: socialhome/templates/account/email.html:46
+msgid "Warning:"
+msgstr ""
+
+#: socialhome/templates/account/email.html:46
+msgid ""
+"You currently do not have any e-mail address set up. You should really "
+"add an e-mail address so you can receive notifications, reset your "
+"password, etc."
+msgstr ""
+
+#: socialhome/templates/account/email.html:51
+msgid "Add E-mail Address"
+msgstr ""
+
+#: socialhome/templates/account/email.html:56
+msgid "Add E-mail"
+msgstr ""
+
+#: socialhome/templates/account/email.html:66
+msgid "Do you really want to remove the selected e-mail address?"
+msgstr ""
+
+#: socialhome/templates/account/email_confirm.html:6
+#: socialhome/templates/account/email_confirm.html:12
+#: socialhome/templates/account/email_confirmed.html:6
+#: socialhome/templates/account/email_confirmed.html:12
+msgid "Confirm E-mail Address"
+msgstr ""
+
+#: socialhome/templates/account/email_confirm.html:18
+#, python-format
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
+"e-mail address for user %(user_display)s."
+msgstr ""
+
+#: socialhome/templates/account/email_confirm.html:22
+msgid "Confirm"
+msgstr ""
+
+#: socialhome/templates/account/email_confirm.html:29
+#, python-format
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+msgstr ""
+
+#: socialhome/templates/account/email_confirmed.html:16
+#, python-format
+msgid ""
+"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
+"e-mail address for user %(user_display)s."
+msgstr ""
+
+#: socialhome/templates/account/login.html:8
+#: socialhome/templates/account/login.html:13
+#: socialhome/templates/account/login.html:40
+msgid "Sign In"
+msgstr ""
+
+#: socialhome/templates/account/login.html:18
+#, python-format
+msgid ""
+"Please sign in with one\n"
+"      of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
+"      for a %(site_name)s account and sign in below:"
+msgstr ""
+
+#: socialhome/templates/account/login.html:26
+msgid "or"
+msgstr ""
+
+#: socialhome/templates/account/login.html:41
+msgid "Forgot Password?"
+msgstr ""
+
+#: socialhome/templates/account/logout.html:5
+#: socialhome/templates/account/logout.html:11
+#: socialhome/templates/account/logout.html:20
+msgid "Sign Out"
+msgstr ""
+
+#: socialhome/templates/account/logout.html:13
+msgid "Are you sure you want to sign out?"
+msgstr ""
+
+#: socialhome/templates/account/password_change.html:5
+#: socialhome/templates/account/password_change.html:10
+#: socialhome/templates/account/password_change.html:15
+#: socialhome/templates/account/password_reset_from_key.html:6
+#: socialhome/templates/account/password_reset_from_key.html:11
+#: socialhome/templates/account/password_reset_from_key_done.html:4
+#: socialhome/templates/account/password_reset_from_key_done.html:9
+msgid "Change Password"
+msgstr ""
+
+#: socialhome/templates/account/password_reset.html:7
+#: socialhome/templates/account/password_reset.html:13
+#: socialhome/templates/account/password_reset_done.html:6
+#: socialhome/templates/account/password_reset_done.html:11
+msgid "Password Reset"
+msgstr ""
+
+#: socialhome/templates/account/password_reset.html:18
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll send "
+"you an e-mail allowing you to reset it."
+msgstr ""
+
+#: socialhome/templates/account/password_reset.html:23
+msgid "Reset My Password"
+msgstr ""
+
+#: socialhome/templates/account/password_reset.html:26
+msgid "Please contact us if you have any trouble resetting your password."
+msgstr ""
+
+#: socialhome/templates/account/password_reset_done.html:17
+msgid ""
+"We have sent you an e-mail. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr ""
+
+#: socialhome/templates/account/password_reset_from_key.html:11
+msgid "Bad Token"
+msgstr ""
+
+#: socialhome/templates/account/password_reset_from_key.html:15
+#, python-format
+msgid ""
+"The password reset link was invalid, possibly because it has already been"
+" used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
+"reset</a>."
+msgstr ""
+
+#: socialhome/templates/account/password_reset_from_key.html:21
+msgid "change password"
+msgstr ""
+
+#: socialhome/templates/account/password_reset_from_key.html:24
+#: socialhome/templates/account/password_reset_from_key_done.html:10
+msgid "Your password is now changed."
+msgstr ""
+
+#: socialhome/templates/account/password_set.html:6
+#: socialhome/templates/account/password_set.html:11
+#: socialhome/templates/account/password_set.html:16
+msgid "Set Password"
+msgstr ""
+
+#: socialhome/templates/account/signup.html:6
+msgid "Signup"
+msgstr ""
+
+#: socialhome/templates/account/signup.html:14
+#, python-format
+msgid ""
+"Already have an account? Then please <a href=\"%(login_url)s\">sign "
+"in</a>."
+msgstr ""
+
+#: socialhome/templates/account/signup_closed.html:5
+#: socialhome/templates/account/signup_closed.html:10
+msgid "Sign Up Closed"
+msgstr ""
+
+#: socialhome/templates/account/signup_closed.html:12
+msgid "We are sorry, but the sign up is currently closed."
+msgstr ""
+
+#: socialhome/templates/account/verification_sent.html:5
+#: socialhome/templates/account/verification_sent.html:10
+#: socialhome/templates/account/verified_email_required.html:5
+#: socialhome/templates/account/verified_email_required.html:10
+msgid "Verify Your E-mail Address"
+msgstr ""
+
+#: socialhome/templates/account/verification_sent.html:12
+#, python-format
+msgid ""
+"We have sent an e-mail to <a href=\"mailto:%(email)s\">%(email)s</a> for "
+"verification. Follow the link provided to finalize the signup process. "
+"Please contact us if you do not receive it within a few minutes."
+msgstr ""
+
+#: socialhome/templates/account/verified_email_required.html:16
+msgid ""
+"This part of the site requires us to verify that\n"
+"        you are who you claim to be. For this purpose, we require that "
+"you\n"
+"        verify ownership of your e-mail address. "
+msgstr ""
+
+#: socialhome/templates/account/verified_email_required.html:20
+msgid ""
+"We have sent an e-mail to you for\n"
+"        verification. Please click on the link inside this e-mail. Please"
+"\n"
+"        contact us if you do not receive it within a few minutes."
+msgstr ""
+
+#: socialhome/templates/account/verified_email_required.html:22
+#, python-format
+msgid ""
+"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change "
+"your e-mail address</a>."
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:10
+msgid "Preferences"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:14
+#: socialhome/users/templates/users/userpicture_form.html:28
+msgid "Save"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:17
+msgid "Export data"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:20
+msgid "Download export"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:21
+msgid "created"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:23
+msgid "Request new export"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:31
+msgid "Back to profile"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:46
+msgid "Export request failed. Please try again later or contact the admin."
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:51
+msgid ""
+"Export has been requested. You will receive an email when it is ready for"
+" download."
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:52
+msgid "The export can also be downloaded from this page when it is ready."
+msgstr ""
+
+#: socialhome/templates/rest_framework_swagger/index.html:29
+msgid "Session Login"
+msgstr ""
+
+#: socialhome/templates/rest_framework_swagger/index.html:40
+msgid "You are logged in as: "
+msgstr ""
+
+#: socialhome/templates/rest_framework_swagger/index.html:42
+msgid "Viewing as an anoymous user"
+msgstr ""
+
+#: socialhome/templates/rest_framework_swagger/index.html:54
+msgid "Powered by "
+msgstr ""
+
+#: socialhome/templates/socialhome/policy_document.html:8
+msgid "Version"
 msgstr ""
 
 #: socialhome/users/models.py:41
@@ -932,11 +1272,6 @@ msgstr ""
 msgid "Save order"
 msgstr ""
 
-#: socialhome/users/templates/users/user_api_token.html:4
-#: socialhome/users/templates/users/user_api_token.html:7
-msgid "API token"
-msgstr ""
-
 #: socialhome/users/templates/users/user_api_token.html:9
 msgid ""
 "Copy the token to a client or tool which you want to use for interacting "
@@ -1018,9 +1353,5 @@ msgid ""
 " you can choose a 'point of interest' by clicking the full image preview "
 "on the right. Click on the center point you would like your profile "
 "picture be around, then click 'Save'."
-msgstr ""
-
-#: socialhome/users/templates/users/userpicture_form.html:28
-msgid "Save"
 msgstr ""
 
