@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-18 13:10+0000\n"
-"PO-Revision-Date: 2021-05-12 15:03+0000\n"
+"PO-Revision-Date: 2021-05-19 02:07+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: French <http://localhost:8001/projects/socialhome/socialhome/"
 "fr/>\n"
@@ -495,8 +495,8 @@ msgstr ""
 #: socialhome/frontend/src/components/streams/Stream.vue:132
 msgid "${ln} new post available"
 msgid_plural "${ln} new posts available"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "${ln} nouvelle publication"
+msgstr[1] "${ln} nouvelles publications"
 
 #: socialhome/frontend/src/components/streams/stamped_elements/FollowedStampedElement.vue:15
 #: socialhome/streams/enums.py:20 socialhome/templates/base.html:48
@@ -575,7 +575,7 @@ msgstr ""
 
 #: socialhome/frontend/src/store/modules/stream.js:85
 msgid "An error happened while fetching new content"
-msgstr ""
+msgstr "Une erreur est survenue pendant l'obtention de nouvelles publications"
 
 #: socialhome/frontend/src/store/modules/stream.js:89
 msgid "An error happened while sharing the content"
@@ -588,7 +588,7 @@ msgstr ""
 #: socialhome/notifications/tasks.py:59
 #, python-format
 msgid "New follower: %s"
-msgstr ""
+msgstr "Nouvel abonné : %s"
 
 #: socialhome/notifications/tasks.py:96
 msgid "You have been mentioned"
@@ -597,12 +597,12 @@ msgstr ""
 #: socialhome/notifications/tasks.py:130
 #, python-format
 msgid "New reply to: %s"
-msgstr ""
+msgstr "Nouvelle réponse à : %s"
 
 #: socialhome/notifications/tasks.py:168
 #, python-format
 msgid "New share of: %s"
-msgstr ""
+msgstr "Nouveau partage de : %s"
 
 #: socialhome/notifications/tasks.py:197
 msgid "Data export is ready for download"
@@ -651,7 +651,7 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/follow.html:6
 #: socialhome/notifications/templates/notifications/follow.txt:5
 msgid "You have a new follower:"
-msgstr ""
+msgstr "Vous avez un nouvel abonné :"
 
 #: socialhome/notifications/templates/notifications/mention.html:6
 #: socialhome/notifications/templates/notifications/mention.txt:5
@@ -702,6 +702,8 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/reply.txt:5
 msgid "There is a new reply to content you have participated in by"
 msgstr ""
+"Il y a une nouvelle réponse pour un publication à laquelle vous avez "
+"participé, par"
 
 #: socialhome/notifications/templates/notifications/reply.html:9
 #: socialhome/notifications/templates/notifications/reply.txt:7
@@ -711,7 +713,7 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/share.html:6
 #: socialhome/notifications/templates/notifications/share.txt:5
 msgid "Your content has received a new share by"
-msgstr ""
+msgstr "Votre publication a été partagée par"
 
 #: socialhome/search/views.py:136
 msgid "Search string is invalid, please try another one."
@@ -823,9 +825,8 @@ msgid "Contacts"
 msgstr "Publication"
 
 #: socialhome/templates/base.html:65
-#, fuzzy
 msgid "My Profile"
-msgstr "Profil"
+msgstr "Mon profil"
 
 #: socialhome/templates/account/signup.html:12
 #: socialhome/templates/account/signup.html:22
@@ -950,6 +951,8 @@ msgid ""
 "This e-mail confirmation link expired or is invalid. Please <a href="
 "\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
+"Ce lien de confirmation de courriel est expiré ou est invalide. Veuillez en "
+"<a href=\"%(email_url)s\">créer un nouveau</a>."
 
 #: socialhome/templates/account/email_confirmed.html:16
 #, python-format
@@ -1039,6 +1042,9 @@ msgid ""
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
 "a>."
 msgstr ""
+"Le lien de réinitialisation du mot de passe est invalide, possiblement parce "
+"qu'il a déjà été utilisé. Veuiilez en demander <a href=\"%(passwd_reset_url)"
+"s\">un nouveau</a>."
 
 #: socialhome/templates/account/password_reset_from_key.html:21
 msgid "change password"
@@ -1293,6 +1299,9 @@ msgid ""
 "use your account through client apps! If you lose your token or need a new "
 "one, click 'Regenerate'."
 msgstr ""
+"Attention! Si vous divulguez votre jeton, n'importe qui pourra utiliser "
+"votre compte via des applis client! Si vous perdez votre jeton ou en désirez "
+"un nouveau, cliquez sur 'Regénérer'."
 
 #: socialhome/users/templates/users/user_api_token.html:25
 msgid "Regenerate"
@@ -1344,7 +1353,7 @@ msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:8
 msgid "Uploading a new picture"
-msgstr ""
+msgstr "Nouvelle image en cours de téléchargement"
 
 #: socialhome/users/templates/users/userpicture_form.html:9
 msgid ""
