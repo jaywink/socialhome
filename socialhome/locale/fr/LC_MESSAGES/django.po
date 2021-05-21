@@ -1,4 +1,4 @@
-# Translations template for PROJECT.
+# French translations for PROJECT.
 # Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
@@ -7,17 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-18 13:10+0000\n"
+"POT-Creation-Date: 2021-05-21 18:06+0000\n"
 "PO-Revision-Date: 2021-05-19 02:07+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
-"Language-Team: French <http://localhost:8001/projects/socialhome/socialhome/"
-"fr/>\n"
 "Language: fr\n"
+"Language-Team: French "
+"<http://localhost:8001/projects/socialhome/socialhome/fr/>\n"
+"Plural-Forms: nplurals=2; plural=n > 1\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.6.2\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -29,8 +28,8 @@ msgstr ""
 #: socialhome/admin.py:38
 msgid "Policy document update emails queued for sending."
 msgstr ""
-"Les courriels au sujet de la mise à jour du document de politique sont en "
-"attente d'envoi."
+"Les courriels au sujet de la mise à jour du document de politique sont en"
+" attente d'envoi."
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
@@ -44,27 +43,21 @@ msgstr "Entente de service"
 msgid "Privacy policy"
 msgstr "Politique sur la vie privée"
 
-#: socialhome/enums.py:21
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:11
-#: socialhome/frontend/src/components/streams/stamped_elements/PublicStampedElement.vue:16
+#: socialhome/enums.py:21 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:25 socialhome/templates/base.html:54
 msgid "Public"
 msgstr "Public"
 
-#: socialhome/enums.py:22
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:16
-#: socialhome/frontend/src/components/streams/stamped_elements/LimitedStampedElement.vue:15
+#: socialhome/enums.py:22 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:21 socialhome/templates/base.html:50
 msgid "Limited"
 msgstr "Restreint"
 
-#: socialhome/enums.py:23
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:21
+#: socialhome/enums.py:23 socialhome/static/dist/vue/js/app.js:67
 msgid "Site"
 msgstr "Site"
 
-#: socialhome/enums.py:24
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:26
+#: socialhome/enums.py:24 socialhome/static/dist/vue/js/app.js:67
 msgid "Self"
 msgstr "Soi-même"
 
@@ -75,8 +68,8 @@ msgstr ""
 #: socialhome/preferences.py:14
 msgid ""
 "If set to true, all outbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should only "
-"be turned on for temporary debugging."
+"instances (available in the admin). This is a performance hit so should "
+"only be turned on for temporary debugging."
 msgstr ""
 
 #: socialhome/preferences.py:24
@@ -86,8 +79,8 @@ msgstr ""
 #: socialhome/preferences.py:25
 msgid ""
 "If set to true, all inbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should only "
-"be turned on for temporary debugging."
+"instances (available in the admin). This is a performance hit so should "
+"only be turned on for temporary debugging."
 msgstr ""
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
@@ -96,9 +89,7 @@ msgstr "Publication"
 
 #: socialhome/content/enums.py:18
 #: socialhome/content/templates/content/_edit_title.html:7
-#: socialhome/frontend/src/components/buttons/ReplyButton.vue:34
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:73
-#: socialhome/frontend/src/components/streams/ReplyEditor.vue:57
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply"
 msgstr "Répondre"
 
@@ -106,8 +97,7 @@ msgstr "Répondre"
 msgid "Share"
 msgstr "Partager"
 
-#: socialhome/content/forms.py:18
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:70
+#: socialhome/content/forms.py:18 socialhome/static/dist/vue/js/app.js:67
 msgid "Recipients"
 msgstr "Destinataires"
 
@@ -173,8 +163,7 @@ msgstr "Auteur"
 msgid "Federation ID"
 msgstr ""
 
-#: socialhome/content/models.py:106
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:78
+#: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
 msgstr "Épinglé au profil"
 
@@ -186,13 +175,11 @@ msgstr "Ordre"
 msgid "Service label"
 msgstr "Étiquette de service"
 
-#: socialhome/content/models.py:115
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:83
+#: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
 msgstr ""
 
-#: socialhome/content/models.py:116
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:84
+#: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to turn off fetching and showing an OEmbed or OpenGraph preview "
 "using the links in the text."
@@ -224,13 +211,11 @@ msgstr "Parent"
 msgid "Share of"
 msgstr "Partagé par"
 
-#: socialhome/content/models.py:138
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:65
+#: socialhome/content/models.py:138 socialhome/static/dist/vue/js/app.js:67
 msgid "Federate to remote servers"
 msgstr ""
 
-#: socialhome/content/models.py:139
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:66
+#: socialhome/content/models.py:139 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
@@ -240,22 +225,19 @@ msgstr ""
 msgid "Limitied visibilities"
 msgstr "Visibilités restreintes"
 
-#: socialhome/content/models.py:148
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:69
+#: socialhome/content/models.py:148 socialhome/static/dist/vue/js/app.js:67
 msgid "Include people I follow"
 msgstr "Inclure les gens que je suis"
 
-#: socialhome/content/models.py:149
+#: socialhome/content/models.py:149 socialhome/static/dist/vue/js/app.js:67
 msgid "Automatically includes all the people you follow as recipients."
-msgstr ""
-"Inclut automatiquement comme destinataires tous les gens que vous suivez."
+msgstr "Inclut automatiquement comme destinataires tous les gens que vous suivez."
 
 #: socialhome/content/models.py:153
 msgid "Remote created"
 msgstr ""
 
-#: socialhome/content/models.py:159
-#: socialhome/frontend/src/components/streams/stamped_elements/LocalStampedElement.vue:15
+#: socialhome/content/models.py:159 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
 msgstr "Local"
@@ -281,18 +263,17 @@ msgid "This recipient couldn't be found (please check the format)."
 msgstr "Destinataire introuvable (veuillez vérifier le format)."
 
 #: socialhome/content/templates/content/_edit_title.html:5
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:74
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Update reply"
 msgstr "Modifier la réponse"
 
 #: socialhome/content/templates/content/_edit_title.html:10
-#: socialhome/frontend/src/components/streams/StreamElement.vue:79
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Update"
 msgstr "Modifier"
 
 #: socialhome/content/templates/content/_edit_title.html:12
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:63
-#: socialhome/templates/base.html:59
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/templates/base.html:59
 msgid "Create"
 msgstr "Créer"
 
@@ -302,7 +283,7 @@ msgid "Confirm delete"
 msgstr "Confirmer la destruction"
 
 #: socialhome/content/templates/content/delete.html:17
-#: socialhome/frontend/src/components/streams/StreamElement.vue:78
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Delete"
 msgstr "Détruire"
 
@@ -317,273 +298,6 @@ msgstr ""
 #: socialhome/content/templates/content/vue.html:18
 msgid "bookmarklet"
 msgstr "bookmarklet"
-
-#: socialhome/frontend/src/components/buttons/ShareButton.vue:30
-msgid "unshare"
-msgstr "ne plus partager"
-
-#: socialhome/frontend/src/components/buttons/ShareButton.vue:30
-msgid "share"
-msgstr "partager"
-
-#: socialhome/frontend/src/components/common/ProfileReactionButtons.vue:72
-#: socialhome/frontend/src/components/streams/stamped_elements/TagStampedElement.vue:55
-#: socialhome/search/templates/search/search.html:48
-#: socialhome/users/templates/users/_actions_column.html:5
-msgid "Follow"
-msgstr "Suivre"
-
-#: socialhome/frontend/src/components/common/ProfileReactionButtons.vue:73
-msgid "Home"
-msgstr "Accueil"
-
-#: socialhome/frontend/src/components/common/ProfileReactionButtons.vue:74
-#: socialhome/users/preferences.py:15
-msgid "Profile"
-msgstr "Profil"
-
-#: socialhome/frontend/src/components/common/ProfileReactionButtons.vue:75
-#: socialhome/frontend/src/components/streams/stamped_elements/TagStampedElement.vue:56
-#: socialhome/search/templates/search/search.html:47
-#: socialhome/users/templates/users/_actions_column.html:4
-msgid "Unfollow"
-msgstr "Ne plus suivre"
-
-#: socialhome/frontend/src/components/contacts/AppFollowers.vue:10
-#: socialhome/users/views.py:234
-msgid "Contacts - followers"
-msgstr ""
-
-#: socialhome/frontend/src/components/contacts/AppFollowing.vue:10
-#: socialhome/users/views.py:226
-msgid "Contacts - following"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:123
-msgid "Toggle fullscreen (F11)"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:124
-msgid "Markdown guide"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:125
-msgid "Heading"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:126
-#, python-format
-msgid "The image %s couldn't be uploaded"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:127
-msgid "add an image using an url (Ctrl-Alt-I)"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:128
-msgid "Loading..."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:129
-msgid "Insert image"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:130
-msgid "Toggle preview (Ctrl-P)"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:131
-msgid ""
-"You can upload images using the camera icon or by dragging them to the text "
-"area. Valid file types: png/jpg/svg/gif."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:133
-msgid "Upload image"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/MarkdownEditor.vue:134
-msgid "Toggle side by side (F9)"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:12
-msgid "visible to anyone, even anonymous users and internet search bots."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:17
-msgid "visible to only those who shared with."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:22
-msgid ""
-"visible to only users who are logged in. Does not federate to other servers."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:27
-msgid "visible to only self. Does not federate to other servers."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:64
-msgid "Edit"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:68
-msgid "Hidden textarea"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:71
-msgid ""
-"Type in the handles (eg user@example.com) of the recipients. Separate by "
-"commas. Sorry, no search yet.."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:75
-msgid "Visibility"
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:76
-msgid ""
-"Tip: You can use the \"Self\" visibility to create draft content and then "
-"change the visibility to for example \"Public\" when you want to publish it."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:79
-msgid ""
-"Pinned content will be shown on your personal profile in the order you want. "
-"Reorder pinned content from the profile menu. Pinned content will federate "
-"and otherwise function as any other content."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:82
-msgid "Error saving content."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:86
-msgid ""
-"When visibility is set to 'Limited', you must either specify recipients or "
-"include your followers."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:88
-msgid "Some recipients couldn't be found."
-msgstr ""
-
-#: socialhome/frontend/src/components/publisher/publisher-mixin.js:89
-msgid "Validation error"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/ReactionsBar.vue:123
-msgid "Replies"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/ReactionsBar.vue:124
-msgid "Shares"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/ReplyEditor.vue:53
-msgid "Full editor"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/ReplyEditor.vue:54
-msgid "Only full editor available for non-public replies at this time"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/ReplyEditor.vue:58
-msgid "Reply text..."
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/Stream.vue:132
-msgid "${ln} new post available"
-msgid_plural "${ln} new posts available"
-msgstr[0] "${ln} nouvelle publication"
-msgstr[1] "${ln} nouvelles publications"
-
-#: socialhome/frontend/src/components/streams/stamped_elements/FollowedStampedElement.vue:15
-#: socialhome/streams/enums.py:20 socialhome/templates/base.html:48
-msgid "Followed"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/FollowedStampedElement.vue:18
-#: socialhome/streams/views.py:170
-msgid "Content from followed users."
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/LimitedStampedElement.vue:18
-#: socialhome/streams/views.py:82
-msgid "Contains non-public content where you are recipient."
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/LocalStampedElement.vue:18
-#: socialhome/streams/views.py:95
-msgid "Contains content from local users."
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:136
-msgid "Change picture"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:137
-msgid "Followers"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:138
-#: socialhome/users/models.py:172
-msgid "Following"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:139
-msgid "Organize profile content"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:140
-msgid "Update profile"
-msgstr "Modifier le profil"
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStampedElement.vue:141
-msgid "User handle or URL on The Federation"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStreamButtons.vue:29
-msgid "Pinned content"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/ProfileStreamButtons.vue:30
-msgid "All content"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/PublicStampedElement.vue:19
-#: socialhome/streams/views.py:108
-msgid "Contains public content from around the network."
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/TagsStampedElement.vue:14
-#: socialhome/users/models.py:176
-msgid "Followed tags"
-msgstr ""
-
-#: socialhome/frontend/src/components/streams/stamped_elements/TagsStampedElement.vue:17
-msgid "Content from all followed tags."
-msgstr ""
-
-#: socialhome/frontend/src/store/modules/profiles.js:28
-msgid "An error happened while trying to follow."
-msgstr ""
-
-#: socialhome/frontend/src/store/modules/profiles.js:43
-msgid "An error happened while trying to unfollow."
-msgstr ""
-
-#: socialhome/frontend/src/store/modules/stream.js:85
-msgid "An error happened while fetching new content"
-msgstr "Une erreur est survenue pendant l'obtention de nouvelles publications"
-
-#: socialhome/frontend/src/store/modules/stream.js:89
-msgid "An error happened while sharing the content"
-msgstr ""
-
-#: socialhome/frontend/src/store/modules/stream.js:99
-msgid "An error happened while unsharing the content"
-msgstr ""
 
 #: socialhome/notifications/tasks.py:59
 #, python-format
@@ -686,8 +400,8 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/policy_document_update.html:21
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:14
 msgid ""
-"No actions are required by you. By continuing to use the service you accept "
-"the new document(s)."
+"No actions are required by you. By continuing to use the service you "
+"accept the new document(s)."
 msgstr ""
 
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:9
@@ -738,6 +452,18 @@ msgstr ""
 msgid "Profiles"
 msgstr ""
 
+#: socialhome/search/templates/search/search.html:47
+#: socialhome/static/dist/vue/js/app.js:67
+#: socialhome/users/templates/users/_actions_column.html:4
+msgid "Unfollow"
+msgstr "Ne plus suivre"
+
+#: socialhome/search/templates/search/search.html:48
+#: socialhome/static/dist/vue/js/app.js:67
+#: socialhome/users/templates/users/_actions_column.html:5
+msgid "Follow"
+msgstr "Suivre"
+
 #: socialhome/search/templates/search/search.html:55
 #: socialhome/search/templates/search/search.html:85
 msgid "No results found."
@@ -753,6 +479,308 @@ msgstr ""
 
 #: socialhome/search/templates/search/search.html:90
 msgid "There are more tags results. Please refine the query."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
+msgid "edited"
+msgstr "créer"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Home"
+msgstr "Accueil"
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/preferences.py:15
+msgid "Profile"
+msgstr "Profil"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Full editor"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Only full editor available for non-public replies at this time"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Reply text..."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "unshare"
+msgstr "ne plus partager"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "share"
+msgstr "partager"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Replies"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Shares"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Hide NSFW content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Show NSFW content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:108
+msgid "Contains public content from around the network."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/enums.py:20
+#: socialhome/templates/base.html:48
+msgid "Followed"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
+msgid "Content from followed users."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
+msgid "Contains non-public content where you are recipient."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:95
+msgid "Contains content from local users."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "All content tagged with"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
+msgid "Followed tags"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Content from all followed tags."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Change picture"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Followers"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:172
+msgid "Following"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Organize profile content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Update profile"
+msgstr "Modifier le profil"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "User handle or URL on The Federation"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Pinned content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "All content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
+msgid "${t} new post available"
+msgid_plural "${t} new posts available"
+msgstr[0] "${ln} nouvelle publication"
+msgstr[1] "${ln} nouvelles publications"
+
+#: socialhome/static/dist/vue/js/app.js:67
+#: socialhome/templates/dynamic_preferences/form.html:14
+#: socialhome/users/templates/users/userpicture_form.html:28
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 1"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 2"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 3"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 4"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 5"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Header 6"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "By url"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Toggle fullscreen (F11)"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Markdown guide"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Heading"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, python-format
+msgid "The image %s couldn't be uploaded"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "add an image using an url (Ctrl-Alt-I)"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Loading..."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Insert image"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Toggle preview (Ctrl-P)"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"You can upload images using the camera icon or by dragging them to the "
+"text area. Valid file types: png/jpg/svg/gif."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Upload image"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Toggle side by side (F9)"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "visible to anyone, even anonymous users and internet search bots."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "visible to only those who shared with."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"visible to only users who are logged in. Does not federate to other "
+"servers."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "visible to only self. Does not federate to other servers."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Edit"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Hidden textarea"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"Type in the handles (eg user@example.com) of the recipients. Separate by "
+"commas. Sorry, no search yet.."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Visibility"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"Tip: You can use the \"Self\" visibility to create draft content and then"
+" change the visibility to for example \"Public\" when you want to publish"
+" it."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"Pinned content will be shown on your personal profile in the order you "
+"want. Reorder pinned content from the profile menu. Pinned content will "
+"federate and otherwise function as any other content."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Error saving content."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"When visibility is set to 'Limited', you must either specify recipients "
+"or include your followers."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Some recipients couldn't be found."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Validation error"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Avatar of"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:226
+msgid "Contacts - following"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:234
+msgid "Contacts - followers"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "An error happened while trying to follow."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "An error happened while trying to unfollow."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "An error happened while fetching new content"
+msgstr "Une erreur est survenue pendant l'obtention de nouvelles publications"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "An error happened while sharing the content"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "An error happened while unsharing the content"
 msgstr ""
 
 #: socialhome/streams/enums.py:19
@@ -910,8 +938,9 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:46
 msgid ""
-"You currently do not have any e-mail address set up. You should really add "
-"an e-mail address so you can receive notifications, reset your password, etc."
+"You currently do not have any e-mail address set up. You should really "
+"add an e-mail address so you can receive notifications, reset your "
+"password, etc."
 msgstr ""
 
 #: socialhome/templates/account/email.html:51
@@ -936,8 +965,8 @@ msgstr ""
 #: socialhome/templates/account/email_confirm.html:18
 #, python-format
 msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
-"address for user %(user_display)s."
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
+"e-mail address for user %(user_display)s."
 msgstr ""
 
 #: socialhome/templates/account/email_confirm.html:22
@@ -948,17 +977,17 @@ msgstr "Confirmer la destruction"
 #: socialhome/templates/account/email_confirm.html:29
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
-"Ce lien de confirmation de courriel est expiré ou est invalide. Veuillez en "
-"<a href=\"%(email_url)s\">créer un nouveau</a>."
+"Ce lien de confirmation de courriel est expiré ou est invalide. Veuillez "
+"en <a href=\"%(email_url)s\">créer un nouveau</a>."
 
 #: socialhome/templates/account/email_confirmed.html:16
 #, python-format
 msgid ""
-"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-"
-"mail address for user %(user_display)s."
+"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
+"e-mail address for user %(user_display)s."
 msgstr ""
 
 #: socialhome/templates/account/login.html:8
@@ -971,8 +1000,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"      of your existing third party accounts. Or, <a href=\"%(signup_url)s"
-"\">sign up</a>\n"
+"      of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
 "      for a %(site_name)s account and sign in below:"
 msgstr ""
 
@@ -1013,8 +1042,8 @@ msgstr ""
 
 #: socialhome/templates/account/password_reset.html:18
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll send you "
-"an e-mail allowing you to reset it."
+"Forgotten your password? Enter your e-mail address below, and we'll send "
+"you an e-mail allowing you to reset it."
 msgstr ""
 
 #: socialhome/templates/account/password_reset.html:23
@@ -1038,13 +1067,13 @@ msgstr ""
 #: socialhome/templates/account/password_reset_from_key.html:15
 #, python-format
 msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
-"a>."
+"The password reset link was invalid, possibly because it has already been"
+" used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
+"reset</a>."
 msgstr ""
-"Le lien de réinitialisation du mot de passe est invalide, possiblement parce "
-"qu'il a déjà été utilisé. Veuiilez en demander <a href=\"%(passwd_reset_url)"
-"s\">un nouveau</a>."
+"Le lien de réinitialisation du mot de passe est invalide, possiblement "
+"parce qu'il a déjà été utilisé. Veuiilez en demander <a "
+"href=\"%(passwd_reset_url)s\">un nouveau</a>."
 
 #: socialhome/templates/account/password_reset_from_key.html:21
 msgid "change password"
@@ -1068,7 +1097,8 @@ msgstr ""
 #: socialhome/templates/account/signup.html:14
 #, python-format
 msgid ""
-"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
+"Already have an account? Then please <a href=\"%(login_url)s\">sign "
+"in</a>."
 msgstr ""
 
 #: socialhome/templates/account/signup_closed.html:5
@@ -1098,32 +1128,29 @@ msgstr ""
 #: socialhome/templates/account/verified_email_required.html:16
 msgid ""
 "This part of the site requires us to verify that\n"
-"        you are who you claim to be. For this purpose, we require that you\n"
+"        you are who you claim to be. For this purpose, we require that "
+"you\n"
 "        verify ownership of your e-mail address. "
 msgstr ""
 
 #: socialhome/templates/account/verified_email_required.html:20
 msgid ""
 "We have sent an e-mail to you for\n"
-"        verification. Please click on the link inside this e-mail. Please\n"
+"        verification. Please click on the link inside this e-mail. Please"
+"\n"
 "        contact us if you do not receive it within a few minutes."
 msgstr ""
 
 #: socialhome/templates/account/verified_email_required.html:22
 #, python-format
 msgid ""
-"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
-"mail address</a>."
+"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change "
+"your e-mail address</a>."
 msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:10
 msgid "Preferences"
 msgstr ""
-
-#: socialhome/templates/dynamic_preferences/form.html:14
-#: socialhome/users/templates/users/userpicture_form.html:28
-msgid "Save"
-msgstr "Sauvegarder"
 
 #: socialhome/templates/dynamic_preferences/form.html:17
 msgid "Export data"
@@ -1153,8 +1180,8 @@ msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:51
 msgid ""
-"Export has been requested. You will receive an email when it is ready for "
-"download."
+"Export has been requested. You will receive an email when it is ready for"
+" download."
 msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:52
@@ -1295,13 +1322,13 @@ msgstr ""
 
 #: socialhome/users/templates/users/user_api_token.html:12
 msgid ""
-"Important! Do not give anyone access to the token or they will be able to "
-"use your account through client apps! If you lose your token or need a new "
-"one, click 'Regenerate'."
+"Important! Do not give anyone access to the token or they will be able to"
+" use your account through client apps! If you lose your token or need a "
+"new one, click 'Regenerate'."
 msgstr ""
 "Attention! Si vous divulguez votre jeton, n'importe qui pourra utiliser "
-"votre compte via des applis client! Si vous perdez votre jeton ou en désirez "
-"un nouveau, cliquez sur 'Regénérer'."
+"votre compte via des applis client! Si vous perdez votre jeton ou en "
+"désirez un nouveau, cliquez sur 'Regénérer'."
 
 #: socialhome/users/templates/users/user_api_token.html:25
 msgid "Regenerate"
@@ -1324,16 +1351,16 @@ msgstr ""
 #: socialhome/users/templates/users/user_confirm_delete.html:17
 msgid ""
 "\n"
-"            Hey! Please note that if you <i>do</i> go ahead with this, might "
-"we say, drastic action, we will of course\n"
+"            Hey! Please note that if you <i>do</i> go ahead with this, "
+"might we say, drastic action, we will of course\n"
 "            delete any content you have created on <i>this server</i>. "
 "Additionally, we will try to delete the content\n"
 "            that <i>this server</i> has sent to <i>other servers</i> as "
 "requested by <i>you</i>. These servers are owned\n"
-"            by other people (decentralization <3). If these other servers "
-"choose to ignore the delete request or they\n"
-"            happen to have technical difficulties in deleting the content as "
-"requested by us, please contact the\n"
+"            by other people (decentralization <3). If these other servers"
+" choose to ignore the delete request or they\n"
+"            happen to have technical difficulties in deleting the content"
+" as requested by us, please contact the\n"
 "            administrators of the other servers. Thanks <3\n"
 "        "
 msgstr ""
@@ -1357,8 +1384,8 @@ msgstr "Nouvelle image en cours de téléchargement"
 
 #: socialhome/users/templates/users/userpicture_form.html:9
 msgid ""
-"Click the file browse button and choose an image file from your computer. "
-"Click 'Save'."
+"Click the file browse button and choose an image file from your computer."
+" Click 'Save'."
 msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:10
@@ -1367,10 +1394,10 @@ msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:11
 msgid ""
-"Profile pictures are square shaped. If your picture is not square shaped, "
-"you can choose a 'point of interest' by clicking the full image preview on "
-"the right. Click on the center point you would like your profile picture be "
-"around, then click 'Save'."
+"Profile pictures are square shaped. If your picture is not square shaped,"
+" you can choose a 'point of interest' by clicking the full image preview "
+"on the right. Click on the center point you would like your profile "
+"picture be around, then click 'Save'."
 msgstr ""
 
 #~ msgid "update"
@@ -1390,3 +1417,4 @@ msgstr ""
 
 #~ msgid "view-by-uuid"
 #~ msgstr "voir-par-uuid"
+

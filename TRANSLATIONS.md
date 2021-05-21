@@ -2,35 +2,40 @@ Requirements
 ------------
 
 pybabel (already installed)
-pip install django-babel (TODO: document my fix to extract.py)
-pip install babel-vue-extractor
+pip install django-babel
 
-Create the initial pot file
----------------------------
+Patch django-babel with (assuming you are using virtualenv):
+```
+patch -p1 ~/.virtualenvs/socialhome/lib/python3.9/site-packages/django_babel/extract < ~/socialhome/translate/django_babel.patch
+```
+
+TODO: create an issue for this
+
+Workflow
+--------
 
 From project directory,
 
-Create babel.cfg with the following content:
+Create or update the pot file using:
 ```
-[django: templates/**.*]
-[django: socialhome/*/templates/**.*]
-[python: socialhome/**.py]
-[babelvueextractor.extract.extract_vue: socialhome/**.vue]
-[javascript: socialhome/frontend/*.js]
-[javascript: socialhome/frontend/src/**.js]
+PYTHONPATH=. pybabel extract -F babel.cfg -o socialhome/locale/django.pot .
 ```
 
-Extract initial pot file using:
-```
-pybabel extract -F babel.cfg -o socialhome/locale/django.pot .
-```
+Translations are hosted at https://hosted.weblate.org/projects/socialhome. During the initial setup, weblate will pull the django.pot file.
+Then new translations can be started using weblate's UI. The pattern to configure for po files is socialhome/locale/*/LC_MESSAGES/django.po.
 
-TODO
+weblate can be configure to automatically compile mo files, but until we figure out how it works, use the following:
+```
+django-admin compilemessages
+```
+Saving and archiving from the weblate project will push the updated po files to socialhome's repository.
+
+If changes to translation files (pot and po) are made, they should be pushed to the repo and then forced synced from weblate's UI.
+
+Hack
 ----
 
-Weblate setup.
+~/socialhome/translate/extract.py is a wrapper around pybabel's javascript extractor to deal with template literal placehlders and filters.
 
-Compile translations
---------------------
+TODO: create an issue for this.
 
-django-admin compilemessages
