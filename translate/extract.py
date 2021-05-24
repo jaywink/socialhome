@@ -24,14 +24,6 @@ def extract_extrajs(fileobj, keywords, comment_tags, options):
     filtpat = re.compile('t\._f\("gettext"\)', re.UNICODE)
     c = filtpat.sub('gettext', c)
 
-#    tickpat = re.compile(r'\x60(.*?)\x60', re.UNICODE)
-#    res = tickpat.findall(contents)
-#    comppat = re.compile(r'\$\{(.*?)\}', re.UNICODE)
-#    for s in res:
-#        r = comppat.findall(s)
-#        if r: txt = txt + '\n'.join(r)
-
-#    options['template_string'] = False
     comppat = re.compile(r'(\$\{gettext\((.*?)\)\})', re.UNICODE)
     c = comppat.sub(r'`+gettext(\g<2>)+`', c, re.UNICODE)
 
@@ -50,8 +42,3 @@ if __name__ == '__main__':
   with open(sys.argv[1], 'rb') as f:
     for i in extract_extrajs(f, ['gettext'], [], {}):
       print(i)
-
-
-
-
-

@@ -30,7 +30,15 @@ django-admin compilemessages
 ```
 Saving and archiving from the weblate project will push the updated po files to socialhome's repository.
 
-If changes to translation files (pot and po) are made, they should be pushed to the repo and then forced synced from weblate's UI.
+If changes to the translation template file (django.pot) are made, they should first be merged with all existing translations with (bash script example):
+
+```
+for f in locale/*/LC_MESSAGES/django.po; do
+  msgmerge -U $f locale/django.pot
+done
+```
+
+and be pushed to the repo and then forced synced from the weblate UI.
 
 Hack
 ----
