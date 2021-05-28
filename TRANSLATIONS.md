@@ -34,16 +34,19 @@ If changes to the translation template file (django.pot) are made, they should f
 
 ```
 for f in locale/*/LC_MESSAGES/django.po; do
-  msgmerge -U $f locale/django.pot
+  msgmerge -U $f locale/django.pot # NOTE: pybabel update could also be used
 done
 ```
 
 and be pushed to the repo and then forced synced from the weblate UI.
 
+
+
 Hack
 ----
 
-~/socialhome/translate/extract.py is a wrapper around pybabel's javascript extractor to deal with template literal placehlders and filters.
+~/socialhome/translate/extract.py is a wrapper around pybabel's javascript extractor to deal with template literal placeholders and filters.
 
 TODO: create an issue for this.
 
+NOTE: pybabel is configured tp parse compiled js only. If changes are made to js or vue files, npm run dev should be run before updating the translation files.

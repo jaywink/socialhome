@@ -31,7 +31,7 @@ export default {
             return true
         },
         translations() {
-            return {reply: gettext("Reply")}
+            return {reply: gettext("reply")}
         },
     },
 }
