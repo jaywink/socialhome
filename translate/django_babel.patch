@@ -1,0 +1,95 @@
+*** extract.py.orig	2021-05-21 17:38:03.719644894 +0000
+--- extract.py	2021-05-11 16:49:10.059785399 +0000
+***************
+*** 1,5 ****
+  # -*- coding: utf-8 -*-
+! from django.template.base import Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK
+  from django.utils.translation import trim_whitespace
+  from django.utils.encoding import smart_text
+  
+--- 1,5 ----
+  # -*- coding: utf-8 -*-
+! from django.template.base import Lexer, TokenType
+  from django.utils.translation import trim_whitespace
+  from django.utils.encoding import smart_text
+  
+***************
+*** 59,65 ****
+      for t in text_lexer.tokenize():
+          lineno += t.contents.count('\n')
+          if intrans:
+!             if t.token_type == TOKEN_BLOCK:
+                  endbmatch = endblock_re.match(t.contents)
+                  pluralmatch = plural_re.match(t.contents)
+                  if endbmatch:
+--- 59,65 ----
+      for t in text_lexer.tokenize():
+          lineno += t.contents.count('\n')
+          if intrans:
+!             if t.token_type == TokenType.BLOCK:
+                  endbmatch = endblock_re.match(t.contents)
+                  pluralmatch = plural_re.match(t.contents)
+                  if endbmatch:
+***************
+*** 106,123 ****
+                  else:
+                      raise SyntaxError('Translation blocks must not include '
+                                        'other block tags: %s' % t.contents)
+!             elif t.token_type == TOKEN_VAR:
+                  if inplural:
+                      plural.append('%%(%s)s' % t.contents)
+                  else:
+                      singular.append('%%(%s)s' % t.contents)
+!             elif t.token_type == TOKEN_TEXT:
+                  if inplural:
+                      plural.append(t.contents)
+                  else:
+                      singular.append(t.contents)
+          else:
+!             if t.token_type == TOKEN_BLOCK:
+                  imatch = inline_re.match(t.contents)
+                  bmatch = block_re.match(t.contents)
+                  cmatches = constant_re.findall(t.contents)
+--- 106,123 ----
+                  else:
+                      raise SyntaxError('Translation blocks must not include '
+                                        'other block tags: %s' % t.contents)
+!             elif t.token_type == TokenType.VAR:
+                  if inplural:
+                      plural.append('%%(%s)s' % t.contents)
+                  else:
+                      singular.append('%%(%s)s' % t.contents)
+!             elif t.token_type == TokenType.TEXT:
+                  if inplural:
+                      plural.append(t.contents)
+                  else:
+                      singular.append(t.contents)
+          else:
+!             if t.token_type == TokenType.BLOCK:
+                  imatch = inline_re.match(t.contents)
+                  bmatch = block_re.match(t.contents)
+                  cmatches = constant_re.findall(t.contents)
+***************
+*** 152,158 ****
+                      for cmatch in cmatches:
+                          stripped_cmatch = strip_quotes(cmatch)
+                          yield lineno, None, smart_text(stripped_cmatch), []
+!             elif t.token_type == TOKEN_VAR:
+                  parts = t.contents.split('|')
+                  cmatch = constant_re.match(parts[0])
+                  if cmatch:
+--- 152,158 ----
+                      for cmatch in cmatches:
+                          stripped_cmatch = strip_quotes(cmatch)
+                          yield lineno, None, smart_text(stripped_cmatch), []
+!             elif t.token_type == TokenType.VAR:
+                  parts = t.contents.split('|')
+                  cmatch = constant_re.match(parts[0])
+                  if cmatch:
+***************
+*** 167,170 ****
+                              p1 = p1.strip('()')
+                          p1 = strip_quotes(p1)
+                          yield lineno, None, smart_text(p1), []
+- 
+--- 167,169 ----

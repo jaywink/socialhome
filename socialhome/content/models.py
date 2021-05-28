@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language, ugettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
 from federation.utils.text import process_text_links, find_tags
@@ -248,7 +248,7 @@ class Content(models.Model):
     @property
     def humanized_timestamp(self):
         """Human readable timestamp ie '2 hours ago'."""
-        return arrow.get(self.modified).humanize()
+        return arrow.get(self.modified).humanize(locale=get_language())
 
     @cached_property
     def root(self):
