@@ -1,6 +1,6 @@
 [![](https://img.shields.io/badge/docker-image-yellow)](https://git.feneas.org/socialhome/socialhome/container_registry)  [![pipeline status](https://git.feneas.org/socialhome/socialhome/badges/master/pipeline.svg)](https://git.feneas.org/socialhome/socialhome/commits/master) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
-[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:matrix.org.svg)](https://matrix.to/#/#socialhome:feneas.org) [![issue tracker](https://img.shields.io/badge/issue%20tracker-gitlab-yellow.svg)](https://git.feneas.org/socialhome/socialhome/issues)
+[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:matrix.org.svg)](https://matrix.to/#/#socialhome:feneas.org) [![issue tracker](https://img.shields.io/badge/issue%20tracker-gitlab-yellow.svg)](https://git.feneas.org/socialhome/socialhome/issues) [![Translations](https://hosted.weblate.org/widgets/socialhome/-/svg-badge.svg)](https://hosted.weblate.org/engage/socialhome/)
 
 ![Socialhome](http://socialhome.readthedocs.io/en/latest/_images/socialhome.png)
 
@@ -52,3 +52,12 @@ Source code
 -----------
 
 Socialhome is fully open source, licenced under the AGPLv3 license.
+
+Translations
+------------
+
+Our translations are handled via [Weblate](https://hosted.weblate.org/engage/socialhome/). Please join the translations team by requesting access via there. Humble thank you for Weblate for their Libre hosting offering 💚
+
+Please also read [TRANSLATIONS.md](TRANSLATIONS.md) for information on the translations process.
+
+![Translations status](https://hosted.weblate.org/widgets/socialhome/-/multi-auto.svg)
