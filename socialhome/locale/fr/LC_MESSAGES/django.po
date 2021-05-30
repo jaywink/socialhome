@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-28 11:24+0000\n"
-"PO-Revision-Date: 2021-05-30 15:40+0000\n"
+"PO-Revision-Date: 2021-05-30 16:15+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
@@ -113,8 +113,8 @@ msgstr "Destinataires"
 #: socialhome/content/forms.py:53
 msgid "Recipients cannot be empty if not including followed users."
 msgstr ""
-"Les destinataires ne peuvent pas être vides si les utilisateurs suivis ne "
-"sont pas inclus."
+"Les destinataires ne peuvent pas être vides si les utilisateurs auxquels on "
+"est abonné ne sont pas inclus."
 
 #: socialhome/content/forms.py:66
 #, python-format
@@ -571,11 +571,11 @@ msgstr "Contient des publications publiques provenant de tout le réseau."
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/enums.py:20
 #: socialhome/templates/base.html:48
 msgid "Followed"
-msgstr "Suivi"
+msgstr "Abonnements"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
 msgid "Content from followed users."
-msgstr "Publication des utilisateurs suivis."
+msgstr "Publications des utilisateurs auxquels on est abonné."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
@@ -881,7 +881,7 @@ msgstr "Flux des tags suivis"
 
 #: socialhome/streams/views.py:157
 msgid "Content from followed tags."
-msgstr "Publications incluant des tags suivis."
+msgstr "Publications contenant des tags suivis."
 
 #: socialhome/streams/views.py:168 socialhome/users/preferences.py:17
 msgid "Followed stream"
