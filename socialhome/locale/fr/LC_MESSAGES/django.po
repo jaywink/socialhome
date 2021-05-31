@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-28 11:24+0000\n"
+"POT-Creation-Date: 2021-05-30 20:44+0000\n"
 "PO-Revision-Date: 2021-05-30 16:15+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
@@ -233,9 +233,9 @@ msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
 msgstr ""
-"Désactiver pour ne pas fédérer cette version aux serveurs distants. Remarque "
-": la version du contenu sauvegardé sera toujours mise à jour dans les flux "
-"locaux."
+"Désactiver pour ne pas fédérer cette version aux serveurs distants. "
+"Remarque : la version du contenu sauvegardé sera toujours mise à jour dans "
+"les flux locaux."
 
 #: socialhome/content/models.py:145
 msgid "Limitied visibilities"
@@ -460,7 +460,8 @@ msgstr "Votre publication a été partagée par"
 
 #: socialhome/search/views.py:136
 msgid "Search string is invalid, please try another one."
-msgstr "La chaîne de recherche n'est pas valide, veuillez en essayer une autre."
+msgstr ""
+"La chaîne de recherche n'est pas valide, veuillez en essayer une autre."
 
 #: socialhome/search/templates/search/search.html:5
 #: socialhome/search/templates/search/search.html:8
@@ -579,7 +580,8 @@ msgstr "Publications des utilisateurs auxquels on est abonné."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
-msgstr "Contient des publications non publiques dont vous êtes le destinataire."
+msgstr ""
+"Contient des publications non publiques dont vous êtes le destinataire."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:95
 msgid "Contains content from local users."
@@ -630,16 +632,16 @@ msgid "All content"
 msgstr "Toutes vos publications"
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "${t} new post available"
-msgid_plural "${t} new posts available"
-msgstr[0] "${t} nouvelle publication"
-msgstr[1] "${t} nouvelles publications"
+msgid "%s new post available"
+msgid_plural "%s new posts available"
+msgstr[0] "%s nouvelle publication disponible"
+msgstr[1] "%s nouvelles publications disponibles"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/templates/dynamic_preferences/form.html:14
 #: socialhome/users/templates/users/userpicture_form.html:28
 msgid "Save"
-msgstr "Sauvegarder"
+msgstr "Enregistrer"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 1"
@@ -821,7 +823,8 @@ msgstr "Une erreur s'est produite lors de la tentative de désabonnement."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while fetching new content"
-msgstr "Une erreur est survenue pendant le chargement de nouvelles publications"
+msgstr ""
+"Une erreur est survenue pendant le chargement de nouvelles publications"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while sharing the content"
@@ -1056,8 +1059,8 @@ msgid ""
 "      for a %(site_name)s account and sign in below:"
 msgstr ""
 "Veuillez vous connecter avec l'un\n"
-"      de vos comptes tiers existants. Ou, <a href=\"%(signup_url)s\""
-">enregistrez</a>\n"
+"      de vos comptes tiers existants. Ou, <a href=\"%(signup_url)s"
+"\">enregistrez</a>\n"
 "      un compte %(site_name)s et connectez-vous ci-dessous :"
 
 #: socialhome/templates/account/login.html:26
@@ -1134,8 +1137,8 @@ msgid ""
 "a>."
 msgstr ""
 "Le lien de réinitialisation du mot de passe est invalide, possiblement parce "
-"qu'il a déjà été utilisé. Veuillez en demander <a href=\"%(passwd_reset_url)"
-"s\">un nouveau</a>."
+"qu'il a déjà été utilisé. Veuillez en demander <a href=\"%(passwd_reset_url)s"
+"\">un nouveau</a>."
 
 #: socialhome/templates/account/password_reset_from_key.html:21
 msgid "change password"
@@ -1161,8 +1164,8 @@ msgstr "Se connecter"
 msgid ""
 "Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
 msgstr ""
-"Vous avez déjà un compte ? Dans ce cas veuillez vous <a href=\"%(login_url)"
-"s\">connecter</a>."
+"Vous avez déjà un compte ? Dans ce cas veuillez vous <a href=\"%(login_url)s"
+"\">connecter</a>."
 
 #: socialhome/templates/account/signup_closed.html:5
 #: socialhome/templates/account/signup_closed.html:10
@@ -1221,8 +1224,8 @@ msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
 "mail address</a>."
 msgstr ""
-"<strong>Note:</strong> vous pouvez toujours <a href=\"%(email_url)s\""
-">modifier votre adresse électronique</a>."
+"<strong>Note:</strong> vous pouvez toujours <a href=\"%(email_url)s"
+"\">modifier votre adresse électronique</a>."
 
 #: socialhome/templates/dynamic_preferences/form.html:10
 msgid "Preferences"
@@ -1243,6 +1246,10 @@ msgstr "créé"
 #: socialhome/templates/dynamic_preferences/form.html:23
 msgid "Request new export"
 msgstr "Demander une nouvelle exportation"
+
+#: socialhome/templates/dynamic_preferences/form.html:29
+msgid "Delete account"
+msgstr "Supprimer le compte"
 
 #: socialhome/templates/dynamic_preferences/form.html:31
 msgid "Back to profile"
@@ -1393,7 +1400,7 @@ msgstr "Organiser les publications"
 
 #: socialhome/users/templates/users/profile_detail_organize.html:32
 msgid "Save order"
-msgstr "Sauvegarder l'ordre"
+msgstr "Enregistrer l'ordre"
 
 #: socialhome/users/templates/users/user_api_token.html:9
 msgid ""
@@ -1448,7 +1455,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"            Hé ! S'il vous plaît noter que si vous aller <i>vraiment</i> de "
+"            Hé ! S'il vous plaît noter que si vous allez <i>vraiment</i> de "
 "l'avant avec cette, disons, action drastique, nous allons bien sûr\n"
 "            supprimer tout contenu que vous avez créé sur <i>ce serveur</i>. "
 "De plus, nous essaierons de supprimer le contenu\n"
