@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-05-30 16:15+0000\n"
+"PO-Revision-Date: 2021-05-31 16:26+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
@@ -113,8 +113,8 @@ msgstr "Destinataires"
 #: socialhome/content/forms.py:53
 msgid "Recipients cannot be empty if not including followed users."
 msgstr ""
-"Les destinataires ne peuvent pas être vides si les utilisateurs auxquels on "
-"est abonné ne sont pas inclus."
+"Les destinataires ne peuvent pas être vides si les utilisateurs auxquels "
+"vous êtes abonné ne sont pas inclus."
 
 #: socialhome/content/forms.py:66
 #, python-format
@@ -576,7 +576,7 @@ msgstr "Abonnements"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
 msgid "Content from followed users."
-msgstr "Publications des utilisateurs auxquels on est abonné."
+msgstr "Publications des utilisateurs auxquels vous êtes abonné."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
@@ -739,7 +739,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to only self. Does not federate to other servers."
-msgstr "visible uniquement par soi-même. Ne se fédère pas à d'autres serveurs."
+msgstr "visible uniquement par vous seul. Ne se fédère pas à d'autres serveurs."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Edit"
@@ -766,7 +766,7 @@ msgid ""
 "Tip: You can use the \"Self\" visibility to create draft content and then "
 "change the visibility to for example \"Public\" when you want to publish it."
 msgstr ""
-"Conseil : vous pouvez utiliser la visibilité \"Soi-même\" pour créer un "
+"Conseil : vous pouvez utiliser la visibilité \"Moi seul\" pour créer un "
 "brouillon de contenu, puis changer la visibilité en \"Public\", par exemple, "
 "lorsque vous souhaitez le publier."
 
