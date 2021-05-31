@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-28 11:24+0000\n"
+"POT-Creation-Date: 2021-05-30 20:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.0\n"
+"Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
 msgid "Choose policy document types to send emails about first!"
@@ -591,8 +591,9 @@ msgid "All content"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "${t} new post available"
-msgid_plural "${t} new posts available"
+#, python-format
+msgid "%s new post available"
+msgid_plural "%s new posts available"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1151,6 +1152,10 @@ msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:23
 msgid "Request new export"
+msgstr ""
+
+#: socialhome/templates/dynamic_preferences/form.html:29
+msgid "Delete account"
 msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:31
