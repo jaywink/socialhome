@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-06-04 23:33+0000\n"
-"Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
+"PO-Revision-Date: 2021-06-05 13:43+0000\n"
+"Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
 "Language: fr\n"
@@ -629,7 +629,7 @@ msgstr "Publications épinglées"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content"
-msgstr "Toutes vos publications"
+msgstr "Toutes les publications"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "%s new post available"
