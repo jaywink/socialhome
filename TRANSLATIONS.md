@@ -6,7 +6,7 @@ pip install django-babel
 
 Patch django-babel with (assuming you are using virtualenv):
 ```
-patch -p1 ~/.virtualenvs/socialhome/lib/python3.9/site-packages/django_babel/extract < ~/socialhome/translate/django_babel.patch
+patch -p1 ~/.virtualenvs/socialhome/lib/python3.9/site-packages/django_babel/extract.py < ~/socialhome/translate/django_babel.patch
 ```
 
 TODO: create an issue for this
@@ -28,9 +28,18 @@ weblate can be configure to automatically compile mo files, but until we figure 
 ```
 django-admin compilemessages
 ```
+
+or (bash script example):
+
+```
+for f in locale/*/LC_MESSAGES/django.po; do
+  msgfmt -o ${f/.po/.mo} $f
+done
+```
+
 Saving and archiving from the weblate project will push the updated po files to socialhome's repository.
 
-If changes to the translation template file (django.pot) are made, they should first be merged with all existing translations with (bash script example):
+If manual changes to the translation template file (django.pot) are made, they should first be merged with all existing translations with (bash script example):
 
 ```
 for f in locale/*/LC_MESSAGES/django.po; do
@@ -38,7 +47,7 @@ for f in locale/*/LC_MESSAGES/django.po; do
 done
 ```
 
-and be pushed to the repo and then forced synced from the weblate UI.
+Then commit and push. weblate should pick them up automatically via its configured gitlab webhook.
 
 
 

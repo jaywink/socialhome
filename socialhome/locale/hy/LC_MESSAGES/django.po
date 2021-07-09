@@ -7,13 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-28 11:24+0000\n"
+"POT-Creation-Date: 2021-05-30 20:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: hy\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.0\n"
 
@@ -62,8 +62,8 @@ msgstr ""
 #: socialhome/preferences.py:14
 msgid ""
 "If set to true, all outbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should "
-"only be turned on for temporary debugging."
+"instances (available in the admin). This is a performance hit so should only "
+"be turned on for temporary debugging."
 msgstr ""
 
 #: socialhome/preferences.py:24
@@ -73,8 +73,8 @@ msgstr ""
 #: socialhome/preferences.py:25
 msgid ""
 "If set to true, all inbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should "
-"only be turned on for temporary debugging."
+"instances (available in the admin). This is a performance hit so should only "
+"be turned on for temporary debugging."
 msgstr ""
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
@@ -394,8 +394,8 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/policy_document_update.html:21
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:14
 msgid ""
-"No actions are required by you. By continuing to use the service you "
-"accept the new document(s)."
+"No actions are required by you. By continuing to use the service you accept "
+"the new document(s)."
 msgstr ""
 
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:9
@@ -591,8 +591,9 @@ msgid "All content"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "${t} new post available"
-msgid_plural "${t} new posts available"
+#, python-format
+msgid "%s new post available"
+msgid_plural "%s new posts available"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -665,8 +666,8 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"You can upload images using the camera icon or by dragging them to the "
-"text area. Valid file types: png/jpg/svg/gif."
+"You can upload images using the camera icon or by dragging them to the text "
+"area. Valid file types: png/jpg/svg/gif."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -687,8 +688,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"visible to only users who are logged in. Does not federate to other "
-"servers."
+"visible to only users who are logged in. Does not federate to other servers."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -715,16 +715,15 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"Tip: You can use the \"Self\" visibility to create draft content and then"
-" change the visibility to for example \"Public\" when you want to publish"
-" it."
+"Tip: You can use the \"Self\" visibility to create draft content and then "
+"change the visibility to for example \"Public\" when you want to publish it."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"Pinned content will be shown on your personal profile in the order you "
-"want. Reorder pinned content from the profile menu. Pinned content will "
-"federate and otherwise function as any other content."
+"Pinned content will be shown on your personal profile in the order you want. "
+"Reorder pinned content from the profile menu. Pinned content will federate "
+"and otherwise function as any other content."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -733,8 +732,8 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"When visibility is set to 'Limited', you must either specify recipients "
-"or include your followers."
+"When visibility is set to 'Limited', you must either specify recipients or "
+"include your followers."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -929,9 +928,8 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:46
 msgid ""
-"You currently do not have any e-mail address set up. You should really "
-"add an e-mail address so you can receive notifications, reset your "
-"password, etc."
+"You currently do not have any e-mail address set up. You should really add "
+"an e-mail address so you can receive notifications, reset your password, etc."
 msgstr ""
 
 #: socialhome/templates/account/email.html:51
@@ -956,8 +954,8 @@ msgstr ""
 #: socialhome/templates/account/email_confirm.html:18
 #, python-format
 msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
-"e-mail address for user %(user_display)s."
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"address for user %(user_display)s."
 msgstr ""
 
 #: socialhome/templates/account/email_confirm.html:22
@@ -967,15 +965,15 @@ msgstr ""
 #: socialhome/templates/account/email_confirm.html:29
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a href="
+"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
 
 #: socialhome/templates/account/email_confirmed.html:16
 #, python-format
 msgid ""
-"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an "
-"e-mail address for user %(user_display)s."
+"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-"
+"mail address for user %(user_display)s."
 msgstr ""
 
 #: socialhome/templates/account/login.html:8
@@ -988,8 +986,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"      of your existing third party accounts. Or, <a "
-"href=\"%(signup_url)s\">sign up</a>\n"
+"      of your existing third party accounts. Or, <a href=\"%(signup_url)s"
+"\">sign up</a>\n"
 "      for a %(site_name)s account and sign in below:"
 msgstr ""
 
@@ -1030,8 +1028,8 @@ msgstr ""
 
 #: socialhome/templates/account/password_reset.html:18
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll send "
-"you an e-mail allowing you to reset it."
+"Forgotten your password? Enter your e-mail address below, and we'll send you "
+"an e-mail allowing you to reset it."
 msgstr ""
 
 #: socialhome/templates/account/password_reset.html:23
@@ -1055,9 +1053,9 @@ msgstr ""
 #: socialhome/templates/account/password_reset_from_key.html:15
 #, python-format
 msgid ""
-"The password reset link was invalid, possibly because it has already been"
-" used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
-"reset</a>."
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
 msgstr ""
 
 #: socialhome/templates/account/password_reset_from_key.html:21
@@ -1082,8 +1080,7 @@ msgstr ""
 #: socialhome/templates/account/signup.html:14
 #, python-format
 msgid ""
-"Already have an account? Then please <a href=\"%(login_url)s\">sign "
-"in</a>."
+"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
 msgstr ""
 
 #: socialhome/templates/account/signup_closed.html:5
@@ -1113,24 +1110,22 @@ msgstr ""
 #: socialhome/templates/account/verified_email_required.html:16
 msgid ""
 "This part of the site requires us to verify that\n"
-"        you are who you claim to be. For this purpose, we require that "
-"you\n"
+"        you are who you claim to be. For this purpose, we require that you\n"
 "        verify ownership of your e-mail address. "
 msgstr ""
 
 #: socialhome/templates/account/verified_email_required.html:20
 msgid ""
 "We have sent an e-mail to you for\n"
-"        verification. Please click on the link inside this e-mail. Please"
-"\n"
+"        verification. Please click on the link inside this e-mail. Please\n"
 "        contact us if you do not receive it within a few minutes."
 msgstr ""
 
 #: socialhome/templates/account/verified_email_required.html:22
 #, python-format
 msgid ""
-"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change "
-"your e-mail address</a>."
+"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
+"mail address</a>."
 msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:10
@@ -1153,6 +1148,10 @@ msgstr ""
 msgid "Request new export"
 msgstr ""
 
+#: socialhome/templates/dynamic_preferences/form.html:29
+msgid "Delete account"
+msgstr ""
+
 #: socialhome/templates/dynamic_preferences/form.html:31
 msgid "Back to profile"
 msgstr ""
@@ -1163,8 +1162,8 @@ msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:51
 msgid ""
-"Export has been requested. You will receive an email when it is ready for"
-" download."
+"Export has been requested. You will receive an email when it is ready for "
+"download."
 msgstr ""
 
 #: socialhome/templates/dynamic_preferences/form.html:52
@@ -1305,9 +1304,9 @@ msgstr ""
 
 #: socialhome/users/templates/users/user_api_token.html:12
 msgid ""
-"Important! Do not give anyone access to the token or they will be able to"
-" use your account through client apps! If you lose your token or need a "
-"new one, click 'Regenerate'."
+"Important! Do not give anyone access to the token or they will be able to "
+"use your account through client apps! If you lose your token or need a new "
+"one, click 'Regenerate'."
 msgstr ""
 
 #: socialhome/users/templates/users/user_api_token.html:25
@@ -1331,16 +1330,16 @@ msgstr ""
 #: socialhome/users/templates/users/user_confirm_delete.html:17
 msgid ""
 "\n"
-"            Hey! Please note that if you <i>do</i> go ahead with this, "
-"might we say, drastic action, we will of course\n"
+"            Hey! Please note that if you <i>do</i> go ahead with this, might "
+"we say, drastic action, we will of course\n"
 "            delete any content you have created on <i>this server</i>. "
 "Additionally, we will try to delete the content\n"
 "            that <i>this server</i> has sent to <i>other servers</i> as "
 "requested by <i>you</i>. These servers are owned\n"
-"            by other people (decentralization <3). If these other servers"
-" choose to ignore the delete request or they\n"
-"            happen to have technical difficulties in deleting the content"
-" as requested by us, please contact the\n"
+"            by other people (decentralization <3). If these other servers "
+"choose to ignore the delete request or they\n"
+"            happen to have technical difficulties in deleting the content as "
+"requested by us, please contact the\n"
 "            administrators of the other servers. Thanks <3\n"
 "        "
 msgstr ""
@@ -1364,8 +1363,8 @@ msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:9
 msgid ""
-"Click the file browse button and choose an image file from your computer."
-" Click 'Save'."
+"Click the file browse button and choose an image file from your computer. "
+"Click 'Save'."
 msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:10
@@ -1374,8 +1373,8 @@ msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:11
 msgid ""
-"Profile pictures are square shaped. If your picture is not square shaped,"
-" you can choose a 'point of interest' by clicking the full image preview "
-"on the right. Click on the center point you would like your profile "
-"picture be around, then click 'Save'."
+"Profile pictures are square shaped. If your picture is not square shaped, "
+"you can choose a 'point of interest' by clicking the full image preview on "
+"the right. Click on the center point you would like your profile picture be "
+"around, then click 'Save'."
 msgstr ""

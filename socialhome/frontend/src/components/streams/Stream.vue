@@ -129,7 +129,8 @@ export default Vue.component("Stream", {
         },
         translations() {
             const ln = this.unfetchedContentIds.length
-            return {newPostsAvailables: ngettext(`${ln} new post available`, `${ln} new posts available`, ln)}
+            const fmts = ngettext("%s new post available", "%s new posts available", ln)
+            return {newPostsAvailables: interpolate(fmts, [ln])}
         },
         unfetchedContentIds() {
             return this.$store.state.stream.unfetchedContentIds
