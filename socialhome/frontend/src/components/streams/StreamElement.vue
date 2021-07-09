@@ -8,10 +8,10 @@
 
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-html="content.rendered" />
+            <div :id="content.id" v-html="content.rendered" />
         </nsfw-shield>
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-else v-html="content.rendered" />
+        <div v-else :id="content.id" v-html="content.rendered" />
 
         <reactions-bar :content="content">
             <div v-if="!showAuthorBar" class="stream-element-content-timestamp mr-2">
@@ -81,6 +81,7 @@ const StreamElement = {
         },
     },
     mounted() {
+        this.layoutAfterIframeResize()
         this.layoutAfterTwitterOEmbeds()
     },
     updated() {
@@ -89,6 +90,16 @@ const StreamElement = {
         }
     },
     methods: {
+        layoutAfterIframeResize() {
+            const iframe = document.getElementById(this.content.id).getElementsByTagName("iframe")[0]
+            if (iframe) {
+                const c = this
+                const resizeObs = new MutationObserver(() => {
+                    c.onImageLoad()
+                })
+                resizeObs.observe(iframe, {attributeFilter: ["height", "style"]})
+            }
+        },
         layoutAfterTwitterOEmbeds() {
             // Hackity hack a Masonry redraw after hopefully Twitter oembeds are loaded...
             // Let's try only add these once even if we have many oembed's
@@ -104,17 +115,17 @@ const StreamElement = {
                         window.twttr.widgets.load(document.getElementsByClassName(".streams-container")[0])
                     }, 1000)
                 }
-                if (this.$store.state.stream.layoutDoneAfterTwitterOEmbeds) {
-                    return
-                }
-                this.$store.dispatch("stream/setLayoutDoneAfterTwitterOEmbeds", true)
-                const c = this
-                setTimeout(() => {
-                    c.onImageLoad()
-                }, 2000)
-                setTimeout(() => {
-                    c.onImageLoad()
-                }, 4000)
+                // if (this.$store.state.stream.layoutDoneAfterTwitterOEmbeds) {
+                //     return
+                // }
+                // this.$store.dispatch("stream/setLayoutDoneAfterTwitterOEmbeds", true)
+                // const c = this
+                // setTimeout(() => {
+                //     c.onImageLoad()
+                // }, 2000)
+                // setTimeout(() => {
+                //     c.onImageLoad()
+                // }, 4000)
             }
         },
         loadMore() {

@@ -1,6 +1,8 @@
 import datetime
 import os
 import re
+import string
+import random
 
 from django.db import DataError
 from django.db import IntegrityError
@@ -88,6 +90,12 @@ class OEmbedDiscoverer(ChainingDiscoverer):
                         "https://twitter.com/"
                     ],
                     "url": "https://publish.twitter.com/oembed",
+                }),
+                StaticDiscoveryEndpoint({
+                    "schemes": [
+                        "https://www.nextplatform.com/*"
+                    ],
+                    "url": "https://www.nextplatform.com/wp-json/oembed/1.0/embed",
                 })
             ])
         ])
@@ -118,8 +126,15 @@ def fetch_oembed_preview(content, urls):
         if not oembed:
             continue
         # Ensure width is 100% not fixed
-        oembed = re.sub(r'width="[0-9]*"', 'width="100%"', oembed)
-        oembed = re.sub(r'height="[0-9]*"', "", oembed)
+        oembed = re.sub(r'\s+width="[0-9]*"', ' width="100%"', oembed)
+        oembed = re.sub(r'\s+height="[0-9]*"', " ", oembed)
+        #if url.startswith("https://www.nextplatform.com/"):
+        if "wp-embedded-content" in oembed:
+            oembed = re.sub(r'<script.*</script>', '', oembed, flags=re.S)
+            oembed = re.sub(r'<blockquote.*</blockquote>', '', oembed)
+            ltr = string.ascii_lowercase + string.digits
+            secret = ''.join(random.choice(ltr) for i in range(10))
+            oembed = re.sub(r'(<iframe.*src=".*?)"', '\g<1>#?secret='+secret+'" data-secret="'+secret+'"', oembed)
         try:
             with transaction.atomic():
                 oembed = OEmbedCache.objects.create(url=url, oembed=oembed)
