@@ -91,13 +91,16 @@ const StreamElement = {
     },
     methods: {
         layoutAfterIframeResize() {
-            const iframe = document.getElementById(this.content.id).getElementsByTagName("iframe")[0]
-            if (iframe) {
-                const c = this
-                const resizeObs = new MutationObserver(() => {
-                    c.onImageLoad()
-                })
-                resizeObs.observe(iframe, {attributeFilter: ["height", "style"]})
+            const post = document.getElementById(this.content.id)
+            if (post) {
+                const iframe = post.getElementsByTagName("iframe")[0]
+                if (iframe) {
+                    const c = this
+                    const resizeObs = new MutationObserver(() => {
+                        c.onImageLoad()
+                    })
+                    resizeObs.observe(iframe, {attributeFilter: ["height", "style"]})
+                }
             }
         },
         layoutAfterTwitterOEmbeds() {
