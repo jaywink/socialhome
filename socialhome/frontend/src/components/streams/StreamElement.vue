@@ -91,15 +91,15 @@ const StreamElement = {
     },
     methods: {
         layoutAfterIframeResize() {
-            const post = document.getElementById(this.content.id)
-            if (post) {
-                const iframe = post.getElementsByTagName("iframe")[0]
-                if (iframe) {
+            if (this.content.show_preview) {
+                const post = document.getElementById(this.content.id)
+                if (post) {
                     const c = this
                     const resizeObs = new MutationObserver(() => {
                         c.onImageLoad()
                     })
-                    resizeObs.observe(iframe, {attributeFilter: ["height", "style"]})
+                    // eslint-disable-next-line object-curly-newline
+                    resizeObs.observe(post, {subtree: true, childList: true})
                 }
             }
         },
