@@ -1,5 +1,5 @@
 <template>
-    <div v-images-loaded.on.progress="onImageLoad">
+    <div>
         <div v-if="content.hasLoadMore">
             <div v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" />
         </div>
@@ -33,7 +33,7 @@
 
 <script>
 import Vue from "vue"
-import imagesLoaded from "vue-images-loaded"
+// import imagesLoaded from "vue-images-loaded"
 
 import AuthorBar from "@/components/streams/AuthorBar.vue"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
@@ -42,7 +42,7 @@ import NsfwShield from "@/components/streams/NsfwShield.vue"
 
 const StreamElement = {
     name: "StreamElement",
-    directives: {imagesLoaded},
+    // directives: {imagesLoaded},
     components: {
         ContentTimestamp, NsfwShield, ReactionsBar, AuthorBar,
     },
@@ -81,7 +81,7 @@ const StreamElement = {
         },
     },
     mounted() {
-        this.layoutAfterIframeResize()
+        this.layoutAfterDOMChange()
         this.layoutAfterTwitterOEmbeds()
     },
     updated() {
@@ -90,17 +90,17 @@ const StreamElement = {
         }
     },
     methods: {
-        layoutAfterIframeResize() {
-            if (this.content.show_preview) {
-                const post = document.getElementById(this.content.id)
-                if (post) {
-                    const c = this
-                    const resizeObs = new MutationObserver(() => {
-                        c.onImageLoad()
-                    })
-                    // eslint-disable-next-line object-curly-newline
-                    resizeObs.observe(post, {subtree: true, childList: true})
-                }
+        layoutAfterDOMChange() {
+            const post = document.getElementById(this.content.id)
+            if (post) {
+                // eslint-disable-next-line prefer-arrow-callback
+                const resizeObs = new MutationObserver(function () {
+                    if (!this.$store.state.stream.stream.single) {
+                        this.$redrawVueMasonry()
+                    }
+                })
+                // eslint-disable-next-line object-curly-newline
+                resizeObs.observe(post, {subtree: true, childList: true})
             }
         },
         layoutAfterTwitterOEmbeds() {
@@ -135,11 +135,11 @@ const StreamElement = {
             this.$store.dispatch("stream/disableLoadMore", this.content.id)
             this.$emit("loadmore")
         },
-        onImageLoad() {
-            if (!this.$store.state.stream.stream.single) {
-                this.$redrawVueMasonry()
-            }
-        },
+        // onImageLoad() {
+        //     if (!this.$store.state.stream.stream.single) {
+        //         this.$redrawVueMasonry()
+        //     }
+        // },
     },
 }
 
