@@ -83,6 +83,9 @@ const StreamElement = {
     mounted() {
         this.layoutAfterDOMChange()
         this.layoutAfterTwitterOEmbeds()
+        if (!this.$store.state.stream.stream.single) {
+            this.$redrawVueMasonry()
+        }
     },
     updated() {
         if (!this.$store.state.stream.stream.single) {
@@ -93,14 +96,13 @@ const StreamElement = {
         layoutAfterDOMChange() {
             const post = document.getElementById(this.content.id)
             if (post) {
+                const redraw = this.$redrawVueMasonry
                 // eslint-disable-next-line prefer-arrow-callback
                 const resizeObs = new MutationObserver(function () {
-                    if (!this.$store.state.stream.stream.single) {
-                        this.$redrawVueMasonry()
-                    }
+                    redraw()
                 })
                 // eslint-disable-next-line object-curly-newline
-                resizeObs.observe(post, {subtree: true, childList: true})
+                resizeObs.observe(post, {attributes: true, subtree: true, childList: true})
             }
         },
         layoutAfterTwitterOEmbeds() {
