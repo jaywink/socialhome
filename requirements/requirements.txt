@@ -6,18 +6,18 @@
 #
 -e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   federation
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 -e git+https://git.feneas.org/jaywink/federation.git@5a940e75f591f71be3af70790c225cfb37411488#egg=federation==0.22.0-dev.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 aioredis==1.3.1
     # via channels-redis
 arrow==1.1.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 asgiref==3.3.4
     # via
     #   channels
@@ -34,7 +34,7 @@ attrs==21.2.0
     #   twisted
 autobahn==21.2.1
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   daphne
 automat==20.2.0
     # via twisted
@@ -48,7 +48,7 @@ beautifulsoup4==4.9.3
     #   python-opengraph-jaywink
 bleach==3.3.0
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   federation
 certifi==2020.12.5
     # via requests
@@ -56,14 +56,14 @@ cffi==1.14.5
     # via cryptography
 channels==2.4.0
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   channels-redis
 channels-redis==2.4.2
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 chardet==4.0.0
     # via requests
 circus==0.17.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 click==7.1.2
     # via rq
 constantly==15.1.0
@@ -95,9 +95,9 @@ defusedxml==0.7.1
     # via python3-openid
 dirty-validators==0.5.4
     # via federation
-django==2.2.22
+django==2.2.24
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   channels
     #   django-allauth
     #   django-braces
@@ -118,55 +118,55 @@ django==2.2.22
     #   djangorestframework
     #   drf-yasg
 django-allauth==0.44.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-braces==1.14.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-crispy-forms==1.11.2
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-dynamic-preferences==1.5.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-enumfields==2.1.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-environ==0.4.5
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-extensions==3.1.3
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-floppyforms==1.9.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-fsm==2.7.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-haystack==3.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-js-reverse==0.9.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-memoize==2.3.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-model-utils==3.2.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-redis==4.12.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-redisboard==4.1.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-reversion==3.0.9
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-robots==4.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-rq==2.4.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-secure==1.0.2
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-settings-export==1.2.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-silk==4.1.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 django-versatileimagefield==2.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 djangorestframework==3.12.4
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   drf-yasg
 drf-yasg==1.20.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 gprof2dot==2021.2.21
     # via django-silk
 hiredis==2.0.0
@@ -185,7 +185,7 @@ incremental==21.3.0
 inflection==0.5.1
     # via drf-yasg
 ipython==7.15.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 ipython-genutils==0.2.0
     # via traitlets
 isodate==0.6.0
@@ -196,7 +196,7 @@ itypes==1.2.0
     # via coreapi
 jedi==0.17.2
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   ipython
 jinja2==2.11.3
     # via
@@ -206,7 +206,7 @@ jsonschema==3.2.0
     # via federation
 lxml==4.6.3
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   federation
 markdown==3.3.4
     # via django-markdownx
@@ -230,7 +230,7 @@ pickleshare==0.7.5
     # via ipython
 pillow==8.2.0
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   django-markdownx
     #   django-versatileimagefield
 prompt-toolkit==3.0.18
@@ -238,7 +238,7 @@ prompt-toolkit==3.0.18
 psutil==5.8.0
     # via circus
 psycopg2-binary==2.8.6
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 ptyprocess==0.7.0
     # via pexpect
 pyasn1==0.4.8
@@ -275,10 +275,10 @@ python-dateutil==2.8.1
 python-magic==0.4.22
     # via django-versatileimagefield
 python-opengraph-jaywink==0.2.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 python-slugify==5.0.2
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   federation
 python-xrd==0.1
     # via federation
@@ -286,21 +286,21 @@ python3-openid==3.2.0
     # via django-allauth
 pytz==2021.1
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   django
     #   django-silk
     #   federation
 pyyaml==5.4.1
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   federation
 pyzmq==22.0.3
     # via circus
 raven==6.10.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 redis==3.5.3
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   django-redis
     #   django-redisboard
     #   django-rq
@@ -321,11 +321,11 @@ requests-oauthlib==1.3.0
     # via django-allauth
 rq==1.8.0
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   django-rq
     #   rq-scheduler
 rq-scheduler==0.11.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 ruamel.yaml==0.17.4
     # via drf-yasg
 ruamel.yaml.clib==0.2.2
@@ -357,7 +357,7 @@ tornado==6.1
     # via circus
 traitlets==4.3.3
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   ipython
 twisted[tls]==21.2.0
     # via daphne
@@ -370,15 +370,15 @@ uritemplate==3.0.1
 urllib3==1.26.4
     # via requests
 uwsgi==2.0.19.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
 whitenoise==5.2.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 whoosh==2.7.4
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 zope.interface==5.4.0
     # via twisted
 
