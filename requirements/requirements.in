@@ -59,7 +59,7 @@ pyyaml
 
 -e git+https://git.feneas.org/jaywink/federation.git@5a940e75f591f71be3af70790c225cfb37411488#egg=federation==0.22.0-dev.1
 
--e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1
+-e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
 
 # Fork to allow ignoring HTML blocks, needs upstream PR
 -e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
