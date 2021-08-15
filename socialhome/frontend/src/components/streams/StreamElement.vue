@@ -96,7 +96,7 @@ const StreamElement = {
             if (post) {
                 const redraw = this.$redrawVueMasonry
                 // eslint-disable-next-line prefer-arrow-callback
-                const resizeObs = new MutationObserver(function () {
+                const resizeObs = new MutationObserver(() => {
                     redraw()
                 })
                 // eslint-disable-next-line object-curly-newline
