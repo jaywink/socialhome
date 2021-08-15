@@ -33,7 +33,6 @@
 
 <script>
 import Vue from "vue"
-// import imagesLoaded from "vue-images-loaded"
 
 import AuthorBar from "@/components/streams/AuthorBar.vue"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
@@ -42,7 +41,6 @@ import NsfwShield from "@/components/streams/NsfwShield.vue"
 
 const StreamElement = {
     name: "StreamElement",
-    // directives: {imagesLoaded},
     components: {
         ContentTimestamp, NsfwShield, ReactionsBar, AuthorBar,
     },
@@ -120,28 +118,12 @@ const StreamElement = {
                         window.twttr.widgets.load(document.getElementsByClassName(".streams-container")[0])
                     }, 1000)
                 }
-                // if (this.$store.state.stream.layoutDoneAfterTwitterOEmbeds) {
-                //     return
-                // }
-                // this.$store.dispatch("stream/setLayoutDoneAfterTwitterOEmbeds", true)
-                // const c = this
-                // setTimeout(() => {
-                //     c.onImageLoad()
-                // }, 2000)
-                // setTimeout(() => {
-                //     c.onImageLoad()
-                // }, 4000)
             }
         },
         loadMore() {
             this.$store.dispatch("stream/disableLoadMore", this.content.id)
             this.$emit("loadmore")
         },
-        // onImageLoad() {
-        //     if (!this.$store.state.stream.stream.single) {
-        //         this.$redrawVueMasonry()
-        //     }
-        // },
     },
 }
 
