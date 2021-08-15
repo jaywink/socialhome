@@ -16,9 +16,9 @@
     # via -r requirements/requirements.in
 aioredis==1.3.1
     # via channels-redis
-arrow==1.1.0
+arrow==1.1.1
     # via -r requirements/requirements.in
-asgiref==3.3.4
+asgiref==3.4.1
     # via
     #   channels
     #   channels-redis
@@ -46,13 +46,13 @@ beautifulsoup4==4.9.3
     # via
     #   pyembed
     #   python-opengraph-jaywink
-bleach==3.3.0
+bleach==4.0.0
     # via
     #   -r requirements/requirements.in
     #   federation
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
-cffi==1.14.5
+cffi==1.14.6
     # via cryptography
 channels==2.4.0
     # via
@@ -60,11 +60,11 @@ channels==2.4.0
     #   channels-redis
 channels-redis==2.4.2
     # via -r requirements/requirements.in
-chardet==4.0.0
+charset-normalizer==2.0.4
     # via requests
 circus==0.17.1
     # via -r requirements/requirements.in
-click==7.1.2
+click==8.0.1
     # via rq
 constantly==15.1.0
     # via twisted
@@ -74,7 +74,7 @@ coreschema==0.0.4
     # via
     #   coreapi
     #   drf-yasg
-croniter==1.0.13
+croniter==1.0.15
     # via rq-scheduler
 cryptography==3.4.7
     # via
@@ -87,7 +87,7 @@ cssselect==1.1.0
     # via federation
 daphne==2.5.0
     # via channels
-decorator==5.0.7
+decorator==5.0.9
     # via
     #   ipython
     #   traitlets
@@ -95,7 +95,7 @@ defusedxml==0.7.1
     # via python3-openid
 dirty-validators==0.5.4
     # via federation
-django==2.2.22
+django==2.2.24
     # via
     #   -r requirements/requirements.in
     #   channels
@@ -117,11 +117,11 @@ django==2.2.22
     #   django-silk
     #   djangorestframework
     #   drf-yasg
-django-allauth==0.44.0
+django-allauth==0.45.0
     # via -r requirements/requirements.in
 django-braces==1.14.0
     # via -r requirements/requirements.in
-django-crispy-forms==1.11.2
+django-crispy-forms==1.12.0
     # via -r requirements/requirements.in
 django-dynamic-preferences==1.5.1
     # via -r requirements/requirements.in
@@ -143,11 +143,11 @@ django-memoize==2.3.1
     # via -r requirements/requirements.in
 django-model-utils==3.2.0
     # via -r requirements/requirements.in
-django-redis==4.12.1
+django-redis==5.0.0
     # via -r requirements/requirements.in
 django-redisboard==4.1.1
     # via -r requirements/requirements.in
-django-reversion==3.0.9
+django-reversion==4.0.0
     # via -r requirements/requirements.in
 django-robots==4.0
     # via -r requirements/requirements.in
@@ -159,7 +159,7 @@ django-settings-export==1.2.1
     # via -r requirements/requirements.in
 django-silk==4.1.0
     # via -r requirements/requirements.in
-django-versatileimagefield==2.0
+django-versatileimagefield==2.1
     # via -r requirements/requirements.in
 djangorestframework==3.12.4
     # via
@@ -175,7 +175,7 @@ hyperlink==21.0.0
     # via
     #   autobahn
     #   twisted
-idna==2.10
+idna==3.2
     # via
     #   hyperlink
     #   requests
@@ -198,7 +198,7 @@ jedi==0.17.2
     # via
     #   -r requirements/requirements.in
     #   ipython
-jinja2==2.11.3
+jinja2==3.0.1
     # via
     #   coreschema
     #   django-silk
@@ -210,13 +210,13 @@ lxml==4.6.3
     #   federation
 markdown==3.3.4
     # via django-markdownx
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 msgpack==0.6.2
     # via channels-redis
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via requests-oauthlib
-packaging==20.9
+packaging==21.0
     # via
     #   bleach
     #   drf-yasg
@@ -228,12 +228,12 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.2.0
+pillow==8.3.1
     # via
     #   -r requirements/requirements.in
     #   django-markdownx
     #   django-versatileimagefield
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.19
     # via ipython
 psutil==5.8.0
     # via circus
@@ -253,7 +253,7 @@ pycparser==2.20
     # via cffi
 pycryptodome==3.10.1
     # via federation
-pygments==2.9.0
+pygments==2.10.0
     # via
     #   django-silk
     #   ipython
@@ -263,16 +263,16 @@ pyopenssl==20.0.1
     # via twisted
 pyparsing==2.4.7
     # via packaging
-pyrsistent==0.17.3
+pyrsistent==0.18.0
     # via jsonschema
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   arrow
     #   croniter
     #   django-silk
     #   federation
     #   rq-scheduler
-python-magic==0.4.22
+python-magic==0.4.24
     # via django-versatileimagefield
 python-opengraph-jaywink==0.2.0
     # via -r requirements/requirements.in
@@ -294,7 +294,7 @@ pyyaml==5.4.1
     # via
     #   -r requirements/requirements.in
     #   federation
-pyzmq==22.0.3
+pyzmq==22.2.1
     # via circus
 raven==6.10.0
     # via -r requirements/requirements.in
@@ -305,7 +305,7 @@ redis==3.5.3
     #   django-redisboard
     #   django-rq
     #   rq
-requests==2.25.1
+requests==2.26.0
     # via
     #   coreapi
     #   django-allauth
@@ -319,18 +319,18 @@ requests-http-signature-jaywink==0.1.0.dev0
     # via federation
 requests-oauthlib==1.3.0
     # via django-allauth
-rq==1.8.0
+rq==1.9.0
     # via
     #   -r requirements/requirements.in
     #   django-rq
     #   rq-scheduler
 rq-scheduler==0.11.0
     # via -r requirements/requirements.in
-ruamel.yaml==0.17.4
+ruamel.yaml==0.17.10
     # via drf-yasg
-ruamel.yaml.clib==0.2.2
+ruamel.yaml.clib==0.2.6
     # via ruamel.yaml
-service-identity==18.1.0
+service-identity==21.1.0
     # via twisted
 six==1.16.0
     # via
@@ -342,6 +342,7 @@ six==1.16.0
     #   jsonschema
     #   pyopenssl
     #   python-dateutil
+    #   service-identity
     #   traitlets
 soupsieve==2.2.1
     # via beautifulsoup4
@@ -359,15 +360,17 @@ traitlets==4.3.3
     # via
     #   -r requirements/requirements.in
     #   ipython
-twisted[tls]==21.2.0
+twisted[tls]==21.7.0
     # via daphne
 txaio==21.2.1
     # via autobahn
+typing-extensions==3.10.0.0
+    # via twisted
 uritemplate==3.0.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.4
+urllib3==1.26.6
     # via requests
 uwsgi==2.0.19.1
     # via -r requirements/requirements.in
@@ -375,7 +378,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
-whitenoise==5.2.0
+whitenoise==5.3.0
     # via -r requirements/requirements.in
 whoosh==2.7.4
     # via -r requirements/requirements.in
