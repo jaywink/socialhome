@@ -26,6 +26,13 @@ Added
   identifier and ActivityPub protocol identifier. The profile will be made primarily
   ActivityPub. All content will be migrated to the other profile and the dupe deleted.
 
+* Translations process! Socialhome can now be translated and is now fully translated to French!
+  Thanks to `tripougnif <https://git.feneas.org/tripougnif>`_ for the awesome work to both
+  push through the translations process and also do the French translations <3
+  Other languages partially translated are German and Norwegian. Also thanks to
+  Weblate for `hosting the translations <https://hosted.weblate.org/projects/socialhome/backendfrontend/>`_
+  for us.
+
 Changed
 .......
 
@@ -47,6 +54,8 @@ Fixed
 
 * Avoid unnecessary Profile object saves when finding sender profiles and nothing for the
   remote profile has changed.
+
+* Stream rendering and OEembed fixes (contributed by tripougnif).
 
 0.12.1 (2020-12-12)
 -------------------
