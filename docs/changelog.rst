@@ -3,8 +3,8 @@
 Changelog
 =========
 
-unreleased
-----------
+0.13.0 (2021-08-15)
+-------------------
 
 Added
 .....
@@ -13,8 +13,12 @@ Added
   if ``SOCIALHOME_MATRIX_ENABLED`` set to ``true``:
 
   * Client and server well-known files are automatically generated.
+  * Register local users on the configured Matrix server.
+  * Post local user public posts into Matrix side to their profile timeline rooms
+    and to each hashtag room.
 
-  See docs at :ref:`matrix-protocol-support` for more information.
+  See docs at :ref:`matrix-protocol-support` for more information. Requires a compatible
+  Matrix server running with the same server name.
 
 * Add ``merge_remote_profiles`` management command
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-__version__ = "0.13.0-dev"
+__version__ = "0.13.0"
 
 # Federation documentation build configuration file, created by
 # sphinx-quickstart on Sun Oct  2 12:42:19 2016.
@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Socialhome'
-copyright = '2016-2017, Jason Robinson'
+copyright = '2016-2021, Jason Robinson'
 author = 'Jason Robinson'
 
 # The version info for the project you're documenting, acts as replacement for
