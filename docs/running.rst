@@ -142,6 +142,7 @@ client towards other Matrix servers.
 
 To run Socialhome with Matrix support, you will need to also run a `Dendrite <https://github.com/matrix-org/dendrite>`_
 server. This should be a dedicated instance for Socialhome alone as it will be tightly integrated.
+NOTE! Currently only Denrite v0.3.11 has been properly tested against.
 
 When setting up the Dendrite server currently the following assumptions are made:
 
@@ -149,8 +150,14 @@ When setting up the Dendrite server currently the following assumptions are made
 * the homeserver is reachable via ``matrix.domain.tld`` port 443. Socialhome will handle the
   well-known delegation for you.
 
-Once you have this Dendrite running, you can set ``SOCIALHOME_MATRIX_ENABLED`` to ``true``. It currently
-wont do much else than serve the well-known files, but things will start appearing.
+Once you have this Dendrite running, you can set ``SOCIALHOME_MATRIX_ENABLED`` to ``true``.
+
+Current functionality:
+
+* Client and server well-known files are automatically generated.
+* Register local users on the configured Matrix server.
+* Post local user public posts into Matrix side to their profile timeline rooms
+  and to each hashtag room.
 
 .. _configuration:
 

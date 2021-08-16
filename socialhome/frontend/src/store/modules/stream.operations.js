@@ -10,7 +10,7 @@ const streamMutations = {
     },
     receivedNewContent(state, contentId) {
         if (state.unfetchedContentIds.indexOf(contentId) === -1) {
-            state.unfetchedContentIds.push(contentId)
+            state.unfetchedContentIds.unshift(contentId)
         }
     },
     setLayoutDoneAfterTwitterOEmbeds(state, status) {

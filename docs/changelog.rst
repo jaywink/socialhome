@@ -3,8 +3,8 @@
 Changelog
 =========
 
-unreleased
-----------
+0.13.0 (2021-08-15)
+-------------------
 
 Added
 .....
@@ -13,14 +13,25 @@ Added
   if ``SOCIALHOME_MATRIX_ENABLED`` set to ``true``:
 
   * Client and server well-known files are automatically generated.
+  * Register local users on the configured Matrix server.
+  * Post local user public posts into Matrix side to their profile timeline rooms
+    and to each hashtag room.
 
-  See docs at :ref:`matrix-protocol-support` for more information.
+  See docs at :ref:`matrix-protocol-support` for more information. Requires a compatible
+  Matrix server running with the same server name.
 
 * Add ``merge_remote_profiles`` management command
 
   Attempts to merge remote profiles where the profile has both a Diaspora protocol
   identifier and ActivityPub protocol identifier. The profile will be made primarily
   ActivityPub. All content will be migrated to the other profile and the dupe deleted.
+
+* Translations process! Socialhome can now be translated and is now fully translated to French!
+  Thanks to `tripougnif <https://git.feneas.org/tripougnif>`_ for the awesome work to both
+  push through the translations process and also do the French translations <3
+  Other languages partially translated are German and Norwegian. Also thanks to
+  Weblate for `hosting the translations <https://hosted.weblate.org/projects/socialhome/backendfrontend/>`_
+  for us.
 
 Changed
 .......
@@ -43,6 +54,8 @@ Fixed
 
 * Avoid unnecessary Profile object saves when finding sender profiles and nothing for the
   remote profile has changed.
+
+* Stream rendering and OEembed fixes (contributed by tripougnif).
 
 0.12.1 (2020-12-12)
 -------------------

@@ -34,12 +34,14 @@ django-versatileimagefield
 django<3
 djangorestframework
 drf-yasg
-#federation
+federation
 # 7.15 is the last version supporting Python 3.6
 ipython<7.16
 lxml
 Pillow
-psycopg2-binary
+# UNLOCK once Django updated to 3.0+
+# https://github.com/psycopg/psycopg2/issues/1293
+psycopg2-binary<2.9
 python-opengraph-jaywink
 python-slugify
 pytz
@@ -57,9 +59,10 @@ pyyaml
 # - GIF upload (upstream rejected)
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
 
--e git+https://git.feneas.org/jaywink/federation.git@5a940e75f591f71be3af70790c225cfb37411488#egg=federation==0.22.0-dev.1
+# Just here to easily use a dev version
+#-e git+https://git.feneas.org/jaywink/federation.git@v0.22.0#egg=federation==0.22.0
 
--e git+https://github.com/jaywink/pyembed.git@440707eebe88c2b2089a08d700772285bf356a45#egg=pyembed==1.4.0-dev.1
+-e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
 
 # Fork to allow ignoring HTML blocks, needs upstream PR
 -e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
