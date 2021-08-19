@@ -8,48 +8,52 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-08-20 21:34+0000\n"
+"Last-Translator: Marek Ľach <graweeld@googlemail.com>\n"
+"Language-Team: Slovak <https://hosted.weblate.org/projects/socialhome/"
+"backendfrontend/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Weblate 4.8-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
 msgid "Choose policy document types to send emails about first!"
 msgstr ""
+"Vyberte si typy dokumentov o nariadeniach, ktoré posielať emailom ako prvé!"
 
 #: socialhome/admin.py:38
 msgid "Policy document update emails queued for sending."
-msgstr ""
+msgstr "Dokument o úprave pravidiel zaradený na odosielanie emailom."
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
-msgstr ""
+msgstr "Poslať email o úpravách všetkým užívateľom"
 
 #: socialhome/enums.py:10 socialhome/templates/base.html:100
 msgid "Terms of service"
-msgstr ""
+msgstr "Podmienky služby"
 
 #: socialhome/enums.py:11 socialhome/templates/base.html:97
 msgid "Privacy policy"
-msgstr ""
+msgstr "Zásady súkromia"
 
 #: socialhome/enums.py:21 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:25 socialhome/templates/base.html:54
 msgid "Public"
-msgstr ""
+msgstr "Verejné"
 
 #: socialhome/enums.py:22 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:21 socialhome/templates/base.html:50
 msgid "Limited"
-msgstr ""
+msgstr "Obmedzená"
 
 #: socialhome/enums.py:23 socialhome/static/dist/vue/js/app.js:67
 msgid "Site"
-msgstr ""
+msgstr "Stránka"
 
 #: socialhome/enums.py:24 socialhome/static/dist/vue/js/app.js:67
 msgid "Self"
@@ -79,17 +83,17 @@ msgstr ""
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
 msgid "Content"
-msgstr ""
+msgstr "Obsah"
 
 #: socialhome/content/enums.py:18
 #: socialhome/content/templates/content/_edit_title.html:7
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply"
-msgstr ""
+msgstr "Odpovedať"
 
 #: socialhome/content/enums.py:19
 msgid "Share"
-msgstr ""
+msgstr "Zdieľať"
 
 #: socialhome/content/forms.py:18 socialhome/static/dist/vue/js/app.js:67
 msgid "Recipients"
