@@ -8,13 +8,16 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-08-21 15:35+0000\n"
+"Last-Translator: norayr tanakian <norayr@arnet.am>\n"
+"Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
+"backendfrontend/hy/>\n"
 "Language: hy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.8.1-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -27,29 +30,29 @@ msgstr ""
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
-msgstr ""
+msgstr "Ուղարկել բոլոր օգտատէրերին"
 
 #: socialhome/enums.py:10 socialhome/templates/base.html:100
 msgid "Terms of service"
-msgstr ""
+msgstr "ծառայութեան պայմաններ"
 
 #: socialhome/enums.py:11 socialhome/templates/base.html:97
 msgid "Privacy policy"
-msgstr ""
+msgstr "գաղտնիութիւն"
 
 #: socialhome/enums.py:21 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:25 socialhome/templates/base.html:54
 msgid "Public"
-msgstr ""
+msgstr "հրապարակային"
 
 #: socialhome/enums.py:22 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:21 socialhome/templates/base.html:50
 msgid "Limited"
-msgstr ""
+msgstr "սահմանափակ"
 
 #: socialhome/enums.py:23 socialhome/static/dist/vue/js/app.js:67
 msgid "Site"
-msgstr ""
+msgstr "կայք"
 
 #: socialhome/enums.py:24 socialhome/static/dist/vue/js/app.js:67
 msgid "Self"
@@ -79,21 +82,21 @@ msgstr ""
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
 msgid "Content"
-msgstr ""
+msgstr "բովանդակութիւն"
 
 #: socialhome/content/enums.py:18
 #: socialhome/content/templates/content/_edit_title.html:7
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply"
-msgstr ""
+msgstr "պատասխանել"
 
 #: socialhome/content/enums.py:19
 msgid "Share"
-msgstr ""
+msgstr "տարածել"
 
 #: socialhome/content/forms.py:18 socialhome/static/dist/vue/js/app.js:67
 msgid "Recipients"
-msgstr ""
+msgstr "ստացողներ"
 
 #: socialhome/content/forms.py:53
 msgid "Recipients cannot be empty if not including followed users."
