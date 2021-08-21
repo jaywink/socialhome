@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-08-21 15:35+0000\n"
+"PO-Revision-Date: 2021-08-22 20:35+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -101,15 +101,17 @@ msgstr "ստացողներ"
 #: socialhome/content/forms.py:53
 msgid "Recipients cannot be empty if not including followed users."
 msgstr ""
+"ստացողների դաշտը չի կարող դատարկ լինել, եթէ չի պարունակում հետեւուող "
+"օգտատէրերին։"
 
 #: socialhome/content/forms.py:66
 #, python-format
 msgid "Recipient %s is not in the correct format."
-msgstr ""
+msgstr "%s հասցէատիրոջ ֆորմատը սխալ է։"
 
 #: socialhome/content/forms.py:72
 msgid "Not all recipients could be found."
-msgstr ""
+msgstr "ոչ բոլոր ստացողներն են գտնուել։"
 
 #: socialhome/content/models.py:32 socialhome/content/models.py:45
 msgid "URL"
@@ -117,20 +119,20 @@ msgstr ""
 
 #: socialhome/content/models.py:33
 msgid "Title"
-msgstr ""
+msgstr "վերնագիր"
 
 #: socialhome/content/models.py:34
 msgid "Description"
-msgstr ""
+msgstr "նկարագրութիւն"
 
 #: socialhome/content/models.py:35
 msgid "Image URL"
-msgstr ""
+msgstr "նկարի URL"
 
 #: socialhome/content/models.py:36 socialhome/content/models.py:47
 #: socialhome/content/models.py:155
 msgid "Modified"
-msgstr ""
+msgstr "փոփոխուած է"
 
 #: socialhome/content/models.py:46
 msgid "OEmbed HTML content"
@@ -138,15 +140,15 @@ msgstr ""
 
 #: socialhome/content/models.py:54 socialhome/users/models.py:138
 msgid "Name"
-msgstr ""
+msgstr "անուն"
 
 #: socialhome/content/models.py:55 socialhome/content/models.py:154
 msgid "Created"
-msgstr ""
+msgstr "ստեղծուած է"
 
 #: socialhome/content/models.py:92
 msgid "Text"
-msgstr ""
+msgstr "տեքստ"
 
 #: socialhome/content/models.py:96 socialhome/users/models.py:143
 msgid "GUID"
@@ -154,19 +156,19 @@ msgstr ""
 
 #: socialhome/content/models.py:98
 msgid "Author"
-msgstr ""
+msgstr "հեղինակ"
 
 #: socialhome/content/models.py:103 socialhome/users/models.py:151
 msgid "Federation ID"
-msgstr ""
+msgstr "դաշնութեան ID"
 
 #: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
-msgstr ""
+msgstr "կցած է պրոֆիլին"
 
 #: socialhome/content/models.py:108
 msgid "Order"
-msgstr ""
+msgstr "կարգ"
 
 #: socialhome/content/models.py:111
 msgid "Service label"
@@ -198,7 +200,7 @@ msgstr ""
 #: socialhome/search/templates/search/search.html:68
 #: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
 msgid "Tags"
-msgstr ""
+msgstr "պիտակներ"
 
 #: socialhome/content/models.py:130
 msgid "Parent"
@@ -210,7 +212,7 @@ msgstr ""
 
 #: socialhome/content/models.py:138 socialhome/static/dist/vue/js/app.js:67
 msgid "Federate to remote servers"
-msgstr ""
+msgstr "ուղարկել (ֆեդերացնել) դէպի այլ սպասարկիչներ"
 
 #: socialhome/content/models.py:139 socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -220,15 +222,15 @@ msgstr ""
 
 #: socialhome/content/models.py:145
 msgid "Limitied visibilities"
-msgstr ""
+msgstr "տեսանելիութեան սահմանափակում"
 
 #: socialhome/content/models.py:148 socialhome/static/dist/vue/js/app.js:67
 msgid "Include people I follow"
-msgstr ""
+msgstr "ներառել մարդկանց ում ես հետեւում եմ"
 
 #: socialhome/content/models.py:149 socialhome/static/dist/vue/js/app.js:67
 msgid "Automatically includes all the people you follow as recipients."
-msgstr ""
+msgstr "աւտոմատ կերպ ներառում է բոլորին, ում դու հետեւում ես։"
 
 #: socialhome/content/models.py:153
 msgid "Remote created"
@@ -237,19 +239,19 @@ msgstr ""
 #: socialhome/content/models.py:159 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
-msgstr ""
+msgstr "տեղական"
 
 #: socialhome/content/models.py:160
 msgid "Rendered text"
-msgstr ""
+msgstr "նիւթաւորուած տեքստ"
 
 #: socialhome/content/models.py:161
 msgid "Reply count"
-msgstr ""
+msgstr "պատասխանների քանակը"
 
 #: socialhome/content/models.py:162
 msgid "Shares count"
-msgstr ""
+msgstr "տարածումների քանակը"
 
 #: socialhome/content/models.py:165
 msgid "Root parent"
@@ -262,31 +264,31 @@ msgstr ""
 #: socialhome/content/templates/content/_edit_title.html:5
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Update reply"
-msgstr ""
+msgstr "թարմացնել պատասխանը"
 
 #: socialhome/content/templates/content/_edit_title.html:10
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Update"
-msgstr ""
+msgstr "թարմացնել"
 
 #: socialhome/content/templates/content/_edit_title.html:12
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/templates/base.html:59
 msgid "Create"
-msgstr ""
+msgstr "գրառել"
 
 #: socialhome/content/templates/content/delete.html:5
 #: socialhome/content/templates/content/delete.html:10
 msgid "Confirm delete"
-msgstr ""
+msgstr "հաստատել ջնջելը"
 
 #: socialhome/content/templates/content/delete.html:17
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Delete"
-msgstr ""
+msgstr "ջնջել"
 
 #: socialhome/content/templates/content/delete.html:18
 msgid "Cancel"
-msgstr ""
+msgstr "չեղարկել"
 
 #: socialhome/content/templates/content/vue.html:18
 msgid "Tip! Share pages easily by bookmarking our"
@@ -299,16 +301,16 @@ msgstr ""
 #: socialhome/notifications/tasks.py:59
 #, python-format
 msgid "New follower: %s"
-msgstr ""
+msgstr "նոր հետեւող՝ %s"
 
 #: socialhome/notifications/tasks.py:96
 msgid "You have been mentioned"
-msgstr ""
+msgstr "ձեզ նշել են"
 
 #: socialhome/notifications/tasks.py:130
 #, python-format
 msgid "New reply to: %s"
-msgstr ""
+msgstr "նոր պատասխան %s֊ին"
 
 #: socialhome/notifications/tasks.py:168
 #, python-format
@@ -317,7 +319,7 @@ msgstr ""
 
 #: socialhome/notifications/tasks.py:197
 msgid "Data export is ready for download"
-msgstr ""
+msgstr "արտահանած տուեալները պատրաստ են ներբեռնելու համար"
 
 #: socialhome/notifications/tasks.py:227
 msgid "Important updates to our Terms of Service and Privacy Policy documents"
@@ -334,26 +336,26 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
 msgid "Dear"
-msgstr ""
+msgstr "սիրելի"
 
 #: socialhome/notifications/templates/notifications/base.html:18
 #: socialhome/notifications/templates/notifications/base.txt:7
 msgid "Wishing you a nice day"
-msgstr ""
+msgstr "քեզ լաւ օր"
 
 #: socialhome/notifications/templates/notifications/base.html:18
 #: socialhome/notifications/templates/notifications/base.txt:8
 #, python-format
 msgid "The friendly %(site_name)s notifications robot"
-msgstr ""
+msgstr "%(site_name)s֊ի ծանուցումների ընկերասէր ռոբոտ notifications robot"
 
 #: socialhome/notifications/templates/notifications/data_export.html:6
 msgid "Your data export is ready for download."
-msgstr ""
+msgstr "քո տուեալները պատրաստ են ներբեռնելու համար"
 
 #: socialhome/notifications/templates/notifications/data_export.html:6
 msgid "Download here"
-msgstr ""
+msgstr "ներբեռնել"
 
 #: socialhome/notifications/templates/notifications/data_export.txt:5
 msgid "Your data export is ready for download:"
