@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-08-22 20:35+0000\n"
+"PO-Revision-Date: 2021-08-24 12:35+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -21,12 +21,17 @@ msgstr ""
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
+#, fuzzy
 msgid "Choose policy document types to send emails about first!"
 msgstr ""
+"ընտրէք կանոնադրութեան փաստաթղթերի տեսակներ՝առաջնահերթութեամբ իմակներ "
+"ուղարկելու համար։"
 
 #: socialhome/admin.py:38
+#, fuzzy
 msgid "Policy document update emails queued for sending."
 msgstr ""
+"կանոնադրութեան թարմացման վերաբերող իմակները հերթի մէջ՝ ուղարկուելու համար։"
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
@@ -59,8 +64,9 @@ msgid "Self"
 msgstr ""
 
 #: socialhome/preferences.py:13
+#, fuzzy
 msgid "Log all outbound payloads"
-msgstr ""
+msgstr "գրառել մատեանում դուրս եկող հաղորդագրութիւնները"
 
 #: socialhome/preferences.py:14
 msgid ""
@@ -70,8 +76,9 @@ msgid ""
 msgstr ""
 
 #: socialhome/preferences.py:24
+#, fuzzy
 msgid "Log all receive payloads"
-msgstr ""
+msgstr "գրառել մատեանում բոլոր ընունուող հաղորդակցութիւնները"
 
 #: socialhome/preferences.py:25
 msgid ""
@@ -114,8 +121,9 @@ msgid "Not all recipients could be found."
 msgstr "ոչ բոլոր ստացողներն են գտնուել։"
 
 #: socialhome/content/models.py:32 socialhome/content/models.py:45
+#, fuzzy
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: socialhome/content/models.py:33
 msgid "Title"
@@ -136,7 +144,7 @@ msgstr "փոփոխուած է"
 
 #: socialhome/content/models.py:46
 msgid "OEmbed HTML content"
-msgstr ""
+msgstr "OEmbed HTML բովանդակութիւն"
 
 #: socialhome/content/models.py:54 socialhome/users/models.py:138
 msgid "Name"
@@ -151,8 +159,9 @@ msgid "Text"
 msgstr "տեքստ"
 
 #: socialhome/content/models.py:96 socialhome/users/models.py:143
+#, fuzzy
 msgid "GUID"
-msgstr ""
+msgstr "GUID"
 
 #: socialhome/content/models.py:98
 msgid "Author"
@@ -171,12 +180,13 @@ msgid "Order"
 msgstr "կարգ"
 
 #: socialhome/content/models.py:111
+#, fuzzy
 msgid "Service label"
-msgstr ""
+msgstr "Ծառայութեան պիտակ"
 
 #: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
-msgstr ""
+msgstr "Ցուցադրել OEmbed կամ OpenGraph նախադիտում"
 
 #: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -194,7 +204,7 @@ msgstr ""
 
 #: socialhome/content/models.py:126
 msgid "Mentions"
-msgstr ""
+msgstr "Նշումներ"
 
 #: socialhome/content/models.py:127
 #: socialhome/search/templates/search/search.html:68
@@ -204,7 +214,7 @@ msgstr "պիտակներ"
 
 #: socialhome/content/models.py:130
 msgid "Parent"
-msgstr ""
+msgstr "Ծնող"
 
 #: socialhome/content/models.py:134
 msgid "Share of"
@@ -291,12 +301,14 @@ msgid "Cancel"
 msgstr "չեղարկել"
 
 #: socialhome/content/templates/content/vue.html:18
+#, fuzzy
 msgid "Tip! Share pages easily by bookmarking our"
-msgstr ""
+msgstr "Ակնա՛րկ։ Տարածէք էջանշելով մեր"
 
 #: socialhome/content/templates/content/vue.html:18
+#, fuzzy
 msgid "bookmarklet"
-msgstr ""
+msgstr "էջանիշ"
 
 #: socialhome/notifications/tasks.py:59
 #, python-format
@@ -315,15 +327,16 @@ msgstr "նոր պատասխան %s֊ին"
 #: socialhome/notifications/tasks.py:168
 #, python-format
 msgid "New share of: %s"
-msgstr ""
+msgstr "%s֊ի նոր տարածում"
 
 #: socialhome/notifications/tasks.py:197
 msgid "Data export is ready for download"
 msgstr "արտահանած տուեալները պատրաստ են ներբեռնելու համար"
 
 #: socialhome/notifications/tasks.py:227
+#, fuzzy
 msgid "Important updates to our Terms of Service and Privacy Policy documents"
-msgstr ""
+msgstr "Կարեւոր թարմացումներ՝ մեր կանոնադրութեան եւ գաղտնիութեան փաստաթղթերի"
 
 #: socialhome/notifications/tasks.py:229
 msgid "Important updates to our Privacy Policy document"
