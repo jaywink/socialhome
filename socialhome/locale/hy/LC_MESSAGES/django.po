@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-08-24 12:35+0000\n"
+"PO-Revision-Date: 2021-08-26 14:35+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -339,8 +339,9 @@ msgid "Important updates to our Terms of Service and Privacy Policy documents"
 msgstr "Կարեւոր թարմացումներ՝ մեր կանոնադրութեան եւ գաղտնիութեան փաստաթղթերի"
 
 #: socialhome/notifications/tasks.py:229
+#, fuzzy
 msgid "Important updates to our Privacy Policy document"
-msgstr ""
+msgstr "Գաղտնիութեանը վերաբերող կանոնակարգի փոփոխութիւն"
 
 #: socialhome/notifications/tasks.py:231
 msgid "Important updates to our Terms of Service document"
@@ -372,29 +373,29 @@ msgstr "ներբեռնել"
 
 #: socialhome/notifications/templates/notifications/data_export.txt:5
 msgid "Your data export is ready for download:"
-msgstr ""
+msgstr "Արտահանուած տուեալները պատրաստ են՝ ներբեռնելու համար։"
 
 #: socialhome/notifications/templates/notifications/follow.html:6
 #: socialhome/notifications/templates/notifications/follow.txt:5
 msgid "You have a new follower:"
-msgstr ""
+msgstr "Նոր հետեւորդ՝"
 
 #: socialhome/notifications/templates/notifications/mention.html:6
 #: socialhome/notifications/templates/notifications/mention.txt:5
 msgid "You have been mentioned by"
-msgstr ""
+msgstr "Ձեզ նշել է"
 
 #: socialhome/notifications/templates/notifications/mention.html:9
 #: socialhome/notifications/templates/notifications/mention.txt:7
 #: socialhome/notifications/templates/notifications/share.html:9
 #: socialhome/notifications/templates/notifications/share.txt:7
 msgid "Link to the content:"
-msgstr ""
+msgstr "Յղում բովանդակութեանը՝"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:9
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:7
 msgid "The changes have become effective at"
-msgstr ""
+msgstr "Փոփոխութիւններն ակտիւացել են սկսած"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:12
 msgid "Please find the updated Terms of Service document"
@@ -403,7 +404,7 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/policy_document_update.html:12
 #: socialhome/notifications/templates/notifications/policy_document_update.html:17
 msgid "here"
-msgstr ""
+msgstr "այստեղ"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:17
 msgid "Please find the updated Privacy Policy document"
@@ -427,17 +428,17 @@ msgstr ""
 #: socialhome/notifications/templates/notifications/reply.html:6
 #: socialhome/notifications/templates/notifications/reply.txt:5
 msgid "There is a new reply to content you have participated in by"
-msgstr ""
+msgstr "Շղթան, որին դուք մասնակցել էք, մեկնաբանուել է՝"
 
 #: socialhome/notifications/templates/notifications/reply.html:9
 #: socialhome/notifications/templates/notifications/reply.txt:7
 msgid "React to the reply here:"
-msgstr ""
+msgstr "Արձագանքէք այստեղ՝"
 
 #: socialhome/notifications/templates/notifications/share.html:6
 #: socialhome/notifications/templates/notifications/share.txt:5
 msgid "Your content has received a new share by"
-msgstr ""
+msgstr "Ձեր գրառումը տարածեց"
 
 #: socialhome/search/views.py:136
 msgid "Search string is invalid, please try another one."
@@ -448,7 +449,7 @@ msgstr ""
 #: socialhome/search/templates/search/search.html:15
 #: socialhome/templates/base.html:107 socialhome/templates/base.html:109
 msgid "Search"
-msgstr ""
+msgstr "Փնտրել"
 
 #: socialhome/search/templates/search/search.html:12
 msgid "Search term"
@@ -459,33 +460,35 @@ msgid "Type a search term"
 msgstr ""
 
 #: socialhome/search/templates/search/search.html:22
+#, fuzzy
 msgid "Profiles"
-msgstr ""
+msgstr "Պրոֆիլներ"
 
 #: socialhome/search/templates/search/search.html:47
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/users/templates/users/_actions_column.html:4
+#, fuzzy
 msgid "Unfollow"
-msgstr ""
+msgstr "Ապահետեւել"
 
 #: socialhome/search/templates/search/search.html:48
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/users/templates/users/_actions_column.html:5
 msgid "Follow"
-msgstr ""
+msgstr "Հետեւել"
 
 #: socialhome/search/templates/search/search.html:55
 #: socialhome/search/templates/search/search.html:85
 msgid "No results found."
-msgstr ""
+msgstr "Արդիւնք չկայ։"
 
 #: socialhome/search/templates/search/search.html:61
 msgid "Previous"
-msgstr ""
+msgstr "Նախորդ"
 
 #: socialhome/search/templates/search/search.html:63
 msgid "Next"
-msgstr ""
+msgstr "Յաջորդ"
 
 #: socialhome/search/templates/search/search.html:90
 msgid "There are more tags results. Please refine the query."
@@ -493,19 +496,19 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "edited"
-msgstr ""
+msgstr "խմբագրուած է"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Home"
-msgstr ""
+msgstr "Տուն"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/preferences.py:15
 msgid "Profile"
-msgstr ""
+msgstr "Պրոֆիլ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "reply"
-msgstr ""
+msgstr "պատասխանել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Full editor"
