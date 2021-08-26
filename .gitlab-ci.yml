@@ -27,7 +27,7 @@ stages:
 
 lint:
   stage: lint
-  image: node:8
+  image: node:10
   cache:
     paths:
       - node_modules/
@@ -65,7 +65,7 @@ test_frontend_unit:
   stage: test_frontend
   environment:
     name: production
-  image: node:8
+  image: node:10
   cache:
     paths:
       - node_modules/
