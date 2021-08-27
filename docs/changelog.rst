@@ -15,6 +15,7 @@ Changed
 Fixed
 .....
 
+* Add the code to deal with tag-by-uuid in the streams/viewsets.py and streams/urls/api.py. (`#607 <https://git.feneas.org/socialhome/socialhome/issues/607>`_)
 
 0.13.0 (2021-08-15)
 -------------------

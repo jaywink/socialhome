@@ -82,7 +82,13 @@ class PublicStreamAPIView(StreamsAPIBaseView):
 
 class TagStreamAPIView(StreamsAPIBaseView):
     def dispatch(self, request, *args, **kwargs):
-        self.tag = get_object_or_404(Tag, name=kwargs.get("name"))
+        if kwargs.get("name"):
+            arguments = {"name": kwargs.get("name")}
+        elif kwargs.get("uuid"):
+            arguments = {"uuid": kwargs.get("uuid")}
+        else:
+            raise Http404
+        self.tag = get_object_or_404(Tag, **arguments)
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
