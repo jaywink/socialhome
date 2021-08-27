@@ -8,10 +8,10 @@
 
         <nsfw-shield v-if="content.is_nsfw" :tags="content.tags">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <div :id="content.id" v-html="content.rendered" />
+            <div :id="`c${content.id}`" v-html="content.rendered" />
         </nsfw-shield>
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-else :id="content.id" v-html="content.rendered" />
+        <div v-else :id="`c${content.id}`" v-html="content.rendered" />
 
         <reactions-bar :content="content">
             <div v-if="!showAuthorBar" class="stream-element-content-timestamp mr-2">
@@ -33,6 +33,7 @@
 
 <script>
 import Vue from "vue"
+import fitvids from "fitvids"
 
 import AuthorBar from "@/components/streams/AuthorBar.vue"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
@@ -81,6 +82,9 @@ const StreamElement = {
     mounted() {
         this.layoutAfterDOMChange()
         this.layoutAfterTwitterOEmbeds()
+        if (this.content.show_preview) {
+            fitvids(`#c${this.content.id}`)
+        }
         if (!this.$store.state.stream.stream.single) {
             this.$redrawVueMasonry()
         }
@@ -92,7 +96,7 @@ const StreamElement = {
     },
     methods: {
         layoutAfterDOMChange() {
-            const post = document.getElementById(this.content.id)
+            const post = document.getElementById(`c${this.content.id}`)
             if (post) {
                 const redraw = this.$redrawVueMasonry
                 // eslint-disable-next-line prefer-arrow-callback

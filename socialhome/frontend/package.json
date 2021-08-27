@@ -16,6 +16,7 @@
     "bootstrap": "<5",
     "bootstrap-vue": "2.21.2",
     "easymde": "^2.15.0",
+    "fitvids": "^2.1.1",
     "fork-awesome": "^1.1.7",
     "js-cookie": "^3.0.0",
     "lodash": "^4.17.21",
