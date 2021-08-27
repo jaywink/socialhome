@@ -12,9 +12,14 @@ Added
 Changed
 .......
 
+* Use `fitvids <https://github.com/rosszurowski/fitvids>`_ to set selected site
+  aspect ratio for oembed videos. This requires leaving the width and height unchanged
+  as fitvids relies on it to compute the aspect ratio.
+
 Fixed
 .....
 
+* Add the code to deal with tag-by-uuid in the streams/viewsets.py and streams/urls/api.py. (`#607 <https://git.feneas.org/socialhome/socialhome/issues/607>`_)
 
 0.13.0 (2021-08-15)
 -------------------

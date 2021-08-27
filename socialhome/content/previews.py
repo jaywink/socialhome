@@ -125,11 +125,14 @@ def fetch_oembed_preview(content, urls):
             continue
         if not oembed:
             continue
-        # Keep height if width = 100%
-        if not re.search(r'\s+width="100%"', oembed):
-            oembed = re.sub(r'\s+height="[0-9]+"', " ", oembed)
-        # Ensure width is 100% not fixed
-        oembed = re.sub(r'\s+width="[0-9]+"', ' width="100%"', oembed)
+        # Keep width and height for some sites embedded videos
+        video_sites = ["youtube.com", "youtu.be", "vimeo.com", "kickstarter.com"]
+        if not any(site in oembed for site in video_sites):
+            # Keep height if width = 100%
+            if not re.search(r'\s+width="100%"', oembed):
+                oembed = re.sub(r'\s+height="[0-9]+"', " ", oembed)
+            # Ensure width is 100% not fixed
+            oembed = re.sub(r'\s+width="[0-9]+"', ' width="100%"', oembed)
         # Wordpress sites use a random token and message events to identify the right iframe in order
         # to set the rendered height. For this to work within a masonry grid, the parent script
         # must already be loaded. Since in that context the parent script which updates the iframe

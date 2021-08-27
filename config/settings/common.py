@@ -144,7 +144,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 TIME_ZONE = env("DJANGO_TIMEZONE", default="UTC")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = env("SOCIALHOME_LANGUAGE_CODE", default="en-us")
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
