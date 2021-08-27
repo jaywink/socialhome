@@ -12,6 +12,10 @@ Added
 Changed
 .......
 
+* Use `fitvids <https://github.com/rosszurowski/fitvids>`_ to set selected site
+  aspect ratio for oembed videos. This requires leaving the width and height unchanged
+  as fitvids relies on it to compute the aspect ratio.
+
 Fixed
 .....
 
