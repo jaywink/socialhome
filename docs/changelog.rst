@@ -3,8 +3,8 @@
 Changelog
 =========
 
-0.14.0-dev (unreleased)
------------------------
+0.14.0 (2021-08-29)
+-------------------
 
 Upgrade notes
 .............
@@ -12,13 +12,10 @@ Upgrade notes
 * Suggested NodeJS version updated to 10 (on the road for actually new versions).
 
   If you don't use the Docker images, ensure you've got NodeJS 10 installed and
-  before running `npm i` delete your existing `node_modules` folders. Under the
+  before running ``npm i`` delete your existing ``node_modules`` folders. Under the
   Socialhome project folder, do:
 
      `rm -rf node_modules/ socialhome/frontend/node_modules/`
-
-Added
-.....
 
 Changed
 .......
