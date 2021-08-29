@@ -248,7 +248,11 @@ class Content(models.Model):
     @property
     def humanized_timestamp(self):
         """Human readable timestamp ie '2 hours ago'."""
-        return arrow.get(self.modified).humanize(locale=get_language())
+        try:
+            humanized = arrow.get(self.modified).humanize(locale=get_language())
+        except ValueError:
+            humanized = arrow.get(self.modified).humanize()
+        return humanized
 
     @cached_property
     def root(self):
