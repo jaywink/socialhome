@@ -11,10 +11,10 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN mkdir /usr/local/nvm
 
 ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 8.15.0
+ENV NODE_VERSION 10.24.1
 
 # Install nvm with node and npm
-RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.11//install.sh | bash \
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash \
     && source $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \

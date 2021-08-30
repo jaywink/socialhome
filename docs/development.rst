@@ -22,7 +22,7 @@ Python Virtualenv
 Python 3.6 is the minimum supported version. Ensure the following are installed:
 
 * Python system dependencies
-* NodeJS (version 6-8)
+* NodeJS (version 10)
 * PostgreSQL server
 * Redis
 
