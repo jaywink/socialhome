@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-08-26 14:35+0000\n"
+"PO-Revision-Date: 2021-09-26 00:53+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.8.1-dev\n"
+"X-Generator: Weblate 4.9-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -690,10 +690,12 @@ msgid ""
 "You can upload images using the camera icon or by dragging them to the text "
 "area. Valid file types: png/jpg/svg/gif."
 msgstr ""
+"Կարող ես նկար վերբեռնել՝ օգտագործելով խցիկի պատկերակը, կամ քաշելով այն "
+"տեքստի տիրոյթ։ Վաւեր նիշքի տիպերն են՝ png/jpg/svg/gif։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
-msgstr ""
+msgstr "Վերբեռնել նկար"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle side by side (F9)"
@@ -702,37 +704,42 @@ msgstr ""
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to anyone, even anonymous users and internet search bots."
 msgstr ""
+"բոլորին տեսանելի, անգամ անանուն օգտատէրերի եւ համացանցում փնտրող բոտերի։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to only those who shared with."
-msgstr ""
+msgstr "տեսանելի միայն նրանց համար, ում հետ կիսւում ես։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "visible to only users who are logged in. Does not federate to other servers."
 msgstr ""
+"տեսանելի միայն նրանց համար, որ մուտք գործած են։ Չի ֆեդերացւում այլ "
+"սպասարկիչներ։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to only self. Does not federate to other servers."
-msgstr ""
+msgstr "տեսանելի միայն քեզ։ Չի ֆեդերացւում այլ սպասարկիչներ։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Edit"
-msgstr ""
+msgstr "Խմբագրել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Hidden textarea"
-msgstr ""
+msgstr "Թաքնուած տեքստի տիրոյթ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Type in the handles (eg user@example.com) of the recipients. Separate by "
 "commas. Sorry, no search yet.."
 msgstr ""
+"Մուտքագրէք ստացողներին (օր․ user@example.am)։ Բաժանէք ստորակէտներով։ Կներէք, "
+"փնտրելը դեռ իրականացուած չէ։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Visibility"
-msgstr ""
+msgstr "Տեսանելիութիւն"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -749,57 +756,59 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Error saving content."
-msgstr ""
+msgstr "Բովանդակութեանը պահպանելիս առաջացաւ սխալ։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "When visibility is set to 'Limited', you must either specify recipients or "
 "include your followers."
 msgstr ""
+"Երբ տեսանելիութիւնը նշուած ա «Սահմանափակ», պէտք ա կամ նշես ստացողներին, կամ "
+"ներառես հետեւողներին։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Some recipients couldn't be found."
-msgstr ""
+msgstr "Որոշ ստացողները գտնուած չեն։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Validation error"
-msgstr ""
+msgstr "Հաստատման սխալ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Avatar of"
-msgstr ""
+msgstr "֊ի աւատար"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:226
 msgid "Contacts - following"
-msgstr ""
+msgstr "Կապեր՝ հետեւուող"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:234
 msgid "Contacts - followers"
-msgstr ""
+msgstr "Կապեր՝ հետեւորդներ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while trying to follow."
-msgstr ""
+msgstr "Հետեւելու փորձի ժամանակ ինչ֊որ բան սխալ գնաց։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while trying to unfollow."
-msgstr ""
+msgstr "Ապահետեւելու փորձի ընթացքում ինչ֊որ բան սխալ գնաց։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while fetching new content"
-msgstr ""
+msgstr "Նոր բովանդակութիւնը ստանալիս մի բան սխալ գնաց"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while sharing the content"
-msgstr ""
+msgstr "Տարածելիս մի բան սխալ գնաց"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while unsharing the content"
-msgstr ""
+msgstr "Ապատարածելիս մի բան սխալ գնաց"
 
 #: socialhome/streams/enums.py:19
 msgid "Custom"
-msgstr ""
+msgstr "Յատուկ"
 
 #: socialhome/streams/enums.py:23
 msgid "Profile (all)"
@@ -811,82 +820,82 @@ msgstr ""
 
 #: socialhome/streams/enums.py:26
 msgid "Tag"
-msgstr ""
+msgstr "Պիտակ"
 
 #: socialhome/streams/views.py:52 socialhome/templates/base.html:13
 #: socialhome/templates/base.html:16
 msgid "A federated social home."
-msgstr ""
+msgstr "Քո տունը դաշնեզերքում։"
 
 #: socialhome/streams/views.py:80
 msgid "Limited stream"
-msgstr ""
+msgstr "Սահմանափակ հոսք"
 
 #: socialhome/streams/views.py:93 socialhome/users/preferences.py:18
 msgid "Local stream"
-msgstr ""
+msgstr "Տեղական հոսք"
 
 #: socialhome/streams/views.py:106 socialhome/users/preferences.py:19
 msgid "Public stream"
-msgstr ""
+msgstr "Դաշնային հոսք"
 
 #: socialhome/streams/views.py:138
 #, python-format
 msgid "#%s stream"
-msgstr ""
+msgstr "#%s հոսք"
 
 #: socialhome/streams/views.py:140
 #, python-format
 msgid "All content tagged with #%s."
-msgstr ""
+msgstr "#%s֊ով պիտակած բոլոր գրառումները։"
 
 #: socialhome/streams/views.py:155
 msgid "Followed tags stream"
-msgstr ""
+msgstr "Հետեւուող պիտակի հոսքը"
 
 #: socialhome/streams/views.py:157
 msgid "Content from followed tags."
-msgstr ""
+msgstr "Հետեւուող պիտակներով բովանդակութիւն։"
 
 #: socialhome/streams/views.py:168 socialhome/users/preferences.py:17
 msgid "Followed stream"
-msgstr ""
+msgstr "Հետեւուող հոսք"
 
 #: socialhome/templates/base.html:45
 msgid "Streams"
-msgstr ""
+msgstr "Հոսքեր"
 
 #: socialhome/templates/base.html:49
 msgid "My content"
-msgstr ""
+msgstr "Իմ գրառումները"
 
 #: socialhome/templates/base.html:62
 msgid "Contacts"
-msgstr ""
+msgstr "Կապեր"
 
 #: socialhome/templates/base.html:65
 msgid "My Profile"
-msgstr ""
+msgstr "Իմ պրոֆիլը"
 
 #: socialhome/templates/account/signup.html:12
 #: socialhome/templates/account/signup.html:22
 #: socialhome/templates/base.html:70
 msgid "Sign Up"
-msgstr ""
+msgstr "Գրանցուել"
 
 #: socialhome/templates/base.html:74
 msgid "Log In"
-msgstr ""
+msgstr "Մուտք"
 
 #: socialhome/templates/base.html:80
 msgid "Menu"
-msgstr ""
+msgstr "Ցանկ"
 
 #: socialhome/templates/account/email.html:6 socialhome/templates/base.html:84
 #: socialhome/templates/dynamic_preferences/form.html:6
 #: socialhome/templates/dynamic_preferences/form.html:9
 msgid "Account"
-msgstr ""
+msgstr "Հաշիւ"
 
 #: socialhome/templates/base.html:85
 #: socialhome/users/templates/users/user_api_token.html:4
@@ -896,81 +905,83 @@ msgstr ""
 
 #: socialhome/templates/base.html:86
 msgid "Emails"
-msgstr ""
+msgstr "էլ․ փոստ"
 
 #: socialhome/templates/base.html:89
 msgid "Admin"
-msgstr ""
+msgstr "Վարչապետ"
 
 #: socialhome/templates/base.html:90
 msgid "Task queue"
-msgstr ""
+msgstr "Գործերի հերթ"
 
 #: socialhome/templates/base.html:93
 #: socialhome/templates/rest_framework_swagger/index.html:27
 msgid "Logout"
-msgstr ""
+msgstr "Ելք"
 
 #: socialhome/templates/account/email.html:11
 msgid "E-mail Addresses"
-msgstr ""
+msgstr "էլ․ փոստի հասցեներ"
 
 #: socialhome/templates/account/email.html:13
 msgid "The following e-mail addresses are associated with your account:"
-msgstr ""
+msgstr "Հետեւեալ էլ․ փոստի հասցեները կապուած են ձեր հաշուի հետ՝"
 
 #: socialhome/templates/account/email.html:27
 msgid "Verified"
-msgstr ""
+msgstr "Հաստատուած"
 
 #: socialhome/templates/account/email.html:29
 msgid "Unverified"
-msgstr ""
+msgstr "Չհաստատուած"
 
 #: socialhome/templates/account/email.html:31
 msgid "Primary"
-msgstr ""
+msgstr "Հիմնական"
 
 #: socialhome/templates/account/email.html:37
 msgid "Make Primary"
-msgstr ""
+msgstr "Դարձնել հիմնական"
 
 #: socialhome/templates/account/email.html:38
 msgid "Re-send Verification"
-msgstr ""
+msgstr "Կրկին ուղարկել ստուգման իմակը"
 
 #: socialhome/templates/account/email.html:39
 msgid "Remove"
-msgstr ""
+msgstr "Հեռացնել"
 
 #: socialhome/templates/account/email.html:46
 msgid "Warning:"
-msgstr ""
+msgstr "Զգօ՛ն՝"
 
 #: socialhome/templates/account/email.html:46
 msgid ""
 "You currently do not have any e-mail address set up. You should really add "
 "an e-mail address so you can receive notifications, reset your password, etc."
 msgstr ""
+"Այս պահին ոչ մի էլ․ փոստի հասցէ չես նշել։ Դու ուզում ես աւելացնել էլ․ հասցէ՝ "
+"ծանուցումներ ստանալու, ծածկագիր փոխելու համար։"
 
 #: socialhome/templates/account/email.html:51
 msgid "Add E-mail Address"
-msgstr ""
+msgstr "Աւելացնել էլ․ փոստի հասցէ"
 
 #: socialhome/templates/account/email.html:56
 msgid "Add E-mail"
-msgstr ""
+msgstr "Աւելացնել էլ․ փոստ"
 
 #: socialhome/templates/account/email.html:66
 msgid "Do you really want to remove the selected e-mail address?"
-msgstr ""
+msgstr "Իսկապէ՞ս ուզում ես հեռացնել այս էլ․ փոստի հասցէն։"
 
 #: socialhome/templates/account/email_confirm.html:6
 #: socialhome/templates/account/email_confirm.html:12
 #: socialhome/templates/account/email_confirmed.html:6
 #: socialhome/templates/account/email_confirmed.html:12
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "Հաստատել էլ․ փոստի հասցէն"
 
 #: socialhome/templates/account/email_confirm.html:18
 #, python-format
@@ -978,10 +989,12 @@ msgid ""
 "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
 "address for user %(user_display)s."
 msgstr ""
+"Հաստատէք, որ <a href=\"mailto:%(email)s\">%(email)s</a> հասցէն իսկապէսi "
+"%(user_display)s օգտատիրոջն է։"
 
 #: socialhome/templates/account/email_confirm.html:22
 msgid "Confirm"
-msgstr ""
+msgstr "Հաստատել"
 
 #: socialhome/templates/account/email_confirm.html:29
 #, python-format
@@ -989,6 +1002,8 @@ msgid ""
 "This e-mail confirmation link expired or is invalid. Please <a href="
 "\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
+"Այս՝ էլ․ փոստ հաստատելու յղումը սխալ է կամ հնացած։ Խնդում եմ <a href=\""
+"%(email_url)s\">ստեղծել նոր էլ․ փոստի հասցէ հաստատելու հայց</a>։"
 
 #: socialhome/templates/account/email_confirmed.html:16
 #, python-format
@@ -996,12 +1011,14 @@ msgid ""
 "You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-"
 "mail address for user %(user_display)s."
 msgstr ""
+"Դու հաստատեցիր, որ <a href=\"mailto:%(email)s\">%(email)s</a> ֊ը "
+"%(user_display)s օգտատիրոջ էլ․ փոստի հասցէն է։"
 
 #: socialhome/templates/account/login.html:8
 #: socialhome/templates/account/login.html:13
 #: socialhome/templates/account/login.html:40
 msgid "Sign In"
-msgstr ""
+msgstr "Մուտք"
 
 #: socialhome/templates/account/login.html:18
 #, python-format
