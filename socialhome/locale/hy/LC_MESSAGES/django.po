@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-09-26 00:53+0000\n"
+"PO-Revision-Date: 2021-09-27 15:39+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -1031,21 +1031,21 @@ msgstr ""
 
 #: socialhome/templates/account/login.html:26
 msgid "or"
-msgstr ""
+msgstr "կամ"
 
 #: socialhome/templates/account/login.html:41
 msgid "Forgot Password?"
-msgstr ""
+msgstr "ծածկագիրը մոռացա՞ր։"
 
 #: socialhome/templates/account/logout.html:5
 #: socialhome/templates/account/logout.html:11
 #: socialhome/templates/account/logout.html:20
 msgid "Sign Out"
-msgstr ""
+msgstr "Ելք"
 
 #: socialhome/templates/account/logout.html:13
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "Համոզուա՞ծ ես։"
 
 #: socialhome/templates/account/password_change.html:5
 #: socialhome/templates/account/password_change.html:10
@@ -1055,38 +1055,40 @@ msgstr ""
 #: socialhome/templates/account/password_reset_from_key_done.html:4
 #: socialhome/templates/account/password_reset_from_key_done.html:9
 msgid "Change Password"
-msgstr ""
+msgstr "Փոխել ծածկագիրը"
 
 #: socialhome/templates/account/password_reset.html:7
 #: socialhome/templates/account/password_reset.html:13
 #: socialhome/templates/account/password_reset_done.html:6
 #: socialhome/templates/account/password_reset_done.html:11
 msgid "Password Reset"
-msgstr ""
+msgstr "Նոր ծածկագիր"
 
 #: socialhome/templates/account/password_reset.html:18
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll send you "
 "an e-mail allowing you to reset it."
 msgstr ""
+"Մոռացա՞ր ծածկագիրը։ Մուտքագրիր էլ․ հասցէդ ներքեւում, ու մենք կուղարկենք իմակ՝"
+" նոր ծածկագիր նշելու յղումով։"
 
 #: socialhome/templates/account/password_reset.html:23
 msgid "Reset My Password"
-msgstr ""
+msgstr "Ստեղծել նոր ծածկագիր"
 
 #: socialhome/templates/account/password_reset.html:26
 msgid "Please contact us if you have any trouble resetting your password."
-msgstr ""
+msgstr "Կապուէ՛ք մեզ հետ, եթէ նոր ծածկագիր ստեղծելու խնդիրներ կան։"
 
 #: socialhome/templates/account/password_reset_done.html:17
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "Նամակ ենք ուղարկել։ Կապուիր մեզ հետ, եթէ չստանաս այն մի քանի րոպէից։"
 
 #: socialhome/templates/account/password_reset_from_key.html:11
 msgid "Bad Token"
-msgstr ""
+msgstr "սխան թոքեն"
 
 #: socialhome/templates/account/password_reset_from_key.html:15
 #, python-format
@@ -1095,47 +1097,49 @@ msgid ""
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
 "a>."
 msgstr ""
+"Ծածկագիր ստեղծելու յղումը սխալ է, հաւանաբար այն արդէն օգտագործուել է։ Փորձէք "
+"կրկին <a href=\"%(passwd_reset_url)s\">նոր ծածկագիր ստեղծել</a>։"
 
 #: socialhome/templates/account/password_reset_from_key.html:21
 msgid "change password"
-msgstr ""
+msgstr "փոխել ծածկագիրը"
 
 #: socialhome/templates/account/password_reset_from_key.html:24
 #: socialhome/templates/account/password_reset_from_key_done.html:10
 msgid "Your password is now changed."
-msgstr ""
+msgstr "Ծածկագիրը յաջողութեամբ փոխուեց։"
 
 #: socialhome/templates/account/password_set.html:6
 #: socialhome/templates/account/password_set.html:11
 #: socialhome/templates/account/password_set.html:16
 msgid "Set Password"
-msgstr ""
+msgstr "Նշել ծածկագիր"
 
 #: socialhome/templates/account/signup.html:6
 msgid "Signup"
-msgstr ""
+msgstr "Գրանցուել"
 
 #: socialhome/templates/account/signup.html:14
 #, python-format
 msgid ""
 "Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
-msgstr ""
+msgstr "Արդէն ունե՞ս շահիւ՝ Ապա <a href=\"%(login_url)s\">մուտք գործիր</a>։"
 
 #: socialhome/templates/account/signup_closed.html:5
 #: socialhome/templates/account/signup_closed.html:10
 msgid "Sign Up Closed"
-msgstr ""
+msgstr "Գրանցումը փակ է"
 
 #: socialhome/templates/account/signup_closed.html:12
 msgid "We are sorry, but the sign up is currently closed."
-msgstr ""
+msgstr "Աւաղ, գրանցումը հիմա փակ է։"
 
 #: socialhome/templates/account/verification_sent.html:5
 #: socialhome/templates/account/verification_sent.html:10
 #: socialhome/templates/account/verified_email_required.html:5
 #: socialhome/templates/account/verified_email_required.html:10
 msgid "Verify Your E-mail Address"
-msgstr ""
+msgstr "Ստուգիր էլ․ փոստդ"
 
 #: socialhome/templates/account/verification_sent.html:12
 #, python-format
@@ -1144,6 +1148,9 @@ msgid ""
 "verification. Follow the link provided to finalize the signup process. "
 "Please contact us if you do not receive it within a few minutes."
 msgstr ""
+"Մենք իմակ յղեցինք <a href=\"mailto:%(email)s\">%(email)s</a> հասցէով։ "
+"Կտացրու ստացած յղումը գրանցումն աւարտելու համար։ Կապուիր մեզ հետ, եթէ մի "
+"քանի րոպէ անց նամակ ստացած չլինես։"
 
 #: socialhome/templates/account/verified_email_required.html:16
 msgid ""
