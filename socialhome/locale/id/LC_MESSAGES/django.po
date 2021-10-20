@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-10-15 04:35+0000\n"
-"Last-Translator: liimee <alt3753.7@gmail.com>\n"
+"PO-Revision-Date: 2021-10-21 04:34+0000\n"
+"Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/id/>\n"
 "Language: id\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: socialhome/admin.py:29
 msgid "Choose policy document types to send emails about first!"
-msgstr ""
+msgstr "Pilih tipe dokumen kebijakan untuk mengirim email terlebih dahulu!"
 
 #: socialhome/admin.py:38
 msgid "Policy document update emails queued for sending."
@@ -30,7 +30,7 @@ msgstr ""
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
-msgstr ""
+msgstr "Kirim email pembaruan ke semua pengguna"
 
 #: socialhome/enums.py:10 socialhome/templates/base.html:100
 msgid "Terms of service"
@@ -105,11 +105,11 @@ msgstr ""
 #: socialhome/content/forms.py:66
 #, python-format
 msgid "Recipient %s is not in the correct format."
-msgstr ""
+msgstr "Format penerima %s keliru."
 
 #: socialhome/content/forms.py:72
 msgid "Not all recipients could be found."
-msgstr ""
+msgstr "Tidak semua penerima dapat ditemukan."
 
 #: socialhome/content/models.py:32 socialhome/content/models.py:45
 msgid "URL"
@@ -130,11 +130,11 @@ msgstr "URL Gambar"
 #: socialhome/content/models.py:36 socialhome/content/models.py:47
 #: socialhome/content/models.py:155
 msgid "Modified"
-msgstr ""
+msgstr "Dimodifikasi"
 
 #: socialhome/content/models.py:46
 msgid "OEmbed HTML content"
-msgstr ""
+msgstr "Konten OEmbed HTML"
 
 #: socialhome/content/models.py:54 socialhome/users/models.py:138
 msgid "Name"
@@ -162,19 +162,19 @@ msgstr "ID Federasi"
 
 #: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
-msgstr ""
+msgstr "Disematkan ke profil"
 
 #: socialhome/content/models.py:108
 msgid "Order"
-msgstr ""
+msgstr "Perintah"
 
 #: socialhome/content/models.py:111
 msgid "Service label"
-msgstr ""
+msgstr "Label layanan"
 
 #: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
-msgstr ""
+msgstr "Tampilkan pratinjau OEmbed atau OpenGraph"
 
 #: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -245,7 +245,7 @@ msgstr ""
 
 #: socialhome/content/models.py:161
 msgid "Reply count"
-msgstr ""
+msgstr "Jumlah balasan"
 
 #: socialhome/content/models.py:162
 msgid "Shares count"
@@ -308,12 +308,12 @@ msgstr "Kamu telah disebut"
 #: socialhome/notifications/tasks.py:130
 #, python-format
 msgid "New reply to: %s"
-msgstr ""
+msgstr "Balasan baru ke:%s"
 
 #: socialhome/notifications/tasks.py:168
 #, python-format
 msgid "New share of: %s"
-msgstr ""
+msgstr "Bagikan baru dari: %s"
 
 #: socialhome/notifications/tasks.py:197
 msgid "Data export is ready for download"
@@ -336,7 +336,7 @@ msgstr "Pembaruan penting terhadap dokumen Kebijakan Layanan kami"
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
 msgid "Dear"
-msgstr ""
+msgstr "Kepada"
 
 #: socialhome/notifications/templates/notifications/base.html:18
 #: socialhome/notifications/templates/notifications/base.txt:7
@@ -376,12 +376,12 @@ msgstr "Kamu telah disebut oleh"
 #: socialhome/notifications/templates/notifications/share.html:9
 #: socialhome/notifications/templates/notifications/share.txt:7
 msgid "Link to the content:"
-msgstr ""
+msgstr "Tautan ke konten:"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:9
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:7
 msgid "The changes have become effective at"
-msgstr ""
+msgstr "Perubahan telah menjadi efektif di"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:12
 msgid "Please find the updated Terms of Service document"
@@ -441,15 +441,15 @@ msgstr "Cari"
 
 #: socialhome/search/templates/search/search.html:12
 msgid "Search term"
-msgstr ""
+msgstr "Istilah pencarian"
 
 #: socialhome/search/templates/search/search.html:13
 msgid "Type a search term"
-msgstr ""
+msgstr "Ketik istilah pencarian"
 
 #: socialhome/search/templates/search/search.html:22
 msgid "Profiles"
-msgstr ""
+msgstr "Profil"
 
 #: socialhome/search/templates/search/search.html:47
 #: socialhome/static/dist/vue/js/app.js:67
@@ -510,7 +510,7 @@ msgstr "Teks balasan..."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "unshare"
-msgstr ""
+msgstr "Batal bagikan"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "share"
@@ -543,7 +543,7 @@ msgstr "Diikuti"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
 msgid "Content from followed users."
-msgstr ""
+msgstr "Konten dari pengguna yang diikuti."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
@@ -595,7 +595,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content"
-msgstr ""
+msgstr "Semua konten"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
@@ -639,11 +639,11 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
-msgstr ""
+msgstr "Beralih ke layar penuh (F11)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Markdown guide"
-msgstr ""
+msgstr "Panduan Markdown"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Heading"
@@ -720,7 +720,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilitas"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -752,27 +752,27 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Validation error"
-msgstr ""
+msgstr "Galat validasi"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Avatar of"
-msgstr ""
+msgstr "Avatar dari"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:226
 msgid "Contacts - following"
-msgstr ""
+msgstr "Kontak - mengikuti"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:234
 msgid "Contacts - followers"
-msgstr ""
+msgstr "Kontak - pengikut"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while trying to follow."
-msgstr ""
+msgstr "Galat saat mencoba mengikuti."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while trying to unfollow."
-msgstr ""
+msgstr "Galat saat mencoba batal mengikuti."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "An error happened while fetching new content"
@@ -788,19 +788,19 @@ msgstr ""
 
 #: socialhome/streams/enums.py:19
 msgid "Custom"
-msgstr ""
+msgstr "Kustom"
 
 #: socialhome/streams/enums.py:23
 msgid "Profile (all)"
-msgstr ""
+msgstr "Profil (semua)"
 
 #: socialhome/streams/enums.py:24
 msgid "Profile (pinned)"
-msgstr ""
+msgstr "Profil (disematkan)"
 
 #: socialhome/streams/enums.py:26
 msgid "Tag"
-msgstr ""
+msgstr "Tag"
 
 #: socialhome/streams/views.py:52 socialhome/templates/base.html:13
 #: socialhome/templates/base.html:16
@@ -847,49 +847,49 @@ msgstr ""
 
 #: socialhome/templates/base.html:49
 msgid "My content"
-msgstr ""
+msgstr "Konten saya"
 
 #: socialhome/templates/base.html:62
 msgid "Contacts"
-msgstr ""
+msgstr "Kontak"
 
 #: socialhome/templates/base.html:65
 msgid "My Profile"
-msgstr ""
+msgstr "Profile saya"
 
 #: socialhome/templates/account/signup.html:12
 #: socialhome/templates/account/signup.html:22
 #: socialhome/templates/base.html:70
 msgid "Sign Up"
-msgstr ""
+msgstr "Daftar"
 
 #: socialhome/templates/base.html:74
 msgid "Log In"
-msgstr ""
+msgstr "Masuk"
 
 #: socialhome/templates/base.html:80
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: socialhome/templates/account/email.html:6 socialhome/templates/base.html:84
 #: socialhome/templates/dynamic_preferences/form.html:6
 #: socialhome/templates/dynamic_preferences/form.html:9
 msgid "Account"
-msgstr ""
+msgstr "Akun"
 
 #: socialhome/templates/base.html:85
 #: socialhome/users/templates/users/user_api_token.html:4
 #: socialhome/users/templates/users/user_api_token.html:7
 msgid "API token"
-msgstr ""
+msgstr "token API"
 
 #: socialhome/templates/base.html:86
 msgid "Emails"
-msgstr ""
+msgstr "Email"
 
 #: socialhome/templates/base.html:89
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: socialhome/templates/base.html:90
 msgid "Task queue"
@@ -898,11 +898,11 @@ msgstr ""
 #: socialhome/templates/base.html:93
 #: socialhome/templates/rest_framework_swagger/index.html:27
 msgid "Logout"
-msgstr ""
+msgstr "Keluar"
 
 #: socialhome/templates/account/email.html:11
 msgid "E-mail Addresses"
-msgstr ""
+msgstr "Alamat email"
 
 #: socialhome/templates/account/email.html:13
 msgid "The following e-mail addresses are associated with your account:"
@@ -910,11 +910,11 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:27
 msgid "Verified"
-msgstr ""
+msgstr "Terverifikasi"
 
 #: socialhome/templates/account/email.html:29
 msgid "Unverified"
-msgstr ""
+msgstr "Belum terverifikasi"
 
 #: socialhome/templates/account/email.html:31
 msgid "Primary"
@@ -930,11 +930,11 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:39
 msgid "Remove"
-msgstr ""
+msgstr "Buang"
 
 #: socialhome/templates/account/email.html:46
 msgid "Warning:"
-msgstr ""
+msgstr "Peringatan:"
 
 #: socialhome/templates/account/email.html:46
 msgid ""
@@ -949,7 +949,7 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:56
 msgid "Add E-mail"
-msgstr ""
+msgstr "Tambah email"
 
 #: socialhome/templates/account/email.html:66
 msgid "Do you really want to remove the selected e-mail address?"
@@ -991,7 +991,7 @@ msgstr ""
 #: socialhome/templates/account/login.html:13
 #: socialhome/templates/account/login.html:40
 msgid "Sign In"
-msgstr ""
+msgstr "Masuk"
 
 #: socialhome/templates/account/login.html:18
 #, python-format
@@ -1008,17 +1008,17 @@ msgstr ""
 
 #: socialhome/templates/account/login.html:41
 msgid "Forgot Password?"
-msgstr ""
+msgstr "Lupa kata sandi?"
 
 #: socialhome/templates/account/logout.html:5
 #: socialhome/templates/account/logout.html:11
 #: socialhome/templates/account/logout.html:20
 msgid "Sign Out"
-msgstr ""
+msgstr "Keluar"
 
 #: socialhome/templates/account/logout.html:13
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "Yakin ingin keluar?"
 
 #: socialhome/templates/account/password_change.html:5
 #: socialhome/templates/account/password_change.html:10
@@ -1028,14 +1028,14 @@ msgstr ""
 #: socialhome/templates/account/password_reset_from_key_done.html:4
 #: socialhome/templates/account/password_reset_from_key_done.html:9
 msgid "Change Password"
-msgstr ""
+msgstr "Ganti Kata sandi"
 
 #: socialhome/templates/account/password_reset.html:7
 #: socialhome/templates/account/password_reset.html:13
 #: socialhome/templates/account/password_reset_done.html:6
 #: socialhome/templates/account/password_reset_done.html:11
 msgid "Password Reset"
-msgstr ""
+msgstr "Setel ulang kata sandi"
 
 #: socialhome/templates/account/password_reset.html:18
 msgid ""
