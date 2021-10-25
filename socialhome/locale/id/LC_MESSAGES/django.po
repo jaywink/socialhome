@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-10-25 01:43+0000\n"
+"PO-Revision-Date: 2021-10-26 03:40+0000\n"
 "Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/id/>\n"
@@ -1314,12 +1314,12 @@ msgstr ""
 #: socialhome/users/views.py:87
 #, python-format
 msgid "Profile of %s."
-msgstr ""
+msgstr "Profil %s."
 
 #: socialhome/users/templates/users/profile_detail_organize.html:4
 #: socialhome/users/templates/users/profile_detail_organize.html:9
 msgid "Organize content"
-msgstr ""
+msgstr "Atur konten"
 
 #: socialhome/users/templates/users/profile_detail_organize.html:32
 msgid "Save order"
