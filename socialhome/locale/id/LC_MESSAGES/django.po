@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-10-21 04:34+0000\n"
+"PO-Revision-Date: 2021-10-25 01:43+0000\n"
 "Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/id/>\n"
@@ -1171,7 +1171,7 @@ msgstr "dibuat"
 
 #: socialhome/templates/dynamic_preferences/form.html:23
 msgid "Request new export"
-msgstr ""
+msgstr "Minta ekspor baru"
 
 #: socialhome/templates/dynamic_preferences/form.html:29
 msgid "Delete account"
@@ -1201,7 +1201,7 @@ msgstr ""
 
 #: socialhome/templates/rest_framework_swagger/index.html:29
 msgid "Session Login"
-msgstr ""
+msgstr "Sesi login"
 
 #: socialhome/templates/rest_framework_swagger/index.html:40
 msgid "You are logged in as: "
@@ -1225,7 +1225,7 @@ msgstr "Nama Pengguna"
 
 #: socialhome/users/models.py:46
 msgid "Trusted editor"
-msgstr ""
+msgstr "Editor terpercaya"
 
 #: socialhome/users/models.py:50
 msgid "Picture"
@@ -1257,7 +1257,7 @@ msgstr ""
 
 #: socialhome/users/models.py:158
 msgid "Profile visibility"
-msgstr ""
+msgstr "Visibilitas Profil"
 
 #: socialhome/users/models.py:161
 msgid "Image - large"
@@ -1285,11 +1285,11 @@ msgstr "Apakah konten pengguna dinyatakan sebagai NSFW?"
 
 #: socialhome/users/models.py:180
 msgid "Private inbox"
-msgstr ""
+msgstr "Kotak masuk privat"
 
 #: socialhome/users/models.py:181
 msgid "Public inbox"
-msgstr ""
+msgstr "Kotak masuk publik"
 
 #: socialhome/users/models.py:184
 msgid "Protocol"
