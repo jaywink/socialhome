@@ -64,6 +64,14 @@ export default Vue.component("Stream", {
         TagStampedElement,
         TagsStampedElement,
     },
+    provide() {
+        const now = {}
+        Object.defineProperty(now, "currentTime", {
+            enumerable: true,
+            get: () => this.currentTime,
+        })
+        return {now}
+    },
     // TODO: Seperate Stream.vue into TagStream.vue, GuidProfile.vue and UsernameProfile.vue, etc. in the future
     props: {
         contentId: {
@@ -89,6 +97,7 @@ export default Vue.component("Stream", {
                 "transition-duration": "0s",
                 stagger: 0,
             },
+            currentTime: Date.now(),
         }
     },
     computed: {
@@ -140,6 +149,14 @@ export default Vue.component("Stream", {
         if (!this.$store.state.stream.stream.single) {
             this.loadStream()
         }
+    },
+    mounted() {
+        this.nowTimer = setInterval(() => {
+            this.currentTime = Date.now()
+        }, 10000)
+    },
+    beforeDestroy() {
+        clearInterval(this.nowTimer)
     },
     methods: {
         onNewContentClick() {
