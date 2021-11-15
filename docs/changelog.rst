@@ -15,8 +15,17 @@ Added
 Changed
 .......
 
+* Humanized timestamps are now handled in javascript with Intl.RelativeTimeFormat. They
+  are updated every 10 seconds using a single interval set in Stream.vue.
+
+  The change also deals properly with DJANGO_TIMEZONE by converting the UTC timestamps
+  (both humanized and plain) using datetime.astimezone.
+
 Fixed
 .....
+
+* Not a socialhome fix per se, upgraded python-opengraph to 0.2.1 which fixes an issue
+  with character rendering of opengraph previews.
 
 
 0.14.0 (2021-08-29)
