@@ -274,7 +274,7 @@ python-dateutil==2.8.2
     #   rq-scheduler
 python-magic==0.4.24
     # via django-versatileimagefield
-python-opengraph-jaywink==0.2.0
+python-opengraph-jaywink==0.2.1
     # via -r requirements/requirements.in
 python-slugify==5.0.2
     # via
