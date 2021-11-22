@@ -3,14 +3,8 @@
 Changelog
 =========
 
-0.15.0-dev (unreleased)
------------------------
-
-Upgrade notes
-.............
-
-Added
-.....
+0.15.0 (2021-11-22)
+-------------------
 
 Changed
 .......
@@ -29,7 +23,6 @@ Fixed
 
 * Fix missing ``libmagic1`` dependency in the v0.14.0 Docker image causing Socialhome
   not to start.
-
 
 0.14.0 (2021-08-29)
 -------------------
