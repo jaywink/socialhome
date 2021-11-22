@@ -27,6 +27,9 @@ Fixed
 * Not a socialhome fix per se, upgraded python-opengraph to 0.2.1 which fixes an issue
   with character rendering of opengraph previews.
 
+* Fix missing ``libmagic1`` dependency in the v0.14.0 Docker image causing Socialhome
+  not to start.
+
 
 0.14.0 (2021-08-29)
 -------------------
