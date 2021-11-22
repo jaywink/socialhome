@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /
 
-RUN apt-get update && apt-get install python3-dev less htop curl git build-essential -y
+RUN apt-get update && apt-get install python3-dev less htop curl git build-essential libmagic1 -y
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
