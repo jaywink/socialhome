@@ -121,7 +121,7 @@ django-braces==1.14.0
     # via -r requirements/requirements.in
 django-crispy-forms==1.12.0
     # via -r requirements/requirements.in
-django-dynamic-preferences==1.5.1
+django-dynamic-preferences==1.11
     # via -r requirements/requirements.in
 django-enumfields==2.1.1
     # via -r requirements/requirements.in
@@ -372,7 +372,7 @@ uritemplate==3.0.1
     #   drf-yasg
 urllib3==1.26.6
     # via requests
-uwsgi==2.0.19.1
+uwsgi==2.0.20
     # via -r requirements/requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit

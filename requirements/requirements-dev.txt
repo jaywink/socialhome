@@ -190,7 +190,7 @@ django-debug-toolbar==1.11.1
     # via -r requirements/requirements-dev.in
 django-debug-toolbar-user-panel==1.1.1
     # via -r requirements/requirements-dev.in
-django-dynamic-preferences==1.5.1
+django-dynamic-preferences==1.11
     # via -r requirements/requirements.txt
 django-enumfields==2.1.1
     # via -r requirements/requirements.txt
@@ -667,7 +667,7 @@ urllib3==1.26.6
     # via
     #   -r requirements/requirements.txt
     #   requests
-uwsgi==2.0.19.1
+uwsgi==2.0.20
     # via -r requirements/requirements.txt
 wcwidth==0.2.5
     # via

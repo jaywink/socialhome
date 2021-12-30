@@ -11,7 +11,7 @@ circus
 django-allauth
 django-braces
 django-crispy-forms
-django-dynamic-preferences<1.6  # Some breaking changes there
+django-dynamic-preferences # fix in templates/base.html
 django-enumfields
 django-environ
 django-extensions
