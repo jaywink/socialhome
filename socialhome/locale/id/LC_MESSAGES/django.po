@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-10-26 03:40+0000\n"
+"PO-Revision-Date: 2021-12-30 00:51+0000\n"
 "Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/id/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.9-dev\n"
+"X-Generator: Weblate 4.10.1\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
@@ -918,15 +918,15 @@ msgstr "Belum terverifikasi"
 
 #: socialhome/templates/account/email.html:31
 msgid "Primary"
-msgstr ""
+msgstr "Utama"
 
 #: socialhome/templates/account/email.html:37
 msgid "Make Primary"
-msgstr ""
+msgstr "Jadikan Utama"
 
 #: socialhome/templates/account/email.html:38
 msgid "Re-send Verification"
-msgstr ""
+msgstr "Kirim ulang Verifikasi"
 
 #: socialhome/templates/account/email.html:39
 msgid "Remove"
@@ -945,7 +945,7 @@ msgstr ""
 
 #: socialhome/templates/account/email.html:51
 msgid "Add E-mail Address"
-msgstr ""
+msgstr "Tambah alamat email"
 
 #: socialhome/templates/account/email.html:56
 msgid "Add E-mail"
@@ -960,7 +960,7 @@ msgstr ""
 #: socialhome/templates/account/email_confirmed.html:6
 #: socialhome/templates/account/email_confirmed.html:12
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "Konfirmasi alamat email"
 
 #: socialhome/templates/account/email_confirm.html:18
 #, python-format
@@ -1045,7 +1045,7 @@ msgstr ""
 
 #: socialhome/templates/account/password_reset.html:23
 msgid "Reset My Password"
-msgstr ""
+msgstr "Atur ulang kata sandi"
 
 #: socialhome/templates/account/password_reset.html:26
 msgid "Please contact us if you have any trouble resetting your password."
@@ -1183,7 +1183,7 @@ msgstr "Kembali ke profil"
 
 #: socialhome/templates/dynamic_preferences/form.html:46
 msgid "Export request failed. Please try again later or contact the admin."
-msgstr ""
+msgstr "Permintaan ekspor gagal. Silakan coba lagi nanti atau hubungi admin."
 
 #: socialhome/templates/dynamic_preferences/form.html:51
 msgid ""
@@ -1245,15 +1245,15 @@ msgstr "alamat surel"
 
 #: socialhome/users/models.py:147
 msgid "Handle"
-msgstr ""
+msgstr "Penanganan"
 
 #: socialhome/users/models.py:154
 msgid "RSA private key"
-msgstr ""
+msgstr "Kunci pribadi RSA"
 
 #: socialhome/users/models.py:155
 msgid "RSA public key"
-msgstr ""
+msgstr "Kunci publik RSA"
 
 #: socialhome/users/models.py:158
 msgid "Profile visibility"
@@ -1297,7 +1297,7 @@ msgstr "Protokol"
 
 #: socialhome/users/preferences.py:16
 msgid "Profile - all content"
-msgstr ""
+msgstr "Profil - semua konten"
 
 #: socialhome/users/preferences.py:20
 msgid "Tags stream"
@@ -1398,7 +1398,7 @@ msgstr ""
 
 #: socialhome/users/templates/users/userpicture_form.html:10
 msgid "Cropping an existing picture"
-msgstr ""
+msgstr "Memotong gambar yang ada"
 
 #: socialhome/users/templates/users/userpicture_form.html:11
 msgid ""
