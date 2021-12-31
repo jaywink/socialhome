@@ -83,6 +83,8 @@ channels==2.4.0
     #   channels-redis
 channels-redis==2.4.2
     # via -r requirements/requirements.txt
+chardet==4.0.0
+    # via -r requirements/requirements.in
 charset-normalizer==2.0.4
     # via
     #   -r requirements/requirements.txt

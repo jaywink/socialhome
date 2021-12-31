@@ -6,6 +6,7 @@ bleach
 channels<3
 # 3.x requires Redis 5.x
 channels_redis<3
+chardet
 circus
 #CommonMark
 django-allauth
