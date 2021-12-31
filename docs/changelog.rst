@@ -9,6 +9,17 @@ Changelog
 Upgrade notes
 .............
 
+* Tweaks for python 3.10. In particular, circus, uwsgi and django-dynamic-preferences needed
+  an update.
+
+* If using virtualenv and python has been updated to 3.10, make sure to run
+
+    `python -m env ~/.virtualenvs/socialhome` # or whatever your virtenv path is
+    `pip install -U virtualenvwrapper`
+
+  before performing a socialhome update. Since the django-dynamic-preferences comes with a migration,
+  it is strongly suggested to backup your DB (but you already do that, right?).
+
 Added
 .....
 
@@ -18,6 +29,7 @@ Changed
 Fixed
 .....
 
+* Namespace change in django-dynamic-preferences required a minor change in templates/base.html and notifications/tasks.py
 
 0.15.0 (2021-11-22)
 -------------------
