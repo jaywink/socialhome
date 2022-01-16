@@ -12,7 +12,7 @@ circus
 django-allauth
 django-braces
 django-crispy-forms
-django-dynamic-preferences # fix in templates/base.html
+django-dynamic-preferences
 django-enumfields
 django-environ
 django-extensions
