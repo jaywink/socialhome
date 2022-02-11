@@ -31,7 +31,7 @@
     "grunt-postcss": "~0.9.0",
     "grunt-sass": "<3.0.0",
     "load-grunt-tasks": "~5.1.0",
-    "node-sass": "<5.0.0",
+    "node-sass": "<8.0.0",
     "npm-check-updates": "^11.8.3",
     "nyc": "^15.1.0",
     "pixrem": "~5.0.0",
