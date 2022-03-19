@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-06-05 13:43+0000\n"
+"PO-Revision-Date: 2022-03-19 13:17+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.7-dev\n"
+"X-Generator: Weblate 4.12-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -597,7 +597,7 @@ msgstr "Étiquettes suivies"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Content from all followed tags."
-msgstr "Publications de tous les étiquettes suivies."
+msgstr "Publications de toutes les étiquettes suivies."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Change picture"
