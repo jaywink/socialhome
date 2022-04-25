@@ -113,7 +113,7 @@ def process_entity_post(entity: Any, profile: Profile):
         "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
-        "remote_created": entity.created_at if entity.created_at.tzinfo else safe_make_aware(entity.created_at, "UTC"),
+        "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     extra_lookups = {}
