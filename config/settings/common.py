@@ -420,6 +420,8 @@ SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORT
 SOCIALHOME_MATRIX_HOMESERVER = f"matrix.{SOCIALHOME_DOMAIN}"
 SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}"
 SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
+# Valid user name required for get requests signature by federation
+FEDERATION_USER = env("FEDERATION_USER", default=None)
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -605,7 +607,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
-    "federation_id": f'{SOCIALHOME_URL}/u/alain/',
+    "federation_id": f'{SOCIALHOME_URL}/u/{FEDERATION_USER}/',
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",
     "get_profile_function": "socialhome.federate.utils.entities.get_profile",
