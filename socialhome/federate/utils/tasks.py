@@ -110,7 +110,7 @@ def process_entity_post(entity: Any, profile: Profile):
         return
     values = {
         "fid": fid,
-        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -159,7 +159,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     if getattr(entity, "public", None) is not None:
         visibility = Visibility.PUBLIC if entity.public else Visibility.LIMITED
     values = {
-        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": visibility if visibility is not None else parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -194,8 +194,9 @@ def process_entity_comment(entity: Any, profile: Profile):
         django_rq.enqueue(forward_entity, entity, root_parent.id)
 
 
-def _embed_entity_images_to_post(children, text):
+def _embed_entity_medias_to_post(children, text):
     """Embed any entity `_children` of base.Image type to the text content as markdown.
+    Embed base.[Audio, Video] types to the text content as HTML5
 
     Images are prefixed on top of the normal text content.
 
@@ -203,13 +204,22 @@ def _embed_entity_images_to_post(children, text):
     :param values: Text for creating the Post
     :return: New text value to create the Post with
     """
-    images = []
+    medias = []
     for child in children:
         if isinstance(child, base.Image):
-            images.append(f"![{safe_text(child.name)}]({safe_text(child.url)}) ")
-    if images:
+            medias.append(f"![{safe_text(child.name)}]({safe_text(child.url)}) ")
+        if isinstance(child, base.Audio):
+            audio = f'<audio controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></audio>'
+            print(audio)
+            if getattr(child, 'name', None):
+                audio = f"<p>{safe_text(child.name)}</p>" + audio
+            medias.append(audio)
+        if isinstance(child, base.Video):
+            pass
+
+    if medias:
         return "%s\n\n%s" % (
-            "".join(images), text
+            text, "".join(medias)
         )
     return text
 
@@ -320,7 +330,7 @@ def process_entity_share(entity, profile):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     # noinspection PyProtectedMember
-    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
+    values["text"] = _embed_entity_medias_to_post(entity._children, values["text"])
     fid = safe_text(entity.id)
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
