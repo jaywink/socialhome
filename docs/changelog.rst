@@ -29,6 +29,9 @@ Added
 Changed
 .......
 
+* JSON-LD processed payloads with federation return aware datetime. Fix safe_make_aware to process only
+  naive datetime.
+
 Fixed
 .....
 

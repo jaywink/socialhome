@@ -269,6 +269,11 @@ DJANGO_TIMEZONE
 
 Default: ``UTC``
 
+FEDERATION_USER
+...............
+
+If set to a valid local user name, that user's private key will be used to sign federation get requests.
+
 REDIS_DB
 ........
 
