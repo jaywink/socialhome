@@ -121,10 +121,10 @@ class GlobalSearchView(SearchView):
                     # Catch various errors parsing the remote content
                     return super().get(request, *args, **kwargs)
                 if remote_content:
-                    process_entities([remote_content])
+                    process_entities(remote_content)
                     # Try again
                     try:
-                        content = Content.objects.visible_for_user(request.user).fed(remote_content.id).get()
+                        content = Content.objects.visible_for_user(request.user).fed(remote_content[0].id).get()
                     except Content.DoesNotExist:
                         return super().get(request, *args, **kwargs)
         if content:

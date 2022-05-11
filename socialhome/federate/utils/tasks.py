@@ -147,8 +147,31 @@ def process_entity_comment(entity: Any, profile: Profile):
     try:
         parent = Content.objects.fed(entity.target_id).get()
     except Content.DoesNotExist:
-        logger.warning("No target found for comment: %s", entity)
-        return
+        # Try fetching. If found, process and then try again
+        # This maybe useless as federation should walk up to the root
+        # and down the reply collection
+        logger.debug(
+            "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
+            entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
+        )
+        remote_target = retrieve_remote_content(
+            entity.target_id,
+            guid=entity.target_guid,
+            handle=entity.target_handle,
+            entity_type=entity.entity_type,
+            sender_key_fetcher=sender_key_fetcher,
+        )
+        if remote_target:
+            process_entities(remote_target)
+            try:
+                parent = Content.objects.fed(entity.target_id).get()
+            except Content.DoesNotExist:
+                logger.warning("Comment target was fetched from remote, but it is still missing locally! Comment: %s",
+                               entity)
+                return
+        else:
+            logger.warning("No target found for comment even after fetching from remote: %s", entity)
+            return
     root_parent = parent
     if entity.root_target_id:
         try:
@@ -198,7 +221,7 @@ def _embed_entity_medias_to_post(children, text):
     """Embed any entity `_children` of base.Image type to the text content as markdown.
     Embed base.[Audio, Video] types to the text content as HTML5
 
-    Images are prefixed on top of the normal text content.
+    Medias are suffixed at the bottom of the normal text content.
 
     :param children: List of child entities
     :param values: Text for creating the Post
@@ -210,12 +233,14 @@ def _embed_entity_medias_to_post(children, text):
             medias.append(f"![{safe_text(child.name)}]({safe_text(child.url)}) ")
         if isinstance(child, base.Audio):
             audio = f'<audio controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></audio>'
-            print(audio)
             if getattr(child, 'name', None):
                 audio = f"<p>{safe_text(child.name)}</p>" + audio
             medias.append(audio)
         if isinstance(child, base.Video):
-            pass
+            video = f'<video controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></video>'
+            if getattr(child, 'name', None):
+                video = f"<p>{safe_text(child.name)}</p>" + video
+            medias.append(video)
 
     if medias:
         return "%s\n\n%s" % (
@@ -308,7 +333,7 @@ def process_entity_share(entity, profile):
             sender_key_fetcher=sender_key_fetcher,
         )
         if remote_target:
-            process_entities([remote_target])
+            process_entities(remote_target)
             try:
                 target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
             except Content.DoesNotExist:
