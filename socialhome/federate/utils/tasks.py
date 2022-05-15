@@ -401,11 +401,11 @@ def process_replies(entity=None, fetch=False, delta=None):
     
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
-    delta = delta * 2 if delta else dt.timedelta(seconds=3600)
-    if getattr(entity, '_replies', None):
+    delta = delta * 2 if delta else dt.timedelta(minutes=15)
+    if hasattr(entity, '_replies'):
         if delta < dt.timedelta(5):
             sched = django_rq.get_scheduler('default')
-            job = sched.enqueue_at(entity.created_at + delta, process_replies, True, delta)
+            job = sched.enqueue_in(delta, process_replies, entity, True, delta)
             if job.is_queued:
                 logger.info("process_replies - refresh job queued")
             else:
