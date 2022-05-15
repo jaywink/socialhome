@@ -1,4 +1,5 @@
 import logging
+import datetime as dt
 from typing import Optional, List, Any
 
 import django_rq
@@ -137,6 +138,9 @@ def process_entity_post(entity: Any, profile: Profile):
         else:
             logger.warning("No receivers for limited Post %s", content.fid)
 
+    if hasattr(entity, '_replies'):
+        django_rq.enqueue(process_replies, entity)
+
 
 # noinspection PyProtectedMember
 def process_entity_comment(entity: Any, profile: Profile):
@@ -162,7 +166,7 @@ def process_entity_comment(entity: Any, profile: Profile):
             sender_key_fetcher=sender_key_fetcher,
         )
         if remote_target:
-            process_entities(remote_target)
+            process_entities([remote_target])
             try:
                 parent = Content.objects.fed(entity.target_id).get()
             except Content.DoesNotExist:
@@ -215,6 +219,9 @@ def process_entity_comment(entity: Any, profile: Profile):
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
         django_rq.enqueue(forward_entity, entity, root_parent.id)
+
+    if hasattr(entity, '_replies'):
+        django_rq.enqueue(process_replies, entity)
 
 
 def _embed_entity_medias_to_post(children, text):
@@ -333,7 +340,7 @@ def process_entity_share(entity, profile):
             sender_key_fetcher=sender_key_fetcher,
         )
         if remote_target:
-            process_entities(remote_target)
+            process_entities([remote_target])
             try:
                 target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
             except Content.DoesNotExist:
@@ -371,6 +378,38 @@ def process_entity_share(entity, profile):
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
         django_rq.enqueue(forward_entity, entity, target_content.id)
+
+
+def process_replies(entity=None, fetch=False, delta=None):
+    # Process Activitypub reply collection
+    if fetch:
+        # Refresh entity
+        entity = retrieve_remote_content(entity.id)
+        if not entity: return
+
+
+    for reply in getattr(entity, '_replies', []):
+        try:
+            content = Content.objects.fed(reply).get()
+        except Content.DoesNotExist:
+            # Try to fetch and process
+            logger.debug(
+                "process_replies - fetching reply %s for entity %s", reply, entity.id)
+        remote_content = retrieve_remote_content(reply)
+        if remote_content:
+            process_entities([remote_content])
+    
+    # Using a delta increasing by a factor of two, refresh
+    # the replies up to 5 days after publication
+    delta = delta * 2 if delta else dt.timedelta(seconds=3600)
+    if getattr(entity, '_replies', None):
+        if delta < dt.timedelta(5):
+            sched = django_rq.get_scheduler('default')
+            job = sched.enqueue_at(entity.created_at + delta, process_replies, True, delta)
+            if job.is_queued:
+                logger.info("process_replies - refresh job queued")
+            else:
+                logger.warn("process_replies - failed to enqueue refresh job")
 
 
 def sender_key_fetcher(fid):
