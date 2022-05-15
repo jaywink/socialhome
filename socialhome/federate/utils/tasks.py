@@ -406,8 +406,8 @@ def process_replies(entity=None, fetch=False, delta=None):
         if delta < dt.timedelta(5):
             sched = django_rq.get_scheduler('default')
             job = sched.enqueue_in(delta, process_replies, entity, True, delta)
-            if job.is_queued:
-                logger.info("process_replies - refresh job queued")
+            if job:
+                logger.info("process_replies - queued refresh job %s", job.description)
             else:
                 logger.warn("process_replies - failed to enqueue refresh job")
 
