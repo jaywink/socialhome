@@ -139,7 +139,10 @@ def process_entity_post(entity: Any, profile: Profile):
             logger.warning("No receivers for limited Post %s", content.fid)
 
     if hasattr(entity, '_replies'):
-        django_rq.enqueue(process_replies, entity)
+        if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            logger.info("process_replies - queued job for entity %s", entity.id)
+        else:
+            logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
 
 
 # noinspection PyProtectedMember
@@ -221,7 +224,10 @@ def process_entity_comment(entity: Any, profile: Profile):
         django_rq.enqueue(forward_entity, entity, root_parent.id)
 
     if hasattr(entity, '_replies'):
-        django_rq.enqueue(process_replies, entity)
+        if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            logger.info("process_replies - queued job for entity %s", entity.id)
+        else:
+            logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
 
 
 def _embed_entity_medias_to_post(children, text):
@@ -395,21 +401,19 @@ def process_replies(entity=None, fetch=False, delta=None):
             # Try to fetch and process
             logger.debug(
                 "process_replies - fetching reply %s for entity %s", reply, entity.id)
-        remote_content = retrieve_remote_content(reply)
-        if remote_content:
-            process_entities([remote_content])
+            remote_content = retrieve_remote_content(reply)
+            if remote_content:
+                process_entities([remote_content])
     
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if hasattr(entity, '_replies'):
         if delta < dt.timedelta(5):
-            sched = django_rq.get_scheduler('default')
-            job = sched.enqueue_in(delta, process_replies, entity, True, delta)
-            if job:
-                logger.info("process_replies - queued refresh job %s", job.description)
+            if django_rq.get_scheduler().enqueue_in(delta, process_replies, entity, True, delta):
+                logger.info("process_replies - queued refresh job for entity %s", entity.id)
             else:
-                logger.warn("process_replies - failed to enqueue refresh job")
+                logger.warn("process_replies - failed to enqueue refresh job for entity %s", entity.id)
 
 
 def sender_key_fetcher(fid):
