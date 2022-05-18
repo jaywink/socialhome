@@ -390,7 +390,7 @@ def process_replies(entity=None, fetch=False, delta=None):
     # Process Activitypub reply collection
     if fetch:
         # Refresh entity
-        entity = retrieve_remote_content(entity.id)
+        entity = retrieve_remote_content(entity.id, cache=False)
         if not entity: return
 
 
