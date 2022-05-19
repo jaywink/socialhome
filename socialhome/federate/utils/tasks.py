@@ -125,6 +125,11 @@ def process_entity_post(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
+        if hasattr(entity, '_replies'):
+            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+                logger.info("process_replies - queued job for entity %s", entity.id)
+            else:
+                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content: %s", content)
     if content.visibility == Visibility.LIMITED:
@@ -137,12 +142,6 @@ def process_entity_post(entity: Any, profile: Profile):
                 logger.warning("No local receivers found for limited Post %s", content.fid)
         else:
             logger.warning("No receivers for limited Post %s", content.fid)
-
-    if hasattr(entity, '_replies'):
-        if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
-            logger.info("process_replies - queued job for entity %s", entity.id)
-        else:
-            logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
 
 
 # noinspection PyProtectedMember
@@ -170,6 +169,9 @@ def process_entity_comment(entity: Any, profile: Profile):
         )
         if remote_target:
             process_entities([remote_target])
+            # pixelfed uses the @ form in reply collections
+            if getattr(remote_target, 'url', None) == entity.target_id:
+                entity.target_id = remote_target.id
             try:
                 parent = Content.objects.fed(entity.target_id).get()
             except Content.DoesNotExist:
@@ -204,6 +206,11 @@ def process_entity_comment(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
+        if hasattr(entity, '_replies'):
+            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+                logger.info("process_replies - queued job for entity %s", entity.id)
+            else:
+                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content from comment entity: %s", content)
 
@@ -222,12 +229,6 @@ def process_entity_comment(entity: Any, profile: Profile):
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
         django_rq.enqueue(forward_entity, entity, root_parent.id)
-
-    if hasattr(entity, '_replies'):
-        if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
-            logger.info("process_replies - queued job for entity %s", entity.id)
-        else:
-            logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
 
 
 def _embed_entity_medias_to_post(children, text):
