@@ -7,9 +7,8 @@ Socialhome is missing features and needs a lot of polish on the UI side. If you 
 
 For guidelines how to contribute, please first read the :ref:`contributing` guide.
 
-* `Source code repo <https://git.feneas.org/socialhome/socialhome>`_
-* `Issue tracker <https://git.feneas.org/socialhome/socialhome/issues>`_
-* `Kanban board <https://git.feneas.org/socialhome/socialhome/boards>`_
+* `Source code repo <https://gitlab.com/jaywink/socialhome>`_
+* `Issue tracker <https://gitlab.com/jaywink/socialhome/-/issues>`_
 
 Environment setup
 -----------------

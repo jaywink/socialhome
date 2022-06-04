@@ -380,8 +380,6 @@ Default: not set
 Configure an optional relay instance endpoint to send outgoing content to,
 for example ``https://relay.domain.tld/receive/public``.
 
-For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
-
 SOCIALHOME_RELAY_SCOPE
 ......................
 
@@ -389,7 +387,6 @@ Default: ``none``
 
 Possible values ``all`` or ``none``. Defines at which level the defined relay is subscribed with.
 Set to ``none`` to disable the relay incoming subscription.
-For more info see `relay system <https://git.feneas.org/jaywink/social-relay>`_.
 
 SOCIALHOME_ROOT_PROFILE
 .......................

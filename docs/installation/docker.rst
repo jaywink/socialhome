@@ -17,9 +17,9 @@ In addition to the main image, the following are needed:
 * Nginx or similar to serve media and/or provide SSL
 
 There is an example
-`docker-compose.yml <https://git.feneas.org/socialhome/socialhome/tree/master/docker/prod>`_
+`docker-compose.yml <https://gitlab.com/jaywink/socialhome/-/tree/master/docker/prod>`_
 that shows how things can be set up. Socialhome environment variables can be used
 to point to an external Redis or PostgreSQL if need be. See :ref:`configuration`.
 
 Find the Socialhome images in the
-`Docker registry <https://git.feneas.org/socialhome/socialhome/container_registry>`_.
+`Docker registry <https://gitlab.com/jaywink/socialhome/container_registry>`_.

@@ -56,5 +56,3 @@ The stickers are contributed by `lostinlight <https://gitlab.com/distributopia/s
 .. image:: _static/brand/stickers/Socialhome.png
 .. image:: _static/brand/stickers/Socialhome-2.png
 .. image:: _static/brand/Sh-text-example.svg
-
-PDF's available `here <https://git.feneas.org/socialhome/socialhome/tree/master/docs/_static/brand/stickers>`_.
