@@ -26,11 +26,21 @@ Upgrade notes
 Added
 .....
 
+* Activitypub audio and video attachements rendering.
+
+* Activitypub reply collection processing.
+
+* Add configuration parameters for federation use of requests_cache with redis.
+
+* Add configuration parameter to enable get requests signature by federation.
+
 Changed
 .......
 
 * JSON-LD processed payloads with federation return aware datetime. Fix safe_make_aware to process only
   naive datetime.
+
+* Fetch reply parents up to the root parent.
 
 Fixed
 .....
