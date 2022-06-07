@@ -107,7 +107,7 @@ const StreamElement = {
                 resizeObs.observe(post, {attributes: true, subtree: true, childList: true})
                 // TODO: this only adds an event for the first video tag. Should find
                 // all video tags
-                const video = document.querySelector("video")
+                const video = post.querySelector("video")
                 video.onloadeddata = () => {
                     redraw()
                 }
