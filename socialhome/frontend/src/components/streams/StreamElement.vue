@@ -108,8 +108,10 @@ const StreamElement = {
                 // TODO: this only adds an event for the first video tag. Should find
                 // all video tags
                 const video = post.querySelector("video")
-                video.onloadeddata = () => {
-                    redraw()
+                if (video) {
+                    video.onloadeddata = () => {
+                        redraw()
+                    }
                 }
             }
         },
