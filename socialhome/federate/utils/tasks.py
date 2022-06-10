@@ -245,6 +245,7 @@ def _embed_entity_medias_to_post(children, text):
     for child in children:
         if isinstance(child, base.Image):
             name = child.name.replace('\n','&#10;')
+            name = name.replace('\"','&#34;')
             medias.append(f'![{safe_text(name)}]({safe_text(child.url)} "{safe_text(name)}") ')
         if isinstance(child, base.Audio):
             audio = f'<audio controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></audio>'
