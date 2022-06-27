@@ -13,7 +13,7 @@
     #   recommonmark
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
     # via -r requirements/requirements.txt
--e git+https://gitlab.com/jaywink/federation.git@a7642f6cc801175d8e902cb115ddfbaec16970a4#egg=federation==0.22.0
+-e git+https://gitlab.com/jaywink/federation.git@9290822902eafa158833d4c0ea5538db62364052#egg=federation==0.22.0
     # via -r requirements/requirements.txt
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
     # via -r requirements/requirements.txt
