@@ -9,15 +9,41 @@ Changelog
 Upgrade notes
 .............
 
+* Tweaks for python 3.10. In particular, circus, uwsgi and django-dynamic-preferences must
+  be updated. To run socialhome with python 3.10, follow these instructions:
+
+  * If using virtualenv, update it with
+
+    `python -m env ~/.virtualenvs/socialhome` # or whatever your virtenv path is
+
+  * If using virtualenvwrapper, it also must be updated with
+
+    `pip install -U virtualenvwrapper`
+
+  * Since the django-dynamic-preferences update comes with a migration,
+    it is strongly suggested to backup your DB (but you already do that, right?).
+
 Added
 .....
+
+* Activitypub audio and video attachements rendering.
+
+* Activitypub reply collection processing.
+
+* Add configuration parameters for federation use of requests_cache with redis.
+
+* Add configuration parameter to enable get requests signature by federation.
 
 Changed
 .......
 
+* JSON-LD processed payloads with federation return aware datetime. Fix safe_make_aware to process only
+  naive datetime.
+
+* Fetch reply parents up to the root parent.
+
 Fixed
 .....
-
 
 0.15.0 (2021-11-22)
 -------------------

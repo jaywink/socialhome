@@ -1,4 +1,5 @@
 import logging
+import datetime as dt
 from typing import Optional, List, Any
 
 import django_rq
@@ -110,7 +111,7 @@ def process_entity_post(entity: Any, profile: Profile):
         return
     values = {
         "fid": fid,
-        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -124,6 +125,11 @@ def process_entity_post(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
+        if hasattr(entity, '_replies'):
+            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+                logger.info("process_replies - queued job for entity %s", entity.id)
+            else:
+                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content: %s", content)
     if content.visibility == Visibility.LIMITED:
@@ -147,8 +153,34 @@ def process_entity_comment(entity: Any, profile: Profile):
     try:
         parent = Content.objects.fed(entity.target_id).get()
     except Content.DoesNotExist:
-        logger.warning("No target found for comment: %s", entity)
-        return
+        # Try fetching. If found, process and then try again
+        # This maybe useless as federation should walk up to the root
+        # and down the reply collection
+        logger.debug(
+            "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
+            entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
+        )
+        remote_target = retrieve_remote_content(
+            entity.target_id,
+            guid=entity.target_guid,
+            handle=entity.target_handle,
+            entity_type=entity.entity_type,
+            sender_key_fetcher=sender_key_fetcher,
+        )
+        if remote_target:
+            process_entities([remote_target])
+            # pixelfed uses the @ form in reply collections
+            if getattr(remote_target, 'url', None) == entity.target_id:
+                entity.target_id = remote_target.id
+            try:
+                parent = Content.objects.fed(entity.target_id).get()
+            except Content.DoesNotExist:
+                logger.warning("Comment target was fetched from remote, but it is still missing locally! Comment: %s",
+                               entity)
+                return
+        else:
+            logger.warning("No target found for comment even after fetching from remote: %s", entity)
+            return
     root_parent = parent
     if entity.root_target_id:
         try:
@@ -159,7 +191,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     if getattr(entity, "public", None) is not None:
         visibility = Visibility.PUBLIC if entity.public else Visibility.LIMITED
     values = {
-        "text": _embed_entity_images_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
         "author": profile,
         "visibility": visibility if visibility is not None else parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -174,6 +206,11 @@ def process_entity_comment(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
+        if hasattr(entity, '_replies'):
+            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+                logger.info("process_replies - queued job for entity %s", entity.id)
+            else:
+                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content from comment entity: %s", content)
 
@@ -194,22 +231,36 @@ def process_entity_comment(entity: Any, profile: Profile):
         django_rq.enqueue(forward_entity, entity, root_parent.id)
 
 
-def _embed_entity_images_to_post(children, text):
+def _embed_entity_medias_to_post(children, text):
     """Embed any entity `_children` of base.Image type to the text content as markdown.
+    Embed base.[Audio, Video] types to the text content as HTML5
 
-    Images are prefixed on top of the normal text content.
+    Medias are suffixed at the bottom of the normal text content.
 
     :param children: List of child entities
     :param values: Text for creating the Post
     :return: New text value to create the Post with
     """
-    images = []
+    medias = []
     for child in children:
         if isinstance(child, base.Image):
-            images.append(f"![{safe_text(child.name)}]({safe_text(child.url)}) ")
-    if images:
+            name = child.name.replace('\n','&#10;')
+            name = name.replace('\"','&#34;')
+            medias.append(f'![{safe_text(name)}]({safe_text(child.url)} "{safe_text(name)}") ')
+        if isinstance(child, base.Audio):
+            audio = f'<audio controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></audio>'
+            if getattr(child, 'name', None):
+                audio = f"<p>{safe_text(child.name)}</p>" + audio
+            medias.append(audio)
+        if isinstance(child, base.Video):
+            video = f'<video controls><source src="{safe_text(child.url)}" type="{safe_text(child.media_type)}"></video>'
+            if getattr(child, 'name', None):
+                video = f"<p>{safe_text(child.name)}</p>" + video
+            medias.append(video)
+
+    if medias:
         return "%s\n\n%s" % (
-            "".join(images), text
+            text, "".join(medias)
         )
     return text
 
@@ -320,7 +371,7 @@ def process_entity_share(entity, profile):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     # noinspection PyProtectedMember
-    values["text"] = _embed_entity_images_to_post(entity._children, values["text"])
+    values["text"] = _embed_entity_medias_to_post(entity._children, values["text"])
     fid = safe_text(entity.id)
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -336,6 +387,36 @@ def process_entity_share(entity, profile):
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
         django_rq.enqueue(forward_entity, entity, target_content.id)
+
+
+def process_replies(entity=None, fetch=False, delta=None):
+    # Process Activitypub reply collection
+    if fetch:
+        # Refresh entity
+        entity = retrieve_remote_content(entity.id)
+        if not entity: return
+
+
+    for reply in getattr(entity, '_replies', []):
+        try:
+            content = Content.objects.fed(reply).get()
+        except Content.DoesNotExist:
+            # Try to fetch and process
+            logger.debug(
+                "process_replies - fetching reply %s for entity %s", reply, entity.id)
+            remote_content = retrieve_remote_content(reply)
+            if remote_content:
+                process_entities([remote_content])
+    
+    # Using a delta increasing by a factor of two, refresh
+    # the replies up to 5 days after publication
+    delta = delta * 2 if delta else dt.timedelta(minutes=15)
+    if hasattr(entity, '_replies'):
+        if delta < dt.timedelta(5):
+            if django_rq.get_scheduler().enqueue_in(delta, process_replies, entity, True, delta):
+                logger.info("process_replies - queued refresh job for entity %s", entity.id)
+            else:
+                logger.warn("process_replies - failed to enqueue refresh job for entity %s", entity.id)
 
 
 def sender_key_fetcher(fid):
