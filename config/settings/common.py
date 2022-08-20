@@ -347,24 +347,32 @@ SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE
 # Content
 # These attributes on tags are kept on save for untrusted users
 SOCIALHOME_CONTENT_SAFE_ATTRS = {
-    'a': ['class', 'href', 'title'],
+    'a': ['class', 'href', 'title', 'target'],
     'abbr': ['title'],
     'acronym': ['title'],
-    'div': ['class'],
-    'img': ['src', 'title'],
+    'audio': ['controls'],
+    'canvas': ['class', 'width', 'height'],
+    'div': ['class', 'role', 'tabindex', 'style'],
+    'i': ['class', 'role'],
+    'img': ['src', 'title', 'class', 'alt', 'style'],
+    'source': ['src', 'type'],
     'span': ['class'],
     'table': ['class'],
     'td': ['class'],
     'th': ['class'],
     'tr': ['class'],
+    'video': ['class', 'role', 'src', 'loop', 'controls'],
 }
 # These tags are kept on save for untrusted users
 SOCIALHOME_CONTENT_SAFE_TAGS = [
     'a',
     'abbr',
+    'audio',
     'b',
     'blockquote',
     'br',
+    'button',
+    'canvas',
     'code',
     'dd',
     'div',
@@ -386,6 +394,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'pre',
     'q',
     'small',
+    'source',
     'span',
     'strong',
     'sub',
@@ -397,6 +406,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'thead',
     'tr',
     'ul',
+    'video',
 ]
 
 # Exports
@@ -420,6 +430,8 @@ SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORT
 SOCIALHOME_MATRIX_HOMESERVER = f"matrix.{SOCIALHOME_DOMAIN}"
 SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}"
 SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
+# Valid user name required for get requests signature by federation
+FEDERATION_USER = env("FEDERATION_USER", default=None)
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -605,11 +617,13 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
+    "federation_id": f'{SOCIALHOME_URL}/u/{FEDERATION_USER}/',
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",
     "get_profile_function": "socialhome.federate.utils.entities.get_profile",
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",
+    "redis": {"host": REDIS_HOST, "port": REDIS_PORT, "db": REDIS_DB, "password": REDIS_PASSWORD},
     "search_path": "/search/?q=",
     "tags_path": "/streams/tag/:tag:/",
 }

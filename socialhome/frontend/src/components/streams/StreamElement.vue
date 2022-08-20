@@ -105,6 +105,14 @@ const StreamElement = {
                 })
                 // eslint-disable-next-line object-curly-newline
                 resizeObs.observe(post, {attributes: true, subtree: true, childList: true})
+                // TODO: this only adds an event for the first video tag. Should find
+                // all video tags
+                const video = post.querySelector("video")
+                if (video) {
+                    video.onloadeddata = () => {
+                        redraw()
+                    }
+                }
             }
         },
         layoutAfterTwitterOEmbeds() {
