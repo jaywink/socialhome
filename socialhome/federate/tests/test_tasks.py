@@ -196,17 +196,6 @@ class TestSendProfileRetraction(SocialhomeTestCase):
             payload_logger=None,
         )
 
-    def test_limited_profile_retraction_not_sent_to_relay(self, mock_make, mock_send):
-        send_profile_retraction(self.limited_profile)
-        mock_send.assert_called_once_with(
-            "entity",
-            self.limited_profile.federable,
-            [
-                self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED),
-            ],
-            payload_logger=None,
-        )
-
     def test_non_local_profile_does_not_get_sent(self, mock_make, mock_send):
         send_profile_retraction(self.remote_profile)
         self.assertTrue(mock_send.called is False)

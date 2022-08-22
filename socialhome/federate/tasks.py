@@ -103,13 +103,6 @@ def send_content(content_id, activity_fid, recipient_id=None):
                 # If we have Matrix support enabled, also add the appservice
                 if settings.SOCIALHOME_MATRIX_ENABLED:
                     recipients.append(content.author.get_recipient_for_matrix_appservice())
-                if settings.SOCIALHOME_RELAY_ID:
-                    recipients.append({
-                        "endpoint": settings.SOCIALHOME_RELAY_ID,
-                        "fid": "",
-                        "public": True,
-                        "protocol": "diaspora"
-                    })
             recipients.extend(_get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
@@ -244,17 +237,7 @@ def send_content_retraction(content, author_id):
             # Don't send in development mode
             return
         if content.visibility == Visibility.PUBLIC:
-            recipients = []
-            if settings.SOCIALHOME_RELAY_ID:
-                recipients.append({
-                    "endpoint": settings.SOCIALHOME_RELAY_ID,
-                    "fid": "",
-                    "public": True,
-                    "protocol": "diaspora"
-                })
-            recipients.extend(
-                _get_remote_followers(author, content.visibility)
-            )
+            recipients = _get_remote_followers(author, content.visibility)
         else:
             recipients = _get_limited_recipients(author.fid, content)
 
