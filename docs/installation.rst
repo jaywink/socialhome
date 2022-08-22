@@ -35,7 +35,7 @@ These instructions are for a production installation. For development installati
 If you have issues following these instructions, please contact us via :ref:`community`.
 
 The recommended installation method is using the official
-`Docker images <https://git.feneas.org/socialhome/socialhome/container_registry>`_. Other guides
+`Docker images <https://gitlab.com/jaywink/socialhome/container_registry>`_. Other guides
 will possibly be out of date and will likely be removed from the official documentation
 at some point.
 
@@ -53,7 +53,7 @@ Available guides:
 Ubuntu via Ansible
 ------------------
 
-See this `Ansible role <https://git.feneas.org/socialhome/ansible-socialhome>`_.
+See this `Ansible role <https://github.com/jaywink/ansible-socialhome>`_.
 
 .. include:: installation/ubuntu.rst
 

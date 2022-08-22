@@ -10,4 +10,4 @@ shcli
 
 This is the official Python library and command line client.
 
-See documentation and code on `GitHub <https://git.feneas.org/socialhome/shcli>`_.
+See documentation and code on `GitHub <https://github.com/jaywink/shcli>`_.

@@ -197,7 +197,7 @@ def send_data_export_ready_notification(user_id):
     subject = _("Data export is ready for download")
     context = get_common_context()
     context.update({
-        "download_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("dynamic_preferences.user")),
+        "download_url": "%s%s" % (settings.SOCIALHOME_URL, reverse("dynamic_preferences:user")),
         "name": user.profile.name_or_handle,
         "subject": subject,
     })

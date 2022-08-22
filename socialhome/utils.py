@@ -53,6 +53,7 @@ def safe_make_aware(value, timezone=None):
     """Safely call Django's make_aware to get aware datetime.
 
     Makes sure DST doesn't cause problems."""
+    if value.tzinfo: return value
     if not timezone:
         timezone = settings.TIME_ZONE
     return make_aware(value, is_dst=is_dst(timezone))
