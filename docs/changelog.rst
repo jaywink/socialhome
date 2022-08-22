@@ -42,8 +42,14 @@ Changed
 
 * Fetch reply parents up to the root parent.
 
-Fixed
-.....
+Removed
+.......
+
+* Delivering to or receiving incoming Diaspora relay content has been removed.
+  The original Social-Relay project was ramped down quite a long ago and nothing
+  similar exists for the Diaspora ecosystem.
+
+  The settings ``SOCIALHOME_RELAY_ID`` and ``SOCIALHOME_RELAY_SCOPE`` can safely be removed.
 
 0.15.0 (2021-11-22)
 -------------------

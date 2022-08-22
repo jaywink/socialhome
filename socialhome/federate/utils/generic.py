@@ -50,7 +50,7 @@ def get_nodeinfo2_data():
             "software": "socialhome",
             "version": version,
         },
-        "relay": settings.SOCIALHOME_RELAY_SCOPE,
+        "relay": "none",
         "openRegistrations": settings.ACCOUNT_ALLOW_REGISTRATION,
     }
     if settings.SOCIALHOME_STATISTICS:
