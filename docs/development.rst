@@ -18,7 +18,7 @@ Instructions are for Ubuntu 16.04+ (+ simple Alpine 3.6 dependencies script). Pl
 Python Virtualenv
 .................
 
-Python 3.6 is the minimum supported version. Ensure the following are installed:
+Python 3.7 is the minimum supported version. Ensure the following are installed:
 
 * Python system dependencies
 * NodeJS (version 10)
