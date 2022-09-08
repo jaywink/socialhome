@@ -27,6 +27,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
             created_at=content.effective_modified,
+            times = {'created':content.created, 'modified':content.modified, 'edited':content.edited},
             guid=str(content.uuid),
             handle=content.author.handle,
             mxid=content.author.mxid,
@@ -44,6 +45,7 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
             target_id=content.parent.fid,
             root_target_id=content.root_parent.fid,
             created_at=content.effective_modified,
+            times = {'created':content.created, 'modified':content.modified, 'edited':content.edited},
             guid=str(content.uuid),
             handle=content.author.handle,
             target_guid=content.parent.guid,
@@ -181,6 +183,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             target_id=target_id,
             handle=handle,
             target_guid=obj.guid,
+            created_at=obj.effective_modified,
         )
     except Exception as ex:
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
