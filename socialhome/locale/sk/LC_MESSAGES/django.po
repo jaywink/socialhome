@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2021-08-20 21:34+0000\n"
+"PO-Revision-Date: 2022-09-12 06:17+0000\n"
 "Last-Translator: Marek Ľach <graweeld@googlemail.com>\n"
 "Language-Team: Slovak <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/sk/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 4.8-dev\n"
+"X-Generator: Weblate 4.14.1-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
@@ -118,11 +118,11 @@ msgstr ""
 
 #: socialhome/content/models.py:33
 msgid "Title"
-msgstr ""
+msgstr "Názov"
 
 #: socialhome/content/models.py:34
 msgid "Description"
-msgstr ""
+msgstr "Popis"
 
 #: socialhome/content/models.py:35
 msgid "Image URL"
@@ -131,7 +131,7 @@ msgstr ""
 #: socialhome/content/models.py:36 socialhome/content/models.py:47
 #: socialhome/content/models.py:155
 msgid "Modified"
-msgstr ""
+msgstr "Upravený"
 
 #: socialhome/content/models.py:46
 msgid "OEmbed HTML content"
@@ -139,11 +139,11 @@ msgstr ""
 
 #: socialhome/content/models.py:54 socialhome/users/models.py:138
 msgid "Name"
-msgstr ""
+msgstr "Meno"
 
 #: socialhome/content/models.py:55 socialhome/content/models.py:154
 msgid "Created"
-msgstr ""
+msgstr "Vytvorený"
 
 #: socialhome/content/models.py:92
 msgid "Text"
@@ -155,7 +155,7 @@ msgstr ""
 
 #: socialhome/content/models.py:98
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: socialhome/content/models.py:103 socialhome/users/models.py:151
 msgid "Federation ID"
@@ -163,11 +163,11 @@ msgstr ""
 
 #: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
-msgstr ""
+msgstr "Pripnutý na profil"
 
 #: socialhome/content/models.py:108
 msgid "Order"
-msgstr ""
+msgstr "Zoradenie"
 
 #: socialhome/content/models.py:111
 msgid "Service label"
