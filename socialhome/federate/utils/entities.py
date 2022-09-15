@@ -166,7 +166,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             actor_id = author.fid
             handle = author.handle
             if obj.content_type == ContentType.SHARE:
-                target_id = obj.activities.first().fid
+                target_id = obj.share_of.fid
             else:
                 target_id = obj.fid
         elif isinstance(obj, Profile):
@@ -178,6 +178,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             logger.warning("make_federable_retraction - Unknown object type %s", obj)
             return
         return base.Retraction(
+            id=obj.activities.first().fid,
             entity_type=entity_type,
             actor_id=actor_id,
             target_id=target_id,
@@ -205,6 +206,11 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
             public_key=profile.rsa_public_key,
             url=profile.url,
             created_at=profile.created,
+            times={
+                'created': profile.created, 
+                'updated': profile.modified,
+                'edited': False,
+            },
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
             handle=profile.handle or "",
