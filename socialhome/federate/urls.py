@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from federation.hostmeta.generators import NODEINFO_DOCUMENT_PATH
 
 from socialhome.federate.views import (
-    host_meta_view, webfinger_view, hcard_view, nodeinfo_well_known_view, nodeinfo_view, social_relay_view,
+    host_meta_view, webfinger_view, hcard_view, nodeinfo_well_known_view, nodeinfo_view,
     ReceivePublicView, ReceiveUserView, content_xml_view, content_fetch_view)
 
 app_name = 'federate'
@@ -19,7 +19,6 @@ urlpatterns = [
     url(r"^hcard/users/(?P<uuid>[^/]+)$", hcard_view, name="hcard"),
     url(r"^.well-known/nodeinfo$", nodeinfo_well_known_view, name="nodeinfo-wellknown"),
     url(NODEINFO_DOCUMENT_PATH.lstrip("/"), nodeinfo_view, name="nodeinfo"),
-    url(r"^.well-known/x-social-relay$", social_relay_view, name="social-relay"),
 
     # Payloads
     # Ensure post without trailing slash works, some Diaspora speaking servers do this

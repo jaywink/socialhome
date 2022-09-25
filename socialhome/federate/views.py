@@ -14,7 +14,7 @@ from django.views.generic import View
 from federation.entities.diaspora.utils import get_full_xml_representation
 from federation.hostmeta.generators import (
     generate_host_meta, generate_legacy_webfinger, generate_hcard, get_nodeinfo_well_known_document, NodeInfo,
-    SocialRelayWellKnown)
+)
 from federation.protocols.diaspora.magic_envelope import MagicEnvelope
 
 from socialhome import __version__ as version
@@ -109,18 +109,6 @@ def nodeinfo_view(request):
         metadata={"nodeName": site.name}
     )
     return JsonResponse(nodeinfo.doc)
-
-
-def social_relay_view(request):
-    """Generate a .well-known/x-social-relay document."""
-    scope = settings.SOCIALHOME_RELAY_SCOPE
-    if scope == 'none':
-        relay = SocialRelayWellKnown(subscribe=False, scope="")
-    elif scope == 'all':
-        relay = SocialRelayWellKnown(subscribe=True)
-    else:
-        return HttpResponseNotFound()
-    return JsonResponse(relay.doc)
 
 
 def content_xml_view(request, uuid):
