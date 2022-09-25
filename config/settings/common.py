@@ -369,6 +369,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'abbr',
     'audio',
     'b',
+    'bdi',
     'blockquote',
     'br',
     'button',

@@ -27,6 +27,7 @@ from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.enums import Visibility
+from socialhome.utils import get_full_url
 
 
 class OpenGraphCache(models.Model):
@@ -216,12 +217,30 @@ class Content(models.Model):
 
     def extract_mentions(self):
         # TODO locally created mentions should not have to be ripped out of text
-        # For now we just rip out diaspora style mentions until we have UI layer
+        # For now we just rip out diaspora and AP style mentions until we have UI layer
         from socialhome.users.models import Profile
-        mentions = re.findall(r'@{[^;]+; [\w.-]+@[^}]+}', self.text)
+        mentions = re.findall(r'@{?[\S ]?[^{}@]+[@;]?\s*[\w\-./@]+[\w/]+}?', self.text)
         if not mentions:
             self.mentions.clear()
-        handles = {s.split(';')[1].strip(' }') for s in mentions}
+
+        handles = set()
+        text = self.text
+        for mention in mentions:
+            handle = mention.lstrip('@{') if ';' not in mention else mention.split(';')[1]
+            handle = handle.strip('} ')
+            if handle.startswith('http'):
+                try:
+                    profile = Profile.objects.get(fid=handle)
+                    if not profile.handle: continue
+                    handle = profile.handle
+                except Profile.DoesNotExist:
+                    continue
+            handles.add(handle)
+            # sanitize text and let federation adjust for protocol
+            text = text.replace(mention, '@'+handle)
+        if self.text != text: 
+            self.text = text
+            Content.objects.filter(id=self.id).update(text=text)
 
         existing_handles = set(self.mentions.values_list('handle', flat=True))
         to_remove = existing_handles.difference(handles)
@@ -416,6 +435,13 @@ class Content(models.Model):
         text = self.get_and_linkify_tags()
         rendered = commonmark(text, ignore_html_blocks=True).strip()
         rendered = process_text_links(rendered)
+
+        for profile in self.mentions.values():
+            handle = profile.get('handle')
+            url = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.get('uuid')}))
+            print('render', handle, url)
+            rendered = rendered.replace('@'+handle, f'<a href="{url}">@{handle}</a>')
+
         if self.show_preview:
             if self.oembed:
                 rendered = "%s<br>%s" % (
@@ -430,6 +456,7 @@ class Content(models.Model):
                         "opengraph": self.opengraph,
                     })
                 )
+
         self.rendered = rendered
         Content.objects.filter(id=self.id).update(rendered=rendered)
 
