@@ -282,6 +282,13 @@ RQ_QUEUES = {
         "PASSWORD": REDIS_PASSWORD,
         "DEFAULT_TIMEOUT": 600,
     },
+    "replies": {
+        "HOST": REDIS_HOST,
+        "PORT": REDIS_PORT,
+        "DB": REDIS_DB,
+        "PASSWORD": REDIS_PASSWORD,
+        "DEFAULT_TIMEOUT": 600,
+    },
 }
 RQ_SHOW_ADMIN_LINK = True
 
@@ -619,6 +626,8 @@ FEDERATION = {
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",
     "get_profile_function": "socialhome.federate.utils.entities.get_profile",
+    "get_public_key_function": "socialhome.federate.utils.tasks.sender_key_fetcher",
+    "get_receivers_function": "socialhome.federate.utils.entities.get_receivers_for_content",
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",
     "redis": {"host": REDIS_HOST, "port": REDIS_PORT, "db": REDIS_DB, "password": REDIS_PASSWORD},

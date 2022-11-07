@@ -27,6 +27,7 @@ from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.enums import Visibility
+from socialhome.users.models import Profile
 from socialhome.utils import get_full_url
 
 
@@ -436,11 +437,11 @@ class Content(models.Model):
         rendered = commonmark(text, ignore_html_blocks=True).strip()
         rendered = process_text_links(rendered)
 
+        # Linkify mentions
         for profile in self.mentions.values():
             handle = profile.get('handle')
             url = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.get('uuid')}))
-            print('render', handle, url)
-            rendered = rendered.replace('@'+handle, f'<a href="{url}">@{handle}</a>')
+            rendered = rendered.replace('@'+handle, f'@<a class="mention" href="{url}">{handle}</a>')
 
         if self.show_preview:
             if self.oembed:
@@ -498,5 +499,18 @@ class Content(models.Model):
             if self.author == user.profile or self.visibility == Visibility.SITE:
                 return True
             if self.limited_visibilities.filter(id=user.profile.id).exists():
+                return True
+        return False
+
+    def visible_for_fed_user(self, fid):
+        """
+        Filter by visibiity to given remote fid
+        Assumes the fid is extracted from a signed AP request
+        """
+        if self.visibility == Visibility.PUBLIC:
+            return True
+        profile = Profile.objects.filter(fid=fid).first()
+        if profile:
+            if self.limited_visibilities.filter(id=profile.id).exists():
                 return True
         return False

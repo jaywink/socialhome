@@ -219,17 +219,33 @@ class ContentSerializer(serializers.ModelSerializer):
         if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
             return content
 
+        # Mentions now == recipients
+        existing_handles = set(content.mentions.values_list('handle', flat=True))
+        to_remove = existing_handles.difference(raw_recipients)
+        to_add = raw_recipients.difference(existing_handles)
+        for handle in to_remove:
+            try:
+                content.mentions.remove(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
+        for handle in to_add:
+            try:
+                content.mentions.add(Profile.objects.get(handle=handle))
+            except Profile.DoesNotExist:
+                pass
+
         if content.content_type == ContentType.CONTENT:
             # Collect new recipients
             recipients = Profile.objects.filter(
                 Q(handle__in=raw_recipients) | Q(fid__in=raw_recipients)
             ).visible_for_user(user)
 
-            # Add following, if included
+            # Add mutuals, if included
             if self.validated_data.get("include_following"):
-                recipients = recipients | user.profile.following.all()
+                recipients = recipients | user.profile.following.intersection(user.profile.followers.all())
                 recipients = recipients.distinct()
         elif content.content_type == ContentType.REPLY:
+            # Should mentions be added as recipients here too?
             recipients = content.root_parent.limited_visibilities.all()
         else:
             return content

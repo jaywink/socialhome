@@ -90,8 +90,9 @@ export default {
             "contentById",
         ]),
         prefillOnReply() {
-            let prefill = this.content.author.fid
-                ? `@{${this.content.author.fid}}` : `@{${this.content.author.handle}}`
+            // Prefer author's handles
+            let prefill = this.content.author.handle
+                ? `@${this.content.author.handle}` : `@{${this.content.author.fid}}`
             if (this.content.content_type === "reply") {
                 // Find root
                 let {content} = this
@@ -99,7 +100,7 @@ export default {
                     content = this.contentById(content.parent)
                 }
                 prefill += " "
-                prefill += content.author.fid ? `@{${content.author.fid}}` : `@{${content.author.handle}}`
+                prefill += content.author.handle ? `@${content.author.handle}` : `@{${this.content.author.fid}}`
             }
             return prefill += " "
         },

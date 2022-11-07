@@ -346,7 +346,7 @@ def send_follow_change(profile_id, followed_id, follow):
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     # Also trigger a profile send
-    send_profile(profile_id, recipients=recipients)
+    if follow: send_profile(profile_id, recipients=recipients)
 
 
 def send_profile(profile_id, recipients=None):

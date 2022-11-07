@@ -22,8 +22,8 @@ logger = logging.getLogger("socialhome")
 @receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
     # TODO remove extract mentions from here when we have UI for creating mentions
-    if instance.local:
-        instance.extract_mentions()
+    #if instance.local:
+    #    instance.extract_mentions()
     fetch_preview(instance)
     render_content(instance)
     created = kwargs.get("created")
@@ -65,6 +65,8 @@ def on_commit_mentioned(action, pks, instance):
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
             profile = Profile.objects.values('user_id').get(id=id)
             django_rq.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
+        # re-render content to linkify mentions
+        render_content(instance)
 
 
 @receiver(m2m_changed, sender=Content.mentions.through)

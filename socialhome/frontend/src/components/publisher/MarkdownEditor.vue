@@ -120,18 +120,25 @@ export default {
         },
         translations() {
             return {
+                bold: gettext("Bold"),
                 fullscreen: gettext("Toggle fullscreen (F11)"),
                 guide: gettext("Markdown guide"),
-                heading: gettext("Heading"),
+                "heading-dropdown": gettext("Heading"),
+                "horizontal-rule": gettext("Insert Horizontal Line"),
                 imageUploadFail: imageName => interpolate(gettext("The image %s couldn't be uploaded"), [imageName]),
                 insertImage: gettext("add an image using an url (Ctrl-Alt-I)"),
+                italic: gettext("Italic"),
+                link: gettext("Create Link"),
                 loading: gettext("Loading..."),
-                picture: gettext("Insert image"),
+                "ordered-list": gettext("Numbered List"),
+                "picture-dropdown": gettext("Insert image"),
                 preview: gettext("Toggle preview (Ctrl-P)"),
                 publisherHelpText: gettext("You can upload images using the camera icon or by dragging them "
                     + "to the text area. Valid file types: png/jpg/svg/gif."),
+                quote: gettext("Quote"),
+                "unordered-list": gettext("Generic List"),
                 uploadImage: gettext("Upload image"),
-                sideBySide: gettext("Toggle side by side (F9)"),
+                "side-by-side": gettext("Toggle side by side (F9)"),
             }
         },
         uploadedSize() {
@@ -176,7 +183,6 @@ export default {
                     name: "heading-dropdown",
                     action: this.toggleHeadingDropdown,
                     className: "fa fa-header fa-heading heading-dropdown-button",
-                    title: this.translations.heading,
                 },
                 "horizontal-rule",
                 "|",
@@ -195,34 +201,43 @@ export default {
                     name: "picture-dropdown",
                     action: this.pictureClickAction,
                     className: "fa fa-camera picture-dropdown-button",
-                    title: this.translations.picture,
                 },
                 {
                     name: "guide",
                     action: "https://www.markdownguide.org/basic-syntax/",
                     className: "fa fa-question-circle",
-                    title: this.translations.guide,
                 },
                 {
                     name: "fullscreen",
                     action: () => this.$editor.toggleFullScreen(),
                     className: "fa fa-arrows-alt no-disable no-mobile",
-                    title: this.translations.fullscreen,
                 },
                 {
                     name: "side-by-side",
                     action: () => this.$editor.toggleSideBySide(),
                     className: "fa fa-columns no-disable no-mobile",
-                    title: this.translations.sideBySide,
                 },
                 {
                     name: "preview",
                     action: () => this.$editor.togglePreview(),
                     className: "fa fa-eye no-disable",
-                    title: this.translations.preview,
                 },
             ],
         })
+
+        // Hack to set tooltip translations without having to explicitely
+        // define all toolbar buttons attributes.
+        // TODO: toolbar button translations? FontAwsome doesn't seem to be
+        // localized...
+        const toolbar = document.getElementsByClassName("editor-toolbar")[0]
+        toolbar.remove()
+        this.$editor.createToolbar(this.$editor.toolbar.map(element => {
+            if (this.translations[element.name]) {
+                // eslint-disable-next-line no-param-reassign
+                element.title = this.translations[element.name]
+            }
+            return element
+        }))
 
         // Sync with parent's v-model (see https://alligator.io/vuejs/add-v-model-support/)
         this.$editor.value(this.value)

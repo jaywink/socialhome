@@ -15,7 +15,7 @@ from django.views.generic.detail import SingleObjectMixin
 from federation.entities.activitypub.django.views import activitypub_object_view
 
 from socialhome.content.enums import ContentType
-from socialhome.content.forms import ContentForm
+#from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType
@@ -75,6 +75,14 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObje
     def get_success_url(self):
         return self.parent.get_absolute_url()
 
+    def get_json_context(self):
+        val = super().get_json_context()
+        mentions = f'@{self.parent.author.handle} '
+        if self.parent.root_parent:
+            mentions += f'@{self.parent.root_parent.author.handle} '
+        val.update({'mentions': mentions, 'rendered': self.parent.rendered})
+        return(val)
+        
 
 class ContentUpdateView(UserOwnsContentMixin, DetailView):
     model = Content
@@ -125,7 +133,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-@method_decorator(activitypub_object_view, name="get")
+@method_decorator(activitypub_object_view, name="dispatch")
 class ContentView(ContentVisibleForUserMixin, DetailView):
     model = Content
     template_name = "streams/base.html"
