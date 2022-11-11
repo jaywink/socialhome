@@ -14,11 +14,11 @@ Upgrade notes
 
   * If using virtualenv, update it with
 
-    `python -m env ~/.virtualenvs/socialhome` # or whatever your virtenv path is
+    ``python -m env ~/.virtualenvs/socialhome # or whatever your virtenv path is``
 
   * If using virtualenvwrapper, it also must be updated with
 
-    `pip install -U virtualenvwrapper`
+    ``pip install -U virtualenvwrapper``
 
   * Since the django-dynamic-preferences update comes with a migration,
     it is strongly suggested to backup your DB (but you already do that, right?).
@@ -33,6 +33,8 @@ Added
 * Add configuration parameters for federation use of requests_cache with redis.
 
 * Add configuration parameter to enable get requests signature by federation.
+
+* Add management command ``rq_job_types`` to list currently queued job types by count.
 
 Changed
 .......
