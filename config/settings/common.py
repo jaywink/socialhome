@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = (
     "allauth.socialaccount",
     "markdownx",
     "django_extensions",
+    "django_prometheus",
     "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
@@ -91,7 +92,9 @@ MIDDLEWARE = (
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 )
+
 
 # SILK
 # ----
@@ -101,6 +104,7 @@ def is_silky_request(request):
             path.startswith('jsreverse'):
         return False
     return True
+
 
 if SILKY_INSTALLED:
     SILKY_INTERCEPT_FUNC = is_silky_request
@@ -130,7 +134,11 @@ FIXTURE_DIRS = (
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome"),
+    "default": env.db(
+        "DATABASE_URL",
+        default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome",
+        engine="django_prometheus.db.backends.postgresql",
+    ),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -427,6 +435,11 @@ SOCIALHOME_MATRIX_APPSERVICE_SHORTCODE = env("SOCIALHOME_MATRIX_APPSERVICE_SHORT
 SOCIALHOME_MATRIX_HOMESERVER = f"matrix.{SOCIALHOME_DOMAIN}"
 SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}"
 SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
+# Set to true to enable /metrics endpoint for Prometheus metrics
+# NOTE! This endpoint has no auth - if you want, be sure to protect it
+# with basic auth in your load balancer, for example.
+SOCIALHOME_METRICS = env.bool("SOCIALHOME_METRICS", default=False)
+
 # Valid user name required for get requests signature by federation
 FEDERATION_USER = env("FEDERATION_USER", default=None)
 

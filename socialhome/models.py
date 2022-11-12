@@ -2,6 +2,7 @@ import reversion
 from django.db import models
 from django.utils.timezone import now
 from django_fsm import FSMField, transition
+from django_prometheus.models import ExportModelOperationsMixin
 from enumfields import EnumField
 from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
@@ -19,7 +20,7 @@ class ImageUpload(TimeStampedModel):
 
 
 @reversion.register(ignore_duplicates=True)
-class PolicyDocument(TimeStampedModel):
+class PolicyDocument(ExportModelOperationsMixin('policydocument'), TimeStampedModel):
     content = MarkdownxField()
     version = models.DateTimeField(auto_now=True)
     published_content = MarkdownxField(editable=False, blank=True)

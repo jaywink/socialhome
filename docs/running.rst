@@ -370,6 +370,16 @@ Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
 
+SOCIALHOME_METRICS
+..................
+
+Default: ``False``
+
+Exports metrics under ``/metrics`` regarding database usage,
+models and caches. See https://github.com/korfuri/django-prometheus for details.
+Note! The metrics endpoint has no authentication. Be sure to protect it by
+adding for example HTTP basic auth, if needed.
+
 SOCIALHOME_NODE_LIST_URL
 ........................
 

@@ -23,6 +23,7 @@ django-js-reverse
 django-memoize
 # Lock due to some regression with date fields, investigate later
 django-model-utils<4
+django-prometheus
 django-redis
 django-redisboard
 django-reversion
