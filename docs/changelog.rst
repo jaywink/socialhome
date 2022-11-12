@@ -36,13 +36,7 @@ Added
 
 * Add management command ``rq_job_types`` to list currently queued job types by count.
 
-* Allow exposing Prometheus metrics.
-
-  By default disabled, enable by setting ``SOCIALHOME_METRICS=True`` in your
-  environment. Exports metrics under ``/metrics`` regarding database usage,
-  models and caches. See https://github.com/korfuri/django-prometheus for details.
-  Note! The metrics endpoint has no authentication. Be sure to protect it by
-  adding for example HTTP basic auth, if needed.
+* Allow exposing Prometheus metrics. See the configuration guide on how to enable.
 
 Changed
 .......

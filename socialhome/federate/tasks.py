@@ -13,6 +13,7 @@ from federation.outbound import handle_send
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
+from socialhome.federate import metrics
 from socialhome.federate.models import Payload
 from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher
 from socialhome.federate.utils import make_federable_profile, get_outbound_payload_logger
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("socialhome")
 
 
+@metrics.TASK_TIME_RECEIVE_TASK.time()
 def receive_task(request, uuid=None):
     # type: (RequestType, Optional[str]) -> None
     """Process received payload."""
@@ -67,6 +69,7 @@ def receive_task(request, uuid=None):
     process_entities(entities)
 
 
+@metrics.TASK_TIME_SEND_CONTENT.time()
 def send_content(content_id, activity_fid, recipient_id=None):
     """
     Handle sending a Content object out via the federation layer.
@@ -153,6 +156,7 @@ def _get_limited_recipients(sender: str, content: Content) -> List:
     return profiles
 
 
+@metrics.TASK_TIME_SEND_REPLY.time()
 def send_reply(content_id, activity_fid):
     """
     Handle sending a Content object that is a reply out via the federation layer.
@@ -197,10 +201,11 @@ def send_reply(content_id, activity_fid):
     handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
 
 
+@metrics.TASK_TIME_SEND_SHARE.time()
 def send_share(content_id, activity_fid):
     """Handle sending a share of a Content object to the federation layer.
 
-    Currently we only deliver public shares.
+    Currently, we only deliver public shares.
     """
     try:
         content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
@@ -224,6 +229,7 @@ def send_share(content_id, activity_fid):
         logger.warning("send_share - No entity for %s", content)
 
 
+@metrics.TASK_TIME_SEND_CONTENT_RETRACTION.time()
 def send_content_retraction(content, author_id):
     """
     Handle sending of retractions for content.
@@ -251,6 +257,7 @@ def send_content_retraction(content, author_id):
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 
 
+@metrics.TASK_TIME_SEND_PROFILE_RETRACTION.time()
 def send_profile_retraction(profile):
     """Handle sending of retractions for profiles.
 
@@ -258,7 +265,7 @@ def send_profile_retraction(profile):
     outside for profiles which were never federated outside if we send for example
     SELF or SITE profile retractions.
 
-    This must be called as a pre_delete signal or it will fail.
+    This must be called as a pre_delete signal, or it will fail.
     """
     if profile.visibility not in (Visibility.PUBLIC, Visibility.LIMITED) or not profile.is_local:
         return
@@ -274,6 +281,7 @@ def send_profile_retraction(profile):
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
 
+@metrics.TASK_TIME_FORWARD_ENTITY.time()
 def forward_entity(entity, target_content_id):
     """Handle forwarding of an entity related to a target content.
 
@@ -314,6 +322,7 @@ def forward_entity(entity, target_content_id):
     )
 
 
+@metrics.TASK_TIME_SEND_FOLLOW_CHANGE.time()
 def send_follow_change(profile_id, followed_id, follow):
     """Handle sending of a local follow of a remote profile."""
     try:
@@ -345,6 +354,7 @@ def send_follow_change(profile_id, followed_id, follow):
     send_profile(profile_id, recipients=recipients)
 
 
+@metrics.TASK_TIME_SEND_PROFILE.time()
 def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
 

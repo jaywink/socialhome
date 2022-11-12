@@ -159,6 +159,31 @@ Current functionality:
 * Post local user public posts into Matrix side to their profile timeline rooms
   and to each hashtag room.
 
+.. _metrics:
+
+Metrics
+-------
+
+Prometheus metrics can be exported under ``/metrics``. If enabled, the following
+metrics are available:
+
+* Various ``django_`` prefixed metrics regarding database, views and caches.
+  See https://github.com/korfuri/django-prometheus for details.
+* Total count and time spent on the main federation tasks under
+  ``socialhome_federate_tasks_`` prefix.
+
+To enable, you'll need to set the following:
+
+* ``SOCIALHOME_METRICS=True`` to enable metrics
+* (non-Docker deployments) ``PROMETHEUS_MULTIPROC_DIR=/path/for/metrics`` where
+  ``/path/for/metrics`` is a path where Socialhome can write to from all the processes.
+  This is already taken care of in the provided Dockerfile.
+
+  Important! When restarting Socialhome, this path should always be cleaned.
+
+Note! The metrics endpoint has no authentication. Be sure to protect it by
+adding for example HTTP basic auth, if needed.
+
 .. _configuration:
 
 Configuration
@@ -375,10 +400,7 @@ SOCIALHOME_METRICS
 
 Default: ``False``
 
-Exports metrics under ``/metrics`` regarding database usage,
-models and caches. See https://github.com/korfuri/django-prometheus for details.
-Note! The metrics endpoint has no authentication. Be sure to protect it by
-adding for example HTTP basic auth, if needed.
+See :ref:`metrics`.
 
 SOCIALHOME_NODE_LIST_URL
 ........................
