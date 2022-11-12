@@ -54,6 +54,15 @@ Changed
 
 * Fetch reply parents up to the root parent.
 
+* Previously all jobs were placed in one background queue. Now three priority based queues exist:
+
+  * ``high`` for all federation related traffic
+  * ``default`` for populating streams and some other tasks
+  * ``low`` for sending notification emails and fetching replies for received content
+
+  If you have customized `circus.ini` in your environment, ensure to add the new
+  ``high`` and ``low`` queues, see the default ``circus.ini`` in ``config/circus.ini``.
+
 Removed
 .......
 

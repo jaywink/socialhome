@@ -41,12 +41,14 @@ def on_commit_profile_following_change(action, pks, instance):
             instance.create_activity(activity_type, object_id=_id)
         # Send out on the federation layer if local follower, remote followed/unfollowed
         if Profile.objects.filter(id=_id, user__isnull=True).exists() and instance.user:
-            django_rq.enqueue(
+            queue = django_rq.get_queue("high")
+            queue.enqueue(
                 send_follow_change, instance.id, _id, True if action == "post_add" else False
             )
         # Send out notification if local followed
         if action == "post_add" and Profile.objects.filter(id=_id, user__isnull=False):
-            django_rq.enqueue(send_follow_notification, instance.id, _id)
+            queue = django_rq.get_queue("low")
+            queue.enqueue(send_follow_notification, instance.id, _id)
 
 
 @receiver(m2m_changed, sender=Profile.following.through)
@@ -65,7 +67,8 @@ def profile_post_save(instance, **kwargs):
 def federate_profile(profile):
     """Send out local profiles to the federation layer."""
     try:
-        transaction.on_commit(lambda: django_rq.enqueue(send_profile, profile.id))
+        queue = django_rq.get_queue("high")
+        transaction.on_commit(lambda: queue.enqueue(send_profile, profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
 

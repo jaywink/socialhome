@@ -28,10 +28,11 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     created = kwargs.get("created")
     if created:
+        queue = django_rq.get_queue("low")
         if instance.content_type == ContentType.REPLY:
-            transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
+            transaction.on_commit(lambda: queue.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
-            transaction.on_commit(lambda: django_rq.enqueue(send_share_notification, instance.id))
+            transaction.on_commit(lambda: queue.enqueue(send_share_notification, instance.id))
         transaction.on_commit(lambda: update_streams_with_content(instance))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
@@ -63,8 +64,9 @@ def on_commit_mentioned(action, pks, instance):
     for id in pks:
         # Send out notification only if local mentioned
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
+            queue = django_rq.get_queue("low")
             profile = Profile.objects.values('user_id').get(id=id)
-            django_rq.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
+            queue.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
 
 
 @receiver(m2m_changed, sender=Content.mentions.through)
@@ -122,14 +124,15 @@ def federate_content(content: Content, recipient: Profile = None, activity: Acti
     # TODO also use activity type for federating?
     """
     recipient_id = recipient.id if recipient else None
+    queue = django_rq.get_queue("high")
     try:
         if content.content_type == ContentType.REPLY:
-            django_rq.enqueue(send_reply, content.id, activity.fid)
+            queue.enqueue(send_reply, content.id, activity.fid)
         elif content.content_type == ContentType.SHARE:
-            django_rq.enqueue(send_share, content.id, activity.fid)
+            queue.enqueue(send_share, content.id, activity.fid)
         else:
             if content.visibility == Visibility.LIMITED and not recipient_id:
                 return
-            django_rq.enqueue(send_content, content.id, activity.fid, recipient_id=recipient_id)
+            queue.enqueue(send_content, content.id, activity.fid, recipient_id=recipient_id)
     except Exception as ex:
         logger.exception("Failed to federate_content %s: %s", content, ex)
