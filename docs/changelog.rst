@@ -38,6 +38,14 @@ Added
 
 * Allow exposing Prometheus metrics. See the configuration guide on how to enable.
 
+* Add ``console`` log target and possibility to configure logging level for any log target.
+
+  The option ``SOCIALHOME_SYSLOG_LEVEL`` is now deprecated and will be removed in
+  a coming release. ``SOCIALHOME_LOG_LEVEL`` determines the logging level for whatever
+  the logging target happens to be.
+
+  The Docker image default target is ``console``.
+
 Changed
 .......
 

@@ -126,16 +126,16 @@ if env('SENTRY_DSN', default=None):
     LOGGING['loggers']['federation']['handlers'].append('sentry')
     LOGGING['loggers']['rq_scheduler.scheduler']['handlers'].append('sentry')
     LOGGING['root'] = {
-        'level': 'WARNING',
+        'level': env("SOCIALHOME_LOG_LEVEL", default="INFO"),
         'handlers': ['sentry', log_target],
     }
     LOGGING['loggers']['raven'] = {
-        'level': 'DEBUG',
+        'level': env("SOCIALHOME_LOG_LEVEL", default="INFO"),
         'handlers': [log_target],
         'propagate': False,
     }
     LOGGING['loggers']['sentry.errors'] = {
-        'level': 'DEBUG',
+        'level': env("SOCIALHOME_LOG_LEVEL", default="INFO"),
         'handlers': [log_target],
         'propagate': False,
     }

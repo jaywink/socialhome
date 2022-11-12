@@ -376,17 +376,25 @@ Default: ``False``
 
 Set this to ``True`` to disable the Django admin error emails in production.
 
+SOCIALHOME_LOG_LEVEL
+....................
+
+Default: ``INFO``
+
+Define the logging level logging. Possible options: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``.
+
 .. _config-log-target:
 
 SOCIALHOME_LOG_TARGET
 .....................
 
-Default: ``file``
+Default: ``file`` (``console`` for the Docker image)
 
 Define target for Django and application logs. Possible options:
 
 * ``file``, logs will go to a file defined in ``SOCIALHOME_LOGFILE``. Note, due to multiple processes logging to the same file, this file log is only really useful for tailing or if running different processes on separate containers or machines.
 * ``syslog``, logs to syslog, to the ``local7`` facility.
+* ``console``, good for Docker environments.
 
 SOCIALHOME_LOGFILE
 ..................
@@ -472,6 +480,8 @@ Define the logging facility for syslog, if ``SOCIALHOME_LOG_TARGET`` is set to `
 
 SOCIALHOME_SYSLOG_LEVEL
 .......................
+
+*Deprecated: Use ``SOCIALHOME_LOG_LEVEL`` instead!*
 
 Default: ``INFO``
 

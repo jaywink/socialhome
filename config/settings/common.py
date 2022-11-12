@@ -483,8 +483,8 @@ MARKDOWNX_UPLOAD_MAX_SIZE = 20 * 1024 * 1024
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
 log_target = env("SOCIALHOME_LOG_TARGET", default="file")
-if log_target not in ("file", "syslog"):
-    raise environ.ImproperlyConfigured("If set, SOCIALHOME_LOG_TARGET must be either 'file' or 'syslog'.")
+if log_target not in ("file", "syslog", "console"):
+    raise environ.ImproperlyConfigured("If set, SOCIALHOME_LOG_TARGET must be either 'file', 'syslog' or 'console'.")
 
 LOGGING = {
     "version": 1,
@@ -492,9 +492,6 @@ LOGGING = {
     "filters": {
         "require_debug_false": {
             "()": "django.utils.log.RequireDebugFalse",
-        },
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
         },
     },
     "formatters": {
@@ -510,14 +507,13 @@ LOGGING = {
             "class": "django.utils.log.AdminEmailHandler"
         },
         "console": {
-            "level": "DEBUG",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "class": "logging.StreamHandler",
-            "filters": ["require_debug_true"],
             "formatter": "verbose",
         },
         "file": {
             "filename": env("SOCIALHOME_LOGFILE", default="/tmp/socialhome.log"),
-            "level": "DEBUG",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "verbose",
             "maxBytes": 10485760,  # 10mb
@@ -527,30 +523,30 @@ LOGGING = {
     "loggers": {
         "django.request": {
             "handlers": [log_target],
-            "level": "ERROR",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "propagate": True,
         },
         "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console", log_target],
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
+            "handlers": [log_target],
             "propagate": True,
         },
         "django": {
-            "level": "ERROR",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "handlers": [log_target, "mail_admins"],
         },
         "socialhome": {
-            "level": "DEBUG",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "handlers": [log_target],
             "propagate": False,
         },
         "federation": {
-            "level": "DEBUG",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "handlers": [log_target],
             "propagate": False,
         },
         "rq_scheduler.scheduler": {
-            "level": "ERROR",
+            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "handlers": [log_target],
             "propagate": False,
         },
@@ -558,8 +554,12 @@ LOGGING = {
 }
 
 if log_target == "syslog":
+    if env("SOCIALHOME_SYSLOG_LEVEL", default=None):
+        syslog_log_level = env("SOCIALHOME_SYSLOG_LEVEL", default=None)
+    else:
+        syslog_log_level = env("SOCIALHOME_LOG_LEVEL", default=None)
     LOGGING["handlers"]["syslog"] = {
-        "level": env("SOCIALHOME_SYSLOG_LEVEL", default="INFO"),
+        "level": syslog_log_level,
         "class": "logging.handlers.SysLogHandler",
         "facility": env("SOCIALHOME_SYSLOG_FACILITY", default="local7"),
         "formatter": "verbose",

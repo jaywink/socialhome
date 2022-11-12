@@ -60,5 +60,6 @@ ENV DJANGO_ACCOUNT_ALLOW_REGISTRATION=False
 ENV DJANGO_ALLOWED_HOSTS socialhome.local
 ENV DBHOST=db
 ENV PROMETHEUS_MULTIPROC_DIR=/tmp/socialhome-metrics
+ENV SOCIALHOME_LOG_TARGET=console
 
 CMD circusd /app/config/circus.ini
