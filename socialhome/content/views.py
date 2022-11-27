@@ -62,6 +62,9 @@ class ContentCreateView(LoginRequiredMixin, TemplateView):
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
         }
 
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
 
 class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObjectMixin):
     is_reply = True
@@ -77,9 +80,10 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObje
 
     def get_json_context(self):
         val = super().get_json_context()
-        mentions = f'@{self.parent.author.handle} '
-        if self.parent.root_parent:
-            mentions += f'@{self.parent.root_parent.author.handle} '
+        mentions = f'@{self.object.author.finger} '
+        if self.object.root_parent:
+            if self.object.author.finger != self.object.root_parent.author.finger:
+                mentions += f'@{self.object.root_parent.author.finger} '
         val.update({'mentions': mentions, 'rendered': self.parent.rendered})
         return(val)
         

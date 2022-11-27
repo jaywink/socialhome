@@ -184,7 +184,7 @@ class Content(models.Model):
         if self.pk:
             # Reply count
             share_ids = Content.objects.filter(share_of=self).values_list("id", flat=True)
-            self.reply_count = self.all_children.count() + Content.objects.filter(parent_id__in=share_ids).count()
+            self.reply_count = self.children.count() + Content.objects.filter(parent_id__in=share_ids).count()
             # Share count
             self.shares_count = self.shares.count()
             if commit:
@@ -439,7 +439,7 @@ class Content(models.Model):
 
         # Linkify mentions
         for profile in self.mentions.values():
-            handle = profile.get('handle')
+            handle = profile.get('finger')
             url = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.get('uuid')}))
             rendered = rendered.replace('@'+handle, f'@<a class="mention" href="{url}">{handle}</a>')
 

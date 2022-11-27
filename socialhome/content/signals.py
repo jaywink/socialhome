@@ -2,7 +2,7 @@ import logging
 
 import django_rq
 from django.db import transaction
-from django.db.models.signals import post_save, m2m_changed, pre_delete
+from django.db.models.signals import post_save, m2m_changed, pre_delete, post_delete
 from django.dispatch import receiver
 from federation.entities.activitypub.enums import ActivityType
 
@@ -32,7 +32,7 @@ def content_post_save(instance, **kwargs):
             transaction.on_commit(lambda: django_rq.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: django_rq.enqueue(send_share_notification, instance.id))
-        transaction.on_commit(lambda: update_streams_with_content(instance))
+    transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
         activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
@@ -52,6 +52,11 @@ def federate_content_retraction(instance, **kwargs):
             logger.exception("Failed to federate_content_retraction %s: %s", instance, ex)
 
 
+@receiver(post_delete, sender=Content)
+def update_counts(instance, **kwargs):
+    instance.cache_related_object_data()
+
+
 def fetch_preview(content):
     try:
         fetch_content_preview(content)
@@ -65,8 +70,6 @@ def on_commit_mentioned(action, pks, instance):
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
             profile = Profile.objects.values('user_id').get(id=id)
             django_rq.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
-        # re-render content to linkify mentions
-        render_content(instance)
 
 
 @receiver(m2m_changed, sender=Content.mentions.through)

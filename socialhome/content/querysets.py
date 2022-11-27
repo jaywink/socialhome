@@ -30,8 +30,8 @@ class ContentQuerySet(models.QuerySet):
         Returns the direct replies and all replies for shares.
         """
         qs = self.filter(content_type=ContentType.REPLY).visible_for_user(user)
-        ids = qs.filter(root_parent_id=parent_id).values_list("id", flat=True)
-        share_ids = qs.filter(root_parent__share_of_id=parent_id).values_list("id", flat=True)
+        ids = qs.filter(parent_id=parent_id).values_list("id", flat=True)
+        share_ids = qs.filter(parent__share_of_id=parent_id).values_list("id", flat=True)
         all_ids = list(ids) + list(share_ids)
         return qs.filter(id__in=all_ids).order_by("created")
 
@@ -75,7 +75,7 @@ class ContentQuerySet(models.QuerySet):
         profile = user.profile
         following_ids = profile.following.values_list("id", flat=True)
         share = Content.objects.filter(share_of=OuterRef("id")).order_by('-id')
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         qs = qs.filter(
@@ -92,13 +92,13 @@ class ContentQuerySet(models.QuerySet):
         return qs.visible_for_user(user)
 
     def limited(self, user, single_id: int = None):
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         return qs.visible_for_user(user).filter(visibility=Visibility.LIMITED)
 
     def local(self, user, single_id: int = None):
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         return qs.visible_for_user(user).filter(local=True)
@@ -116,7 +116,7 @@ class ContentQuerySet(models.QuerySet):
         from socialhome.content.models import Content
         if not profile.visible_to_user(user):
             return Content.objects.none()
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         ids = qs.filter(author=profile).values_list("id", flat=True)
@@ -159,7 +159,7 @@ class ContentQuerySet(models.QuerySet):
         return self.profile_by_attr(attr, value, user, include_shares=False).pinned()
 
     def public(self, single_id: int = None):
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         return qs.filter(visibility=Visibility.PUBLIC)
@@ -169,7 +169,7 @@ class ContentQuerySet(models.QuerySet):
         return qs.order_by("created")
 
     def tag(self, tag, user, single_id: int = None):
-        qs = self.top_level()
+        qs = self.top_level(single_id)
         if single_id:
             qs = qs.filter(id=single_id)
         return qs.visible_for_user(user).filter(tags=tag)
@@ -186,13 +186,14 @@ class ContentQuerySet(models.QuerySet):
         # type: (User, int) -> ContentQuerySet
         if not user.is_authenticated:
             return self.none()
-        qs = self.top_level().visible_for_user(user)
+        qs = self.top_level(single_id).visible_for_user(user)
         if single_id:
             qs = qs.filter(id=single_id)
         return qs.filter(tags__in=user.profile.followed_tags.all())
 
-    def top_level(self):
+    def top_level(self, single_id=None):
         # type: () -> ContentQuerySet
+        if single_id: return self.filter(content_type__in=[ContentType.CONTENT,ContentType.REPLY])
         return self.filter(content_type=ContentType.CONTENT)
 
     def visible_for_user(self, user):

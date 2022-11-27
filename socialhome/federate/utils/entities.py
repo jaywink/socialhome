@@ -16,6 +16,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
+from socialhome.users.utils import set_profile_finger
 
 logger = logging.getLogger("socialhome")
 
@@ -261,6 +262,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
 def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
+    set_profile_finger(profile)
     try:
         return base.Profile(
             raw_content="",

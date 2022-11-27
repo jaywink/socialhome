@@ -34,6 +34,17 @@ Added
 
 * Add configuration parameter to enable get requests signature by federation.
 
+* Threaded replies.
+
+* Dynamic update of the reply and share counts.
+
+* Provide to and cc properties to federation for outbound AP payloads.
+
+* Initial work on providing responses to AP collections.
+
+* Enable signature verification for remote AP GET requests. Allows limited content access for
+  valid signatures.
+
 Changed
 .......
 
@@ -41,6 +52,18 @@ Changed
   naive datetime.
 
 * Fetch reply parents up to the root parent.
+
+* Limited content recipients are now extracted from parsing mentions from UI 
+  for both contents and replies (ignored for limited visibility replies).
+
+* As a result of the change described above, mentions no longer need to 
+  be extracted on content save.
+
+* Show reply and share counts for replies.
+
+* Prefill the full reply editor with parent and root parent mentions.
+
+* The reply box is now functional for limited replies.
 
 Removed
 .......
@@ -50,6 +73,14 @@ Removed
   similar exists for the Diaspora ecosystem.
 
   The settings ``SOCIALHOME_RELAY_ID`` and ``SOCIALHOME_RELAY_SCOPE`` can safely be removed.
+
+Fixed
+.....
+
+* Fix limited reply retractions not being sent by adding the remote content author to
+  the limited_visibilities.
+
+* Update reply and share counts for local content retractions.
 
 0.15.0 (2021-11-22)
 -------------------

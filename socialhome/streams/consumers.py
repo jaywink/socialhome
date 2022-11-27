@@ -11,7 +11,8 @@ from socialhome.content.models import Content
 def notify_listeners(content: Content, keys: Set) -> None:
     """Send out to listening consumers."""
     channel_layer = get_channel_layer()
-    data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
+    data = {"type": "notification", "payload": {"event": "new", "id": content.id,
+        "parentId": getattr(content.parent, 'id', None)}}
     for key in keys:
         async_to_sync(channel_layer.group_send)(key, data)
 

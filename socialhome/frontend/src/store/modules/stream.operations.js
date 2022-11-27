@@ -8,9 +8,14 @@ const streamMutations = {
     disableLoadMore(state, contentId) {
         Vue.set(state.contents[contentId], "hasLoadMore", false)
     },
-    receivedNewContent(state, contentId) {
-        if (state.unfetchedContentIds.indexOf(contentId) === -1) {
-            state.unfetchedContentIds.unshift(contentId)
+    receivedNewContent(state, payload) {
+        const {contentId, parentId} = payload
+        if (parentId === null) {
+            if (state.unfetchedContentIds.indexOf(contentId) === -1) {
+                state.unfetchedContentIds.unshift(contentId)
+            }
+        } else if (state.allContentIds.indexOf(contentId) === -1 && state.contents[parentId] !== undefined) {
+            state.contents[parentId].reply_count += 1
         }
     },
     setLayoutDoneAfterTwitterOEmbeds(state, status) {
@@ -34,8 +39,8 @@ const streamActions = {
     disableLoadMore({commit}, contentId) {
         commit("disableLoadMore", contentId)
     },
-    receivedNewContent({commit}, newContentLengh) {
-        commit("receivedNewContent", newContentLengh)
+    receivedNewContent({commit}, payload) {
+        commit("receivedNewContent", payload)
     },
     setLayoutDoneAfterTwitterOEmbeds({commit}, status) {
         commit("setLayoutDoneAfterTwitterOEmbeds", status)
@@ -62,15 +67,9 @@ const streamGetters = {
     },
     replies: state => content => {
         const replies = []
-        if (content.content_type === "content") {
-            state.contents[content.id].replyIds.forEach(id => {
-                replies.push(state.contents[id])
-            })
-        } else if (content.content_type === "share") {
-            state.contents[content.id].replyIds.forEach(id => {
-                replies.push(state.contents[id])
-            })
-        }
+        state.contents[content.id].replyIds.forEach(id => {
+            replies.push(state.contents[id])
+        })
         return replies
     },
     shares: state => contentId => {

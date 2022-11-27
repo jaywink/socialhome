@@ -133,8 +133,10 @@ def process_entity_post(entity: Any, profile: Profile):
     else:
         logger.info("Updated Content: %s", content)
     if content.visibility == Visibility.LIMITED:
+        # add author to visibilities for local reply retractions to work.
+        receivers = [profile]
         if entity._receivers:
-            receivers = get_profiles_from_receivers(entity._receivers)
+            receivers.extend(get_profiles_from_receivers(entity._receivers))
             if len(receivers):
                 content.limited_visibilities.set(receivers)
                 logger.info("Added visibility to Post %s to %s", content.fid, receivers)
@@ -390,6 +392,7 @@ def process_entity_share(entity, profile):
 
 
 def process_replies(entity=None, fetch=False, delta=None):
+    if settings.DEBUG: return
     # Process Activitypub reply collection
     if fetch:
         # Refresh entity

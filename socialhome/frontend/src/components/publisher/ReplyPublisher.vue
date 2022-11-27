@@ -64,7 +64,6 @@ export default {
                 ...this.model,
                 parent: this.parentId,
             }
-
             return this.$store.dispatch("publisher/publishReply", payload)
         },
     },

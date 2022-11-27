@@ -17,13 +17,16 @@ export default {
         content: {
             type: Object, required: true,
         },
+        parentVisibility: {
+            type: String, default: "public",
+        },
     },
     computed: {
         showShareAction() {
             if (!this.$store.state.application.isUserAuthenticated) {
                 return false
             }
-            return !this.content.user_is_author && this.content.visibility === "public"
+            return this.parentVisibility === "public"
         },
         translations() {
             return {

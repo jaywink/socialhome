@@ -50,6 +50,9 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             qs = qs.exclude(visibility=Visibility.LIMITED)
         return qs
 
+    #@action(detail=True, methods=["get"])
+    #def read(self, request, uuid=None):
+
     @action(detail=True, methods=["post"])
     def follow(self, request, uuid=None):
         try:

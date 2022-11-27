@@ -1,5 +1,6 @@
 import re
 from typing import Dict, Any, Set, List
+import traceback
 
 from django.db.models import Q
 from django.utils.translation import ngettext as _
@@ -10,7 +11,8 @@ from rest_framework.fields import SerializerMethodField, BooleanField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
-from socialhome.content.utils import safe_text_for_markdown
+from socialhome.content.signals import render_content
+from socialhome.content.utils import safe_text_for_markdown, update_counts
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.users.serializers import LimitedProfileSerializer
@@ -18,9 +20,6 @@ from socialhome.users.serializers import LimitedProfileSerializer
 
 class RecipientsField(serializers.Field):
     def get_value(self, dictionary: Dict[str, Any]) -> Set[str]:
-        if dictionary.get("visibility", Visibility.PUBLIC.value) != Visibility.LIMITED.value:
-            return set()
-
         raw_recipients = set()
         for r in dictionary.get("recipients", ""):
             r2 = r.strip()
@@ -31,14 +30,20 @@ class RecipientsField(serializers.Field):
 
     def get_attribute(self, instance: Content) -> Set[str]:
         """
-        Add the previous values from limited visibilities for existing limited content.
+        Add the mentions for public content or
+        add the previous values from limited visibilities for existing limited content.
         """
-        handles = instance.limited_visibilities.filter(fid__isnull=True).order_by("id").values_list("handle", flat=True)
-        fids = instance.limited_visibilities.filter(handle__isnull=True).order_by("id").values_list("fid", flat=True)
-        both = instance.limited_visibilities.filter(
-            handle__isnull=False, fid__isnull=False,
-        ).order_by("id").values_list("handle", flat=True)
-        return set(list(handles) + list(fids) + list(both))
+        if instance.visibility == Visibility.LIMITED:
+            fingers = instance.limited_visibilities.filter(finger__isnull=False).order_by("id").values_list("finger", flat=True)
+            # Legacy?
+            handles = instance.limited_visibilities.filter(fid__isnull=True).order_by("id").values_list("handle", flat=True)
+            fids = instance.limited_visibilities.filter(handle__isnull=True).order_by("id").values_list("fid", flat=True)
+            both = instance.limited_visibilities.filter(
+                handle__isnull=False, fid__isnull=False,
+            ).order_by("id").values_list("handle", flat=True)
+            return set(list(handles) + list(fids) + list(both) + list(fingers))
+        else:
+            return set(instance.mentions.all().values_list("finger", flat=True))
 
     def to_internal_value(self, data: Set[str]) -> Set[str]:
         return data
@@ -185,6 +190,7 @@ class ContentSerializer(serializers.ModelSerializer):
         return value
 
     def to_representation(self, instance: Content) -> Dict[str, Any]:
+        update_counts(instance)
         result = dict(super().to_representation(instance))
         if not self.get_user_is_author(instance):
             result["recipients"] = ""
@@ -216,28 +222,31 @@ class ContentSerializer(serializers.ModelSerializer):
 
         content = super().save(**kwargs)
 
-        if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
-            return content
-
-        # Mentions now == recipients
-        existing_handles = set(content.mentions.values_list('handle', flat=True))
+        # Mentions now == recipients entered through the UI
+        existing_handles = set(content.mentions.values_list('finger', flat=True))
         to_remove = existing_handles.difference(raw_recipients)
         to_add = raw_recipients.difference(existing_handles)
         for handle in to_remove:
             try:
-                content.mentions.remove(Profile.objects.get(handle=handle))
+                content.mentions.remove(Profile.objects.get(finger=handle))
             except Profile.DoesNotExist:
                 pass
         for handle in to_add:
             try:
-                content.mentions.add(Profile.objects.get(handle=handle))
+                content.mentions.add(Profile.objects.get(finger=handle))
             except Profile.DoesNotExist:
                 pass
+        # Linkify mentions
+        render_content(content)
+
+        if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
+            return content
 
         if content.content_type == ContentType.CONTENT:
             # Collect new recipients
+            # TODO: maybe filtering only on finger is enough now?
             recipients = Profile.objects.filter(
-                Q(handle__in=raw_recipients) | Q(fid__in=raw_recipients)
+                Q(handle__in=raw_recipients) | Q(finger__in=raw_recipients) | Q(fid__in=raw_recipients)
             ).visible_for_user(user)
 
             # Add mutuals, if included
@@ -315,7 +324,7 @@ class ContentSerializer(serializers.ModelSerializer):
             })
 
         recipient_profiles = Profile.objects.filter(
-            Q(handle__in=value) | Q(fid__in=value)
+            Q(handle__in=value) | Q(fid__in=value) | Q(finger__in=value)
         ).visible_for_user(user)
 
         # TODO we should probably try to lookup missing ones over the network first before failing
