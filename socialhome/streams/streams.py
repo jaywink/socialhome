@@ -75,9 +75,15 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
     cache_keys = []
     notify_keys = set()
     # Cache for each active user`
+    counter = 0
     for user in qs.iterator():
+        counter += 1
         check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
                               through.content_type == ContentType.SHARE)
+    logger.info(
+        "Stream.add_to_stream_for_users - checked stream %s for %s users, adding to %s cache keys",
+        stream_cls_name, counter, len(cache_keys),
+    )
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
