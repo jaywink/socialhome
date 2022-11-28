@@ -457,6 +457,8 @@ Amount of items to keep in stream precaches, per user, per stream. Increasing th
 
 Note the amount actually stored can temporarily go over the limit. Cache trimming is done as a daily job, not every time a new item needs to be added to the cache.
 
+Setting this to zero will disable precache tasks.
+
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS
 .........................................
 
