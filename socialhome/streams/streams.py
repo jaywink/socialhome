@@ -456,13 +456,13 @@ class TagsStream(BaseStream):
 
 CACHED_STREAM_CLASSES = (
     FollowedStream,
-    ProfileAllStream,
     TagsStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
     LimitedStream,
     LocalStream,
+    ProfileAllStream,
     ProfilePinnedStream,
     PublicStream,
     TagStream,
