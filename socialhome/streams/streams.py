@@ -139,6 +139,9 @@ def update_streams_with_content(content):
 
     First adds to the author streams, then queues the rest of the user streams to a background job.
     """
+    if not settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
+        # Streams precaching not enabled
+        return
     # Store current acting profile
     acting_profile = content.author
     # The original is the "through" always, has importance in shares
