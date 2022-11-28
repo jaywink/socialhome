@@ -127,7 +127,7 @@ def process_entity_post(entity: Any, profile: Profile):
         logger.info("Saved Content: %s", content)
         if hasattr(entity, '_replies'):
             queue = django_rq.get_queue("low")
-            if queue.enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
                 logger.warning("process_replies - failed to enqueue job for entity %s", entity.id)
@@ -209,7 +209,7 @@ def process_entity_comment(entity: Any, profile: Profile):
         logger.info("Saved Content from comment entity: %s", content)
         if hasattr(entity, '_replies'):
             queue = django_rq.get_queue("low")
-            if queue.enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
                 logger.warning("process_replies - failed to enqueue job for entity %s", entity.id)
@@ -418,7 +418,7 @@ def process_replies(entity=None, fetch=False, delta=None):
     if hasattr(entity, '_replies'):
         if delta < dt.timedelta(5):
             queue = django_rq.get_queue("low")
-            if queue.enqueue_in(delta, process_replies, entity, True, delta):
+            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, entity, True, delta):
                 logger.info("process_replies - queued refresh job for entity %s", entity.id)
             else:
                 logger.warning("process_replies - failed to enqueue refresh job for entity %s", entity.id)
