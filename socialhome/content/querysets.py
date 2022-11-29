@@ -2,6 +2,7 @@ from typing import Dict, Tuple, TYPE_CHECKING, Any
 
 from django.db import models
 from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNotExist
+from django.db.utils import IntegrityError
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
@@ -53,18 +54,26 @@ class ContentQuerySet(models.QuerySet):
             extra_lookups = {}
         try:
             content = self.fed(fid, **extra_lookups).get()
+            create = False
         except ObjectDoesNotExist:
+            create = True
+
+        if create:
             if fid.startswith('http'):
                 values['fid'] = fid
             values.update(extra_lookups)
-            return self.create(**values), True
-        else:
-            for key, value in values.items():
-                if key in ('fid', 'guid'):
-                    continue
-                setattr(content, key, value)
-            content.save()
-            return content, False
+            try:
+                return self.create(**values), True
+            except IntegrityError:
+                # something beat us to creation
+                content = self.fed(fid, **extra_lookups).get()
+
+        for key, value in values.items():
+            if key in ('fid', 'guid'):
+                continue
+            setattr(content, key, value)
+        content.save()
+        return content, False
 
     def followed(self, user, single_id: int = None):
         """Get content from followed users.

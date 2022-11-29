@@ -126,7 +126,8 @@ def process_entity_post(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content: %s", content)
         if hasattr(entity, '_replies'):
-            if django_rq.get_queue('replies').enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            queue = django_rq.get_queue('replies')
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
                 logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
@@ -209,7 +210,8 @@ def process_entity_comment(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content from comment entity: %s", content)
         if hasattr(entity, '_replies'):
-            if django_rq.get_queue('replies').enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            queue = django_rq.get_queue('replies')
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
                 logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
@@ -416,7 +418,8 @@ def process_replies(entity=None, fetch=False, delta=None):
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if hasattr(entity, '_replies'):
         if delta < dt.timedelta(5):
-            if django_rq.get_queue('replies').enqueue_in(delta, process_replies, entity, True, delta):
+            queue = django_rq.get_queue('replies')
+            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, entity, True, delta):
                 logger.info("process_replies - queued refresh job for entity %s", entity.id)
             else:
                 logger.warn("process_replies - failed to enqueue refresh job for entity %s", entity.id)
