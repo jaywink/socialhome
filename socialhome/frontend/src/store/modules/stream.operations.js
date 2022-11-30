@@ -59,7 +59,7 @@ const streamGetters = {
     currentContentList(state) {
         const contents = []
         state.currentContentIds.forEach(id => {
-            if (state.contents[id] !== undefined) {
+            if (state.contents[id] !== undefined && state.contents[id].content_type === "content") {
                 contents.push(state.contents[id])
             }
         })
