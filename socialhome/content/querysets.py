@@ -202,7 +202,7 @@ class ContentQuerySet(models.QuerySet):
 
     def top_level(self, single_id=None):
         # type: () -> ContentQuerySet
-        if single_id: return self.filter(content_type__in=[ContentType.CONTENT,ContentType.REPLY])
+        # if single_id: return self.filter(content_type__in=[ContentType.CONTENT,ContentType.REPLY])
         return self.filter(content_type=ContentType.CONTENT)
 
     def visible_for_user(self, user):

@@ -54,7 +54,12 @@ def federate_content_retraction(instance, **kwargs):
 
 @receiver(post_delete, sender=Content)
 def update_counts(instance, **kwargs):
-    instance.cache_related_object_data()
+    try:
+        parent = Content.objects.get(id=instance.parent_id)
+        parent.cache_data(commit=True)
+        parent.cache_related_object_data()
+    except:
+        pass
 
 
 def fetch_preview(content):

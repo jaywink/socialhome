@@ -89,7 +89,8 @@ def update_counts(content):
     from socialhome.content.enums import ContentType
 
     if content.content_type != ContentType.CONTENT: return
-    if content.reply_count > 0 and content.all_children.count() == content.children.count(): return
+    child_count = content.children.count()
+    if content.reply_count == child_count or content.all_children.count() == child_count: return
 
     do_root = False
     for child in content.all_children.iterator():
