@@ -3,6 +3,7 @@ import datetime as dt
 from typing import Optional, List, Any
 
 import django_rq
+from django.conf import settings
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 
@@ -125,7 +126,7 @@ def process_entity_post(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
-        if hasattr(entity, '_replies'):
+        if hasattr(entity, '_replies') and settings.SOCIALHOME_FETCH_NEW_CONTENT_REPLIES:
             queue = django_rq.get_queue("low")
             if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
@@ -207,7 +208,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
-        if hasattr(entity, '_replies'):
+        if hasattr(entity, '_replies') and settings.SOCIALHOME_FETCH_NEW_CONTENT_REPLIES:
             queue = django_rq.get_queue("low")
             if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
@@ -415,7 +416,7 @@ def process_replies(entity=None, fetch=False, delta=None):
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
-    if hasattr(entity, '_replies'):
+    if hasattr(entity, '_replies') and settings.SOCIALHOME_FETCH_NEW_CONTENT_REPLIES:
         if delta < dt.timedelta(5):
             queue = django_rq.get_queue("low")
             if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, entity, True, delta):

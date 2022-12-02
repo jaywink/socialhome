@@ -456,6 +456,9 @@ if "rqworker" in sys.argv:
             process_identifier=os.getppid,
         )
 
+# Replies pre-fetching when new content is received
+SOCIALHOME_FETCH_NEW_CONTENT_REPLIES = env.bool("SOCIALHOME_FETCH_NEW_CONTENT_REPLIES", default=False)
+
 # Valid user name required for get requests signature by federation
 FEDERATION_USER = env("FEDERATION_USER", default=None)
 
