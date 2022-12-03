@@ -3,6 +3,7 @@ import datetime as dt
 from typing import Optional, List, Any
 
 import django_rq
+from django.conf import settings
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 
@@ -403,13 +404,17 @@ def process_replies(entity=None, fetch=False, delta=None):
 
 
     for reply in getattr(entity, '_replies', []):
+        reply_fid = getattr(reply, 'id', reply)
         try:
-            content = Content.objects.fed(reply).get()
+            content = Content.objects.fed(reply_fid).get()
         except Content.DoesNotExist:
-            # Try to fetch and process
-            logger.debug(
-                "process_replies - fetching reply %s for entity %s", reply, entity.id)
-            remote_content = retrieve_remote_content(reply)
+            if isinstance(reply, base.Comment):
+                remote_content = reply
+            else:
+                # Try to fetch and process
+                logger.debug(
+                    "process_replies - fetching reply %s for entity %s", reply, entity.id)
+                remote_content = retrieve_remote_content(reply)
             if remote_content:
                 process_entities([remote_content])
     
