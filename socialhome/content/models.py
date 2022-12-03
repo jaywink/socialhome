@@ -17,6 +17,7 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language, ugettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
 from federation.utils.text import process_text_links, find_tags
@@ -31,7 +32,7 @@ from socialhome.users.models import Profile
 from socialhome.utils import get_full_url
 
 
-class OpenGraphCache(models.Model):
+class OpenGraphCache(ExportModelOperationsMixin('content_opengraphcache'), models.Model):
     url = models.URLField(_("URL"), unique=True)
     title = models.CharField(_("Title"), max_length=256, blank=True)
     description = models.TextField(_("Description"), blank=True)
@@ -44,7 +45,7 @@ class OpenGraphCache(models.Model):
         )
 
 
-class OEmbedCache(models.Model):
+class OEmbedCache(ExportModelOperationsMixin('content_oembedcache'), models.Model):
     url = models.URLField(_("URL"), unique=True)
     oembed = models.TextField(_("OEmbed HTML content"))
     modified = AutoLastModifiedField(_("Modified"), db_index=True)
@@ -53,7 +54,7 @@ class OEmbedCache(models.Model):
         return self.url
 
 
-class Tag(models.Model):
+class Tag(ExportModelOperationsMixin('content_tag'), models.Model):
     name = models.CharField(_("Name"), max_length=255, unique=True)
     created = AutoCreatedField(_('Created'))
     uuid = models.UUIDField(unique=True, default=uuid4, editable=False)
@@ -88,7 +89,7 @@ class Tag(models.Model):
         return ("%s_%s" % (self.id, slugify(self.name)))[:80]
 
 
-class Content(models.Model):
+class Content(ExportModelOperationsMixin('content_content'), models.Model):
     # Local UUID
     uuid = models.UUIDField(unique=True, blank=True, null=True, editable=False)
 

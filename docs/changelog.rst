@@ -14,11 +14,11 @@ Upgrade notes
 
   * If using virtualenv, update it with
 
-    `python -m env ~/.virtualenvs/socialhome` # or whatever your virtenv path is
+    ``python -m env ~/.virtualenvs/socialhome # or whatever your virtenv path is``
 
   * If using virtualenvwrapper, it also must be updated with
 
-    `pip install -U virtualenvwrapper`
+    ``pip install -U virtualenvwrapper``
 
   * Since the django-dynamic-preferences update comes with a migration,
     it is strongly suggested to backup your DB (but you already do that, right?).
@@ -44,6 +44,18 @@ Added
 
 * Enable signature verification for remote AP GET requests. Allows limited content access for
   valid signatures.
+
+* Add management command ``rq_job_types`` to list currently queued job types by count.
+
+* Allow exposing Prometheus metrics. See the configuration guide on how to enable.
+
+* Add ``console`` log target and possibility to configure logging level for any log target.
+
+  The option ``SOCIALHOME_SYSLOG_LEVEL`` is now deprecated and will be removed in
+  a coming release. ``SOCIALHOME_LOG_LEVEL`` determines the logging level for whatever
+  the logging target happens to be.
+
+  The Docker image default target is ``console``.
 
 Changed
 .......

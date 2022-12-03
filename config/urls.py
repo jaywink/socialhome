@@ -114,6 +114,11 @@ if settings.SILKY_INSTALLED:
         url(r'^_silk/', include('silk.urls', namespace='silk')),
     ]
 
+if settings.SOCIALHOME_METRICS:
+    urlpatterns += [
+        path('', include('django_prometheus.urls')),
+    ]
+
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
     # these url in browser to see how these error pages look like.

@@ -159,6 +159,31 @@ Current functionality:
 * Post local user public posts into Matrix side to their profile timeline rooms
   and to each hashtag room.
 
+.. _metrics:
+
+Metrics
+-------
+
+Prometheus metrics can be exported under ``/metrics``. If enabled, the following
+metrics are available:
+
+* Various ``django_`` prefixed metrics regarding database, views and caches.
+  See https://github.com/korfuri/django-prometheus for details.
+* Total count and time spent on the main federation tasks under
+  ``socialhome_federate_tasks_`` prefix.
+
+To enable, you'll need to set the following:
+
+* ``SOCIALHOME_METRICS=True`` to enable metrics
+* (non-Docker deployments) ``PROMETHEUS_MULTIPROC_DIR=/path/for/metrics`` where
+  ``/path/for/metrics`` is a path where Socialhome can write to from all the processes.
+  This is already taken care of in the provided Dockerfile.
+
+  Important! When restarting Socialhome, this path should always be cleaned.
+
+Note! The metrics endpoint has no authentication. Be sure to protect it by
+adding for example HTTP basic auth, if needed.
+
 .. _configuration:
 
 Configuration
@@ -351,17 +376,25 @@ Default: ``False``
 
 Set this to ``True`` to disable the Django admin error emails in production.
 
+SOCIALHOME_LOG_LEVEL
+....................
+
+Default: ``INFO``
+
+Define the logging level logging. Possible options: ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``.
+
 .. _config-log-target:
 
 SOCIALHOME_LOG_TARGET
 .....................
 
-Default: ``file``
+Default: ``file`` (``console`` for the Docker image)
 
 Define target for Django and application logs. Possible options:
 
 * ``file``, logs will go to a file defined in ``SOCIALHOME_LOGFILE``. Note, due to multiple processes logging to the same file, this file log is only really useful for tailing or if running different processes on separate containers or machines.
 * ``syslog``, logs to syslog, to the ``local7`` facility.
+* ``console``, good for Docker environments.
 
 SOCIALHOME_LOGFILE
 ..................
@@ -369,6 +402,13 @@ SOCIALHOME_LOGFILE
 Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
+
+SOCIALHOME_METRICS
+..................
+
+Default: ``False``
+
+See :ref:`metrics`.
 
 SOCIALHOME_NODE_LIST_URL
 ........................
@@ -440,6 +480,8 @@ Define the logging facility for syslog, if ``SOCIALHOME_LOG_TARGET`` is set to `
 
 SOCIALHOME_SYSLOG_LEVEL
 .......................
+
+*Deprecated: Use ``SOCIALHOME_LOG_LEVEL`` instead!*
 
 Default: ``INFO``
 

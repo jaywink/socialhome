@@ -1,8 +1,9 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 from model_utils.fields import AutoCreatedField
 
 
-class Payload(models.Model):
+class Payload(ExportModelOperationsMixin('federate_payload'), models.Model):
     """
     Model for federation payloads.
 
