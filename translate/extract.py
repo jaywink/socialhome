@@ -1,5 +1,4 @@
 import re
-import functools
 from io import BytesIO
 
 from babel.messages.extract import extract_javascript
@@ -34,7 +33,7 @@ def extract_extrajs(fileobj, keywords, comment_tags, options):
             options):
         if i:
             yield (i[0], i[1], i[2], i[3])
-    
+
 
 if __name__ == '__main__':
   import sys
