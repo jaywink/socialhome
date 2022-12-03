@@ -452,10 +452,15 @@ if "rqworker" in sys.argv:
     redis_conn = Redis(host=REDIS_HOST)
     workers = {worker.pid for worker in Worker.all(connection=redis_conn) if worker.pid}
     if os.getppid() in workers:
+        print(f"***** WORKER JOB worker pid {os.getppid()} my pid {os.getpid()}")
         # Running in a child, use the parent pid
         prometheus_client.values.ValueClass = prometheus_client.values.MultiProcessValue(
             process_identifier=os.getppid,
         )
+    else:
+        print(f"***** WORKER pid {os.getpid()}")
+else:
+    print(f"***** NON-WORKER pid {os.getpid()}")
 
 # Replies pre-fetching when new content is received
 SOCIALHOME_FETCH_NEW_CONTENT_REPLIES = env.bool("SOCIALHOME_FETCH_NEW_CONTENT_REPLIES", default=False)
