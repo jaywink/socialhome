@@ -2,7 +2,7 @@ import logging
 
 import django_rq
 from django.db import transaction
-from django.db.models.signals import post_save, m2m_changed, pre_delete
+from django.db.models.signals import post_save, m2m_changed, pre_delete, post_delete
 from django.dispatch import receiver
 from federation.entities.activitypub.enums import ActivityType
 
@@ -22,8 +22,8 @@ logger = logging.getLogger("socialhome")
 @receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
     # TODO remove extract mentions from here when we have UI for creating mentions
-    if instance.local:
-        instance.extract_mentions()
+    #if instance.local:
+    #    instance.extract_mentions()
     fetch_preview(instance)
     render_content(instance)
     created = kwargs.get("created")
@@ -33,7 +33,7 @@ def content_post_save(instance, **kwargs):
             transaction.on_commit(lambda: queue.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: queue.enqueue(send_share_notification, instance.id))
-        transaction.on_commit(lambda: update_streams_with_content(instance))
+    transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
         activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
@@ -51,6 +51,16 @@ def federate_content_retraction(instance, **kwargs):
             send_content_retraction(instance, instance.author_id)
         except Exception as ex:
             logger.exception("Failed to federate_content_retraction %s: %s", instance, ex)
+
+
+@receiver(post_delete, sender=Content)
+def update_counts(instance, **kwargs):
+    try:
+        parent = Content.objects.get(id=instance.parent_id)
+        parent.cache_data(commit=True)
+        parent.cache_related_object_data()
+    except:
+        pass
 
 
 def fetch_preview(content):

@@ -1,6 +1,6 @@
 <template>
     <div v-images-loaded.on.progress="onImageLoad">
-        <div class="replies-container">
+        <div class="replies-container" v-bind:class="isReply?'vertical-bar':''" >
             <stream-element
                 v-for="reply in replies"
                 :key="reply.id"
@@ -33,7 +33,13 @@ export default {
     },
     computed: {
         isContent() {
+            return this.isPost || this.isReply
+        },
+        isPost() {
             return this.content.content_type === "content"
+        },
+        isReply() {
+            return this.content.content_type === "reply"
         },
         isUserAuthenticated() {
             return this.$store.state.application.isUserAuthenticated
@@ -45,7 +51,10 @@ export default {
             return this.$store.getters["stream/shares"](this.content.id)
         },
         showSpinner() {
-            return this.isContent && this.$store.state.stream.pending.replies && this.content.reply_count > 0
+            // the vuex-rest-api pending property is global
+            return this.isPost
+                && this.$store.state.stream.pending.replies
+                && this.content.reply_count > 0
         },
     },
     mounted() {
@@ -72,5 +81,8 @@ export default {
 <style scoped>
   .replies-spinner {
     height: 42px;
+  }
+  .vertical-bar {
+    border-left: 2px solid #373a3c;
   }
 </style>

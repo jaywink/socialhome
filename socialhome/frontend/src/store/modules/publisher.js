@@ -32,11 +32,12 @@ function actions(Axios) {
                 .then(({data}) => Urls["content:view"]({pk: data.id}))
         },
 
-        publishReply(_, {parent, showPreview = true, text}) {
+        publishReply(_, {parent, showPreview = true, text, recipients}) {
             const payload = {
                 parent,
                 show_preview: showPreview,
                 text,
+                recipients,
             }
 
             return Axios

@@ -46,6 +46,17 @@ Added
 
   The Docker image default target is ``console``.
 
+* Threaded replies.
+
+* Dynamic update of the reply and share counts.
+
+* Provide to and cc properties to federation for outbound AP payloads.
+
+* Initial work on providing responses to AP collections.
+
+* Enable signature verification for remote AP GET requests. Allows limited content access for
+  valid signatures.
+
 Changed
 .......
 
@@ -72,6 +83,11 @@ Fixed
 
 * Fix streams precache tasks unnecessarely running for all stream classes, now they only
   run for the cached strea classes.
+
+* Fix limited reply retractions not being sent by adding the remote content author to
+  the limited_visibilities.
+
+* Update reply and share counts for local content retractions.
 
 Removed
 .......

@@ -28,7 +28,6 @@ export default {
                 showPreview: _get(window, ["context", "showPreview"], true),
                 text: _get(window, ["context", "text"]),
             }
-
             if (this.isReply) {
                 values.parentId = _get(window, ["context", "parent"])
             } else {

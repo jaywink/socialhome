@@ -3,13 +3,12 @@
         <div class="grid-item-bar d-flex justify-content-start">
             <slot />
             <reply-button
-                v-if="content.content_type === 'content'"
                 :content-type="content.content_type"
                 :toggle-reply-editor="toggleReplyEditor"
             />
             <share-button
-                v-if="content.content_type === 'content'"
                 :content="content"
+                :parent-visibility="rootParent.visibility"
             />
             <div class="ml-auto grid-item-reactions mt-1">
                 <b-button
@@ -37,11 +36,6 @@
                         <span class="reaction-counter">{{ content.reply_count }}</span>
                     </span>
                 </b-button>
-                <reply-button
-                    v-if="content.content_type === 'reply'"
-                    :content-type="content.content_type"
-                    :toggle-reply-editor="toggleReplyEditor"
-                />
             </div>
         </div>
         <div v-if="replyEditorActive">
@@ -89,34 +83,50 @@ export default {
         ...mapGetters("stream", [
             "contentById",
         ]),
+        rootParent() {
+            // Find root
+            let {content} = this
+            while (content.parent) {
+                content = this.contentById(content.parent)
+            }
+            return content
+        },
         prefillOnReply() {
-            let prefill = this.content.author.fid
-                ? `@{${this.content.author.fid}}` : `@{${this.content.author.handle}}`
+            // Prefer author's webfinger subject
+            let prefill = `@${this.content.author.finger}`
+            if (prefill == null) {
+                prefill = this.content.author.fid
+                    ? `@{${this.content.author.fid}}` : `@${this.content.author.handle}`
+            }
             if (this.content.content_type === "reply") {
-                // Find root
-                let {content} = this
-                while (content.parent) {
-                    content = this.contentById(content.parent)
+                let rootPrefill = ""
+                // prefill += " "
+                if (this.rootParent.author.finger !== null) {
+                    rootPrefill += `@${this.rootParent.author.finger}`
+                } else {
+                    rootPrefill += this.rootParent.author.fid
+                        ? `@{${this.rootParent.author.fid}}` : `@${this.rootParent.author.handle}`
                 }
-                prefill += " "
-                prefill += content.author.fid ? `@{${content.author.fid}}` : `@{${content.author.handle}}`
+                if (prefill !== rootPrefill) {
+                    prefill += ` ${rootPrefill}`
+                }
             }
             return prefill += " "
         },
         showExpandRepliesIcon() {
-            if (this.content.content_type === "content") {
-                return this.content.reply_count > 0
-            }
-            return false
+            // if (this.content.content_type === "content") {
+            return this.content.reply_count > 0
+            // }
+            // return false
         },
         showRepliesContainer() {
             return this.showRepliesBox || this.$store.state.stream.stream.single
         },
         showSharesCountIcon() {
-            if (this.content.content_type === "content") {
-                return this.content.shares_count > 0
-            }
-            return false
+            // if (this.content.content_type === "content") {
+            return this.content.shares_count > 0
+            // }
+            // return false
         },
         translations() {
             return {

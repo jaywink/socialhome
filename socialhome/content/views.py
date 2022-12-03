@@ -15,7 +15,7 @@ from django.views.generic.detail import SingleObjectMixin
 from federation.entities.activitypub.django.views import activitypub_object_view
 
 from socialhome.content.enums import ContentType
-from socialhome.content.forms import ContentForm
+#from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType
@@ -62,6 +62,9 @@ class ContentCreateView(LoginRequiredMixin, TemplateView):
             "isUserAuthenticated": bool(self.request.user.is_authenticated),
         }
 
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
 
 class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObjectMixin):
     is_reply = True
@@ -75,6 +78,15 @@ class ContentReplyView(ContentVisibleForUserMixin, ContentCreateView, SingleObje
     def get_success_url(self):
         return self.parent.get_absolute_url()
 
+    def get_json_context(self):
+        val = super().get_json_context()
+        mentions = f'@{self.object.author.finger} '
+        if self.object.root_parent:
+            if self.object.author.finger != self.object.root_parent.author.finger:
+                mentions += f'@{self.object.root_parent.author.finger} '
+        val.update({'mentions': mentions, 'rendered': self.parent.rendered})
+        return(val)
+        
 
 class ContentUpdateView(UserOwnsContentMixin, DetailView):
     model = Content
@@ -125,7 +137,7 @@ class ContentDeleteView(UserOwnsContentMixin, DeleteView):
         return reverse("home")
 
 
-@method_decorator(activitypub_object_view, name="get")
+@method_decorator(activitypub_object_view, name="dispatch")
 class ContentView(ContentVisibleForUserMixin, DetailView):
     model = Content
     template_name = "streams/base.html"

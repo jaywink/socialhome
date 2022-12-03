@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 import logging
 from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
@@ -6,10 +7,12 @@ import django_rq
 from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
+from federation.entities.activitypub.enums import ActivityType
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
 from federation.outbound import handle_send
 
+from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
@@ -95,7 +98,7 @@ def send_content(content_id, activity_fid, recipient_id=None):
     entity = make_federable_content(content)
     if entity:
         entity.activity_id = activity_fid
-        if settings.DEBUG:
+        if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
         recipients = []
@@ -175,7 +178,7 @@ def send_reply(content_id, activity_fid):
     if not entity:
         logger.warning("send_reply - No entity for %s", content)
     entity.activity_id = activity_fid
-    if settings.DEBUG:
+    if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
         # Don't send in development mode
         return
     recipients = []
@@ -216,7 +219,7 @@ def send_share(content_id, activity_fid):
     entity = make_federable_content(content)
     if entity:
         entity.activity_id = activity_fid
-        if settings.DEBUG:
+        if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
         recipients = _get_remote_followers(content.author, content.visibility)
@@ -239,7 +242,7 @@ def send_content_retraction(content, author_id):
     author = Profile.objects.get(id=author_id)
     entity = make_federable_retraction(content, author)
     if entity:
-        if settings.DEBUG:
+        if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
         if content.visibility == Visibility.PUBLIC:
@@ -272,7 +275,7 @@ def send_profile_retraction(profile):
         return
     entity = make_federable_retraction(profile)
     if entity:
-        if settings.DEBUG:
+        if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
         recipients = _get_remote_followers(profile, profile.visibility)
@@ -302,7 +305,7 @@ def forward_entity(entity, target_content_id):
     except Content.DoesNotExist:
         logger.warning("forward_entity - No content found with uuid %s", entity.id)
         return
-    if settings.DEBUG:
+    if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
         # Don't send in development mode
         return
     if target_content.visibility == Visibility.PUBLIC:
@@ -336,11 +339,12 @@ def send_follow_change(profile_id, followed_id, follow):
     except Profile.DoesNotExist:
         logger.warning("send_follow_change - No remote profile %s found to send follow for", followed_id)
         return
-    if settings.DEBUG:
+    if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
         # Don't send in development mode
         return
+    activity = Activity.objects.filter(profile=profile, object_id=remote_profile.id, type=ActivityType.FOLLOW).last()
     entity = base.Follow(
-        activity_id=f'{profile.fid}#follow-{uuid4()}',
+        activity_id=getattr(activity, 'fid', f'{profile.fid}#follow-{uuid4()}'),
         actor_id=profile.fid,
         target_id=remote_profile.fid,
         following=follow,
@@ -352,7 +356,7 @@ def send_follow_change(profile_id, followed_id, follow):
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     # Also trigger a profile send
-    send_profile(profile_id, recipients=recipients)
+    if follow: send_profile(profile_id, recipients=recipients)
 
 
 @metrics.TASK_TIME_SEND_PROFILE.time()
@@ -371,7 +375,9 @@ def send_profile(profile_id, recipients=None):
     if not entity:
         logger.warning("send_profile - No entity for %s", profile)
         return
-    if settings.DEBUG:
+    if hasattr(entity, 'times'):
+        entity.times['edited'] = (datetime.now(timezone.utc)-profile.modified)< timedelta(seconds=60)
+    if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
         # Don't send in development mode
         return
     if not recipients:

@@ -14,7 +14,7 @@ const VISIBILITY_OPTIONS = Object.freeze({
     LIMITED: {
         value: 1,
         text: gettext("Limited"),
-        help: gettext("visible to only those who shared with."),
+        help: gettext("visible only to those mentioned in the text and/or your mutuals."),
     },
     SITE: {
         value: 2,
@@ -36,7 +36,7 @@ const publisherMixin = {
         return {
             baseModel: {
                 showPreview: true,
-                text: "",
+                text: _get(window, ["context", "mentions"], ""),
             },
             extendedModel: {},
             errors: {
@@ -46,6 +46,7 @@ const publisherMixin = {
             },
             wasValidated: null,
             isPosting: false,
+            renderedText: _get(window, ["context", "rendered"], ""),
         }
     },
     computed: {
@@ -66,10 +67,12 @@ const publisherMixin = {
                 federateHelp: gettext("Disable to skip federating this version to remote servers. "
                     + "Note, saved content version will still be updated to local streams."),
                 hiddenTextarea: gettext("Hidden textarea"),
-                includeFollowing: gettext("Include people I follow"),
-                recipients: gettext("Recipients"),
-                recipientsHelp: gettext("Type in the handles (eg user@example.com) "
-                    + "of the recipients. Separate by commas. Sorry, no search yet.."),
+                includeFollowing: gettext("Include your mutuals"),
+                includeFollowingHelp: gettext("Automatically include people you follow "
+                    + "that also follow you as recipients."),
+                recipients: `${gettext("Recipients")}:`,
+                recipientsHelp: gettext("Enter the recipients' handles (eg @user@example.com) "
+                    + "in the editor window. Sorry, no search yet... "),
                 reply: gettext("Reply"),
                 updateReply: gettext("Update reply"),
                 visibility: gettext("Visibility"),
@@ -84,7 +87,7 @@ const publisherMixin = {
                 showPreviewHelp: gettext("Disable to turn off fetching and showing an OEmbed or "
                     + "OpenGraph preview using the links in the text."),
                 limitedVisibilityError: gettext("When visibility is set to 'Limited', you must either "
-                    + "specify recipients or include your followers."),
+                    + "mention recipients in the text or include your mutuals."),
                 recipientsNotFoundError: gettext("Some recipients couldn't be found."),
                 validationError: gettext("Validation error"),
             }
@@ -100,6 +103,17 @@ const publisherMixin = {
         },
         postFormRequest() {
             throw new Error("`postFormRequest` must be overriden")
+        },
+        // TODO: implement search UI
+        extractMentions() {
+            const cm = this.$refs.editor.$editor.codemirror
+            const cur = cm.getSearchCursor(/@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9]+)[\W\s]?/)
+            let match = cur.findNext()
+            this.extendedModel.recipients = []
+            while (match) {
+                this.extendedModel.recipients.push(match[1])
+                match = cur.findNext()
+            }
         },
         async onPostForm() {
             if (this.isPosting === true) return

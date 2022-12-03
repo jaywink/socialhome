@@ -2,7 +2,7 @@
     <div class="socialhome-publisher">
         <h1>{{ titleText }}</h1>
 
-        <markdown-editor v-model="baseModel.text" />
+        <markdown-editor ref="editor" v-model="baseModel.text" @input="extractMentions" />
 
         <b-form @submit.stop.prevent="onPostForm">
             <b-row>
@@ -50,6 +50,9 @@ export default {
             type: String, required: true,
         },
     },
+    data() {
+        return {extendedModel: {recipients: []}}
+    },
     computed: {
         titleText() {
             return this.translations.reply
@@ -61,7 +64,6 @@ export default {
                 ...this.model,
                 parent: this.parentId,
             }
-
             return this.$store.dispatch("publisher/publishReply", payload)
         },
     },

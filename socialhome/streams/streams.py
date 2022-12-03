@@ -134,7 +134,7 @@ def get_precache_users_qs(acting_profile):
     return qs
 
 
-def update_streams_with_content(content):
+def update_streams_with_content(content, event='new'):
     """Handle content adding to streams.
 
     First adds to the author streams, then queues the rest of the user streams to a background job.
@@ -142,6 +142,8 @@ def update_streams_with_content(content):
     if not settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
         # Streams precaching not enabled
         return
+    # TODO: implement update and delete events in the UI
+    if event != 'new': return
     # Store current acting profile
     acting_profile = content.author
     # The original is the "through" always, has importance in shares
