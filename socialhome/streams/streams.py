@@ -116,6 +116,10 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
                 continue
             if user.recently_active:
                 notify_keys.add(stream.notify_key)
+        # Dynamic update of the reply_count
+        if content.content_type == ContentType.REPLY:
+            notify_keys.add(stream.notify_key)
+
 
 
 def get_precache_users_qs(acting_profile):
