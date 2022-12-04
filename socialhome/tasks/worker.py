@@ -1,7 +1,7 @@
 import logging
 import os
 
-import prometheus_client
+import prometheus_client.values
 from rq import Worker
 
 logger = logging.getLogger("socialhome")
