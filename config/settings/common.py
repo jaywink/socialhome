@@ -11,11 +11,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import environ
 import logging
 import os
-import sys
 import warnings
 from datetime import datetime
-
-import prometheus_client.values
 
 logger = logging.getLogger("socialhome")
 
@@ -448,22 +445,6 @@ SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}
 # NOTE! This endpoint has no auth - if you want, be sure to protect it
 # with basic auth in your load balancer, for example.
 SOCIALHOME_METRICS = env.bool("SOCIALHOME_METRICS", default=False)
-
-if "rqworker" in sys.argv:
-    from rq import Worker
-    from redis import Redis
-    redis_conn = Redis(host=REDIS_HOST)
-    workers = {worker.pid for worker in Worker.all(connection=redis_conn) if worker.pid}
-    if os.getppid() in workers:
-        logger.warning(f"***** WORKER JOB worker pid {os.getppid()} my pid {os.getpid()}")
-        # Running in a child, use the parent pid
-        prometheus_client.values.ValueClass = prometheus_client.values.MultiProcessValue(
-            process_identifier=os.getppid,
-        )
-    else:
-        logger.warning(f"***** WORKER pid {os.getpid()}")
-else:
-    logger.warning(f"***** NON-WORKER pid {os.getpid()}")
 
 # Replies pre-fetching when new content is received
 SOCIALHOME_FETCH_NEW_CONTENT_REPLIES = env.bool("SOCIALHOME_FETCH_NEW_CONTENT_REPLIES", default=False)
