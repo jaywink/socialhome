@@ -9,12 +9,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 import environ
+import logging
 import os
 import sys
 import warnings
 from datetime import datetime
 
 import prometheus_client.values
+
+logger = logging.getLogger("socialhome")
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("socialhome")
@@ -452,15 +455,15 @@ if "rqworker" in sys.argv:
     redis_conn = Redis(host=REDIS_HOST)
     workers = {worker.pid for worker in Worker.all(connection=redis_conn) if worker.pid}
     if os.getppid() in workers:
-        print(f"***** WORKER JOB worker pid {os.getppid()} my pid {os.getpid()}")
+        logger.warning(f"***** WORKER JOB worker pid {os.getppid()} my pid {os.getpid()}")
         # Running in a child, use the parent pid
         prometheus_client.values.ValueClass = prometheus_client.values.MultiProcessValue(
             process_identifier=os.getppid,
         )
     else:
-        print(f"***** WORKER pid {os.getpid()}")
+        logger.warning(f"***** WORKER pid {os.getpid()}")
 else:
-    print(f"***** NON-WORKER pid {os.getpid()}")
+    logger.warning(f"***** NON-WORKER pid {os.getpid()}")
 
 # Replies pre-fetching when new content is received
 SOCIALHOME_FETCH_NEW_CONTENT_REPLIES = env.bool("SOCIALHOME_FETCH_NEW_CONTENT_REPLIES", default=False)
