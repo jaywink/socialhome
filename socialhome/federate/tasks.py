@@ -7,6 +7,7 @@ import django_rq
 from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
+from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
 from federation.entities.activitypub.enums import ActivityType
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
@@ -386,6 +387,9 @@ def send_profile(profile_id, recipients=None):
         else:
             recipients = []
         recipients.extend(_get_remote_followers(profile, profile.visibility))
+        entity.to = NAMESPACE_PUBLIC
+    else:
+        entity.to = [recipient.get('fid') for recipient in recipients if recipient.get('fid', None)]
 
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())

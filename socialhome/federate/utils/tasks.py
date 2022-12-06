@@ -1,16 +1,19 @@
-import logging
 import datetime as dt
+import logging
 from typing import Optional, List, Any
 
 import django_rq
 from django.conf import settings
+
 from federation.entities import base
+from federation.entities.activitypub.models import extract_replies
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
+from socialhome.federate import metrics
 from socialhome.federate.utils import get_profiles_from_receivers
 from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
@@ -118,6 +121,8 @@ def process_entity_post(entity: Any, profile: Profile):
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
+    if isinstance(getattr(entity, 'replies', None), base.Collection):
+        values["replies_fid"] = entity.replies.id
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -126,12 +131,13 @@ def process_entity_post(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content: %s", content)
-        if hasattr(entity, '_replies'):
+        if content.replies_fid:
             queue = django_rq.get_queue('replies')
-            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
-                logger.info("process_replies - queued job for entity %s", entity.id)
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=120), 
+                    process_replies, content.id):
+                logger.info("process_entity_post - queued process_replies job for entity %s", entity.id)
             else:
-                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
+                logger.warn("process_entity_post - failed to enqueue process_replies job for entity %s", entity.id)
     else:
         logger.info("Updated Content: %s", content)
     if content.visibility == Visibility.LIMITED:
@@ -202,6 +208,8 @@ def process_entity_comment(entity: Any, profile: Profile):
         "parent": parent,
         "root_parent": root_parent,
     }
+    if isinstance(getattr(entity, 'replies', None), base.Collection):
+        values["replies_fid"] = entity.replies.id
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -210,12 +218,6 @@ def process_entity_comment(entity: Any, profile: Profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
-        if hasattr(entity, '_replies'):
-            queue = django_rq.get_queue('replies')
-            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
-                logger.info("process_replies - queued job for entity %s", entity.id)
-            else:
-                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content from comment entity: %s", content)
 
@@ -275,7 +277,7 @@ def _process_mentions(content, entity):
     Link mentioned profiles to the content.
     """
     fids = set(entity._mentions)
-    existing_fids = set(content.mentions.values_list('fid', flat=True))
+    existing_fids = set(content.mentions.values_list('finger', flat=True))
     to_remove = existing_fids.difference(fids)
     to_add = fids.difference(existing_fids)
     for fid in to_remove:
@@ -384,6 +386,14 @@ def process_entity_share(entity, profile):
     _process_mentions(content, entity)
     if created:
         logger.info("Saved share: %s", content)
+        if target_content.replies_fid:
+            queue = django_rq.get_queue('replies')
+            content_id = target_content.id if target_content.content_type == ContentType.COMMENT else target_content.root_parent_id
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), 
+                    process_replies, content_id, shared_by_id=content.id):
+                logger.info("process_entity_share - queued process_replies job for content id %s", content_id)
+            else:
+                logger.warn("process_entity_share - failed to enqueue process_replies job for content id %s", content_id)
     else:
         logger.info("Updated share: %s", content)
     # TODO: send participation to the share from the author, if local
@@ -394,40 +404,76 @@ def process_entity_share(entity, profile):
         django_rq.enqueue(forward_entity, entity, target_content.id)
 
 
-def process_replies(entity=None, fetch=False, delta=None):
-    if settings.DEBUG: return
+@metrics.TASK_TIME_PROCESS_REPLIES.time()
+def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
-    if fetch:
-        # Refresh entity
-        entity = retrieve_remote_content(entity.id)
-        if not entity: return
+    try:
+        root = Content.objects.get(id=root_id)
+    except Content.DoesNotExist:
+        # Retracted?
+        return
+    # A job should have been scheduled from process_entity_shares
+    if root.shares_count > 0 and not shared_by_id: 
+        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root_id)
+        return
+    # Leave replies processing to the latest job submitted from process_entity_share
+    if root.shares.last().id != shared_by_id: 
+        logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root_id)
+        return
 
+    if not ids: ids = [root.id]
+    content = root
+    to_remove = []
+    to_add = []
+    for cid in ids:
+        if cid == root.id:
+            content = root
+        else:
+            try:
+                content = Content.objects.fed(fid).get()
+            except Content.DoesNotExist:
+                # retracted?
+                to_remove.append(fid)
+                continue
 
-    for reply in getattr(entity, '_replies', []):
-        reply_fid = getattr(reply, 'id', reply)
-        try:
-            content = Content.objects.fed(reply_fid).get()
-        except Content.DoesNotExist:
-            if isinstance(reply, base.Comment):
-                remote_content = reply
-            else:
-                # Try to fetch and process
-                logger.debug(
-                    "process_replies - fetching reply %s for entity %s", reply, entity.id)
-                remote_content = retrieve_remote_content(reply)
-            if remote_content:
-                process_entities([remote_content])
-    
+        # refresh reply collection
+        coll = retrieve_remote_content(cid.replies_fid)
+        if isinstance(coll, base.Collection):
+            for reply in extract_replies(getattr(coll, 'first', [])):
+                reply_fid = getattr(reply, 'id', reply)
+                try:
+                    content = Content.objects.fed(reply_fid).get()
+                except Content.DoesNotExist:
+                    # Try to fetch and process
+                    if isinstance(reply, base.Comment):
+                        remote_content = reply
+                    else:
+                        remote_content = retrieve_remote_content(reply_fid)
+                    if remote_content:
+                        logger.debug(
+                            "process_replies - processing reply %s for entity %s", remote_content.id, root.id)
+                        if isinstance(getattr(remote_content, 'replies', None), base.Collection):
+                            to_add.append(remote_content.id)
+                        # should we enqueue a job for this?
+                        process_entities([remote_content])
+        else:
+            to_remove.append(fid)
+
+    ids = [v for v in ids if v not in to_remove]
+    ids.extend(to_add)
+    if not reply_dict: return
+
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
+    if setting.DEBUG: return
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if hasattr(entity, '_replies'):
-        if delta < dt.timedelta(5):
+        if delta < dt.timedelta(3):
             queue = django_rq.get_queue('replies')
-            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, entity, True, delta):
-                logger.info("process_replies - queued refresh job for entity %s", entity.id)
+            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, ids, shared_by, delta):
+                logger.info("process_replies - queued refresh job for entity %s", fid)
             else:
-                logger.warn("process_replies - failed to enqueue refresh job for entity %s", entity.id)
+                logger.warn("process_replies - failed to enqueue refresh job for entity %s", fid)
 
 
 def sender_key_fetcher(fid):

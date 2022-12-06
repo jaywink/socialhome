@@ -106,6 +106,10 @@ class Content(ExportModelOperationsMixin('content_content'), models.Model):
     # Optional
     fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
+    # Reply collection  identifier (some AP platforms)
+    # Optional
+    replies_fid = models.URLField(_("Reply Collection ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
     # Order int to allow ordering content within some context, for example profile
