@@ -412,13 +412,13 @@ def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
     except Content.DoesNotExist:
         # Retracted?
         return
-    # A job should have been scheduled from process_entity_shares
-    if root.shares_count > 0 and not shared_by_id: 
+    # A job might have been scheduled from process_entity_shares
+    if shared_by_id:
+        if getattr(root.shares.last(), 'id', None) != shared_by_id: 
+            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root_id)
+            return
+    elif root.shares_count > 0:
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root_id)
-        return
-    # Leave replies processing to the latest job submitted from process_entity_share
-    if root.shares.last().id != shared_by_id: 
-        logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root_id)
         return
 
     if not ids: ids = [root.id]
