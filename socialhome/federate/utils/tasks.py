@@ -466,7 +466,7 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
 
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
-    if setting.DEBUG: return
+    if settings.DEBUG: return
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if hasattr(entity, '_replies'):
         if delta < dt.timedelta(3):
