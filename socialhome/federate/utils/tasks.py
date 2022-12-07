@@ -405,7 +405,7 @@ def process_entity_share(entity, profile):
 
 
 @metrics.TASK_TIME_PROCESS_REPLIES.time()
-def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
+def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
     try:
         root = Content.objects.get(id=root_id)
@@ -421,28 +421,29 @@ def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root_id)
         return
 
-    if not ids: ids = [root.id]
+    if not fids: fids = [root.fid]
     content = root
     to_remove = []
     to_add = []
-    for cid in ids:
-        if cid == root.id:
+    for fid in fids:
+        if fid == root.fid:
             content = root
         else:
             try:
-                content = Content.objects.fed(fid).get()
+                content = Content.objects.get(fid=fid)
             except Content.DoesNotExist:
-                # retracted?
+                # Retracted?
                 to_remove.append(fid)
                 continue
 
         # refresh reply collection
-        coll = retrieve_remote_content(cid.replies_fid)
+        coll = retrieve_remote_content(content.replies_fid)
         if isinstance(coll, base.Collection):
             for reply in extract_replies(getattr(coll, 'first', [])):
                 reply_fid = getattr(reply, 'id', reply)
                 try:
                     content = Content.objects.fed(reply_fid).get()
+                    if reply_fid not in fids: to_add.append(reply_fid)
                 except Content.DoesNotExist:
                     # Try to fetch and process
                     if isinstance(reply, base.Comment):
@@ -451,7 +452,7 @@ def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
                         remote_content = retrieve_remote_content(reply_fid)
                     if remote_content:
                         logger.debug(
-                            "process_replies - processing reply %s for entity %s", remote_content.id, root.id)
+                            "process_replies - processing reply %s for entity %s", remote_content.id, root.fid)
                         if isinstance(getattr(remote_content, 'replies', None), base.Collection):
                             to_add.append(remote_content.id)
                         # should we enqueue a job for this?
@@ -459,9 +460,9 @@ def process_replies(root_id, ids=None, shared_by_id=None, delta=None):
         else:
             to_remove.append(fid)
 
-    ids = [v for v in ids if v not in to_remove]
-    ids.extend(to_add)
-    if not reply_dict: return
+    fids = [v for v in fids if v not in to_remove]
+    fids.extend(to_add)
+    if not fids: return
 
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
