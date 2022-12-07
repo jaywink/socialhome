@@ -415,10 +415,10 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
     # A job might have been scheduled from process_entity_shares
     if shared_by_id:
         if getattr(root.shares.last(), 'id', None) != shared_by_id: 
-            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root_id)
+            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root.fid)
             return
     elif root.shares_count > 0:
-        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root_id)
+        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
         return
 
     if not fids: fids = [root.fid]
@@ -470,7 +470,7 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if delta < dt.timedelta(3):
         queue = django_rq.get_queue('replies')
-        if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, fids, shared_by, delta):
+        if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, fids, shared_by_id, delta):
             logger.info("process_replies - queued refresh job for entity %s", root.fid)
         else:
             logger.warn("process_replies - failed to enqueue refresh job for entity %s", root.fid)
