@@ -468,13 +468,12 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
     # the replies up to 5 days after publication
     if settings.DEBUG: return
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
-    if hasattr(entity, '_replies'):
-        if delta < dt.timedelta(3):
-            queue = django_rq.get_queue('replies')
-            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, ids, shared_by, delta):
-                logger.info("process_replies - queued refresh job for entity %s", fid)
-            else:
-                logger.warn("process_replies - failed to enqueue refresh job for entity %s", fid)
+    if delta < dt.timedelta(3):
+        queue = django_rq.get_queue('replies')
+        if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, fids, shared_by, delta):
+            logger.info("process_replies - queued refresh job for entity %s", root.fid)
+        else:
+            logger.warn("process_replies - failed to enqueue refresh job for entity %s", root.fid)
 
 
 def sender_key_fetcher(fid):
