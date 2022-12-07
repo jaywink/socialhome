@@ -20,8 +20,8 @@ Upgrade notes
 
     ``pip install -U virtualenvwrapper``
 
-  * Since the django-dynamic-preferences update comes with a migration,
-    it is strongly suggested to backup your DB (but you already do that, right?).
+  * Since this release comes with a few migrations, it is strongly suggested to backup 
+    your DB (but you already do that, right?).
 
 Added
 .....
@@ -76,6 +76,9 @@ Changed
 * Prefill the full reply editor with parent and root parent mentions.
 
 * The reply box is now functional for limited replies.
+
+* Complete rework of AP reply collections processing. Replies are now processed only from top_level content/share.
+  This should dramatically reduce the number of scheduled jobs.
 
 Removed
 .......

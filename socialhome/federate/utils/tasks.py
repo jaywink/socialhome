@@ -422,7 +422,6 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
         return
 
     if not fids: fids = [root.fid]
-    content = root
     to_remove = []
     to_add = []
     for fid in fids:
@@ -448,13 +447,15 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
                     # Try to fetch and process
                     if isinstance(reply, base.Comment):
                         remote_content = reply
-                    else:
+                    elif isinstance(reply, str):
                         remote_content = retrieve_remote_content(reply_fid)
+                    else:
+                        continue
                     if remote_content:
                         logger.debug(
                             "process_replies - processing reply %s for entity %s", remote_content.id, root.fid)
                         if isinstance(getattr(remote_content, 'replies', None), base.Collection):
-                            to_add.append(remote_content.id)
+                            if reply_fid not in fids: to_add.append(remote_content.id)
                         # should we enqueue a job for this?
                         process_entities([remote_content])
         else:
