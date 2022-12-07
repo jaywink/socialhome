@@ -430,6 +430,7 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
         else:
             try:
                 content = Content.objects.get(fid=fid)
+                if not content.replies_fid: continue # not supported by all platforms
             except Content.DoesNotExist:
                 # Retracted?
                 to_remove.append(fid)
