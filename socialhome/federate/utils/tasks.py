@@ -456,7 +456,7 @@ def process_replies(root_id, fids=None, shared_by_id=None, delta=None):
                         logger.debug(
                             "process_replies - processing reply %s for entity %s", remote_content.id, root.fid)
                         if isinstance(getattr(remote_content, 'replies', None), base.Collection):
-                            if reply_fid not in fids: to_add.append(remote_content.id)
+                            if reply_fid not in fids: to_add.append(reply_fid)
                         # should we enqueue a job for this?
                         process_entities([remote_content])
         else:
