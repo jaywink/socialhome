@@ -54,6 +54,16 @@ Changed
 
 * Fetch reply parents up to the root parent.
 
+* Moved ``ProfileAllStream`` stream class to the non-cached stream classes.
+
+Fixed
+.....
+
+* Setting ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` to zero will now correct skip precache tasks.
+
+* Fix streams precache tasks unnecessarely running for all stream classes, now they only
+  run for the cached strea classes.
+
 Removed
 .......
 
