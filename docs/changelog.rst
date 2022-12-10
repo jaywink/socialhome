@@ -54,6 +54,8 @@ Changed
 
 * Fetch reply parents up to the root parent.
 
+* Moved ``ProfileAllStream`` stream class to the non-cached stream classes.
+
 * Previously all jobs were placed in one background queue. Now three priority based queues exist:
 
   * ``high`` for all federation related traffic
@@ -62,6 +64,14 @@ Changed
 
   If you have customized `circus.ini` in your environment, ensure to add the new
   ``high`` and ``low`` queues, see the default ``circus.ini`` in ``config/circus.ini``.
+
+Fixed
+.....
+
+* Setting ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` to zero will now correct skip precache tasks.
+
+* Fix streams precache tasks unnecessarely running for all stream classes, now they only
+  run for the cached strea classes.
 
 Removed
 .......

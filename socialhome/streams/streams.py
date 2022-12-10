@@ -75,9 +75,15 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
     cache_keys = []
     notify_keys = set()
     # Cache for each active user`
+    counter = 0
     for user in qs.iterator():
+        counter += 1
         check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
                               through.content_type == ContentType.SHARE)
+    logger.info(
+        "Stream.add_to_stream_for_users - checked stream %s for %s users, adding to %s cache keys",
+        stream_cls_name, counter, len(cache_keys),
+    )
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
@@ -133,6 +139,9 @@ def update_streams_with_content(content):
 
     First adds to the author streams, then queues the rest of the user streams to a background job.
     """
+    if not settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
+        # Streams precaching not enabled
+        return
     # Store current acting profile
     acting_profile = content.author
     # The original is the "through" always, has importance in shares
@@ -144,13 +153,13 @@ def update_streams_with_content(content):
     if acting_profile.is_local:
         keys = []
         notify_keys = set()
-        for stream_cls in ALL_STREAMS:
+        for stream_cls in CACHED_STREAM_CLASSES:
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys)
     # Queue rest to RQ
-    for stream_cls in ALL_STREAMS:
+    for stream_cls in CACHED_STREAM_CLASSES:
         django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
@@ -447,13 +456,13 @@ class TagsStream(BaseStream):
 
 CACHED_STREAM_CLASSES = (
     FollowedStream,
-    ProfileAllStream,
     TagsStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
     LimitedStream,
     LocalStream,
+    ProfileAllStream,
     ProfilePinnedStream,
     PublicStream,
     TagStream,
