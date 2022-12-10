@@ -13,7 +13,6 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
-from socialhome.federate import metrics
 from socialhome.federate.utils import get_profiles_from_receivers
 from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
@@ -406,7 +405,6 @@ def process_entity_share(entity, profile):
         queue.enqueue(forward_entity, entity, target_content.id)
 
 
-@metrics.TASK_TIME_PROCESS_REPLIES.time()
 def process_replies(root_id, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
     try:
