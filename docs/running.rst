@@ -403,13 +403,6 @@ Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
 
-SOCIALHOME_METRICS
-..................
-
-Default: ``False``
-
-See :ref:`metrics`.
-
 SOCIALHOME_NODE_LIST_URL
 ........................
 
@@ -456,6 +449,8 @@ Default: ``100``
 Amount of items to keep in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting.
 
 Note the amount actually stored can temporarily go over the limit. Cache trimming is done as a daily job, not every time a new item needs to be added to the cache.
+
+Setting this to zero will disable precache tasks.
 
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS
 .........................................
