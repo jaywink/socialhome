@@ -36,8 +36,6 @@ Added
 
 * Add management command ``rq_job_types`` to list currently queued job types by count.
 
-* Allow exposing Prometheus metrics. See the configuration guide on how to enable.
-
 * Add ``console`` log target and possibility to configure logging level for any log target.
 
   The option ``SOCIALHOME_SYSLOG_LEVEL`` is now deprecated and will be removed in

@@ -13,7 +13,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
 from federation.types import UserType
@@ -35,7 +34,7 @@ from socialhome.utils import get_full_media_url, get_redis_connection
 logger = logging.getLogger("socialhome")
 
 
-class User(ExportModelOperationsMixin('users_user'), AbstractUser):
+class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns
     # around the globe.
@@ -127,7 +126,7 @@ class User(ExportModelOperationsMixin('users_user'), AbstractUser):
 
 
 # noinspection PyCallingNonCallable
-class Profile(ExportModelOperationsMixin('users_profile'), TimeStampedModel):
+class Profile(TimeStampedModel):
     """Profile data for local and remote users."""
     # Local UUID
     uuid = models.UUIDField(unique=True, blank=True, null=True, editable=False)

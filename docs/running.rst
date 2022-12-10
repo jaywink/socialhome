@@ -403,13 +403,6 @@ Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
 
-SOCIALHOME_METRICS
-..................
-
-Default: ``False``
-
-See :ref:`metrics`.
-
 SOCIALHOME_NODE_LIST_URL
 ........................
 

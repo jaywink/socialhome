@@ -1,13 +1,12 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django_prometheus.models import ExportModelOperationsMixin
 from enumfields import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from model_utils.fields import AutoCreatedField
 
 
-class Activity(ExportModelOperationsMixin('activities_activity'), models.Model):
+class Activity(models.Model):
     """
     Model for Activities done by a profile.
     """
