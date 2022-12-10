@@ -131,7 +131,8 @@ def queue_payload(request: HttpRequest, uuid: str = None):
             if match:
                 uuid = match.groups()[0]
 
-        django_rq.enqueue(receive_task, _request, uuid=uuid)
+        queue = django_rq.get_queue("high")
+        queue.enqueue(receive_task, _request, uuid=uuid)
         return True
     except Exception:
         logger.exception('Failed to enqueue payload')

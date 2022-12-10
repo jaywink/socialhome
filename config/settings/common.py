@@ -282,14 +282,17 @@ REDIS_DEFAULT_EXPIRY = 60*60*24*30
 
 # RQ
 # --
+rq_queue_config = {
+    "HOST": REDIS_HOST,
+    "PORT": REDIS_PORT,
+    "DB": REDIS_DB,
+    "PASSWORD": REDIS_PASSWORD,
+    "DEFAULT_TIMEOUT": 600,
+}
 RQ_QUEUES = {
-    "default": {
-        "HOST": REDIS_HOST,
-        "PORT": REDIS_PORT,
-        "DB": REDIS_DB,
-        "PASSWORD": REDIS_PASSWORD,
-        "DEFAULT_TIMEOUT": 600,
-    },
+    "default": rq_queue_config,
+    "high": rq_queue_config,
+    "low": rq_queue_config,
 }
 RQ_SHOW_ADMIN_LINK = True
 

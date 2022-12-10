@@ -126,10 +126,11 @@ def process_entity_post(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content: %s", content)
         if hasattr(entity, '_replies'):
-            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            queue = django_rq.get_queue("low")
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
-                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
+                logger.warning("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content: %s", content)
     if content.visibility == Visibility.LIMITED:
@@ -207,10 +208,11 @@ def process_entity_comment(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content from comment entity: %s", content)
         if hasattr(entity, '_replies'):
-            if django_rq.get_scheduler().enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
+            queue = django_rq.get_queue("low")
+            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90), process_replies, entity):
                 logger.info("process_replies - queued job for entity %s", entity.id)
             else:
-                logger.warn("process_replies - failed to enqueue job for entity %s", entity.id)
+                logger.warning("process_replies - failed to enqueue job for entity %s", entity.id)
     else:
         logger.info("Updated Content from comment entity: %s", content)
 
@@ -228,7 +230,8 @@ def process_entity_comment(entity: Any, profile: Profile):
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
-        django_rq.enqueue(forward_entity, entity, root_parent.id)
+        queue = django_rq.get_queue("high")
+        queue.enqueue(forward_entity, entity, root_parent.id)
 
 
 def _embed_entity_medias_to_post(children, text):
@@ -386,7 +389,8 @@ def process_entity_share(entity, profile):
     if target_content.local:
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
-        django_rq.enqueue(forward_entity, entity, target_content.id)
+        queue = django_rq.get_queue("high")
+        queue.enqueue(forward_entity, entity, target_content.id)
 
 
 def process_replies(entity=None, fetch=False, delta=None):
@@ -407,16 +411,17 @@ def process_replies(entity=None, fetch=False, delta=None):
             remote_content = retrieve_remote_content(reply)
             if remote_content:
                 process_entities([remote_content])
-    
+
     # Using a delta increasing by a factor of two, refresh
     # the replies up to 5 days after publication
     delta = delta * 2 if delta else dt.timedelta(minutes=15)
     if hasattr(entity, '_replies'):
         if delta < dt.timedelta(5):
-            if django_rq.get_scheduler().enqueue_in(delta, process_replies, entity, True, delta):
+            queue = django_rq.get_queue("low")
+            if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, entity, True, delta):
                 logger.info("process_replies - queued refresh job for entity %s", entity.id)
             else:
-                logger.warn("process_replies - failed to enqueue refresh job for entity %s", entity.id)
+                logger.warning("process_replies - failed to enqueue refresh job for entity %s", entity.id)
 
 
 def sender_key_fetcher(fid):
