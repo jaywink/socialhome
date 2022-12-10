@@ -133,7 +133,6 @@ DATABASES = {
     "default": env.db(
         "DATABASE_URL",
         default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome",
-        engine="django_prometheus.db.backends.postgresql",
     ),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
