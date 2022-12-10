@@ -53,7 +53,7 @@ RUN npm run build && \
     rm -rf /bower_components && \
     rm -rf /root/.cache/Cypress && \
     cp config/circus_docker.ini config/circus.ini && \
-    mkdir -p /logs && mkdir /tmp/socialhome-metrics
+    mkdir -p /logs
 
 ENV POSTGRES_PASSWORD postgres
 ENV RQWORKER_NUM 1
