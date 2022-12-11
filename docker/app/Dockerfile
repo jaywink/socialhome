@@ -25,18 +25,27 @@ COPY docker/app/gunicorn.sh /gunicorn.sh
 
 RUN npm install && \
     node_modules/.bin/bower --allow-root install && \
-    chmod +x /gunicorn.sh
+    chmod +x /gunicorn.sh && \
+    mkdir -p /app/socialhome/frontend
 
-COPY . /app
-
-RUN ln -s /node_modules /app/node_modules && \
-    ln -s /bower_components /app/bower_components
+COPY socialhome/frontend/package.json /app/socialhome/frontend
+COPY socialhome/frontend/package-lock.json /app/socialhome/frontend
 
 WORKDIR /app/socialhome/frontend
 
-RUN npm install
+RUN npm install && \
+    ln -s /node_modules /app/node_modules && \
+    ln -s /bower_components /app/bower_components
 
 WORKDIR /app
+
+COPY requirements/requirements.txt ./
+
+RUN pip install -U pip setuptools pip-tools && \
+    pip-sync requirements.txt && \
+    pip install gunicorn
+
+COPY . /app
 
 RUN npm run build && \
     rm -rf /node_modules && \
@@ -44,10 +53,7 @@ RUN npm run build && \
     rm -rf /bower_components && \
     rm -rf /root/.cache/Cypress && \
     cp config/circus_docker.ini config/circus.ini && \
-    mkdir -p /logs && mkdir /tmp/socialhome-metrics && \
-    pip install -U pip setuptools pip-tools && \
-    pip-sync requirements/requirements.txt && \
-    pip install gunicorn
+    mkdir -p /logs
 
 ENV POSTGRES_PASSWORD postgres
 ENV RQWORKER_NUM 1
@@ -59,7 +65,6 @@ ENV DJANGO_DEBUG False
 ENV DJANGO_ACCOUNT_ALLOW_REGISTRATION=False
 ENV DJANGO_ALLOWED_HOSTS socialhome.local
 ENV DBHOST=db
-ENV PROMETHEUS_MULTIPROC_DIR=/tmp/socialhome-metrics
 ENV SOCIALHOME_LOG_TARGET=console
 
 CMD circusd /app/config/circus.ini

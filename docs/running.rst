@@ -159,31 +159,6 @@ Current functionality:
 * Post local user public posts into Matrix side to their profile timeline rooms
   and to each hashtag room.
 
-.. _metrics:
-
-Metrics
--------
-
-Prometheus metrics can be exported under ``/metrics``. If enabled, the following
-metrics are available:
-
-* Various ``django_`` prefixed metrics regarding database, views and caches.
-  See https://github.com/korfuri/django-prometheus for details.
-* Total count and time spent on the main federation tasks under
-  ``socialhome_federate_tasks_`` prefix.
-
-To enable, you'll need to set the following:
-
-* ``SOCIALHOME_METRICS=True`` to enable metrics
-* (non-Docker deployments) ``PROMETHEUS_MULTIPROC_DIR=/path/for/metrics`` where
-  ``/path/for/metrics`` is a path where Socialhome can write to from all the processes.
-  This is already taken care of in the provided Dockerfile.
-
-  Important! When restarting Socialhome, this path should always be cleaned.
-
-Note! The metrics endpoint has no authentication. Be sure to protect it by
-adding for example HTTP basic auth, if needed.
-
 .. _configuration:
 
 Configuration
@@ -403,13 +378,6 @@ Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
 
-SOCIALHOME_METRICS
-..................
-
-Default: ``False``
-
-See :ref:`metrics`.
-
 SOCIALHOME_NODE_LIST_URL
 ........................
 
@@ -456,6 +424,8 @@ Default: ``100``
 Amount of items to keep in stream precaches, per user, per stream. Increasing this setting can radically increase Redis memory usage. If you have a lot of users, you might consider decreasing this setting.
 
 Note the amount actually stored can temporarily go over the limit. Cache trimming is done as a daily job, not every time a new item needs to be added to the cache.
+
+Setting this to zero will disable precache tasks.
 
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS
 .........................................

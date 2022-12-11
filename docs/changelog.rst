@@ -20,7 +20,7 @@ Upgrade notes
 
     ``pip install -U virtualenvwrapper``
 
-  * Since this release comes with a few migrations, it is strongly suggested to backup 
+  * Since this release comes with a few migrations, it is strongly suggested to backup
     your DB (but you already do that, right?).
 
 Added
@@ -47,8 +47,6 @@ Added
 
 * Add management command ``rq_job_types`` to list currently queued job types by count.
 
-* Allow exposing Prometheus metrics. See the configuration guide on how to enable.
-
 * Add ``console`` log target and possibility to configure logging level for any log target.
 
   The option ``SOCIALHOME_SYSLOG_LEVEL`` is now deprecated and will be removed in
@@ -65,10 +63,21 @@ Changed
 
 * Fetch reply parents up to the root parent.
 
-* Limited content recipients are now extracted from parsing mentions from UI 
+* Moved ``ProfileAllStream`` stream class to the non-cached stream classes.
+
+* Previously all jobs were placed in one background queue. Now three priority based queues exist:
+
+  * ``high`` for all federation related traffic
+  * ``default`` for populating streams and some other tasks
+  * ``low`` for sending notification emails and fetching replies for received content
+
+  If you have customized `circus.ini` in your environment, ensure to add the new
+  ``high`` and ``low`` queues, see the default ``circus.ini`` in ``config/circus.ini``.
+
+* Limited content recipients are now extracted from parsing mentions from UI
   for both contents and replies (ignored for limited visibility replies).
 
-* As a result of the change described above, mentions no longer need to 
+* As a result of the change described above, mentions no longer need to
   be extracted on content save.
 
 * Show reply and share counts for replies.
@@ -79,6 +88,14 @@ Changed
 
 * Complete rework of AP reply collections processing. Replies are now processed only from top_level content/share.
   This should dramatically reduce the number of scheduled jobs.
+
+Fixed
+.....
+
+* Setting ``SOCIALHOME_STREAMS_PRECACHE_SIZE`` to zero will now correct skip precache tasks.
+
+* Fix streams precache tasks unnecessarely running for all stream classes, now they only
+  run for the cached strea classes.
 
 Removed
 .......
