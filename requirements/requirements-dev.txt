@@ -723,7 +723,7 @@ urllib3==1.26.6
     #   -r requirements/requirements.txt
     #   requests
     #   requests-cache
-uwsgi==2.0.20
+uwsgi==2.0.21
     # via -r requirements/requirements.txt
 wcwidth==0.2.5
     # via

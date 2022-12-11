@@ -410,7 +410,7 @@ urllib3==1.26.6
     # via
     #   requests
     #   requests-cache
-uwsgi==2.0.20
+uwsgi==2.0.21
     # via -r requirements/requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
