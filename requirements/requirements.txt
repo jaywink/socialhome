@@ -56,7 +56,7 @@ bleach==4.0.0
     #   federation
 cachetools==5.0.0
     # via pyld
-calamus==0.4.0
+calamus==0.4.1
     # via federation
 cattrs==1.10.0
     # via requests-cache

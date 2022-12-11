@@ -81,7 +81,7 @@ cachetools==5.0.0
     # via
     #   -r requirements/requirements.txt
     #   pyld
-calamus==0.4.0
+calamus==0.4.1
     # via
     #   -r requirements/requirements.txt
     #   federation
