@@ -149,7 +149,7 @@ def update_streams_with_content(content, event='new'):
     # TODO: implement update and delete events in the UI
     if event != 'new': return
     # Store current acting profile
-    acting_profile = content.author
+    acting_profile = content.author if not content.content_type == ContentType.REPLY else content.root_parent.author
     # The original is the "through" always, has importance in shares
     through = content
     if content.content_type == ContentType.SHARE:
