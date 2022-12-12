@@ -84,9 +84,12 @@ export default {
             "contentById",
         ]),
         rootParent() {
+            if (this.content.content_type !== "reply") {
+                return this.content
+            }
             // Find root
             let {content} = this
-            while (content.parent) {
+            while (content.parent !== null) {
                 content = this.contentById(content.parent)
             }
             return content
