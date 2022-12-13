@@ -387,7 +387,7 @@ def process_entity_share(entity, profile):
     if created:
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:
-            queue = django_rq.get_queue('replies')
+            queue = django_rq.get_queue('low')
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
             if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90),
                     process_replies, content_id, shared_by_id=content.id):
