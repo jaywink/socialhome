@@ -152,7 +152,7 @@ def get_receivers_for_content(content: Content) -> Tuple:
     to = []
     cc = []
 
-    mentions = content.mentions.filter(protocol='activitypub').values_list("fid", flat=True)
+    mentions = content.mentions.filter(fid__isnull=False).values_list("fid", flat=True)
     followers = content.author.fid + 'followers/'
 
     if content.content_type == ContentType.SHARE:
@@ -213,7 +213,7 @@ def make_federable_content(content: Content) -> Optional[Union[base.Post, base.C
     elif content.content_type == ContentType.SHARE:
         ret = _make_share(content)
     else: ret = _make_post(content)
-    if content.author.protocol == 'activitypub':
+    if content.author.fid:
         ret.to, ret.cc = get_receivers_for_content(content)
     return ret
         
@@ -252,7 +252,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             target_guid=obj.guid,
             created_at=obj.effective_modified,
         )
-        if obj.author.protocol == 'activitypub':
+        if obj.author.fid:
             ret.to, ret.cc = get_receivers_for_content(obj)
         return ret
     except Exception as ex:
