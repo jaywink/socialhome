@@ -37,35 +37,27 @@ class ProfileQuerySet(QuerySet):
             extra_lookups = {}
         try:
             profile = self.fed(fid, **extra_lookups).get()
-            create = False
         except ObjectDoesNotExist:
-            create = True
-
-        if create:
             if fid.startswith('http'):
                 values['fid'] = fid
             values.update(extra_lookups)
-            try:
-                return self.create(**values), True
-            except IntegrityError:
-                # something beat us to creation
-                profile = self.fed(fid, **extra_lookups).get()
-
-        changed = False
-        for key, value in values.items():
-            if key in ('fid', 'guid', 'handle'):
-                continue
-            if getattr(profile, key, None) != value:
+            return self.create(**values), True
+        else:
+            changed = False
+            for key, value in values.items():
+                if key in ('fid', 'guid', 'handle'):
+                    continue
+                if getattr(profile, key, None) != value:
+                    changed = True
+                    setattr(profile, key, value)
+            # Switch profile to ActivityPub if Diaspora and we got an ActivityPub payload,
+            # indicating this is a multi-protocol remote
+            if profile.protocol == "diaspora" and profile.fid:
+                profile.protocol = "activitypub"
                 changed = True
-                setattr(profile, key, value)
-        # Switch profile to ActivityPub if Diaspora and we got an ActivityPub payload,
-        # indicating this is a multi-protocol remote
-        if profile.protocol == "diaspora" and profile.fid:
-            profile.protocol = "activitypub"
-            changed = True
-        if changed:
-            profile.save()
-        return profile, False
+            if changed:
+                profile.save()
+            return profile, False
 
     def followers(self, profile):
         """Return followers of a Profile."""

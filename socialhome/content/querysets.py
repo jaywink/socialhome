@@ -54,26 +54,18 @@ class ContentQuerySet(models.QuerySet):
             extra_lookups = {}
         try:
             content = self.fed(fid, **extra_lookups).get()
-            create = False
         except ObjectDoesNotExist:
-            create = True
-
-        if create:
             if fid.startswith('http'):
                 values['fid'] = fid
             values.update(extra_lookups)
-            try:
-                return self.create(**values), True
-            except IntegrityError:
-                # something beat us to creation
-                content = self.fed(fid, **extra_lookups).get()
-
-        for key, value in values.items():
-            if key in ('fid', 'guid'):
-                continue
-            setattr(content, key, value)
-        content.save()
-        return content, False
+            return self.create(**values), True
+        else:
+            for key, value in values.items():
+                if key in ('fid', 'guid'):
+                    continue
+                setattr(content, key, value)
+            content.save()
+            return content, False
 
     def followed(self, user, single_id: int = None):
         """Get content from followed users.
