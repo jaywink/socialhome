@@ -47,14 +47,13 @@ def add_to_redis(content, through, keys):
             r.expire(throughs_key, settings.REDIS_DEFAULT_EXPIRY)
 
 
-def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_profile_id):
+def add_to_streams_for_users(content_id, through_id, acting_profile_id):
     """Add content to all user streams of one type and do notification of streams.
 
     Excludes author of content.
 
     This function is designed to be queued to RQ.
     """
-    stream_cls = globals().get(stream_cls_name)
     try:
         content = Content.objects.get(id=content_id)
     except Content.DoesNotExist:
@@ -72,20 +71,21 @@ def add_to_stream_for_users(content_id, through_id, stream_cls_name, acting_prof
         return
 
     qs = get_precache_users_qs(acting_profile)
-    cache_keys = []
-    notify_keys = set()
-    # Cache for each active user`
-    counter = 0
-    for user in qs.iterator():
-        counter += 1
-        check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
+    for stream_cls in ALL_STREAMS:
+        cache_keys = []
+        notify_keys = set()
+        # Cache for each active user`
+        counter = 0
+        for user in qs.iterator():
+            counter += 1
+            check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
                               through.content_type == ContentType.SHARE)
-    logger.info(
-        "Stream.add_to_stream_for_users - checked stream %s for %s users, adding to %s cache keys",
-        stream_cls_name, counter, len(cache_keys),
-    )
-    add_to_redis(content, through, cache_keys)
-    notify_listeners(content, notify_keys)
+        logger.info(
+            "Stream.add_to_stream_for_users - checked stream %s for %s users, adding to %s cache keys",
+            stream_cls.__name__, counter, len(cache_keys),
+        )
+        add_to_redis(content, through, cache_keys)
+        notify_listeners(content, notify_keys)
 
 
 def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share):
@@ -102,7 +102,7 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     :param notify_keys: List of existing notify keys to add to.
     :param is_share: Boolean whether this is a shared content.
     """
-    if stream_cls not in CACHED_STREAM_CLASSES and not user.recently_active:
+    if not user.recently_active:
         # Abort early to avoid unnecessary work if we're not intending to cache for this user
         # and we're also not intending to notify them
         return
@@ -110,7 +110,7 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
         if stream.should_cache_content(content):
-            if stream_cls in CACHED_STREAM_CLASSES:
+            if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
                 cache_keys.append(stream.key)
             if is_share and (not stream.notify_for_shares or acting_profile == getattr(user, "profile", None)):
                 continue
@@ -118,7 +118,8 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
                 notify_keys.add(stream.notify_key)
         # Dynamic update of the reply_count
         if content.content_type == ContentType.REPLY:
-            notify_keys.add(stream.notify_key)
+            if stream.should_cache_content(content.root_parent):
+                notify_keys.add(stream.notify_key)
 
 
 
@@ -143,10 +144,7 @@ def update_streams_with_content(content, event='new'):
 
     First adds to the author streams, then queues the rest of the user streams to a background job.
     """
-    if not settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
-        # Streams precaching not enabled
-        return
-    # TODO: implement update and delete events in the UI
+    # TODO: implement update and delete activities in the UI
     if event != 'new': return
     # Store current acting profile
     acting_profile = content.author if not content.content_type == ContentType.REPLY else content.root_parent.author
@@ -159,14 +157,13 @@ def update_streams_with_content(content, event='new'):
     if acting_profile.is_local:
         keys = []
         notify_keys = set()
-        for stream_cls in CACHED_STREAM_CLASSES:
+        for stream_cls in ALL_STREAMS:
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys)
     # Queue rest to RQ
-    for stream_cls in CACHED_STREAM_CLASSES:
-        django_rq.enqueue(add_to_stream_for_users, content.id, through.id, stream_cls.__name__, acting_profile.id)
+    django_rq.enqueue(add_to_streams_for_users, content.id, through.id, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
         # Content reply
@@ -462,13 +459,13 @@ class TagsStream(BaseStream):
 
 CACHED_STREAM_CLASSES = (
     FollowedStream,
+    ProfileAllStream,
     TagsStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
     LimitedStream,
     LocalStream,
-    ProfileAllStream,
     ProfilePinnedStream,
     PublicStream,
     TagStream,
