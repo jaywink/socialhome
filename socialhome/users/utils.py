@@ -47,7 +47,7 @@ def set_profile_finger(profile):
     profile.refresh_from_db()
     if not profile.finger: 
         finger = ""
-        if profile.protocol == 'diaspora':
+        if profile.is_local or profile.protocol == 'diaspora':
             finger = profile.handle
         elif profile.protocol == 'activitypub':
             domain = urlparse(profile.fid).netloc
