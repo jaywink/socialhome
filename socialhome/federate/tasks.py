@@ -214,7 +214,7 @@ def send_share(content_id, activity_fid):
         return
     entity = make_federable_content(content)
     if entity:
-        entity.activity_id = activity_fid
+        entity.id = activity_fid
         if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
@@ -378,9 +378,10 @@ def send_profile(profile_id, recipients=None):
         else:
             recipients = []
         recipients.extend(_get_remote_followers(profile, profile.visibility))
-        entity.to = NAMESPACE_PUBLIC
+        to = NAMESPACE_PUBLIC
     else:
-        entity.to = [recipient.get('fid') for recipient in recipients if recipient.get('fid', None)]
+        to = recipients
+    if hasattr(entity, 'to'): entity.to = to
 
     logger.debug("send_profile - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())

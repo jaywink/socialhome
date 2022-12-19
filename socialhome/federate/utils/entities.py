@@ -77,7 +77,7 @@ def _make_share(content: Content) -> Optional[base.Share]:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
 
 
-def get_federable_object(request: HttpRequest, signer: str) -> Optional[BaseEntity]:
+def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[BaseEntity]:
     """
     Retrieve local object and return it as a federable version.
 
@@ -213,7 +213,7 @@ def make_federable_content(content: Content) -> Optional[Union[base.Post, base.C
     elif content.content_type == ContentType.SHARE:
         ret = _make_share(content)
     else: ret = _make_post(content)
-    if content.author.fid:
+    if content.author.fid and isinstance(content.author.fid, str):
         ret.to, ret.cc = get_receivers_for_content(content)
     return ret
         
@@ -252,7 +252,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             target_guid=obj.guid,
             created_at=obj.effective_modified,
         )
-        if obj.author.fid:
+        if obj.author.fid and isinstance(obj.author.fid, str):
             ret.to, ret.cc = get_receivers_for_content(obj)
         return ret
     except Exception as ex:
