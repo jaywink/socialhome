@@ -57,35 +57,35 @@ def add_to_streams_for_users(content_id, through_id, acting_profile_id):
     try:
         content = Content.objects.get(id=content_id)
     except Content.DoesNotExist:
-        logger.warning("Stream.add_to_stream_for_users - content %s does not exist!", content_id)
+        logger.warning("Stream.add_to_streams_for_users - content %s does not exist!", content_id)
         return
     try:
         through = Content.objects.get(id=through_id)
     except Content.DoesNotExist:
-        logger.warning("Stream.add_to_stream_for_users - through content %s does not exist!", through_id)
+        logger.warning("Stream.add_to_streams_for_users - through content %s does not exist!", through_id)
         return
     try:
         acting_profile = Profile.objects.select_related("user").get(id=acting_profile_id)
     except Profile.DoesNotExist:
-        logger.warning("Stream.add_to_stream_for_users - acting profile %s does not exist!", acting_profile_id)
+        logger.warning("Stream.add_to_streams_for_users - acting profile %s does not exist!", acting_profile_id)
         return
 
     qs = get_precache_users_qs(acting_profile)
+    cache_keys = []
+    notify_keys = set()
+    counter = 0
     for stream_cls in ALL_STREAMS:
-        cache_keys = []
-        notify_keys = set()
         # Cache for each active user`
-        counter = 0
         for user in qs.iterator():
             counter += 1
             check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
                               through.content_type == ContentType.SHARE)
-        logger.info(
-            "Stream.add_to_stream_for_users - checked stream %s for %s users, adding to %s cache keys",
-            stream_cls.__name__, counter, len(cache_keys),
-        )
-        add_to_redis(content, through, cache_keys)
-        notify_listeners(content, notify_keys)
+    logger.info(
+        "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
+        stream_cls.__name__, counter, len(cache_keys),
+    )
+    add_to_redis(content, through, cache_keys)
+    notify_listeners(content, notify_keys)
 
 
 def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share):
@@ -154,9 +154,9 @@ def update_streams_with_content(content, event='new'):
         # If this is a share we want to cache the shared content, not the original
         content = content.share_of
     # Do author immediately
+    keys = []
+    notify_keys = set()
     if acting_profile.is_local:
-        keys = []
-        notify_keys = set()
         for stream_cls in ALL_STREAMS:
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
