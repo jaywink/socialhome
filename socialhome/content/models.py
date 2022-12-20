@@ -35,7 +35,7 @@ class OpenGraphCache(models.Model):
     url = models.URLField(_("URL"), unique=True)
     title = models.CharField(_("Title"), max_length=256, blank=True)
     description = models.TextField(_("Description"), blank=True)
-    image = models.URLField(_("Image URL"), blank=True)
+    image = models.URLField(_("Image URL"), blank=True, max_length=500)
     modified = AutoLastModifiedField(_("Modified"), db_index=True)
 
     def __str__(self):

@@ -162,9 +162,9 @@ class Profile(TimeStampedModel):
     visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
     # Image urls
-    image_url_large = models.URLField(_("Image - large"), blank=True)
-    image_url_medium = models.URLField(_("Image - medium"), blank=True)
-    image_url_small = models.URLField(_("Image - small"), blank=True)
+    image_url_large = models.URLField(_("Image - large"), blank=True, max_length=500)
+    image_url_medium = models.URLField(_("Image - medium"), blank=True, max_length=500)
+    image_url_small = models.URLField(_("Image - small"), blank=True, max_length=500)
 
     # Location
     location = models.CharField(_("Location"), max_length=128, blank=True)

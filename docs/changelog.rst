@@ -89,6 +89,8 @@ Changed
 * Complete rework of AP reply collections processing. Replies are now processed only from top_level content/share.
   This should dramatically reduce the number of scheduled jobs.
 
+* Image URLField max_length bumped to 500 (for content/OpenGraphCache and users/Profile).
+
 Fixed
 .....
 
