@@ -216,7 +216,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         limited_content = LimitedContentWithRecipientsFactory(author=self.user.profile)
         serializer = ContentSerializer(limited_content, context={"request": Mock(user=self.user)})
         expected_recipients_list = set(
-            limited_content.limited_visibilities.all().order_by("id").values_list("handle", flat=True)
+            limited_content.limited_visibilities.all().order_by("id").values_list("finger", flat=True)
         )
         self.assertEqual(expected_recipients_list, set(serializer.data["recipients"]))
 
@@ -317,6 +317,8 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         ):
             serializer.is_valid(True)
 
+    # recipients == mentions, so not ignored anymore
+    @pytest.mark.skip
     def test_validate_recipients__recipients_ignored_if_not_limited(self):
         serializer = ContentSerializer(
             instance=self.limited_content, partial=True, context={"request": Mock(user=self.user)}, data={

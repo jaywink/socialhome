@@ -2,7 +2,8 @@ from unittest.mock import patch, Mock, call
 
 from django.db import IntegrityError, transaction
 from federation.entities import base
-from federation.entities.activitypub.entities import ActivitypubComment
+from federation.entities.activitypub.enums import ActivityType
+from federation.entities.activitypub.models import Comment
 from federation.tests.factories import entities
 from federation.types import UserType, ReceiverVariant
 
@@ -150,7 +151,7 @@ class TestProcessEntityPost(SocialhomeTestCase):
         content = Content.objects.get(fid=entity.id)
         self.assertEqual(
             set(content.limited_visibilities.all()),
-            {self.local_user.profile, self.local_user2.profile},
+            {self.profile, self.local_user.profile, self.local_user2.profile},
         )
 
     def test_visibility_is_added_to_receiving_profile(self):
@@ -160,7 +161,7 @@ class TestProcessEntityPost(SocialhomeTestCase):
         content = Content.objects.get(fid=entity.id)
         self.assertEqual(
             set(content.limited_visibilities.all()),
-            {self.receiving_profile},
+            {content.author, self.receiving_profile},
         )
 
     def test_visibility_is_not_added_to_public_content(self):
@@ -278,7 +279,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
         self.assertEqual(content.limited_visibilities.count(), 0)
 
     def test_visibility__added_if_public_parent_content_if_visibility_on_comment__non_public_comment(self):
-        comment = ActivitypubComment(
+        comment = Comment(
             id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
             actor_id="https://example.com/profile2", public=False,
         )
@@ -291,7 +292,7 @@ class TestProcessEntityComment(SocialhomeTestCase):
         )
 
     def test_visibility__not_added_if_public_parent_content_if_visibility_on_comment__public_comment(self):
-        comment = ActivitypubComment(
+        comment = Comment(
             id="https://example.com/comment2", target_id=self.public_content.fid, raw_content="foobar",
             actor_id="https://example.com/profile2", public=True,
         )
@@ -343,13 +344,13 @@ class TestProcessEntityComment(SocialhomeTestCase):
         content = Content.objects.get(fid=self.comment.id, parent=self.content)
         self.assertEqual(content.text, "&lt;script&gt;alert('yup');&lt;/script&gt;")
 
-    @patch("socialhome.federate.utils.tasks.django_rq.enqueue")
+    @patch("socialhome.federate.utils.tasks.django_rq.queues.DjangoRQ")
     def test_does_not_forward_relayable_if_not_local_content(self, mock_rq):
         process_entity_comment(self.comment, ProfileFactory())
         Content.objects.get(fid=self.comment.id, parent=self.content)
-        self.assertFalse(mock_rq.called)
+        assert len(mock_rq.method_calls) == 0
 
-    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.tasks.django_rq.queues.DjangoRQ", autospec=True)
     def test_forwards_relayable_if_local_content(self, mock_rq):
         user = UserFactory()
         self.content.author = user.profile
@@ -359,9 +360,10 @@ class TestProcessEntityComment(SocialhomeTestCase):
         process_entity_comment(self.comment, ProfileFactory())
         Content.objects.get(fid=self.comment.id, parent=self.content)
         call_args = [
-            call(forward_entity, self.comment, self.content.id),
+            call().enqueue(forward_entity, self.comment, self.content.id),
         ]
-        self.assertEqual(mock_rq.call_args_list, call_args)
+        assert len(mock_rq.method_calls) == 1
+        self.assertEqual(mock_rq.method_calls, call_args)
 
     @patch("socialhome.federate.utils.tasks.Content.objects.update_or_create", return_value=(None, None), autospec=True)
     def test_local_reply_is_skipped(self, mock_update):
@@ -464,10 +466,11 @@ class TestProcessEntityFollow(SocialhomeTransactionTestCase):
         process_entity_follow(base.Follow(target_id=self.profile.fid, following=False), self.remote_profile)
         self.assertEqual(self.remote_profile.following.count(), 0)
 
-    @patch("socialhome.users.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_follower_added_sends_a_notification(self, mock_enqueue):
         process_entity_follow(base.Follow(target_id=self.profile.fid, following=True), self.remote_profile)
-        mock_enqueue.assert_called_once_with(send_follow_notification, self.remote_profile.id, self.profile.id)
+        assert len(mock_enqueue.method_calls) == 1
+        mock_enqueue.method_calls[0].assert_called_once_with(call().enqueue(send_follow_notification, self.remote_profile.id, self.profile.id))
 
 
 class TestProcessEntityShare(SocialhomeTestCase):
@@ -480,23 +483,24 @@ class TestProcessEntityShare(SocialhomeTestCase):
         cls.remote_content = PublicContentFactory()
         cls.remote_profile2 = PublicProfileFactory()
 
-    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.tasks.django_rq.queues.DjangoRQ", autospec=True)
     def test_does_not_forward_share_if_not_local_content(self, mock_rq):
         entity = base.Share(
             id="https://example.com/share", actor_id=self.remote_profile.fid,
             target_id=self.remote_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
-        self.assertFalse(mock_rq.called)
+        assert len(mock_rq.method_calls) == 0
 
-    @patch("socialhome.federate.utils.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.tasks.django_rq.queues.DjangoRQ", autospec=True)
     def test_forwards_share_if_local_content(self, mock_rq):
         entity = base.Share(
             id="https://example.com/share", actor_id=self.remote_profile.fid,
             target_id=self.local_content.fid, public=True,
         )
         process_entity_share(entity, self.remote_profile)
-        mock_rq.assert_called_once_with(forward_entity, entity, self.local_content.id)
+        assert len(mock_rq.method_calls) == 1
+        mock_rq.method_calls[0].assert_called_once_with(call().enqueue(forward_entity, entity, self.local_content.id))
 
     def test_share_is_created(self):
         entity = base.Share(
@@ -692,6 +696,7 @@ class TestMakeFederableContent(SocialhomeTestCase):
 class TestMakeFederableRetraction(SocialhomeTestCase):
     def test_returns_entity(self):
         content = PublicContentFactory()
+        content.create_activity(ActivityType.CREATE)
         entity = make_federable_retraction(content, content.author)
         self.assertEqual(entity.entity_type, "Post")
         self.assertEqual(entity.target_id, content.fid)

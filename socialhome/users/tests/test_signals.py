@@ -45,65 +45,68 @@ class TestProfileFollowingChange(TransactionTestCase):
         self.profile2 = self.user2.profile
         self.profile = ProfileFactory()
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ")
     def test_adding_follower__local_actor__creates_activity(self, mock_enqueue):
         self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.FOLLOW).count(), 0)
         self.profile2.following.add(self.profile)
         self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.FOLLOW).count(), 1)
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ")
     def test_adding_follower__remote_actor__does_not_create_activity(self, mock_enqueue):
         self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.FOLLOW).count(), 0)
         self.profile.following.add(self.profile2)
         self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.FOLLOW).count(), 0)
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_adding_remote_follower_triggers_federation_event(self, mock_enqueue):
         self.profile2.following.add(self.profile)
+        assert len(mock_enqueue.method_calls) == 1
         self.assertEqual(
-            mock_enqueue.call_args_list,
+            mock_enqueue.method_calls,
             [
-                call(send_follow_change, self.profile2.id, self.profile.id, True),
+                call().enqueue(send_follow_change, self.profile2.id, self.profile.id, True),
             ]
         )
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ")
     def test_removing_follower__local_actor__creates_activity(self, mock_enqueue):
         self.profile2.following.add(self.profile)
         self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.UNDO).count(), 0)
         self.profile2.following.remove(self.profile)
         self.assertEqual(Activity.objects.filter(profile=self.profile2, type=ActivityType.UNDO).count(), 1)
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ")
     def test_removing_follower__remote_actor__does_not_create_activity(self, mock_enqueue):
         self.profile.following.add(self.profile2)
         self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.UNDO).count(), 0)
         self.profile.following.remove(self.profile2)
         self.assertEqual(Activity.objects.filter(profile=self.profile, type=ActivityType.UNDO).count(), 0)
 
-    @patch("socialhome.users.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_removing_remote_follower_triggers_federation_event(self, mock_enqueue):
         self.profile2.following.add(self.profile)
         mock_enqueue.reset_mock()
         self.profile2.following.remove(self.profile)
+        assert len(mock_enqueue.method_calls) == 1
         self.assertEqual(
-            mock_enqueue.call_args_list,
+            mock_enqueue.method_calls,
             [
-                call(send_follow_change, self.profile2.id, self.profile.id, False),
+                call().enqueue(send_follow_change, self.profile2.id, self.profile.id, False),
             ]
         )
 
 
 class TestFederateProfile(TransactionTestCase):
-    @patch("socialhome.users.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_non_local_profile_does_not_get_sent(self, mock_send):
         ProfileFactory()
         self.assertTrue(mock_send.called is False)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_local_profile_gets_sent(self, mock_send):
         user = UserFactory()
-        mock_send.assert_called_once_with(send_profile, user.profile.id)
+        assert len(mock_send.method_calls) == 1
+        mock_send.method_calls[0].assert_called_once_with(call().enqueue(send_profile, user.profile.id))
 
 
 class TestFederateProfileRetraction(SocialhomeTestCase):

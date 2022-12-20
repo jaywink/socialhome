@@ -1,6 +1,8 @@
 from unittest import mock
 from unittest.mock import patch, Mock, call
 
+import django_rq
+
 from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.content.enums import ContentType
@@ -21,35 +23,29 @@ class TestContentMentionsChange(SocialhomeTransactionTestCase):
         self.user = UserFactory()
         self.profile = self.user.profile
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
-    def test_adding_mention_triggers_notification(self, mock_enqueue):
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    def test_adding_mention_triggers_notification(self, mock_queue):
         self.content.mentions.add(self.profile)
-        self.assertEqual(
-            mock_enqueue.call_args_list,
-            [
-                call(send_mention_notification, self.user.id, self.content.author.id, self.content.id),
-            ]
+        self.assertEqual(mock_queue.method_calls,
+            [call().enqueue(send_mention_notification, self.user.id, self.content.author.id, self.content.id)]
         )
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
-    def test_adding_mention_triggers_notification__only_once(self, mock_enqueue):
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    def test_adding_mention_triggers_notification__only_once(self, mock_queue):
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
-        self.assertEqual(
-            mock_enqueue.call_args_list,
-            [
-                call(send_mention_notification, self.user.id, self.content.author.id, self.content.id),
-            ]
+        self.assertEqual(mock_queue.method_calls,
+            [call().enqueue(send_mention_notification, self.user.id, self.content.author.id, self.content.id)]
         )
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
-    def test_removing_mention_does_not_trigger_notification(self, mock_enqueue):
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    def test_removing_mention_does_not_trigger_notification(self, mock_queue):
         self.content.mentions.add(self.profile)
-        mock_enqueue.reset_mock()
+        mock_queue.reset_mock()
         self.content.mentions.remove(self.profile)
-        self.assertFalse(mock_enqueue.called)
+        assert len(mock_queue.method_calls) == 0
 
 
 class TestContentPostSave(SocialhomeTransactionTestCase):
@@ -57,12 +53,12 @@ class TestContentPostSave(SocialhomeTransactionTestCase):
     def test_calls_update_streams_with_content(self, mock_update):
         # Calls on create
         content = ContentFactory()
-        mock_update.assert_called_once_with(content)
+        mock_update.assert_called_once_with(content, event='new')
         mock_update.reset_mock()
-        # Does not call on update
+        # Call on update (TODO: implement stream updates)
         content.text = "update!"
         content.save()
-        self.assertFalse(mock_update.called)
+        mock_update.assert_called_once_with(content, event='update')
 
 
 class TestNotifyListeners(SocialhomeTestCase):
@@ -78,7 +74,7 @@ class TestNotifyListeners(SocialhomeTestCase):
         content = ContentFactory()
         with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
             update_streams_with_content(content)
-        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id, "parentId": None}}
         calls = [
             call(f"streams_profile_all__{content.author.id}__{self.user.id}", data),
             call(f"streams_public__{self.user.id}", data),
@@ -104,7 +100,7 @@ class TestNotifyListeners(SocialhomeTestCase):
         content.limited_visibilities.add(self.profile)
         with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
             update_streams_with_content(content)
-        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id, "parentId": None}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
         calls = [
@@ -136,7 +132,7 @@ class TestNotifyListeners(SocialhomeTestCase):
         content = ContentFactory(author=self.remote_profile, text="#foobar #barfoo")
         with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
             update_streams_with_content(content)
-        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id, 'parentId': None}}
         foobar_id = Tag.objects.get(name="foobar").id
         barfoo_id = Tag.objects.get(name="barfoo").id
         calls = [
@@ -155,6 +151,7 @@ class TestNotifyListeners(SocialhomeTestCase):
             call(f"streams_followed__{self.user.id}", data),
             call(f"streams_followed__{other_user.id}", data),
         ]
+        print(mock_send.mock_calls)
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 14)
 
@@ -169,7 +166,7 @@ class TestNotifyListeners(SocialhomeTestCase):
         share = ContentFactory(content_type=ContentType.SHARE, share_of=content, author=other_profile)
         with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
             update_streams_with_content(share)
-        data = {"type": "notification", "payload": {"event": "new", "id": content.id}}
+        data = {"type": "notification", "payload": {"event": "new", "id": content.id, "parentId": None}}
         calls = [
             call(f"streams_profile_all__{share.author.id}__{self.user.id}", data),
             call(f"streams_profile_all__{share.author.id}__{other_user.id}", data),
@@ -184,37 +181,43 @@ class TestNotifyListeners(SocialhomeTestCase):
         mock_async.return_value = mock_send
         content = ContentFactory()
         reply = ContentFactory(parent=content)
-        update_streams_with_content(reply)
-        data = {"type": "notification", "payload": {"event": "new", "id": reply.id}}
-        mock_send.assert_called_once_with("streams_content__%s" % content.channel_group_name, data)
+        with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
+            update_streams_with_content(reply)
+        data = {"type": "notification", "payload": {"event": "new", "id": reply.id, "parentId": content.id}}
+        calls = [
+            call(f'streams_public__{self.user.id}', data),
+            call(f'streams_profile_all__{content.author.id}__{self.user.id}', data),
+            call(f'streams_content__{content.channel_group_name}', data),
+        ]
+        mock_send.assert_has_calls(calls, any_order=True)
+        self.assertEqual(mock_send.call_count, 3)
 
 
 class TestFederateContent(SocialhomeTransactionTestCase):
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_non_local_content_does_not_get_sent(self, mock_update, mock_send):
         ContentFactory()
-        self.assertTrue(mock_send.called is False)
+        assert len(mock_send.method_calls) == 0
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_local_content_with_federate_false_does_not_get_sent(self, mock_update, mock_send):
         user = UserFactory()
         mock_send.reset_mock()
         ContentFactory(author=user.profile, federate=False)
-        self.assertTrue(mock_send.called is False)
+        assert len(mock_send.method_calls) == 0
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_local_content_with_parent_sent_as_reply(self, mock_send):
         user = UserFactory()
         parent = ContentFactory(author=user.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, parent=parent)
-        print(mock_send.call_args_list)
         self.assertTrue(content.local)
         activity = content.activities.first()
         send_reply_notifications_found = send_reply_found = False
-        for args, kwargs in mock_send.call_args_list:
+        for name, args, kwargs in mock_send.method_calls:
             if args == (send_reply_notifications, content.id):
                 send_reply_notifications_found = True
             elif args[0] == send_reply and args[1] == content.id and args[2] == activity.fid:
@@ -223,15 +226,16 @@ class TestFederateContent(SocialhomeTransactionTestCase):
             self.fail()
         self.assertEqual(activity.type, ActivityType.CREATE)
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_local_content_gets_sent(self, mock_update, mock_send):
         user = UserFactory()
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile)
         self.assertTrue(content.local)
-        self.assertEqual(mock_send.call_count, 1)
-        args, kwargs = mock_send.call_args_list[0]
+        assert len(mock_send.method_calls) == 1
+        name, args, kwargs = mock_send.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(args[0], send_content)
         self.assertEqual(args[1], content.id)
         self.assertEqual(kwargs, {'recipient_id': None})
@@ -239,7 +243,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertEqual(args[2], activity.fid)
         self.assertEqual(activity.type, ActivityType.CREATE)
 
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content", autospec=True)
     def test_local_content_update_gets_sent(self, mock_update, mock_send):
         user = UserFactory()
@@ -248,8 +252,9 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         mock_send.reset_mock()
         content.text = "foobar edit"
         content.save()
-        self.assertEqual(mock_send.call_count, 1)
-        args, kwargs = mock_send.call_args_list[0]
+        assert len(mock_send.method_calls) == 1
+        name, args, kwargs = mock_send.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(args[0], send_content)
         self.assertEqual(args[1], content.id)
         self.assertEqual(kwargs, {'recipient_id': None})
@@ -257,7 +262,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         self.assertEqual(args[2], activity.fid)
         self.assertEqual(activity.type, ActivityType.UPDATE)
 
-    @patch("socialhome.content.signals.django_rq.enqueue")
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.content.signals.update_streams_with_content")
     def test_share_gets_sent(self, mock_update, mock_send):
         user = UserFactory()
@@ -265,9 +270,11 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         share_of = ContentFactory(author=user2.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, share_of=share_of)
-        args, kwargs = mock_send.call_args_list[0]
+        name, args, kwargs = mock_send.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(args, (send_share_notification, content.id))
-        args, kwargs = mock_send.call_args_list[1]
+        name, args, kwargs = mock_send.method_calls[1]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(args[0], send_share)
         self.assertEqual(args[1], content.id)
         activity = content.activities.first()
@@ -276,11 +283,11 @@ class TestFederateContent(SocialhomeTransactionTestCase):
 
 
 class TestFederateContentRetraction(SocialhomeTestCase):
-    @patch("socialhome.content.signals.django_rq.enqueue", autospec=True)
+    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_non_local_content_retraction_does_not_get_sent(self, mock_send):
         content = ContentFactory()
         content.delete()
-        self.assertTrue(mock_send.called is False)
+        self.assertTrue(mock_send.enqueue.called is False)
 
     @patch("socialhome.content.signals.send_content_retraction", autospec=True)
     def test_local_content_retraction_gets_sent(self, mock_send):

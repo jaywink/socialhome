@@ -105,6 +105,7 @@ class UserWithContactFactory(UserFactory):
 class ProfileFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("safe_email")
     fid = "placeholder"
+    finger = factory.Faker("safe_email")
     name = factory.Faker("name")
 
     # Dummy strings as keys since generating these is expensive
@@ -127,6 +128,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
             guid=factory.Faker('uuid4'),
         )
 
+    
     @factory.post_generation
     def set_fid(self, extracted, created, **kwargs):
         if self.fid == "placeholder":
@@ -141,7 +143,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
         # Set handle sometimes, sometimes not, but also allow passing in True to force
         if extracted is True or randint(0, 100) > 50:
-            self.handle = self.email
+            self.handle = self.finger
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
