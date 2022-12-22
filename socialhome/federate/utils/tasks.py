@@ -422,7 +422,7 @@ def process_replies(root_id, shared_by_id=None, delta=None):
         return
 
     def process_reply_collection(replies_fid):
-        coll = retrieve_remote_content(replies_fid) # refresh reply collection
+        coll = retrieve_remote_content(replies_fid, cache=False) # refresh reply collection
         if isinstance(coll, base.Collection):
             replies = extract_replies(getattr(coll, 'first', []))
             for reply in replies:
