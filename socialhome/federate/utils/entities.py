@@ -284,6 +284,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
             handle=profile.handle or "",
+            finger=profile.finger or "",
             guid=str(profile.uuid) if profile.is_local else profile.guid if profile.guid else "",
             inboxes={
                 "private": profile.inbox_private,
