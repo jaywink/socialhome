@@ -18,7 +18,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.federate.models import Payload
-from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher
+from socialhome.federate.utils.tasks import process_entities, sender_key_fetcher, process_replies
 from socialhome.federate.utils import make_federable_profile, get_outbound_payload_logger
 from socialhome.federate.utils.entities import make_federable_content, make_federable_retraction
 from socialhome.users.models import Profile
@@ -224,6 +224,15 @@ def send_share(content_id, activity_fid):
             recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
         handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
+        target_content = content.share_of
+        if target_content.replies_fid:
+            queue = django_rq.get_queue('low')
+            content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
+            if django_rq.get_scheduler(queue=queue).enqueue_in(timedelta(seconds=90),
+                    process_replies, content_id, shared_by_id=content.id):
+                logger.info("send_share - queued process_replies job for content id %s", content_id)
+            else:
+                logger.warn("send_share - failed to enqueue process_replies job for content id %s", content_id)
     else:
         logger.warning("send_share - No entity for %s", content)
 
