@@ -123,7 +123,9 @@ export default {
             // return false
         },
         showRepliesContainer() {
-            return this.showRepliesBox || this.$store.state.stream.stream.single
+            return this.showRepliesBox
+                || (this.$store.state.stream.stream.single
+                && this.content.content_type === "content")
         },
         showSharesCountIcon() {
             // if (this.content.content_type === "content") {
