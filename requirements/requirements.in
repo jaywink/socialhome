@@ -1,6 +1,4 @@
 arrow
-# Not a direct requirement, remove once upgraded from Python 3.6
-autobahn<=21.2.1
 bleach
 # 3.x: This is a major version change requiring updates to consumers and middleware.
 channels<3
@@ -12,10 +10,12 @@ circus
 django-allauth
 django-braces
 django-crispy-forms
-django-dynamic-preferences
+# 1.14.0 drops Django < 3.2 support
+django-dynamic-preferences<1.14.0
 django-enumfields
 django-environ
-django-extensions
+# 3.2 drops support for Django 2.2
+django-extensions<3.2
 django-floppyforms
 django-fsm
 django-haystack
@@ -25,19 +25,21 @@ django-memoize
 django-model-utils<4
 django-redis
 django-redisboard
-django-reversion
+# 5.0.3 drops support for Django 2.x - because that's what patch releases do
+django-reversion<5.0.3
 django-robots
 django-rq
 django-secure
 django-settings-export
-django-silk
+# 5.0 drops support for Django 2.x
+django-silk<5
 django-versatileimagefield
 django<3
-djangorestframework
+# 3.13.0 drops Django 2.x support
+djangorestframework<3.13.0
 drf-yasg
 #federation
-# 7.15 is the last version supporting Python 3.6
-ipython<7.16
+ipython
 lxml
 Pillow
 # UNLOCK once Django updated to 3.0+
@@ -71,5 +73,5 @@ pyyaml
 ## NON-DIRECT requirements locked here due to issues
 #https://github.com/ipython/ipython/issues/12740
 jedi==0.17.2
-# Python 3.6 support dropped
-traitlets<5
+# 23.0.0 requires cryptography >= 35
+pyopenssl<22.0.0
