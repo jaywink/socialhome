@@ -37,7 +37,7 @@ djangorestframework
 drf-yasg
 #federation
 # 7.15 is the last version supporting Python 3.6
-ipython<7.16
+ipython<7.17
 lxml
 Pillow
 # UNLOCK once Django updated to 3.0+
