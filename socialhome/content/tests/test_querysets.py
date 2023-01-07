@@ -321,7 +321,7 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
 
     def test_children(self):
         contents = set(Content.objects.children(self.public_content.id, self.anonymous_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply, self.public_reply_of_reply})
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
         contents = set(Content.objects.children(self.limited_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.self_content.id, self.anonymous_user))
@@ -330,17 +330,19 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         self.assertEqual(contents, set())
 
         contents = set(Content.objects.children(self.public_content.id, self.other_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply, self.public_reply_of_reply})
+        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
         contents = set(Content.objects.children(self.limited_content.id, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.self_content.id, self.other_user))
         self.assertEqual(contents, set())
         contents = set(Content.objects.children(self.site_content.id, self.other_user))
-        self.assertEqual(contents, {self.site_reply, self.share_site_reply, self.site_reply_of_reply})
+        self.assertEqual(contents, {self.site_reply, self.share_site_reply})
 
         contents = set(Content.objects.children(self.limited_content.id, self.limited_content_user))
-        self.assertEqual(contents, {self.limited_reply, self.limited_reply_of_reply})
+        self.assertEqual(contents, {self.limited_reply})
 
+        contents = set(Content.objects.children(self.public_reply.id, self.anonymous_user))
+        self.assertEqual(contents, {self.public_reply_of_reply})
 
 class TestContentQuerySetShares(SocialhomeTestCase):
     """Ensure certain querysets include content via shares."""

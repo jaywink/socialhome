@@ -140,7 +140,7 @@ const StreamElement = {
 }
 
 // StreamElement and RepliesContainer recursively source each other
-// Global registration is needed to prevent StreamElement being unknown when redering StreamContainer
+// Global registration is needed to prevent StreamElement being unknown when rendering StreamContainer
 Vue.component(StreamElement.name, StreamElement)
 
 export default StreamElement

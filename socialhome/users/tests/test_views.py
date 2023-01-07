@@ -113,6 +113,7 @@ class TestProfileDetailView(SocialhomeTestCase):
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
         ownProfile = ProfileSerializer(request.user.profile, context={'request': request}).data
+        print(view.get_json_context())
         self.assertEqual(
             view.get_json_context(),
             {
@@ -123,6 +124,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                     "id": profile.id,
                     "uuid": str(profile.uuid),
                     "fid": profile.fid,
+                    "finger": profile.finger,
                     "followed_tags": [],
                     "followers_count": 0,
                     "following_count": profile.following.count(),
@@ -155,6 +157,7 @@ class TestProfileDetailView(SocialhomeTestCase):
                     "id": profile.id,
                     "uuid": str(profile.uuid),
                     "fid": profile.fid,
+                    "finger": profile.finger,
                     "followed_tags": [],
                     "followers_count": 0,
                     "following_count": profile.following.count(),
@@ -400,6 +403,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
                     "id": profile.id,
                     "uuid": str(profile.uuid),
                     "fid": profile.fid,
+                    "finger": profile.finger,
                     "followed_tags": [],
                     "followers_count": 0,
                     "following_count": profile.following.count(),
@@ -432,6 +436,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
                     "id": profile.id,
                     "uuid": str(profile.uuid),
                     "fid": profile.fid,
+                    "finger": profile.finger,
                     "followed_tags": [],
                     "followers_count": 0,
                     "following_count": profile.following.count(),

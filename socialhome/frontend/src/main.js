@@ -46,7 +46,10 @@ function getMainInstance(LocalVue) {
                 const data = JSON.parse(message.data)
 
                 if (data.event === "new") {
-                    this.$store.dispatch("stream/receivedNewContent", data.id)
+                    this.$store.dispatch("stream/receivedNewContent", {
+                        contentId: data.id,
+                        parentId: data.parentId,
+                    })
                 }
             },
             onWebsocketOpen() {

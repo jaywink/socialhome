@@ -48,15 +48,18 @@ export function fetchRepliesSuccess(state, payload) {
             ...item, replyIds: [], shareIds: [],
         }
         Vue.set(state.contents, reply.id, reply)
-        if (state.contents[reply.root_parent] !== undefined) {
-            if (state.contents[reply.root_parent].replyIds.indexOf(reply.id) === -1) {
-                state.contents[reply.root_parent].replyIds.push(reply.id)
+        if (state.contents[reply.parent] !== undefined) {
+            if (state.contents[reply.parent].replyIds.indexOf(reply.id) === -1) {
+                state.contents[reply.parent].replyIds.push(reply.id)
             }
         }
         if (state.allContentIds.indexOf(reply.id) === -1) {
             state.allContentIds.push(reply.id)
         }
     })
+    if (items.length > 0) {
+        state.contents[items[0].parent].reply_count = state.contents[items[0].parent].replyIds.length
+    }
 }
 
 export function fetchSharesSuccess(state, payload) {

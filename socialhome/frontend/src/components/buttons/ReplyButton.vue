@@ -6,7 +6,7 @@
         @click.stop.prevent="toggleReplyEditor"
     >
         <i class="fa fa-comment" :aria-label="translations.reply" :title="translations.reply" />
-        <span v-if="contentType === 'content'">
+        <span>
             &nbsp;{{ translations.reply }}
         </span>
     </b-button>

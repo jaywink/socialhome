@@ -10,10 +10,12 @@ class TestQueuePayload(SocialhomeTestCase):
         super().setUp()
         self.request = self.get_request(None)
 
-    @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.django_rq.queues.DjangoRQ", autospec=True)
     def test_calls_enqueue(self, mock_enqueue):
         queue_payload(self.request)
-        args, kwargs = mock_enqueue.call_args
+        assert len(mock_enqueue.method_calls) == 1
+        name, args, kwargs = mock_enqueue.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(args[0], receive_task)
         request = args[1]
         self.assertEqual(request.body, self.request.body)
@@ -23,15 +25,19 @@ class TestQueuePayload(SocialhomeTestCase):
         self.assertEqual(request.url, self.request.build_absolute_uri())
         self.assertIsNone(kwargs['uuid'])
 
-    @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.django_rq.queues.DjangoRQ", autospec=True)
     def test_calls_enqueue__with_uuid(self, mock_enqueue):
         queue_payload(self.request, uuid='1234')
-        _args, kwargs = mock_enqueue.call_args
+        assert len(mock_enqueue.method_calls) == 1
+        name, _args, kwargs = mock_enqueue.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(kwargs['uuid'], '1234')
 
-    @patch("socialhome.federate.utils.generic.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.utils.django_rq.queues.DjangoRQ", autospec=True)
     def test_calls_enqueue__with_uuid_from_path(self, mock_enqueue):
         request = self.get_request(None, path="/p/1234/inbox/")
         queue_payload(request)
-        _args, kwargs = mock_enqueue.call_args
+        assert len(mock_enqueue.method_calls) == 1
+        name, _args, kwargs = mock_enqueue.method_calls[0]
+        self.assertEqual(name, '().enqueue')
         self.assertEqual(kwargs['uuid'], '1234')

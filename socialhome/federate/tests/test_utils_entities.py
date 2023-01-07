@@ -109,4 +109,4 @@ class TestMakeFederableRetraction(SocialhomeTestCase):
 
     def test_target_id_correct_for_share(self):
         obj = make_federable_retraction(self.share, author=self.profile)
-        self.assertEqual(obj.target_id, self.share.activities.first().fid)
+        self.assertEqual(obj.target_id, self.share.share_of.fid)

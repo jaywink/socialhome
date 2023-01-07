@@ -118,7 +118,7 @@ class TestSendContentRetraction(SocialhomeTestCase):
         cls.profile = cls.user.profile
         cls.limited_content2 = LimitedContentFactory(author=cls.profile)
 
-    @patch("socialhome.federate.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.tasks.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.federate.tasks._get_limited_recipients", autospec=True)
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity", autospec=True)
     def test_limited_retraction_calls_get_recipients(self, mock_maker, mock_get, mock_enqueue):
@@ -138,11 +138,12 @@ class TestSendContentRetraction(SocialhomeTestCase):
         send_content_retraction(self.public_content, self.public_content.author_id)
         mock_maker.assert_called_once_with(self.public_content, self.public_content.author)
 
-    @patch("socialhome.federate.tasks.django_rq.enqueue", autospec=True)
+    @patch("socialhome.federate.tasks.django_rq.queues.DjangoRQ", autospec=True)
     @patch("socialhome.federate.tasks.make_federable_retraction", return_value="entity", autospec=True)
-    def test_handle_create_payload_is_called(self, mock_maker, mock_enqueue):
+    def test_handle_create_payload_is_called(self, mock_maker, mock_queue):
         send_content_retraction(self.public_content, self.public_content.author_id)
-        mock_enqueue.assert_called_once_with(
+        assert len(mock_queue.method_calls) == 1
+        mock_queue.method_calls[0].assert_called_once_with(
             ANY,
             "entity",
             self.public_content.author.federable,

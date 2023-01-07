@@ -1,6 +1,7 @@
 from typing import Dict, Tuple, TYPE_CHECKING, Any
 
 from django.db.models import QuerySet, Q, ObjectDoesNotExist
+from django.db.utils import IntegrityError
 
 from socialhome.enums import Visibility
 
@@ -23,7 +24,7 @@ class ProfileQuerySet(QuerySet):
         Get Profile by federated ID.
         """
         return self.filter(
-            Q(fid=value) | Q(guid=value) | Q(handle=value)
+            Q(fid=value) | Q(guid=value) | Q(handle=value) | Q(finger=value)
         ).filter(**params)
 
     def fed_update_or_create(
@@ -48,7 +49,7 @@ class ProfileQuerySet(QuerySet):
                     continue
                 if getattr(profile, key, None) != value:
                     changed = True
-                setattr(profile, key, value)
+                    setattr(profile, key, value)
             # Switch profile to ActivityPub if Diaspora and we got an ActivityPub payload,
             # indicating this is a multi-protocol remote
             if profile.protocol == "diaspora" and profile.fid:

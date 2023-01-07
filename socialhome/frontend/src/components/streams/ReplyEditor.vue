@@ -2,7 +2,6 @@
     <div>
         <div class="mt-2">
             <b-form-textarea
-                v-if="contentVisibility === 'public'"
                 v-model="replyText"
                 :max-rows="5"
                 :placeholder="translations.replyText"
@@ -14,7 +13,6 @@
             <a :href="fullEditorUrl" target="_blank" rel="noopener noreferrer">{{ translations.fullEditor }}</a>
         </div>
         <div
-            v-if="contentVisibility === 'public'"
             class="reply-save-button"
         >
             <b-button variant="primary" @click.prevent.stop="saveReply">
@@ -50,10 +48,8 @@ export default Vue.component("ReplyEditor", {
             return Urls["content:reply"]({pk: this.contentId})
         },
         translations() {
-            const fullEditor = this.contentVisibility === "public" ? gettext("Full editor")
-                : gettext("Only full editor available for non-public replies at this time")
             return {
-                fullEditor,
+                fullEditor: gettext("Full editor"),
                 replySave: gettext("Reply"),
                 replyText: gettext("Reply text..."),
             }
@@ -62,10 +58,15 @@ export default Vue.component("ReplyEditor", {
     methods: {
         saveReply() {
             if (this.replyText) {
+                const re = /@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9]+)[\W\s]?/g
+                const recipients = Array.from(this.replyText.matchAll(re), m => m[1])
+                // this.prefilledText.split(" ").forEach(item => recipients.push(item.substring(1)))
                 this.$store.dispatch(
                     "stream/saveReply", {
                         data: {
-                            parent: this.contentId, text: this.replyText,
+                            parent: this.contentId,
+                            text: this.replyText,
+                            recipients,
                         },
                     },
                 )

@@ -1,4 +1,5 @@
 import datetime
+import pytest
 from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
@@ -46,7 +47,7 @@ class TestContentModel(SocialhomeTestCase):
         }
         cls.content_with_twitter_oembed = ContentFactory(text='class="twitter-tweet"')
         cls.content_with_mentions = ContentFactory(
-            text="foo @{bar; %s} bar @{foo; %s}" % (cls.user.profile.handle, cls.remote_profile.handle),
+            text="foo @%s bar @%s" % (cls.user.profile.finger, cls.remote_profile.finger),
             author=cls.local_user.profile,
         )
         cls.content_with_url = ContentFactory(
@@ -70,12 +71,18 @@ class TestContentModel(SocialhomeTestCase):
         content = ContentFactory()
         assert content.uuid
 
+    # inbound mentions are extracted by federation
+    # outbound mentions are supplied by the UI
+    @pytest.mark.skip
     def test_extract_mentions(self):
         self.assertEqual(
             set(self.content_with_mentions.mentions.values_list('id', flat=True)),
             {self.user.profile.id, self.remote_profile.id},
         )
 
+    # inbound mentions are extracted by federation
+    # outbound mentions are supplied by the UI
+    @pytest.mark.skip
     def test_extract_mentions__removes_mentions(self):
         self.content_with_mentions.text = "foo bar @{foo; %s}" % self.remote_profile.handle
         self.content_with_mentions.save()

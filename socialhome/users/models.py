@@ -150,6 +150,10 @@ class Profile(TimeStampedModel):
     # Optional
     fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
+    # webfinger subject
+    # Optional
+    finger = models.CharField(_("Webfinger subject"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     # RSA key
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
     rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
@@ -158,9 +162,9 @@ class Profile(TimeStampedModel):
     visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
     # Image urls
-    image_url_large = models.URLField(_("Image - large"), blank=True)
-    image_url_medium = models.URLField(_("Image - medium"), blank=True)
-    image_url_small = models.URLField(_("Image - small"), blank=True)
+    image_url_large = models.URLField(_("Image - large"), blank=True, max_length=500)
+    image_url_medium = models.URLField(_("Image - medium"), blank=True, max_length=500)
+    image_url_small = models.URLField(_("Image - small"), blank=True, max_length=500)
 
     # Location
     location = models.CharField(_("Location"), max_length=128, blank=True)
@@ -309,6 +313,14 @@ class Profile(TimeStampedModel):
                 raise ValueError("Not a valid handle")
         else:
             self.handle = None
+
+        if self.finger:
+            # Ensure finger is *always* lowercase
+            self.finger = self.finger.lower()
+            if not validate_handle(self.finger):
+                raise ValueError("Not a valid wefinger subject")
+        else:
+            self.finger = None
 
         if self.guid == "":
             self.guid = None
@@ -479,6 +491,7 @@ class Profile(TimeStampedModel):
         fid = safe_text(remote_profile.id)
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
+        values['finger'] = safe_text(remote_profile.finger)
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}
