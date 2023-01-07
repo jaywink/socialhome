@@ -21,9 +21,6 @@ logger = logging.getLogger("socialhome")
 
 @receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
-    # TODO remove extract mentions from here when we have UI for creating mentions
-    #if instance.local:
-    #    instance.extract_mentions()
     fetch_preview(instance)
     render_content(instance)
     created = kwargs.get("created")

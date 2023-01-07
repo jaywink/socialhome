@@ -103,7 +103,6 @@ export default {
             }
             if (this.content.content_type === "reply") {
                 let rootPrefill = ""
-                // prefill += " "
                 if (this.rootParent.author.finger !== null) {
                     rootPrefill += `@${this.rootParent.author.finger}`
                 } else {
@@ -117,10 +116,7 @@ export default {
             return prefill += " "
         },
         showExpandRepliesIcon() {
-            // if (this.content.content_type === "content") {
             return this.content.reply_count > 0
-            // }
-            // return false
         },
         showRepliesContainer() {
             return this.showRepliesBox
@@ -128,10 +124,7 @@ export default {
                 && this.content.content_type === "content")
         },
         showSharesCountIcon() {
-            // if (this.content.content_type === "content") {
             return this.content.shares_count > 0
-            // }
-            // return false
         },
         translations() {
             return {

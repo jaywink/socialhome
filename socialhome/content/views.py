@@ -15,7 +15,6 @@ from django.views.generic.detail import SingleObjectMixin
 from federation.entities.activitypub.django.views import activitypub_object_view
 
 from socialhome.content.enums import ContentType
-#from socialhome.content.forms import ContentForm
 from socialhome.content.models import Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType

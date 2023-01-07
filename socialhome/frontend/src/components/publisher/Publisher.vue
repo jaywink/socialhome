@@ -28,29 +28,11 @@
                         </b-form-text>
                     </b-form-group>
 
-                    <b-form-group
-                        v-show="extendedModel.visibility === 999"
-                        :label="translations.recipients"
-                        label-for="recipients"
-                    >
-                        <b-form-input
-                            readonly
-                            id="recipients"
-                            ref="recipients"
-                            v-model="recipientsText"
-                            name="recipients"
-                            :state="recipientsFormControlState"
-                        />
-                        <b-form-text>
-                            <p>{{ translations.recipientsHelp }}</p>
-                        </b-form-text>
+                    <b-form-group v-show="extendedModel.visibility === visibilityOptions.LIMITED.value">
+                        <p>{{ translations.recipientsHelp }}</p>
                         <b-form-invalid-feedback :state="errors.recipientsErrors.length > 0">
                             {{ errors.recipientsErrors }}
                         </b-form-invalid-feedback>
-                    </b-form-group>
-
-                    <b-form-group v-show="extendedModel.visibility === visibilityOptions.LIMITED.value">
-                        <p>{{ translations.recipientsHelp }}</p>
                         <b-form-checkbox-group
                             ref="includeFollowing"
                             v-model="includeFollowingAccessor"
