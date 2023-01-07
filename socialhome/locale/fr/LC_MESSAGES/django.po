@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2022-03-19 13:17+0000\n"
+"PO-Revision-Date: 2023-01-07 23:47+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.12-dev\n"
+"X-Generator: Weblate 4.15.1-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -175,9 +175,8 @@ msgid "Federation ID"
 msgstr "ID de fédération"
 
 #: socialhome/content/models.py:110
-#, fuzzy
 msgid "Reply Collection ID"
-msgstr "Nombre de réponses"
+msgstr "ID de la collection des réponses"
 
 #: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
@@ -673,7 +672,7 @@ msgstr "Par URL"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Bold"
-msgstr ""
+msgstr "Gras"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
@@ -689,7 +688,7 @@ msgstr "En-tête"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert Horizontal Line"
-msgstr ""
+msgstr "Ligne horizontale"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
@@ -702,12 +701,11 @@ msgstr "ajouter une image en utilisant un URL (Ctrl-Alt-I)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Italic"
-msgstr ""
+msgstr "Italique"
 
 #: socialhome/static/dist/vue/js/app.js:67
-#, fuzzy
 msgid "Create Link"
-msgstr "Créer"
+msgstr "Insérer un lien"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
@@ -715,7 +713,7 @@ msgstr "Chargement..."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Numbered List"
-msgstr ""
+msgstr "Liste numérotée"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert image"
@@ -735,11 +733,11 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Quote"
-msgstr ""
+msgstr "Citation"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Generic List"
-msgstr ""
+msgstr "Liste générique"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
@@ -757,7 +755,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible only to those mentioned in the text and/or your mutuals."
-msgstr ""
+msgstr "visible seulement à ceux mentionnés dans le texte et/ou à vos mutuels."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -781,23 +779,22 @@ msgstr "Zone de texte cachée"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Include your mutuals"
-msgstr ""
+msgstr "Inclure vos mutuels"
 
 #: socialhome/static/dist/vue/js/app.js:67
-#, fuzzy
 msgid ""
 "Automatically include people you follow that also follow you as recipients."
 msgstr ""
-"Inclut automatiquement comme destinataires tous les gens que vous suivez."
+"Inclut automatiquement comme destinataires tous les gens que vous suivez et "
+"qui vous suivent."
 
 #: socialhome/static/dist/vue/js/app.js:67
-#, fuzzy
 msgid ""
 "Enter the recipients' handles (eg @user@example.com) in the editor window. "
 "Sorry, no search yet... "
 msgstr ""
-"Tapez le nom des destinataires (par exemple user@example.com). Séparez-les "
-"par des virgules. Désolé, la recherche n'est pas encore disponible.."
+"Tapez l'adresse des destinataires (par exemple @user@example.com) dans la "
+"fenêtre d'édition. Désolé, la recherche n'est pas encore disponible.. "
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Visibility"
@@ -828,13 +825,12 @@ msgid "Error saving content."
 msgstr "Erreur de sauvegarde de la publication."
 
 #: socialhome/static/dist/vue/js/app.js:67
-#, fuzzy
 msgid ""
 "When visibility is set to 'Limited', you must either mention recipients in "
 "the text or include your mutuals."
 msgstr ""
 "Lorsque la visibilité est définie sur \"Limité\", vous devez soit spécifier "
-"les destinataires, soit inclure vos abonné-e-s."
+"les destinataires dans le texte, soit inclure vos mutuels."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Some recipients couldn't be found."
@@ -1368,7 +1364,7 @@ msgstr "Identifiant"
 
 #: socialhome/users/models.py:155
 msgid "Webfinger subject"
-msgstr ""
+msgstr "Sujet webfinger"
 
 #: socialhome/users/models.py:158
 msgid "RSA private key"
