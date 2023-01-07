@@ -27,13 +27,15 @@ from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentManager
 from socialhome.enums import Visibility
+from socialhome.users.models import Profile
+from socialhome.utils import get_full_url
 
 
 class OpenGraphCache(models.Model):
     url = models.URLField(_("URL"), unique=True)
     title = models.CharField(_("Title"), max_length=256, blank=True)
     description = models.TextField(_("Description"), blank=True)
-    image = models.URLField(_("Image URL"), blank=True)
+    image = models.URLField(_("Image URL"), blank=True, max_length=500)
     modified = AutoLastModifiedField(_("Modified"), db_index=True)
 
     def __str__(self):
@@ -102,6 +104,10 @@ class Content(models.Model):
     # Federation identifier
     # Optional
     fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
+    # Reply collection  identifier (some AP platforms)
+    # Optional
+    replies_fid = models.URLField(_("Reply Collection ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Is this content pinned to the user profile
     pinned = models.BooleanField(_("Pinned to profile"), default=False, db_index=True)
@@ -182,7 +188,7 @@ class Content(models.Model):
         if self.pk:
             # Reply count
             share_ids = Content.objects.filter(share_of=self).values_list("id", flat=True)
-            self.reply_count = self.all_children.count() + Content.objects.filter(parent_id__in=share_ids).count()
+            self.reply_count = self.children.count() + Content.objects.filter(parent_id__in=share_ids).count()
             # Share count
             self.shares_count = self.shares.count()
             if commit:
@@ -216,12 +222,30 @@ class Content(models.Model):
 
     def extract_mentions(self):
         # TODO locally created mentions should not have to be ripped out of text
-        # For now we just rip out diaspora style mentions until we have UI layer
+        # For now we just rip out diaspora and AP style mentions until we have UI layer
         from socialhome.users.models import Profile
-        mentions = re.findall(r'@{[^;]+; [\w.-]+@[^}]+}', self.text)
+        mentions = re.findall(r'@{?[\S ]?[^{}@]+[@;]?\s*[\w\-./@]+[\w/]+}?', self.text)
         if not mentions:
             self.mentions.clear()
-        handles = {s.split(';')[1].strip(' }') for s in mentions}
+
+        handles = set()
+        text = self.text
+        for mention in mentions:
+            handle = mention.lstrip('@{') if ';' not in mention else mention.split(';')[1]
+            handle = handle.strip('} ')
+            if handle.startswith('http'):
+                try:
+                    profile = Profile.objects.get(fid=handle)
+                    if not profile.handle: continue
+                    handle = profile.handle
+                except Profile.DoesNotExist:
+                    continue
+            handles.add(handle)
+            # sanitize text and let federation adjust for protocol
+            text = text.replace(mention, '@'+handle)
+        if self.text != text: 
+            self.text = text
+            Content.objects.filter(id=self.id).update(text=text)
 
         existing_handles = set(self.mentions.values_list('handle', flat=True))
         to_remove = existing_handles.difference(handles)
@@ -416,6 +440,13 @@ class Content(models.Model):
         text = self.get_and_linkify_tags()
         rendered = commonmark(text, ignore_html_blocks=True).strip()
         rendered = process_text_links(rendered)
+
+        # Linkify mentions
+        for profile in self.mentions.values():
+            handle = profile.get('finger')
+            url = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.get('uuid')}))
+            rendered = rendered.replace('@'+handle, f'@<a class="mention" href="{url}">{handle}</a>')
+
         if self.show_preview:
             if self.oembed:
                 rendered = "%s<br>%s" % (
@@ -430,6 +461,7 @@ class Content(models.Model):
                         "opengraph": self.opengraph,
                     })
                 )
+
         self.rendered = rendered
         Content.objects.filter(id=self.id).update(rendered=rendered)
 
@@ -471,5 +503,18 @@ class Content(models.Model):
             if self.author == user.profile or self.visibility == Visibility.SITE:
                 return True
             if self.limited_visibilities.filter(id=user.profile.id).exists():
+                return True
+        return False
+
+    def visible_for_fed_user(self, fid):
+        """
+        Filter by visibiity to given remote fid
+        Assumes the fid is extracted from a signed AP request
+        """
+        if self.visibility == Visibility.PUBLIC:
+            return True
+        profile = Profile.objects.filter(fid=fid).first()
+        if profile:
+            if self.limited_visibilities.filter(id=profile.id).exists():
                 return True
         return False

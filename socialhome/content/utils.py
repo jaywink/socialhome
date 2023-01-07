@@ -1,8 +1,10 @@
+import logging
 import re
 
 import bleach
 from django.conf import settings
 
+logger = logging.getLogger("socialhome")
 
 def safe_text_for_markdown(text: str) -> str:
     """Clean the text using bleach but keep certain Markdown sections.
@@ -75,3 +77,27 @@ def find_urls_in_text(text):
 
     bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
     return urls
+
+
+def update_counts(content):
+    """
+    Update cached data in support of threaded replies.
+    This will be removed in a future release and
+    replaced with a management command.
+    """
+    from socialhome.content.models import Content
+    from socialhome.content.enums import ContentType
+
+    if content.content_type != ContentType.CONTENT: return
+    child_count = content.children.count()
+    if content.reply_count == child_count or content.all_children.count() == child_count: return
+
+    do_root = False
+    for child in content.all_children.iterator():
+        if child.root_parent_id != child.parent_id:
+            do_root = True
+            child.cache_data(commit=True)
+    if do_root:
+        content.cache_data(commit=True)
+        content.refresh_from_db()
+        logger.info(f'counts updated for content #{content.id}')

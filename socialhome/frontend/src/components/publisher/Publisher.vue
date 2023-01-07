@@ -2,7 +2,7 @@
     <div class="socialhome-publisher">
         <h1>{{ titleText }}</h1>
 
-        <markdown-editor v-model="baseModel.text" />
+        <markdown-editor ref="editor" v-model="baseModel.text" @input="extractMentions" />
 
         <b-form :validated="wasValidated" @submit.stop.prevent="onPostForm">
             <b-row>
@@ -28,26 +28,11 @@
                         </b-form-text>
                     </b-form-group>
 
-                    <b-form-group
-                        v-show="extendedModel.visibility === visibilityOptions.LIMITED.value"
-                        :label="translations.recipients"
-                        label-for="recipients"
-                    >
-                        <b-form-input
-                            id="recipients"
-                            ref="recipients"
-                            v-model="recipientsText"
-                            name="recipients"
-                            :state="recipientsFormControlState"
-                        >
-                            {{ translations.recipientsHelp }}
-                        </b-form-input>
+                    <b-form-group v-show="extendedModel.visibility === visibilityOptions.LIMITED.value">
+                        <p>{{ translations.recipientsHelp }}</p>
                         <b-form-invalid-feedback :state="errors.recipientsErrors.length > 0">
                             {{ errors.recipientsErrors }}
                         </b-form-invalid-feedback>
-                    </b-form-group>
-
-                    <b-form-group v-show="extendedModel.visibility === visibilityOptions.LIMITED.value">
                         <b-form-checkbox-group
                             ref="includeFollowing"
                             v-model="includeFollowingAccessor"
@@ -60,7 +45,7 @@
                             </b-form-invalid-feedback>
                         </b-form-checkbox-group>
                         <b-form-text>
-                            {{ "Automatically includes all the people you follow as recipients." | gettext }}
+                            {{ translations.includeFollowingHelp }}
                         </b-form-text>
                     </b-form-group>
                 </b-col>
@@ -292,7 +277,6 @@ export default {
             this.$refs.includeFollowing.$el.querySelector("input")
                 .setCustomValidity(this.errors.includeFollowingErrors)
         },
-
     },
 }
 </script>

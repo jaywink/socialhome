@@ -2,6 +2,7 @@ from typing import Dict, Tuple, TYPE_CHECKING, Any
 
 from django.db import models
 from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNotExist
+from django.db.utils import IntegrityError
 
 from socialhome.content.enums import ContentType
 from socialhome.enums import Visibility
@@ -30,8 +31,8 @@ class ContentQuerySet(models.QuerySet):
         Returns the direct replies and all replies for shares.
         """
         qs = self.filter(content_type=ContentType.REPLY).visible_for_user(user)
-        ids = qs.filter(root_parent_id=parent_id).values_list("id", flat=True)
-        share_ids = qs.filter(root_parent__share_of_id=parent_id).values_list("id", flat=True)
+        ids = qs.filter(parent_id=parent_id).values_list("id", flat=True)
+        share_ids = qs.filter(parent__share_of_id=parent_id).values_list("id", flat=True)
         all_ids = list(ids) + list(share_ids)
         return qs.filter(id__in=all_ids).order_by("created")
 

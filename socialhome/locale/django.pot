@@ -1,14 +1,14 @@
 # Translations template for PROJECT.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-30 20:44+0000\n"
+"POT-Creation-Date: 2023-01-07 17:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,151 +108,155 @@ msgstr ""
 msgid "Not all recipients could be found."
 msgstr ""
 
-#: socialhome/content/models.py:32 socialhome/content/models.py:45
+#: socialhome/content/models.py:35 socialhome/content/models.py:48
 msgid "URL"
 msgstr ""
 
-#: socialhome/content/models.py:33
+#: socialhome/content/models.py:36
 msgid "Title"
 msgstr ""
 
-#: socialhome/content/models.py:34
+#: socialhome/content/models.py:37
 msgid "Description"
 msgstr ""
 
-#: socialhome/content/models.py:35
+#: socialhome/content/models.py:38
 msgid "Image URL"
 msgstr ""
 
-#: socialhome/content/models.py:36 socialhome/content/models.py:47
-#: socialhome/content/models.py:155
+#: socialhome/content/models.py:39 socialhome/content/models.py:50
+#: socialhome/content/models.py:162
 msgid "Modified"
 msgstr ""
 
-#: socialhome/content/models.py:46
+#: socialhome/content/models.py:49
 msgid "OEmbed HTML content"
 msgstr ""
 
-#: socialhome/content/models.py:54 socialhome/users/models.py:138
+#: socialhome/content/models.py:57 socialhome/users/models.py:138
 msgid "Name"
 msgstr ""
 
-#: socialhome/content/models.py:55 socialhome/content/models.py:154
+#: socialhome/content/models.py:58 socialhome/content/models.py:161
 msgid "Created"
 msgstr ""
 
-#: socialhome/content/models.py:92
+#: socialhome/content/models.py:95
 msgid "Text"
 msgstr ""
 
-#: socialhome/content/models.py:96 socialhome/users/models.py:143
+#: socialhome/content/models.py:99 socialhome/users/models.py:143
 msgid "GUID"
 msgstr ""
 
-#: socialhome/content/models.py:98
+#: socialhome/content/models.py:101
 msgid "Author"
 msgstr ""
 
-#: socialhome/content/models.py:103 socialhome/users/models.py:151
+#: socialhome/content/models.py:106 socialhome/users/models.py:151
 msgid "Federation ID"
 msgstr ""
 
-#: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:110
+msgid "Reply Collection ID"
+msgstr ""
+
+#: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
 msgstr ""
 
-#: socialhome/content/models.py:108
+#: socialhome/content/models.py:115
 msgid "Order"
 msgstr ""
 
-#: socialhome/content/models.py:111
+#: socialhome/content/models.py:118
 msgid "Service label"
 msgstr ""
 
-#: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:122 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
 msgstr ""
 
-#: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:123 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to turn off fetching and showing an OEmbed or OpenGraph preview "
 "using the links in the text."
 msgstr ""
 
-#: socialhome/content/models.py:120
+#: socialhome/content/models.py:127
 msgid "OEmbed cache"
 msgstr ""
 
-#: socialhome/content/models.py:123
+#: socialhome/content/models.py:130
 msgid "OpenGraph cache"
 msgstr ""
 
-#: socialhome/content/models.py:126
+#: socialhome/content/models.py:133
 msgid "Mentions"
 msgstr ""
 
-#: socialhome/content/models.py:127
+#: socialhome/content/models.py:134
 #: socialhome/search/templates/search/search.html:68
 #: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
 msgid "Tags"
 msgstr ""
 
-#: socialhome/content/models.py:130
+#: socialhome/content/models.py:137
 msgid "Parent"
 msgstr ""
 
-#: socialhome/content/models.py:134
+#: socialhome/content/models.py:141
 msgid "Share of"
 msgstr ""
 
-#: socialhome/content/models.py:138 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:145 socialhome/static/dist/vue/js/app.js:67
 msgid "Federate to remote servers"
 msgstr ""
 
-#: socialhome/content/models.py:139 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:146 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
 msgstr ""
 
-#: socialhome/content/models.py:145
+#: socialhome/content/models.py:152
 msgid "Limitied visibilities"
 msgstr ""
 
-#: socialhome/content/models.py:148 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:155
 msgid "Include people I follow"
 msgstr ""
 
-#: socialhome/content/models.py:149 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:156
 msgid "Automatically includes all the people you follow as recipients."
 msgstr ""
 
-#: socialhome/content/models.py:153
+#: socialhome/content/models.py:160
 msgid "Remote created"
 msgstr ""
 
-#: socialhome/content/models.py:159 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:166 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
 msgstr ""
 
-#: socialhome/content/models.py:160
+#: socialhome/content/models.py:167
 msgid "Rendered text"
 msgstr ""
 
-#: socialhome/content/models.py:161
+#: socialhome/content/models.py:168
 msgid "Reply count"
 msgstr ""
 
-#: socialhome/content/models.py:162
+#: socialhome/content/models.py:169
 msgid "Shares count"
 msgstr ""
 
-#: socialhome/content/models.py:165
+#: socialhome/content/models.py:172
 msgid "Root parent"
 msgstr ""
 
-#: socialhome/content/serializers.py:290
+#: socialhome/content/serializers.py:317
 msgid "This recipient couldn't be found (please check the format)."
 msgstr ""
 
@@ -494,10 +498,6 @@ msgid "Full editor"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "Only full editor available for non-public replies at this time"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply text..."
 msgstr ""
 
@@ -550,7 +550,7 @@ msgstr ""
 msgid "All content tagged with"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
 msgid "Followed tags"
 msgstr ""
 
@@ -566,7 +566,7 @@ msgstr ""
 msgid "Followers"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:172
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
 msgid "Following"
 msgstr ""
 
@@ -632,6 +632,10 @@ msgid "By url"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Bold"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
 msgstr ""
 
@@ -644,6 +648,10 @@ msgid "Heading"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Insert Horizontal Line"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "The image %s couldn't be uploaded"
 msgstr ""
@@ -653,7 +661,19 @@ msgid "add an image using an url (Ctrl-Alt-I)"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Italic"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Create Link"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Numbered List"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -671,6 +691,14 @@ msgid ""
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Quote"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Generic List"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
 msgstr ""
 
@@ -683,7 +711,7 @@ msgid "visible to anyone, even anonymous users and internet search bots."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "visible to only those who shared with."
+msgid "visible only to those mentioned in the text and/or your mutuals."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -705,9 +733,19 @@ msgid "Hidden textarea"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Include your mutuals"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"Type in the handles (eg user@example.com) of the recipients. Separate by "
-"commas. Sorry, no search yet.."
+"Automatically include people you follow that also follow you as "
+"recipients."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"Enter the recipients' handles (eg @user@example.com) in the editor "
+"window. Sorry, no search yet... "
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -734,8 +772,8 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"When visibility is set to 'Limited', you must either specify recipients "
-"or include your followers."
+"When visibility is set to 'Limited', you must either mention recipients "
+"in the text or include your mutuals."
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -1224,51 +1262,55 @@ msgstr ""
 msgid "Handle"
 msgstr ""
 
-#: socialhome/users/models.py:154
-msgid "RSA private key"
-msgstr ""
-
 #: socialhome/users/models.py:155
-msgid "RSA public key"
+msgid "Webfinger subject"
 msgstr ""
 
 #: socialhome/users/models.py:158
-msgid "Profile visibility"
+msgid "RSA private key"
 msgstr ""
 
-#: socialhome/users/models.py:161
-msgid "Image - large"
+#: socialhome/users/models.py:159
+msgid "RSA public key"
 msgstr ""
 
 #: socialhome/users/models.py:162
-msgid "Image - medium"
+msgid "Profile visibility"
 msgstr ""
 
-#: socialhome/users/models.py:163
-msgid "Image - small"
+#: socialhome/users/models.py:165
+msgid "Image - large"
 msgstr ""
 
 #: socialhome/users/models.py:166
+msgid "Image - medium"
+msgstr ""
+
+#: socialhome/users/models.py:167
+msgid "Image - small"
+msgstr ""
+
+#: socialhome/users/models.py:170
 msgid "Location"
 msgstr ""
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "NSFW"
 msgstr ""
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "Should users content be considered NSFW?"
 msgstr ""
 
-#: socialhome/users/models.py:180
+#: socialhome/users/models.py:184
 msgid "Private inbox"
 msgstr ""
 
-#: socialhome/users/models.py:181
+#: socialhome/users/models.py:185
 msgid "Public inbox"
 msgstr ""
 
-#: socialhome/users/models.py:184
+#: socialhome/users/models.py:188
 msgid "Protocol"
 msgstr ""
 

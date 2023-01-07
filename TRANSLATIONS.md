@@ -6,8 +6,9 @@ pip install django-babel
 
 Patch django-babel with (assuming you are using virtualenv):
 ```
-patch -p1 ~/.virtualenvs/socialhome/lib/python3.9/site-packages/django_babel/extract.py < ~/socialhome/translate/django_babel.patch
+patch -p1 ~/.virtualenvs/socialhome/lib/python3.XX/site-packages/django_babel/extract.py < ~/socialhome/translate/django_babel.patch
 ```
+where XX is your python version.
 
 TODO: create an issue for this
 
@@ -58,4 +59,4 @@ Hack
 
 TODO: create an issue for this.
 
-NOTE: pybabel is configured tp parse compiled js only. If changes are made to js or vue files, npm run dev should be run before updating the translation files.
+NOTE: pybabel is configured to parse compiled js only. If changes are made to js or vue files, npm run dev should be run before updating the translation files.

@@ -1,5 +1,6 @@
 import logging
-from typing import Optional, Union, List
+import re
+from typing import Optional, Union, List, Dict, Tuple
 
 from Crypto.PublicKey.RSA import RsaKey
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.models.query_utils import Q
 from django.http import HttpRequest
 from federation.entities import base
+from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
 from federation.entities.mixins import BaseEntity
 from federation.types import UserType, ReceiverVariant
 
@@ -14,6 +16,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
+from socialhome.users.utils import set_profile_finger
 
 logger = logging.getLogger("socialhome")
 
@@ -27,6 +30,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
             public=True if content.visibility == Visibility.PUBLIC else False,
             provider_display_name="Socialhome",
             created_at=content.effective_modified,
+            times = {'created':content.created, 'modified':content.modified, 'edited':content.edited},
             guid=str(content.uuid),
             handle=content.author.handle,
             mxid=content.author.mxid,
@@ -44,6 +48,7 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
             target_id=content.parent.fid,
             root_target_id=content.root_parent.fid,
             created_at=content.effective_modified,
+            times = {'created':content.created, 'modified':content.modified, 'edited':content.edited},
             guid=str(content.uuid),
             handle=content.author.handle,
             target_guid=content.parent.guid,
@@ -72,17 +77,20 @@ def _make_share(content: Content) -> Optional[base.Share]:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
 
 
-def get_federable_object(request: HttpRequest) -> Optional[BaseEntity]:
+def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[BaseEntity]:
     """
     Retrieve local object and return it as a federable version.
 
     Ensure to check permissions before returning object.
+
+    The signer is extracted and validated from the request signature header.
     """
     object_id = request.build_absolute_uri()
     user = getattr(request, 'user', AnonymousUser())
     if request.path.startswith('/content/'):
         content = Content.objects.filter(fid=object_id).first()
-        if content and content.visible_for_user(user):
+        if content and content.author.is_local and (
+                content.visible_for_user(user) or content.visible_for_fed_user(signer)):
             federable_content = make_federable_content(content)
             return federable_content
     elif request.path.startswith('/u/') or request.path == '/':
@@ -93,6 +101,38 @@ def get_federable_object(request: HttpRequest) -> Optional[BaseEntity]:
         if profile and profile.visible_to_user(user):
             federable_profile = make_federable_profile(profile)
             return federable_profile
+        else:
+            return _make_federable_collection(object_id, request.path, user)
+
+
+def _make_federable_collection(fid, path, user):
+    """
+    WIP: Provide a response for some AP collection requests
+    Should this be done using views?
+    TODO: implement collection pages
+    """
+    try:
+        coll = re.match(r'.+/(\w+)/$', path).groups()[0]
+    except AttributeError:
+        return None
+    if coll in ('followers', 'following', 'outbox', 'featured'):
+        fid = fid.replace(coll+'/', '')
+    else:
+        return None
+
+    profile = Profile.objects.filter(fid=fid).first()
+    if profile and profile.is_local and profile.visible_to_user(user):
+        if coll in ('followers', 'following'):
+            # return item count only until pages are implemented
+            return base.Collection(
+                id = profile.fid+coll+'/',
+                #items = list(getattr(profile,coll).filter(fid__isnull=False).values_list('fid',flat=True)),
+                total_items = getattr(profile,coll).filter(fid__isnull=False).count(),
+                ordered = True,
+                )
+        elif coll in ('outbox', 'featured'):
+            # unimplemnted
+            return None
 
 
 def get_profile(**kwargs) -> base.Profile:
@@ -104,6 +144,30 @@ def get_profile(**kwargs) -> base.Profile:
     profile = Profile.objects.select_related('user').get(**kwargs)
     return make_federable_profile(profile)
 
+
+def get_receivers_for_content(content: Content) -> Tuple:
+    """
+    Return values are used by federation to populate AP to and cc fields
+    """
+    to = []
+    cc = []
+
+    mentions = content.mentions.filter(fid__isnull=False).values_list("fid", flat=True)
+    followers = content.author.fid + 'followers/'
+
+    if content.content_type == ContentType.SHARE:
+        to = [NAMESPACE_PUBLIC]
+        cc = [content.share_of.author.fid, followers]
+    elif content.visibility == Visibility.PUBLIC:
+        to = [NAMESPACE_PUBLIC]
+        cc = list(mentions) + [followers]
+    elif content.visibility == Visibility.LIMITED:
+        to = list(mentions)
+        if content.include_following:
+            if to: cc = [followers]
+            else: to = [followers]
+
+    return to, cc
 
 def get_profiles_from_receivers(receivers: List[UserType]) -> List[Profile]:
     """
@@ -145,10 +209,14 @@ def make_federable_content(content: Content) -> Optional[Union[base.Post, base.C
     """Make Content federable by converting it to a federation entity."""
     logger.info("make_federable_content - Content: %s", content)
     if content.content_type == ContentType.REPLY:
-        return _make_comment(content)
+        ret = _make_comment(content)
     elif content.content_type == ContentType.SHARE:
-        return _make_share(content)
-    return _make_post(content)
+        ret = _make_share(content)
+    else: ret = _make_post(content)
+    if content.author.fid and isinstance(content.author.fid, str):
+        ret.to, ret.cc = get_receivers_for_content(content)
+    return ret
+        
 
 
 def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Profile]=None):
@@ -164,7 +232,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
             actor_id = author.fid
             handle = author.handle
             if obj.content_type == ContentType.SHARE:
-                target_id = obj.activities.first().fid
+                target_id = obj.share_of.fid
             else:
                 target_id = obj.fid
         elif isinstance(obj, Profile):
@@ -175,13 +243,18 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
         else:
             logger.warning("make_federable_retraction - Unknown object type %s", obj)
             return
-        return base.Retraction(
+        ret = base.Retraction(
+            id=obj.activities.first().fid,
             entity_type=entity_type,
             actor_id=actor_id,
             target_id=target_id,
             handle=handle,
             target_guid=obj.guid,
+            created_at=obj.effective_modified,
         )
+        if obj.author.fid and isinstance(obj.author.fid, str):
+            ret.to, ret.cc = get_receivers_for_content(obj)
+        return ret
     except Exception as ex:
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
 
@@ -189,6 +262,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
 def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
+    set_profile_finger(profile)
     try:
         return base.Profile(
             raw_content="",
@@ -202,9 +276,15 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
             public_key=profile.rsa_public_key,
             url=profile.url,
             created_at=profile.created,
+            times={
+                'created': profile.created, 
+                'updated': profile.modified,
+                'edited': False,
+            },
             base_url=settings.SOCIALHOME_URL,
             id=profile.fid,
             handle=profile.handle or "",
+            finger=profile.finger or "",
             guid=str(profile.uuid) if profile.is_local else profile.guid if profile.guid else "",
             inboxes={
                 "private": profile.inbox_private,

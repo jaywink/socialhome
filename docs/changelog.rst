@@ -20,8 +20,8 @@ Upgrade notes
 
     ``pip install -U virtualenvwrapper``
 
-  * Since the django-dynamic-preferences update comes with a migration,
-    it is strongly suggested to backup your DB (but you already do that, right?).
+  * Since this release comes with a few migrations, it is strongly suggested to backup
+    your DB (but you already do that, right?).
 
 Added
 .....
@@ -33,6 +33,17 @@ Added
 * Add configuration parameters for federation use of requests_cache with redis.
 
 * Add configuration parameter to enable get requests signature by federation.
+
+* Threaded replies.
+
+* Dynamic update of the reply and share counts.
+
+* Provide to and cc properties to federation for outbound AP payloads.
+
+* Initial work on providing responses to AP collections.
+
+* Enable signature verification for remote AP GET requests. Allows limited content access for
+  valid signatures.
 
 * Add management command ``rq_job_types`` to list currently queued job types by count.
 
@@ -63,6 +74,23 @@ Changed
   If you have customized `circus.ini` in your environment, ensure to add the new
   ``high`` and ``low`` queues, see the default ``circus.ini`` in ``config/circus.ini``.
 
+* Limited content recipients are now extracted from parsing mentions from UI
+  for both contents and replies (ignored for limited visibility replies).
+
+* As a result of the change described above, mentions no longer need to
+  be extracted on content save.
+
+* Show reply and share counts for replies.
+
+* Prefill the full reply editor with parent and root parent mentions.
+
+* The reply box is now functional for limited replies.
+
+* Complete rework of AP reply collections processing. Replies are now processed only from top_level content/share.
+  This should dramatically reduce the number of scheduled jobs.
+
+* Image URLField max_length bumped to 500 (for content/OpenGraphCache and users/Profile).
+
 Fixed
 .....
 
@@ -79,6 +107,14 @@ Removed
   similar exists for the Diaspora ecosystem.
 
   The settings ``SOCIALHOME_RELAY_ID`` and ``SOCIALHOME_RELAY_SCOPE`` can safely be removed.
+
+Fixed
+.....
+
+* Fix limited reply retractions not being sent by adding the remote content author to
+  the limited_visibilities.
+
+* Update reply and share counts for local content retractions.
 
 0.15.0 (2021-11-22)
 -------------------
