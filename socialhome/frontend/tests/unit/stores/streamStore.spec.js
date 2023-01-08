@@ -169,7 +169,12 @@ describe("streamStore", () => {
                 allContentIds: ["1", "2", "3", "6", "7"],
                 contents: {
                     1: {
-                        id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
+                        id: "1",
+                        text: "Plop",
+                        content_type: "content",
+                        replyIds: ["6"],
+                        reply_count: 1,
+                        shareIds: ["3"],
                     },
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
@@ -227,7 +232,12 @@ describe("streamStore", () => {
                 allContentIds: ["1", "2", "3", "6"],
                 contents: {
                     1: {
-                        id: "1", text: "Plop", content_type: "content", replyIds: ["6"], shareIds: ["3"],
+                        id: "1",
+                        text: "Plop",
+                        content_type: "content",
+                        replyIds: ["6"],
+                        reply_count: 1,
+                        shareIds: ["3"],
                     },
                     2: {
                         id: "2", text: "Hello!", content_type: "content", replyIds: [], shareIds: [],
@@ -677,7 +687,7 @@ describe("streamStore", () => {
                     target.state.contents.should
                         .eql({
                             1: {
-                                id: "1", text: "content", replyIds: ["6", "7"], shareIds: [],
+                                id: "1", text: "content", replyIds: ["6", "7"], reply_count: 2, shareIds: [],
                             },
                             6: {
                                 id: "6",
@@ -761,7 +771,7 @@ describe("streamStore", () => {
                 Moxios.wait(() => {
                     target.state.contents.should.eql({
                         1: {
-                            id: "1", text: "content", replyIds: ["6"], shareIds: [],
+                            id: "1", text: "content", replyIds: ["6"], reply_count: 1, shareIds: [],
                         },
                         6: {
                             id: "6",
@@ -824,7 +834,9 @@ describe("streamStore", () => {
         describe("receivedNewContent", () => {
             it("should insert id to 'state.unfetchedContentIds'", () => {
                 const state = {unfetchedContentIds: []}
-                mutations.receivedNewContent(state, "6")
+                mutations.receivedNewContent(state, {
+                    contentId: "6", parentId: null,
+                })
                 state.unfetchedContentIds.should.eql(["6"])
             })
         })

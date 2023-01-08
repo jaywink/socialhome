@@ -46,6 +46,7 @@ describe("EditReplyPublisher", () => {
                 "publisher/editReply", {
                     contentId: "12",
                     parent: propsData.parentId,
+                    recipients: [],
                     showPreview: propsData.showPreview,
                     text: propsData.text,
                 },

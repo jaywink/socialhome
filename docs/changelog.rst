@@ -20,8 +20,18 @@ Upgrade notes
 
     ``pip install -U virtualenvwrapper``
 
-  * Since this release comes with a few migrations, it is strongly suggested to backup
-    your DB (but you already do that, right?).
+* Since this release comes with a few migrations, it is strongly suggested to backup
+  your DB (but you already do that, right?).
+
+* Nodejs must be bumped to v12. If you are using a local install, run the following:
+
+  ::
+
+    npm install v12
+    npm alias default v12
+    npm rebuild node-sass
+
+  Then follow the upgrade instructions.
 
 Added
 .....

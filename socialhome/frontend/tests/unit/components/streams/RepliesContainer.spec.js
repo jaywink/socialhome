@@ -33,7 +33,7 @@ describe("RepliesContainer", () => {
             target = mount(RepliesContainer, {
                 propsData: {content: store.reply}, store,
             })
-            target.instance().isContent.should.be.false
+            target.instance().isContent.should.be.true
 
             target = mount(RepliesContainer, {
                 propsData: {content: store.share}, store,
