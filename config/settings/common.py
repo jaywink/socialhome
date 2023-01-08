@@ -8,11 +8,12 @@ https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
+import os
+import sys
+import warnings
 from datetime import datetime
 
 import environ
-import os
-import warnings
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("socialhome")
@@ -29,6 +30,8 @@ else:
         env.read_env("env.local")
     else:
         warnings.warn("!!! No .env file found!")
+
+testing = env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in sys.argv
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -79,6 +82,8 @@ LOCAL_APPS = (
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
+if testing:
+    SILKY_INSTALLED = False
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
