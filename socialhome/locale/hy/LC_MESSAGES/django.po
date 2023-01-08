@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-30 20:44+0000\n"
+"POT-Creation-Date: 2023-01-07 17:32+0000\n"
 "PO-Revision-Date: 2021-09-27 15:39+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
@@ -120,154 +120,159 @@ msgstr "%s հասցէատիրոջ ֆորմատը սխալ է։"
 msgid "Not all recipients could be found."
 msgstr "ոչ բոլոր ստացողներն են գտնուել։"
 
-#: socialhome/content/models.py:32 socialhome/content/models.py:45
+#: socialhome/content/models.py:35 socialhome/content/models.py:48
 #, fuzzy
 msgid "URL"
 msgstr "URL"
 
-#: socialhome/content/models.py:33
+#: socialhome/content/models.py:36
 msgid "Title"
 msgstr "վերնագիր"
 
-#: socialhome/content/models.py:34
+#: socialhome/content/models.py:37
 msgid "Description"
 msgstr "նկարագրութիւն"
 
-#: socialhome/content/models.py:35
+#: socialhome/content/models.py:38
 msgid "Image URL"
 msgstr "նկարի URL"
 
-#: socialhome/content/models.py:36 socialhome/content/models.py:47
-#: socialhome/content/models.py:155
+#: socialhome/content/models.py:39 socialhome/content/models.py:50
+#: socialhome/content/models.py:162
 msgid "Modified"
 msgstr "փոփոխուած է"
 
-#: socialhome/content/models.py:46
+#: socialhome/content/models.py:49
 msgid "OEmbed HTML content"
 msgstr "OEmbed HTML բովանդակութիւն"
 
-#: socialhome/content/models.py:54 socialhome/users/models.py:138
+#: socialhome/content/models.py:57 socialhome/users/models.py:138
 msgid "Name"
 msgstr "անուն"
 
-#: socialhome/content/models.py:55 socialhome/content/models.py:154
+#: socialhome/content/models.py:58 socialhome/content/models.py:161
 msgid "Created"
 msgstr "ստեղծուած է"
 
-#: socialhome/content/models.py:92
+#: socialhome/content/models.py:95
 msgid "Text"
 msgstr "տեքստ"
 
-#: socialhome/content/models.py:96 socialhome/users/models.py:143
+#: socialhome/content/models.py:99 socialhome/users/models.py:143
 #, fuzzy
 msgid "GUID"
 msgstr "GUID"
 
-#: socialhome/content/models.py:98
+#: socialhome/content/models.py:101
 msgid "Author"
 msgstr "հեղինակ"
 
-#: socialhome/content/models.py:103 socialhome/users/models.py:151
+#: socialhome/content/models.py:106 socialhome/users/models.py:151
 msgid "Federation ID"
 msgstr "դաշնութեան ID"
 
-#: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:110
+#, fuzzy
+msgid "Reply Collection ID"
+msgstr "պատասխանների քանակը"
+
+#: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
 msgstr "կցած է պրոֆիլին"
 
-#: socialhome/content/models.py:108
+#: socialhome/content/models.py:115
 msgid "Order"
 msgstr "կարգ"
 
-#: socialhome/content/models.py:111
+#: socialhome/content/models.py:118
 #, fuzzy
 msgid "Service label"
 msgstr "Ծառայութեան պիտակ"
 
-#: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:122 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
 msgstr "Ցուցադրել OEmbed կամ OpenGraph նախադիտում"
 
-#: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:123 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to turn off fetching and showing an OEmbed or OpenGraph preview "
 "using the links in the text."
 msgstr ""
 
-#: socialhome/content/models.py:120
+#: socialhome/content/models.py:127
 msgid "OEmbed cache"
 msgstr ""
 
-#: socialhome/content/models.py:123
+#: socialhome/content/models.py:130
 msgid "OpenGraph cache"
 msgstr ""
 
-#: socialhome/content/models.py:126
+#: socialhome/content/models.py:133
 msgid "Mentions"
 msgstr "Նշումներ"
 
-#: socialhome/content/models.py:127
+#: socialhome/content/models.py:134
 #: socialhome/search/templates/search/search.html:68
 #: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
 msgid "Tags"
 msgstr "պիտակներ"
 
-#: socialhome/content/models.py:130
+#: socialhome/content/models.py:137
 msgid "Parent"
 msgstr "Ծնող"
 
-#: socialhome/content/models.py:134
+#: socialhome/content/models.py:141
 msgid "Share of"
 msgstr ""
 
-#: socialhome/content/models.py:138 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:145 socialhome/static/dist/vue/js/app.js:67
 msgid "Federate to remote servers"
 msgstr "ուղարկել (ֆեդերացնել) դէպի այլ սպասարկիչներ"
 
-#: socialhome/content/models.py:139 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:146 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
 msgstr ""
 
-#: socialhome/content/models.py:145
+#: socialhome/content/models.py:152
 msgid "Limitied visibilities"
 msgstr "տեսանելիութեան սահմանափակում"
 
-#: socialhome/content/models.py:148 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:155
 msgid "Include people I follow"
 msgstr "ներառել մարդկանց ում ես հետեւում եմ"
 
-#: socialhome/content/models.py:149 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:156
 msgid "Automatically includes all the people you follow as recipients."
 msgstr "աւտոմատ կերպ ներառում է բոլորին, ում դու հետեւում ես։"
 
-#: socialhome/content/models.py:153
+#: socialhome/content/models.py:160
 msgid "Remote created"
 msgstr ""
 
-#: socialhome/content/models.py:159 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:166 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
 msgstr "տեղական"
 
-#: socialhome/content/models.py:160
+#: socialhome/content/models.py:167
 msgid "Rendered text"
 msgstr "նիւթաւորուած տեքստ"
 
-#: socialhome/content/models.py:161
+#: socialhome/content/models.py:168
 msgid "Reply count"
 msgstr "պատասխանների քանակը"
 
-#: socialhome/content/models.py:162
+#: socialhome/content/models.py:169
 msgid "Shares count"
 msgstr "տարածումների քանակը"
 
-#: socialhome/content/models.py:165
+#: socialhome/content/models.py:172
 msgid "Root parent"
 msgstr ""
 
-#: socialhome/content/serializers.py:290
+#: socialhome/content/serializers.py:317
 msgid "This recipient couldn't be found (please check the format)."
 msgstr ""
 
@@ -515,10 +520,6 @@ msgid "Full editor"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "Only full editor available for non-public replies at this time"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply text..."
 msgstr ""
 
@@ -571,7 +572,7 @@ msgstr ""
 msgid "All content tagged with"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
 msgid "Followed tags"
 msgstr ""
 
@@ -587,7 +588,7 @@ msgstr ""
 msgid "Followers"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:172
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
 msgid "Following"
 msgstr ""
 
@@ -653,6 +654,10 @@ msgid "By url"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Bold"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
 msgstr ""
 
@@ -665,6 +670,10 @@ msgid "Heading"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Insert Horizontal Line"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "The image %s couldn't be uploaded"
 msgstr ""
@@ -674,7 +683,20 @@ msgid "add an image using an url (Ctrl-Alt-I)"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Italic"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
+msgid "Create Link"
+msgstr "գրառել"
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Numbered List"
 msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
@@ -694,6 +716,14 @@ msgstr ""
 "տեքստի տիրոյթ։ Վաւեր նիշքի տիպերն են՝ png/jpg/svg/gif։"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Quote"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Generic List"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
 msgstr "Վերբեռնել նկար"
 
@@ -707,8 +737,8 @@ msgstr ""
 "բոլորին տեսանելի, անգամ անանուն օգտատէրերի եւ համացանցում փնտրող բոտերի։"
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "visible to only those who shared with."
-msgstr "տեսանելի միայն նրանց համար, ում հետ կիսւում ես։"
+msgid "visible only to those mentioned in the text and/or your mutuals."
+msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -730,9 +760,20 @@ msgid "Hidden textarea"
 msgstr "Թաքնուած տեքստի տիրոյթ"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Include your mutuals"
+msgstr ""
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
 msgid ""
-"Type in the handles (eg user@example.com) of the recipients. Separate by "
-"commas. Sorry, no search yet.."
+"Automatically include people you follow that also follow you as recipients."
+msgstr "աւտոմատ կերպ ներառում է բոլորին, ում դու հետեւում ես։"
+
+#: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
+msgid ""
+"Enter the recipients' handles (eg @user@example.com) in the editor window. "
+"Sorry, no search yet... "
 msgstr ""
 "Մուտքագրէք ստացողներին (օր․ user@example.am)։ Բաժանէք ստորակէտներով։ Կներէք, "
 "փնտրելը դեռ իրականացուած չէ։"
@@ -759,9 +800,10 @@ msgid "Error saving content."
 msgstr "Բովանդակութեանը պահպանելիս առաջացաւ սխալ։"
 
 #: socialhome/static/dist/vue/js/app.js:67
+#, fuzzy
 msgid ""
-"When visibility is set to 'Limited', you must either specify recipients or "
-"include your followers."
+"When visibility is set to 'Limited', you must either mention recipients in "
+"the text or include your mutuals."
 msgstr ""
 "Երբ տեսանելիութիւնը նշուած ա «Սահմանափակ», պէտք ա կամ նշես ստացողներին, կամ "
 "ներառես հետեւողներին։"
@@ -999,11 +1041,11 @@ msgstr "Հաստատել"
 #: socialhome/templates/account/email_confirm.html:29
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
-"Այս՝ էլ․ փոստ հաստատելու յղումը սխալ է կամ հնացած։ Խնդում եմ <a href=\""
-"%(email_url)s\">ստեղծել նոր էլ․ փոստի հասցէ հաստատելու հայց</a>։"
+"Այս՝ էլ․ փոստ հաստատելու յղումը սխալ է կամ հնացած։ Խնդում եմ <a "
+"href=\"%(email_url)s\">ստեղծել նոր էլ․ փոստի հասցէ հաստատելու հայց</a>։"
 
 #: socialhome/templates/account/email_confirmed.html:16
 #, python-format
@@ -1024,8 +1066,8 @@ msgstr "Մուտք"
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"      of your existing third party accounts. Or, <a href=\"%(signup_url)s"
-"\">sign up</a>\n"
+"      of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
 "      for a %(site_name)s account and sign in below:"
 msgstr ""
 
@@ -1069,8 +1111,8 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll send you "
 "an e-mail allowing you to reset it."
 msgstr ""
-"Մոռացա՞ր ծածկագիրը։ Մուտքագրիր էլ․ հասցէդ ներքեւում, ու մենք կուղարկենք իմակ՝"
-" նոր ծածկագիր նշելու յղումով։"
+"Մոռացա՞ր ծածկագիրը։ Մուտքագրիր էլ․ հասցէդ ներքեւում, ու մենք կուղարկենք "
+"իմակ՝ նոր ծածկագիր նշելու յղումով։"
 
 #: socialhome/templates/account/password_reset.html:23
 msgid "Reset My Password"
@@ -1263,51 +1305,55 @@ msgstr ""
 msgid "Handle"
 msgstr ""
 
-#: socialhome/users/models.py:154
-msgid "RSA private key"
-msgstr ""
-
 #: socialhome/users/models.py:155
-msgid "RSA public key"
+msgid "Webfinger subject"
 msgstr ""
 
 #: socialhome/users/models.py:158
-msgid "Profile visibility"
+msgid "RSA private key"
 msgstr ""
 
-#: socialhome/users/models.py:161
-msgid "Image - large"
+#: socialhome/users/models.py:159
+msgid "RSA public key"
 msgstr ""
 
 #: socialhome/users/models.py:162
-msgid "Image - medium"
+msgid "Profile visibility"
 msgstr ""
 
-#: socialhome/users/models.py:163
-msgid "Image - small"
+#: socialhome/users/models.py:165
+msgid "Image - large"
 msgstr ""
 
 #: socialhome/users/models.py:166
+msgid "Image - medium"
+msgstr ""
+
+#: socialhome/users/models.py:167
+msgid "Image - small"
+msgstr ""
+
+#: socialhome/users/models.py:170
 msgid "Location"
 msgstr ""
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "NSFW"
 msgstr ""
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "Should users content be considered NSFW?"
 msgstr ""
 
-#: socialhome/users/models.py:180
+#: socialhome/users/models.py:184
 msgid "Private inbox"
 msgstr ""
 
-#: socialhome/users/models.py:181
+#: socialhome/users/models.py:185
 msgid "Public inbox"
 msgstr ""
 
-#: socialhome/users/models.py:184
+#: socialhome/users/models.py:188
 msgid "Protocol"
 msgstr ""
 
@@ -1423,3 +1469,6 @@ msgid ""
 "the right. Click on the center point you would like your profile picture be "
 "around, then click 'Save'."
 msgstr ""
+
+#~ msgid "visible to only those who shared with."
+#~ msgstr "տեսանելի միայն նրանց համար, ում հետ կիսւում ես։"
