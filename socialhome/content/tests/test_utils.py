@@ -35,7 +35,7 @@ class TestSafeTextForMarkdown:
 
     def test_text_with_html_is_cleaned__mention_link_classes_preserved(self):
         assert safe_text_for_markdown(HTML_TEXT_WITH_MENTION_LINK) == \
-           '<p><span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/"' \
+           '<p><span class="h-card"><a href="https://dev.jasonrobinson.me/u/jaywink/" class="u-url mention"' \
            '>@<span>jaywink</span></a></span> boom</p>'
 
     def test_text_with_quotes_survives(self):
@@ -57,7 +57,7 @@ class TestSafeText:
         assert safe_text(SCRIPT_TEXT) == "console.log"
 
     def test_text_with_html_is_cleaned(self):
-        assert safe_text(HTML_TEXT) == "barceedaaafaa"
+        assert safe_text(HTML_TEXT) == "barceedaaa\nfaa"
 
     def test_text_with_html_is_cleaned__mention_link_removed(self):
         assert safe_text(HTML_TEXT_WITH_MENTION_LINK) == '@jaywink boom'
