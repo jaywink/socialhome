@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-30 20:44+0000\n"
-"PO-Revision-Date: 2022-03-19 13:17+0000\n"
+"POT-Creation-Date: 2023-01-07 17:32+0000\n"
+"PO-Revision-Date: 2023-01-07 23:47+0000\n"
 "Last-Translator: Alain St-Denis <alain@zenfolie.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.12-dev\n"
+"X-Generator: Weblate 4.15.1-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -125,72 +125,76 @@ msgstr "Le format du destinataire %s est incorrect."
 msgid "Not all recipients could be found."
 msgstr "Certains destinataires sont introuvables."
 
-#: socialhome/content/models.py:32 socialhome/content/models.py:45
+#: socialhome/content/models.py:35 socialhome/content/models.py:48
 msgid "URL"
 msgstr "URL"
 
-#: socialhome/content/models.py:33
+#: socialhome/content/models.py:36
 msgid "Title"
 msgstr "Titre"
 
-#: socialhome/content/models.py:34
+#: socialhome/content/models.py:37
 msgid "Description"
 msgstr "Description"
 
-#: socialhome/content/models.py:35
+#: socialhome/content/models.py:38
 msgid "Image URL"
 msgstr "URL de l'image"
 
-#: socialhome/content/models.py:36 socialhome/content/models.py:47
-#: socialhome/content/models.py:155
+#: socialhome/content/models.py:39 socialhome/content/models.py:50
+#: socialhome/content/models.py:162
 msgid "Modified"
 msgstr "Modifié"
 
-#: socialhome/content/models.py:46
+#: socialhome/content/models.py:49
 msgid "OEmbed HTML content"
 msgstr "Contenu HTML OEmbed"
 
-#: socialhome/content/models.py:54 socialhome/users/models.py:138
+#: socialhome/content/models.py:57 socialhome/users/models.py:138
 msgid "Name"
 msgstr "Nom"
 
-#: socialhome/content/models.py:55 socialhome/content/models.py:154
+#: socialhome/content/models.py:58 socialhome/content/models.py:161
 msgid "Created"
 msgstr "Créé"
 
-#: socialhome/content/models.py:92
+#: socialhome/content/models.py:95
 msgid "Text"
 msgstr "Texte"
 
-#: socialhome/content/models.py:96 socialhome/users/models.py:143
+#: socialhome/content/models.py:99 socialhome/users/models.py:143
 msgid "GUID"
 msgstr "GUID"
 
-#: socialhome/content/models.py:98
+#: socialhome/content/models.py:101
 msgid "Author"
 msgstr "Auteur"
 
-#: socialhome/content/models.py:103 socialhome/users/models.py:151
+#: socialhome/content/models.py:106 socialhome/users/models.py:151
 msgid "Federation ID"
 msgstr "ID de fédération"
 
-#: socialhome/content/models.py:106 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:110
+msgid "Reply Collection ID"
+msgstr "ID de la collection des réponses"
+
+#: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
 msgstr "Épinglé au profil"
 
-#: socialhome/content/models.py:108
+#: socialhome/content/models.py:115
 msgid "Order"
 msgstr "Ordre"
 
-#: socialhome/content/models.py:111
+#: socialhome/content/models.py:118
 msgid "Service label"
 msgstr "Étiquette de service"
 
-#: socialhome/content/models.py:115 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:122 socialhome/static/dist/vue/js/app.js:67
 msgid "Show OEmbed or OpenGraph preview"
 msgstr "Afficher l'aperçu OEmbed ou OpenGraph"
 
-#: socialhome/content/models.py:116 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:123 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to turn off fetching and showing an OEmbed or OpenGraph preview "
 "using the links in the text."
@@ -198,84 +202,84 @@ msgstr ""
 "Désactiver pour empêcher la récupération et l'affichage d'un aperçu d'OEmbed "
 "ou d'OpenGraph en utilisant les liens dans le texte."
 
-#: socialhome/content/models.py:120
+#: socialhome/content/models.py:127
 msgid "OEmbed cache"
 msgstr "Cache OEmbed"
 
-#: socialhome/content/models.py:123
+#: socialhome/content/models.py:130
 msgid "OpenGraph cache"
 msgstr "Cache OpenGraph"
 
-#: socialhome/content/models.py:126
+#: socialhome/content/models.py:133
 msgid "Mentions"
 msgstr "Mentions"
 
-#: socialhome/content/models.py:127
+#: socialhome/content/models.py:134
 #: socialhome/search/templates/search/search.html:68
 #: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: socialhome/content/models.py:130
+#: socialhome/content/models.py:137
 msgid "Parent"
 msgstr "Parent"
 
-#: socialhome/content/models.py:134
+#: socialhome/content/models.py:141
 msgid "Share of"
 msgstr "Partagé par"
 
-#: socialhome/content/models.py:138 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:145 socialhome/static/dist/vue/js/app.js:67
 msgid "Federate to remote servers"
 msgstr "Fédérer vers les ux serveurs distants"
 
-#: socialhome/content/models.py:139 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:146 socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
 msgstr ""
-"Désactiver pour ne pas fédérer cette version aux serveurs distants. Remarque "
-": la version du contenu sauvegardé sera toujours mise à jour dans les flux "
-"locaux."
+"Désactiver pour ne pas fédérer cette version aux serveurs distants. "
+"Remarque : la version du contenu sauvegardé sera toujours mise à jour dans "
+"les flux locaux."
 
-#: socialhome/content/models.py:145
+#: socialhome/content/models.py:152
 msgid "Limitied visibilities"
 msgstr "Visibilités restreintes"
 
-#: socialhome/content/models.py:148 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:155
 msgid "Include people I follow"
 msgstr "Inclure les gens que je suis"
 
-#: socialhome/content/models.py:149 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:156
 msgid "Automatically includes all the people you follow as recipients."
 msgstr ""
 "Inclut automatiquement comme destinataires tous les gens que vous suivez."
 
-#: socialhome/content/models.py:153
+#: socialhome/content/models.py:160
 msgid "Remote created"
 msgstr "Créé à distance"
 
-#: socialhome/content/models.py:159 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:166 socialhome/static/dist/vue/js/app.js:67
 #: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
 msgid "Local"
 msgstr "Local"
 
-#: socialhome/content/models.py:160
+#: socialhome/content/models.py:167
 msgid "Rendered text"
 msgstr "Texte animé"
 
-#: socialhome/content/models.py:161
+#: socialhome/content/models.py:168
 msgid "Reply count"
 msgstr "Nombre de réponses"
 
-#: socialhome/content/models.py:162
+#: socialhome/content/models.py:169
 msgid "Shares count"
 msgstr "Nombre de partages"
 
-#: socialhome/content/models.py:165
+#: socialhome/content/models.py:172
 msgid "Root parent"
 msgstr "Racine du parent"
 
-#: socialhome/content/serializers.py:290
+#: socialhome/content/serializers.py:317
 msgid "This recipient couldn't be found (please check the format)."
 msgstr "Destinataire introuvable (veuillez vérifier le format)."
 
@@ -532,12 +536,6 @@ msgid "Full editor"
 msgstr "Éditeur complet"
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "Only full editor available for non-public replies at this time"
-msgstr ""
-"Pour le moment, seul l'éditeur complet est disponible pour les réponses non "
-"publiques"
-
-#: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply text..."
 msgstr "Texte de la réponse..."
 
@@ -591,7 +589,7 @@ msgstr "Contient les publications des utilisateurs locaux."
 msgid "All content tagged with"
 msgstr "Toutes les publications étiquetées avec"
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
 msgid "Followed tags"
 msgstr "Étiquettes suivies"
 
@@ -607,7 +605,7 @@ msgstr "Changer l'image"
 msgid "Followers"
 msgstr "Abonné-e-s"
 
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:172
+#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
 msgid "Following"
 msgstr "Abonnements"
 
@@ -632,6 +630,7 @@ msgid "All content"
 msgstr "Toutes les publications"
 
 #: socialhome/static/dist/vue/js/app.js:67
+#, python-format
 msgid "%s new post available"
 msgid_plural "%s new posts available"
 msgstr[0] "%s nouvelle publication disponible"
@@ -672,6 +671,10 @@ msgid "By url"
 msgstr "Par URL"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Bold"
+msgstr "Gras"
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
 msgstr "Basculer en plein écran (F11)"
 
@@ -684,6 +687,10 @@ msgid "Heading"
 msgstr "En-tête"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Insert Horizontal Line"
+msgstr "Ligne horizontale"
+
+#: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "The image %s couldn't be uploaded"
 msgstr "L'image %s n'a pas pu être téléversée"
@@ -693,8 +700,20 @@ msgid "add an image using an url (Ctrl-Alt-I)"
 msgstr "ajouter une image en utilisant un URL (Ctrl-Alt-I)"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Italic"
+msgstr "Italique"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Create Link"
+msgstr "Insérer un lien"
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
 msgstr "Chargement..."
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Numbered List"
+msgstr "Liste numérotée"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert image"
@@ -713,6 +732,14 @@ msgstr ""
 "les glissant vers la zone de texte. Format supportés : png/jpg/svg/gif."
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Quote"
+msgstr "Citation"
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid "Generic List"
+msgstr "Liste générique"
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
 msgstr "Téléverser une image"
 
@@ -727,8 +754,8 @@ msgstr ""
 "recherche sur Internet."
 
 #: socialhome/static/dist/vue/js/app.js:67
-msgid "visible to only those who shared with."
-msgstr "visible uniquement par ceux qui avec qui on a partagé."
+msgid "visible only to those mentioned in the text and/or your mutuals."
+msgstr "visible seulement à ceux mentionnés dans le texte et/ou à vos mutuels."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -739,7 +766,8 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to only self. Does not federate to other servers."
-msgstr "visible uniquement par vous seul. Ne se fédère pas à d'autres serveurs."
+msgstr ""
+"visible uniquement par vous seul. Ne se fédère pas à d'autres serveurs."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Edit"
@@ -750,12 +778,23 @@ msgid "Hidden textarea"
 msgstr "Zone de texte cachée"
 
 #: socialhome/static/dist/vue/js/app.js:67
+msgid "Include your mutuals"
+msgstr "Inclure vos mutuels"
+
+#: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"Type in the handles (eg user@example.com) of the recipients. Separate by "
-"commas. Sorry, no search yet.."
+"Automatically include people you follow that also follow you as recipients."
 msgstr ""
-"Tapez le nom des destinataires (par exemple user@example.com). Séparez-les "
-"par des virgules. Désolé, la recherche n'est pas encore disponible.."
+"Inclut automatiquement comme destinataires tous les gens que vous suivez et "
+"qui vous suivent."
+
+#: socialhome/static/dist/vue/js/app.js:67
+msgid ""
+"Enter the recipients' handles (eg @user@example.com) in the editor window. "
+"Sorry, no search yet... "
+msgstr ""
+"Tapez l'adresse des destinataires (par exemple @user@example.com) dans la "
+"fenêtre d'édition. Désolé, la recherche n'est pas encore disponible.. "
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Visibility"
@@ -787,11 +826,11 @@ msgstr "Erreur de sauvegarde de la publication."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
-"When visibility is set to 'Limited', you must either specify recipients or "
-"include your followers."
+"When visibility is set to 'Limited', you must either mention recipients in "
+"the text or include your mutuals."
 msgstr ""
 "Lorsque la visibilité est définie sur \"Limité\", vous devez soit spécifier "
-"les destinataires, soit inclure vos abonné-e-s."
+"les destinataires dans le texte, soit inclure vos mutuels."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Some recipients couldn't be found."
@@ -1029,8 +1068,8 @@ msgstr "Confirmer"
 #: socialhome/templates/account/email_confirm.html:29
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a href="
-"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
 msgstr ""
 "Ce lien de confirmation de courriel est expiré ou invalide. Veuillez en <a "
 "href=\"%(email_url)s\">créer un nouveau</a>."
@@ -1054,13 +1093,13 @@ msgstr "S'enregistrer"
 #, python-format
 msgid ""
 "Please sign in with one\n"
-"      of your existing third party accounts. Or, <a href=\"%(signup_url)s"
-"\">sign up</a>\n"
+"      of your existing third party accounts. Or, <a "
+"href=\"%(signup_url)s\">sign up</a>\n"
 "      for a %(site_name)s account and sign in below:"
 msgstr ""
 "Veuillez vous connecter avec l'un\n"
-"      de vos comptes tiers existants. Ou, <a href=\"%(signup_url)s"
-"\">enregistrez</a>\n"
+"      de vos comptes tiers existants. Ou, <a "
+"href=\"%(signup_url)s\">enregistrez</a>\n"
 "      un compte %(site_name)s et connectez-vous ci-dessous :"
 
 #: socialhome/templates/account/login.html:26
@@ -1137,8 +1176,8 @@ msgid ""
 "a>."
 msgstr ""
 "Le lien de réinitialisation du mot de passe est invalide, possiblement parce "
-"qu'il a déjà été utilisé. Veuillez en demander <a href=\"%(passwd_reset_url)s"
-"\">un nouveau</a>."
+"qu'il a déjà été utilisé. Veuillez en demander <a "
+"href=\"%(passwd_reset_url)s\">un nouveau</a>."
 
 #: socialhome/templates/account/password_reset_from_key.html:21
 msgid "change password"
@@ -1164,8 +1203,8 @@ msgstr "Se connecter"
 msgid ""
 "Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
 msgstr ""
-"Vous avez déjà un compte ? Dans ce cas veuillez vous <a href=\"%(login_url)s"
-"\">connecter</a>."
+"Vous avez déjà un compte ? Dans ce cas veuillez vous <a "
+"href=\"%(login_url)s\">connecter</a>."
 
 #: socialhome/templates/account/signup_closed.html:5
 #: socialhome/templates/account/signup_closed.html:10
@@ -1224,8 +1263,8 @@ msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
 "mail address</a>."
 msgstr ""
-"<strong>Note :</strong> vous pouvez toujours <a href=\"%(email_url)s\""
-">modifier votre adresse électronique</a>."
+"<strong>Note :</strong> vous pouvez toujours <a "
+"href=\"%(email_url)s\">modifier votre adresse électronique</a>."
 
 #: socialhome/templates/dynamic_preferences/form.html:10
 msgid "Preferences"
@@ -1323,51 +1362,55 @@ msgstr "adresse courriel"
 msgid "Handle"
 msgstr "Identifiant"
 
-#: socialhome/users/models.py:154
+#: socialhome/users/models.py:155
+msgid "Webfinger subject"
+msgstr "Sujet webfinger"
+
+#: socialhome/users/models.py:158
 msgid "RSA private key"
 msgstr "Clé RSA privée"
 
-#: socialhome/users/models.py:155
+#: socialhome/users/models.py:159
 msgid "RSA public key"
 msgstr "Clé RSA publique"
 
-#: socialhome/users/models.py:158
+#: socialhome/users/models.py:162
 msgid "Profile visibility"
 msgstr "Visibilité du profil"
 
-#: socialhome/users/models.py:161
+#: socialhome/users/models.py:165
 msgid "Image - large"
 msgstr "Image - large"
 
-#: socialhome/users/models.py:162
+#: socialhome/users/models.py:166
 msgid "Image - medium"
 msgstr "Image - moyenne"
 
-#: socialhome/users/models.py:163
+#: socialhome/users/models.py:167
 msgid "Image - small"
 msgstr "Image - petite"
 
-#: socialhome/users/models.py:166
+#: socialhome/users/models.py:170
 msgid "Location"
 msgstr "Emplacement"
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "NSFW"
 msgstr "NSFW"
 
-#: socialhome/users/models.py:169
+#: socialhome/users/models.py:173
 msgid "Should users content be considered NSFW?"
 msgstr "Le contenu des utilisateurs doit-il être considéré comme NSFW ?"
 
-#: socialhome/users/models.py:180
+#: socialhome/users/models.py:184
 msgid "Private inbox"
 msgstr "Boîte de réception privée"
 
-#: socialhome/users/models.py:181
+#: socialhome/users/models.py:185
 msgid "Public inbox"
 msgstr "Boîte de réception publique"
 
-#: socialhome/users/models.py:184
+#: socialhome/users/models.py:188
 msgid "Protocol"
 msgstr "Protocole"
 
@@ -1508,6 +1551,14 @@ msgstr ""
 "carrée, vous pouvez choisir un \"point d'intérêt\" en cliquant sur l'aperçu "
 "complet de l'image à droite. Cliquez sur le point central autour duquel vous "
 "souhaitez placer votre photo de profil, puis cliquez sur \"Enregistrer\"."
+
+#~ msgid "Only full editor available for non-public replies at this time"
+#~ msgstr ""
+#~ "Pour le moment, seul l'éditeur complet est disponible pour les réponses "
+#~ "non publiques"
+
+#~ msgid "visible to only those who shared with."
+#~ msgstr "visible uniquement par ceux qui avec qui on a partagé."
 
 #~ msgid "update"
 #~ msgstr "modifier"

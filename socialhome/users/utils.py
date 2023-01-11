@@ -6,7 +6,6 @@ from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
-from federation.utils.activitypub import get_profile_id_from_webfinger
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -43,6 +42,7 @@ def set_profile_finger(profile):
     query) we call this from profile serializers. It should
     eventually become a noop
     """
+    from federation.utils.activitypub import get_profile_id_from_webfinger
     from socialhome.users.models import Profile
     profile.refresh_from_db()
     if not profile.finger: 
