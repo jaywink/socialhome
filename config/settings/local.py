@@ -7,8 +7,6 @@ import sys
 
 from .common import *  # noqa
 
-testing = env.bool("CI", default=False) or env.bool("TEST", default=False) or "test" in sys.argv
-
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
