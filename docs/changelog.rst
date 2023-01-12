@@ -27,8 +27,8 @@ Upgrade notes
 
   ::
 
-    npm install v12
-    npm alias default v12
+    nvm install v12
+    nvm alias default v12
     npm rebuild node-sass
 
   Then follow the upgrade instructions.
