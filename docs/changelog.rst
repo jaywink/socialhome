@@ -101,6 +101,8 @@ Changed
 
 * Image URLField max_length bumped to 500 (for content/OpenGraphCache and users/Profile).
 
+* Docker images Python version is now 3.9.
+
 Fixed
 .....
 
