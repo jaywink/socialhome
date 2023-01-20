@@ -49,7 +49,9 @@ describe("ReplyEditor", () => {
                     "stream/saveReply",
                     {
                         data: {
-                            parent: store.content.id, text: "\"Code without tests doesn't exist\" -Albert Einstein",
+                            parent: store.content.id,
+                            text: "\"Code without tests doesn't exist\" -Albert Einstein",
+                            recipients: [],
                         },
                     },
                 ])

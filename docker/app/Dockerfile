@@ -1,15 +1,15 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 ENV PYTHONUNBUFFERED 1
 ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 10.24.1
+ENV NODE_VERSION 12.22.12
 
 WORKDIR /
 
 # Install nvm with node and npm
 RUN apt-get update && apt-get install python3-dev less htop curl git build-essential libmagic1 -y && \
     rm /bin/sh && ln -s /bin/bash /bin/sh && mkdir /usr/local/nvm && \
-    curl https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+    curl https://raw.githubusercontent.com/creationix/nvm/v0.39.3/install.sh | bash
 
 RUN source $NVM_DIR/nvm.sh && \
     nvm install $NODE_VERSION && \

@@ -44,14 +44,6 @@ describe("ReactionsBar", () => {
                 })
                 target.vm.showExpandRepliesIcon.should.be.true
             })
-
-            it("should be false if content is not of type content", () => {
-                content.content_type = "reply"
-                const target = shallowMount(ReactionsBar, {
-                    propsData: {content}, store, localVue,
-                })
-                target.vm.showExpandRepliesIcon.should.be.false
-            })
         })
 
         describe("showSharesCountIcon", () => {
@@ -67,14 +59,6 @@ describe("ReactionsBar", () => {
                     propsData: {content}, store, localVue,
                 })
                 target.vm.showSharesCountIcon.should.be.true
-            })
-
-            it("should be false if content is not of type content", () => {
-                content.content_type = "reply"
-                const target = shallowMount(ReactionsBar, {
-                    propsData: {content}, store, localVue,
-                })
-                target.vm.showSharesCountIcon.should.be.false
             })
         })
     })

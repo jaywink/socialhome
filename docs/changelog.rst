@@ -20,8 +20,18 @@ Upgrade notes
 
     ``pip install -U virtualenvwrapper``
 
-  * Since this release comes with a few migrations, it is strongly suggested to backup
-    your DB (but you already do that, right?).
+* Since this release comes with a few migrations, it is strongly suggested to backup
+  your DB (but you already do that, right?).
+
+* Nodejs must be bumped to v12. If you are using a local install, run the following:
+
+  ::
+
+    nvm install v12
+    nvm alias default v12
+    npm rebuild node-sass
+
+  Then follow the upgrade instructions.
 
 Added
 .....
@@ -90,6 +100,8 @@ Changed
   This should dramatically reduce the number of scheduled jobs.
 
 * Image URLField max_length bumped to 500 (for content/OpenGraphCache and users/Profile).
+
+* Docker images Python version is now 3.9.
 
 Fixed
 .....

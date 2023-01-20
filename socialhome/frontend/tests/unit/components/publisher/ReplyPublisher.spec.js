@@ -33,6 +33,7 @@ describe("ReplyPublisher", () => {
             store.dispatch.getCall(0).args.should.eql([
                 "publisher/publishReply", {
                     parent: 12,
+                    recipients: [],
                     showPreview: true,
                     text: "",
                 },

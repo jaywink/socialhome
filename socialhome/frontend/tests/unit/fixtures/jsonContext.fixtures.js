@@ -24,6 +24,7 @@ const getFakeContent = function getFakeContent(args = {}) {
         humanized_timestamp: faker.random.number(),
         id: faker.random.number(),
         parent: null,
+        recipients: [],
         rendered: `<p>${faker.lorem.paragraphs()}</p>`,
         reply_count: faker.random.number(),
         replyIds: [],

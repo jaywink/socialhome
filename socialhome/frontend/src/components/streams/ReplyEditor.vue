@@ -60,7 +60,6 @@ export default Vue.component("ReplyEditor", {
             if (this.replyText) {
                 const re = /@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9]+)[\W\s]?/g
                 const recipients = Array.from(this.replyText.matchAll(re), m => m[1])
-                // this.prefilledText.split(" ").forEach(item => recipients.push(item.substring(1)))
                 this.$store.dispatch(
                     "stream/saveReply", {
                         data: {
