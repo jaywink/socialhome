@@ -23,7 +23,7 @@
     "eslint": "<7",
     "eslint-config-airbnb": "^18.2.1",
     "faker": "^5.5.3",
-    "grunt": "~1.4.1",
+    "grunt": "~1.5.3",
     "grunt-cli": "~1.4.3",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "~1.0.0",
