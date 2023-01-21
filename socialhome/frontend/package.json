@@ -40,7 +40,7 @@
     "@vue/cli-plugin-eslint": "<5",
     "@vue/cli-plugin-pwa": "<5",
     "@vue/cli-plugin-unit-mocha": "<5",
-    "@vue/cli-service": "<5",
+    "@vue/cli-service": "<6",
     "@vue/compiler-dom": "^3.2.45",
     "@vue/composition-api": "^1.7.1",
     "@vue/eslint-config-airbnb": "^7.0.0",
