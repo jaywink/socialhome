@@ -38,9 +38,10 @@
     "time-grunt": "~2.0.0"
   },
   "engines": {
-    "node": ">=10 <11"
+    "node": ">=12 <13"
   },
   "dependencies": {
+    "chai": "^4.3.7",
     "lodash": "^4.17.21"
   },
   "eslintIgnore": [
