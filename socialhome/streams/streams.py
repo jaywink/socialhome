@@ -102,7 +102,7 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     :param notify_keys: List of existing notify keys to add to.
     :param is_share: Boolean whether this is a shared content.
     """
-    if not user.recently_active:
+    if stream_cls not in CACHED_STREAM_CLASSES and not user.recently_active:
         # Abort early to avoid unnecessary work if we're not intending to cache for this user
         # and we're also not intending to notify them
         return
