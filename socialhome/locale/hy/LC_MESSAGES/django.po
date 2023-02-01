@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2021-09-27 15:39+0000\n"
+"PO-Revision-Date: 2023-01-25 10:49+0000\n"
 "Last-Translator: norayr tanakian <norayr@arnet.am>\n"
 "Language-Team: Armenian <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/hy/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.9-dev\n"
+"X-Generator: Weblate 4.16-dev\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -61,7 +61,7 @@ msgstr "կայք"
 
 #: socialhome/enums.py:24 socialhome/static/dist/vue/js/app.js:67
 msgid "Self"
-msgstr ""
+msgstr "Ինքզինք"
 
 #: socialhome/preferences.py:13
 #, fuzzy
@@ -274,7 +274,7 @@ msgstr ""
 
 #: socialhome/content/serializers.py:317
 msgid "This recipient couldn't be found (please check the format)."
-msgstr ""
+msgstr "Ստացողը չի գտնուել (ստուգէք ձեւաչափը)։"
 
 #: socialhome/content/templates/content/_edit_title.html:5
 #: socialhome/static/dist/vue/js/app.js:67
@@ -447,7 +447,7 @@ msgstr "Ձեր գրառումը տարածեց"
 
 #: socialhome/search/views.py:136
 msgid "Search string is invalid, please try another one."
-msgstr ""
+msgstr "Փնտրուող տողը սխալ է, փորձէք այլ տող։"
 
 #: socialhome/search/templates/search/search.html:5
 #: socialhome/search/templates/search/search.html:8
@@ -458,11 +458,11 @@ msgstr "Փնտրել"
 
 #: socialhome/search/templates/search/search.html:12
 msgid "Search term"
-msgstr ""
+msgstr "Փնտրուող բառը"
 
 #: socialhome/search/templates/search/search.html:13
 msgid "Type a search term"
-msgstr ""
+msgstr "Ներմուծէք փնտրուող բառը"
 
 #: socialhome/search/templates/search/search.html:22
 #, fuzzy
@@ -517,88 +517,88 @@ msgstr "պատասխանել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Full editor"
-msgstr ""
+msgstr "Առաջադէմ խմբագրիչ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply text..."
-msgstr ""
+msgstr "Պատասխանել…"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "unshare"
-msgstr ""
+msgstr "Ապատարածել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "share"
-msgstr ""
+msgstr "տարածել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Replies"
-msgstr ""
+msgstr "Մեկնաբանութիւններ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Shares"
-msgstr ""
+msgstr "Տարածումներ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Hide NSFW content"
-msgstr ""
+msgstr "Թաքցնել քըխ բովանդակութիւնը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Show NSFW content"
-msgstr ""
+msgstr "Ցուցադրել քըխ բովանդակութիւնը"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:108
 msgid "Contains public content from around the network."
-msgstr ""
+msgstr "Պարունակում է համաշխարհային հանրային բովանդակութիւն։"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/enums.py:20
 #: socialhome/templates/base.html:48
 msgid "Followed"
-msgstr ""
+msgstr "Հիմնական"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
 msgid "Content from followed users."
-msgstr ""
+msgstr "Բովանդակութիւն հետեւուող օգտատէրերից։"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
-msgstr ""
+msgstr "Պարունակում է ձեզ վերաբերող ոչ հանրային բովանդակութիւն։"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:95
 msgid "Contains content from local users."
-msgstr ""
+msgstr "Պարունակում է հանգոյցի օգտատէրերի բովանդակութիւն։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content tagged with"
-msgstr ""
+msgstr "Ամէնն ինչ պիտակուած է"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
 msgid "Followed tags"
-msgstr ""
+msgstr "Հետեւուող պիտակներ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Content from all followed tags."
-msgstr ""
+msgstr "Բովանդակութիւն հետեւուող պիտակներից։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Change picture"
-msgstr ""
+msgstr "Փոխել նկարը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Followers"
-msgstr ""
+msgstr "Հետեւողներ"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
 msgid "Following"
-msgstr ""
+msgstr "Հետեւում ես"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Organize profile content"
-msgstr ""
+msgstr "Կարգաւորել պրոֆիլը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Update profile"
-msgstr ""
+msgstr "Թարմացնել պրոֆիլը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "User handle or URL on The Federation"
@@ -606,85 +606,85 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned content"
-msgstr ""
+msgstr "Ամրացուած բովանդակութիւն"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content"
-msgstr ""
+msgstr "Ամէնը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "%s new post available"
 msgid_plural "%s new posts available"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s նոր գրառում"
+msgstr[1] "%s նոր գրառում"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/templates/dynamic_preferences/form.html:14
 #: socialhome/users/templates/users/userpicture_form.html:28
 msgid "Save"
-msgstr ""
+msgstr "Պահել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 1"
-msgstr ""
+msgstr "Վերնագիր 1"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 2"
-msgstr ""
+msgstr "Վերնագիր 2"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 3"
-msgstr ""
+msgstr "Վերնագիր 3"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 4"
-msgstr ""
+msgstr "Վերնագիր 4"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 5"
-msgstr ""
+msgstr "Վերնագիր 5"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 6"
-msgstr ""
+msgstr "Վերնագիր 6"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "By url"
-msgstr ""
+msgstr "Ըստ url֊ի"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Bold"
-msgstr ""
+msgstr "Թաւատառ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
-msgstr ""
+msgstr "Լիաէկրան (F11)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Markdown guide"
-msgstr ""
+msgstr "Նշաձւեի ձեռնարկ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Heading"
-msgstr ""
+msgstr "Խորագիր"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert Horizontal Line"
-msgstr ""
+msgstr "Ներդնել հորիզոնական գիծ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "The image %s couldn't be uploaded"
-msgstr ""
+msgstr "հնարաւոր չէ վերբեռնել %s նկարը"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "add an image using an url (Ctrl-Alt-I)"
-msgstr ""
+msgstr "աւելացնել նկար url օգտագործելով (Ctrl-Alt-I)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Italic"
-msgstr ""
+msgstr "Շեղատառ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, fuzzy
@@ -693,19 +693,19 @@ msgstr "գրառել"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
-msgstr ""
+msgstr "Բեռնւում է…"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Numbered List"
-msgstr ""
+msgstr "համարակալուած ցանկ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert image"
-msgstr ""
+msgstr "Ներդնել պատկեր"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle preview (Ctrl-P)"
-msgstr ""
+msgstr "Նախադիտել (Ctrl-P)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -717,11 +717,11 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Quote"
-msgstr ""
+msgstr "Մէջբերում"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Generic List"
-msgstr ""
+msgstr "Ընդհանուր ցանկ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
@@ -729,7 +729,7 @@ msgstr "Վերբեռնել նկար"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle side by side (F9)"
-msgstr ""
+msgstr "Կողք կողքի (F9)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to anyone, even anonymous users and internet search bots."
@@ -738,7 +738,7 @@ msgstr ""
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible only to those mentioned in the text and/or your mutuals."
-msgstr ""
+msgstr "տեսանելի միայն նրանց, որ նշուած են տեքստում եւ/կամ ձեր փոխադարձներին։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -761,7 +761,7 @@ msgstr "Թաքնուած տեքստի տիրոյթ"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Include your mutuals"
-msgstr ""
+msgstr "Ներառել ձեր փոխադարձներին"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, fuzzy
@@ -787,6 +787,8 @@ msgid ""
 "Tip: You can use the \"Self\" visibility to create draft content and then "
 "change the visibility to for example \"Public\" when you want to publish it."
 msgstr ""
+"Ակնարկ՝ Կարող էք օգտագործել «ինքզինք» տեսանելիութիւն սեւագիր ստեղծելու "
+"համար, եւ դարձրէք այն, օրինակ, «հանրային», երբ որոշէք հրապարակել։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
@@ -794,6 +796,9 @@ msgid ""
 "Reorder pinned content from the profile menu. Pinned content will federate "
 "and otherwise function as any other content."
 msgstr ""
+"Ամրացուած բովանդակութիւնն երեւալու է պրոֆիլում ձեր ուզած յաջորդականութեամբ։ "
+"Փոխէք ամրացուած բովանդակութիւնը պրոֆիլի ընտրացանկից։ Ամրացուած "
+"բովանդակութիւնը ֆեդերացուելու է եւ գործելու է այլ բովանդակութեան պէս։"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Error saving content."
@@ -854,11 +859,11 @@ msgstr "Յատուկ"
 
 #: socialhome/streams/enums.py:23
 msgid "Profile (all)"
-msgstr ""
+msgstr "Պրոֆիլ (բոլորը)"
 
 #: socialhome/streams/enums.py:24
 msgid "Profile (pinned)"
-msgstr ""
+msgstr "Պրոֆիլ (ամրացուած)"
 
 #: socialhome/streams/enums.py:26
 msgid "Tag"
@@ -1207,6 +1212,10 @@ msgid ""
 "        verification. Please click on the link inside this e-mail. Please\n"
 "        contact us if you do not receive it within a few minutes."
 msgstr ""
+"Մենք ձեզ ուղարկել ենք իմակ՝\n"
+"        էլ․ փոստի հասցէն հաստատելու համար։ Կտացրէք էլ․ փոստով ստացուած "
+"յղումը։\n"
+"        Կապուէք մեզ հետ, եթէ մի քանի րոպէի ընթացքում իմակը ձեզ չհասնի։"
 
 #: socialhome/templates/account/verified_email_required.html:22
 #, python-format
