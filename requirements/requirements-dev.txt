@@ -310,7 +310,7 @@ hiredis==2.1.0
     # via
     #   -r requirements/requirements.txt
     #   aioredis
-httpsig @ git+https://github.com/tripougnif/python-httpsig-socialhome.git@f04c890ecca4d8921cd838a96db3e3345a80b4f0
+httpsig @ git+https://github.com/tripougnif/python-httpsig-socialhome.git@ce03fa7b25acfacc14fba2670c33246025db7be0
     # via
     #   -r requirements/requirements.txt
     #   federation
