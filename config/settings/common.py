@@ -290,9 +290,11 @@ rq_queue_config = {
     "DEFAULT_TIMEOUT": 600,
 }
 RQ_QUEUES = {
-    "default": rq_queue_config,
+    "highest": rq_queue_config,
     "high": rq_queue_config,
+    "default": rq_queue_config,
     "low": rq_queue_config,
+    "lowest": rq_queue_config,
 }
 RQ_SHOW_ADMIN_LINK = True
 
