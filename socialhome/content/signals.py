@@ -71,7 +71,7 @@ def on_commit_mentioned(action, pks, instance):
     for id in pks:
         # Send out notification only if local mentioned
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
-            queue = django_rq.get_queue("low")
+            queue = django_rq.get_queue("high")
             profile = Profile.objects.values('user_id').get(id=id)
             queue.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
     if action == "post_add": render_content(instance)
@@ -132,7 +132,7 @@ def federate_content(content: Content, recipient: Profile = None, activity: Acti
     # TODO also use activity type for federating?
     """
     recipient_id = recipient.id if recipient else None
-    queue = django_rq.get_queue("high")
+    queue = django_rq.get_queue("highest")
     try:
         if content.content_type == ContentType.REPLY:
             queue.enqueue(send_reply, content.id, activity.fid)

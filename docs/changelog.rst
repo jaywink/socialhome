@@ -33,6 +33,17 @@ Upgrade notes
 
   Then follow the upgrade instructions.
 
+* Previously all jobs were placed in one background queue. Now five priority based queues exist:
+
+  * ``highest``
+  * ``high``
+  * ``default``
+  * ``low``
+  * ``lowest``
+
+  If you have customized `circus.ini` in your environment, ensure to add the new
+  queues, see the default ``circus.ini`` in ``config/circus.ini``.
+
 Added
 .....
 
@@ -74,15 +85,6 @@ Changed
 * Fetch reply parents up to the root parent.
 
 * Moved ``ProfileAllStream`` stream class to the non-cached stream classes.
-
-* Previously all jobs were placed in one background queue. Now three priority based queues exist:
-
-  * ``high`` for all federation related traffic
-  * ``default`` for populating streams and some other tasks
-  * ``low`` for sending notification emails and fetching replies for received content
-
-  If you have customized `circus.ini` in your environment, ensure to add the new
-  ``high`` and ``low`` queues, see the default ``circus.ini`` in ``config/circus.ini``.
 
 * Limited content recipients are now extracted from parsing mentions from UI
   for both contents and replies (ignored for limited visibility replies).
