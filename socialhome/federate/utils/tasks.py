@@ -405,6 +405,43 @@ def process_entity_share(entity, profile):
         queue.enqueue(forward_entity, entity, target_content.id)
 
 
+def process_reply_collection(replies_fid):
+    coll = retrieve_remote_content(replies_fid, cache=False)  # refresh reply collection
+    if isinstance(coll, base.Collection):
+        replies = extract_replies(getattr(coll, 'first', []))
+        for reply in replies:
+            queue = django_rq.get_queue('low')
+            if queue.enqueue(process_reply, reply):
+                logger.info("process_reply - queued job for entity %s", reply)
+            else:
+                logger.warning("process_reply - failed to queue job for entity %s", reply)
+
+def process_reply(reply):
+    reply_fid = getattr(reply, 'id', reply)
+    try:
+        content = Content.objects.fed(reply_fid).get()
+        if content.replies_fid: process_reply_collection(content.replies_fid)
+    except Content.DoesNotExist:
+        # Try to fetch and process
+        if isinstance(reply, base.Comment):
+            remote_content = reply
+        elif isinstance(reply, str):
+            remote_content = retrieve_remote_content(reply_fid)
+        else:
+            return
+        if remote_content:
+            logger.info(
+                "process_reply - processing reply %s for entity %s",
+                remote_content.id, remote_content.target_id)
+            process_entities([remote_content])
+            try:
+                content = Content.objects.fed(reply_fid).get()
+                if content.replies_fid: process_reply_collection(content.replies_fid)
+            except Content.DoesNotExist:
+                logger.warning(
+                    "process_reply - reply %s for entity %s could not be processed",
+                    remote_content.id, remote_content.target_id)
+
 def process_replies(root_id, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
     try:
@@ -421,36 +458,8 @@ def process_replies(root_id, shared_by_id=None, delta=None):
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
         return
 
-    def process_reply_collection(replies_fid):
-        coll = retrieve_remote_content(replies_fid, cache=False) # refresh reply collection
-        if isinstance(coll, base.Collection):
-            replies = extract_replies(getattr(coll, 'first', []))
-            for reply in replies:
-                reply_fid = getattr(reply, 'id', reply)
-                try:
-                    content = Content.objects.fed(reply_fid).get()
-                    if content.replies_fid: process_reply_collection(content.replies_fid)
-                except Content.DoesNotExist:
-                    # Try to fetch and process
-                    if isinstance(reply, base.Comment):
-                        remote_content = reply
-                    elif isinstance(reply, str):
-                        remote_content = retrieve_remote_content(reply_fid)
-                    else:
-                        continue
-                    if remote_content:
-                        logger.info(
-                            "process_replies - processing reply %s for entity %s",
-                            remote_content.id, remote_content.target_id)
-                        process_entities([remote_content])
-                        try:
-                            content = Content.objects.fed(reply_fid).get()
-                            if content.replies_fid: process_reply_collection(content.replies_fid)
-                        except Content.DoesNotExist:
-                            logger.warning(
-                                "process_replies - reply %s for entity %s could not be processed",
-                                remote_content.id, remote_content.target_id)
-                            continue
+
+
 
     process_reply_collection(root.replies_fid)
 
