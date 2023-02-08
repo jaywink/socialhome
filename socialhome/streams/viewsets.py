@@ -20,7 +20,7 @@ class StreamsAPIBaseView(APIView):
             self.accept_ids = self.accept_ids.split(",")
         return super().dispatch(request, *args, **kwargs)
 
-    @cache_control(no_cache=True)
+    @cache_control(no_cache=True, must_revalidate=True)
     def get(self, request, **kwargs):
         qs, throughs = self.get_content()
         serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
