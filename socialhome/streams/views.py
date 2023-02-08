@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 
 from socialhome.content.models import Tag
@@ -19,6 +20,7 @@ class BaseStreamView(TemplateView):
     stream_class = None
     template_name = "streams/base.html"
 
+    @cache_control(no_cache=True)
     def dispatch(self, request, *args, **kwargs):
         self.last_id = request.GET.get("last_id")
         return super().dispatch(request, *args, **kwargs)
