@@ -20,7 +20,7 @@ class BaseStreamView(TemplateView):
     stream_class = None
     template_name = "streams/base.html"
 
-    @cache_control(no_cache=True)
+    @cache_control(no_cache=True, must_revalidate=True)
     def dispatch(self, request, *args, **kwargs):
         self.last_id = request.GET.get("last_id")
         return super().dispatch(request, *args, **kwargs)
