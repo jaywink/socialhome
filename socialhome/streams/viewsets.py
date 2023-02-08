@@ -1,3 +1,4 @@
+from django.views.decorators.cache import cache_control
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,6 +20,7 @@ class StreamsAPIBaseView(APIView):
             self.accept_ids = self.accept_ids.split(",")
         return super().dispatch(request, *args, **kwargs)
 
+    @cache_control(no_cache=True)
     def get(self, request, **kwargs):
         qs, throughs = self.get_content()
         serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
