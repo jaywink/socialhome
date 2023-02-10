@@ -3,6 +3,8 @@
 Ubuntu (14.04)
 --------------
 
+**NOTE! Here be dragons! This guide is outdated! Please use the Docker installation guide!**
+
 This guide is very opinionated and experienced sysadmins will most likely want to do things differently. This guide will give you a Socialhome production install on uWSGI using an Apache2 web server.
 
 Supported versions
@@ -56,7 +58,7 @@ Install system packages
 Install Node.js
 '''''''''''''''
 
-Node.js version 10 has been tested to work. Install one by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
+Node.js version 12 has been tested to work. Install one by following the `Node.js install guides <https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions>`_.
 
 If you already have a system Node installed which is either too old or newer, consider using [NVM](https://github.com/creationix/nvm) to install a specific version for Socialhome only.
 
@@ -227,7 +229,7 @@ Add the following lines to your ``.bashrc`` and reload it via ``source ~/.bashrc
 Create Python virtualenv
 ''''''''''''''''''''''''
 
-Python 3.6+ is required! If your system Python 3 is not at least this version, please install Python 3.6 and replace ``/usr/bin/python3`` in the below command with the path to the Python 3.6 binary.
+Python 3.8+ is required! If your system Python 3 is not at least this version, please install Python 3.8 and replace ``/usr/bin/python3`` in the below command with the path to the Python 3.8 binary.
 
 ::
 
