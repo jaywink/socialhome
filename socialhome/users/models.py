@@ -2,9 +2,10 @@ import logging
 import os
 import re
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from uuid import uuid4
 
+import django_rq
 # noinspection PyPackageRequirements
 from Crypto.PublicKey import RSA
 from django.conf import settings
@@ -35,6 +36,12 @@ logger = logging.getLogger("socialhome")
 
 
 class User(AbstractUser):
+    # User approved by an admin
+    # If ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL is set to True, the user wont be able to use
+    # the system until approved by an admin.
+    admin_approved = models.NullBooleanField(_("Admin approved"), default=None)
+    # Reason for requesting an account, given on signup if approval is required
+    account_request_reason = models.CharField(_("Account request reason"), blank=True, max_length=255)
 
     # First Name and Last Name do not cover name patterns
     # around the globe.
@@ -56,8 +63,17 @@ class User(AbstractUser):
     picture_width = models.PositiveIntegerField(_("Picture width"), blank=True, null=True)
     picture_ppoi = PPOIField("Picture PPOI")
 
+    _old_values: Any
+
     def __str__(self):
         return self.username
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        # Tip from https://stackoverflow.com/a/64116052/1489738
+        instance = super().from_db(db, field_names, values)
+        instance._old_values = dict(zip(field_names, values))
+        return instance
 
     @property
     def activity_key(self) -> str:
@@ -123,6 +139,15 @@ class User(AbstractUser):
         """
         r = get_redis_connection()
         return r.exists(self.activity_key)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # If users require approval, and we were approved, send the user an email
+        if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL and self.admin_approved is True and \
+                self._old_values.admin_approved is False:
+            from socialhome.notifications.tasks import send_account_approval_user_notification
+            django_rq.enqueue(send_account_approval_user_notification, user_id=self.id)
 
 
 # noinspection PyCallingNonCallable

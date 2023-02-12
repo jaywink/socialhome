@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.federate.tasks import send_follow_change, send_profile, send_profile_retraction
-from socialhome.notifications.tasks import send_follow_notification
+from socialhome.notifications.tasks import send_follow_notification, send_account_approval_admin_notification
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -27,6 +27,10 @@ def user_post_save(sender, **kwargs):
         )
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()
+
+        # If users require approval, email the admin
+        if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
+            django_rq.enqueue(send_account_approval_admin_notification, user_id=user.id)
     # Initialize and copy pictures to profile
     user.init_pictures_on_disk()
     user.copy_picture_to_profile()

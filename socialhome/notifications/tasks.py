@@ -41,6 +41,61 @@ def get_root_content_participants(content, exclude_user=None):
     return set(participants)
 
 
+def send_account_approval_admin_notification(user_id: int):
+    """
+    Send account approval request notification to admin.
+    """
+    user = User.objects.get(id=user_id, is_active=True)
+
+    if user.admin_approved:
+        # Nothing to do
+        logger.info("Skipping notifying about user %s account approval requestas they are already approved", user_id)
+        return
+
+    subject = _("New user approval request")
+    context = get_common_context()
+    context.update({
+        "admin_url": "%s%s" % (
+            settings.SOCIALHOME_URL, reverse("admin:users_user_change", kwargs={"object_id": user_id}),
+        ),
+        "name": "site admin",
+        "subject": subject,
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/admin_account_approval.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [settings.SOCIALHOME_CONTACT_EMAIL],
+        fail_silently=False,
+        html_message=render_to_string("notifications/admin_account_approval.html", context=context),
+    )
+
+
+def send_account_approval_user_notification(user_id: int):
+    """
+    Send account approval request notification to user after approval.
+    """
+    user = User.objects.get(id=user_id, is_active=True)
+
+    if not user.admin_approved:
+        raise Exception(f"User {user_id} is not admin approved")
+
+    subject = _("Your account has been approved")
+    context = get_common_context()
+    context.update({
+        "name": user.profile.name_or_handle,
+        "subject": subject,
+    })
+    send_mail(
+        "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
+        render_to_string("notifications/user_account_approved.txt", context=context),
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+        html_message=render_to_string("notifications/user_account_approved.html", context=context),
+    )
+
+
 def send_follow_notification(follower_id, followed_id):
     """Super simple you've been followed notification to a user."""
     if settings.DEBUG:

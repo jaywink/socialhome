@@ -93,6 +93,7 @@ MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "socialhome.users.middleware.AdminApprovalMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
@@ -261,7 +262,16 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
+ACCOUNT_FORMS = {
+    "signup": "socialhome.users.forms.UserSignupForm",
+}
+SOCIALACCOUNT_FORMS = {
+    "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
+}
+
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+# Require new signups to be approved by an admin
+ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL = env.bool("ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL", False)
 ACCOUNT_ADAPTER = "socialhome.users.adapters.AccountAdapter"
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
@@ -342,9 +352,17 @@ SOCIALHOME_HOME_VIEW = env("SOCIALHOME_HOME_VIEW", default=None)
 # If signups are closed, make signup link point here
 SOCIALHOME_NODE_LIST_URL = env("SOCIALHOME_NODE_LIST_URL", default="https://the-federation.info/socialhome")
 # Contact email
-SOCIALHOME_CONTACT_EMAIL = env("DJANGO_ADMIN_MAIL", default="webmaster@%s" % SOCIALHOME_DOMAIN)
+# Defaults to DJANGO_ADMIN_MAIL for backwards compatibility, TODO remove sometime after v0.17.0
+SOCIALHOME_CONTACT_EMAIL = env(
+    "SOCIALHOME_CONTACT_EMAIL",
+    default=env("DJANGO_ADMIN_MAIL", default="info@%s" % SOCIALHOME_DOMAIN),
+)
 # Maintainer
-SOCIALHOME_MAINTAINER = env("DJANGO_ADMIN_NAME", default="Private individual")
+# Defaults to DJANGO_ADMIN_NAME for backwards compatibility, TODO remove sometime after v0.17.0
+SOCIALHOME_MAINTAINER = env(
+    "SOCIALHOME_MAINTAINER",
+    default=env("DJANGO_ADMIN_NAME", default="Private individual"),
+)
 # Jurisdiction for terms of service
 SOCIALHOME_TOS_JURISDICTION = env("SOCIALHOME_TOS_JURISDICTION", default=None)
 
@@ -447,10 +465,7 @@ FEDERATION_USER = env("FEDERATION_USER", default=None)
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = (
-    (env("DJANGO_ADMIN_NAME", default="Socialhome Admin"),
-     env("DJANGO_ADMIN_MAIL", default="webmaster@%s" % SOCIALHOME_DOMAIN)),
-)
+ADMINS = SOCIALHOME_MAINTAINER, SOCIALHOME_CONTACT_EMAIL
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS

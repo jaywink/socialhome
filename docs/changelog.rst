@@ -3,6 +3,25 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Added
+.....
+
+* It's now possible to require new signups to be approved by an admin. Setting
+  ``ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL`` to ``True``will trigger an email to the site admin.
+  Once the new account is approved, an email will be sent to the user so they can start using
+  their account.
+
+Deprecations
+............
+
+* The settings ``DJANGO_ADMIN_NAME`` and ``DJANGO_ADMIN_MAIL`` are deprecated. Instead
+  ``SOCIALHOME_MAINTAINER`` and ``SOCIALHOME_CONTACT_EMAIL`` should be used. These
+  currently get their default value from the former, though this will be removed in a future
+  release.
+
 0.16.0 (2023-02-08)
 -------------------
 
