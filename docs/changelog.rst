@@ -3,7 +3,7 @@
 Changelog
 =========
 
-0.16.0-dev (unreleased)
+0.16.0 (2023-02-08)
 -------------------
 
 Upgrade notes
