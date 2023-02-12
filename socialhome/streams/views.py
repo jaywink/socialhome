@@ -1,14 +1,16 @@
 from braces.views import LoginRequiredMixin
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import cache_control
+from django.views.decorators.http import condition
 from django.views.generic import TemplateView
 
-from socialhome.content.models import Tag
+from socialhome.content.models import Content, Tag
 from socialhome.streams.streams import PublicStream, FollowedStream, TagStream, LimitedStream, LocalStream, TagsStream
 from socialhome.utils import get_full_url
 from socialhome.users.serializers import ProfileSerializer
@@ -20,10 +22,21 @@ class BaseStreamView(TemplateView):
     stream_class = None
     template_name = "streams/base.html"
 
-    @cache_control(no_cache=True, must_revalidate=True)
+
+
+
     def dispatch(self, request, *args, **kwargs):
         self.last_id = request.GET.get("last_id")
         return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        def get_etag(request, **kwargs):
+            return f'"{str(Content.objects.last().id)}"'
+        @cache_control(no_cache=True, must_revalidate=True)
+        @condition(etag_func=get_etag)
+        def _get(request):
+            return super(BaseStreamView, self).get(request)
+        return _get(request)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences

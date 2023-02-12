@@ -1,15 +1,20 @@
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
+from django.views.decorators.http import condition
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from socialhome.content.models import Tag
+from socialhome.content.models import Tag, Content
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.streams import (
     PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream, LimitedStream, LocalStream,
     TagsStream)
 from socialhome.users.models import Profile
+
+def get_etag(request, **kwargs):
+    return f'"{str(Content.objects.last().id)}"'
 
 
 class StreamsAPIBaseView(APIView):
@@ -20,11 +25,15 @@ class StreamsAPIBaseView(APIView):
             self.accept_ids = self.accept_ids.split(",")
         return super().dispatch(request, *args, **kwargs)
 
-    @cache_control(no_cache=True, must_revalidate=True)
+
     def get(self, request, **kwargs):
-        qs, throughs = self.get_content()
-        serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
-        return Response(serializer.data)
+        @cache_control(no_cache=True, must_revalidate=True)
+        @condition(etag_func=get_etag)
+        def _get(request, **kwargs):
+            qs, throughs = self.get_content()
+            serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
+            return Response(serializer.data)
+        return _get(request, **kwargs)
 
     def get_content(self):
         return [], {}
