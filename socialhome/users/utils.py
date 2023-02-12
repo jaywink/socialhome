@@ -56,11 +56,11 @@ def set_profile_finger(profile):
             if get_profile_id_from_webfinger(webf) == profile.fid:
                 finger = webf
         if finger:
-            try:
+            if Profile.objects.filter(finger=finger).exists():
+                logger.error(f"failed to set finger to {finger} for {profile}: duplicate found in database")
+            else:
                 Profile.objects.filter(id=profile.id).update(finger=finger)
                 logger.info(f"finger set to {finger} for {profile}")
-            except Exception as exc:
-                logger.error(f"failed to set finger to {finger} for {profile}: {exc}")
         else:
             # should we raise an error here? should the profile be removed?
             logger.error(f"failed to set finger to {finger} for {profile}: could not be retrieved")
