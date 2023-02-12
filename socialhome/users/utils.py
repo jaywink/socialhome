@@ -36,7 +36,7 @@ def get_recently_active_user_ids() -> List[int]:
 
 
 def set_profile_finger(profile):
-    """ 
+    """
     To avoid going through all profiles in one shot
     (which could take quite a while due the the webfinger
     query) we call this from profile serializers. It should
@@ -45,7 +45,7 @@ def set_profile_finger(profile):
     from federation.utils.activitypub import get_profile_id_from_webfinger
     from socialhome.users.models import Profile
     profile.refresh_from_db()
-    if not profile.finger: 
+    if not profile.finger:
         finger = ""
         if profile.is_local or profile.protocol == 'diaspora':
             finger = profile.handle
@@ -56,8 +56,11 @@ def set_profile_finger(profile):
             if get_profile_id_from_webfinger(webf) == profile.fid:
                 finger = webf
         if finger:
-            Profile.objects.filter(id=profile.id).update(finger=finger)
-            logger.info(f"finger set to {finger} for {profile}")
+            try:
+                Profile.objects.filter(id=profile.id).update(finger=finger)
+                logger.info(f"finger set to {finger} for {profile}")
+            except Exception as exc:
+                logger.error(f"failed to set finger to {finger} for {profile}: {exc}")
         else:
             # should we raise an error here? should the profile be removed?
             logger.error(f"failed to set finger to {finger} for {profile}: could not be retrieved")
