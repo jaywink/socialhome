@@ -3,7 +3,7 @@
 Docker
 ------
 
-This page tries to explain how to setup a Socialhome instance using Docker. While the core
+This page explains how to setup a Socialhome instance using Docker. While the core
 of Socialhome is in one single container, the setup is a bit more complex due to other
 services required. These can either be other containers, running on the host or other
 machines.
