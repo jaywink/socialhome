@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import time
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 from uuid import uuid4
 
 import django_rq
@@ -63,17 +63,14 @@ class User(AbstractUser):
     picture_width = models.PositiveIntegerField(_("Picture width"), blank=True, null=True)
     picture_ppoi = PPOIField("Picture PPOI")
 
-    _old_values: Any
+    _previous_admin_approved: bool
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._previous_admin_approved = self.admin_approved
 
     def __str__(self):
         return self.username
-
-    @classmethod
-    def from_db(cls, db, field_names, values):
-        # Tip from https://stackoverflow.com/a/64116052/1489738
-        instance = super().from_db(db, field_names, values)
-        instance._old_values = dict(zip(field_names, values))
-        return instance
 
     @property
     def activity_key(self) -> str:
@@ -145,7 +142,7 @@ class User(AbstractUser):
 
         # If users require approval, and we were approved, send the user an email
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL and self.admin_approved is True and \
-                self._old_values.admin_approved is False:
+                self._previous_admin_approved is False:
             from socialhome.notifications.tasks import send_account_approval_user_notification
             django_rq.enqueue(send_account_approval_user_notification, user_id=self.id)
 
