@@ -1,0 +1,8 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "Congrats! Your account has been approved." %}
+
+{% trans "Login and say hello!" %}: {{ site_url }}
+{% endblock %}

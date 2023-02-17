@@ -168,6 +168,15 @@ Configuration mainly happens through environment variables. Those are passed to 
 
 After making changes to this file, don't forget to reload the app with ``sudo service socialhome restart``.
 
+ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL
+.....................................
+
+Default: ``False``
+
+If set to true, new signups will require admin approval. An email notification is sent to
+the email designated in ``SOCIALHOME_CONTACT_EMAIL``. Once an admin approves the new user,
+an email is sent to the user that they may start using their account.
+
 DATABASE_URL
 ............
 
@@ -181,20 +190,6 @@ DJANGO_ACCOUNT_ALLOW_REGISTRATION
 Default: ``True``
 
 Set this to ``False`` if you want to disable signups.
-
-DJANGO_ADMIN_MAIL
-.................
-
-Default: ``info@socialhome.local``
-
-Admin email for terms of service and privacy policy documents, outgoing emails and server metadata.
-
-DJANGO_ADMIN_NAME
-.................
-
-Default: ``Socialhome Admin``
-
-Admin display name or organization name for Terms of Service, outgoing emails and server metadata.
 
 DJANGO_ALLOWED_HOSTS
 ....................
@@ -323,6 +318,13 @@ Default: ``None``
 Allows to use additional third-party app url-conf, string with two comma-separated values, url prefix and path to urlpatterns, for example ``myapp/,myapp.urls``.
 If you need to include urls from more than one app, this could be done by creating intermediary app which aggregates urls.
 
+SOCIALHOME_CONTACT_EMAIL
+........................
+
+Default: ``info@socialhome.local``
+
+Admin email for terms of service and privacy policy documents, server metadata and contacting the admins.
+
 SOCIALHOME_DOMAIN
 .................
 
@@ -377,6 +379,13 @@ SOCIALHOME_LOGFILE
 Default: ``/tmp/socialhome.log``
 
 Where to write the main application log.
+
+SOCIALHOME_MAINTAINER
+.....................
+
+Default: ``Private individual``
+
+Admin display name or organization name for Terms of Service, outgoing emails and server metadata.
 
 SOCIALHOME_NODE_LIST_URL
 ........................

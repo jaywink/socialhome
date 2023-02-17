@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Admin approval required" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Admin approval required" %}</h1>
+    <p>
+        {% trans "An admin will need to check your account request. An email will be sent to you if your account is approved." %}
+    </p>
+{% endblock %}

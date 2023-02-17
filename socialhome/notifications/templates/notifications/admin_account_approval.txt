@@ -1,0 +1,12 @@
+{% extends "notifications/base.txt" %}
+{% load i18n %}
+
+{% block body %}
+{% trans "There is a new account approval request waiting." %}
+
+{% trans "User" %}: {{ user_name }}
+
+{% trans "Approve or delete the user via the following url" %}: {{ admin_url }}
+
+{% trans "The user will be notified if approved." %}
+{% endblock %}

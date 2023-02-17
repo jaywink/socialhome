@@ -1,0 +1,12 @@
+{% extends "notifications/base.html" %}
+{% load i18n %}
+
+{% block body %}
+    <p>
+        {% trans "Congrats! Your account has been approved." %}
+    </p>
+
+    <p>
+        <a href="{{ site_url }}">{% trans "Login and say hello!" %}</a>
+    </p>
+{% endblock %}

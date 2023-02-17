@@ -1,0 +1,20 @@
+{% extends "notifications/base.html" %}
+{% load i18n %}
+
+{% block body %}
+    <p>
+        {% trans "There is a new account approval request waiting." %}
+    </p>
+
+    <p>
+        {% trans "User" %}: {{ user_name }}
+    </p>
+
+    <p>
+        <a href="{{ admin_url }}">{% trans "Approve or delete the user" %}</a>
+    </p>
+
+    <p>
+        {% trans "The user will be notified if approved." %}
+    </p>
+{% endblock %}
