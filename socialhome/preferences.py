@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from dynamic_preferences.registries import global_preferences_registry
 from dynamic_preferences.types import Section, BooleanPreference
 

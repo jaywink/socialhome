@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.timezone import get_current_timezone
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
 from federation.utils.text import process_text_links, find_tags
@@ -243,7 +243,7 @@ class Content(models.Model):
             handles.add(handle)
             # sanitize text and let federation adjust for protocol
             text = text.replace(mention, '@'+handle)
-        if self.text != text: 
+        if self.text != text:
             self.text = text
             Content.objects.filter(id=self.id).update(text=text)
 

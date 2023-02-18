@@ -5,7 +5,7 @@ from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 from federation.utils.text import validate_handle

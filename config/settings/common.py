@@ -48,6 +48,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "channels",
     "crispy_forms",
+    "crispy_bootstrap4",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -604,6 +605,9 @@ REST_FRAMEWORK = {
     },
     "DEFAULT_VERSION": "0.1",
 }
+
+# See https://docs.djangoproject.com/en/3.2/releases/3.2/#models
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # DYNAMIC PREFERENCES
 # -------------------

@@ -6,45 +6,39 @@ channels<3
 channels_redis<3
 chardet
 circus
+crispy-bootstrap4
 #CommonMark
 django-allauth
 django-braces
 django-crispy-forms
-# 1.14.0 drops Django < 3.2 support
-django-dynamic-preferences<1.14.0
+django-dynamic-preferences
 django-enumfields
 django-environ
-# 3.2 drops support for Django 2.2
-django-extensions<3.2
+django-extensions
 django-floppyforms
 django-fsm
 django-haystack
 django-js-reverse
+django-markdownx
 django-memoize
-# Lock due to some regression with date fields, investigate later
-django-model-utils<4
+django-model-utils
 django-redis
 django-redisboard
-# 5.0.3 drops support for Django 2.x - because that's what patch releases do
-django-reversion<5.0.3
+django-reversion
 django-robots
 django-rq
 django-secure
 django-settings-export
-# 5.0 drops support for Django 2.x
-django-silk<5
+django-silk
 django-versatileimagefield
-django<3
-# 3.13.0 drops Django 2.x support
-djangorestframework<3.13.0
+django<4
+djangorestframework
 drf-yasg
 federation
 ipython
 lxml
 Pillow
-# UNLOCK once Django updated to 3.0+
-# https://github.com/psycopg/psycopg2/issues/1293
-psycopg2-binary<2.9
+psycopg2-binary
 pyopenssl
 python-opengraph-jaywink
 python-slugify
@@ -61,7 +55,7 @@ pyyaml
 # Own markdownx fork for some tweaks:
 # - disable tab when ctrl down (https://github.com/neutronX/django-markdownx/pull/85)
 # - GIF upload (upstream rejected)
--e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
+#-e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
 
 # Just here to easily use a dev version
 #-e git+https://gitlab.com/jaywink/federation.git@xyz#egg=federation==0.24.0-dev
