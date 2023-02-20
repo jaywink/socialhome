@@ -11,6 +11,8 @@
     #   recommonmark
 -e git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a#egg=django-markdownx==2.0.28.1
     # via -r requirements/requirements.txt
+-e git+https://gitlab.com/jaywink/federation.git@31e8c9d4c7dd92a4b3f6bc444a49672188eac255#egg=federation==0.24.0-dev
+    # via -r requirements/requirements.txt
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
     # via -r requirements/requirements.txt
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
@@ -291,8 +293,6 @@ faker==15.3.4
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-federation==0.23.1
-    # via -r requirements/requirements.txt
 flake8==6.0.0
     # via -r requirements/requirements-dev.in
 freezegun==1.2.2
