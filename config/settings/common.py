@@ -47,6 +47,7 @@ DJANGO_APPS = (
 )
 THIRD_PARTY_APPS = (
     "channels",
+    "daphne",
     "crispy_forms",
     "crispy_bootstrap4",
     "allauth",
@@ -80,7 +81,7 @@ LOCAL_APPS = (
     "socialhome.tasks",
 )
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
 if testing:
@@ -484,7 +485,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-ASGI_APPLICATION = "config.routing.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 # MARKDOWN
 # --------
