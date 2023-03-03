@@ -47,7 +47,6 @@ RUN pip install -U pip setuptools pip-tools && \
 COPY . /app
 
 RUN npm run build && \
-    /usr/local/bin/python /app/manage.py collectstatic --noinput && \
     rm -rf /node_modules && \
     rm -rf /app/socialhome/frontend/node_modules && \
     rm -rf /bower_components && \
