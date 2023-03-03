@@ -15,10 +15,9 @@ The application
 
 The main application container has the following process controlled by the main Circus process:
 
-* Gunicorn for the uWSGI layer
+* Daphne for http and websocket traffic
 * The configured number of RQ workers
 * An RQ scheduler
-* Daphne for websocket traffic
 
 The application container does not serve media.
 

@@ -21,11 +21,11 @@ ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY package.json ./
 COPY bower.json ./
-COPY docker/app/gunicorn.sh /gunicorn.sh
+COPY docker/app/daphne.sh /daphne.sh
 
 RUN npm install && \
     node_modules/.bin/bower --allow-root install && \
-    chmod +x /gunicorn.sh && \
+    chmod +x /daphne.sh && \
     mkdir -p /app/socialhome/frontend
 
 COPY socialhome/frontend/package.json /app/socialhome/frontend
@@ -42,12 +42,12 @@ WORKDIR /app
 COPY requirements/requirements.txt ./
 
 RUN pip install -U pip setuptools pip-tools && \
-    pip-sync requirements.txt && \
-    pip install gunicorn
+    pip-sync requirements.txt
 
 COPY . /app
 
 RUN npm run build && \
+    /usr/local/bin/python /app/manage.py collectstatic --noinput && \
     rm -rf /node_modules && \
     rm -rf /app/socialhome/frontend/node_modules && \
     rm -rf /bower_components && \
