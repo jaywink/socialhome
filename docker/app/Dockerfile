@@ -56,6 +56,7 @@ RUN npm run build && \
 
 ENV POSTGRES_PASSWORD postgres
 ENV RQWORKER_NUM 1
+ENV DAPHNE_WORKER_NUM 1
 ENV DJANGO_SETTINGS_MODULE config.settings.production
 ENV REDIS_HOST redis
 ENV DATABASE_URL postgres://postgres:$POSTGRES_PASSWORD@db:5432/postgres
