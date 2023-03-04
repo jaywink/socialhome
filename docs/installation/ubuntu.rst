@@ -346,6 +346,7 @@ Create Upstart configuration ``/etc/init/socialhome.conf`` with the following co
     env PYTHONPATH="/home/socialhome/socialhome"
     env SOCIALHOME_HOME="/home/socialhome"
     env RQWORKER_NUM=5
+    env DAPHNE_WORKER_NUM=2
     env VIRTUAL_ENV=/home/socialhome/.virtualenvs/socialhome
     env LC_CTYPE=en_US.UTF-8
     env LC_ALL=C.UTF-8

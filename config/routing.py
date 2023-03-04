@@ -1,3 +1,4 @@
+# TODO: remove this file when ASGI has been run for a while
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path

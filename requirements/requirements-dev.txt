@@ -9,7 +9,7 @@
     #   -r requirements/requirements.txt
     #   federation
     #   recommonmark
--e git+https://gitlab.com/jaywink/federation.git@0688e8324067b36a7efa4cf0debd14cdc9cfcb82#egg=federation==0.24.0-dev
+-e git+https://gitlab.com/jaywink/federation.git@c574f69adcc9595fe54b1d0d3e9f7733ea0af9f3#egg=federation==0.24.0-dev
     # via -r requirements/requirements.txt
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
     # via -r requirements/requirements.txt

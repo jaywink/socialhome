@@ -32,16 +32,17 @@ Memory requirements
 '''''''''''''''''''
 
 On average the container will require approximately 360mb of RAM plus approx 75mb per RQ
-worker. The default worker count is 1 though on a busy instance you may need many more. The
-amount of RQ workers can be controlled with the environment variable ``RQWORKER_NUM``.
+worker. The default RQ worker count is 1 though on a busy instance you may need many more. The
+amount of RQ workers can be controlled with the environment variable ``RQWORKER_NUM``. The default
+daphne worker count is also 1 and can be controlled with the ``DAPHNE_WORKER_NUM`` environment
+variable.
 
 Networking
 ''''''''''
 
 The following routing needs to be done:
 
-* Path prefix ``/ch/`` to port **23564**
-* Everything else to port **5000**
+* Everything to port **23564**
 
 TLS should be terminated by a load balancer before sending traffic to the application container.
 
@@ -68,7 +69,8 @@ Socialhome uses environment variables for configuration. At minimum, you need to
 * ``DJANGO_ALLOWED_HOSTS`` your Socialhome domain
 * ``SOCIALHOME_DOMAIN`` your Socialhome domain
 * ``REDIS_HOST`` hostname of your Redis instance
-* ``RQWORKER_NUM`` the amount of worker processes you want to run (default 1)
+* ``RQWORKER_NUM`` the amount of RQ worker processes you want to run (default 1)
+* ``DAPHNE_WORKER_NUM`` the amount of daphne processes you want to run (default 1)
 * ``DJANGO_ACCOUNT_ALLOW_REGISTRATION`` either "True" or "False" depending whether you
   want to allow signups.
 

@@ -1,3 +1,4 @@
+# TODO: remove this file when ASGI has been run for a while
 import os
 
 from django.core.wsgi import get_wsgi_application
