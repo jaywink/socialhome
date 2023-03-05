@@ -21,11 +21,11 @@ ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY package.json ./
 COPY bower.json ./
-COPY docker/app/daphne.sh /daphne.sh
+COPY docker/app/start_socialhome.sh /start_socialhome.sh
 
 RUN npm install && \
     node_modules/.bin/bower --allow-root install && \
-    chmod +x /daphne.sh && \
+    chmod +x /start_socialhome.sh && \
     mkdir -p /app/socialhome/frontend
 
 COPY socialhome/frontend/package.json /app/socialhome/frontend
@@ -69,4 +69,4 @@ ENV DJANGO_ALLOWED_HOSTS socialhome.local
 ENV DBHOST=db
 ENV SOCIALHOME_LOG_TARGET=console
 
-CMD circusd /app/config/circus.ini
+CMD /start_socialhome.sh
