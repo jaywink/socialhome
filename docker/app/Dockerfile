@@ -51,6 +51,8 @@ RUN npm run build && \
     rm -rf /app/socialhome/frontend/node_modules && \
     rm -rf /bower_components && \
     rm -rf /root/.cache/Cypress && \
+    apt-get purge python3-dev build-essential -y && \
+    apt autoremove -y && \
     cp config/circus_docker.ini config/circus.ini && \
     mkdir -p /logs
 
