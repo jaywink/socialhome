@@ -127,7 +127,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         serializer.is_valid()
         content = serializer.save()
 
-        self.assertEquals(set(content.limited_visibilities.all()), {self.user_recipient, self.user_recipient2})
+        self.assertEqual(set(content.limited_visibilities.all()), {self.user_recipient, self.user_recipient2})
 
     def test_save__collects_recipients__reply_copies_from_parent(self):
         serializer = ContentSerializer(
@@ -140,7 +140,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
 
-        serializer.is_valid(True)
+        serializer.is_valid(raise_exception=True)
         content = serializer.save()
 
         actual = set(content.limited_visibilities.all().order_by("id"))
@@ -157,7 +157,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
 
-        serializer.is_valid(True)
+        serializer.is_valid(raise_exception=True)
         content = serializer.save()
 
         actual = set(content.limited_visibilities.all().order_by("id"))
@@ -174,7 +174,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
 
-        serializer.is_valid(True)
+        serializer.is_valid(raise_exception=True)
         content = serializer.save()
         self.assertSetEqual(set(content.limited_visibilities.all()), {self.user_recipient})
 
@@ -190,7 +190,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
                 "visibility": Visibility.LIMITED.value,
                 "include_following": True,
             })
-        serializer.is_valid(True)
+        serializer.is_valid(raise_exception=True)
         content = serializer.save()
 
         actual = set(content.limited_visibilities.all().order_by("id"))
@@ -290,7 +290,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
         self.assertTrue(serializer.is_valid())
-        self.assertEquals(serializer.validated_data["recipients"],
+        self.assertEqual(serializer.validated_data["recipients"],
                           {self.user_recipient.handle, self.user_recipient2.handle})
 
     def test_validate_recipients__fails_bad_recipients(self):
@@ -301,7 +301,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
         with pytest.raises(serializers.ValidationError, match=r".*Not all recipients could be found\..*"):
-            serializer.is_valid(True)
+            serializer.is_valid(raise_exception=True)
 
     def test_validate_recipients__recipients_and_include_following_cant_both_be_empty(self):
         serializer = ContentSerializer(
@@ -315,7 +315,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             serializers.ValidationError,
             match=r".*Recipients cannot be empty if not including followed users\..*"
         ):
-            serializer.is_valid(True)
+            serializer.is_valid(raise_exception=True)
 
     # recipients == mentions, so not ignored anymore
     @pytest.mark.skip
@@ -327,5 +327,5 @@ class ContentSerializerTestCase(SocialhomeTestCase):
             },
         )
 
-        serializer.is_valid(True)
-        self.assertEquals(serializer.validated_data["recipients"], set())
+        serializer.is_valid(raise_exception=True)
+        self.assertEqual(serializer.validated_data["recipients"], set())

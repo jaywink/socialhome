@@ -47,7 +47,9 @@ DJANGO_APPS = (
 )
 THIRD_PARTY_APPS = (
     "channels",
+    "daphne",
     "crispy_forms",
+    "crispy_bootstrap4",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -79,7 +81,7 @@ LOCAL_APPS = (
     "socialhome.tasks",
 )
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
 if testing:
@@ -483,7 +485,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-ASGI_APPLICATION = "config.routing.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 # MARKDOWN
 # --------
@@ -604,6 +606,9 @@ REST_FRAMEWORK = {
     },
     "DEFAULT_VERSION": "0.1",
 }
+
+# See https://docs.djangoproject.com/en/3.2/releases/3.2/#models
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # DYNAMIC PREFERENCES
 # -------------------

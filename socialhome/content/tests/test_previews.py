@@ -31,18 +31,18 @@ class TestFetchOgPreview(SocialhomeTestCase):
         cls.urls = ["https://example.com"]
 
     def test_if_cached_already_dont_fetch(self):
-        with freeze_time(datetime.date.today() - datetime.timedelta(days=3)):
-            opengraph = OpenGraphCacheFactory(url=self.urls[0])
-        result = fetch_og_preview(self.content, self.urls)
+        opengraph = OpenGraphCacheFactory(url=self.urls[0])
+        with freeze_time(datetime.date.today() + datetime.timedelta(days=3)):
+            result = fetch_og_preview(self.content, self.urls)
         self.assertTrue(result)
         self.content.refresh_from_db()
         self.assertEqual(self.content.opengraph, opengraph)
 
     @patch("socialhome.content.previews.OpenGraph")
     def test_if_cached_already_but_older_than_7_days_then_fetch(self, og):
-        with freeze_time(datetime.date.today() - datetime.timedelta(days=8)):
-            OpenGraphCacheFactory(url=self.urls[0])
-        fetch_og_preview(self.content, self.urls)
+        OpenGraphCacheFactory(url=self.urls[0])
+        with freeze_time(datetime.date.today() + datetime.timedelta(days=8)):
+            fetch_og_preview(self.content, self.urls)
         og.assert_called_once_with(url=self.urls[0], parser="lxml")
 
     @patch("socialhome.content.previews.OpenGraph")
@@ -150,9 +150,9 @@ class TestFetchOEmbedPreview(SocialhomeTestCase):
 
     @patch("socialhome.content.previews.PyEmbed.embed", return_value="")
     def test_cache_updated_if_previous_found_older_than_7_days(self, embed):
-        with freeze_time(datetime.date.today() - datetime.timedelta(days=8)):
-            OEmbedCacheFactory(url=self.urls[0])
-        fetch_oembed_preview(self.content, self.urls)
+        OEmbedCacheFactory(url=self.urls[0])
+        with freeze_time(datetime.date.today() + datetime.timedelta(days=8)):
+            fetch_oembed_preview(self.content, self.urls)
         embed.assert_called_once_with(self.urls[0])
 
     @patch("socialhome.content.previews.PyEmbed.embed", return_value="")

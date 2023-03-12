@@ -1,7 +1,7 @@
 import django_rq
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from markdownx.admin import MarkdownxModelAdmin
 
 from socialhome.models import PolicyDocument

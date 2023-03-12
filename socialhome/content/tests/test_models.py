@@ -45,7 +45,7 @@ class TestContentModel(SocialhomeTestCase):
         cls.set = {
             cls.public_content, cls.site_content, cls.limited_content, cls.self_content
         }
-        cls.content_with_twitter_oembed = ContentFactory(text='class="twitter-tweet"')
+        cls.content_with_twitter_oembed = ContentFactory(text='<a href="toto" class="twitter-tweet">bla</a>')
         cls.content_with_mentions = ContentFactory(
             text="foo @%s bar @%s" % (cls.user.profile.finger, cls.remote_profile.finger),
             author=cls.local_user.profile,

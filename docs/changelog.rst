@@ -6,13 +6,29 @@ Changelog
 unreleased
 ----------
 
+Upgrade notes
+.............
+
+* Since all requests are now served through ASGI, your proxy server configuration should be updated to
+  target a single port (23564 by default).
+
 Added
 .....
 
 * It's now possible to require new signups to be approved by an admin. Setting
-  ``ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL`` to ``True``will trigger an email to the site admin.
+  ``ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL`` to ``True`` will trigger an email to the site admin.
   Once the new account is approved, an email will be sent to the user so they can start using
   their account.
+
+* The number of daphne processes can be controlled with the DAPHNE_WORKER_NUM environment variable. circusd
+  binds to the port and load balances the traffic between the daphne workers.
+
+Changed
+.......
+
+* Upgrade to Django 3.2.18. Major dependency updates.
+
+* ASGI now serving both http and webserver requests. See upgrade notes.
 
 Deprecations
 ............
