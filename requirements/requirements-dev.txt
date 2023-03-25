@@ -9,8 +9,6 @@
     #   -r requirements/requirements.txt
     #   federation
     #   recommonmark
--e git+https://gitlab.com/jaywink/federation.git@38fd38101ff8026edf856aec85377f9c1b9d9e02#egg=federation==0.24.0-dev
-    # via -r requirements/requirements.txt
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
     # via -r requirements/requirements.txt
 -e git+https://github.com/rtfd/recommonmark.git@c410abb565a3c4ad4de0ce204ab2fa2db8031cf1#egg=recommonmark==0.4.0
@@ -304,6 +302,8 @@ faker==17.0.0
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
+federation==0.24.1
+    # via -r requirements/requirements.txt
 flake8==6.0.0
     # via -r requirements/requirements-dev.in
 freezegun==1.2.2
@@ -710,7 +710,6 @@ tomli==2.0.1
     #   coverage
     #   django-stubs
     #   mypy
-    #   pyproject-hooks
     #   pytest
 tornado==6.2
     # via
