@@ -389,7 +389,7 @@ def send_profile(profile_id, recipients=None):
         recipients.extend(_get_remote_followers(profile, profile.visibility))
         to = NAMESPACE_PUBLIC
     else:
-        to = recipients
+        to = [recipient['fid'] for recipient in recipients if recipient.get('fid', None)]
     if hasattr(entity, 'to'): entity.to = to
 
     logger.debug("send_profile - sending to recipients: %s", recipients)
