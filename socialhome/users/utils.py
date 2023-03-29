@@ -42,7 +42,7 @@ def set_profile_finger(profile):
     query) we call this from profile serializers. It should
     eventually become a noop
     """
-    from federation.utils.activitypub import get_profile_id_from_webfinger
+    from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
     profile.refresh_from_db()
     if not profile.finger:
@@ -50,11 +50,9 @@ def set_profile_finger(profile):
         if profile.is_local or profile.protocol == 'diaspora':
             finger = profile.handle
         elif profile.protocol == 'activitypub':
-            domain = urlparse(profile.fid).netloc
-            user = profile.fid.strip('/').split('/')[-1]
-            webf = f'{user}@{domain}'
-            if get_profile_id_from_webfinger(webf) == profile.fid:
-                finger = webf
+            # This is the only reliable way to obtain the preferredUsername property
+            remote_profile = retrieve_remote_profile(profile.fid)
+            finger = getattr(remote_profile, 'finger', "")
         if finger:
             if Profile.objects.filter(finger=finger).exists():
                 logger.error(f"failed to set finger to {finger} for {profile}: duplicate found in database")
