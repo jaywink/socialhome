@@ -16,7 +16,6 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
-from socialhome.users.utils import set_profile_finger
 
 logger = logging.getLogger("socialhome")
 
@@ -216,7 +215,7 @@ def make_federable_content(content: Content) -> Optional[Union[base.Post, base.C
     if content.author.fid and isinstance(content.author.fid, str):
         ret.to, ret.cc = get_receivers_for_content(content)
     return ret
-        
+
 
 
 def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Profile]=None):
@@ -262,7 +261,6 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
 def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
-    set_profile_finger(profile)
     try:
         return base.Profile(
             raw_content="",
@@ -277,7 +275,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
             url=profile.url,
             created_at=profile.created,
             times={
-                'created': profile.created, 
+                'created': profile.created,
                 'updated': profile.modified,
                 'edited': False,
             },
