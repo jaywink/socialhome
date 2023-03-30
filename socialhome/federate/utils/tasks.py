@@ -16,6 +16,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.utils import get_profiles_from_receivers
 from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
+from socialhome.users.utils import set_profile_finger
 
 logger = logging.getLogger("socialhome")
 
@@ -28,6 +29,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     try:
         logger.debug("get_sender_profile - looking from local db using %s", sender)
         sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
+        set_profile_finger(sender_profile)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
@@ -48,11 +50,11 @@ def process_entities(entities: List):
         logger.info("Entity: %s", entity)
         # noinspection PyProtectedMember
         logger.info("Receivers: %s", entity._receivers)
-        sender_id = entity.id if isinstance(entity, base.Profile) else entity.actor_id
-        profile = get_sender_profile(sender_id)
-        if not profile:
-            logger.warning("No sender profile for entity %s, skipping", entity)
-            continue
+        if not isinstance(entity, base.Profile):
+            profile = get_sender_profile(entity.actor_id)
+            if not profile:
+                logger.warning("No sender profile for entity %s, skipping", entity)
+                continue
         try:
             if isinstance(entity, base.Post):
                 process_entity_post(entity, profile)
