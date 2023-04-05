@@ -180,6 +180,10 @@ class Profile(TimeStampedModel):
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
     rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
 
+    # Key ID
+    # Optional
+    key_id = models.URLField(_("AP Public Key ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     # Profile visibility
     visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
@@ -196,6 +200,10 @@ class Profile(TimeStampedModel):
 
     # Following
     following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
+
+    # Followers fid
+    # optional
+    followers_fid = models.URLField(_("AP Followers FID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Tags
     followed_tags = models.ManyToManyField(
@@ -507,6 +515,7 @@ class Profile(TimeStampedModel):
         if public_key:
             # Only update public key if it has a value
             values["rsa_public_key"] = public_key
+            values["key_id"] = safe_text(getattr(remote_profile, 'key_id', None))
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
@@ -514,6 +523,7 @@ class Profile(TimeStampedModel):
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
         values['finger'] = safe_text(remote_profile.finger)
+        values['followers_fid'] = safe_text(getattr(remote_profile, 'followers', None))
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}

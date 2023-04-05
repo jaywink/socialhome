@@ -16,7 +16,6 @@ from socialhome.enums import Visibility
 from socialhome.federate.utils import get_profiles_from_receivers
 from socialhome.utils import safe_make_aware
 from socialhome.users.models import Profile, User
-from socialhome.users.utils import set_profile_finger
 
 logger = logging.getLogger("socialhome")
 
@@ -29,7 +28,6 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
     try:
         logger.debug("get_sender_profile - looking from local db using %s", sender)
         sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
-        set_profile_finger(sender_profile)
     except Profile.DoesNotExist:
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)

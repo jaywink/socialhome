@@ -1,7 +1,9 @@
+import datetime
 import logging
+import requests
 from typing import List
-from urllib.parse import urlparse
 
+import django_rq
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
@@ -9,6 +11,7 @@ from django.conf import settings
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
+
 
 def generate_rsa_private_key(bits=4096):
     """Generate a new RSA private key."""
@@ -35,30 +38,44 @@ def get_recently_active_user_ids() -> List[int]:
     return [int(key.decode("utf-8").rsplit(":", 1)[1]) for key in keys]
 
 
-def set_profile_finger(profile):
-    """
-    To avoid going through all profiles in one shot
-    (which could take quite a while due the the webfinger
-    query) we call this from profile serializers. It should
-    eventually become a noop
-    """
+def update_profile_from_fed(profile_id):
     from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
-    profile.refresh_from_db()
-    if not profile.finger:
-        finger = ""
-        if profile.is_local or profile.protocol == 'diaspora':
-            finger = profile.handle
-        elif profile.protocol == 'activitypub':
-            # This is the only reliable way to obtain the preferredUsername property
-            remote_profile = retrieve_remote_profile(profile.fid)
-            finger = getattr(remote_profile, 'finger', "")
-        if finger:
-            if Profile.objects.filter(finger=finger).exists():
-                logger.error(f"failed to set finger to {finger} for {profile}: duplicate found in database")
+
+    try:
+        profile = Profile.objects.get(id=profile_id)
+    except Profile.DoesNotExist:
+        logger.warning('update_profile - profile id %s not found', profile_id)
+        return
+
+    remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
+    if remote_profile:
+        Profile.from_remote_profile(remote_profile)
+        logger.info('update_profile - profile %s update', remote_profile)
+    else:
+        logger.warning('update_profile - failed to retrieve %s', profile)
+
+
+def update_profile(profile):
+    """
+    Add comment here
+    """
+    from socialhome.users.models import Profile
+
+    if profile.is_local:
+        if not profile.finger:
+            Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
+            profile.refresh_from_db()
+    else:
+        if any((
+            not profile.finger,
+            profile.fid and not (profile.key_id or profile.followers_fid),
+            not requests.head(profile.image_url_small),
+            datetime.datetime.now(tz=profile.modified.tzinfo) - profile.modified > datetime.timedelta(days=7))):
+            queue = django_rq.get_queue("lowest")
+            if queue.enqueue(update_profile_from_fed, profile.id):
+                logger.info("update_profile - queued profile update job for %s", profile)
             else:
-                Profile.objects.filter(id=profile.id).update(finger=finger)
-                logger.info(f"finger set to {finger} for {profile}")
-        else:
-            # should we raise an error here? should the profile be removed?
-            logger.error(f"failed to set finger to {finger} for {profile}: could not be retrieved")
+                logger.warning("update_profile - failed to queue profile update job for %s", profile)
+
+
