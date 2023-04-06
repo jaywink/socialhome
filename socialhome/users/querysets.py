@@ -45,7 +45,7 @@ class ProfileQuerySet(QuerySet):
         else:
             changed = False
             for key, value in values.items():
-                if key in ('fid', 'followers_fid', 'guid', 'handle', 'key_id'):
+                if key in ('fid', 'guid', 'handle'):
                     continue
                 if getattr(profile, key, None) != value:
                     changed = True

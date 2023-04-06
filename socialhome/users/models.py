@@ -355,6 +355,12 @@ class Profile(TimeStampedModel):
         if self.guid == "":
             self.guid = None
 
+        if not self.key_id:
+            self.key_id = None
+
+        if not self.followers_fid:
+            self.followers_fid = None
+
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
@@ -522,8 +528,10 @@ class Profile(TimeStampedModel):
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
         values['finger'] = safe_text(remote_profile.finger)
-        values['followers_fid'] = safe_text(remote_profile.followers)
-        values["key_id"] = safe_text(remote_profile.key_id)
+        if fid.startswith('http'):
+            # only needed for activitypub profiles
+            values['followers_fid'] = safe_text(remote_profile.followers)
+            values["key_id"] = safe_text(remote_profile.key_id)
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}
