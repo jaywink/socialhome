@@ -515,7 +515,6 @@ class Profile(TimeStampedModel):
         if public_key:
             # Only update public key if it has a value
             values["rsa_public_key"] = public_key
-            values["key_id"] = safe_text(getattr(remote_profile, 'key_id', None))
         for img_size in ["small", "medium", "large"]:
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
@@ -523,7 +522,8 @@ class Profile(TimeStampedModel):
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
         values['finger'] = safe_text(remote_profile.finger)
-        values['followers_fid'] = safe_text(getattr(remote_profile, 'followers', None))
+        values['followers_fid'] = safe_text(remote_profile.followers)
+        values["key_id"] = safe_text(remote_profile.key_id)
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}
