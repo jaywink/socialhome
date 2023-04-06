@@ -8,6 +8,8 @@ from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
+from federation.fetchers import retrieve_remote_profile
+from federation.utils.network import fetch_content_type
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -39,7 +41,6 @@ def get_recently_active_user_ids() -> List[int]:
 
 
 def update_profile_from_fed(profile_id):
-    from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
 
     try:
@@ -70,7 +71,7 @@ def update_profile(profile):
         if any((
             not profile.finger,
             profile.fid and not (profile.key_id or profile.followers_fid),
-            not requests.head(profile.image_url_small),
+            not fetch_content_type(profile.image_url_small),
             datetime.datetime.now(tz=profile.modified.tzinfo) - profile.modified > datetime.timedelta(days=7))):
             queue = django_rq.get_queue("lowest")
             if queue.enqueue(update_profile_from_fed, profile.id):
