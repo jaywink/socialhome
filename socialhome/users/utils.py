@@ -8,7 +8,6 @@ from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
-from federation.fetchers import retrieve_remote_profile
 from federation.utils.network import fetch_content_type
 from socialhome.utils import get_redis_connection
 
@@ -41,6 +40,7 @@ def get_recently_active_user_ids() -> List[int]:
 
 
 def update_profile_from_fed(profile_id):
+    from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
 
     try:
