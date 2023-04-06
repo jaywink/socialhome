@@ -495,7 +495,7 @@ class Profile(TimeStampedModel):
         return url
 
     @staticmethod
-    def from_remote_profile(remote_profile):
+    def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
         # noinspection PyProtectedMember
@@ -529,6 +529,6 @@ class Profile(TimeStampedModel):
             extra_lookups = {"guid": values["guid"]}
         else:
             extra_lookups = {}
-        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups)
+        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

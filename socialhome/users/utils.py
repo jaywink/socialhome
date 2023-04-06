@@ -51,7 +51,7 @@ def update_profile_from_fed(profile_id):
 
     remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
     if remote_profile:
-        Profile.from_remote_profile(remote_profile)
+        Profile.from_remote_profile(remote_profile, force=True)
         profile.refresh_from_db()
         logger.info('update_profile - profile %s updated', profile)
     else:
