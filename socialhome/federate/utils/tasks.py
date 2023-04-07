@@ -330,8 +330,17 @@ def process_entity_retraction(entity, profile):
     if entity_type in ("Post", "Comment", "Share", "Object"):
         target_fid = safe_text(entity.target_id)
         _retract_content(target_fid, profile)
+    elif entity_type == 'Profile':
+        # AP profiles only
+        target_fid = safe_text(entity.target_id)
+        if target_fid == profile.fid:
+            profile.delete()
+            logger.info("Retraction done for profile %s", profile)
+        else:
+            logger.warning("Target profile %s doesn't match profile retraction author %s",
+                           target_fid, profile)
     else:
-        logger.debug("Ignoring retraction of entity_type %s", entity_type)
+        logger.debug("Ignoring retraction of entity_type %s from %s", entity_type, profile)
 
 
 def process_entity_share(entity, profile):
