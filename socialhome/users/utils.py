@@ -8,10 +8,12 @@ from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
-from federation.utils.network import fetch_content_type
+from federation.utils.network import fetch_document
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
+
+workers = django_rq.workers.get_worker_class().all(connection=get_redis_connection())
 
 
 def generate_rsa_private_key(bits=4096):
@@ -49,13 +51,19 @@ def update_profile_from_fed(profile_id):
         logger.warning('update_profile - profile id %s not found', profile_id)
         return
 
-    remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
-    if remote_profile:
-        Profile.from_remote_profile(remote_profile, force=True)
-        profile.refresh_from_db()
-        logger.info('update_profile - profile %s updated', profile)
-    else:
-        logger.warning('update_profile - failed to retrieve %s', profile)
+    if any((
+        not profile.finger,
+        profile.fid and not (profile.key_id or profile.followers_fid),
+        not fetch_document(profile.image_url_small)[0],
+        datetime.datetime.now(tz=profile.modified.tzinfo) - profile.modified > datetime.timedelta(days=7))):
+
+        remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
+        if remote_profile:
+            Profile.from_remote_profile(remote_profile, force=True)
+            profile.refresh_from_db()
+            logger.info('update_profile - profile %s updated', profile)
+        else:
+            logger.warning('update_profile - failed to retrieve %s', profile)
 
 
 def update_profile(profile):
@@ -69,15 +77,11 @@ def update_profile(profile):
             Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
             profile.refresh_from_db()
     else:
-        if any((
-            not profile.finger,
-            profile.fid and not (profile.key_id or profile.followers_fid),
-            not fetch_content_type(profile.image_url_small),
-            datetime.datetime.now(tz=profile.modified.tzinfo) - profile.modified > datetime.timedelta(days=7))):
-            queue = django_rq.get_queue("lowest")
-            if queue.enqueue(update_profile_from_fed, profile.id):
-                logger.info("update_profile - queued profile update job for %s", profile)
-            else:
-                logger.warning("update_profile - failed to queue profile update job for %s", profile)
-
-
+        queue = django_rq.get_queue("lowest")
+        job_id = f'update_profile_{profile.id}'
+        if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
+            logger.warning("update_profile - job found for profile %s, skipping", profile)
+        if queue.enqueue(update_profile_from_fed, profile.id, job_id=job_id):
+            logger.info("update_profile - queued profile update job for %s", profile)
+        else:
+            logger.warning("update_profile - failed to queue profile update job for %s", profile)
