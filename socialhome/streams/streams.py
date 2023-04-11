@@ -15,6 +15,7 @@ from socialhome.content.models import Content
 from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
 from socialhome.users.models import User, Profile
+from socialhome.users.utils import update_profiles
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -139,6 +140,14 @@ def get_precache_users_qs(acting_profile):
     return qs
 
 
+def update_profile_for_streams(profile, event='profile'):
+    redis = get_redis_connection()
+    keys = redis.keys('asgi:group:*')
+    notify_keys = [key.decode().split(':')[-1] for key in keys]
+    notify_listeners(profile, notify_keys, event)
+
+
+
 def update_streams_with_content(content, event='new'):
     """Handle content adding to streams.
 
@@ -161,14 +170,14 @@ def update_streams_with_content(content, event='new'):
             check_and_add_to_keys(stream_cls, acting_profile.user, content, keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
-        notify_listeners(content, notify_keys)
+        notify_listeners(content, notify_keys, event)
     # Queue rest to RQ
     django_rq.enqueue(add_to_streams_for_users, content.id, through.id, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
         # Content reply
         # TODO notify per user due to visibility
-        notify_listeners(content, {"streams_content__%s" % content.root_parent.channel_group_name})
+        notify_listeners(content, {"streams_content__%s" % content.root_parent.channel_group_name}, event)
 
 
 class BaseStream:
@@ -239,6 +248,7 @@ class BaseStream:
         preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
+        update_profiles(content)
         return content, throughs
 
     def get_content_ids(self):

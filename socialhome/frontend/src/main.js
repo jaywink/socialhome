@@ -50,6 +50,8 @@ function getMainInstance(LocalVue) {
                         contentId: data.id,
                         parentId: data.parentId,
                     })
+                } else if (data.event === "profile") {
+                    this.$store.dispatch("profiles/getProfile", {uuid: data.uuid})
                 }
             },
             onWebsocketOpen() {

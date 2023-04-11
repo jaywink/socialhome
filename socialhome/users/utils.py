@@ -1,6 +1,5 @@
-import datetime
 import logging
-import requests
+from datetime import datetime
 from typing import List
 
 import django_rq
@@ -51,11 +50,17 @@ def update_profile_from_fed(profile_id):
         logger.warning('update_profile - profile id %s not found', profile_id)
         return
 
+    if profile.is_local:
+        if not profile.finger:
+            Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
+            profile.refresh_from_db()
+        return
+
     if any((
         not profile.finger,
         profile.fid and not (profile.key_id or profile.followers_fid),
         not fetch_document(profile.image_url_small)[0],
-        datetime.datetime.now(tz=profile.modified.tzinfo) - profile.modified > datetime.timedelta(days=7))):
+        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 
         remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
         if remote_profile:
@@ -66,22 +71,19 @@ def update_profile_from_fed(profile_id):
             logger.warning('update_profile - failed to retrieve %s', profile)
 
 
-def update_profile(profile):
+def update_profiles(contents):
     """
     Add comment here
     """
     from socialhome.users.models import Profile
 
-    if profile.is_local:
-        if not profile.finger:
-            Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
-            profile.refresh_from_db()
-    else:
+    profile_ids = {content.author.id for content in contents}
+    for profile_id in profile_ids:
         queue = django_rq.get_queue("lowest")
-        job_id = f'update_profile_{profile.id}'
+        job_id = f'update_profile_{profile_id}'
         if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
-            logger.warning("update_profile - job found for profile %s, skipping", profile)
-        if queue.enqueue(update_profile_from_fed, profile.id, job_id=job_id):
-            logger.info("update_profile - queued profile update job for %s", profile)
+            logger.warning("update_profile - job found for profile id %s, skipping", profile_id)
+        if queue.enqueue(update_profile_from_fed, profile_id, job_id=job_id):
+            logger.info("update_profile - queued profile update job for profile id %s", profile_id)
         else:
-            logger.warning("update_profile - failed to queue profile update job for %s", profile)
+            logger.warning("update_profile - failed to queue profile update job for profile id %s", profile_id)

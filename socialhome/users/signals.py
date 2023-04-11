@@ -8,6 +8,7 @@ from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.federate.tasks import send_follow_change, send_profile, send_profile_retraction
 from socialhome.notifications.tasks import send_follow_notification, send_account_approval_admin_notification
+from socialhome.streams.streams import update_profile_for_streams
 from socialhome.users.models import User, Profile
 
 logger = logging.getLogger("socialhome")
@@ -67,6 +68,7 @@ def profile_following_change(sender, instance, action, pk_set, **kwargs):
 def profile_post_save(instance, **kwargs):
     if instance.is_local:
         transaction.on_commit(lambda: federate_profile(instance))
+    update_profile_for_streams(instance)
 
 
 def federate_profile(profile):

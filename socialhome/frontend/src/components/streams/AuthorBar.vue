@@ -62,9 +62,13 @@ export default {
     },
     computed: {
         author() {
-            return this.content.author
+            // return this.content.author
+            return this.$store.state.profiles.all[this.content.author.uuid]
         },
         authorFederationId() {
+            if (this.author.finger) {
+                return this.author.finger
+            }
             if (this.author.handle) {
                 return this.author.handle
             }
@@ -81,21 +85,24 @@ export default {
         isShared() {
             return this.content.through !== this.content.id
         },
+        throughAuthor() {
+            return this.$store.state.profiles.all[this.content.through_author.uuid]
+        },
         throughAuthorFederationId() {
-            const throughAuthor = this.content.through_author
-            if (throughAuthor.handle) {
-                return throughAuthor.handle
+            // const throughAuthor = this.content.through_author
+            if (this.throughAuthor.handle) {
+                return this.throughAuthor.handle
             }
-            return throughAuthor.fid
+            return this.throughAuthor.fid
         },
         throughAuthorName() {
-            const throughAuthor = this.content.through_author
-            if (throughAuthor.name) {
-                return throughAuthor.name
-            } if (throughAuthor.handle) {
-                return throughAuthor.handle
+            // const throughAuthor = this.content.through_author
+            if (this.throughAuthor.name) {
+                return this.throughAuthor.name
+            } if (this.throughAuthor.handle) {
+                return this.throughAuthor.handle
             }
-            return throughAuthor.fid || ""
+            return this.throughAuthor.fid || ""
         },
     },
     updated() {

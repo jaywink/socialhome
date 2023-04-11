@@ -131,6 +131,9 @@ class ContentSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         self.cache_through_authors()
 
+    def get_author_uuid(self, obj):
+        return obj.author.uuid
+
     def cache_through_authors(self):
         """
         If we have 'throughs', cache author information here for all of them.

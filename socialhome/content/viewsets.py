@@ -9,6 +9,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content, Tag
 from socialhome.content.serializers import ContentSerializer, TagSerializer
+from socialhome.users.utils import update_profiles
+
 
 
 class IsOwnContentOrReadOnly(BasePermission):
@@ -110,6 +112,7 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         parent = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
+        update_profiles(serializer.child.instance)
         return Response(serializer.data)
 
     @action(detail=True, methods=["delete", "post"])
