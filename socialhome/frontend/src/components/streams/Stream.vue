@@ -105,7 +105,12 @@ export default Vue.component("Stream", {
             if (!this.$store.state.stream.singleContentId) {
                 return null
             }
-            return this.$store.state.stream.contents[this.$store.state.stream.singleContentId]
+            const content = this.$store.state.stream.contents[this.$store.state.stream.singleContentId]
+            this.$store.commit("profiles/setProfile", content.author)
+            if (content.through_author) {
+                this.$store.commit("profiles/setProfile", content.through_author)
+            }
+            return content
         },
         showProfileStreamButtons() {
             return this.streamName === "profile_all" || this.streamName === "profile_pinned"

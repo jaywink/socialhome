@@ -70,6 +70,12 @@ const mutations = {
                 Vue.set(state.all, content.author.uuid, content.author)
                 state.index.push(content.author.uuid)
             }
+            if (content.through_author) {
+                if (state.index.indexOf(content.through_author.uuid) === -1) {
+                    Vue.set(state.all, content.through_author.uuid, content.through_author)
+                    state.index.push(content.through_author.uuid)
+                }
+            }
         })
     },
 }

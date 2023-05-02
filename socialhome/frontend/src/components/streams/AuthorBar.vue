@@ -100,6 +100,9 @@ export default {
         },
         throughAuthorFederationId() {
             // const throughAuthor = this.content.through_author
+            if (this.throughAuthor.finger) {
+                return this.throughAuthor.finger
+            }
             if (this.throughAuthor.handle) {
                 return this.throughAuthor.handle
             }
