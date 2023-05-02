@@ -2,7 +2,11 @@
     <div>
         <div class="grid-item-author-bar mt-1">
             <div>
-                <img :src="author.image_url_small" class="grid-item-author-bar-pic">
+                <img
+                    :src="author.image_url_small"
+                    class="grid-item-author-bar-pic"
+                    @error="requestProfileUpdate($event)"
+                >
                 <div class="author-bar-name-container">
                     <popper
                         trigger="clickToToggle"
@@ -58,6 +62,12 @@ export default {
     props: {
         content: {
             type: Object, required: true,
+        },
+    },
+    methods: {
+        requestProfileUpdate(e) {
+            e.target.src = "/static/images/pony50.png" // TODO: parametrize this
+            this.$store.dispatch("profiles/requestProfileUpdate", {uuid: this.author.uuid})
         },
     },
     computed: {

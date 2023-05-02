@@ -33,6 +33,15 @@ const actions = {
             .get(Urls["api:profile-detail"]({uuid}))
             .then(result => commit("setProfile", result.data))
     },
+    // eslint-disable-next-line no-unused-vars
+    requestProfileUpdate({commit}, {uuid}) {
+        return Vue.axios
+            .post(Urls["api:profile-sched-update"]({uuid}))
+            .then()
+            .catch(() => {
+                Vue.snotify.error(gettext("An error happened while requesting a profile update."))
+            })
+    },
     unFollow({commit}, {uuid}) {
         return Vue.axios
             .post(Urls["api:profile-unfollow"]({uuid}))
