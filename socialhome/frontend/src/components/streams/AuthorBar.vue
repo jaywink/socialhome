@@ -72,7 +72,6 @@ export default {
     },
     computed: {
         author() {
-            // return this.content.author
             return this.$store.state.profiles.all[this.content.author.uuid]
         },
         authorFederationId() {
@@ -99,7 +98,6 @@ export default {
             return this.$store.state.profiles.all[this.content.through_author.uuid]
         },
         throughAuthorFederationId() {
-            // const throughAuthor = this.content.through_author
             if (this.throughAuthor.finger) {
                 return this.throughAuthor.finger
             }
@@ -109,7 +107,6 @@ export default {
             return this.throughAuthor.fid
         },
         throughAuthorName() {
-            // const throughAuthor = this.content.through_author
             if (this.throughAuthor.name) {
                 return this.throughAuthor.name
             } if (this.throughAuthor.handle) {
