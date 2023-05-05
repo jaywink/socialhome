@@ -22,6 +22,8 @@ Added
     * key_id: which helps keeping federation GET requests low by enabling searches in the local DB using the HTTP
       signature keyID.
 
+* AP profile deletes are now processed.
+
 Changed
 .......
 

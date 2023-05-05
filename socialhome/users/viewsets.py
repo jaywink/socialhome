@@ -91,7 +91,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         profile.following.remove(target_profile)
         return Response({"status": "Unfollowed."})
 
-    @action(detail=True, methods=["post"], permission_classes=(AllowAny,))
+    @action(detail=True, methods=["get"])
     def sched_update(self, request, uuid):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
