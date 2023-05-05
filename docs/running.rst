@@ -401,6 +401,13 @@ Default: ''
 
 If this is set to a local username, that users profile will be shown when navigating to ``/`` as not logged in user. Logged in users will still see their own profile. Good for single user instances.
 
+SOCIALHOME_PROFILE_UPDATE_FREQ
+..............................
+
+Default: ``7``
+
+A profile that has not been updated for that number of days or more becomes eligible for an update.
+
 SOCIALHOME_SHOW_ADMINS
 ......................
 
