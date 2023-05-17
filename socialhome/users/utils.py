@@ -60,10 +60,19 @@ def update_profile_from_fed(profile_id):
 
 
 def update_profile(profile, force=False):
+    """
+    Decide if a profile update should be scheduled if any of the following criteria
+    is true:
+    - force is True
+    - unset finger property (for local profiles, set and return immediately)
+    - unset key_id or followers_fid property for AP profiles
+    - more than SOCIALHOME_PROFILE_UPDATE_FREQ days since the last update
+    """
+    from socialhome.users.models import Profile
+
     if profile.is_local:
         if not profile.finger:
             Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
-            profile.refresh_from_db()
         return
 
     if any((
@@ -84,7 +93,8 @@ def update_profile(profile, force=False):
 
 def update_profiles(contents):
     """
-    Add comment here
+    This function builds a set of unique profiles extracted from
+    the provided contents list.
     """
     profiles = {content.author for content in contents}
     for profile in profiles:

@@ -5,7 +5,7 @@
                 <img
                     :src="author.image_url_small"
                     class="grid-item-author-bar-pic"
-                    @error="requestProfileUpdate($event)"
+                    @error="requestProfileUpdate($event, author, icon)"
                 >
                 <div class="author-bar-name-container">
                     <popper
@@ -52,8 +52,10 @@ import Popper from "vue-popperjs"
 import "vue-popperjs/dist/vue-popper.css"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
+import profileMixin from "@/components/streams/profile-mixin"
 
 export default {
+    mixins: [profileMixin],
     components: {
         ContentTimestamp,
         Popper,
@@ -62,12 +64,6 @@ export default {
     props: {
         content: {
             type: Object, required: true,
-        },
-    },
-    methods: {
-        requestProfileUpdate(e) {
-            e.target.src = "/static/images/pony50.png" // TODO: parametrize this
-            this.$store.dispatch("profiles/requestProfileUpdate", {uuid: this.author.uuid})
         },
     },
     computed: {
@@ -90,6 +86,9 @@ export default {
                 return this.author.handle
             }
             return this.author.fid
+        },
+        icon() {
+            return "/static/images/pony50.png"
         },
         isShared() {
             return this.content.through !== this.content.id

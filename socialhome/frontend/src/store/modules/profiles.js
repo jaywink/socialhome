@@ -14,6 +14,15 @@ const getters = {
         })
         return profiles
     },
+    getProfileSelection: state => selection => {
+        const profiles = []
+        selection.forEach(profile => {
+            profiles.push(state.all[profile.uuid])
+        })
+        // eslint-disable-next-line no-console
+        console.log("selection", profiles)
+        return profiles
+    },
     getByUuid: state => uuid => state.all[uuid],
 }
 
@@ -59,9 +68,11 @@ const mutations = {
         Vue.set(state.all[uuid], "user_following", status)
     },
     setProfile(state, profile) {
-        Vue.set(state.all, profile.uuid, profile)
         if (state.index.indexOf(profile.uuid) === -1) {
+            Vue.set(state.all, profile.uuid, profile)
             state.index.push(profile.uuid)
+        } else {
+            Vue.set(state.all, profile.uuid, Object.assign(state.all[profile.uuid], profile))
         }
     },
     setProfilesFromContentList(state, contentList) {
@@ -75,6 +86,14 @@ const mutations = {
                     Vue.set(state.all, content.through_author.uuid, content.through_author)
                     state.index.push(content.through_author.uuid)
                 }
+            }
+        })
+    },
+    setProfilesFromContactList(state, contactList) {
+        contactList.forEach(contact => {
+            if (state.index.indexOf(contact.uuid) === -1) {
+                Vue.set(state.all, contact.uuid, contact)
+                state.index.push(contact.uuid)
             }
         })
     },

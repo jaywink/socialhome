@@ -97,3 +97,5 @@ socialhome/static/mocha/
 # Docker
 /docker-compose.yml
 
+/http_cache.sqlite
+/.env.livedev

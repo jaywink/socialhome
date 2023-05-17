@@ -14,7 +14,6 @@ Added
   * A new API route was added to allow the UI to request a profile update when
     the profile icon is not available. In such cases, a profile update is forced.
   * The update frequency is defined by the SOCIALHOME_PROFILE_UPDATE_FREQ configuration value (default = 7 days).
-  * Only authenticated users can benefit from this feature.
 
 * Added two fields to Activitypub profiles:
 

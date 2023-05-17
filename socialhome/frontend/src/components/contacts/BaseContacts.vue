@@ -6,11 +6,14 @@
                 v-for="item in chunk"
                 :key="item.fid"
                 :title="contactDesignation(item)"
-                :img-src="item.image_url_large"
-                :img-alt="contactAvatarAlt(item)"
-                img-top
                 class="socialhome-contact-card mb-3"
             >
+                <b-card-img
+                    :src="item.image_url_large"
+                    :alt="contactAvatarAlt(item)"
+                    top
+                    @error="requestProfileUpdate($event, item, icon)"
+                />
                 <b-card-text>{{ item.handle }}</b-card-text>
 
                 <profile-reaction-buttons
@@ -25,23 +28,30 @@
 </template>
 
 <script>
-import {mapState} from "vuex"
+import {reactive} from "vue"
+import {mapGetters, mapState} from "vuex"
 import _chunk from "lodash/chunk"
+import profileMixin from "@/components/streams/profile-mixin"
 
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons"
 
 export default {
     components: {ProfileReactionButtons},
+    mixins: [profileMixin],
     computed: {
         ...mapState("contacts", {
             following: state => state.following,
             followers: state => state.followers,
         }),
+        ...mapGetters("profiles", ["getProfileSelection"]),
         chunks() {
-            return _chunk(this.contacts, this.nbColumns)
+            return reactive(_chunk(this.getProfileSelection(this.contacts), this.nbColumns))
         },
         contacts() {
             return []
+        },
+        icon() {
+            return "/static/images/pony300.png"
         },
         nbColumns() {
             if (this.$deviceSize.isMinLg) {
