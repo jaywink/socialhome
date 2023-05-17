@@ -92,7 +92,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return Response({"status": "Unfollowed."})
 
     @action(detail=True, methods=["get"])
-    def sched_update(self, request, uuid):
+    def schedule_update(self, request, uuid):
         try:
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:

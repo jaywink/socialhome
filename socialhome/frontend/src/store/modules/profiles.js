@@ -45,7 +45,7 @@ const actions = {
     // eslint-disable-next-line no-unused-vars
     requestProfileUpdate({commit}, {uuid}) {
         return Vue.axios
-            .get(Urls["api:profile-sched-update"]({uuid}))
+            .get(Urls["api:profile-schedule-update"]({uuid}))
             .then()
             .catch(() => {
                 Vue.snotify.error(gettext("An error happened while requesting a profile update."))
