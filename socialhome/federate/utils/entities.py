@@ -6,6 +6,7 @@ from Crypto.PublicKey.RSA import RsaKey
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models.query_utils import Q
+from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from federation.entities import base
 from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
@@ -194,12 +195,16 @@ def get_user_private_key(identifier: str) -> Optional[RsaKey]:
     """
     Get a local user private key by identifier (fid, handle or guid).
     """
+    if not identifier: return
     from socialhome.users.models import Profile  # Circulars
     try:
         profile = Profile.objects.only('rsa_private_key').get(
             Q(fid=identifier) | Q(handle=identifier) | Q(guid=identifier),
         )
     except Profile.DoesNotExist:
+        logger.error('get_user_private_key - no profile for %s' % identifier)
+        return
+    except ProgrammingError:
         return
     return profile.private_key
 
