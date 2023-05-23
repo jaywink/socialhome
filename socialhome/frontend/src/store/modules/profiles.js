@@ -41,6 +41,9 @@ const actions = {
         return Vue.axios
             .get(Urls["api:profile-detail"]({uuid}))
             .then(result => commit("setProfile", result.data))
+            .catch(() => {
+                Vue.snotify.error(gettext("An error happened while fetching a profile."))
+            })
     },
     // eslint-disable-next-line no-unused-vars
     requestProfileUpdate({commit}, {uuid}) {
