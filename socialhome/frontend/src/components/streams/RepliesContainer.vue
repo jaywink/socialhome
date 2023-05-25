@@ -58,7 +58,7 @@ export default {
         },
     },
     mounted() {
-        if (this.isContent) {
+        if (this.isPost) {
             this.$store.dispatch("stream/getReplies", {params: {id: this.content.id}})
             this.$store.dispatch("stream/getShares", {params: {id: this.content.id}})
         }
