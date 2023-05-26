@@ -185,7 +185,9 @@ def send_reply_notifications(content_id):
         return
     subject = _("New reply to: %s" % root_content.short_text_inline)
     # TODO use fragment url to reply directly when available
-    content_url = "%s%s" % (settings.SOCIALHOME_URL, root_content.get_absolute_url())
+    content_url = "%s%s#r%s" % (settings.SOCIALHOME_URL,
+                                root_content.get_absolute_url(),
+                                content.id)
     context = get_common_context()
     context.update({
         "subject": subject, "actor_name": content.author.name_or_handle,

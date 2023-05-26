@@ -5,6 +5,7 @@
                 v-for="reply in replies"
                 :key="reply.id"
                 class="reply"
+                :id="`r${reply.id}`"
                 :content="reply"
             />
         </div>
