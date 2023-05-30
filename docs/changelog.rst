@@ -32,6 +32,12 @@ Changed
 
 * While a profile update is being processed, display the default pony icon if no icon is available.
 
+* Fetch all replies in one GET request in order to expand all threads in single content pages without
+  hitting 429 errors.
+
+* Set the id property for each reply container and use the id in reply notifications to scroll to the reply.
+  Use the same for mention notifications.
+
 Fixed
 .....
 
