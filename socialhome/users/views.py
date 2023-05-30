@@ -6,6 +6,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from django.views.generic import DetailView, ListView, UpdateView, TemplateView, DeleteView
 from federation.entities.activitypub.django.views import activitypub_object_view
 from rest_framework.authtoken.models import Token
@@ -31,6 +33,8 @@ class DeleteAccountView(DeleteView):
         return reverse("home")
 
 
+@method_decorator(cache_page(900), name='dispatch')
+@method_decorator(vary_on_headers('Accept'), name='dispatch')
 @method_decorator(activitypub_object_view, name='dispatch')
 class UserDetailView(DetailView):
     model = User
