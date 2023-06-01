@@ -24,11 +24,11 @@ class ProfileQuerySet(QuerySet):
         Get Profile by federated ID.
         """
         return self.filter(
-            Q(fid=value) | Q(guid=value) | Q(handle=value) | Q(finger=value)
+            Q(fid=value) | Q(guid=value) | Q(handle=value)
         ).filter(**params)
 
     def fed_update_or_create(
-        self, fid: str, values: Dict[str, Any], extra_lookups: Dict = None
+        self, fid: str, values: Dict[str, Any], extra_lookups: Dict = None, force: bool = False
     ) -> Tuple['Profile', bool]:
         """
         Update or create by federated ID.
@@ -55,7 +55,7 @@ class ProfileQuerySet(QuerySet):
             if profile.protocol == "diaspora" and profile.fid:
                 profile.protocol = "activitypub"
                 changed = True
-            if changed:
+            if changed or force:
                 profile.save()
             return profile, False
 

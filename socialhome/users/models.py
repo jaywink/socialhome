@@ -180,6 +180,10 @@ class Profile(TimeStampedModel):
     rsa_private_key = models.TextField(_("RSA private key"), null=True, editable=False)
     rsa_public_key = models.TextField(_("RSA public key"), null=True, editable=False)
 
+    # Key ID
+    # Optional
+    key_id = models.URLField(_("AP Public Key ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     # Profile visibility
     visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
@@ -196,6 +200,10 @@ class Profile(TimeStampedModel):
 
     # Following
     following = models.ManyToManyField("self", verbose_name=_("Following"), related_name="followers", symmetrical=False)
+
+    # Followers fid
+    # optional
+    followers_fid = models.URLField(_("AP Followers FID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Tags
     followed_tags = models.ManyToManyField(
@@ -347,6 +355,12 @@ class Profile(TimeStampedModel):
         if self.guid == "":
             self.guid = None
 
+        if not self.key_id:
+            self.key_id = None
+
+        if not self.followers_fid:
+            self.followers_fid = None
+
         # Set default pony images if image urls are empty
         if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
             ponies = get_pony_urls()
@@ -487,7 +501,7 @@ class Profile(TimeStampedModel):
         return url
 
     @staticmethod
-    def from_remote_profile(remote_profile):
+    def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
         # noinspection PyProtectedMember
@@ -514,11 +528,15 @@ class Profile(TimeStampedModel):
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
         values['finger'] = safe_text(remote_profile.finger)
+        if fid.startswith('http'):
+            # only needed for activitypub profiles
+            values['followers_fid'] = safe_text(remote_profile.followers)
+            values["key_id"] = safe_text(remote_profile.key_id)
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}
         else:
             extra_lookups = {}
-        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups)
+        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
         logger.info("from_remote_profile - created %s, profile %s", created, profile)
         return profile

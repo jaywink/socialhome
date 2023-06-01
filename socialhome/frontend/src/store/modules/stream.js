@@ -2,6 +2,7 @@
 import Vue from "vue"
 import Vapi from "vuex-rest-api"
 import _defaults from "lodash/defaults"
+import _get from "lodash/get"
 
 import Axios from "axios"
 import getState from "@/store/modules/stream.state"
@@ -113,6 +114,8 @@ export const profilesPlugin = store => {
     store.subscribe(({type, payload}) => {
         if (/^stream\/GET[A-Z_]*SUCCEEDED$/.test(type)) {
             store.commit("profiles/setProfilesFromContentList", payload.payload.data, {root: true})
+        } else if (/^stream\/GET_PROFILE_(ALL|PINNED)$/.test(type)) {
+            store.commit("profiles/setProfile", _get(window, ["context", "profile"]), {root: true})
         }
     })
 }

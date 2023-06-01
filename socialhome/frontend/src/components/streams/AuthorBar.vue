@@ -2,7 +2,11 @@
     <div>
         <div class="grid-item-author-bar mt-1">
             <div>
-                <img :src="author.image_url_small" class="grid-item-author-bar-pic">
+                <img
+                    :src="author.image_url_small"
+                    class="grid-item-author-bar-pic"
+                    @error="requestProfileUpdate($event, author, icon)"
+                >
                 <div class="author-bar-name-container">
                     <popper
                         trigger="clickToToggle"
@@ -48,8 +52,10 @@ import Popper from "vue-popperjs"
 import "vue-popperjs/dist/vue-popper.css"
 import ContentTimestamp from "@/components/streams/ContentTimestamp"
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
+import profileMixin from "@/components/streams/profile-mixin"
 
 export default {
+    mixins: [profileMixin],
     components: {
         ContentTimestamp,
         Popper,
@@ -62,9 +68,12 @@ export default {
     },
     computed: {
         author() {
-            return this.content.author
+            return this.$store.state.profiles.all[this.content.author.uuid]
         },
         authorFederationId() {
+            if (this.author.finger) {
+                return this.author.finger
+            }
             if (this.author.handle) {
                 return this.author.handle
             }
@@ -78,24 +87,31 @@ export default {
             }
             return this.author.fid
         },
+        icon() {
+            return "/static/images/pony50.png"
+        },
         isShared() {
             return this.content.through !== this.content.id
         },
+        throughAuthor() {
+            return this.$store.state.profiles.all[this.content.through_author.uuid]
+        },
         throughAuthorFederationId() {
-            const throughAuthor = this.content.through_author
-            if (throughAuthor.handle) {
-                return throughAuthor.handle
+            if (this.throughAuthor.finger) {
+                return this.throughAuthor.finger
             }
-            return throughAuthor.fid
+            if (this.throughAuthor.handle) {
+                return this.throughAuthor.handle
+            }
+            return this.throughAuthor.fid
         },
         throughAuthorName() {
-            const throughAuthor = this.content.through_author
-            if (throughAuthor.name) {
-                return throughAuthor.name
-            } if (throughAuthor.handle) {
-                return throughAuthor.handle
+            if (this.throughAuthor.name) {
+                return this.throughAuthor.name
+            } if (this.throughAuthor.handle) {
+                return this.throughAuthor.handle
             }
-            return throughAuthor.fid || ""
+            return this.throughAuthor.fid || ""
         },
     },
     updated() {

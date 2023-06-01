@@ -7,7 +7,6 @@ from rest_framework.serializers import ModelSerializer
 from socialhome.content.models import Content
 from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
-from socialhome.users.utils import set_profile_finger
 
 class LimitedProfileSerializer(ModelSerializer):
     """Read only Profile serializer with less information.
@@ -54,10 +53,6 @@ class LimitedProfileSerializer(ModelSerializer):
         if not request:
             return False
         return bool(request.user.is_authenticated and obj.id in request.user.profile.following_ids)
-
-    def to_representation(self, instance):
-        if isinstance(instance, Profile): set_profile_finger(instance)
-        return super().to_representation(instance)
 
 
 class ProfileSerializer(ModelSerializer):
@@ -135,10 +130,6 @@ class ProfileSerializer(ModelSerializer):
         if not request:
             return False
         return bool(request.user.is_authenticated and obj.id in request.user.profile.following_ids)
-
-    def to_representation(self, instance):
-        if isinstance(instance, Profile): set_profile_finger(instance)
-        return super().to_representation(instance)
 
 
 class UserSerializer(ModelSerializer):

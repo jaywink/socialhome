@@ -48,11 +48,11 @@ def process_entities(entities: List):
         logger.info("Entity: %s", entity)
         # noinspection PyProtectedMember
         logger.info("Receivers: %s", entity._receivers)
-        sender_id = entity.id if isinstance(entity, base.Profile) else entity.actor_id
-        profile = get_sender_profile(sender_id)
-        if not profile:
-            logger.warning("No sender profile for entity %s, skipping", entity)
-            continue
+        if not isinstance(entity, base.Profile):
+            profile = get_sender_profile(entity.actor_id)
+            if not profile:
+                logger.warning("No sender profile for entity %s, skipping", entity)
+                continue
         try:
             if isinstance(entity, base.Post):
                 process_entity_post(entity, profile)
@@ -330,8 +330,17 @@ def process_entity_retraction(entity, profile):
     if entity_type in ("Post", "Comment", "Share", "Object"):
         target_fid = safe_text(entity.target_id)
         _retract_content(target_fid, profile)
+    elif entity_type == 'Profile':
+        # AP profiles only
+        target_fid = safe_text(entity.target_id)
+        if target_fid == profile.fid:
+            profile.delete()
+            logger.info("Retraction done for profile %s", profile)
+        else:
+            logger.warning("Target profile %s doesn't match profile retraction author %s",
+                           target_fid, profile)
     else:
-        logger.debug("Ignoring retraction of entity_type %s", entity_type)
+        logger.debug("Ignoring retraction of entity_type %s from %s", entity_type, profile)
 
 
 def process_entity_share(entity, profile):

@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import os
 import sys
 import warnings
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import environ
 
@@ -445,6 +445,9 @@ SOCIALHOME_EXPORTS_PATH = str(ROOT_DIR("var", "exports"))
 
 # How many seconds since we saw user activity do we consider the user have been recently active?
 SOCIALHOME_USER_ACTIVITY_SECONDS = 130
+
+# How many days from now before a remote profile will be updated
+SOCIALHOME_PROFILE_UPDATE_FREQ = timedelta(days = int(env("SOCIALHOME_PROFILE_UPDATE_FREQ", default="7")))
 
 # Matrix support
 # NOTE! Incomplete, alpha, here be dragons, requires Dendrite, etc

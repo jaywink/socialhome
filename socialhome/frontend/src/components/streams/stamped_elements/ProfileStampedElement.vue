@@ -94,7 +94,11 @@
         </div>
 
         <div class="d-inline-block">
-            <img v-if="profile.image_url_large" class="profile-stream-stamped-image" :src="profile.image_url_large">
+            <img
+                class="profile-stream-stamped-image"
+                :src="profile.image_url_large"
+                @error="requestProfileUpdate($event, profile, icon)"
+            >
         </div>
         <div class="d-inline-block align-center stamped-profile-info">
             <h1>{{ displayName }}</h1>
@@ -110,15 +114,20 @@
 import Vue from "vue"
 
 import ProfileReactionButtons from "@/components/common/ProfileReactionButtons.vue"
+import profileMixin from "@/components/streams/profile-mixin"
 
 export default Vue.component("ProfileStampedElement", {
+    mixins: [profileMixin],
     components: {ProfileReactionButtons},
     computed: {
         displayName() {
             return this.profile.name ? this.profile.name : this.profile.fid
         },
+        icon() {
+            return "/static/images/pony300.png"
+        },
         profile() {
-            return this.$store.state.application.profile
+            return this.$store.state.profiles.all[this.$store.state.application.profile.uuid]
         },
         profileHandle() {
             return this.profile.handle ? this.profile.handle : this.profile.fid

@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAdminUser
+from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -13,7 +13,7 @@ from socialhome.enums import Visibility
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer, LimitedProfileSerializer
 from socialhome.users.tasks.exports import create_user_export, UserExporter
-from socialhome.users.utils import get_recently_active_user_ids
+from socialhome.users.utils import get_recently_active_user_ids, update_profile
 
 
 class IsOwnProfileOrReadOnly(BasePermission):
@@ -90,6 +90,15 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             raise ValidationError("Cannot unfollow self!")
         profile.following.remove(target_profile)
         return Response({"status": "Unfollowed."})
+
+    @action(detail=True, methods=["get"])
+    def schedule_update(self, request, uuid):
+        try:
+            target_profile = Profile.objects.get(uuid=uuid)
+        except Profile.DoesNotExist:
+            raise PermissionDenied("Profile given does not exist.")
+        update_profile(target_profile, force=True)
+        return Response({"status": "Scheduled"})
 
     @action(detail=False, methods=["get"], permission_classes=(IsAuthenticated,))
     def retrieve_export(self, request, pk=None):

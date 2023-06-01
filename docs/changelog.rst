@@ -3,10 +3,43 @@
 Changelog
 =========
 
-unreleased
+0.18.0-dev (unreleased)
 ----------
 
-...
+Added
+.....
+
+* Automatic remote profile update.
+
+  * A new API route was added to allow the UI to request a profile update when
+    the profile icon is not available. In such cases, a profile update is forced.
+  * The update frequency is defined by the SOCIALHOME_PROFILE_UPDATE_FREQ configuration value (default = 7 days).
+
+* Added two fields to Activitypub profiles:
+
+    * followers_fid: which allows federation to better identify receiver types.
+    * key_id: which helps keeping federation GET requests low by enabling searches in the local DB using the HTTP
+      signature keyID.
+
+* AP profile deletes are now processed.
+
+Changed
+.......
+
+* AuthorBAr.vue and Stream.vue/singleContent now get content authors from profiles.js.
+
+* content.through_author is also added to the store profiles
+
+* While a profile update is being processed, display the default pony icon if no icon is available.
+
+Fixed
+.....
+
+* Do not rely on the end part of a fid to derive webfinger handles.
+
+* Extract the AP fid from the receiver dict in send_profile. Previously, the whole dict was sent outbound
+  as the to|cc properties.
+
 
 0.17.0 (2023-03-18)
 -------------------

@@ -1,14 +1,19 @@
 import logging
+from datetime import datetime
 from typing import List
-from urllib.parse import urlparse
 
+import django_rq
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
+from federation.utils.network import fetch_document
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
+
+workers = django_rq.workers.get_worker_class().all(connection=get_redis_connection())
+
 
 def generate_rsa_private_key(bits=4096):
     """Generate a new RSA private key."""
@@ -35,32 +40,62 @@ def get_recently_active_user_ids() -> List[int]:
     return [int(key.decode("utf-8").rsplit(":", 1)[1]) for key in keys]
 
 
-def set_profile_finger(profile):
-    """
-    To avoid going through all profiles in one shot
-    (which could take quite a while due the the webfinger
-    query) we call this from profile serializers. It should
-    eventually become a noop
-    """
-    from federation.utils.activitypub import get_profile_id_from_webfinger
+def update_profile_from_fed(profile_id):
+    from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
-    profile.refresh_from_db()
-    if not profile.finger:
-        finger = ""
-        if profile.is_local or profile.protocol == 'diaspora':
-            finger = profile.handle
-        elif profile.protocol == 'activitypub':
-            domain = urlparse(profile.fid).netloc
-            user = profile.fid.strip('/').split('/')[-1]
-            webf = f'{user}@{domain}'
-            if get_profile_id_from_webfinger(webf) == profile.fid:
-                finger = webf
-        if finger:
-            if Profile.objects.filter(finger=finger).exists():
-                logger.error(f"failed to set finger to {finger} for {profile}: duplicate found in database")
-            else:
-                Profile.objects.filter(id=profile.id).update(finger=finger)
-                logger.info(f"finger set to {finger} for {profile}")
+
+    try:
+        profile = Profile.objects.get(id=profile_id)
+    except Profile.DoesNotExist:
+        logger.warning('update_profile - profile id %s not found', profile_id)
+        return
+
+    remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
+    if remote_profile:
+        Profile.from_remote_profile(remote_profile, force=True)
+        profile.refresh_from_db()
+        logger.info('update_profile - profile %s updated', profile)
+    else:
+        logger.warning('update_profile - failed to retrieve %s', profile)
+
+
+def update_profile(profile, force=False):
+    """
+    Decide if a profile update should be scheduled if any of the following criteria
+    is true:
+    - force is True
+    - unset finger property (for local profiles, set and return immediately)
+    - unset key_id or followers_fid property for AP profiles
+    - more than SOCIALHOME_PROFILE_UPDATE_FREQ days since the last update
+    """
+    from socialhome.users.models import Profile
+
+    if profile.is_local:
+        if not profile.finger:
+            Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
+        return
+
+    if any((
+        force,
+        not profile.finger,
+        profile.fid and not (profile.key_id or profile.followers_fid),
+        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
+
+        queue = django_rq.get_queue("lowest")
+        job_id = f'update_profile_{profile.id}'
+        if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
+            logger.warning("update_profile - job found for profile %s, skipping", profile)
+        if queue.enqueue(update_profile_from_fed, profile.id, job_id=job_id):
+            logger.info("update_profile - queued profile update job for profile %s", profile)
         else:
-            # should we raise an error here? should the profile be removed?
-            logger.error(f"failed to set finger to {finger} for {profile}: could not be retrieved")
+            logger.warning("update_profile - failed to queue profile update job for profile %s", profile)
+
+
+def update_profiles(contents):
+    """
+    This function builds a set of unique profiles extracted from
+    the provided contents list.
+    """
+    profiles = {content.author for content in contents}
+    for profile in profiles:
+        update_profile(profile)

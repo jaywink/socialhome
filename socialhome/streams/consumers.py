@@ -1,18 +1,25 @@
 import json
-from typing import Set
+from typing import Set, Union
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
 
 from socialhome.content.models import Content
+from socialhome.users.models import Profile
 
 
-def notify_listeners(content: Content, keys: Set) -> None:
+def notify_listeners(obj: Union[Content, Profile], keys: Set, event: str = "new") -> None:
     """Send out to listening consumers."""
     channel_layer = get_channel_layer()
-    data = {"type": "notification", "payload": {"event": "new", "id": content.id,
-        "parentId": getattr(content.parent, 'id', None)}}
+
+    payload = {"event": event}
+    if event == 'profile':
+        payload.update({'uuid': obj.uuid.hex})
+    else:
+        payload.update({"id": obj.id, "parentId": getattr(obj.parent, 'id', None)})
+
+    data = {"type": "notification", "payload": payload}
     for key in keys:
         async_to_sync(channel_layer.group_send)(key, data)
 
