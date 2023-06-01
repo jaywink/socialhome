@@ -19,8 +19,6 @@ const getters = {
         selection.forEach(profile => {
             profiles.push(state.all[profile.uuid])
         })
-        // eslint-disable-next-line no-console
-        console.log("selection", profiles)
         return profiles
     },
     getByUuid: state => uuid => state.all[uuid],
