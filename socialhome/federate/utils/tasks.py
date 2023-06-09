@@ -286,10 +286,9 @@ def _process_mentions(content, entity):
         except Profile.DoesNotExist:
             pass
     for fid in to_add:
-        try:
-            content.mentions.add(Profile.objects.fed(fid).get())
-        except Profile.DoesNotExist:
-            pass
+        profile = get_sender_profile(fid)
+        if profile:
+            content.mentions.add(profile)
 
 
 def _retract_content(target_fid, profile):
