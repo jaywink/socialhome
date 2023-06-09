@@ -10,6 +10,7 @@
     #   federation
 -e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
     # via -r requirements/requirements.in
+-e git+https://gitlab.com/jaywink/federation.git@60694662a5a323d28c82c44609935638e4d55eab#egg=federation==0.24.0-dev
 aioredis==1.3.1
     # via channels-redis
 appdirs==1.4.4
