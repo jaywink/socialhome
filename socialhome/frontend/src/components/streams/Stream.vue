@@ -155,6 +155,19 @@ export default Vue.component("Stream", {
             this.loadStream()
         }
     },
+    updated() {
+        const hash = window.location.hash.slice(1)
+        if (hash.startsWith("r")) {
+            const element = document.getElementById(hash)
+            if (element && this.$store.state.stream.stream.single && window.scrollY === 0) {
+                const position = element.getBoundingClientRect().top
+                window.scrollTo({
+                    top: position - 50,
+                    behavior: "smooth",
+                })
+            }
+        }
+    },
     mounted() {
         this.nowTimer = setInterval(() => {
             this.currentTime = Date.now()

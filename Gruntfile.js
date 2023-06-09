@@ -2,6 +2,8 @@ module.exports = function (grunt) {
 
     var appConfig = grunt.file.readJSON('package.json');
 
+    const sass = require('node-sass')
+
     // Load grunt tasks automatically
     // see: https://github.com/sindresorhus/load-grunt-tasks
     require('load-grunt-tasks')(grunt);
@@ -43,6 +45,7 @@ module.exports = function (grunt) {
                 ],
                 tasks: ['sass:dev', 'concat', 'copy'],
                 options: {
+		    implementation: sass,
                     atBegin: true
                 }
             },
@@ -63,6 +66,7 @@ module.exports = function (grunt) {
         sass: {
             dev: {
                 options: {
+		    implementation: sass,
                     outputStyle: 'nested',
                     sourceMap: false,
                     precision: 10
@@ -77,6 +81,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 options: {
+		    implementation: sass,
                     outputStyle: 'compressed',
                     sourceMap: false,
                     precision: 10

@@ -148,7 +148,9 @@ def send_mention_notification(user_id, mention_profile_id, content_id):
     except Profile.DoesNotExist:
         logger.warning("No profile found with id %s", mention_profile_id)
         return
-    content_url = "%s%s" % (settings.SOCIALHOME_URL, content.get_absolute_url())
+    content_url = "%s%s" % (settings.SOCIALHOME_URL, content.root.get_absolute_url())
+    if content.content_type == ContentType.REPLY:
+        content_url = "%s#r%s" % (content_url, content.id)
     subject = _("You have been mentioned")
     context = get_common_context()
     context.update({
@@ -185,7 +187,9 @@ def send_reply_notifications(content_id):
         return
     subject = _("New reply to: %s" % root_content.short_text_inline)
     # TODO use fragment url to reply directly when available
-    content_url = "%s%s" % (settings.SOCIALHOME_URL, root_content.get_absolute_url())
+    content_url = "%s%s#r%s" % (settings.SOCIALHOME_URL,
+                                root_content.get_absolute_url(),
+                                content.id)
     context = get_common_context()
     context.update({
         "subject": subject, "actor_name": content.author.name_or_handle,

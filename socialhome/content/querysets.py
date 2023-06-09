@@ -25,14 +25,14 @@ class TagQuerySet(models.QuerySet):
 
 
 class ContentQuerySet(models.QuerySet):
-    def children(self, parent_id, user):
+    def full_conversation(self, parent_id, user):
         """Return replies for a Content visible to user..
 
         Returns the direct replies and all replies for shares.
         """
         qs = self.filter(content_type=ContentType.REPLY).visible_for_user(user)
-        ids = qs.filter(parent_id=parent_id).values_list("id", flat=True)
-        share_ids = qs.filter(parent__share_of_id=parent_id).values_list("id", flat=True)
+        ids = qs.filter(root_parent_id=parent_id).values_list("id", flat=True)
+        share_ids = qs.filter(root_parent__share_of_id=parent_id).values_list("id", flat=True)
         all_ids = list(ids) + list(share_ids)
         return qs.filter(id__in=all_ids).order_by("created")
 

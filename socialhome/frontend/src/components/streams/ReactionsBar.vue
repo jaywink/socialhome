@@ -119,9 +119,7 @@ export default {
             return this.content.reply_count > 0
         },
         showRepliesContainer() {
-            return this.showRepliesBox
-                || (this.$store.state.stream.stream.single
-                && this.content.content_type === "content")
+            return this.showRepliesBox || this.$store.state.stream.stream.single
         },
         showSharesCountIcon() {
             return this.content.shares_count > 0

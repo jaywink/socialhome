@@ -5,6 +5,7 @@
                 v-for="reply in replies"
                 :key="reply.id"
                 class="reply"
+                :id="`r${reply.id}`"
                 :content="reply"
             />
         </div>
@@ -58,7 +59,7 @@ export default {
         },
     },
     mounted() {
-        if (this.isContent) {
+        if (this.isPost) {
             this.$store.dispatch("stream/getReplies", {params: {id: this.content.id}})
             this.$store.dispatch("stream/getShares", {params: {id: this.content.id}})
         }
