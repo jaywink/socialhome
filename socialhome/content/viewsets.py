@@ -91,7 +91,7 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
 
     def get_queryset(self, parent=None, share_of=None):
         if parent:
-            return Content.objects.children(parent.id, self.request.user)
+            return Content.objects.full_conversation(parent.id, self.request.user)
         elif share_of:
             return Content.objects.shares(share_of.id, self.request.user)
         if self.request.user.is_staff:

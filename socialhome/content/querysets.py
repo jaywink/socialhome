@@ -25,7 +25,7 @@ class TagQuerySet(models.QuerySet):
 
 
 class ContentQuerySet(models.QuerySet):
-    def children(self, parent_id, user):
+    def full_conversation(self, parent_id, user):
         """Return replies for a Content visible to user..
 
         Returns the direct replies and all replies for shares.
