@@ -38,6 +38,11 @@ Changed
 * Set the id property for each reply container and use the id in reply notifications to scroll to the reply.
   Use the same for mention notifications.
 
+* Provide rendered outbound content to federation.
+
+* Linkify hashtags and mentions using BeautifulSoup to find the data-[hashtag,mention] attributes set
+  by federation on HTML content.
+
 Fixed
 .....
 

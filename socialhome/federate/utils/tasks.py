@@ -114,7 +114,8 @@ def process_entity_post(entity: Any, profile: Profile):
         return
     values = {
         "fid": fid,
-        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children,
+                                             safe_text_for_markdown(entity.raw_content or entity.rendered_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -200,7 +201,8 @@ def process_entity_comment(entity: Any, profile: Profile):
     if getattr(entity, "public", None) is not None:
         visibility = Visibility.PUBLIC if entity.public else Visibility.LIMITED
     values = {
-        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children,
+                                             safe_text_for_markdown(entity.raw_content or entity.rendered_content)),
         "author": profile,
         "visibility": visibility if visibility is not None else parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -344,10 +346,6 @@ def process_entity_retraction(entity, profile):
 
 def process_entity_share(entity, profile):
     """Process an entity of type Share."""
-    if not entity.entity_type == "Post":
-        # TODO: enable shares of replies too
-        logger.warning("Ignoring share entity type that is not of type Post")
-        return
     try:
         target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
     except Content.DoesNotExist:
@@ -379,7 +377,7 @@ def process_entity_share(entity, profile):
         logger.warning("Share '%s' target '%s' is not public - aborting", entity, target_content)
         return
     values = {
-        "text": safe_text_for_markdown(entity.raw_content),
+        "text": safe_text_for_markdown(entity.raw_content or entity.rendered_content),
         "author": profile,
         "visibility": Visibility.PUBLIC,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),

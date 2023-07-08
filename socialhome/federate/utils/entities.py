@@ -25,6 +25,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
     try:
         return base.Post(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             actor_id=content.author.fid,
             public=True if content.visibility == Visibility.PUBLIC else False,
@@ -43,6 +44,7 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
     try:
         return base.Comment(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             actor_id=content.author.fid,
             target_id=content.parent.fid,
@@ -62,6 +64,7 @@ def _make_share(content: Content) -> Optional[base.Share]:
     try:
         return base.Share(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             target_id=content.share_of.fid,
             actor_id=content.author.fid,
