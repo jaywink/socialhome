@@ -20,7 +20,7 @@ from socialhome.users.models import Profile, User
 logger = logging.getLogger("socialhome")
 
 
-def get_sender_profile(sender: str) -> Optional[Profile]:
+def get_sender_profile(sender: str, fetch: bool = True) -> Optional[Profile]:
     """Get or create sender profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
@@ -29,6 +29,7 @@ def get_sender_profile(sender: str) -> Optional[Profile]:
         logger.debug("get_sender_profile - looking from local db using %s", sender)
         sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
     except Profile.DoesNotExist:
+        if not fetch: return
         logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
         remote_profile = retrieve_remote_profile(sender)
         if not remote_profile:
@@ -49,7 +50,9 @@ def process_entities(entities: List):
         # noinspection PyProtectedMember
         logger.info("Receivers: %s", entity._receivers)
         if not isinstance(entity, base.Profile):
-            profile = get_sender_profile(entity.actor_id)
+            # Do not fetch and create a profile that's about to be retracted
+            fetch = not (isinstance(entity, base.Retraction) and entity.entity_type == 'Profile')
+            profile = get_sender_profile(entity.actor_id, fetch=fetch)
             if not profile:
                 logger.warning("No sender profile for entity %s, skipping", entity)
                 continue
