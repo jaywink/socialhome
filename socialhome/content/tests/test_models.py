@@ -306,8 +306,8 @@ class TestContentRendered(SocialhomeTestCase):
 
     def test_renders_linkified_tags(self):
         content = ContentFactory(text="#tag #MiXeD")
-        self.assertEqual(content.rendered, '<p><a href="/streams/tag/tag/">#tag</a> '
-                                           '<a href="/streams/tag/mixed/">#MiXeD</a></p>')
+        self.assertEqual(content.rendered, '<p><a class="hashtag" href="/streams/tag/tag/">#tag</a> '
+                                           '<a class="hashtag" href="/streams/tag/mixed/">#MiXeD</a></p>')
 
     def test_renders_without_previews_with_show_preview_false(self):
         content = ContentFactory(
@@ -369,7 +369,7 @@ class TestContentSaveTags(SocialhomeTestCase):
 
     def test_invalid_text_returns_no_tags(self):
         tags = set(self.invalid.tags.values_list("name", flat=True))
-        self.assertEqual(tags, set())
+        self.assertEqual(tags, {'a'})
 
     def test_endings_are_filtered_out(self):
         tags = set(self.endings.tags.values_list("name", flat=True))

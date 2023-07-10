@@ -320,29 +320,29 @@ class TestContentQuerySetChildren(SocialhomeTestCase):
         cls.limited_content.limited_visibilities.add(cls.limited_content_profile)
 
     def test_children(self):
-        contents = set(Content.objects.children(self.public_content.id, self.anonymous_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
-        contents = set(Content.objects.children(self.limited_content.id, self.anonymous_user))
+        contents = set(Content.objects.full_conversation(self.public_content.id, self.anonymous_user))
+        self.assertEqual(contents, {self.public_reply, self.public_reply_of_reply, self.public_share_reply})
+        contents = set(Content.objects.full_conversation(self.limited_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.children(self.self_content.id, self.anonymous_user))
+        contents = set(Content.objects.full_conversation(self.self_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.children(self.site_content.id, self.anonymous_user))
+        contents = set(Content.objects.full_conversation(self.site_content.id, self.anonymous_user))
         self.assertEqual(contents, set())
 
-        contents = set(Content.objects.children(self.public_content.id, self.other_user))
-        self.assertEqual(contents, {self.public_reply, self.public_share_reply})
-        contents = set(Content.objects.children(self.limited_content.id, self.other_user))
+        contents = set(Content.objects.full_conversation(self.public_content.id, self.other_user))
+        self.assertEqual(contents, {self.public_reply, self.public_reply_of_reply, self.public_share_reply})
+        contents = set(Content.objects.full_conversation(self.limited_content.id, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.children(self.self_content.id, self.other_user))
+        contents = set(Content.objects.full_conversation(self.self_content.id, self.other_user))
         self.assertEqual(contents, set())
-        contents = set(Content.objects.children(self.site_content.id, self.other_user))
-        self.assertEqual(contents, {self.site_reply, self.share_site_reply})
+        contents = set(Content.objects.full_conversation(self.site_content.id, self.other_user))
+        self.assertEqual(contents, {self.site_reply, self.site_reply_of_reply, self.share_site_reply})
 
-        contents = set(Content.objects.children(self.limited_content.id, self.limited_content_user))
-        self.assertEqual(contents, {self.limited_reply})
+        contents = set(Content.objects.full_conversation(self.limited_content.id, self.limited_content_user))
+        self.assertEqual(contents, {self.limited_reply, self.limited_reply_of_reply})
 
-        contents = set(Content.objects.children(self.public_reply.id, self.anonymous_user))
-        self.assertEqual(contents, {self.public_reply_of_reply})
+        contents = set(Content.objects.full_conversation(self.public_reply.id, self.anonymous_user))
+        self.assertEqual(contents, set())
 
 class TestContentQuerySetShares(SocialhomeTestCase):
     """Ensure certain querysets include content via shares."""

@@ -470,7 +470,7 @@ FEDERATION_USER = env("FEDERATION_USER", default=None)
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = SOCIALHOME_MAINTAINER, SOCIALHOME_CONTACT_EMAIL
+ADMINS = [(SOCIALHOME_MAINTAINER, SOCIALHOME_CONTACT_EMAIL)]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
