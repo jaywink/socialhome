@@ -20,25 +20,25 @@ from socialhome.users.models import Profile, User
 logger = logging.getLogger("socialhome")
 
 
-def get_sender_profile(sender: str, fetch: bool = True) -> Optional[Profile]:
-    """Get or create sender profile.
+def get_profile(owner: str, fetch: bool = True, no_local:bool = True) -> Optional[Profile]:
+    """Get or create a profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
     try:
-        logger.debug("get_sender_profile - looking from local db using %s", sender)
-        sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
+        logger.debug("get_profile - looking from local db using %s", owner)
+        sender_profile = Profile.objects.fed(owner).exclude(rsa_public_key="").get()
     except Profile.DoesNotExist:
         if not fetch: return
-        logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
-        remote_profile = retrieve_remote_profile(sender)
+        logger.debug("get_profile - %s was not found, fetching from remote", owner)
+        remote_profile = retrieve_remote_profile(owner)
         if not remote_profile:
-            logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
+            logger.warning("get_profile - Remote profile %s not found locally or remotely.", owner)
             return
         sender_profile = Profile.from_remote_profile(remote_profile)
     else:
-        if sender_profile.is_local:
-            logger.warning("get_sender_profile - %s is local! Skip.", sender)
+        if no_local and sender_profile.is_local:
+            logger.warning("get_profile - %s is local! Skip.", owner)
             return
     return sender_profile
 
@@ -52,7 +52,7 @@ def process_entities(entities: List):
         if not isinstance(entity, base.Profile):
             # Do not fetch and create a profile that's about to be retracted
             fetch = not (isinstance(entity, base.Retraction) and entity.entity_type == 'Profile')
-            profile = get_sender_profile(entity.actor_id, fetch=fetch)
+            profile = get_profile(entity.actor_id, fetch=fetch)
             if not profile:
                 logger.warning("No sender profile for entity %s, skipping", entity)
                 continue
@@ -291,7 +291,7 @@ def _process_mentions(content, entity):
         except Profile.DoesNotExist:
             pass
     for fid in to_add:
-        profile = get_sender_profile(fid)
+        profile = get_profile(fid, no_local=False)
         if profile:
             content.mentions.add(profile)
 
@@ -495,7 +495,7 @@ def sender_key_fetcher(fid):
     :rtype: str
     """
     logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
-    profile = get_sender_profile(fid)
+    profile = get_profile(fid)
     if not profile:
         return
     return profile.rsa_public_key

@@ -523,16 +523,20 @@ class Content(models.Model):
         # federation sets the data-mention attributes on inbound AP HTML payloads
         for link in self._soup.find_all('a', attrs={'data-mention':True}):
             mention = link['data-mention']
-            profile = self.mentions.get(finger=mention)
-            if not profile: continue
+            try:
+                profile = self.mentions.get(finger=mention)
+            except Profile.DoesNotExist:
+                continue
             link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
             if 'mention' not in link.get('class', []):
                 link['class'] = ['mention'] + link.get('class', [])
             del link['data-mention']
 
         for mention in find_elements(self._soup, MENTION_PATTERN):
-            profile = self.mentions.get(finger=mention.text.lstrip('@'))
-            if not profile: continue
+            try:
+                profile = self.mentions.get(finger=mention.text.lstrip('@'))
+            except Profile.DoesNotExist:
+                continue
             link = self._soup.new_tag('a')
             link.append(mention.text)
             link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
