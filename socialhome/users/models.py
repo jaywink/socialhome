@@ -345,8 +345,6 @@ class Profile(TimeStampedModel):
             self.handle = None
 
         if self.finger:
-            # Ensure finger is *always* lowercase
-            self.finger = self.finger.lower()
             if not validate_handle(self.finger):
                 raise ValueError("Not a valid wefinger subject")
         else:
