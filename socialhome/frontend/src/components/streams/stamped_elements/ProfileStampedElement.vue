@@ -101,7 +101,7 @@
             >
         </div>
         <div class="d-inline-block align-center stamped-profile-info">
-            <h1>{{ displayName }}</h1>
+            <h1 v-html="displayName" />
             <h3>
                 <cite :title="translations.userHandle">{{ profileHandle }}</cite>
             </h3>

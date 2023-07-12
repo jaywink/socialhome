@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import django_rq
 # noinspection PyPackageRequirements
+from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -420,6 +421,10 @@ class Profile(TimeStampedModel):
     def is_local(self):
         """If the profile has a user, it's local."""
         return self.user is not None
+
+    @property
+    def plain_name(self):
+        return BeautifulSoup(self.name, 'html.parser').text
 
     def safer_image_url(self, size):
         """Return a most likely more working image url for the profile.

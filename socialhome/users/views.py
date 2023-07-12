@@ -85,7 +85,7 @@ class ProfileViewMixin(AccessMixin, BaseStreamView, DetailView):
 
     def get_page_meta(self):
         meta = super().get_page_meta()
-        name = self.object.name if self.object.name else self.object.fid
+        name = self.object.plain_name if self.object.plain_name else self.object.fid
         meta.update({
             "title": name,
             "description": _("Profile of %s." % name),
