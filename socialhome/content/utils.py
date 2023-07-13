@@ -69,7 +69,7 @@ def find_urls_in_text(text):
     urls = []
 
     def link_collector(attrs, new=False):
-        if "mention" in attrs.get((None, "class"), []):
+        if attrs.get((None, "data-mention")) or attrs.get((None, "data-hashtag")):
             return
         url = attrs.get((None, "href"))
         if url not in urls:

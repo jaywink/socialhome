@@ -221,7 +221,7 @@ class Profile(TimeStampedModel):
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.fid or self.handle})"
+        return f"{self.plain_name} ({self.fid or self.handle})"
 
     def create_activity(self, activity_type: ActivityType, object_id: int = None) -> Activity:
         """
