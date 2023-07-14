@@ -507,6 +507,14 @@ class Content(models.Model):
             del link['data-hashtag']
 
         for tag in find_elements(self._soup, TAG_PATTERN):
+            # ignore url fragments in link text
+            link = tag.find_parent('a')
+            if link:
+                if link.text == tag.text: continue # already linkified?
+                if link.text.startswith('http') and link.text.endswith(tag.text): continue
+            sibling = tag.previous_sibling.split()
+            if sibling and sibling[-1].text.startswith('http'): continue
+            #  prepare for linkification
             found_tags.add(tag.text.lstrip('#').lower())
             link = self._soup.new_tag('a')
             link.append(tag.text)
@@ -514,7 +522,7 @@ class Content(models.Model):
             tag.replace_with(link)
 
         self.save_tags(found_tags)
-
+        # linkify
         for link in self._soup.find_all('a', attrs={'class':'hashtag'}):
             link['href'] = reverse("streams:tag", kwargs={"name": link.text.lstrip('#').lower()})
 
