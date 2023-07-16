@@ -46,7 +46,7 @@ raven
 redis
 rq
 rq-scheduler
-uwsgi
+validators
 whitenoise
 whoosh
 pyyaml

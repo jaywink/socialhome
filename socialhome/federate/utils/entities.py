@@ -92,6 +92,12 @@ def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[B
     user = getattr(request, 'user', AnonymousUser())
     if request.path.startswith('/content/'):
         content = Content.objects.filter(fid=object_id).first()
+        if not content: # try with the content id
+            try:
+                content_id = int(request.path.split('/')[2])
+                content = Content.objects.filter(id=content_id).first()
+            except ValueError:
+                pass
         if content and content.author.is_local and (
                 content.visible_for_user(user) or content.visible_for_fed_user(signer)):
             federable_content = make_federable_content(content)
