@@ -3,7 +3,7 @@ import re
 from uuid import uuid4
 
 import arrow
-import bleach
+import validators
 from bs4 import BeautifulSoup
 from commonmark import commonmark
 from django.conf import settings
@@ -20,7 +20,7 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language, gettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
-from federation.utils.text import process_text_links, find_elements, TAG_PATTERN, MENTION_PATTERN
+from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
@@ -414,7 +414,7 @@ class Content(models.Model):
     @cached_property
     def short_text(self):
         # Remove html
-        cleaned_text = bleach.clean(self.text, strip=True)
+        cleaned_text = BeautifulSoup(self.rendered, 'html.parser').text
         # Remove urls
         cleaned_text = re.sub(r"http\S+", "", cleaned_text)
         return truncatechars(cleaned_text, 50) or ""
@@ -467,12 +467,12 @@ class Content(models.Model):
 
     def render(self):
         """Pre-render text to Content.rendered."""
-        # Figure out if markdown or html. commonmark adds a p tag to html content
         self._soup = BeautifulSoup(commonmark(self.text, ignore_html_blocks=True).strip(), 'html.parser')
 
         self.get_and_linkify_tags()
         self.linkify_mentions()
-        rendered = process_text_links(str(self._soup)) # convert to BeautifulSoup?
+        self.process_text_links()
+        rendered = str(self._soup)
 
         if self.show_preview:
             if self.oembed:
@@ -550,6 +550,26 @@ class Content(models.Model):
             link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
             link['class'] = 'mention'
             mention.replace_with(link)
+
+    def process_text_links(self):
+        """Process links in text, adding some attributes and linkifying textual links."""
+        for link in self._soup.find_all('a'):
+            if link.get('href', "").startswith('/'): continue
+            if 'nofollow' not in link.get('rel', []):
+                link['rel'] = ['nofollow'] + link.get('rel', [])
+            link['target'] = '_blank'
+            if not link.get('href'):
+                link.string = link['href']
+
+        for url in find_elements(self._soup, URL_PATTERN):
+            if url.find_parent('a'): continue
+            if validators.url(url.text):
+                link = self._soup.new_tag('a')
+                link['href'] = url.text
+                link.string = url.text
+                link['rel'] = ['nofollow']
+                link['target'] = '_blank'
+                url.replace_with(link)
 
     def fix_local_uploads(self):
         """Fix the markdown URL of local uploads.
