@@ -78,7 +78,7 @@ class TestFindUrlsInText(TestCase):
                                 "[waat](https://example.org)"
         cls.without_protocol = "example.org"
         cls.many_for_ordered = "http://spam.com http://eggs.com http://spam.com"
-        cls.with_mention = '<a href="https://example.com" class="mention">foo</a> https://example.net'
+        cls.with_mention = '<a href="https://example.com" data-mention="bla">foo</a> https://example.net'
 
     def test_ignores_mention(self):
         urls = find_urls_in_text(self.with_mention)
@@ -86,7 +86,7 @@ class TestFindUrlsInText(TestCase):
 
     def test_returns_in_order_without_duplicates(self):
         urls = find_urls_in_text(self.many_for_ordered)
-        self.assertEqual(urls, ["http://spam.com", "http://eggs.com"])
+        self.assertEqual(urls, ["http://eggs.com", "http://spam.com"])
 
     def test_starts_with_url(self):
         urls = find_urls_in_text(self.starts_with_url)
@@ -105,7 +105,7 @@ class TestFindUrlsInText(TestCase):
     def test_urls_in_text(self):
         urls = find_urls_in_text(self.urls_in_text)
         self.assertEqual(urls, [
-            "https://example1.com", "https://example2.com", "https://example-3.com"
+            "https://example-3.com", "https://example1.com", "https://example2.com"
         ])
 
     def test_href_markdown(self):
@@ -114,4 +114,4 @@ class TestFindUrlsInText(TestCase):
 
     def test_without_protocol(self):
         urls = find_urls_in_text(self.without_protocol)
-        self.assertEqual(urls, ["http://example.org"])
+        self.assertEqual(urls, ["https://example.org"])

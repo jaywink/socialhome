@@ -4,13 +4,6 @@
 #
 #    ./compile-requirements.sh
 #
--e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
-    # via
-    #   -r requirements/requirements.in
-    #   federation
--e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
-    # via -r requirements/requirements.in
--e git+https://gitlab.com/jaywink/federation.git@60694662a5a323d28c82c44609935638e4d55eab#egg=federation==0.24.0-dev
 aioredis==1.3.1
     # via channels-redis
 appdirs==1.4.4
@@ -79,6 +72,10 @@ circus==0.18.0
     # via -r requirements/requirements.in
 click==8.1.3
     # via rq
+commonmark @ git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d
+    # via
+    #   -r requirements/requirements.in
+    #   federation
 constantly==15.1.0
     # via twisted
 coreapi==2.3.3
@@ -103,7 +100,9 @@ cssselect==1.2.0
 daphne==3.0.2
     # via channels
 decorator==5.1.1
-    # via ipython
+    # via
+    #   ipython
+    #   validators
 defusedxml==0.7.1
     # via python3-openid
 dirty-validators==0.5.4
@@ -191,10 +190,12 @@ exceptiongroup==1.1.0
     # via cattrs
 executing==1.2.0
     # via stack-data
-federation==0.24.1
+federation @ git+https://gitlab.com/jaywink/federation.git@4b5a886492f6bef5c7b3f07d27df76530c240280
     # via -r requirements/requirements.in
 frozendict==2.3.5
     # via pyld
+funcy==2.0
+    # via federation
 gprof2dot==2022.7.29
     # via django-silk
 hiredis==2.2.2
@@ -290,6 +291,8 @@ pycryptodome==3.17
     # via
     #   federation
     #   python-httpsig-socialhome
+pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
+    # via -r requirements/requirements.in
 pygments==2.14.0
     # via ipython
 pyjwt[crypto]==2.6.0
@@ -422,7 +425,7 @@ urllib3==1.26.14
     # via
     #   requests
     #   requests-cache
-uwsgi==2.0.21
+validators==0.20.0
     # via -r requirements/requirements.in
 wcwidth==0.2.6
     # via prompt-toolkit

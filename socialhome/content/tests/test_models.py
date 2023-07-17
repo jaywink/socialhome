@@ -196,11 +196,12 @@ class TestContentModel(SocialhomeTestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_short_text(self):
-        self.assertEqual(self.public_content.short_text, truncatechars(self.public_content.text, 50))
+        self.assertEqual(self.public_content.short_text, "Foobar")
 
     def test_short_text_inline(self):
         self.public_content.text = "foo\n\rbar"
-        self.assertEqual(self.public_content.short_text_inline, "foo  bar")
+        self.public_content.render()
+        self.assertEqual(self.public_content.short_text_inline, "foo bar")
 
     def test_slug(self):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
@@ -293,7 +294,7 @@ class TestContentModel(SocialhomeTestCase):
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):
         content = ContentFactory(text="# Foobar <img src='localhost'>")
-        self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"></h1>')
+        self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"/></h1>')
 
     def test_renders_with_oembed(self):
         content = ContentFactory(text="foobar", oembed=OEmbedCacheFactory())

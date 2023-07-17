@@ -33,7 +33,7 @@ django-versatileimagefield
 django<4
 djangorestframework
 drf-yasg
-federation
+#federation
 ipython
 lxml
 Pillow
@@ -58,11 +58,13 @@ pyyaml
 
 # Just here to easily use a dev version
 #-e git+https://gitlab.com/jaywink/federation.git@38fd38101ff8026edf856aec85377f9c1b9d9e02#egg=federation==0.24.0-dev
+federation @ git+https://gitlab.com/jaywink/federation.git@4b5a886492f6bef5c7b3f07d27df76530c240280
 
--e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
+#-e git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627#egg=pyembed==1.4.0-dev.2
+pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
 
 # Fork to allow ignoring HTML blocks, needs upstream PR
--e git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d#egg=commonmark==0.9.1-dev.1
+commonmark @ git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d
 
 ## NON-DIRECT requirements locked here due to issues
 #https://github.com/ipython/ipython/issues/12740

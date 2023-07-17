@@ -500,11 +500,10 @@ class Content(models.Model):
         found_tags = set()
         # federation sets the data-hashtag attributes on inbound AP HTML payloads
         for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
-            tag = link['data-hashtag']
+            tag = link['data-hashtag'].lstrip('#')
             found_tags.add(tag)
             if 'hashtag' not in link.get('class', []):
                 link['class'] = ['hashtag'] + link.get('class', [])
-            del link['data-hashtag']
 
         for tag in find_elements(self._soup, TAG_PATTERN):
             # ignore url fragments in link text
@@ -515,16 +514,19 @@ class Content(models.Model):
             sibling = tag.previous_sibling.split()
             if sibling and sibling[-1].startswith('http'): continue
             #  prepare for linkification
-            found_tags.add(tag.text.lstrip('#').lower())
+            final = tag.text.lstrip('#').lower()
+            found_tags.add(final)
             link = self._soup.new_tag('a')
             link.append(tag.text)
             link['class'] = 'hashtag'
+            link['data-hashtag'] = final
             tag.replace_with(link)
 
         self.save_tags(found_tags)
         # linkify
-        for link in self._soup.find_all('a', attrs={'class':'hashtag'}):
-            link['href'] = reverse("streams:tag", kwargs={"name": link.text.lstrip('#').lower()})
+        for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
+            link['href'] = reverse("streams:tag", kwargs={"name": link['data-hashtag']})
+            del link['data-hashtag']
 
     def linkify_mentions(self):
         # Linkify mentions
@@ -563,9 +565,12 @@ class Content(models.Model):
 
         for url in find_elements(self._soup, URL_PATTERN):
             if url.find_parent('a'): continue
-            if validators.url(url.text):
+            href = url.text
+            if not href.startswith('http'):
+                href = 'https://' + href
+            if validators.url(href):
                 link = self._soup.new_tag('a')
-                link['href'] = url.text
+                link['href'] = href
                 link.string = url.text
                 link['rel'] = ['nofollow']
                 link['target'] = '_blank'

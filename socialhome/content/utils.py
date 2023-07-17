@@ -72,20 +72,23 @@ def find_urls_in_text(text):
     :param text: Text to search links from
     :returns: list of urls with duplicates removed
     """
-    urls = []
+    urls = set()
 
     soup = BeautifulSoup(commonmark(text, ignore_html_blocks=True), 'html.parser')
     for link in soup.find_all('a'):
         if link.get('data-mention') or link.get('data-hashtag'): continue
         if link.get('href'):
-            urls.append(link['href'])
+            urls.add(link['href'])
         link.extract()
 
     for url in find_elements(soup, URL_PATTERN):
-        if validators.url(url.text):
-            urls.append(url.text)
+        href = url.text
+        if not href.startswith('http'):
+            href = 'https://' + href
+        if validators.url(href):
+            urls.add(href)
 
-    return urls
+    return sorted(urls)
 
 
 def update_counts(content):
