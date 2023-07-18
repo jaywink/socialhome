@@ -299,7 +299,7 @@ faker==17.0.0
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-federation @ git+https://gitlab.com/jaywink/federation.git@4b5a886492f6bef5c7b3f07d27df76530c240280
+federation @ git+https://gitlab.com/jaywink/federation.git@b1bc8e729553d9dedf36252350a0dfcd50f90519
     # via -r requirements/requirements.txt
 flake8==6.0.0
     # via -r requirements/requirements-dev.in

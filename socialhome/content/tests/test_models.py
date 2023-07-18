@@ -401,6 +401,55 @@ class TestContentSaveTags(SocialhomeTestCase):
         )
 
 
+class TestProcessTextLinks(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestProcessTextLinks, cls).setUpTestData()
+        cls.content = ContentFactory(
+            text="**Foobar** #tag #othertag",
+            show_preview=False
+        )
+
+    def test_link_at_start_or_end(self):
+        self.content.text = 'https://example.org example.org\nhttp://example.org'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a> ' \
+               '<a href="https://example.org" rel="nofollow" target="_blank">example.org</a>\n' \
+               '<a href="http://example.org" rel="nofollow" target="_blank">http://example.org</a></p>'
+
+    def test_existing_links_get_attrs_added(self):
+        self.content.text = '<a href="https://example.org">https://example.org</a>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a></p>'
+
+    def test_code_sections_are_skipped(self):
+        self.content.text = '<code>https://example.org</code><code>\nhttps://example.org\n</code>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><code>https://example.org</code><code>\nhttps://example.org\n</code></p>'
+
+    def test_emails_are_skipped(self):
+        self.content.text = 'foo@example.org'
+        self.content.render()
+        assert self.content.rendered == '<p>foo@example.org</p>'
+
+    def test_does_not_add_target_blank_if_link_is_internal(self):
+        self.content.text = '<a href="/streams/tag/foobar">#foobar</a>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="/streams/tag/foobar">#foobar</a></p>'
+
+    def test_does_not_remove_mention_classes(self):
+        self.content.text = '<span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/">' \
+                            '@<span>jaywink</span></a></span> boom'
+        self.content.render()
+        assert self.content.rendered == \
+           '<p><span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/" ' \
+           'rel="nofollow" target="_blank">@<span>jaywink</span></a></span> boom</p>'
+
+
 class TestTagModel(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
