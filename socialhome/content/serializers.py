@@ -332,9 +332,12 @@ class ContentSerializer(serializers.ModelSerializer):
                 "payload": validation_errors,
             })
 
-        recipient_profiles = Profile.objects.filter(
-            Q(handle__in=value) | Q(fid__in=value) | Q(finger__in=value)
-        ).visible_for_user(user)
+        recipient_profiles = Profile.objects.none()
+        if value:
+            recipient_profiles = Profile.objects.filter(
+                Q(handle__in=value) | Q(fid__in=value) | \
+                reduce(operator.or_, (Q(finger__iexact=x) for x in value))
+                ).visible_for_user(user)
 
         # TODO we should probably try to lookup missing ones over the network first before failing
         if recipient_profiles.distinct().count() != len(set(value)):
