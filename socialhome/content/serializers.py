@@ -1,4 +1,6 @@
+import operator
 import re
+from functools import reduce
 from typing import Dict, Any, Set, List
 import traceback
 
@@ -231,12 +233,12 @@ class ContentSerializer(serializers.ModelSerializer):
         to_add = raw_recipients.difference(existing_handles)
         for handle in to_remove:
             try:
-                content.mentions.remove(Profile.objects.get(finger=handle))
+                content.mentions.remove(Profile.objects.get(finger__iexact=handle))
             except Profile.DoesNotExist:
                 pass
         for handle in to_add:
             try:
-                content.mentions.add(Profile.objects.get(finger=handle))
+                content.mentions.add(Profile.objects.get(finger__iexact=handle))
             except Profile.DoesNotExist:
                 pass
         # Linkify mentions
@@ -249,7 +251,9 @@ class ContentSerializer(serializers.ModelSerializer):
             # Collect new recipients
             # TODO: maybe filtering only on finger is enough now?
             recipients = Profile.objects.filter(
-                Q(handle__in=raw_recipients) | Q(finger__in=raw_recipients) | Q(fid__in=raw_recipients)
+                Q(handle__in=raw_recipients) | \
+                reduce(operator.or_, (Q(finger__iexact=x) for x in raw_recipients)) | \
+                Q(fid__in=raw_recipients)
             ).visible_for_user(user)
 
             # Add mutuals, if included

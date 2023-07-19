@@ -448,7 +448,7 @@ class Content(models.Model):
 
         # Do mention links
         for link in soup.find_all('a', attrs={'class':'mention'}):
-            profile = self.mentions.get(finger=link.text.lstrip('@'))
+            profile = self.mentions.get(finger__iexact=link.text.lstrip('@'))
             if profile:
                 link['href'] = profile.fid
 
@@ -534,7 +534,7 @@ class Content(models.Model):
         for link in self._soup.find_all('a', attrs={'data-mention':True}):
             mention = link['data-mention']
             try:
-                profile = self.mentions.get(finger=mention)
+                profile = self.mentions.get(finger__iexact=mention)
             except Profile.DoesNotExist:
                 continue
             link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
@@ -544,7 +544,7 @@ class Content(models.Model):
 
         for mention in find_elements(self._soup, MENTION_PATTERN):
             try:
-                profile = self.mentions.get(finger=mention.text.lstrip('@'))
+                profile = self.mentions.get(finger__iexact=mention.text.lstrip('@'))
             except Profile.DoesNotExist:
                 continue
             link = self._soup.new_tag('a')

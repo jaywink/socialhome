@@ -24,7 +24,7 @@ class ProfileQuerySet(QuerySet):
         Get Profile by federated ID.
         """
         return self.filter(
-            Q(fid=value) | Q(guid=value) | Q(finger=value)
+            Q(fid=value) | Q(guid=value) | Q(finger__iexact=value)
         ).filter(**params)
 
     def fed_update_or_create(
