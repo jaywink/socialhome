@@ -86,7 +86,7 @@ class TestFindUrlsInText(TestCase):
 
     def test_returns_in_order_without_duplicates(self):
         urls = find_urls_in_text(self.many_for_ordered)
-        self.assertEqual(urls, ["http://eggs.com", "http://spam.com"])
+        self.assertEqual(urls, ["http://spam.com", "http://eggs.com"])
 
     def test_starts_with_url(self):
         urls = find_urls_in_text(self.starts_with_url)
@@ -105,7 +105,7 @@ class TestFindUrlsInText(TestCase):
     def test_urls_in_text(self):
         urls = find_urls_in_text(self.urls_in_text)
         self.assertEqual(urls, [
-            "https://example-3.com", "https://example1.com", "https://example2.com"
+            "https://example1.com", "https://example2.com", "https://example-3.com"
         ])
 
     def test_href_markdown(self):

@@ -250,11 +250,13 @@ class ContentSerializer(serializers.ModelSerializer):
         if content.content_type == ContentType.CONTENT:
             # Collect new recipients
             # TODO: maybe filtering only on finger is enough now?
-            recipients = Profile.objects.filter(
-                Q(handle__in=raw_recipients) | \
-                reduce(operator.or_, (Q(finger__iexact=x) for x in raw_recipients)) | \
-                Q(fid__in=raw_recipients)
-            ).visible_for_user(user)
+            recipients = Profile.objects.none()
+            if raw_recipients:
+                recipients = Profile.objects.filter(
+                    Q(handle__in=raw_recipients) | \
+                    reduce(operator.or_, (Q(finger__iexact=x) for x in raw_recipients)) | \
+                    Q(fid__in=raw_recipients)
+                ).visible_for_user(user)
 
             # Add mutuals, if included
             if self.validated_data.get("include_following"):
