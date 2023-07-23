@@ -150,7 +150,7 @@ def get_profile(**kwargs) -> base.Profile:
     """
     from socialhome.users.models import Profile  # Circulars
     kwargs.pop('request', None)
-    profile = Profile.objects.select_related('user').get(**kwargs)
+    profile = Profile.objects.select_related('user').get(Q(**kwargs, _connector=Q.OR))
     return make_federable_profile(profile)
 
 
@@ -286,7 +286,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
                 "large": profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
-            url=profile.url,
+            url=profile.home_url,
             created_at=profile.created,
             times={
                 'created': profile.created,

@@ -446,12 +446,6 @@ class Content(models.Model):
             if not link['href'].startswith('http'):
                 link['href'] = get_full_url(link['href'])
 
-        # Do mention links
-        for link in soup.find_all('a', attrs={'class':'mention'}):
-            profile = self.mentions.get(finger__iexact=link.text.lstrip('@'))
-            if profile:
-                link['href'] = profile.fid
-
         # Remove preview
         if self.show_preview:
             if self.oembed:

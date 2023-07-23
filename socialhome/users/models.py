@@ -218,6 +218,8 @@ class Profile(TimeStampedModel):
     # Federation protocol
     protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
 
+    remote_url = models.URLField(_("Profile URL"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
@@ -283,7 +285,6 @@ class Profile(TimeStampedModel):
     @property
     def home_url(self):
         if not self.user:
-            # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
             return self.remote_url
         return self.url
 
@@ -315,13 +316,6 @@ class Profile(TimeStampedModel):
     @property
     def name_or_handle(self):
         return self.name or self.handle or self.fid
-
-    @property
-    def remote_url(self):
-        # TODO fix this
-        # TODO this is completely broken, remove or something better
-        return ""
-        # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
 
     def save(self, *args, **kwargs):
         if not self.uuid:
@@ -535,6 +529,10 @@ class Profile(TimeStampedModel):
             # only needed for activitypub profiles
             values['followers_fid'] = safe_text(remote_profile.followers)
             values["key_id"] = safe_text(remote_profile.key_id)
+            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
+        else:
+            values["remote_url"] = "https://%s/people/%s" % (values["handle"].split("@")[1], values["guid"])
+
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}
