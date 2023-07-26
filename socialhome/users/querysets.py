@@ -41,7 +41,11 @@ class ProfileQuerySet(QuerySet):
             if fid.startswith('http'):
                 values['fid'] = fid
             values.update(extra_lookups)
-            return self.create(**values), True
+            try:
+                return self.create(**values), True
+            except IntegrityError:
+                # another worker won the race?
+                return self.fed_update_or_create(fid, values, extra_lookups, force)
         else:
             changed = False
             for key, value in values.items():
