@@ -15,11 +15,13 @@ Added
     the profile icon is not available. In such cases, a profile update is forced.
   * The update frequency is defined by the SOCIALHOME_PROFILE_UPDATE_FREQ configuration value (default = 7 days).
 
-* Added two fields to Activitypub profiles:
+* Added three fields to Activitypub profiles:
 
     * followers_fid: which allows federation to better identify receiver types.
     * key_id: which helps keeping federation GET requests low by enabling searches in the local DB using the HTTP
       signature keyID.
+    * remote_url: this actually replaces the @property method of the same name and is required for AP inbound
+      mention linkification.
 
 * AP profile deletes are now processed.
 
@@ -43,6 +45,16 @@ Changed
 * Linkify hashtags and mentions using BeautifulSoup to find the data-[hashtag,mention] attributes set
   by federation on HTML content.
 
+* The finger profile property has been made case insensitive.
+
+* Move the process_text_links federation function back as a Content method.
+
+* Render author names using v-html in order to properly render HTML escapes (and eventually custom emojis).
+
+* Enable HTTP cacheing on UserDetailView in an attempt to reduce DB queries.
+
+* Renamed ContentQuerySet.children to the more meaningful ContentQuerySet.full_conversation.
+
 Fixed
 .....
 
@@ -50,6 +62,15 @@ Fixed
 
 * Extract the AP fid from the receiver dict in send_profile. Previously, the whole dict was sent outbound
   as the to|cc properties.
+
+* Revert to using both the handle and finger properties in Profile.objects.get as it was preventing old Diaspora
+  profile updates.
+
+* The addition of the remote_url profile property fixes the profile home_url property method behavior.
+
+* Do not lowercase URL and handles before searching.
+
+* Do no fetch and create a profile that is about to be retracted.
 
 
 0.17.0 (2023-03-18)
