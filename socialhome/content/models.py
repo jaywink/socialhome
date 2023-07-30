@@ -555,12 +555,12 @@ class Content(models.Model):
 
     def process_text_links(self):
         """Process links in text, adding some attributes and linkifying textual links."""
-        for link in self._soup.find_all('a'):
-            if link.get('href', "").startswith('/'): continue
+        for link in self._soup.find_all('a', href=True):
+            if link['href'].startswith('/'): continue
             if 'nofollow' not in link.get('rel', []):
                 link['rel'] = ['nofollow'] + link.get('rel', [])
             link['target'] = '_blank'
-            if not link.get('href'):
+            if not link.text:
                 link.string = link['href']
 
         for url in find_elements(self._soup, URL_PATTERN):
