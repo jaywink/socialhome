@@ -511,7 +511,7 @@ class Content(models.Model):
             if link:
                 if link.text == tag.text: continue # already linkified?
                 if link.text.startswith('http') and link.text.endswith(tag.text): continue
-            sibling = tag.previous_sibling.split()
+            sibling = (tag.previous_sibling or ' ').split()
             if sibling and sibling[-1].startswith('http'): continue
             #  prepare for linkification
             final = tag.text.lstrip('#').lower()
