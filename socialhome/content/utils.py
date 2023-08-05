@@ -82,6 +82,7 @@ def find_urls_in_text(text):
         link.extract()
 
     for url in find_elements(soup, URL_PATTERN):
+        if url.find_parent('a'): continue
         href = url.text
         if not href.startswith('http'):
             href = 'https://' + href
