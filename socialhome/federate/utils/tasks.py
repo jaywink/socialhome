@@ -20,24 +20,25 @@ from socialhome.users.models import Profile, User
 logger = logging.getLogger("socialhome")
 
 
-def get_sender_profile(sender: str) -> Optional[Profile]:
-    """Get or create sender profile.
+def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True) -> Optional[Profile]:
+    """Get or create a profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
     try:
-        logger.debug("get_sender_profile - looking from local db using %s", sender)
-        sender_profile = Profile.objects.fed(sender).exclude(rsa_public_key="").get()
+        logger.debug("get_profile_for_object - looking from local db using %s", owner)
+        sender_profile = Profile.objects.fed(owner).exclude(rsa_public_key="").get()
     except Profile.DoesNotExist:
-        logger.debug("get_sender_profile - %s was not found, fetching from remote", sender)
-        remote_profile = retrieve_remote_profile(sender)
+        if not fetch: return
+        logger.debug("get_profile_for_object - %s was not found, fetching from remote", owner)
+        remote_profile = retrieve_remote_profile(owner)
         if not remote_profile:
-            logger.warning("get_sender_profile - Remote profile %s not found locally or remotely.", sender)
+            logger.warning("get_profile_for_object - Remote profile %s not found locally or remotely.", owner)
             return
         sender_profile = Profile.from_remote_profile(remote_profile)
     else:
-        if sender_profile.is_local:
-            logger.warning("get_sender_profile - %s is local! Skip.", sender)
+        if no_local and sender_profile.is_local:
+            logger.warning("get_profile_for_object - %s is local! Skip.", owner)
             return
     return sender_profile
 
@@ -49,7 +50,9 @@ def process_entities(entities: List):
         # noinspection PyProtectedMember
         logger.info("Receivers: %s", entity._receivers)
         if not isinstance(entity, base.Profile):
-            profile = get_sender_profile(entity.actor_id)
+            # Do not fetch and create a profile that's about to be retracted
+            fetch = not (isinstance(entity, base.Retraction) and entity.entity_type == 'Profile')
+            profile = get_profile_for_object(entity.actor_id, fetch=fetch)
             if not profile:
                 logger.warning("No sender profile for entity %s, skipping", entity)
                 continue
@@ -114,7 +117,8 @@ def process_entity_post(entity: Any, profile: Profile):
         return
     values = {
         "fid": fid,
-        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children,
+                                             safe_text_for_markdown(entity.raw_content or entity.rendered_content)),
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -200,7 +204,8 @@ def process_entity_comment(entity: Any, profile: Profile):
     if getattr(entity, "public", None) is not None:
         visibility = Visibility.PUBLIC if entity.public else Visibility.LIMITED
     values = {
-        "text": _embed_entity_medias_to_post(entity._children, safe_text_for_markdown(entity.raw_content)),
+        "text": _embed_entity_medias_to_post(entity._children,
+                                             safe_text_for_markdown(entity.raw_content or entity.rendered_content)),
         "author": profile,
         "visibility": visibility if visibility is not None else parent.visibility,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -286,10 +291,9 @@ def _process_mentions(content, entity):
         except Profile.DoesNotExist:
             pass
     for fid in to_add:
-        try:
-            content.mentions.add(Profile.objects.fed(fid).get())
-        except Profile.DoesNotExist:
-            pass
+        profile = get_profile_for_object(fid, no_local=False)
+        if profile:
+            content.mentions.add(profile)
 
 
 def _retract_content(target_fid, profile):
@@ -345,10 +349,6 @@ def process_entity_retraction(entity, profile):
 
 def process_entity_share(entity, profile):
     """Process an entity of type Share."""
-    if not entity.entity_type == "Post":
-        # TODO: enable shares of replies too
-        logger.warning("Ignoring share entity type that is not of type Post")
-        return
     try:
         target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
     except Content.DoesNotExist:
@@ -380,7 +380,7 @@ def process_entity_share(entity, profile):
         logger.warning("Share '%s' target '%s' is not public - aborting", entity, target_content)
         return
     values = {
-        "text": safe_text_for_markdown(entity.raw_content),
+        "text": safe_text_for_markdown(entity.raw_content or entity.rendered_content),
         "author": profile,
         "visibility": Visibility.PUBLIC,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
@@ -495,7 +495,7 @@ def sender_key_fetcher(fid):
     :rtype: str
     """
     logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
-    profile = get_sender_profile(fid)
+    profile = get_profile_for_object(fid)
     if not profile:
         return
     return profile.rsa_public_key

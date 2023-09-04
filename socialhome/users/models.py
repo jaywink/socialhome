@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import django_rq
 # noinspection PyPackageRequirements
+from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -217,10 +218,12 @@ class Profile(TimeStampedModel):
     # Federation protocol
     protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
 
+    remote_url = models.URLField(_("Profile URL"), editable=False, max_length=255, unique=True, blank=True, null=True)
+
     objects = ProfileQuerySet.as_manager()
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.fid or self.handle})"
+        return f"{self.plain_name} ({self.fid or self.handle})"
 
     def create_activity(self, activity_type: ActivityType, object_id: int = None) -> Activity:
         """
@@ -282,7 +285,6 @@ class Profile(TimeStampedModel):
     @property
     def home_url(self):
         if not self.user:
-            # TODO: this is basically "diaspora" - support other networks too by looking at where user came from
             return self.remote_url
         return self.url
 
@@ -315,13 +317,6 @@ class Profile(TimeStampedModel):
     def name_or_handle(self):
         return self.name or self.handle or self.fid
 
-    @property
-    def remote_url(self):
-        # TODO fix this
-        # TODO this is completely broken, remove or something better
-        return ""
-        # return "https://%s/people/%s" % (self.handle.split("@")[1], self.uuid)
-
     def save(self, *args, **kwargs):
         if not self.uuid:
             self.uuid = uuid4()
@@ -345,8 +340,6 @@ class Profile(TimeStampedModel):
             self.handle = None
 
         if self.finger:
-            # Ensure finger is *always* lowercase
-            self.finger = self.finger.lower()
             if not validate_handle(self.finger):
                 raise ValueError("Not a valid wefinger subject")
         else:
@@ -422,6 +415,10 @@ class Profile(TimeStampedModel):
     def is_local(self):
         """If the profile has a user, it's local."""
         return self.user is not None
+
+    @property
+    def plain_name(self):
+        return BeautifulSoup(self.name, 'html.parser').text
 
     def safer_image_url(self, size):
         """Return a most likely more working image url for the profile.
@@ -532,6 +529,10 @@ class Profile(TimeStampedModel):
             # only needed for activitypub profiles
             values['followers_fid'] = safe_text(remote_profile.followers)
             values["key_id"] = safe_text(remote_profile.key_id)
+            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
+        else:
+            values["remote_url"] = "https://%s/people/%s" % (values["handle"].split("@")[1], values["guid"])
+
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
             extra_lookups = {"guid": values["guid"]}

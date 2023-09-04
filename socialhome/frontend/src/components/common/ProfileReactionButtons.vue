@@ -12,6 +12,8 @@
         <b-button
             v-if="!profile.is_local"
             :href="profile.home_url"
+            target="_blank"
+            rel="nofollow"
             variant="outline-dark"
             :title="translations.home"
             :aria-label="translations.home"

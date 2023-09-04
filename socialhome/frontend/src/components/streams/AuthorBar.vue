@@ -18,9 +18,7 @@
                             {{ authorFederationId }}
                             <profile-reaction-buttons :profile-uuid="author.uuid" />
                         </div>
-                        <div slot="reference" class="pointer">
-                            {{ authorName }}
-                        </div>
+                        <div slot="reference" class="pointer" v-html="authorName" />
                     </popper>
                     <content-timestamp :content="content" />
                     <div v-if="isShared">
@@ -37,7 +35,8 @@
                                 />
                             </div>
                             <div slot="reference" class="pointer">
-                                <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" /> {{ throughAuthorName }}
+                                <i class="fa fa-refresh mr-2 shared-icon" aria-hidden="true" />
+                                &nbsp;<span v-html="throughAuthorName" />
                             </div>
                         </popper>
                     </div>

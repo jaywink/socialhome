@@ -3,7 +3,8 @@ import re
 from uuid import uuid4
 
 import arrow
-import bleach
+import validators
+from bs4 import BeautifulSoup
 from commonmark import commonmark
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -19,7 +20,7 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language, gettext_lazy as _
 from enumfields import EnumIntegerField
 from federation.entities.activitypub.enums import ActivityType
-from federation.utils.text import process_text_links, find_tags
+from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
@@ -363,7 +364,7 @@ class Content(models.Model):
             # TODO: support sharing replies too
             raise ValidationError("Can only share top level content.")
         if self.author == profile:
-            raise ValidationError("Cannot share own content")
+            raise ValidationError("Cannot share own content") # why not?
         if not self.visible_for_user(profile.user):
             raise ValidationError("Content to be shared is not visible to sharer.")
         if self.shares.filter(author=profile).exists():
@@ -413,7 +414,7 @@ class Content(models.Model):
     @cached_property
     def short_text(self):
         # Remove html
-        cleaned_text = bleach.clean(self.text, strip=True)
+        cleaned_text = BeautifulSoup(self.rendered, 'html.parser').text
         # Remove urls
         cleaned_text = re.sub(r"http\S+", "", cleaned_text)
         return truncatechars(cleaned_text, 50) or ""
@@ -435,17 +436,43 @@ class Content(models.Model):
         # TODO use only id
         return ("%s_%s" % (self.id, self.uuid))
 
+    def render_for_federation(self):
+        """Fix tag and mention links."""
+        soup = BeautifulSoup(self.rendered, 'html.parser')
+        # Do tag links. Set the hashtag class in case we're dealing with old content
+        for link in soup.find_all('a', string=TAG_PATTERN):
+            if 'hashtag' not in link.get('class', []):
+                link['class'] = ['hashtag'] + link.get('class', [])
+            if not link['href'].startswith('http'):
+                link['href'] = get_full_url(link['href'])
+
+        # Do mention links
+        for link in soup.find_all('a', attrs={'class':'mention'}):
+            profile = self.mentions.get(finger__iexact=link.text.lstrip('@'))
+            if profile and not profile.is_local:
+                link['href'] = profile.remote_url or profile.fid
+
+        # Remove preview
+        if self.show_preview:
+            if self.oembed:
+                oembed = soup.find('iframe')
+                oembed.previous.extract()
+                oembed.extract()
+            if self.opengraph:
+                # this may break if content/_og_preview.html changes
+                og = soup.find(attrs={'class':'opengraph-card'})
+                og.extract()
+
+        return str(soup)
+
     def render(self):
         """Pre-render text to Content.rendered."""
-        text = self.get_and_linkify_tags()
-        rendered = commonmark(text, ignore_html_blocks=True).strip()
-        rendered = process_text_links(rendered)
+        self._soup = BeautifulSoup(commonmark(self.text, ignore_html_blocks=True).strip(), 'html.parser')
 
-        # Linkify mentions
-        for profile in self.mentions.values():
-            handle = profile.get('finger')
-            url = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.get('uuid')}))
-            rendered = rendered.replace('@'+handle, f'@<a class="mention" href="{url}">{handle}</a>')
+        self.get_and_linkify_tags()
+        self.linkify_mentions()
+        self.process_text_links()
+        rendered = str(self._soup)
 
         if self.show_preview:
             if self.oembed:
@@ -466,18 +493,88 @@ class Content(models.Model):
         Content.objects.filter(id=self.id).update(rendered=rendered)
 
     def get_and_linkify_tags(self):
-        """Find tags in text and convert them to Markdown links.
+        """Find tags in text and convert them to HTML links.
 
         Save found tags to the content.
         """
-        def linkifier(tag: str) -> str:
-            return "[#%s](%s)" % (
-                tag,
-                reverse("streams:tag", kwargs={"name": tag.lower()})
-            )
-        found_tags, text = find_tags(self.text, replacer=linkifier)
+        found_tags = set()
+        # federation sets the data-hashtag attributes on inbound AP HTML payloads
+        for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
+            tag = link['data-hashtag'].lstrip('#')
+            found_tags.add(tag)
+            if 'hashtag' not in link.get('class', []):
+                link['class'] = ['hashtag'] + link.get('class', [])
+
+        for tag in find_elements(self._soup, TAG_PATTERN):
+            # ignore url fragments in link text
+            link = tag.find_parent('a')
+            if link:
+                if link.text == tag.text: continue # already linkified?
+                if link.text.startswith('http') and link.text.endswith(tag.text): continue
+            sibling = (tag.previous_sibling or ' ').split()
+            if sibling and sibling[-1].startswith('http'): continue
+            #  prepare for linkification
+            final = tag.text.lstrip('#').lower()
+            found_tags.add(final)
+            link = self._soup.new_tag('a')
+            link.append(tag.text)
+            link['class'] = 'hashtag'
+            link['data-hashtag'] = final
+            tag.replace_with(link)
+
         self.save_tags(found_tags)
-        return text
+        # linkify
+        for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
+            link['href'] = reverse("streams:tag", kwargs={"name": link['data-hashtag']})
+            del link['data-hashtag']
+
+    def linkify_mentions(self):
+        # Linkify mentions
+        # federation sets the data-mention attributes on inbound AP HTML payloads
+        for link in self._soup.find_all('a', attrs={'data-mention':True}):
+            mention = link['data-mention']
+            try:
+                profile = self.mentions.get(finger__iexact=mention)
+            except Profile.DoesNotExist:
+                continue
+            link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+            if 'mention' not in link.get('class', []):
+                link['class'] = ['mention'] + link.get('class', [])
+            del link['data-mention']
+
+        for mention in find_elements(self._soup, MENTION_PATTERN):
+            try:
+                profile = self.mentions.get(finger__iexact=mention.text.lstrip('@'))
+            except Profile.DoesNotExist:
+                continue
+            link = self._soup.new_tag('a')
+            link.append(mention.text)
+            link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+            link['class'] = 'mention'
+            mention.replace_with(link)
+
+    def process_text_links(self):
+        """Process links in text, adding some attributes and linkifying textual links."""
+        for link in self._soup.find_all('a', href=True):
+            if link['href'].startswith('/'): continue
+            if 'nofollow' not in link.get('rel', []):
+                link['rel'] = ['nofollow'] + link.get('rel', [])
+            link['target'] = '_blank'
+            if not link.text:
+                link.string = link['href']
+
+        for url in find_elements(self._soup, URL_PATTERN):
+            if url.find_parent('a'): continue
+            href = url.text
+            if not href.startswith('http'):
+                href = 'https://' + href
+            if validators.url(href):
+                link = self._soup.new_tag('a')
+                link['href'] = href
+                link.string = url.text
+                link['rel'] = ['nofollow']
+                link['target'] = '_blank'
+                url.replace_with(link)
 
     def fix_local_uploads(self):
         """Fix the markdown URL of local uploads.

@@ -1,4 +1,5 @@
 from random import randint
+from uuid import uuid4
 
 import factory
 from allauth.account.models import EmailAddress
@@ -117,7 +118,8 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     image_url_medium = "https://127.0.0.1:8000/static/images/pony100.png"
     image_url_large = "/static/images/pony300.png"
 
-    uuid = factory.Faker('uuid4')
+    #uuid = factory.Faker('uuid4')
+    uuid = factory.LazyAttribute(lambda x: uuid4())
 
     class Meta:
         model = "users.Profile"
@@ -128,7 +130,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
             guid=factory.Faker('uuid4'),
         )
 
-    
+
     @factory.post_generation
     def set_fid(self, extracted, created, **kwargs):
         if self.fid == "placeholder":

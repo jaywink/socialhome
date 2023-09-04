@@ -196,11 +196,12 @@ class TestContentModel(SocialhomeTestCase):
             self.assertTrue(self.public_content.edited)
 
     def test_short_text(self):
-        self.assertEqual(self.public_content.short_text, truncatechars(self.public_content.text, 50))
+        self.assertEqual(self.public_content.short_text, "Foobar")
 
     def test_short_text_inline(self):
         self.public_content.text = "foo\n\rbar"
-        self.assertEqual(self.public_content.short_text_inline, "foo  bar")
+        self.public_content.render()
+        self.assertEqual(self.public_content.short_text_inline, "foo bar")
 
     def test_slug(self):
         self.assertEqual(self.public_content.slug, slugify(self.public_content.short_text))
@@ -293,7 +294,7 @@ class TestContentModel(SocialhomeTestCase):
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):
         content = ContentFactory(text="# Foobar <img src='localhost'>")
-        self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"></h1>')
+        self.assertEqual(content.rendered, '<h1>Foobar <img src="localhost"/></h1>')
 
     def test_renders_with_oembed(self):
         content = ContentFactory(text="foobar", oembed=OEmbedCacheFactory())
@@ -306,8 +307,8 @@ class TestContentRendered(SocialhomeTestCase):
 
     def test_renders_linkified_tags(self):
         content = ContentFactory(text="#tag #MiXeD")
-        self.assertEqual(content.rendered, '<p><a href="/streams/tag/tag/">#tag</a> '
-                                           '<a href="/streams/tag/mixed/">#MiXeD</a></p>')
+        self.assertEqual(content.rendered, '<p><a class="hashtag" href="/streams/tag/tag/">#tag</a> '
+                                           '<a class="hashtag" href="/streams/tag/mixed/">#MiXeD</a></p>')
 
     def test_renders_without_previews_with_show_preview_false(self):
         content = ContentFactory(
@@ -369,7 +370,7 @@ class TestContentSaveTags(SocialhomeTestCase):
 
     def test_invalid_text_returns_no_tags(self):
         tags = set(self.invalid.tags.values_list("name", flat=True))
-        self.assertEqual(tags, set())
+        self.assertEqual(tags, {'a'})
 
     def test_endings_are_filtered_out(self):
         tags = set(self.endings.tags.values_list("name", flat=True))
@@ -398,6 +399,55 @@ class TestContentSaveTags(SocialhomeTestCase):
             tags,
             {"notcode"}
         )
+
+
+class TestProcessTextLinks(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super(TestProcessTextLinks, cls).setUpTestData()
+        cls.content = ContentFactory(
+            text="**Foobar** #tag #othertag",
+            show_preview=False
+        )
+
+    def test_link_at_start_or_end(self):
+        self.content.text = 'https://example.org example.org\nhttp://example.org'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a> ' \
+               '<a href="https://example.org" rel="nofollow" target="_blank">example.org</a>\n' \
+               '<a href="http://example.org" rel="nofollow" target="_blank">http://example.org</a></p>'
+
+    def test_existing_links_get_attrs_added(self):
+        self.content.text = '<a href="https://example.org">https://example.org</a>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="https://example.org" rel="nofollow" target="_blank">https://example.org</a></p>'
+
+    def test_code_sections_are_skipped(self):
+        self.content.text = '<code>https://example.org</code><code>\nhttps://example.org\n</code>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><code>https://example.org</code><code>\nhttps://example.org\n</code></p>'
+
+    def test_emails_are_skipped(self):
+        self.content.text = 'foo@example.org'
+        self.content.render()
+        assert self.content.rendered == '<p>foo@example.org</p>'
+
+    def test_does_not_add_target_blank_if_link_is_internal(self):
+        self.content.text = '<a href="/streams/tag/foobar">#foobar</a>'
+        self.content.render()
+        assert self.content.rendered == \
+               '<p><a href="/streams/tag/foobar">#foobar</a></p>'
+
+    def test_does_not_remove_mention_classes(self):
+        self.content.text = '<span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/">' \
+                            '@<span>jaywink</span></a></span> boom'
+        self.content.render()
+        assert self.content.rendered == \
+           '<p><span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/" ' \
+           'rel="nofollow" target="_blank">@<span>jaywink</span></a></span> boom</p>'
 
 
 class TestTagModel(SocialhomeTestCase):

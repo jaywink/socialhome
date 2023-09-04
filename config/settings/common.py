@@ -377,7 +377,7 @@ SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE
 # Content
 # These attributes on tags are kept on save for untrusted users
 SOCIALHOME_CONTENT_SAFE_ATTRS = {
-    'a': ['class', 'href', 'title', 'target'],
+    'a': ['class', 'href', 'title', 'target', 'data-mention', 'data-hashtag'],
     'abbr': ['title'],
     'acronym': ['title'],
     'audio': ['controls'],
@@ -470,7 +470,7 @@ FEDERATION_USER = env("FEDERATION_USER", default=None)
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = SOCIALHOME_MAINTAINER, SOCIALHOME_CONTACT_EMAIL
+ADMINS = [(SOCIALHOME_MAINTAINER, SOCIALHOME_CONTACT_EMAIL)]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS

@@ -2,9 +2,15 @@ import logging
 import re
 
 import bleach
+import validators
+from bs4 import BeautifulSoup
+from commonmark import commonmark
 from django.conf import settings
 
+from federation.utils.text import find_elements, URL_PATTERN
+
 logger = logging.getLogger("socialhome")
+
 
 def safe_text_for_markdown(text: str) -> str:
     """Clean the text using bleach but keep certain Markdown sections.
@@ -61,21 +67,28 @@ def safe_text(text):
 def find_urls_in_text(text):
     """Find url's from text.
 
-    Bleach does the heavy lifting here by identifying the links.
+    Beautiful does the heavy lifting here by identifying the links.
 
     :param text: Text to search links from
     :returns: list of urls with duplicates removed
     """
     urls = []
 
-    def link_collector(attrs, new=False):
-        if "mention" in attrs.get((None, "class"), []):
-            return
-        url = attrs.get((None, "href"))
-        if url not in urls:
-            urls.append(url)
+    soup = BeautifulSoup(commonmark(text, ignore_html_blocks=True), 'html.parser')
+    for link in soup.find_all('a'):
+        if link.get('data-mention') or link.get('data-hashtag'): continue
+        if link.get('href') and link['href'] not in urls:
+            urls.append(link['href'])
+        link.extract()
 
-    bleach.linkify(text, callbacks=[link_collector], parse_email=False, skip_tags=["code"])
+    for url in find_elements(soup, URL_PATTERN):
+        if url.find_parent('a'): continue
+        href = url.text
+        if not href.startswith('http'):
+            href = 'https://' + href
+        if validators.url(href) and href not in urls:
+            urls.append(href)
+
     return urls
 
 

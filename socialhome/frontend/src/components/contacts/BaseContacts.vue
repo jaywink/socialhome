@@ -5,16 +5,16 @@
             <b-card
                 v-for="item in chunk"
                 :key="item.fid"
-                :title="contactDesignation(item)"
                 class="socialhome-contact-card mb-3"
             >
+                <b-card-title v-html="contactDesignation(item)" />
                 <b-card-img
                     :src="item.image_url_large"
                     :alt="contactAvatarAlt(item)"
                     top
                     @error="requestProfileUpdate($event, item, icon)"
                 />
-                <b-card-text>{{ item.handle }}</b-card-text>
+                <b-card-text>{{ item.finger }}</b-card-text>
 
                 <profile-reaction-buttons
                     slot="footer"

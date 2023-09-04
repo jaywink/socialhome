@@ -489,6 +489,6 @@ class TestSendProfile(SocialhomeTestCase):
     @patch("socialhome.federate.tasks.handle_send")
     @patch("socialhome.federate.tasks.make_federable_profile", return_value="profile")
     def test_send_to_given_recipients_only(self, mock_federable, mock_send):
-        recipients = [self.remote_profile.fid]
+        recipients = [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)]
         send_profile(self.profile.id, recipients=recipients)
         mock_send.assert_called_once_with("profile", self.profile.federable, recipients, payload_logger=None)

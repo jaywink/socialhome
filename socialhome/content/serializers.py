@@ -1,4 +1,6 @@
+import operator
 import re
+from functools import reduce
 from typing import Dict, Any, Set, List
 import traceback
 
@@ -231,12 +233,12 @@ class ContentSerializer(serializers.ModelSerializer):
         to_add = raw_recipients.difference(existing_handles)
         for handle in to_remove:
             try:
-                content.mentions.remove(Profile.objects.get(finger=handle))
+                content.mentions.remove(Profile.objects.get(finger__iexact=handle))
             except Profile.DoesNotExist:
                 pass
         for handle in to_add:
             try:
-                content.mentions.add(Profile.objects.get(finger=handle))
+                content.mentions.add(Profile.objects.get(finger__iexact=handle))
             except Profile.DoesNotExist:
                 pass
         # Linkify mentions
@@ -248,9 +250,13 @@ class ContentSerializer(serializers.ModelSerializer):
         if content.content_type == ContentType.CONTENT:
             # Collect new recipients
             # TODO: maybe filtering only on finger is enough now?
-            recipients = Profile.objects.filter(
-                Q(handle__in=raw_recipients) | Q(finger__in=raw_recipients) | Q(fid__in=raw_recipients)
-            ).visible_for_user(user)
+            recipients = Profile.objects.none()
+            if raw_recipients:
+                recipients = Profile.objects.filter(
+                    Q(handle__in=raw_recipients) | \
+                    reduce(operator.or_, (Q(finger__iexact=x) for x in raw_recipients)) | \
+                    Q(fid__in=raw_recipients)
+                ).visible_for_user(user)
 
             # Add mutuals, if included
             if self.validated_data.get("include_following"):
@@ -326,9 +332,12 @@ class ContentSerializer(serializers.ModelSerializer):
                 "payload": validation_errors,
             })
 
-        recipient_profiles = Profile.objects.filter(
-            Q(handle__in=value) | Q(fid__in=value) | Q(finger__in=value)
-        ).visible_for_user(user)
+        recipient_profiles = Profile.objects.none()
+        if value:
+            recipient_profiles = Profile.objects.filter(
+                Q(handle__in=value) | Q(fid__in=value) | \
+                reduce(operator.or_, (Q(finger__iexact=x) for x in value))
+                ).visible_for_user(user)
 
         # TODO we should probably try to lookup missing ones over the network first before failing
         if recipient_profiles.distinct().count() != len(set(value)):

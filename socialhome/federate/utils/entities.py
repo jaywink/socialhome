@@ -25,6 +25,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
     try:
         return base.Post(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             actor_id=content.author.fid,
             public=True if content.visibility == Visibility.PUBLIC else False,
@@ -43,6 +44,7 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
     try:
         return base.Comment(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             actor_id=content.author.fid,
             target_id=content.parent.fid,
@@ -62,6 +64,7 @@ def _make_share(content: Content) -> Optional[base.Share]:
     try:
         return base.Share(
             raw_content=content.text,
+            rendered_content=content.render_for_federation(),
             id=content.fid,
             target_id=content.share_of.fid,
             actor_id=content.author.fid,
@@ -89,6 +92,12 @@ def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[B
     user = getattr(request, 'user', AnonymousUser())
     if request.path.startswith('/content/'):
         content = Content.objects.filter(fid=object_id).first()
+        if not content: # try with the content id
+            try:
+                content_id = int(request.path.split('/')[2])
+                content = Content.objects.filter(id=content_id).first()
+            except ValueError:
+                pass
         if content and content.author.is_local and (
                 content.visible_for_user(user) or content.visible_for_fed_user(signer)):
             federable_content = make_federable_content(content)
@@ -141,7 +150,7 @@ def get_profile(**kwargs) -> base.Profile:
     """
     from socialhome.users.models import Profile  # Circulars
     kwargs.pop('request', None)
-    profile = Profile.objects.select_related('user').get(**kwargs)
+    profile = Profile.objects.select_related('user').get(Q(**kwargs, _connector=Q.OR))
     return make_federable_profile(profile)
 
 
@@ -277,7 +286,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
                 "large": profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
-            url=profile.url,
+            url=profile.home_url,
             created_at=profile.created,
             times={
                 'created': profile.created,

@@ -7,17 +7,17 @@
 {% block containertype %}container-fluid{% endblock %}
 
 {% block title %}
-    {{ meta.title|addslashes }} - {{ request.site.name|addslashes }}
+    {{ meta.title }} - {{ request.site.name }}
 {% endblock %}
 
-{% block description %}{{ meta.description|addslashes }}{% endblock %}
+{% block description %}{{ meta.description }}{% endblock %}
 
 {% block pagetags %}
-    <meta property="og:title" content="{{ meta.title|addslashes }} - {{ request.site.name|addslashes }}" />
+    <meta property="og:title" content="{{ meta.title }} - {{ request.site.name }}" />
     <meta property="og:type" content="{{ meta.type }}" />
     <meta property="og:url" content="{{ meta.url }}" />
     <meta property="og:image" content="{{ meta.image }}" />
-    <meta property="og:description" content="{{ meta.description|addslashes }}" />
+    <meta property="og:description" content="{{ meta.description }}" />
     {% if meta.author_url %}
         <link rel="me" href="{{ meta.author_url }}" type="text/html">
     {% endif %}

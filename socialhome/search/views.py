@@ -76,10 +76,11 @@ class GlobalSearchView(SearchView):
         """
         q = safe_text(request.GET.get("q"))
         if q:
-            q = q.strip().lower().strip("@")
+            q = q.strip().strip("@")
         self.q = q
         # Check if direct tag matches
         if q.startswith('#'):
+            q = q.lower()
             try:
                 tag = Tag.objects.filter(
                     name=q[1:]

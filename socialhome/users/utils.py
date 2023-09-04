@@ -78,6 +78,7 @@ def update_profile(profile, force=False):
     if any((
         force,
         not profile.finger,
+        not profile.remote_url,
         profile.fid and not (profile.key_id or profile.followers_fid),
         datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 

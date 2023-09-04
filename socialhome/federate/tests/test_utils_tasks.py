@@ -14,7 +14,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import forward_entity
 # noinspection PyProtectedMember
 from socialhome.federate.utils.tasks import (
-    process_entities, get_sender_profile, process_entity_post,
+    process_entities, get_profile_for_object, process_entity_post,
     process_entity_retraction, sender_key_fetcher, process_entity_comment, process_entity_follow,
     process_entity_share, _process_mentions)
 from socialhome.federate.utils import make_federable_profile
@@ -41,56 +41,56 @@ class TestProcessEntities(SocialhomeTestCase):
         cls.receiving_profile = cls.receiving_user.profile
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_post_is_called(self, mock_sender, mock_process):
         process_entities([self.post])
         mock_process.assert_called_once_with(self.post, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_post_is_called__with_receiving_profile(self, mock_sender, mock_process):
         process_entities([self.post])
         mock_process.assert_called_once_with(self.post, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_retraction")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_retraction_is_called(self, mock_sender, mock_process):
         process_entities([self.retraction])
         mock_process.assert_called_once_with(self.retraction, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_comment")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_comment_is_called(self, mock_sender, mock_process):
         process_entities([self.comment])
         mock_process.assert_called_once_with(self.comment, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_comment")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_comment_is_called__with_receiving_profile(self, mock_sender, mock_process):
         process_entities([self.comment])
         mock_process.assert_called_once_with(self.comment, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_follow")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_follow_is_called(self, mock_sender, mock_process):
         process_entities([self.follow])
         mock_process.assert_called_once_with(self.follow, "profile")
 
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_profile_is_called(self, mock_sender, mock_from):
         process_entities([self.profile])
         mock_from.assert_called_once_with(self.profile)
 
     @patch("socialhome.federate.utils.tasks.process_entity_share")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_process_entity_share_is_called(self, mock_sender, mock_process):
         process_entities([self.share])
         mock_process.assert_called_once_with(self.share, "profile")
 
     @patch("socialhome.federate.utils.tasks.process_entity_post", side_effect=Exception)
     @patch("socialhome.federate.utils.tasks.logger.exception")
-    @patch("socialhome.federate.utils.tasks.get_sender_profile", return_value="profile")
+    @patch("socialhome.federate.utils.tasks.get_profile_for_object", return_value="profile")
     def test_logger_is_called_on_process_exception(self, mock_sender, mock_process, mock_logger):
         process_entities([self.post])
         self.assertEqual(mock_logger.called, 1)
@@ -395,8 +395,9 @@ class TestProcessEntityRetraction(SocialhomeTestCase):
 
     @patch("socialhome.federate.utils.tasks.logger.debug", autospec=True)
     def test_non_post_entity_types_are_skipped(self, mock_logger):
-        process_entity_retraction(Mock(entity_type="foo"), Mock())
-        mock_logger.assert_called_with("Ignoring retraction of entity_type %s", "foo")
+        profile = Mock()
+        process_entity_retraction(Mock(entity_type="foo"), profile)
+        mock_logger.assert_called_with("Ignoring retraction of entity_type %s from %s", "foo", profile)
 
     @patch("socialhome.federate.utils.tasks.logger.warning", autospec=True)
     def test_does_nothing_if_content_doesnt_exist(self, mock_logger):
@@ -577,10 +578,10 @@ class TestGetSenderProfile(SocialhomeTestCase):
         cls.create_local_and_remote_user()
 
     def test_returns_existing_profile(self):
-        self.assertEqual(get_sender_profile(self.remote_profile.fid), self.remote_profile)
+        self.assertEqual(get_profile_for_object(self.remote_profile.fid), self.remote_profile)
 
     def test_returns_none_on_existing_local_profile(self):
-        self.assertIsNone(get_sender_profile(self.profile.fid))
+        self.assertIsNone(get_profile_for_object(self.profile.fid))
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile", autospec=True)
     def test_fetches_remote_profile_if_not_found(self, mock_retrieve):
@@ -588,7 +589,7 @@ class TestGetSenderProfile(SocialhomeTestCase):
             name="foobar", raw_content="barfoo", public_key="xyz",
             id="https:/example.com/foo/bar",
         )
-        sender_profile = get_sender_profile("https:/example.com/foo/bar")
+        sender_profile = get_profile_for_object("https:/example.com/foo/bar")
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "foobar"
         assert sender_profile.visibility == Visibility.PUBLIC
@@ -598,7 +599,7 @@ class TestGetSenderProfile(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_returns_none_if_no_remote_profile_found(self, mock_retrieve):
         mock_retrieve.return_value = None
-        assert not get_sender_profile("https:/example.com/foo/bar")
+        assert not get_profile_for_object("https:/example.com/foo/bar")
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     def test_cleans_text_fields_in_profile(self, mock_retrieve):
@@ -613,7 +614,7 @@ class TestGetSenderProfile(SocialhomeTestCase):
             },
             location="<script>alert('yup');</script>",
         )
-        sender_profile = get_sender_profile("https:/example.com/foo/bar")
+        sender_profile = get_profile_for_object("https:/example.com/foo/bar")
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "alert('yup');"
         assert sender_profile.rsa_public_key == "alert('yup');"
@@ -751,5 +752,5 @@ class TestSenderKeyFetcher(SocialhomeTestCase):
     @patch("socialhome.federate.utils.tasks.logger.warning")
     def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
         self.assertEqual(sender_key_fetcher("https://example.com/foo"), None)
-        mock_logger.assert_called_once_with("get_sender_profile - Remote profile %s not found locally "
+        mock_logger.assert_called_once_with("get_profile_for_object - Remote profile %s not found locally "
                                             "or remotely.", "https://example.com/foo")
