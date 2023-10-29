@@ -439,7 +439,7 @@ class TestProcessTextLinks(SocialhomeTestCase):
         self.content.text = '<a href="/streams/tag/foobar">#foobar</a>'
         self.content.render()
         assert self.content.rendered == \
-               '<p><a href="/streams/tag/foobar">#foobar</a></p>'
+               '<p><a class="hashtag" href="/streams/tag/foobar/">#foobar</a></p>'
 
     def test_does_not_remove_mention_classes(self):
         self.content.text = '<span class="h-card"><a class="u-url mention" href="https://dev.jasonrobinson.me/u/jaywink/">' \

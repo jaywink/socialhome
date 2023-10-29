@@ -5,6 +5,7 @@ from uuid import uuid4
 import arrow
 import validators
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 from commonmark import commonmark
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -507,20 +508,23 @@ class Content(models.Model):
 
         for tag in find_elements(self._soup, TAG_PATTERN):
             # ignore url fragments in link text
+            final = tag.text.lstrip('#').lower()
             link = tag.find_parent('a')
             if link:
-                if link.text == tag.text: continue # already linkified?
-                if link.text.startswith('http') and link.text.endswith(tag.text): continue
-            sibling = (tag.previous_sibling or ' ').split()
-            if sibling and sibling[-1].startswith('http'): continue
+                if link.text != tag.text: continue
+                if 'hashtag' not in link.get('class', []):
+                    link['class'] = ['hashtag'] + link.get('class', [])
+            else:
+                sibling = tag.previous_sibling
+                if isinstance(sibling, NavigableString) and re.search(URL_PATTERN.pattern+'$', sibling): continue
+                link = self._soup.new_tag('a')
+                link.append(tag.text)
+                link['class'] = 'hashtag'
+                tag.replace_with(link)
+
             #  prepare for linkification
-            final = tag.text.lstrip('#').lower()
             found_tags.add(final)
-            link = self._soup.new_tag('a')
-            link.append(tag.text)
-            link['class'] = 'hashtag'
             link['data-hashtag'] = final
-            tag.replace_with(link)
 
         self.save_tags(found_tags)
         # linkify
