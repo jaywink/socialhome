@@ -438,7 +438,7 @@ def process_reply(reply):
             remote_content = retrieve_remote_content(reply_fid)
         else:
             return
-        if remote_content:
+        if isinstance(remote_content, base.Comment): # some content may not be a Comment? 
             logger.info(
                 "process_reply - processing reply %s for entity %s",
                 remote_content.id, remote_content.target_id)
