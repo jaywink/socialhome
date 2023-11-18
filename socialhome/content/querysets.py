@@ -85,7 +85,7 @@ class ContentQuerySet(models.QuerySet):
             through=Subquery(share.values("id")[:1])
         ).annotate(
             through=Case(
-                When(author_id__in=following_ids, then="id"),
+                # When(author_id__in=following_ids, then="id"),
                 When(through__isnull=False, then="through"),
                 default="id",
             )
