@@ -151,11 +151,17 @@ class ContentSerializer(serializers.ModelSerializer):
         self.context["throughs_authors"] = {through_to_id.get(c.id, c.id): c.author for c in throughs}
 
     def get_through(self, obj):
-        """Through is generally required only for serializing content for streams."""
-        throughs = self.context.get("throughs")
-        if not throughs:
-            return obj.id
-        return throughs.get(obj.id, obj.id)
+        """
+        Through is generally required only for serializing content for streams.
+        Since through is now a model field instead of an annotation, it's expected
+        to have a sane value (one of id or latest share id). This method  is kept
+        so that contents predating the addition of the through field are properly
+        updated.
+        """
+        if obj.through == 0:
+            obj.through = obj.shares.values_list('id', flat=True).last() or obj.id
+            Content.objects.filter(id=obj.id).update(through=obj.through)
+        return obj.through
 
     def get_through_author(self, obj):
         throughs_authors = self.context.get("throughs_authors")
