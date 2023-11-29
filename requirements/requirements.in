@@ -57,7 +57,7 @@ pyyaml
 #django-markdownx @ git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a
 
 # Just here to easily use a dev version
-federation @ git+https://gitlab.com/jaywink/federation.git@aa351e27e20f1724fcb9d8fc25f1fc3776127be5
+federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
 
 pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
 
