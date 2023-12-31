@@ -72,23 +72,13 @@ class ContentQuerySet(models.QuerySet):
 
         This includes content shared by the followed users.
         """
-        from socialhome.content.models import Content
         profile = user.profile
         following_ids = profile.following.values_list("id", flat=True)
-        share = Content.objects.filter(share_of=OuterRef("id")).order_by('-id')
         qs = self.top_level()
         if single_id:
             qs = qs.filter(id=single_id)
         qs = qs.filter(
             Q(shares__author_id__in=following_ids) | Q(author_id__in=following_ids)
-        ).annotate(
-            through=Subquery(share.values("id")[:1])
-        ).annotate(
-            through=Case(
-                When(author_id__in=following_ids, then="id"),
-                When(through__isnull=False, then="through"),
-                default="id",
-            )
         )
         return qs.visible_for_user(user)
 
@@ -123,17 +113,8 @@ class ContentQuerySet(models.QuerySet):
         ids = qs.filter(author=profile).values_list("id", flat=True)
         if include_shares:
             ids = list(ids) + list(Content.objects.filter(shares__author=profile).values_list("id", flat=True))
-        # Get the right through for the content for shares
-        share = Content.objects.filter(share_of=OuterRef("id"), author=profile)
         qs = qs.filter(
             Q(id__in=ids) | Q(share_of_id__in=ids)
-        ).annotate(
-            through=Subquery(share.values("id")[:1])
-        ).annotate(
-            through=Case(
-                When(through__isnull=False, then='through'),
-                default='id',
-            )
         )
         return qs.visible_for_user(user)
 
@@ -209,9 +190,3 @@ class ContentQuerySet(models.QuerySet):
                 Q(limited_visibilities=user.profile)
             )
         )
-
-
-class ContentManager(models.Manager.from_queryset(ContentQuerySet)):
-    def get_queryset(self):
-        # Add a default 'through' to every object. QuerySets will override this when needed
-        return super().get_queryset().annotate(through=F("id"))

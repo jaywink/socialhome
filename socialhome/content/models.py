@@ -27,7 +27,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
-from socialhome.content.querysets import TagQuerySet, ContentManager
+from socialhome.content.querysets import TagQuerySet, ContentQuerySet
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.utils import get_full_url
@@ -169,6 +169,7 @@ class Content(models.Model):
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
+    through = models.PositiveIntegerField(_("Latest share id"), default=0, editable=False)
     # Indirect parent in the hierarchy
     root_parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name=_("Root parent"), related_name="all_children", null=True,
@@ -178,7 +179,7 @@ class Content(models.Model):
     # Other relations
     activities = GenericRelation(Activity)
 
-    objects = ContentManager()
+    objects = ContentQuerySet.as_manager()
 
     def __str__(self):
         return f"{truncatechars(self.text, 30)} ({self.content_type}, {self.visibility}, {self.fid or self.guid})"
@@ -193,9 +194,10 @@ class Content(models.Model):
             self.reply_count = self.children.count() + Content.objects.filter(parent_id__in=share_ids).count()
             # Share count
             self.shares_count = self.shares.count()
+            self.through = self.shares.values_list('id', flat=True).last() or self.id
             if commit:
                 Content.objects.filter(id=self.id).update(
-                    local=self.local, reply_count=self.reply_count, shares_count=self.shares_count,
+                    local=self.local, reply_count=self.reply_count, shares_count=self.shares_count, through=self.through,
                 )
 
     def cache_related_object_data(self):
@@ -345,6 +347,10 @@ class Content(models.Model):
         self.fix_local_uploads()
         super().save(*args, **kwargs)
         self.cache_related_object_data()
+        if self.through == 0 and self.content_type != ContentType.SHARE:
+            self.through = self.id
+            Content.objects.filter(id=self.id).update(through=self.through)
+
 
     def save_tags(self, tags):
         """Save given tag relations."""

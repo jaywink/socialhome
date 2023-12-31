@@ -190,7 +190,7 @@ exceptiongroup==1.1.0
     # via cattrs
 executing==1.2.0
     # via stack-data
-federation @ git+https://gitlab.com/jaywink/federation.git@aa351e27e20f1724fcb9d8fc25f1fc3776127be5
+federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
     # via -r requirements/requirements.in
 frozendict==2.3.5
     # via pyld
