@@ -12,6 +12,7 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -221,6 +222,11 @@ class Profile(TimeStampedModel):
     remote_url = models.URLField(_("Profile URL"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     objects = ProfileQuerySet.as_manager()
+
+    # case-insensitive query optimisation
+    # (from https://blog.gitguardian.com/10-tips-to-optimize-postgresql-queries-in-your-django-project/)
+    class Meta:
+        indexes = [models.Index(Upper('finger'), name='%(app_label)s_%(class)s_finger_upper')]
 
     def __str__(self) -> str:
         return f"{self.plain_name} ({self.fid or self.handle})"
