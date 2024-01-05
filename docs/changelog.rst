@@ -21,7 +21,7 @@ Added
     * key_id: which helps keeping federation GET requests low by enabling searches in the local DB using the HTTP
       signature keyID.
     * remote_url: this actually replaces the @property method of the same name and is required for AP inbound
-      mention linkification.
+      mention linkification. As a side effect, it enables the UI profile home button.
 
 * AP profile deletes are now processed.
 
@@ -55,6 +55,9 @@ Changed
 
 * Renamed ContentQuerySet.children to the more meaningful ContentQuerySet.full_conversation.
 
+* Change the through annontation to a model field in order to always know the most recent share
+  id.
+
 Fixed
 .....
 
@@ -71,7 +74,6 @@ Fixed
 * Do not lowercase URL and handles before searching.
 
 * Do no fetch and create a profile that is about to be retracted.
-
 
 0.17.0 (2023-03-18)
 -------------------
