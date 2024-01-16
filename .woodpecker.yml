@@ -32,7 +32,7 @@ steps:
       - python -V
       - pip install virtualenv
       - virtualenv venv
-      - source venv/bin/activate
+      - . venv/bin/activate
       - pip install -U pip-tools pip setuptools
       - pip-sync dev-requirements.txt
       - python manage.py migrate --noinput -v 0
