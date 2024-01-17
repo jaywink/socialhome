@@ -17,8 +17,8 @@ describe("EditReplyPublisher", () => {
         store = getStore()
         propsData = {
             contentId: "12",
-            parentId: `${faker.random.number()}`,
-            showPreview: faker.random.boolean(),
+            parentId: `${faker.datatype.number()}`,
+            showPreview: faker.datatype.boolean(),
             text: faker.lorem.paragraphs(4),
         }
     })
