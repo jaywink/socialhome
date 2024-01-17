@@ -10,6 +10,7 @@ export default {
             return gettext("Contacts - following")
         },
         contacts() {
+            this.$store("profiles/setProfilesFromContactList", this.following.contacts)
             return this.following.contacts
         },
         next() {

@@ -2,7 +2,6 @@
 import Vapi from "vuex-rest-api"
 
 import _isString from "lodash/isString"
-import profiles from "@/store/modules/profiles"
 
 function getState() {
     return {
@@ -23,7 +22,6 @@ function onSuccess(stateTarget, data) {
     stateTarget.count = data.count
     stateTarget.next = _isString(data.next) ? new URL(data.next).searchParams.get("page") : null
     data.results.forEach(contact => stateTarget.contacts.push(contact))
-    profiles.mutations.setProfilesFromContactList(profiles.state, data.results)
 }
 
 function getContactFn(key) {

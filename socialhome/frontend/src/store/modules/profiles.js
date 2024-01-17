@@ -43,14 +43,16 @@ const actions = {
                 Vue.snotify.error(gettext("An error happened while fetching a profile."))
             })
     },
-    // eslint-disable-next-line no-unused-vars
-    requestProfileUpdate({commit}, {uuid}) {
+    requestProfileUpdate(_, {uuid}) {
         return Vue.axios
             .get(Urls["api:profile-schedule-update"]({uuid}))
             .then()
             .catch(() => {
                 Vue.snotify.error(gettext("An error happened while requesting a profile update."))
             })
+    },
+    setProfilesFromContactList({commit}, {contactList}) {
+        commit("setProfilesFromContactList", {contactList})
     },
     unFollow({commit}, {uuid}) {
         return Vue.axios
