@@ -17,12 +17,12 @@ describe("EditPublisher", () => {
         store = getStore()
         propsData = {
             contentId: 12,
-            isReply: faker.random.boolean(),
-            federate: faker.random.boolean(),
-            includeFollowing: faker.random.boolean(),
-            recipients: Array(faker.random.number(5)).map(() => faker.random.email()),
-            pinned: faker.random.boolean(),
-            showPreview: faker.random.boolean(),
+            isReply: faker.datatype.boolean(),
+            federate: faker.datatype.boolean(),
+            includeFollowing: faker.datatype.boolean(),
+            recipients: Array(faker.datatype.number(5)).map(() => faker.datatype.email()),
+            pinned: faker.datatype.boolean(),
+            showPreview: faker.datatype.boolean(),
             text: faker.lorem.paragraphs(4),
             visibility: Math.floor((Math.random() * 4)),
         }

@@ -473,16 +473,16 @@ class TestContentQuerySetThroughs(SocialhomeTestCase):
 
     def test_base_queryset_has_through(self):
         content = Content.objects.get(id=self.content.id)
-        self.assertEqual(content.through, content.id)
+        self.assertEqual(content.through, self.share.id)
 
     def test_followed__has_through(self):
         contents = Content.objects.followed(self.user).order_by('id')
         self.assertEqual(contents[0].through, self.share.id)
         self.assertEqual(contents[1].through, self.share2.id)
-        self.assertEqual(contents[2].through, self.sharer_content.id)
+        self.assertEqual(contents[2].through, self.sharer_content_share.id)
 
     def test_profile__has_through(self):
         contents = Content.objects.profile(self.sharer_content.author, AnonymousUser()).order_by('id')
         self.assertEqual(contents[0].through, self.share.id)
         self.assertEqual(contents[1].through, self.share2.id)
-        self.assertEqual(contents[2].through, self.sharer_content.id)
+        self.assertEqual(contents[2].through, self.sharer_content_share.id)

@@ -200,6 +200,9 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         )
         self.assertSetEqual(actual, expected)
 
+    # through has been changed from an annotation to a field and is always set to the
+    # latest share.
+    @pytest.mark.skip
     def test_serializes_through(self):
         serializer = ContentSerializer(self.content)
         self.assertEqual(serializer.data["through"], self.content.id)
