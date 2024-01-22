@@ -6,7 +6,7 @@ channels_redis<4
 chardet
 circus
 crispy-bootstrap4
-#CommonMark
+commonmark_socialhome
 django-allauth
 django-braces
 django-crispy-forms
@@ -33,7 +33,7 @@ django-versatileimagefield
 django<4
 djangorestframework
 drf-yasg
-#federation
+federation
 ipython
 lxml
 Pillow
@@ -57,12 +57,9 @@ pyyaml
 #django-markdownx @ git+https://github.com/jaywink/django-markdownx.git@ae0d882891972a79334fde0af2a06b66714b101a
 
 # Just here to easily use a dev version
-federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
+#federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
 
 pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
-
-# Fork to allow ignoring HTML blocks, needs upstream PR
-commonmark @ git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d
 
 ## NON-DIRECT requirements locked here due to issues
 #https://github.com/ipython/ipython/issues/12740

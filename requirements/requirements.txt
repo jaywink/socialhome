@@ -42,6 +42,7 @@ backcall==0.2.0
     # via ipython
 beautifulsoup4==4.11.2
     # via
+    #   federation
     #   pyembed
     #   python-opengraph-jaywink
 bleach==6.0.0
@@ -72,7 +73,7 @@ circus==0.18.0
     # via -r requirements/requirements.in
 click==8.1.3
     # via rq
-commonmark @ git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d
+commonmark-socialhome==0.9.1.post2
     # via
     #   -r requirements/requirements.in
     #   federation
@@ -190,7 +191,7 @@ exceptiongroup==1.1.0
     # via cattrs
 executing==1.2.0
     # via stack-data
-federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
+federation==0.25.0
     # via -r requirements/requirements.in
 frozendict==2.3.5
     # via pyld

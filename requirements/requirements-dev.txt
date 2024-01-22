@@ -65,6 +65,7 @@ backcall==0.2.0
 beautifulsoup4==4.11.2
     # via
     #   -r requirements/requirements.txt
+    #   federation
     #   pyembed
     #   python-opengraph-jaywink
 bleach==6.0.0
@@ -116,11 +117,12 @@ codecov==2.1.13
     # via -r requirements/requirements-dev.in
 colorama==0.4.6
     # via sphinx-autobuild
-commonmark @ git+https://github.com/jaywink/commonmark.py.git@b853dc194cb337063da898e57a9e2e6b9d3f733d
+commonmark==0.9.1
+    # via recommonmark
+commonmark-socialhome==0.9.1.post2
     # via
     #   -r requirements/requirements.txt
     #   federation
-    #   recommonmark
 constantly==15.1.0
     # via
     #   -r requirements/requirements.txt
@@ -299,7 +301,7 @@ faker==17.0.0
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-federation @ git+https://gitlab.com/jaywink/federation.git@d4f207ba02e1d507a4e7d8f69a5d78eab80dfa37
+federation==0.25.0
     # via -r requirements/requirements.txt
 flake8==6.0.0
     # via -r requirements/requirements-dev.in
@@ -715,7 +717,6 @@ tomli==2.0.1
     #   coverage
     #   django-stubs
     #   mypy
-    #   pyproject-hooks
     #   pytest
 tornado==6.2
     # via
