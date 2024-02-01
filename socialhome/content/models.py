@@ -570,7 +570,7 @@ class Content(models.Model):
             if 'nofollow' not in link.get('rel', []):
                 link['rel'] = ['nofollow'] + link.get('rel', [])
             link['target'] = '_blank'
-            if not link.text:
+            if not (link.text or link.next):
                 link.string = link['href']
 
         for url in find_elements(self._soup, URL_PATTERN):

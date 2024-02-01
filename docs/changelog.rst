@@ -3,6 +3,15 @@
 Changelog
 =========
 
+0.18.1 (unreleased)
+
+Fixed
+.....
+
+* Fix a bad BeautifulSoup usage of the tag.string property where replacing its value not only replaces
+  the inner tag text but also its inner tags. This would result in linked image tags to be
+  replaced with the link text.
+
 0.18.0 (2024-01-23)
 ----------
 
