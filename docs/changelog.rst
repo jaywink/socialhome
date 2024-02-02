@@ -3,7 +3,7 @@
 Changelog
 =========
 
-0.18.1 (unreleased)
+0.18.1 (2024-02-03)
 
 Fixed
 .....
