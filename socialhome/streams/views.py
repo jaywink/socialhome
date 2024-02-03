@@ -100,6 +100,11 @@ class LocalStreamView(BaseStreamView):
 class PublicStreamView(BaseStreamView):
     stream_class = PublicStream
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated and not settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
     def get_page_meta(self):
         meta = super().get_page_meta()
         meta.update({

@@ -3,7 +3,21 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Changed
+.......
+
+* Don't show "public" stream to anonymous unauthenticated users by default, if running
+  in single user mode (the root profile is set to a user).
+
+  This behaviour can controlled by setting the ``SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH``
+  environment variable to ``True`` or ``False``.
+
+
 0.18.1 (2024-02-03)
+-------------------
 
 Fixed
 .....
@@ -13,7 +27,7 @@ Fixed
   replaced with the link text.
 
 0.18.0 (2024-01-23)
-----------
+-------------------
 
 Added
 .....

@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -75,6 +76,11 @@ class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
 
 
 class PublicStreamAPIView(StreamsAPIBaseView):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated and not settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
     def get_content(self):
         stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids)
         return stream.get_content()

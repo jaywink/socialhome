@@ -457,6 +457,16 @@ Default: ``0``
 
 Amount of items to keep in stream precaches, per user, per stream, for inactive and anonymous users. By default maintenance will always clear the cache for inactive and anonymous users daily. See notes about ``SOCIALHOME_STREAMS_PRECACHE_SIZE``.
 
+SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH
+.............................................
+
+Default: ``True`` if ``SOCIALHOME_ROOT_PROFILE`` is set, otherwise ``False``
+
+Should the public stream be shown to anonymous unauthenticated users. If not set, depends on the
+``SOCIALHOME_ROOT_PROFILE`` setting. If it looks like we're a single user instance,
+don't show the public stream to anonymous users as that could leak information about
+who the single user instance user follows.
+
 SOCIALHOME_SYSLOG_FACILITY
 ..........................
 
