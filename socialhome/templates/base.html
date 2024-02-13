@@ -51,7 +51,9 @@
                                 <a class="dropdown-item" href="{% url "streams:tags" %}">{% trans "Tags" %}</a>
                             {% endif %}
                             <a class="dropdown-item" href="{% url "streams:local" %}">{% trans "Local" %}</a>
-                            <a class="dropdown-item" href="{% url "streams:public" %}">{% trans "Public" %}</a>
+                            {% if request.user.is_authenticated or settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH %}
+                                <a class="dropdown-item" href="{% url "streams:public" %}">{% trans "Public" %}</a>
+                            {% endif %}
                         </div>
                     </li>
                     {% if request.user.is_authenticated %}

@@ -213,6 +213,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 SETTINGS_EXPORT = [
     "ACCOUNT_ALLOW_REGISTRATION",
     "SOCIALHOME_NODE_LIST_URL",
+    "SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH",
 ]
 
 # See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
@@ -373,6 +374,12 @@ SOCIALHOME_TOS_JURISDICTION = env("SOCIALHOME_TOS_JURISDICTION", default=None)
 SOCIALHOME_STREAMS_PRECACHE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE_SIZE", default=100)
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS = env.int("SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS", default=90)
 SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE = env.int("SOCIALHOME_STREAMS_PRECACHE_INACTIVE_SIZE", default=0)
+# Should the public stream be shown for anonymous users. This defaults as follows:
+# - if this is likely a single user instance, ie SOCIALHOME_ROOT_PROFILE is set, do not show a public stream
+# - otherwise, show a public stream by default, unless disabled
+SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH = env.bool(
+    "SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH", default=False if SOCIALHOME_ROOT_PROFILE else True,
+)
 
 # Content
 # These attributes on tags are kept on save for untrusted users
