@@ -188,7 +188,6 @@ django==3.2.18
     #   django-braces
     #   django-crispy-forms
     #   django-debug-toolbar
-    #   django-debug-toolbar-user-switcher
     #   django-dynamic-preferences
     #   django-extensions
     #   django-haystack
@@ -219,10 +218,8 @@ django-crispy-forms==2.0
     #   -r requirements/requirements.txt
     #   crispy-bootstrap4
 django-debug-toolbar==3.8.1
-    # via
-    #   -r requirements/requirements-dev.in
-    #   django-debug-toolbar-user-switcher
-django-debug-toolbar-user-switcher==2.2.0
+    # via -r requirements/requirements-dev.in
+django-debug-toolbar-user-panel==2.0.0
     # via -r requirements/requirements-dev.in
 django-dynamic-preferences==1.14.0
     # via -r requirements/requirements.txt
@@ -717,6 +714,7 @@ tomli==2.0.1
     #   coverage
     #   django-stubs
     #   mypy
+    #   pyproject-hooks
     #   pytest
 tornado==6.2
     # via

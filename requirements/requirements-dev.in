@@ -5,7 +5,7 @@ codecov
 coverage
 ddt
 django-debug-toolbar
-django-debug-toolbar-user-switcher
+django-debug-toolbar-user-panel
 django-querycount
 django-stubs
 django-test-plus
