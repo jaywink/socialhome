@@ -6,6 +6,11 @@ Changelog
 unreleased
 ----------
 
+Security
+........
+
+* Updated `federation` dependency to fix CVE-2024-23832.
+
 Changed
 .......
 

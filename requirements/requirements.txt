@@ -191,7 +191,7 @@ exceptiongroup==1.1.0
     # via cattrs
 executing==1.2.0
     # via stack-data
-federation==0.25.0
+federation==0.25.1
     # via -r requirements/requirements.in
 frozendict==2.3.5
     # via pyld
