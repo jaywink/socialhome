@@ -15,6 +15,8 @@ Changed
   This behaviour can controlled by setting the ``SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH``
   environment variable to ``True`` or ``False``.
 
+* Docker images Python version is now 3.10.
+
 
 0.18.1 (2024-02-03)
 -------------------
