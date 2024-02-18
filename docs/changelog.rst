@@ -3,8 +3,8 @@
 Changelog
 =========
 
-unreleased
-----------
+0.19.0 (2024-02-18)
+-------------------
 
 Security
 ........
@@ -21,7 +21,6 @@ Changed
   environment variable to ``True`` or ``False``.
 
 * Docker images Python version is now 3.10.
-
 
 0.18.1 (2024-02-03)
 -------------------
