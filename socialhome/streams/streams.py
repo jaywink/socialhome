@@ -249,7 +249,7 @@ class BaseStream:
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
         update_profiles(content)
-        return content, throughs
+        return content, throughs, self.notify_key
 
     def get_content_ids(self):
         """Get a list of content ID's."""

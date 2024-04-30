@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import Http404
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,9 +22,12 @@ class StreamsAPIBaseView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, **kwargs):
-        qs, throughs = self.get_content()
+        qs, throughs, notify_key = self.get_content()
         serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
-        return Response(serializer.data)
+        data = serializer.data
+        # Hack used to send the ws channel name the SPA UI
+        if request.version == '2.0': data = {"notify_key": notify_key, "data": data}
+        return Response(data)
 
     def get_content(self):
         return [], {}
@@ -82,7 +86,7 @@ class PublicStreamAPIView(StreamsAPIBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
-        stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids)
+        stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids, user=self.request.user)
         return stream.get_content()
 
 
