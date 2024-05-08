@@ -3,6 +3,14 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Fixed
+......
+
+* Fix missing `Http404` imports in Streams API viewsets.
+
 0.19.0 (2024-02-18)
 -------------------
 
