@@ -292,7 +292,7 @@ class Profile(TimeStampedModel):
     def home_url(self):
         if not self.user:
             return self.remote_url
-        return self.url
+        return self.user.url
 
     @property
     def local_url(self) -> str:
@@ -537,7 +537,7 @@ class Profile(TimeStampedModel):
             values["key_id"] = safe_text(remote_profile.key_id)
             values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
         else:
-            values["remote_url"] = "https://%s/people/%s" % (values["handle"].split("@")[1], values["guid"])
+            values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(remote_profile.username))
 
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
