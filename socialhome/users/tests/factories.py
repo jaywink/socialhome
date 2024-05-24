@@ -96,7 +96,8 @@ class UserWithContactFactory(UserFactory):
         count_followers = attrs.pop("count_followers", 3) if isinstance(attrs, dict) else 3
         following = [ProfileFactory() for _ in range(count_following)]
         followers = [ProfileFactory() for _ in range(count_followers)]
-
+        # set one mutual
+        following.append(followers[0])
         user = super(UserWithContactFactory, cls)._generate(create, attrs)
         user.profile.following.set(following)
         user.profile.followers.set(followers)

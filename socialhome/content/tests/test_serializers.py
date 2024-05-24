@@ -10,6 +10,7 @@ from socialhome.content.tests.factories import PublicContentFactory, TagFactory,
     LimitedContentWithRecipientsFactory
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
+from socialhome.users.models import Profile
 from socialhome.users.tests.factories import PublicProfileFactory, PublicUserFactory, UserWithContactFactory
 
 
@@ -178,6 +179,7 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         content = serializer.save()
         self.assertSetEqual(set(content.limited_visibilities.all()), {self.user_recipient})
 
+    # include_following is now include_mutuals. TODO: rename the parameter?
     def test_save__collects_recipients__include_following(self):
         user = UserWithContactFactory()
         content = LimitedContentFactory(author=user.profile)
@@ -194,10 +196,10 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         content = serializer.save()
 
         actual = set(content.limited_visibilities.all().order_by("id"))
-        expected = set(
-            list(user.profile.following.all().order_by("id")) +
-            [self.user_recipient, self.user_recipient2]
-        )
+        mutuals = Profile.objects.filter(followers=user.profile).intersection(
+            Profile.objects.filter(following=user.profile))
+        expected = Profile.objects.filter(handle__in={self.user_recipient.handle, self.user_recipient2.handle})
+        expected = set(expected.union(mutuals).all())
         self.assertSetEqual(actual, expected)
 
     # through has been changed from an annotation to a field and is always set to the
