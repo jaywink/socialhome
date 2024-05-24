@@ -379,7 +379,7 @@ class LocalStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id
+        return self.user.id or 'anon'
 
 
 class ProfileStreamBase(BaseStream):
@@ -426,7 +426,7 @@ class PublicStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id
+        return self.user.id or 'anon'
 
 
 class TagStream(BaseStream):
@@ -464,7 +464,7 @@ class TagsStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id
+        return self.user.id or 'anon'
 
 
 CACHED_STREAM_CLASSES = (
