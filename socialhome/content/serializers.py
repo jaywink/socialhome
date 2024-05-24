@@ -266,8 +266,9 @@ class ContentSerializer(serializers.ModelSerializer):
 
             # Add mutuals, if included
             if self.validated_data.get("include_following"):
-                recipients = recipients | user.profile.following.intersection(user.profile.followers.all())
-                recipients = recipients.distinct()
+                mutuals = Profile.objects.filter(followers=user.profile).intersection(
+                    Profile.objects.filter(following=user.profile))
+                recipients = recipients.union(mutuals)
         elif content.content_type == ContentType.REPLY:
             # Should mentions be added as recipients here too?
             recipients = content.root_parent.limited_visibilities.all()
