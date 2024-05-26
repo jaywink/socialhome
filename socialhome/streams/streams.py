@@ -249,7 +249,7 @@ class BaseStream:
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
         update_profiles(content)
-        return content, throughs, self.notify_key
+        return content, throughs
 
     def get_content_ids(self):
         """Get a list of content ID's."""
@@ -379,7 +379,7 @@ class LocalStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id or 'anon'
+        return self.user.id
 
 
 class ProfileStreamBase(BaseStream):
@@ -397,7 +397,7 @@ class ProfileStreamBase(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class ProfileAllStream(ProfileStreamBase):
@@ -426,7 +426,7 @@ class PublicStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id or 'anon'
+        return self.user.id
 
 
 class TagStream(BaseStream):
@@ -452,7 +452,7 @@ class TagStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class TagsStream(BaseStream):
@@ -464,7 +464,7 @@ class TagsStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return self.user.id or 'anon'
+        return self.user.id
 
 
 CACHED_STREAM_CLASSES = (
