@@ -14,6 +14,8 @@ from socialhome.users.models import Profile
 
 
 class StreamsAPIBaseView(APIView):
+    stream = None
+
     def dispatch(self, request, *args, **kwargs):
         self.last_id = request.GET.get("last_id")
         self.accept_ids = request.GET.get("accept_ids", None)
@@ -22,11 +24,11 @@ class StreamsAPIBaseView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, **kwargs):
-        qs, throughs, notify_key = self.get_content()
+        qs, throughs = self.get_content()
         serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
         data = serializer.data
         # Hack used to send the ws channel name the SPA UI
-        if request.version == '2.0': data = {"notify_key": notify_key, "data": data}
+        if request.version == '2.0': data = {"notify_key": self.stream.notify_key, "data": data}
         return Response(data)
 
     def get_content(self):
@@ -37,22 +39,22 @@ class FollowedStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
     def get_content(self):
-        stream = FollowedStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
-        return stream.get_content()
+        self.stream = FollowedStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
+        return self.stream.get_content()
 
 
 class LimitedStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
     def get_content(self):
-        stream = LimitedStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
-        return stream.get_content()
+        self.stream = LimitedStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
+        return self.stream.get_content()
 
 
 class LocalStreamAPIView(StreamsAPIBaseView):
     def get_content(self):
-        stream = LocalStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
-        return stream.get_content()
+        self.stream = LocalStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
+        return self.stream.get_content()
 
 
 class ProfileAllStreamAPIView(StreamsAPIBaseView):
@@ -61,10 +63,10 @@ class ProfileAllStreamAPIView(StreamsAPIBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
-        stream = ProfileAllStream(
+        self.stream = ProfileAllStream(
             last_id=self.last_id, profile=self.profile, user=self.request.user, accept_ids=self.accept_ids,
         )
-        return stream.get_content()
+        return self.stream.get_content()
 
 
 class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
@@ -73,10 +75,10 @@ class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
-        stream = ProfilePinnedStream(
+        self.stream = ProfilePinnedStream(
             last_id=self.last_id, profile=self.profile, user=self.request.user, accept_ids=self.accept_ids,
         )
-        return stream.get_content()
+        return self.stream.get_content()
 
 
 class PublicStreamAPIView(StreamsAPIBaseView):
@@ -86,8 +88,8 @@ class PublicStreamAPIView(StreamsAPIBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
-        stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids, user=self.request.user)
-        return stream.get_content()
+        self.stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids, user=self.request.user)
+        return self.stream.get_content()
 
 
 class TagStreamAPIView(StreamsAPIBaseView):
@@ -102,13 +104,13 @@ class TagStreamAPIView(StreamsAPIBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_content(self):
-        stream = TagStream(last_id=self.last_id, tag=self.tag, user=self.request.user, accept_ids=self.accept_ids)
-        return stream.get_content()
+        self.stream = TagStream(last_id=self.last_id, tag=self.tag, user=self.request.user, accept_ids=self.accept_ids)
+        return self.stream.get_content()
 
 
 class TagsStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
     def get_content(self):
-        stream = TagsStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
-        return stream.get_content()
+        self.stream = TagsStream(last_id=self.last_id, user=self.request.user, accept_ids=self.accept_ids)
+        return self.stream.get_content()
