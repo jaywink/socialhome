@@ -55,6 +55,7 @@ class SocialhomeTestBase(CreateDataMixin):
         request = RequestFactory().get(path)
         request.user = user
         request.site = get_current_site(request)
+        request.version = None
         return request
 
     @staticmethod

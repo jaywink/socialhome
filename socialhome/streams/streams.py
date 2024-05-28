@@ -397,7 +397,7 @@ class ProfileStreamBase(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class ProfileAllStream(ProfileStreamBase):
@@ -452,7 +452,7 @@ class TagStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class TagsStream(BaseStream):

@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 from django.urls import reverse
 
@@ -34,6 +35,7 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
     @patch("socialhome.streams.viewsets.ContentSerializer", autospec=True)
     def test_serializer_context(self, mock_serializer):
         request = RequestFactory().get("/")
+        request.version = None
         view = StreamsAPIBaseView()
         view.get(request)
         mock_serializer.assert_called_once_with([], many=True, context={"throughs": {}, "request": request})
@@ -188,7 +190,7 @@ class TestPublicStreamAPIView(SocialhomeAPITestCase):
     def test_users_correct_stream_class(self, mock_stream):
         mock_stream.return_value = MockStream()
         self.get("api-streams:public")
-        mock_stream.assert_called_once_with(last_id=None, accept_ids=None)
+        mock_stream.assert_called_once_with(last_id=None, accept_ids=None, user=AnonymousUser())
 
 
 class TestTagStreamAPIView(SocialhomeAPITestCase):

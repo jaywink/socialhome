@@ -615,6 +615,7 @@ REST_FRAMEWORK = {
         "content_create": "100/day",
     },
     "DEFAULT_VERSION": "0.1",
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
 }
 
 # See https://docs.djangoproject.com/en/3.2/releases/3.2/#models
