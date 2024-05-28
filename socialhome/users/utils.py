@@ -77,6 +77,7 @@ def update_profile(profile, force=False):
 
     if any((
         force,
+        not profile.avatar_url,
         not profile.finger,
         not profile.remote_url,
         profile.fid and not (profile.key_id or profile.followers_fid),
