@@ -161,6 +161,7 @@ class Profile(TimeStampedModel):
     # Fields mirroring 'User' table since all our Profiles are not local
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
+    bio = models.TextField(_("Bio"), blank=True)
 
     # Federation GUID
     # Optional, related to Diaspora network platforms
@@ -193,6 +194,12 @@ class Profile(TimeStampedModel):
     image_url_large = models.URLField(_("Image - large"), blank=True, max_length=500)
     image_url_medium = models.URLField(_("Image - medium"), blank=True, max_length=500)
     image_url_small = models.URLField(_("Image - small"), blank=True, max_length=500)
+
+    # Avatar and profile image
+    # avatar_url = image_url_large, image_url is the AP profile picture, used by the SPA UI
+    # the 3 fields above are kept for legacy
+    avatar_url = models.URLField(_("Avatar"), blank=True, max_length=500)
+    picture_url = models.URLField(_("Picture"), blank=True, max_length=500)
 
     # Location
     location = models.CharField(_("Location"), max_length=128, blank=True)
@@ -510,10 +517,12 @@ class Profile(TimeStampedModel):
         # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
+            "bio": safe_text(remote_profile.raw_content),
             "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public
             "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
             "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
             "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
+            "avatar_url": Profile.absolute_image_url(remote_profile, "large"),
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
@@ -536,6 +545,8 @@ class Profile(TimeStampedModel):
             values['followers_fid'] = safe_text(remote_profile.followers)
             values["key_id"] = safe_text(remote_profile.key_id)
             values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
+            if remote_profile.image:
+                values["picture_url"] = safe_text(remote_profile.image.url)
         else:
             values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(remote_profile.username))
 
