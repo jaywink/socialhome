@@ -517,7 +517,9 @@ class Profile(TimeStampedModel):
         # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
-            "bio": safe_text_for_markdown(remote_profile.raw_content),
+            "bio": safe_text_for_markdown("\n".join(remote_profile.raw_content)
+                                          if isinstance(remote_profile.raw_content, list)
+                                          else remote_profile.raw_content),
             "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public
             "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
             "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
