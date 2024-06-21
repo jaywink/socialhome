@@ -25,7 +25,7 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     created = kwargs.get("created")
     if created:
-        queue = django_rq.get_queue("low")
+        queue = django_rq.get_queue("lowest")
         if instance.content_type == ContentType.REPLY:
             transaction.on_commit(lambda: queue.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:

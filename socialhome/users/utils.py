@@ -83,7 +83,7 @@ def update_profile(profile, force=False):
         profile.fid and not (profile.key_id or profile.followers_fid),
         datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 
-        queue = django_rq.get_queue("lowest")
+        queue = django_rq.get_queue("low")
         job_id = f'update_profile_{profile.id}'
         if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
             logger.warning("update_profile - job found for profile %s, skipping", profile)
