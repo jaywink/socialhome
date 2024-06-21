@@ -124,7 +124,7 @@ class TestProfile(SocialhomeTestCase):
     def test_home_url(self):
         self.assertEqual(self.profile.home_url, self.profile.remote_url)
         self.assertEqual(
-            self.user.profile.home_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.profile.get_absolute_url()),
+            self.user.profile.home_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.get_absolute_url()),
         )
 
     def test_local_url(self):
@@ -218,6 +218,7 @@ class TestProfile(SocialhomeTestCase):
         remote_profile.image_urls["small"] = "/sm"
         remote_profile.image_urls["medium"] = "/me"
         remote_profile.image_urls["large"] = "/lg"
+        print('>>>>>>>>', remote_profile.raw_content)
         profile = Profile.from_remote_profile(remote_profile)
         self.assertEqual(profile.image_url_small, "https://example.com/sm")
         self.assertEqual(profile.image_url_medium, "https://example.com/me")
