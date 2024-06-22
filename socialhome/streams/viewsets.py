@@ -83,9 +83,11 @@ class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
 
 class PublicStreamAPIView(StreamsAPIBaseView):
     def dispatch(self, request, *args, **kwargs):
+        # must be called first to ensure token authentication is processed
+        response = super().dispatch(request, *args, **kwargs)
         if not request.user.is_authenticated and not settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH:
             raise Http404
-        return super().dispatch(request, *args, **kwargs)
+        return response
 
     def get_content(self):
         self.stream = PublicStream(last_id=self.last_id, accept_ids=self.accept_ids, user=self.request.user)
