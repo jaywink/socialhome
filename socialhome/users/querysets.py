@@ -40,7 +40,7 @@ class ProfileQuerySet(QuerySet):
         # Some platforms (hello firefish) allow fid updates while keeping
         # the same finger and remote_url properties. Is it ok to assumes
         # finger and remote_url are never updated?
-        qs2 = self.filter(finger=values.get('finger', ''), remote_url=values.get('remote_url', ''))
+        qs2 = self.filter(finger=values.get('finger', '')) | self.filter(remote_url=values.get('remote_url', ''))
         if qs1.count():
             profile = qs1.get()
         elif qs2.count():
