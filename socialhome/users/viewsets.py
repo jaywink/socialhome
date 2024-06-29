@@ -2,10 +2,12 @@ from typing import Any
 
 import django_rq
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated, SAFE_METHODS, IsAdminUser
+from rest_framework.permissions import (AllowAny, BasePermission,
+                                        IsAuthenticated, IsAuthenticatedOrReadOnly, SAFE_METHODS, IsAdminUser)
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -114,7 +116,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 class UserViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = User.objects.none()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -128,3 +130,11 @@ class UserViewSet(mixins.RetrieveModelMixin, GenericViewSet):
         users = [UserSerializer(instance=user).data for user in users]
         return JsonResponse(users, safe=False)
 
+    def retrieve(self, request, *args, **kwargs):
+        # hack enabling  /u/<username> routes for the SPA UI
+        if request.version == '2.0':
+            profile = get_object_or_404(Profile, user__username=kwargs.get("pk"))
+            serializer = ProfileSerializer(profile, context={'request': request})
+            return Response(serializer.data)
+        else:
+            return super().retrieve(request, *args, **kwargs)
