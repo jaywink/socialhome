@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import truncatechars
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.timezone import make_aware

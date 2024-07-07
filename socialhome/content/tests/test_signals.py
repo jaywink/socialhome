@@ -1,8 +1,6 @@
 from unittest import mock
 from unittest.mock import patch, Mock, call
 
-import django_rq
-
 from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.content.enums import ContentType
