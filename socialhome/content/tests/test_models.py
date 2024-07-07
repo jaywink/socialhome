@@ -91,6 +91,17 @@ class TestContentModel(SocialhomeTestCase):
             {self.remote_profile.id},
         )
 
+    def test_has_had_local_replies(self):
+        self.assertFalse(self.public_content.has_had_local_replies)
+        self.assertFalse(self.remote_content.has_had_local_replies)
+        # Add replies
+        LocalContentFactory(parent=self.public_content)
+        LocalContentFactory(parent=self.remote_content)
+        self.public_content.refresh_from_db()
+        self.remote_content.refresh_from_db()
+        self.assertTrue(self.public_content.has_had_local_replies)
+        self.assertTrue(self.remote_content.has_had_local_replies)
+
     def test_has_shared(self):
         self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))
         # Do a share
