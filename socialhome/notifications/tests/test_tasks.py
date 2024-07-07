@@ -4,12 +4,81 @@ from ddt import ddt, data
 from django.conf import settings
 from django.urls import reverse
 
+from socialhome.content.enums import ContentType
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.notifications.tasks import (
     send_reply_notifications, send_follow_notification, send_share_notification, send_data_export_ready_notification,
-    send_policy_document_update_notification, send_policy_document_update_notifications, send_mention_notification)
+    send_policy_document_update_notification, send_policy_document_update_notifications, send_mention_notification,
+    get_root_content_participants)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
+
+
+class TestGetRootContentParticipants(SocialhomeTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_local_and_remote_user()
+        cls.local_content = ContentFactory(author=cls.profile)
+        cls.remote_content = ContentFactory(author=cls.remote_profile)
+        cls.local_user = UserFactory()
+        cls.local_profile = cls.local_user.profile
+
+    def test_no_participants_for_just_root_content(self):
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
+
+    def test_no_participants_for_just_remote_replies(self):
+        ContentFactory(parent=self.local_content)
+        ContentFactory(parent=self.remote_content)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
+
+    def test_no_participants_for_just_remote_shares(self):
+        ContentFactory(parent=self.local_content, content_type=ContentType.SHARE)
+        ContentFactory(parent=self.remote_content, content_type=ContentType.SHARE)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
+
+    def test_local_participant_for_direct_reply(self):
+        ContentFactory(parent=self.local_content, author=self.local_profile)
+        ContentFactory(parent=self.remote_content, author=self.local_profile)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
+
+    def test_local_participant_for_direct_share(self):
+        ContentFactory(parent=self.local_content, author=self.local_profile, content_type=ContentType.SHARE)
+        ContentFactory(parent=self.remote_content, author=self.local_profile, content_type=ContentType.SHARE)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
+
+    def test_local_participant_for_reply_of_remote_reply(self):
+        reply = ContentFactory(parent=self.local_content)
+        ContentFactory(parent=reply, author=self.local_profile)
+        reply = ContentFactory(parent=self.remote_content)
+        ContentFactory(parent=reply, author=self.local_profile)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
+
+    def test_local_participant_for_share_of_remote_reply(self):
+        reply = ContentFactory(parent=self.local_content)
+        ContentFactory(parent=reply, author=self.local_profile, content_type=ContentType.SHARE)
+        reply = ContentFactory(parent=self.remote_content)
+        ContentFactory(parent=reply, author=self.local_profile, content_type=ContentType.SHARE)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
+
+    def test_local_participants_of_different_types_on_remote(self):
+        user2 = UserFactory()
+        profile2 = user2.profile
+        user3 = UserFactory()
+        profile3 = user3.profile
+        ContentFactory(parent=self.local_content, author=self.local_profile)
+        reply = ContentFactory(parent=self.local_content)
+        ContentFactory(parent=reply, author=profile2)
+        reply = ContentFactory(parent=self.local_content)
+        ContentFactory(parent=reply, author=profile3, content_type=ContentType.SHARE)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 3)
 
 
 class TestSendMentionNotification(SocialhomeTestCase):

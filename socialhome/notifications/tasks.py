@@ -28,17 +28,18 @@ def get_root_content_participants(content, exclude_user=None):
     :param exclude: A User object to exclude
     :returns: Set of User objects
     """
+    exclude_user_id = exclude_user.id if exclude_user else None
     # Author of parent content
-    participants = User.objects.filter(profile__content__id=content.id)
+    author_participant = list(User.objects.filter(profile__content__id=content.id).exclude(id=exclude_user_id))
     # Other replies
-    participants = participants | User.objects.filter(profile__content__parent_id=content.id)
+    other_replies = list(User.objects.filter(profile__content__root_parent_id=content.id).exclude(id=exclude_user_id))
     # Shares
-    participants = participants | User.objects.filter(profile__content__share_of_id=content.id)
+    shares = list(User.objects.filter(profile__content__share_of_id=content.id).exclude(id=exclude_user_id))
     # Replies on shares
-    participants = participants | User.objects.filter(profile__content__parent__share_of_id=content.id)
-    if exclude_user:
-        participants = participants.exclude(id=exclude_user.id)
-    return set(participants)
+    replies_on_shares = list(
+        User.objects.filter(profile__content__parent__share_of_id=content.id).exclude(id=exclude_user_id)
+    )
+    return set(author_participant + other_replies + shares + replies_on_shares)
 
 
 def send_account_approval_admin_notification(user_id: int):
