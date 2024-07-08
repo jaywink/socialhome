@@ -218,7 +218,6 @@ class TestProfile(SocialhomeTestCase):
         remote_profile.image_urls["small"] = "/sm"
         remote_profile.image_urls["medium"] = "/me"
         remote_profile.image_urls["large"] = "/lg"
-        print('>>>>>>>>', remote_profile.raw_content)
         profile = Profile.from_remote_profile(remote_profile)
         self.assertEqual(profile.image_url_small, "https://example.com/sm")
         self.assertEqual(profile.image_url_medium, "https://example.com/me")

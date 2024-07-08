@@ -6,8 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import (AllowAny, BasePermission,
-                                        IsAuthenticated, IsAuthenticatedOrReadOnly, SAFE_METHODS, IsAdminUser)
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
