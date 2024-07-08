@@ -113,10 +113,14 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         return response
 
 
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS and request.version == '2.0'
+
 class UserViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = User.objects.none()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated|ReadOnly,)
 
     def get_queryset(self):
         if self.request.user.is_staff:
