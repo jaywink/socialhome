@@ -51,7 +51,11 @@ function getMainInstance(LocalVue) {
                         parentId: data.parentId,
                     })
                 } else if (data.event === "profile") {
-                    this.$store.dispatch("profiles/getProfile", {uuid: data.uuid})
+                    const index = _get(this.$store, ["state", "profiles", "index"])
+                    // only update profiles we already fetched
+                    if (index.indexOf(data.uuid) !== -1) {
+                        this.$store.dispatch("profiles/getProfile", {uuid: data.uuid})
+                    }
                 }
             },
             onWebsocketOpen() {
