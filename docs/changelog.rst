@@ -6,10 +6,61 @@ Changelog
 unreleased
 ----------
 
+Added
+.....
+
+* Add support for API versioning through the Accept header, to avoid potential breaking changes
+  required by the SPA UI (WIP). Currently `version=2.0` is in use for the following:
+
+    * The stream name is sent to the current UI through a JSON context added to the corresponding
+      Django view. Since the SPA UI only used the API, the views are never called. In order to keep
+      the Django backend as the single source for stream names, the streams viewsets prepend it to the
+      response payload when version == 2.0.
+    * A hack has been added to users.UserViewSet to allow the SPA UI to fetch profiles corresponding
+      to /u/<username> URIs. The new ReadOnly permission class that passes only when version == 2.0
+      was added to preserve the current UI behavior.
+
+* In support of richer AP profiles, add two properties to users.Profile:
+
+    * `picture_url`: corresponds to the AP profile `image` property.
+    * `bio`: corresponds to the AP profile `summary` property.
+
+  In order to populate these new properties, schedule a profile update if `avatar_url` is emtpy.
+  Note that until some UI interface is implemented, the `bio` and `picture_url` properties must be
+  manually populated for local users.
+
+* With the intent to eventualy get rid of the `image_urls_[small,medium,large]` properties, add
+  the `avatar_url` property. TODO: remove the former properties in a way that won't break Diaspora.
+
+Changed
+.......
+
+* Reduce the amount of /api/profiles/<uuid> requests by ignoring profile update notifications for profile
+  not already cached in the UI (both current and SPA) cache.
+
+* Bump `update_profiles` priority to low. Reduce `send_reply_notification` prority to lowest.
+
+* Set the `remote_url/home_url` properties to `/u/<username>` for both local and Diaspora profiles.
+
 Fixed
-......
+.....
 
 * Fix missing `Http404` imports in Streams API viewsets.
+
+* Fix settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH processing for the SPA UI by calling
+  super().dispatch before evaluating request.user.is_authenticated. It appears token authentification
+  is not made avaible to the request object the same time session authentication is. The SPA UI currently
+  uses token authentication.
+
+* Ensure through_author is set even if it's not cached.
+
+* Users switching to a new platform will sometimes get a new `fid` while keeping their `finger` and/or
+  `remote_url` properties unchanged. This has been causing a lot of profile update errors because these
+  properties must be unique and `fid` updates are not allowed. The fix is to allow `fid` updates.
+
+* Drop the use of `_anon` that some stream classes set for unauthenticated users stream keys.
+
+* Fix issue #628 (posting with limited visibility and "include your mutuals" fails with err 500).
 
 0.19.0 (2024-02-18)
 -------------------
