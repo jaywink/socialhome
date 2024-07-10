@@ -52,7 +52,7 @@ const actions = {
             })
     },
     setProfilesFromContactList({commit}, {contactList}) {
-        commit("setProfilesFromContactList", {contactList})
+        commit("setProfilesFromContactList", contactList)
     },
     unFollow({commit}, {uuid}) {
         return Vue.axios
