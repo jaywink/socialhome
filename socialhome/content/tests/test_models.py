@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import truncatechars
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.timezone import make_aware
@@ -90,6 +89,17 @@ class TestContentModel(SocialhomeTestCase):
             set(self.content_with_mentions.mentions.values_list('id', flat=True)),
             {self.remote_profile.id},
         )
+
+    def test_has_had_local_replies(self):
+        self.assertFalse(self.public_content.has_had_local_replies)
+        self.assertFalse(self.remote_content.has_had_local_replies)
+        # Add replies
+        LocalContentFactory(parent=self.public_content)
+        LocalContentFactory(parent=self.remote_content)
+        self.public_content.refresh_from_db()
+        self.remote_content.refresh_from_db()
+        self.assertTrue(self.public_content.has_had_local_replies)
+        self.assertTrue(self.remote_content.has_had_local_replies)
 
     def test_has_shared(self):
         self.assertFalse(Content.has_shared(self.public_content.id, self.local_user.profile.id))

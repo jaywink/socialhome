@@ -175,6 +175,9 @@ class Content(models.Model):
         "self", on_delete=models.CASCADE, verbose_name=_("Root parent"), related_name="all_children", null=True,
         blank=True,
     )
+    # Whether any local users have replied to this root content.
+    # Relevant for root content only.
+    has_had_local_replies = models.BooleanField(_("Has root content had local replies"), default=False)
 
     # Other relations
     activities = GenericRelation(Activity)
@@ -326,6 +329,8 @@ class Content(models.Model):
                 self.visibility = self.root.visibility
             self.pinned = False
             self.root_parent = self.root
+            if self.local and not self.root_parent.has_had_local_replies:
+                Content.objects.filter(id=self.root_parent.id).update(has_had_local_replies=True)
         elif self.share_of:
             self.content_type = ContentType.SHARE
 
