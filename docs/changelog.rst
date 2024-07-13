@@ -6,10 +6,21 @@ Changelog
 unreleased
 ----------
 
+Update notes
+............
+
+* This release contains long running database migrations due to new
+  fields added to the `Content` model.
+
 Fixed
 ......
 
 * Fix missing `Http404` imports in Streams API viewsets.
+
+* Fix `send_reply_notifications` job database query performance issues.
+
+* Stop queuing unnecessary `send_reply_notifications` jobs for received
+  content that has no local participations.
 
 0.19.0 (2024-02-18)
 -------------------
