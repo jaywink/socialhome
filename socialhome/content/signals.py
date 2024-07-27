@@ -26,7 +26,10 @@ def content_post_save(instance, **kwargs):
     created = kwargs.get("created")
     if created:
         queue = django_rq.get_queue("lowest")
-        if instance.content_type == ContentType.REPLY:
+        # Trigger send_reply_notifications only if root parent is local or it has had local replies
+        if instance.content_type == ContentType.REPLY and (
+            instance.root_parent.local or instance.root_parent.has_had_local_replies
+        ):
             transaction.on_commit(lambda: queue.enqueue(send_reply_notifications, instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: queue.enqueue(send_share_notification, instance.id))

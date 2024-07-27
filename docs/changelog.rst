@@ -42,6 +42,12 @@ Changed
 
 * Set the `remote_url/home_url` properties to `/u/<username>` for both local and Diaspora profiles.
 
+Update notes
+............
+
+* This release contains long running database migrations due to new
+  fields added to the `Content` model.
+
 Fixed
 .....
 
@@ -63,6 +69,11 @@ Fixed
 * Fix issue #628 (posting with limited visibility and "include your mutuals" fails with err 500).
 
 * Fix a programming error introduced at 0.18.0 that broke the contact lists.
+
+* Fix `send_reply_notifications` job database query performance issues.
+
+* Stop queuing unnecessary `send_reply_notifications` jobs for received
+  content that has no local participations.
 
 0.19.0 (2024-02-18)
 -------------------
