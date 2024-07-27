@@ -62,6 +62,8 @@ Fixed
 
 * Fix issue #628 (posting with limited visibility and "include your mutuals" fails with err 500).
 
+* Fix a programming error introduced at 0.18.0 that broke the contact lists.
+
 0.19.0 (2024-02-18)
 -------------------
 
