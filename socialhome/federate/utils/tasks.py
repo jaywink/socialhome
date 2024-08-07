@@ -4,6 +4,7 @@ from typing import Optional, List, Any
 
 import django_rq
 from django.conf import settings
+from django.utils.timezone import now
 
 from federation.entities import base
 from federation.entities.activitypub.models import extract_replies
@@ -451,6 +452,7 @@ def process_reply(reply):
                     "process_reply - reply %s for entity %s could not be processed",
                     remote_content.id, remote_content.target_id)
 
+
 def process_replies(root_id, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
     try:
@@ -458,6 +460,12 @@ def process_replies(root_id, shared_by_id=None, delta=None):
     except Content.DoesNotExist:
         # Retracted?
         return
+
+    if root.created + dt.timedelta(days=3) < now():
+        # Too old, don't bother
+        logger.info("process_replies - skipping content that is too old: %s", root.created)
+        return
+
     # A job might have been scheduled from process_entity_shares
     if shared_by_id:
         if getattr(root.shares.last(), 'id', None) != shared_by_id:
@@ -466,9 +474,6 @@ def process_replies(root_id, shared_by_id=None, delta=None):
     elif root.shares_count > 0:
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
         return
-
-
-
 
     process_reply_collection(root.replies_fid)
 
