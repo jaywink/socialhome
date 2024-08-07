@@ -239,6 +239,13 @@ Then execute the following and copy the markdown version for pasting to GitHub r
 
     pandoc --from rst --to markdown_github docs/changelog.rst | less
 
+Make a tag
+..........
+
+Create a git tag for the release, ie `git tag v<version>`.
+
+Push the tag and master branch.
+
 Docker images
 .............
 
