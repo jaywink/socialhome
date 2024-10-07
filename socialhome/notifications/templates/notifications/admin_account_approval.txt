@@ -6,6 +6,8 @@
 
 {% trans "User" %}: {{ user_name }}
 
+{% trans "Reason" %}: {{ reason }}
+
 {% trans "Approve or delete the user via the following url" %}: {{ admin_url }}
 
 {% trans "The user will be notified if approved." %}

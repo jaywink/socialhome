@@ -16,6 +16,9 @@ class ProfileAdmin(ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(ModelAdmin):
-    list_display = ('id', 'username', 'name', 'email', 'is_staff', 'trusted_editor', 'admin_approved', 'date_joined')
+    list_display = (
+        'id', 'username', 'name', 'email', 'is_staff', 'trusted_editor', 'admin_approved', 'date_joined',
+        'account_request_reason',
+    )
     list_filter = ('email', 'trusted_editor', 'admin_approved', 'is_staff')
     search_fields = ('id', 'name', 'username', 'email')

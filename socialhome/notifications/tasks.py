@@ -62,6 +62,7 @@ def send_account_approval_admin_notification(user_id: int):
         "name": "site admin",
         "subject": subject,
         "user_name": user.profile.name_or_handle,
+        "reason": user.account_request_reason,
     })
     send_mail(
         "%s%s" % (settings.EMAIL_SUBJECT_PREFIX, subject),
