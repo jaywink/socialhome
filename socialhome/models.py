@@ -18,6 +18,14 @@ class ImageUpload(TimeStampedModel):
         return self.image.name
 
 
+class MediaUpload(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="mediauploads")
+    media = models.FileField(null=True, blank=True, validators=[], upload_to='uploads/%Y/%m/%d/')
+
+    def __str__(self):
+        return self.media.name
+
+
 @reversion.register(ignore_duplicates=True)
 class PolicyDocument(TimeStampedModel):
     content = MarkdownxField()
