@@ -3,6 +3,14 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Fixed
+.....
+
+* Fix race condition sending new user approval emails.
+
 0.20.0 (2024-08-07)
 -------------------
 
