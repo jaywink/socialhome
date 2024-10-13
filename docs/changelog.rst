@@ -6,6 +6,11 @@ Changelog
 unreleased
 ----------
 
+Socialhome code has migrated from GitLab to Codeberg. Please find the relevant
+repositories under https://codeberg.org/socialhome
+
+Any issues before October 2024 are only available in the old `GitLab issue tracker <https://gitlab.com/jaywink/socialhome/-/issues>`_.
+
 Fixed
 .....
 

@@ -19,6 +19,7 @@ else
     tag=$1
 fi
 
+# TODO which registry do we use?
 docker login registry.gitlab.com
 docker build -f docker/app/Dockerfile -t registry.gitlab.com/jaywink/socialhome:${tag} .
 docker push registry.gitlab.com/jaywink/socialhome:${tag}
