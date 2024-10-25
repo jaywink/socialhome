@@ -1,6 +1,6 @@
-[![](https://img.shields.io/badge/docker-image-yellow)](https://gitlab.com/jaywink/socialhome/container_registry)  [![pipeline status](https://git.feneas.org/socialhome/socialhome/badges/master/pipeline.svg)](https://git.feneas.org/socialhome/socialhome/commits/master) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
+[![](https://img.shields.io/badge/docker-image-yellow)](https://gitlab.com/jaywink/socialhome/container_registry) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
-[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:federator.dev?server_fqdn=federator.modular.im)](https://matrix.to/#/#socialhome:federator.dev) [![issue tracker](https://img.shields.io/badge/issue%20tracker-gitlab-yellow.svg)](https://gitlab.com/jaywink/socialhome/-/issues) [![Translations](https://hosted.weblate.org/widgets/socialhome/-/svg-badge.svg)](https://hosted.weblate.org/engage/socialhome/)
+[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:federator.dev?server_fqdn=federator.modular.im)](https://matrix.to/#/#socialhome:federator.dev) [![issue tracker](https://img.shields.io/badge/issue%20tracker-codeberg-yellow.svg)](https://codeberg.org/socialhome/socialhome/issues) [![Translations](https://hosted.weblate.org/widgets/socialhome/-/svg-badge.svg)](https://hosted.weblate.org/engage/socialhome/)
 
 ![Socialhome](http://socialhome.readthedocs.io/en/latest/_images/socialhome.png)
 
@@ -44,14 +44,10 @@ Development
 
 Please see the [development](http://socialhome.readthedocs.io/en/latest/development.html) pages.
 
-NOTE! Contributions welcome through GitHub even though code repository has been moved to 
-[GitLab](https://gitlab.com/jaywink/socialhome). Issue tracker however is 
-only available onGitLab. GitHub users, you can log in using your GitHub credentials.
-
 Source code
 -----------
 
-Socialhome is fully open source, licenced under the AGPLv3 license.
+Socialhome is fully [open source](https://codeberg.org/socialhome), licenced under the AGPLv3 license.
 
 Translations
 ------------

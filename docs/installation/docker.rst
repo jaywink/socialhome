@@ -24,6 +24,7 @@ The application container does not serve media.
 Docker images
 '''''''''''''
 
+TODO docker registry
 The containers can be found at the `GitLab docker registry <https://gitlab.com/jaywink/socialhome/container_registry>`_.
 
 Each version will have a tag and additionally the ``latest`` tag contains the latest version.
