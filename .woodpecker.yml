@@ -21,7 +21,7 @@ steps:
       - SOCIALHOME_HTTPS=False
       - DJANGO_DEBUG=False
       - DJANGO_DEBUG_TOOLBAR=False
-      - DJANGO_SECRET_KEY=foobar"
+      - DJANGO_SECRET_KEY=foobar
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - POSTGRES_DB=postgres
@@ -50,4 +50,3 @@ steps:
       - npm rebuild node-sass
       - npm run build
       - npm run test:unit
-      
