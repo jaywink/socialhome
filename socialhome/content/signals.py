@@ -56,9 +56,12 @@ def federate_content_retraction(instance, **kwargs):
 @receiver(post_delete, sender=Content)
 def update_counts(instance, **kwargs):
     try:
-        parent = Content.objects.get(id=instance.parent_id)
-        parent.cache_data(commit=True)
-        parent.cache_related_object_data()
+        if instance.content_type == ContentType.REPLY:
+            obj = Content.objects.get(id=instance.parent_id)
+        elif instance.content_type == ContentType.SHARE:
+            obj = Content.objects.get(id=instance.share_of.id)
+        obj.cache_data(commit=True)
+        obj.cache_related_object_data()
     except:
         pass
 
