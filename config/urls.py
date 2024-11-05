@@ -88,6 +88,7 @@ urlpatterns = [
     url(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
+    url(r"^api/spa-auth/", include("socialhome.authapi.urls"), name="api-spa-auth"),
 
     # Account
     url(r"^account/", include("dynamic_preferences.urls")),

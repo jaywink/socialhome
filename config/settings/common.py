@@ -48,6 +48,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "channels",
     "daphne",
+    "corsheaders",
     "crispy_forms",
     "crispy_bootstrap4",
     "allauth",
@@ -90,6 +91,7 @@ if testing:
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -599,7 +601,6 @@ if log_target == "syslog":
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 100,
