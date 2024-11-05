@@ -9,6 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content, Tag
 from socialhome.content.serializers import ContentSerializer, TagSerializer
+from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.utils import update_profiles
 
 
@@ -87,7 +88,15 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             raise exceptions.ValidationError(e.message)
         except Exception:
             raise exceptions.APIException("Unknown error when creating share.")
-        return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
+        #return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
+        response = {"status": "ok"}
+        if self.request.version == '2.0':
+            content.refresh_from_db()
+            response.update({'content_id': content.through, 'through_author': None})
+            if content.id != content.through:
+                response.update({'through_author': LimitedProfileSerializer(Content.objects.get(id=content.through).author,
+                                                                            context={'request': self.request}).data})
+        return Response(response)
 
     def get_queryset(self, parent=None, share_of=None):
         if parent:
