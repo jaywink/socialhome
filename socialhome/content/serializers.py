@@ -34,6 +34,8 @@ class RecipientsField(serializers.Field):
         """
         Add the mentions for public content or
         add the previous values from limited visibilities for existing limited content.
+        TODO: fix finger case sensitivity potentially causing both handle and finger to
+        return a recipient
         """
         if instance.visibility == Visibility.LIMITED:
             fingers = instance.limited_visibilities.filter(finger__isnull=False).order_by("id").values_list("finger", flat=True)
