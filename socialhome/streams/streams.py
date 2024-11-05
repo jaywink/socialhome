@@ -248,7 +248,7 @@ class BaseStream:
         preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
-        update_profiles(content)
+        if not settings.DEBUG: update_profiles(content)
         return content, throughs
 
     def get_content_ids(self):

@@ -1,6 +1,7 @@
 from typing import Any
 
 import django_rq
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status
@@ -98,7 +99,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
             target_profile = Profile.objects.get(uuid=uuid)
         except Profile.DoesNotExist:
             raise PermissionDenied("Profile given does not exist.")
-        update_profile(target_profile, force=True)
+        if not settings.DEBUG: update_profile(target_profile, force=True)
         return Response({"status": "Scheduled"})
 
     @action(detail=False, methods=["get"], permission_classes=(IsAuthenticated,))
