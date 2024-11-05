@@ -31,7 +31,8 @@ def user_post_save(sender, **kwargs):
 
         # If users require approval, email the admin
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
-            django_rq.enqueue(send_account_approval_admin_notification, user_id=user.id)
+            queue = django_rq.get_queue("high")
+            transaction.on_commit(lambda: queue.enqueue(send_account_approval_admin_notification, user_id=user.id))
     # Initialize and copy pictures to profile
     user.init_pictures_on_disk()
     user.copy_picture_to_profile()

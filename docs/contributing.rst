@@ -18,10 +18,10 @@ The best contributions come from real personal need.
 Finding things to do
 --------------------
 
-We have an `issue tracker <https://gitlab.com/jaywink/socialhome/-/issues>`_ on GitHub. If you don't already have an idea
-on what to do, check out the issues listed there. Some issues are
-`labeled as newcomer <https://gitlab.com/jaywink/socialhome/-/boards/4055970>`_.
-These are easy picking tasks for those either new to Socialhome or with less knowledge of Django.
+We have an `issue tracker <https://codeberg.org/socialhome/socialhome/issues>`_ on Codeberg.
+
+NOTE! Due to bugs in the GitLab -> Codeberg migration tool, old issues before October 2024 can
+only be found in the old [GitLab issue tracker](https://gitlab.com/jaywink/socialhome/-/issues).
 
 Logging issues
 --------------
@@ -53,7 +53,7 @@ Before submitting a pull request, please ensure you've read and understood the f
 Reviewing code
 --------------
 
-Code review is a valuable way to contribute, and also to learn about the code base! Don't be afraid to give some comments to `open merge requests <https://gitlab.com/jaywink/socialhome/-/merge_requests>`_! You don't have to be a veteran or know everything to be able to give opinions. Pull request reviews are not just for reviewing, they're a valuable opportunity for learning too.
+Code review is a valuable way to contribute, and also to learn about the code base! Don't be afraid to give some comments to `open pull requests <https://codeberg.org/socialhome/socialhome/pulls>`_! You don't have to be a veteran or know everything to be able to give opinions. Pull request reviews are not just for reviewing, they're a valuable opportunity for learning too.
 
 Tests
 -----
@@ -67,7 +67,7 @@ Testing tools
 Django
 ''''''
 
-We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own `base classes <http://gitlab.com/jaywink/socialhome/blob/master/socialhome/tests/utils.py>`_ which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these to Django test classes.
+We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own `base classes <https://codeberg.org/socialhome/socialhome/src/branch/master/socialhome/tests/utils.py>`_ which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these to Django test classes.
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
 

@@ -6,6 +6,11 @@ Changelog
 unreleased
 ----------
 
+Socialhome code has migrated from GitLab to Codeberg. Please find the relevant
+repositories under https://codeberg.org/socialhome
+
+Any issues before October 2024 are only available in the old `GitLab issue tracker <https://gitlab.com/jaywink/socialhome/-/issues>`_.
+
 Added
 .....
 
@@ -41,6 +46,14 @@ Changed
 * Bump `update_profiles` priority to low. Reduce `send_reply_notification` prority to lowest.
 
 * Set the `remote_url/home_url` properties to `/u/<username>` for both local and Diaspora profiles.
+
+Fixed
+.....
+
+* Fix race condition sending new user approval emails.
+
+0.20.0 (2024-08-07)
+-------------------
 
 Update notes
 ............

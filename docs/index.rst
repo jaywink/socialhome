@@ -47,7 +47,7 @@ Source code
 
 Socialhome is fully open source, licenced under the AGPLv3 license.
 
-Check the code on `GitHub <https://gitlab.com/jaywink/socialhome>`_.
+Check the code on `Codeberg <https://codeberg.org/socialhome/socialhome>`_.
 
 Table of contents
 -----------------

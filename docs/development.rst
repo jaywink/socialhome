@@ -7,8 +7,11 @@ Socialhome is missing features and needs a lot of polish on the UI side. If you 
 
 For guidelines how to contribute, please first read the :ref:`contributing` guide.
 
-* `Source code repo <https://gitlab.com/jaywink/socialhome>`_
-* `Issue tracker <https://gitlab.com/jaywink/socialhome/-/issues>`_
+* `Source code repo <https://codeberg.org/socialhome/socialhome>`_
+* `Issue tracker <https://codeberg.org/socialhome/socialhome/issues>`_
+
+NOTE! Due to bugs in the GitLab -> Codeberg migration tool, old issues before October 2024 can
+only be found in the old [GitLab issue tracker](https://gitlab.com/jaywink/socialhome/-/issues).
 
 Environment setup
 -----------------
@@ -233,11 +236,18 @@ To generate a markdown version of the release changelog, first install ``Pandoc`
 
     sudo apt install pandoc
 
-Then execute the following and copy the markdown version for pasting to GitHub releases or a Socialhome post:
+Then execute the following and copy the markdown version for pasting to Codeberg releases or a Socialhome post:
 
 ::
 
     pandoc --from rst --to markdown_github docs/changelog.rst | less
+
+Make a tag
+..........
+
+Create a git tag for the release, ie `git tag v<version>`.
+
+Push the tag and master branch.
 
 Docker images
 .............
