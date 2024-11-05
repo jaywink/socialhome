@@ -277,7 +277,7 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     logger.info("make_federable_profile - Profile: %s", profile)
     try:
         return base.Profile(
-            raw_content="",
+            raw_content=profile.bio,
             public=True,  # A profile is public in the context of federation if it is sent outwards
             name=profile.name_or_handle,
             image_urls={
