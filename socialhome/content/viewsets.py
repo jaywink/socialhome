@@ -96,7 +96,8 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             if content.id != content.through:
                 response.update({'through_author': LimitedProfileSerializer(Content.objects.get(id=content.through).author,
                                                                             context={'request': self.request}).data})
-        return Response(response)
+            return Response(response)
+        else: return Response(response, status=HTTP_204_NO_CONTENT)
 
     def get_queryset(self, parent=None, share_of=None):
         if parent:
