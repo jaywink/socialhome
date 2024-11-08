@@ -14,6 +14,8 @@ const HTML = `<!doctype html>
 require("jsdom-global")(HTML, {
     pretendToBeVisual: true, url: "http://localhost",
 })
+const jsdom = require("jsdom-global")
+global.jsdom = new jsdom.JSDOM(HTML)
 require("chai/register-should.js")
 require("chai").use(require("chai-as-promised")).use(require("sinon-chai"))
 // Django's gettext and other i18n functions
@@ -44,3 +46,9 @@ global.window.Date = Date
 global.window.document.createRange = createRange
 global.window.document.body.createTextRange = () => {}
 global.window.focus = () => {}
+
+// Noop function to make the tests pass
+global.WebSocket = function () {} // eslint-disable-line func-names
+// Absence of WebSocket.prototype.close can cause tests to randomly fail
+// when components using websocket try to close socket
+global.WebSocket.prototype.close = function () {} // eslint-disable-line func-names

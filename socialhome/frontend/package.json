@@ -54,7 +54,7 @@
     "eslint": "<7",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-vue": "<8",
-    "jsdom-global": "https://github.com/christophehenry/jsdom-global.git#v3.0.3",
+    "jsdom-global": "^3.0.2",
     "mock-socket": "^9.1.5",
     "moxios": "^0.4.0",
     "sass": "<1.27.0",
