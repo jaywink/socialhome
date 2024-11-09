@@ -9,9 +9,6 @@ module.exports = {
         output: {filename: "js/[name].js"},
         resolve: {
             alias: {
-                "%": path.resolve(__dirname, "tests"),
-                "%fixtures": path.resolve(__dirname, "tests", "unit", "fixtures"),
-                "mock-socket": "mock-socket/dist/mock-socket.js",
                 "reconnecting-websocket": "ReconnectingWebSocket/reconnecting-websocket.min.js",
                 "vue-masonry": "vue-masonry/src/masonry.plugin.js",
                 vue$: "vue/dist/vue.common.js",

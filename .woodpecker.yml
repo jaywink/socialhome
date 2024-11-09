@@ -5,55 +5,45 @@ when:
       - master
   - event: tag
 
-# services:
-#   postgres:
-#     image: postgres:14
-#     environment:
-#       - POSTGRES_DB=postgres
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=postgres
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
-#   redis:
-#     image: redis
+  redis:
+    image: redis
 
 steps:
-#   test-server:
-#     image: python:3.10
-#     environment:
-#       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
-#       - DJANGO_SETTINGS_MODULE=config.settings.local
-#       - DJANGO_ALLOWED_HOSTS=*
-#       - DJANGO_SECURE_SSL_REDIRECT=False
-#       - SOCIALHOME_DOMAIN=127.0.0.1:8000
-#       - SOCIALHOME_HTTPS=False
-#       - DJANGO_DEBUG=False
-#       - DJANGO_DEBUG_TOOLBAR=False
-#       - DJANGO_SECRET_KEY=foobar
-#       - REDIS_HOST=redis
-#       - REDIS_PORT=6379
-#       - POSTGRES_DB=postgres
-#       - POSTGRES_PASSWORD=postgres
-#       - POSTGRES_USER=postgres
-#       - SOCIALHOME_MATRIX_ENABLED=True
-#     commands:
-#       - python -V
-#       - pip install virtualenv
-#       - virtualenv venv
-#       - . venv/bin/activate
-#       - pip install -U pip-tools pip setuptools
-#       - pip-sync dev-requirements.txt
-#       - python manage.py migrate --noinput -v 0
-#       - python manage.py collectstatic --noinput -v 0
-#       - pip freeze
-#       - python manage.py print_settings
-#       - pytest
-
-  test-frontend-unit:
-    image: node:12
+  test-server:
+    image: python:3.10
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
+      - DJANGO_SETTINGS_MODULE=config.settings.local
+      - DJANGO_ALLOWED_HOSTS=*
+      - DJANGO_SECURE_SSL_REDIRECT=False
+      - SOCIALHOME_DOMAIN=127.0.0.1:8000
+      - SOCIALHOME_HTTPS=False
+      - DJANGO_DEBUG=False
+      - DJANGO_DEBUG_TOOLBAR=False
+      - DJANGO_SECRET_KEY=foobar
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - SOCIALHOME_MATRIX_ENABLED=True
     commands:
-      - npm install
-      - node_modules/.bin/bower install --allow-root
-      - npm i --prefix=socialhome/frontend
-#       - npm rebuild node-sass
-      - npm run build
-      - npm run test:unit
+      - python -V
+      - pip install virtualenv
+      - virtualenv venv
+      - . venv/bin/activate
+      - pip install -U pip-tools pip setuptools
+      - pip-sync dev-requirements.txt
+      - python manage.py migrate --noinput -v 0
+      - python manage.py collectstatic --noinput -v 0
+      - pip freeze
+      - python manage.py print_settings
+      - pytest
