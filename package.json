@@ -6,11 +6,6 @@
     "build": "./node_modules/grunt/bin/grunt build && npm run --prefix=socialhome/frontend build",
     "dev": "./node_modules/grunt/bin/grunt dev && npm run --prefix=socialhome/frontend build",
     "watch": "./node_modules/grunt/bin/grunt dev && npm run --prefix=socialhome/frontend watch",
-    "test": "npm run test:all",
-    "test:all": "npm run test:unit",
-    "test:unit": "npm run --prefix=socialhome/frontend test:unit",
-    "test:e2e": "npm run --prefix=socialhome/frontend test:e2e",
-    "test:e2e:ci": "npm run --prefix=socialhome/frontend test:e2e -- --headless",
     "lint": "npm run --prefix=socialhome/frontend lint -- --no-fix",
     "lint:fix": "npm run --prefix=socialhome/frontend lint",
     "postinstall": "./node_modules/.bin/bower install && npm i --prefix=socialhome/frontend"
@@ -22,7 +17,6 @@
     "cssnano": "<5.0.0",
     "eslint": "<7",
     "eslint-config-airbnb": "^18.2.1",
-    "faker": "^5.5.3",
     "grunt": "~1.4.1",
     "grunt-cli": "~1.4.3",
     "grunt-contrib-concat": "^1.0.1",
@@ -41,11 +35,9 @@
     "node": ">=12 <13"
   },
   "dependencies": {
-    "chai": "^4.3.7",
     "lodash": "^4.17.21"
   },
   "eslintIgnore": [
-    "**/tests/*",
     "**/socialhome/static/*"
   ]
 }

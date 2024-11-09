@@ -25,31 +25,31 @@ class TestGetRootContentParticipants(SocialhomeTestCase):
         cls.local_profile = cls.local_user.profile
 
     def test_no_participants_for_just_root_content(self):
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 0)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
 
     def test_no_participants_for_just_remote_replies(self):
         ContentFactory(parent=self.local_content)
         ContentFactory(parent=self.remote_content)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 0)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
 
     def test_no_participants_for_just_remote_shares(self):
         ContentFactory(parent=self.local_content, content_type=ContentType.SHARE)
         ContentFactory(parent=self.remote_content, content_type=ContentType.SHARE)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 0)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 0)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 0)
 
     def test_local_participant_for_direct_reply(self):
         ContentFactory(parent=self.local_content, author=self.local_profile)
         ContentFactory(parent=self.remote_content, author=self.local_profile)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 1)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
 
     def test_local_participant_for_direct_share(self):
         ContentFactory(parent=self.local_content, author=self.local_profile, content_type=ContentType.SHARE)
         ContentFactory(parent=self.remote_content, author=self.local_profile, content_type=ContentType.SHARE)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 1)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
 
     def test_local_participant_for_reply_of_remote_reply(self):
@@ -57,7 +57,7 @@ class TestGetRootContentParticipants(SocialhomeTestCase):
         ContentFactory(parent=reply, author=self.local_profile)
         reply = ContentFactory(parent=self.remote_content)
         ContentFactory(parent=reply, author=self.local_profile)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 1)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
 
     def test_local_participant_for_share_of_remote_reply(self):
@@ -65,7 +65,7 @@ class TestGetRootContentParticipants(SocialhomeTestCase):
         ContentFactory(parent=reply, author=self.local_profile, content_type=ContentType.SHARE)
         reply = ContentFactory(parent=self.remote_content)
         ContentFactory(parent=reply, author=self.local_profile, content_type=ContentType.SHARE)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 1)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 1)
         self.assertEqual(len(get_root_content_participants(self.remote_content)), 1)
 
     def test_local_participants_of_different_types_on_remote(self):
@@ -78,7 +78,7 @@ class TestGetRootContentParticipants(SocialhomeTestCase):
         ContentFactory(parent=reply, author=profile2)
         reply = ContentFactory(parent=self.local_content)
         ContentFactory(parent=reply, author=profile3, content_type=ContentType.SHARE)
-        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.profile)), 3)
+        self.assertEqual(len(get_root_content_participants(self.local_content, exclude_user=self.user)), 3)
 
 
 class TestSendMentionNotification(SocialhomeTestCase):
