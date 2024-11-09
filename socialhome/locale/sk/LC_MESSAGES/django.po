@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2022-09-12 06:17+0000\n"
+"PO-Revision-Date: 2024-11-10 19:00+0000\n"
 "Last-Translator: Marek Ľach <graweeld@googlemail.com>\n"
 "Language-Team: Slovak <https://hosted.weblate.org/projects/socialhome/"
 "backendfrontend/sk/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 4.14.1-dev\n"
+"X-Generator: Weblate 5.8.2\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
@@ -97,11 +97,12 @@ msgstr "Zdieľať"
 
 #: socialhome/content/forms.py:18 socialhome/static/dist/vue/js/app.js:67
 msgid "Recipients"
-msgstr ""
+msgstr "Prijemcovia"
 
 #: socialhome/content/forms.py:53
 msgid "Recipients cannot be empty if not including followed users."
 msgstr ""
+"Prijemcovia nemôžu byť prázdni, keď nezahrňujete nasledovaních užívateľov."
 
 #: socialhome/content/forms.py:66
 #, python-format
