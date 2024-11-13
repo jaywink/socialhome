@@ -661,6 +661,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
+    "federate": FEDERATE,
     "federation_id": f'{SOCIALHOME_URL}/u/{FEDERATION_USER}/',
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",
