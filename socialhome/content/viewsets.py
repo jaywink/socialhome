@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework import exceptions, status
 from rest_framework import mixins
@@ -122,7 +123,7 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         parent = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
-        update_profiles(serializer.child.instance)
+        if not settings.DEBUG: update_profiles(serializer.child.instance)
         return Response(serializer.data)
 
     @action(detail=True, methods=["delete", "post"])

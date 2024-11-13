@@ -16,6 +16,7 @@ asgiref==3.6.0
     #   channels-redis
     #   daphne
     #   django
+    #   django-cors-headers
 asttokens==2.2.1
     # via stack-data
 async-timeout==4.0.2
@@ -115,6 +116,7 @@ django==3.2.18
     #   crispy-bootstrap4
     #   django-allauth
     #   django-braces
+    #   django-cors-headers
     #   django-crispy-forms
     #   django-dynamic-preferences
     #   django-extensions
@@ -136,6 +138,8 @@ django==3.2.18
 django-allauth==0.52.0
     # via -r requirements/requirements.in
 django-braces==1.15.0
+    # via -r requirements/requirements.in
+django-cors-headers==4.5.0
     # via -r requirements/requirements.in
 django-crispy-forms==2.0
     # via

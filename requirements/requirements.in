@@ -9,6 +9,7 @@ crispy-bootstrap4
 commonmark_socialhome
 django-allauth
 django-braces
+django-cors-headers<4.6.0
 django-crispy-forms
 django-dynamic-preferences
 django-enumfields
