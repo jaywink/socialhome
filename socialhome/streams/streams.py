@@ -113,7 +113,7 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
         if stream.should_cache_content(content):
             if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
                 cache_keys.append(stream.key)
-            if is_share and (not stream.notify_for_shares or acting_profile == getattr(user, "profile", None)):
+            if is_share and acting_profile == getattr(user, "profile", None):
                 continue
             if user.recently_active:
                 notify_keys.add(stream.notify_key)
@@ -183,16 +183,19 @@ def update_streams_with_content(content, event='new'):
 class BaseStream:
     accept_ids = None
     last_id = None
+    newest_through_id = None
     key_base = ["sh", "streams"]
     notify_for_shares = True
     ordering = "-created"
     paginate_by = 15
     redis = None
     stream_type = None
+    unfetched_content = False
 
-    def __init__(self, last_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
+    def __init__(self, last_id: int = None, newest_through_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
         self.accept_ids = accept_ids or []
         self.last_id = last_id
+        self.newest_through_id = newest_through_id
         self.user = user
 
     def __str__(self):
@@ -218,6 +221,29 @@ class BaseStream:
                 # This item is outside our cached ids, abort
                 return [], {}
             index = last_index + 1
+        if self.newest_through_id:
+            self.unfetched_content = False
+            id = Content.objects.filter(through=self.newest_through_id).values_list('id',flat=True)
+            if id:
+                id = id[0]
+            else:
+                logger.warning("Stream.get_cached_content_ids - no content associated with through id %s",
+                               self.newest_through_id)
+                return [], {}
+            index = self.redis.zrevrank(self.key, id)
+            if isinstance(index, int):
+                ids = [int(x) for x in self.redis.zrevrange(self.key, 0, index)]
+                throughs = [int(x) for x in self.redis.hmget(self.get_throughs_key(self.key), keys=ids)]
+                throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
+                ids = throughs.keys()
+                if len(ids) > self.paginate_by:
+                    self.unfetched_content = True
+                    return ids[:self.paginate_by], {id: throughs[id] for id in throughs.keys()[:self.paginate_by]}
+                else: return ids, throughs
+                print('cached_content_ids', index, ids, throughs, self.newest_through_id)
+            else:
+                print('cached_content_ids', index, self.newest_through_id)
+                return [], {}
         return self.get_cached_range(index)
 
     def get_cached_range(self, index):
@@ -257,8 +283,10 @@ class BaseStream:
         throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
+            print('cached ids', ids, throughs, self.last_id, self.newest_through_id, type(self.newest_through_id))
             if len(ids) >= self.paginate_by:
                 return ids, throughs
+
         remaining = self.paginate_by - len(ids)
         qs = self.get_queryset()
         if self.last_id:
@@ -266,11 +294,15 @@ class BaseStream:
                 qs = qs.filter(through__lt=self.last_id)
             else:
                 qs = qs.filter(through__gt=self.last_id)
+        if self.newest_through_id: qs = qs.filter(through__gt=self.newest_through_id)
         # Get and fill remaining items
+        count = qs.values("id", "through").order_by(self.ordering).count() + len(ids)
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
         for item in ids_throughs:
             ids.append(item["id"])
             throughs[item["id"]] = item["through"]
+        self.unfetched_content = count > self.paginate_by and isinstance(self.newest_through_id, str)
+        print('ids', ids_throughs, ids, throughs, self.last_id, self.newest_through_id, count)
         return ids, throughs
 
     def get_queryset(self, *args, **kwars):
@@ -471,14 +503,15 @@ CACHED_STREAM_CLASSES = (
     FollowedStream,
     ProfileAllStream,
     TagsStream,
-)
-
-NON_CACHED_STREAM_CLASSES = (
     LimitedStream,
     LocalStream,
     ProfilePinnedStream,
     PublicStream,
     TagStream,
+)
+
+NON_CACHED_STREAM_CLASSES = (
+
 )
 
 ALL_STREAMS = CACHED_STREAM_CLASSES + NON_CACHED_STREAM_CLASSES
