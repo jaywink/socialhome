@@ -189,4 +189,4 @@ class ContentQuerySet(models.QuerySet):
                 Q(visibility=Visibility.LIMITED) &
                 Q(limited_visibilities=user.profile)
             )
-        )
+        ).distinct()
