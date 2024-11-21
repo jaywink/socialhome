@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 #from .forms import CreateUserForm
 
-from socialhome.users.serializers import LimitedProfileSerializer
+from socialhome.users.serializers import ProfileSerializer
 
 @ensure_csrf_cookie
 @require_http_methods(['GET'])
@@ -34,7 +34,7 @@ def login_view(request):
 
     if user:
         login(request, user)
-        data = LimitedProfileSerializer(user.profile, context={"request": request}).data
+        data = ProfileSerializer(user.profile, context={"request": request}).data
         return JsonResponse(data)
     return JsonResponse(
         {'success': False, 'message': 'Invalid credentials'}, status=401
