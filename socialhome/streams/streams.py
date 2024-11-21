@@ -378,6 +378,7 @@ class BaseStream:
 
     def get_context_data(self):
         return {
+            'is_cached': self.__class__ in CACHED_STREAM_CLASSES,
             'notify_key': self.notify_key,
             'unfetched_content': self.unfetched_content,
         }
@@ -513,7 +514,6 @@ class TagsStream(BaseStream):
 CACHED_STREAM_CLASSES = (
     FollowedStream,
     ProfileAllStream,
-    TagsStream,
     LimitedStream,
     LocalStream,
     ProfilePinnedStream,
@@ -522,7 +522,7 @@ CACHED_STREAM_CLASSES = (
 )
 
 NON_CACHED_STREAM_CLASSES = (
-
+    TagsStream,
 )
 
 ALL_STREAMS = CACHED_STREAM_CLASSES + NON_CACHED_STREAM_CLASSES
