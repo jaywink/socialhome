@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from socialhome.content.models import Tag
 from socialhome.content.serializers import ContentSerializer
+from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
     PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream, LimitedStream, LocalStream,
     TagsStream)
@@ -28,10 +29,10 @@ class StreamsAPIBaseView(APIView):
         qs, throughs = self.get_content()
         serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
         data = serializer.data
-        # Hack used to send the ws channel name the SPA UI
+        # Hack used to send the ws channel name and relevant context data to the SPA UI
+        # This is used in lieu of json context
         if request.version == '2.0':
-            data = {"notify_key": self.stream.notify_key,
-                    "unfetched_content": self.stream.unfetched_content,
+            data = {"context": self.stream.get_context_data(),
                     "data": data}
         return Response(data)
 

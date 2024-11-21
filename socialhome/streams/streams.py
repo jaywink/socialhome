@@ -376,6 +376,12 @@ class BaseStream:
     def notify_key_extra(self):
         return None
 
+    def get_context_data(self):
+        return {
+            'notify_key': self.notify_key,
+            'unfetched_content': self.unfetched_content,
+        }
+
     def should_cache_content(self, content):
         return self.get_queryset(single_id=content.id)
 
@@ -468,6 +474,11 @@ class TagStream(BaseStream):
     def __init__(self, tag, **kwargs):
         super().__init__(**kwargs)
         self.tag = tag
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['tag_uuid'] = self.tag.uuid
+        return context
 
     def get_queryset(self, single_id=None):
         if not self.tag:
