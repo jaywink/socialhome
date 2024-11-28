@@ -235,7 +235,7 @@ class BaseStream:
                 ids = [int(x) for x in self.redis.zrevrange(self.key, 0, index)]
                 throughs = [int(x) for x in self.redis.hmget(self.get_throughs_key(self.key), keys=ids)]
                 throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
-                ids = throughs.keys()
+                ids = list(throughs.keys())
                 if len(ids) > self.paginate_by:
                     self.unfetched_content = True
                     return ids[:self.paginate_by], {id: throughs[id] for id in throughs.keys()[:self.paginate_by]}
@@ -516,12 +516,12 @@ CACHED_STREAM_CLASSES = (
     ProfileAllStream,
     LimitedStream,
     LocalStream,
-    ProfilePinnedStream,
     PublicStream,
     TagStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
+    ProfilePinnedStream,
     TagsStream,
 )
 
