@@ -21,10 +21,10 @@ Instructions are for Ubuntu 16.04+ (+ simple Alpine 3.6 dependencies script). Pl
 Python Virtualenv
 .................
 
-Python 3.7 is the minimum supported version. Ensure the following are installed:
+Python 3.10 is the suggested minimum development version. Ensure the following are installed:
 
 * Python system dependencies
-* NodeJS (version 10)
+* NodeJS (version 12)
 * PostgreSQL server
 * Redis
 
@@ -179,15 +179,6 @@ Python tests
     py.test
 
 To also generate profiling information, add ``--profile --profile-svg`` to the command.
-
-JavaScript tests
-................
-
-Execute the following to run the frontend JavaScript tests.
-
-::
-
-    npm run test
 
 API Routes
 -----------

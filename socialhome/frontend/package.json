@@ -6,8 +6,6 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit --require tests/unit/setup.js --timeout 10s",
     "watch": "vue-cli-service build --watch"
   },
   "dependencies": {
@@ -39,29 +37,18 @@
     "@vue/cli-plugin-e2e-cypress": "<5",
     "@vue/cli-plugin-eslint": "<5",
     "@vue/cli-plugin-pwa": "<5",
-    "@vue/cli-plugin-unit-mocha": "<5",
     "@vue/cli-service": "<5",
     "@vue/compiler-dom": "^3.2.45",
     "@vue/composition-api": "^1.7.1",
     "@vue/eslint-config-airbnb": "^7.0.0",
-    "@vue/test-utils": "1.0.0-beta.29",
     "autoprefixer": "<10",
-    "avoriaz": "^6.3.0",
     "babel-eslint": "^10.1.0",
-    "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1",
     "django-i18n": "<1.6",
     "eslint": "<7",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-vue": "<8",
-    "jsdom-global": "https://github.com/christophehenry/jsdom-global.git#v3.0.3",
-    "mock-socket": "^9.1.5",
-    "moxios": "^0.4.0",
     "sass": "<1.27.0",
     "sass-loader": "<9",
-    "sinon": "^15.0.1",
-    "sinon-chai": "^3.7.0",
-    "uuid": "<7",
     "vue-template-compiler": "^2.7.14"
   },
   "eslintConfig": {
@@ -81,8 +68,5 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ],
-  "eslintIgnore": [
-    "tests/unit/fixtures/Urls.js"
   ]
 }

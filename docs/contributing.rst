@@ -64,17 +64,9 @@ and for features always add a good enough coverage. PR's without sufficient test
 Testing tools
 .............
 
-Django
-''''''
-
 We use ``py.test`` as test runner but the tests themselves are Django based test classes. We have our own `base classes <https://codeberg.org/socialhome/socialhome/src/branch/master/socialhome/tests/utils.py>`_ which should be used as a base for all Django tests. Some old tests are pure py.test function based tests, feel free to convert these to Django test classes.
 
 Focus is placed in pure unit tests instead of complex integration or browser tests. In terms of coverage, 100% is not the key, meaningful tests and coverage of critical lines is. Don't worry if a PR drops coverage a bit if the coverage diff clearly shows all critical code paths are covered by meaningful tests.
-
-Vue
-'''
-
-The JS tests are using the `Avoriaz <https://eddyerburgh.gitbooks.io/avoriaz/content/>`_ Vue test utils and `Mocha <https://mochajs.org/>`_ test runner.
 
 Code style
 ----------

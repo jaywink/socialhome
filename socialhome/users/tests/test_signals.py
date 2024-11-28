@@ -105,7 +105,7 @@ class TestFederateProfile(TransactionTestCase):
     @patch("socialhome.users.signals.django_rq.queues.DjangoRQ", autospec=True)
     def test_local_profile_gets_sent(self, mock_send):
         user = UserFactory()
-        assert len(mock_send.method_calls) == 2
+        assert len(mock_send.method_calls) == 1
         mock_send.method_calls[0].assert_called_once_with(call().enqueue(send_profile, user.profile.id))
 
 

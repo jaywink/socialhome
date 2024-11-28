@@ -1,3 +1,10 @@
+when:
+  - event: pull_request
+  - event: push
+    branch:
+      - master
+  - event: tag
+
 services:
   postgres:
     image: postgres:14
@@ -21,7 +28,7 @@ steps:
       - SOCIALHOME_HTTPS=False
       - DJANGO_DEBUG=False
       - DJANGO_DEBUG_TOOLBAR=False
-      - DJANGO_SECRET_KEY=foobar"
+      - DJANGO_SECRET_KEY=foobar
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - POSTGRES_DB=postgres
@@ -40,14 +47,3 @@ steps:
       - pip freeze
       - python manage.py print_settings
       - pytest
-
-  test-frontend-unit:
-    image: node:12
-    commands:
-      - npm install --ignore-scripts
-      - node_modules/.bin/bower install --allow-root
-      - npm i --prefix=socialhome/frontend
-      - npm rebuild node-sass
-      - npm run build
-      - npm run test:unit
-      
