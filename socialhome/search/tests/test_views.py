@@ -103,7 +103,7 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertEqual(self.context["view"].__class__, TagStreamView)
         self.assertEqual(self.context["name"], self.tag.name)
 
-    @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
+    @patch("socialhome.search.utils.retrieve_remote_profile", autospec=True)
     def test_search_by_fid_fetches_unknown_profile(self, mock_retrieve):
         fid = "https://example.com/i-dont-exist-locally"
         mock_retrieve.return_value = base.Profile(
@@ -123,7 +123,7 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], profile)
 
-    @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
+    @patch("socialhome.search.utils.retrieve_remote_profile", autospec=True)
     def test_search_by_handle_fetches_unknown_profile(self, mock_retrieve):
         handle = "i-dont-exist-locally@example.com"
         mock_retrieve.return_value = base.Profile(
@@ -146,7 +146,7 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertEqual(self.context["object"], profile)
 
     @pytest.mark.skip
-    @patch("socialhome.search.views.retrieve_remote_profile", autospec=True)
+    @patch("socialhome.search.utils.retrieve_remote_profile", autospec=True)
     def test_search_by_handle_lowercases_before_fetching(self, mock_retrieve):
         mock_retrieve.return_value = BaseProfileFactory()
         self.get("%s?q=%s" % (reverse("search:global"), "i-dont-EXIST-locally@eXample.com"), follow=True)
