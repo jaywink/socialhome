@@ -640,8 +640,8 @@ DYNAMIC_PREFERENCES = {
 # ------
 HAYSTACK_CONNECTIONS = {
     "default": {
-        "ENGINE": "haystack.backends.whoosh_backend.WhooshEngine",
-        "PATH": str(ROOT_DIR("var", "whoosh")),
+        "ENGINE": "xapian_backend.XapianEngine",
+        "PATH": str(ROOT_DIR("var", "xapian-index")),
         "BATCH_SIZE": 100,
     },
 }

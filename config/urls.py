@@ -14,6 +14,7 @@ from django_js_reverse.views import urls_js
 from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
+from socialhome.search.viewsets import SearchViewSet
 from socialhome.viewsets import ImageUploadView, MediaUploadView
 from socialhome.views import (
     HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
@@ -29,6 +30,7 @@ from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
+router.register(r"search", SearchViewSet, basename="search")
 router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
 

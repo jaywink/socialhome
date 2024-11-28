@@ -17,11 +17,13 @@ class IntegerEnumField(indexes.IntegerField):
 
 class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True, use_template=True)
+    avatar_url = indexes.CharField(model_attr="avatar_url", indexed=False, null=True)
+    uuid = indexes.CharField(model_attr="uuid", indexed=False)
     profile_visibility = IntegerEnumField(model_attr="visibility")
 
     class Meta:
         model = Profile
-        fields = ("name", "handle")
+        fields = ("name", "finger", "avatar_url", "uuid")
 
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""
