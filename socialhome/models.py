@@ -1,6 +1,7 @@
 import reversion
 from django.db import models
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, transition
 from enumfields import EnumField
 from markdownx.models import MarkdownxField
@@ -18,9 +19,14 @@ class ImageUpload(TimeStampedModel):
         return self.image.name
 
 
+def media_file_name(instance, filename):
+    return '{0}/{1}/{2}'.format(instance.user.id, instance.category, filename)
+
+
 class MediaUpload(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="mediauploads")
-    media = models.FileField(null=True, blank=True, validators=[], upload_to='uploads/%Y/%m/%d/')
+    media = models.FileField(null=True, blank=True, validators=[], upload_to=media_file_name)
+    category = models.CharField(_("Upload Category"), blank=True, max_length=255)
 
     def __str__(self):
         return self.media.name

@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import FileField, ImageField
-from rest_framework.serializers import Serializer
+from rest_framework.fields import ImageField, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, Serializer
 
 from socialhome.forms import MarkdownXImageForm
 from socialhome.models import MediaUpload
@@ -29,17 +29,22 @@ class ImageUploadSerializer(Serializer):
         return instance
 
 
-class MediaUploadSerializer(Serializer):
-    media = FileField()
+class MediaUploadSerializer(ModelSerializer):
+    class Meta:
+        model = MediaUpload
+        fields = ['category', 'media']
 
     def validate_media(self, value):
         if value:
             return value
         raise ValidationError("Invalid media")
 
+    def validate_category(self, value):
+        if value in ('uploads', 'avatars', 'pictures'): return value
+        raise ValidationError("Invalid media category")
+
     def create(self, data):
-        self.is_valid(raise_exception=True)
-        media = MediaUpload.objects.create(**data)
-        return {
-            "media": media.media
-        }
+       self.is_valid(raise_exception=True)
+
+       return MediaUpload.objects.create(user=self.context.get("request").user, **data)
+

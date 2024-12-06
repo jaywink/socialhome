@@ -207,6 +207,7 @@ django==3.2.18
     #   django-stubs-ext
     #   django-versatileimagefield
     #   djangorestframework
+    #   drf-haystack
     #   drf-yasg
     #   xapian-haystack
 django-allauth==0.52.0
@@ -240,6 +241,7 @@ django-fsm==2.8.1
 django-haystack==3.2.1
     # via
     #   -r /home/alain/Code/socialhome/requirements/requirements.txt
+    #   drf-haystack
     #   xapian-haystack
 django-js-reverse==0.9.1
     # via -r /home/alain/Code/socialhome/requirements/requirements.txt
@@ -280,11 +282,14 @@ django-versatileimagefield==3.0
 djangorestframework==3.14.0
     # via
     #   -r /home/alain/Code/socialhome/requirements/requirements.txt
+    #   drf-haystack
     #   drf-yasg
 djangorestframework-stubs==1.9.0
     # via -r requirements/requirements-dev.in
 docutils==0.19
     # via sphinx
+drf-haystack==1.9.1
+    # via -r /home/alain/Code/socialhome/requirements/requirements.txt
 drf-yasg==1.21.5
     # via -r /home/alain/Code/socialhome/requirements/requirements.txt
 exceptiongroup==1.1.0
@@ -562,6 +567,7 @@ python-dateutil==2.8.2
     #   -r /home/alain/Code/socialhome/requirements/requirements.txt
     #   arrow
     #   croniter
+    #   drf-haystack
     #   faker
     #   federation
     #   freezegun

@@ -33,6 +33,7 @@ django-silk
 django-versatileimagefield
 django<4
 djangorestframework
+drf-haystack
 drf-yasg
 federation
 ipython

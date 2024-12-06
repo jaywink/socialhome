@@ -110,8 +110,6 @@ class ProfileSerializer(ModelSerializer):
             "image_url_large",
             "image_url_medium",
             "image_url_small",
-            "avatar_url",
-            "picture_url",
             "is_local",
             "url",
             "user_following",
