@@ -46,5 +46,5 @@ class MediaUploadSerializer(ModelSerializer):
     def create(self, data):
        self.is_valid(raise_exception=True)
 
-       return MediaUpload.objects.create(user=self.context.get("request").user, **data)
+       return MediaUpload.objects.create(**data)
 
