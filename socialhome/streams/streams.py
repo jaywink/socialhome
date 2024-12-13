@@ -292,6 +292,9 @@ class BaseStream:
         if self.last_id:
             if self.ordering == "-created":
                 qs = qs.filter(through__lt=self.last_id)
+            elif self.ordering == "order":
+                last = Content.objects.filter(id=self.last_id).values_list("order", flat=True)[0]
+                qs = qs.filter(order__gt=last)
             else:
                 qs = qs.filter(through__gt=self.last_id)
         if self.newest_through_id: qs = qs.filter(through__gt=self.newest_through_id)
