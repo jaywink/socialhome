@@ -32,7 +32,7 @@ from socialhome.content.utils import safe_text, safe_text_for_markdown
 from socialhome.enums import Visibility
 from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls, generate_rsa_private_key
-from socialhome.utils import get_full_media_url, get_redis_connection
+from socialhome.utils import get_full_media_url, get_redis_connection, is_url
 
 logger = logging.getLogger("socialhome")
 
@@ -502,7 +502,9 @@ class Profile(TimeStampedModel):
     @staticmethod
     def absolute_image_url(profile, image_name):
         """Returns absolute version of image URL of given size if they wasn't absolute"""
-        url = safe_text(profile.image_urls[image_name])
+        url = profile.image_urls[image_name]
+        if not is_url(url):
+            return ""
 
         if url.startswith("/") and profile.handle:
             return "https://%s%s" % (
@@ -547,8 +549,8 @@ class Profile(TimeStampedModel):
             values['followers_fid'] = safe_text(remote_profile.followers)
             values["key_id"] = safe_text(remote_profile.key_id)
             values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
-            if remote_profile.image:
-                values["picture_url"] = safe_text(remote_profile.image.url)
+            if remote_profile.image and is_url(remote_profile.image.url):
+                values["picture_url"] = remote_profile.image.url
         else:
             values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(remote_profile.username))
 
