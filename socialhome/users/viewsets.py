@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from socialhome.enums import Visibility
+from socialhome.content.models import Content
 from socialhome.users.models import User, Profile
 from socialhome.users.serializers import UserSerializer, ProfileSerializer, LimitedProfileSerializer
 from socialhome.users.tasks.exports import create_user_export, UserExporter
@@ -46,11 +47,15 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         self.pagination_class.page_size_query_param = "page_size"
 
     def get_queryset(self):
-        qs = Profile.objects.visible_for_user(self.request.user)
-        if self.action == "list" and not self.request.user.is_staff:
-            # Filter out also LIMITED profiles since those don't want to be "searched"
-            qs = qs.exclude(visibility=Visibility.LIMITED)
-        return qs
+        if self.action == 'organize':
+            profile = get_object_or_404(Profile, user=self.request.user)
+            return Content.objects.profile_pinned(profile, self.request.user).order_by("order")
+        else:
+            qs = Profile.objects.visible_for_user(self.request.user)
+            if self.action == "list" and not self.request.user.is_staff:
+                # Filter out also LIMITED profiles since those don't want to be "searched"
+                qs = qs.exclude(visibility=Visibility.LIMITED)
+            return qs
 
     @action(detail=True, methods=["post"])
     def follow(self, request, uuid=None):
@@ -111,6 +116,20 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
         response = HttpResponse(zipf, content_type='application/zip')
         response['Content-Disposition'] = 'attachment; filename=%s' % exporter.name
         return response
+
+    def _save_sort_order(self, card_ids):
+        """Update Content `order` values according to sort order."""
+        qs_ids = self.get_queryset().values_list("id", flat=True)
+        for i in range(0, len(card_ids)):
+            # Only allow updating cards that are in our qs
+            card_id = int(card_ids[i])
+            if card_id in qs_ids:
+                Content.objects.filter(id=card_id).update(order=i)
+
+    @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
+    def organize(self, request, uuid=None):
+        self._save_sort_order(request.data.get("sort_order").split(","))
+        return Response({"status": "Organized."})
 
 
 class ReadOnly(BasePermission):
