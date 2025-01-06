@@ -46,15 +46,14 @@ def logout_view(request):
     return JsonResponse({'message': 'Logged out'})
 
 
-#@require_http_methods(['GET'])
-#def user(request):
-#    if request.user.is_authenticated:
-#        return JsonResponse(
-#            {'username': request.user.username, 'email': request.user.email}
-#        )
-#    return JsonResponse(
-#        {'message': 'Not logged in'}, status=401
-#    )
+@require_http_methods(['GET'])
+def user_view(request):
+    if request.user.is_authenticated:
+        data = ProfileSerializer(request.user.profile, context={"request": request}).data
+        return JsonResponse(data)
+    return JsonResponse(
+        {'message': 'Not logged in'}, status=401
+    )
 
 
 #@require_http_methods(['POST'])
