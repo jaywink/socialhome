@@ -100,9 +100,11 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             return Response(response)
         else: return Response(response, status=HTTP_204_NO_CONTENT)
 
-    def get_queryset(self, parent=None, share_of=None):
-        if parent:
-            return Content.objects.full_conversation(parent.id, self.request.user)
+    def get_queryset(self, root_parent=None, parent=None, share_of=None):
+        if root_parent:
+            return Content.objects.full_conversation(root_parent.id, self.request.user)
+        elif parent:
+            return Content.objects.children(parent.id, self.request.user)
         elif share_of:
             return Content.objects.shares(share_of.id, self.request.user)
         if self.request.user.is_staff:
@@ -120,6 +122,14 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
 
     @action(detail=True, methods=["get"])
     def replies(self, request, *args, **kwargs):
+        parent = self.get_object()
+        queryset = self.filter_queryset(self.get_queryset(root_parent=parent)).order_by("created")
+        serializer = self.get_serializer(queryset, many=True)
+        if not settings.DEBUG: update_profiles(serializer.child.instance)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def thread(self, request, *args, **kwargs):
         parent = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
