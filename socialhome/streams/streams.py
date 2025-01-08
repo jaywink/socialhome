@@ -238,7 +238,7 @@ class BaseStream:
                 ids = list(throughs.keys())
                 if len(ids) > self.paginate_by:
                     self.unfetched_content = True
-                    return ids[:self.paginate_by], {id: throughs[id] for id in throughs.keys()[:self.paginate_by]}
+                    return ids[:self.paginate_by], {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
                 else: return ids, throughs
                 print('cached_content_ids', index, ids, throughs, self.newest_through_id)
             else:
