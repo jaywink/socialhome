@@ -29,7 +29,7 @@ def use_new_ui(get_response):
                         ap_request = True
                         break
                 if not any((
-                    request.path.split('/')[1] in ('api', 'admin', 'ch', 'static'),
+                    request.path.split('/')[1] in ('admin', 'api', 'ch', 'django-rq', 'static'),
                     ap_request,
                 )):
                     return render(request, 'index.html')
