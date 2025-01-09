@@ -297,15 +297,15 @@ class BaseStream:
                 qs = qs.filter(order__gt=last)
             else:
                 qs = qs.filter(through__gt=self.last_id)
-        if self.newest_through_id: qs = qs.filter(through__gt=self.newest_through_id)
+        if self.newest_through_id:
+            qs = qs.filter(through__gt=self.newest_through_id)
+            self.unfetched_content = (qs.count() + len(ids)) > self.paginate_by
         # Get and fill remaining items
-        count = qs.values("id", "through").order_by(self.ordering).count() + len(ids)
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
         for item in ids_throughs:
             ids.append(item["id"])
             throughs[item["id"]] = item["through"]
-        self.unfetched_content = count > self.paginate_by and isinstance(self.newest_through_id, str)
-        print('ids', ids_throughs, ids, throughs, self.last_id, self.newest_through_id, count)
+        print('ids', ids_throughs, ids, throughs, self.last_id, self.newest_through_id, self.unfetched_content)
         return ids, throughs
 
     def get_queryset(self, *args, **kwars):
