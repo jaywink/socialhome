@@ -169,7 +169,7 @@ class Content(models.Model):
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
-    through = models.PositiveIntegerField(_("Latest share id"), default=0, editable=False)
+    through = models.PositiveIntegerField(_("Latest share id"), default=0, editable=False, db_index=True)
     # Indirect parent in the hierarchy
     root_parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name=_("Root parent"), related_name="all_children", null=True,
