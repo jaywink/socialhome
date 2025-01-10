@@ -234,6 +234,7 @@ class BaseStream:
                 last_index = last_index - 1
                 if last_index - first_index < self.paginate_by:
                     self.paginate_by = last_index - first_index
+                else: self.unfetched_content = True
             elif not self.last_id: return [], {}
 
         #ids, throughs = self.get_cached_range(first_index)
