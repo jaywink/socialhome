@@ -168,7 +168,10 @@ class ContentSerializer(serializers.ModelSerializer):
     def get_through_author(self, obj):
         throughs_authors = self.context.get("throughs_authors")
         if not throughs_authors:
-            through_author = Content.objects.get(id=self.get_through(obj)).author
+            try:
+                through_author = Content.objects.get(id=self.get_through(obj)).author
+            except Content.DoesNotExist:
+                through_author = obj.author
         else:
             through_author = throughs_authors.get(obj.id, obj.author)
         if through_author != obj.author:
