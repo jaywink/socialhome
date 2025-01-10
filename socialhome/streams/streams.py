@@ -224,32 +224,29 @@ class BaseStream:
             first_index = self.redis.zrevrank(self.key, self.last_id)
             if first_index:
                 first_index = first_index + 1
-                #final_ids, final_throughs = self.get_cached_range(index)
+            else: return [], {}
 
         if self.newest_through_id:
             self.unfetched_content = False
-            id = Content.objects.filter(through=self.newest_through_id).values_list('id',flat=True)
-            try:
-                id = id[0]
-                last_index = self.redis.zrevrank(self.key, id)
-                # making the assumption the SPA UI never send a negative content window
-                if isinstance(last_index, int) and last_index - first_index < self.paginate_by:
+            last_index = self.redis.zrevrank(self.key, self.newest_through_id)
+            # making the assumption the SPA UI never sends a negative content window
+            if isinstance(last_index, int) and last_index:
+                last_index = last_index - 1
+                if last_index - first_index < self.paginate_by:
                     self.paginate_by = last_index - first_index
-            except KeyError:
-                logger.warning("Stream.get_cached_content_ids - no content associated with through id %s",
-                               self.newest_through_id)
+            elif not self.last_id: return [], {}
 
-        ids, throughs = self.get_cached_range(first_index)
+        #ids, throughs = self.get_cached_range(first_index)
 
-        if self.newest_through_id:
-            throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
-            ids = list(throughs.keys())
-            if len(ids) > self.paginate_by:
-                self.unfetched_content = True
-                ids = ids[:self.paginate_by]
-                throughs = {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
+        #if self.newest_through_id:
+        #    throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
+        #    ids = list(throughs.keys())
+        #    if len(ids) > self.paginate_by:
+        #        self.unfetched_content = True
+        #        ids = ids[:self.paginate_by]
+        #        throughs = {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
 
-        return ids, throughs
+        return self.get_cached_range(first_index)
 
     def get_cached_range(self, index):
         self.init_redis_connection()
@@ -296,15 +293,17 @@ class BaseStream:
         remaining = self.paginate_by - len(ids)
         qs = self.get_queryset()
         if self.last_id:
+            through_id = Content.objects.filter(id=self.last_id).values_list('through',flat=True)[0]
             if self.ordering == "-created":
-                qs = qs.filter(through__lt=self.last_id)
+                qs = qs.filter(through__lt=through_id)
             elif self.ordering == "order":
                 last = Content.objects.filter(id=self.last_id).values_list("order", flat=True)[0]
                 qs = qs.filter(order__gt=last)
             else:
-                qs = qs.filter(through__gt=self.last_id)
+                qs = qs.filter(through__gt=through_id)
         if self.newest_through_id:
-            qs = qs.filter(through__gt=self.newest_through_id)
+            through_id = Content.objects.filter(id=self.newest_through_id).values_list('through',flat=True)[0]
+            qs = qs.filter(through__gt=through_id)
             self.unfetched_content = (qs.count() + len(ids)) > self.paginate_by
         # Get and fill remaining items
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
