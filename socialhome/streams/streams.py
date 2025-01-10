@@ -214,37 +214,42 @@ class BaseStream:
 
     def get_cached_content_ids(self):
         self.init_redis_connection()
-        index = 0
+        if not self.last_id and not self.newest_through_id:
+            return self.get_cached_range(0)
+
+        first_index = 0
+        last_index = 0
+
         if self.last_id:
-            last_index = self.redis.zrevrank(self.key, self.last_id)
-            if not last_index:
-                # This item is outside our cached ids, abort
-                return [], {}
-            index = last_index + 1
+            first_index = self.redis.zrevrank(self.key, self.last_id)
+            if first_index:
+                first_index = first_index + 1
+                #final_ids, final_throughs = self.get_cached_range(index)
+
         if self.newest_through_id:
             self.unfetched_content = False
             id = Content.objects.filter(through=self.newest_through_id).values_list('id',flat=True)
-            if id:
+            try:
                 id = id[0]
-            else:
+                last_index = self.redis.zrevrank(self.key, id)
+                # making the assumption the SPA UI never send a negative content window
+                if isinstance(last_index, int) and last_index - first_index < self.paginate_by:
+                    self.paginate_by = last_index - first_index
+            except KeyError:
                 logger.warning("Stream.get_cached_content_ids - no content associated with through id %s",
                                self.newest_through_id)
-                return [], {}
-            index = self.redis.zrevrank(self.key, id)
-            if isinstance(index, int):
-                ids = [int(x) for x in self.redis.zrevrange(self.key, 0, index)]
-                throughs = [int(x) for x in self.redis.hmget(self.get_throughs_key(self.key), keys=ids)]
-                throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
-                ids = list(throughs.keys())
-                if len(ids) > self.paginate_by:
-                    self.unfetched_content = True
-                    return ids[:self.paginate_by], {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
-                else: return ids, throughs
-                print('cached_content_ids', index, ids, throughs, self.newest_through_id)
-            else:
-                print('cached_content_ids', index, self.newest_through_id)
-                return [], {}
-        return self.get_cached_range(index)
+
+        ids, throughs = self.get_cached_range(first_index)
+
+        if self.newest_through_id:
+            throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
+            ids = list(throughs.keys())
+            if len(ids) > self.paginate_by:
+                self.unfetched_content = True
+                ids = ids[:self.paginate_by]
+                throughs = {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
+
+        return ids, throughs
 
     def get_cached_range(self, index):
         self.init_redis_connection()
@@ -285,6 +290,7 @@ class BaseStream:
             ids, throughs = self.get_cached_content_ids()
             print('cached ids', ids, throughs, self.last_id, self.newest_through_id, type(self.newest_through_id))
             if len(ids) >= self.paginate_by:
+                self.paginate_by = 15
                 return ids, throughs
 
         remaining = self.paginate_by - len(ids)
