@@ -237,16 +237,6 @@ class BaseStream:
                 else: self.unfetched_content = True
             elif not self.last_id: return [], {}
 
-        #ids, throughs = self.get_cached_range(first_index)
-
-        #if self.newest_through_id:
-        #    throughs = {id: through for id, through in zip(ids, throughs) if through > int(self.newest_through_id)}
-        #    ids = list(throughs.keys())
-        #    if len(ids) > self.paginate_by:
-        #        self.unfetched_content = True
-        #        ids = ids[:self.paginate_by]
-        #        throughs = {id: throughs[id] for id in list(throughs.keys())[:self.paginate_by]}
-
         return self.get_cached_range(first_index)
 
     def get_cached_range(self, index):
@@ -294,14 +284,13 @@ class BaseStream:
         remaining = self.paginate_by - len(ids)
         qs = self.get_queryset()
         if self.last_id:
-            through_id = Content.objects.filter(id=self.last_id).values_list('through',flat=True)[0]
             if self.ordering == "-created":
-                qs = qs.filter(through__lt=through_id)
+                qs = qs.filter(through__lt=self.last_id)
             elif self.ordering == "order":
                 last = Content.objects.filter(id=self.last_id).values_list("order", flat=True)[0]
                 qs = qs.filter(order__gt=last)
             else:
-                qs = qs.filter(through__gt=through_id)
+                qs = qs.filter(through__gt=self.last_id)
         if self.newest_through_id:
             through_id = Content.objects.filter(id=self.newest_through_id).values_list('through',flat=True)[0]
             qs = qs.filter(through__gt=through_id)
