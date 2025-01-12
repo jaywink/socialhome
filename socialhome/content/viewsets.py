@@ -1,5 +1,10 @@
+import logging
+from uuid import UUID
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, status
 from rest_framework import mixins
 from rest_framework.decorators import action
@@ -99,6 +104,18 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
                                                                             context={'request': self.request}).data})
             return Response(response)
         else: return Response(response, status=HTTP_204_NO_CONTENT)
+
+    def get_object(self):
+        try:
+            uuid = UUID(self.kwargs['pk'])
+            try:
+                return get_object_or_404(Content, uuid=uuid)
+            except ValidationError as ex:
+                logger.debug("ContentViewSet.get_object - failed at get_object_or_404: %s", ex)
+                raise Http404()
+        except (ValueError, TypeError):
+            pass
+        return super().get_object()
 
     def get_queryset(self, root_parent=None, parent=None, share_of=None):
         if root_parent:
