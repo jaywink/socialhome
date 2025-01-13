@@ -107,7 +107,7 @@ class ContentSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "author",
-            "content_type"
+            "content_type",
             "edited",
             "uuid",
             "has_twitter_oembed",
