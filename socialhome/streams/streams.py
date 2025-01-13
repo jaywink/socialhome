@@ -443,6 +443,11 @@ class ProfileAllStream(ProfileStreamBase):
     def get_queryset(self, single_id=None):
         return Content.objects.profile(self.profile, self.user, single_id=single_id)
 
+    def should_cache_content(self, content):
+        # only cache the requesting user's profile stream
+        should_cache = super().should_cache_content(content)
+        return should_cache and self.user.profile == self.profile
+
 
 class ProfilePinnedStream(ProfileStreamBase):
     notify_for_shares = False
