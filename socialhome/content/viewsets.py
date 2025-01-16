@@ -18,7 +18,7 @@ from socialhome.content.serializers import ContentSerializer, TagSerializer
 from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.utils import update_profiles
 
-
+logger = logging.getLogger("socialhome")
 
 class IsOwnContentOrReadOnly(BasePermission):
     def has_permission(self, request, view):
