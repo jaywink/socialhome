@@ -60,6 +60,7 @@ class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
     include_following = BooleanField(default=False)
+    notify_key = SerializerMethodField()
     recipients = RecipientsField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
@@ -82,6 +83,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "is_nsfw",
             "include_following",
             "local",
+            "notify_key",
             "order",
             "parent",
             "pinned",
@@ -94,6 +96,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "share_of",
             "shares_count",
             "show_preview",
+            "slug",
             "tags",
             "text",
             "through",
@@ -115,12 +118,14 @@ class ContentSerializer(serializers.ModelSerializer):
             "id",
             "is_nsfw",
             "local",
+            "notify_key",
             "remote_created",
             "rendered",
             "reply_count",
             "root_parent",
             "share_of",
             "shares_count",
+            "slug",
             "tags",
             "through",
             "through_author",
@@ -137,6 +142,9 @@ class ContentSerializer(serializers.ModelSerializer):
 
     def get_author_uuid(self, obj):
         return obj.author.uuid
+
+    def get_notify_key(self, obj):
+        return "streams_content__%s" % obj.channel_group_name
 
     def cache_through_authors(self):
         """
