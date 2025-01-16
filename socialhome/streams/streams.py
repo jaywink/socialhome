@@ -74,17 +74,17 @@ def add_to_streams_for_users(content_id, through_id, acting_profile_id):
     qs = get_precache_users_qs(acting_profile)
     cache_keys = []
     notify_keys = set()
-    counter = 0
     for stream_cls in ALL_STREAMS:
+        counter = 0
         # Cache for each active user`
         for user in qs.iterator():
             counter += 1
             check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
-                              through.content_type == ContentType.SHARE)
-    logger.info(
-        "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
-        stream_cls.__name__, counter, len(cache_keys),
-    )
+                                  through.content_type == ContentType.SHARE)
+        logger.info(
+            "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
+            stream_cls.__name__, counter, len(cache_keys),
+        )
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
@@ -113,14 +113,14 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
         if stream.should_cache_content(content):
             if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
                 cache_keys.append(stream.key)
-            if is_share and acting_profile == getattr(user, "profile", None):
-                continue
-            if user.recently_active:
-                notify_keys.add(stream.notify_key)
+        # TODO: fix this when sharing replies will be permitted
+        if not (is_share and acting_profile == getattr(user, "profile", None)
+            and user.recently_active):
+            notify_keys.add(stream.notify_key)
         # Dynamic update of the reply_count
-        if content.content_type == ContentType.REPLY:
-            if stream.should_cache_content(content.root_parent):
-                notify_keys.add(stream.notify_key)
+        #if content.content_type == ContentType.REPLY:
+        #    if stream.should_cache_content(content.root_parent):
+        #        notify_keys.add(stream.notify_key)
 
 
 
