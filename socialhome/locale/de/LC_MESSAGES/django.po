@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2021-12-03 17:52+0000\n"
-"Last-Translator: Jay <weblate21.g.loodc@neverbox.com>\n"
-"Language-Team: German <https://hosted.weblate.org/projects/socialhome/"
-"backendfrontend/de/>\n"
+"PO-Revision-Date: 2025-01-22 08:50+0000\n"
+"Last-Translator: Atalanttore "
+"<atalanttore@users.noreply.translate.codeberg.org>\n"
+"Language-Team: German <https://translate.codeberg.org/projects/socialhome/"
+"backendoldui/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.10-dev\n"
+"X-Generator: Weblate 5.9.2\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
@@ -173,9 +174,8 @@ msgid "Federation ID"
 msgstr "Föderations-ID"
 
 #: socialhome/content/models.py:110
-#, fuzzy
 msgid "Reply Collection ID"
-msgstr "Zahl der Antworten"
+msgstr ""
 
 #: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
