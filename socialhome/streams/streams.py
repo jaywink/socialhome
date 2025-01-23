@@ -113,14 +113,14 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
         if stream.should_cache_content(content):
             if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
                 cache_keys.append(stream.key)
-        # TODO: fix this when sharing replies will be permitted
-        if not (is_share and acting_profile == getattr(user, "profile", None)
-            and user.recently_active):
-            notify_keys.add(stream.notify_key)
+            # TODO: fix this when sharing replies will be permitted
+            if not (is_share and acting_profile == getattr(user, "profile", None)
+                and user.recently_active):
+                notify_keys.add(stream.notify_key)
         # Dynamic update of the reply_count
-        #if content.content_type == ContentType.REPLY:
-        #    if stream.should_cache_content(content.root_parent):
-        #        notify_keys.add(stream.notify_key)
+        if content.content_type == ContentType.REPLY:
+            if stream.should_cache_content(content.root_parent):
+                notify_keys.add(stream.notify_key)
 
 
 
