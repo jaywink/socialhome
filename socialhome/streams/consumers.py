@@ -15,7 +15,7 @@ def notify_listeners(obj: Union[Content, Profile], keys: Set, event: str = "new"
 
     payload = {"event": event}
     if event == 'profile':
-        payload.update({'uuid': str(uuid)})
+        payload.update({'uuid': str(obj.uuid)})
     else:
         payload.update({"id": obj.id, "parentId": getattr(obj.parent, 'id', None)})
 
