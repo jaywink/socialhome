@@ -183,7 +183,7 @@ def update_streams_with_content(content, event='new'):
 class BaseStream:
     accept_ids = None
     last_id = None
-    newest_through_id = None
+    first_id = None
     key_base = ["sh", "streams"]
     notify_for_shares = True
     ordering = "-created"
@@ -192,10 +192,10 @@ class BaseStream:
     stream_type = None
     unfetched_content = False
 
-    def __init__(self, last_id: int = None, newest_through_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
+    def __init__(self, last_id: int = None, first_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
         self.accept_ids = accept_ids or []
         self.last_id = last_id
-        self.newest_through_id = newest_through_id
+        self.first_id = first_id
         self.user = user
 
     def __str__(self):
@@ -214,7 +214,7 @@ class BaseStream:
 
     def get_cached_content_ids(self):
         self.init_redis_connection()
-        if not self.last_id and not self.newest_through_id:
+        if not self.last_id and not self.first_id:
             return self.get_cached_range(0)
 
         first_index = 0
@@ -226,9 +226,9 @@ class BaseStream:
                 first_index = first_index + 1
             else: return [], {}
 
-        if self.newest_through_id:
+        if self.first_id:
             self.unfetched_content = False
-            last_index = self.redis.zrevrank(self.key, self.newest_through_id)
+            last_index = self.redis.zrevrank(self.key, self.first_id)
             # making the assumption the SPA UI never sends a negative content window
             if isinstance(last_index, int) and last_index:
                 last_index = last_index - 1
@@ -276,7 +276,7 @@ class BaseStream:
         throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
-            print('cached ids', ids, throughs, self.last_id, self.newest_through_id, type(self.newest_through_id))
+            print('cached ids', ids, throughs, self.last_id, self.first_id, type(self.first_id))
             if len(ids) >= self.paginate_by:
                 self.paginate_by = 15
                 return ids, throughs
@@ -291,8 +291,8 @@ class BaseStream:
                 qs = qs.filter(order__gt=last)
             else:
                 qs = qs.filter(through__gt=self.last_id)
-        if self.newest_through_id:
-            through_id = Content.objects.filter(id=self.newest_through_id).values_list('through',flat=True)[0]
+        if self.first_id:
+            through_id = Content.objects.filter(id=self.first_id).values_list('through',flat=True)[0]
             qs = qs.filter(through__gt=through_id)
             self.unfetched_content = (qs.count() + len(ids)) > self.paginate_by
         # Get and fill remaining items
@@ -300,7 +300,7 @@ class BaseStream:
         for item in ids_throughs:
             ids.append(item["id"])
             throughs[item["id"]] = item["through"]
-        print('ids', ids_throughs, ids, throughs, self.last_id, self.newest_through_id, self.unfetched_content)
+        print('ids', ids_throughs, ids, throughs, self.last_id, self.first_id, self.unfetched_content)
         return ids, throughs
 
     def get_queryset(self, *args, **kwars):
