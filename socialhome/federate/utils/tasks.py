@@ -194,6 +194,8 @@ def process_entity_comment(entity: Any, profile: Profile):
         else:
             logger.warning("No target found for comment even after fetching from remote: %s", entity)
             return
+    # Diaspora reshares are also posts. For us, a content of type SHARE can't be a parent
+    if parent.content_type == ContentType.SHARE: parent = parent.share_of
     root_parent = parent
     if entity.root_target_id:
         try:
