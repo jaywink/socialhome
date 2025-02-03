@@ -23,12 +23,19 @@ class StreamsAPIBaseView(APIView):
         if self.accept_ids:
             self.accept_ids = self.accept_ids.split(",")
         self.first_id = request.GET.get("first_id")
+        self.unfetched_count = request.GET.get("unfetched_count", False)
+        if self.unfetched_count == '': self.unfetched_count = True
+        self.set_stream()
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, **kwargs):
-        qs, throughs = self.get_content()
-        serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
-        data = serializer.data
+        if request.version == '2.0' and self.unfetched_count:
+            data = {'count': self.get_content_count()}
+            return Response(data)
+        else:
+            qs, throughs = self.get_content()
+            serializer = ContentSerializer(qs, many=True, context={"throughs": throughs, "request": request})
+            data = serializer.data
         # Hack used to send the ws channel name and relevant context data to the SPA UI
         # This is used in lieu of json context
         if request.version == '2.0':
@@ -37,29 +44,36 @@ class StreamsAPIBaseView(APIView):
         return Response(data)
 
     def get_content(self):
+        return self.stream.get_content()
+
+    def get_content_count(self):
+        paginate_by = self.stream.paginate_by
+        self.stream.paginate_by = 500
+        ids, _ = self.stream.get_content_ids()
+        self.stream.paginate_by = paginate_by
+        return len(ids)
+    
+    def set_stream(self):
         return [], {}
 
 
 class FollowedStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = FollowedStream(last_id=self.last_id, first_id=self.first_id, user=self.request.user, accept_ids=self.accept_ids)
-        return self.stream.get_content()
 
 
 class LimitedStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = LimitedStream(last_id=self.last_id, first_id=self.first_id, user=self.request.user, accept_ids=self.accept_ids)
-        return self.stream.get_content()
 
 
 class LocalStreamAPIView(StreamsAPIBaseView):
-    def get_content(self):
+    def set_stream(self):
         self.stream = LocalStream(last_id=self.last_id, first_id=self.first_id, user=self.request.user, accept_ids=self.accept_ids)
-        return self.stream.get_content()
 
 
 class ProfileAllStreamAPIView(StreamsAPIBaseView):
@@ -67,11 +81,10 @@ class ProfileAllStreamAPIView(StreamsAPIBaseView):
         self.profile = get_object_or_404(Profile, uuid=kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = ProfileAllStream(
             last_id=self.last_id, first_id=self.first_id, profile=self.profile, user=self.request.user, accept_ids=self.accept_ids,
         )
-        return self.stream.get_content()
 
 
 class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
@@ -79,11 +92,10 @@ class ProfilePinnedStreamAPIView(StreamsAPIBaseView):
         self.profile = get_object_or_404(Profile, uuid=kwargs.get("uuid"))
         return super().dispatch(request, *args, **kwargs)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = ProfilePinnedStream(
             last_id=self.last_id, first_id=self.first_id, profile=self.profile, user=self.request.user, accept_ids=self.accept_ids,
         )
-        return self.stream.get_content()
 
 
 class PublicStreamAPIView(StreamsAPIBaseView):
@@ -94,9 +106,8 @@ class PublicStreamAPIView(StreamsAPIBaseView):
             raise Http404
         return response
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = PublicStream(last_id=self.last_id, first_id=self.first_id, accept_ids=self.accept_ids, user=self.request.user)
-        return self.stream.get_content()
 
 
 class TagStreamAPIView(StreamsAPIBaseView):
@@ -110,14 +121,12 @@ class TagStreamAPIView(StreamsAPIBaseView):
         self.tag = get_object_or_404(Tag, **arguments)
         return super().dispatch(request, *args, **kwargs)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = TagStream(last_id=self.last_id, first_id=self.first_id, tag=self.tag, user=self.request.user, accept_ids=self.accept_ids)
-        return self.stream.get_content()
 
 
 class TagsStreamAPIView(StreamsAPIBaseView):
     permission_classes = (IsAuthenticated,)
 
-    def get_content(self):
+    def set_stream(self):
         self.stream = TagsStream(last_id=self.last_id, first_id=self.first_id, user=self.request.user, accept_ids=self.accept_ids)
-        return self.stream.get_content()
