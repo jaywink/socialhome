@@ -96,7 +96,13 @@ class OEmbedDiscoverer(ChainingDiscoverer):
                         "https://www.nextplatform.com/*"
                     ],
                     "url": "https://www.nextplatform.com/wp-json/oembed/1.0/embed",
-                })
+                }),
+                StaticDiscoveryEndpoint({
+                    "schemes": [
+                        "https://geekgirls.fi/wp/*"
+                    ],
+                    "url": "https://geekgirls.fi/wp/wp-json/oembed/1.0/embed",
+                    })
             ])
         ])
 
