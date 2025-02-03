@@ -215,7 +215,7 @@ class BaseStream:
     def get_cached_content_ids(self):
         self.init_redis_connection()
         if not self.last_id and not self.first_id:
-            return self.get_cached_range(0)
+            return self.get_cached_range(0, self.paginate_by - 1)
 
         first_index = 0
         last_index = 0
@@ -224,24 +224,29 @@ class BaseStream:
             first_index = self.redis.zrevrank(self.key, self.last_id)
             if first_index:
                 first_index = first_index + 1
+                last_index = first_index + self.paginate_by - 1
             else: return [], {}
 
         if self.first_id:
             self.unfetched_content = False
             last_index = self.redis.zrevrank(self.key, self.first_id)
             # making the assumption the SPA UI never sends a negative content window
-            if isinstance(last_index, int) and last_index:
-                last_index = last_index - 1
-                if last_index - first_index < self.paginate_by:
-                    self.paginate_by = last_index - first_index
-                else: self.unfetched_content = True
-            elif not self.last_id: return [], {}
+            if isinstance(last_index, int):
+                if last_index > 0:
+                    last_index = last_index - 1
+                    if last_index - first_index > self.paginate_by:
+                        self.unfetched_content = True
+                    last_index = min(last_index, first_index + self.paginate_by - 1)
+                elif not self.last_id: return [], {}
+            else:
+                last_index = first_index + self.paginate_by - 1
+                self.unfetched_content = True
 
-        return self.get_cached_range(first_index)
+        return self.get_cached_range(first_index, last_index)
 
-    def get_cached_range(self, index):
+    def get_cached_range(self, first, last):
         self.init_redis_connection()
-        raw_ids = self.redis.zrevrange(self.key, index, index + self.paginate_by)
+        raw_ids = self.redis.zrevrange(self.key, first, last)
         if not raw_ids:
             return [], {}
         ids = [int(x) for x in raw_ids]
@@ -277,8 +282,7 @@ class BaseStream:
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
             print('cached ids', ids, throughs, self.last_id, self.first_id, type(self.first_id))
-            if len(ids) >= self.paginate_by:
-                self.paginate_by = 15
+            if len(ids) >= self.paginate_by or (not self.unfetched_content and self.first_id):
                 return ids, throughs
 
         remaining = self.paginate_by - len(ids)
