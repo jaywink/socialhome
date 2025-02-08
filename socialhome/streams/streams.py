@@ -281,7 +281,6 @@ class BaseStream:
         throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
-            print('cached ids', ids, throughs, self.last_id, self.first_id, type(self.first_id))
             if len(ids) >= self.paginate_by or (not self.unfetched_content and self.first_id):
                 return ids, throughs
 
@@ -304,7 +303,6 @@ class BaseStream:
         for item in ids_throughs:
             ids.append(item["id"])
             throughs[item["id"]] = item["through"]
-        print('ids', ids_throughs, ids, throughs, self.last_id, self.first_id, self.unfetched_content)
         return ids, throughs
 
     def get_queryset(self, *args, **kwars):
