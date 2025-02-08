@@ -503,15 +503,13 @@ class Profile(TimeStampedModel):
     def absolute_image_url(profile, image_name):
         """Returns absolute version of image URL of given size if they wasn't absolute"""
         url = profile.image_urls[image_name]
-        if not is_url(url):
-            return ""
 
         if url.startswith("/") and profile.handle:
             return "https://%s%s" % (
                 profile.handle.split("@")[1], url,
             )
-        return url
-
+        return url if is_url(url) else ""
+    
     @staticmethod
     def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""

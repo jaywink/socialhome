@@ -25,6 +25,7 @@ from socialhome.users.models import Profile
 from socialhome.users.tests.factories import (
     ProfileFactory, UserFactory, BaseProfileFactory, BaseShareFactory, PublicProfileFactory,
     SelfUserFactory)
+from socialhome.users.utils import get_pony_urls
 
 
 class TestProcessEntities(SocialhomeTestCase):
@@ -618,9 +619,10 @@ class TestGetSenderProfile(SocialhomeTestCase):
         assert isinstance(sender_profile, Profile)
         assert sender_profile.name == "alert('yup');"
         assert sender_profile.rsa_public_key == "alert('yup');"
-        assert sender_profile.image_url_small == "alert('yup');"
-        assert sender_profile.image_url_medium == "alert('yup');"
-        assert sender_profile.image_url_large == "alert('yup');"
+        ponies = get_pony_urls()
+        assert sender_profile.image_url_small == ponies[2]
+        assert sender_profile.image_url_medium == ponies[1]
+        assert sender_profile.image_url_large == ponies[0]
         assert sender_profile.location == "alert('yup');"
 
 
