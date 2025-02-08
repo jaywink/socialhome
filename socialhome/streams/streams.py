@@ -110,16 +110,15 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     # noinspection PyCallingNonCallable
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
-        if stream.should_cache_content(content):
-            if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
+        if stream.should_stream_content(content):
+            if stream.should_cache_stream(stream_cls, user):
                 cache_keys.append(stream.key)
             # TODO: fix this when sharing replies will be permitted
-            if not (is_share and acting_profile == getattr(user, "profile", None)
-                and user.recently_active):
+            if not (is_share and acting_profile == getattr(user, "profile", None)) and user.recently_active:
                 notify_keys.add(stream.notify_key)
         # Dynamic update of the reply_count
         if content.content_type == ContentType.REPLY:
-            if stream.should_cache_content(content.root_parent):
+            if stream.should_stream_content(content.root_parent):
                 notify_keys.add(stream.notify_key)
 
 
@@ -383,9 +382,12 @@ class BaseStream:
             'unfetched_content': self.unfetched_content,
         }
 
-    def should_cache_content(self, content):
+    def should_stream_content(self, content):
         return self.get_queryset(single_id=content.id)
 
+    def should_cache_stream(self, cls, user):
+        return cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE
+        
 
 class FollowedStream(BaseStream):
     stream_type = StreamType.FOLLOWED
@@ -445,9 +447,9 @@ class ProfileAllStream(ProfileStreamBase):
     def get_queryset(self, single_id=None):
         return Content.objects.profile(self.profile, self.user, single_id=single_id)
 
-    def should_cache_content(self, content):
+    def should_cache_stream(self, cls, user):
         # only cache the requesting user's profile stream
-        should_cache = super().should_cache_content(content)
+        should_cache = super().should_cache_stream(cls, user)
         return should_cache and self.user.profile == self.profile
 
 

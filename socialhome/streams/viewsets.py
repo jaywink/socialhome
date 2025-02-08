@@ -9,8 +9,8 @@ from socialhome.content.models import Tag
 from socialhome.content.serializers import ContentSerializer
 from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
-    PublicStream, FollowedStream, TagStream, ProfileAllStream, ProfilePinnedStream, LimitedStream, LocalStream,
-    TagsStream)
+    PublicStream, FollowedStream, TagStream, ProfileAllStream,
+    ProfilePinnedStream, LimitedStream, LocalStream, TagsStream)
 from socialhome.users.models import Profile
 
 
@@ -54,7 +54,7 @@ class StreamsAPIBaseView(APIView):
         return len(ids)
     
     def set_stream(self):
-        return [], {}
+        raise NotImplemented
 
 
 class FollowedStreamAPIView(StreamsAPIBaseView):
