@@ -101,7 +101,9 @@ Changed
 
 * Replaced whoosh with xapian as a search index backend.
 
-* Instead of all profiles, only cache a user's own profile-all stream.
+* Instead of all profiles, only cache a user's own profile-all stream. For this, we must differentiate
+  "should stream content" from "should cache stream". This allows for finer grain control on which streams
+  are cached.
 
 Fixed
 .....
