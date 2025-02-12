@@ -47,6 +47,10 @@ class StreamsAPIBaseView(APIView):
         return self.stream.get_content()
 
     def get_content_count(self):
+        # the first_id param is ignored when sort by "order" is used
+        # so the stream is always refetched in this case
+        if self.stream.ordering == "order": return None
+
         paginate_by = self.stream.paginate_by
         self.stream.paginate_by = 500
         ids, _ = self.stream.get_content_ids()

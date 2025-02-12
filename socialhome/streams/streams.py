@@ -295,7 +295,10 @@ class BaseStream:
                 qs = qs.filter(through__gt=self.last_id)
         if self.first_id:
             through_id = Content.objects.filter(id=self.first_id).values_list('through',flat=True)[0]
-            qs = qs.filter(through__gt=through_id)
+            if self.ordering == "-created":
+                qs = qs.filter(through__gt=through_id)
+            elif self.ordering == "created":
+                qs = qs.filter(through__lt=through_id)
             self.unfetched_content = (qs.count() + len(ids)) > self.paginate_by
         # Get and fill remaining items
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
