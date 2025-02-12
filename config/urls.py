@@ -15,7 +15,7 @@ from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
 from socialhome.search.viewsets import SearchViewSet
-from socialhome.viewsets import ImageUploadView, MediaUploadView
+from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view 
 from socialhome.views import (
     HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
@@ -91,7 +91,8 @@ urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
     url(r"^api/spa-auth/", include("socialhome.authapi.urls"), name="api-spa-auth"),
-
+    url(r"^api/settings/", settings_view, name="settings"),
+    
     # Account
     url(r"^account/", include("dynamic_preferences.urls")),
 

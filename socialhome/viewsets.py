@@ -1,9 +1,21 @@
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 
 from socialhome.serializers import ImageUploadSerializer, MediaUploadSerializer
+
+
+@require_http_methods(['GET'])
+def settings_view(request):
+    return JsonResponse({
+                        'ACCOUNT_ALLOW_REGISTRATION': settings.ACCOUNT_ALLOW_REGISTRATION,
+                        'SOCIALHOME_ROOT_PROFILE': settings.SOCIALHOME_ROOT_PROFILE,
+                        'SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH': settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH
+                         })
 
 
 class ImageUploadThrottle(UserRateThrottle):
