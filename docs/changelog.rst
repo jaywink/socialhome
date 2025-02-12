@@ -82,6 +82,8 @@ Added
 
 * Implement a profile organizer API.
 
+* Implement a simple relevant to the SPA UI backend settings fetch API.
+
 * Temporary addition to enable SPA UI testing: based on a per user dynamic preference,
   redirect authenticated users to the SPA UI (see https://codeberg.org/socialhome/socialhome-ui/INSTALLATION.md
   for details). This is implemented using a simple middleware.
