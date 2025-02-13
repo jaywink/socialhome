@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2025-02-10 13:21+0000\n"
+"PO-Revision-Date: 2025-02-13 21:15+0000\n"
 "Last-Translator: Vistaus <vistaus@users.noreply.translate.codeberg.org>\n"
 "Language-Team: Dutch <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/nl/>\n"
@@ -88,7 +88,7 @@ msgstr ""
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
 msgid "Content"
-msgstr "Inhoud"
+msgstr "Items"
 
 #: socialhome/content/enums.py:18
 #: socialhome/content/templates/content/_edit_title.html:7
@@ -334,77 +334,78 @@ msgstr "Je gegevensexport is samengesteld"
 #: socialhome/notifications/tasks.py:227
 msgid "Important updates to our Terms of Service and Privacy Policy documents"
 msgstr ""
+"Belangrijke updates omtrent onze gebruiksvoorwaarden en ons privacybeleid"
 
 #: socialhome/notifications/tasks.py:229
 msgid "Important updates to our Privacy Policy document"
-msgstr ""
+msgstr "Belangrijke updates omtrent ons privacybeleid"
 
 #: socialhome/notifications/tasks.py:231
 msgid "Important updates to our Terms of Service document"
-msgstr ""
+msgstr "Belangrijke updates omtrent onze gebruiksvoorwaarden"
 
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
 msgid "Dear"
-msgstr ""
+msgstr "Beste"
 
 #: socialhome/notifications/templates/notifications/base.html:18
 #: socialhome/notifications/templates/notifications/base.txt:7
 msgid "Wishing you a nice day"
-msgstr ""
+msgstr "We wensen je een prettige dag"
 
 #: socialhome/notifications/templates/notifications/base.html:18
 #: socialhome/notifications/templates/notifications/base.txt:8
 #, python-format
 msgid "The friendly %(site_name)s notifications robot"
-msgstr ""
+msgstr "De vriendelijke meldingsrobot van %(site_name)s"
 
 #: socialhome/notifications/templates/notifications/data_export.html:6
 msgid "Your data export is ready for download."
-msgstr ""
+msgstr "Je gegevens kunnen worden gedownload."
 
 #: socialhome/notifications/templates/notifications/data_export.html:6
 msgid "Download here"
-msgstr ""
+msgstr "Downloaden"
 
 #: socialhome/notifications/templates/notifications/data_export.txt:5
 msgid "Your data export is ready for download:"
-msgstr ""
+msgstr "Je gegevens kunnen worden gedownload:"
 
 #: socialhome/notifications/templates/notifications/follow.html:6
 #: socialhome/notifications/templates/notifications/follow.txt:5
 msgid "You have a new follower:"
-msgstr ""
+msgstr "Je hebt een nieuwe volger:"
 
 #: socialhome/notifications/templates/notifications/mention.html:6
 #: socialhome/notifications/templates/notifications/mention.txt:5
 msgid "You have been mentioned by"
-msgstr ""
+msgstr "Je bent vermeld door"
 
 #: socialhome/notifications/templates/notifications/mention.html:9
 #: socialhome/notifications/templates/notifications/mention.txt:7
 #: socialhome/notifications/templates/notifications/share.html:9
 #: socialhome/notifications/templates/notifications/share.txt:7
 msgid "Link to the content:"
-msgstr ""
+msgstr "Link naar het item:"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:9
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:7
 msgid "The changes have become effective at"
-msgstr ""
+msgstr "De wijzigingen gaan in op"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:12
 msgid "Please find the updated Terms of Service document"
-msgstr ""
+msgstr "Lees onze bijgewerkte gebruiksvoorwaarden"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:12
 #: socialhome/notifications/templates/notifications/policy_document_update.html:17
 msgid "here"
-msgstr ""
+msgstr "hier"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:17
 msgid "Please find the updated Privacy Policy document"
-msgstr ""
+msgstr "Lees ons bijgewerkte privacybeleid"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.html:21
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:14
@@ -412,314 +413,318 @@ msgid ""
 "No actions are required by you. By continuing to use the service you "
 "accept the new document(s)."
 msgstr ""
+"Je hoeft verder niets te doen. Door gebruik te blijven maken van de dienst, "
+"ga je automatisch akkoord met de nieuwe documenten."
 
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:9
 msgid "Please find the updated Terms of Service document at"
-msgstr ""
+msgstr "Lees onze bijgewerkte gebruiksvoorwaarden op"
 
 #: socialhome/notifications/templates/notifications/policy_document_update.txt:12
 msgid "Please find the updated Privacy Policy document at"
-msgstr ""
+msgstr "Lees ons bijgewerkte privacybeleid op"
 
 #: socialhome/notifications/templates/notifications/reply.html:6
 #: socialhome/notifications/templates/notifications/reply.txt:5
 msgid "There is a new reply to content you have participated in by"
-msgstr ""
+msgstr "Er is een antwoord gegeven in een gesprek waaraan je hebt deelgenomen"
 
 #: socialhome/notifications/templates/notifications/reply.html:9
 #: socialhome/notifications/templates/notifications/reply.txt:7
 msgid "React to the reply here:"
-msgstr ""
+msgstr "Reageer hier op het antwoord:"
 
 #: socialhome/notifications/templates/notifications/share.html:6
 #: socialhome/notifications/templates/notifications/share.txt:5
 msgid "Your content has received a new share by"
-msgstr ""
+msgstr "Je item is gedeeld door"
 
 #: socialhome/search/views.py:136
 msgid "Search string is invalid, please try another one."
-msgstr ""
+msgstr "De zoekopdracht is ongeldig - probeer een andere."
 
 #: socialhome/search/templates/search/search.html:5
 #: socialhome/search/templates/search/search.html:8
 #: socialhome/search/templates/search/search.html:15
 #: socialhome/templates/base.html:107 socialhome/templates/base.html:109
 msgid "Search"
-msgstr ""
+msgstr "Zoeken"
 
 #: socialhome/search/templates/search/search.html:12
 msgid "Search term"
-msgstr ""
+msgstr "Zoekopdracht"
 
 #: socialhome/search/templates/search/search.html:13
 msgid "Type a search term"
-msgstr ""
+msgstr "Voer een zoekopdracht in"
 
 #: socialhome/search/templates/search/search.html:22
 msgid "Profiles"
-msgstr ""
+msgstr "Profielen"
 
 #: socialhome/search/templates/search/search.html:47
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/users/templates/users/_actions_column.html:4
 msgid "Unfollow"
-msgstr ""
+msgstr "Ontvolgen"
 
 #: socialhome/search/templates/search/search.html:48
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/users/templates/users/_actions_column.html:5
 msgid "Follow"
-msgstr ""
+msgstr "Volgen"
 
 #: socialhome/search/templates/search/search.html:55
 #: socialhome/search/templates/search/search.html:85
 msgid "No results found."
-msgstr ""
+msgstr "Er zijn geen zoekresultaten."
 
 #: socialhome/search/templates/search/search.html:61
 msgid "Previous"
-msgstr ""
+msgstr "Vorige"
 
 #: socialhome/search/templates/search/search.html:63
 msgid "Next"
-msgstr ""
+msgstr "Volgende"
 
 #: socialhome/search/templates/search/search.html:90
 msgid "There are more tags results. Please refine the query."
-msgstr ""
+msgstr "Er zijn meer labelresultaten - verfijn de zoekopdracht."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "edited"
-msgstr ""
+msgstr "bewerkt"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Home"
-msgstr ""
+msgstr "Startpagina"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/preferences.py:15
 msgid "Profile"
-msgstr ""
+msgstr "Profiel"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "reply"
-msgstr ""
+msgstr "antwoord"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Full editor"
-msgstr ""
+msgstr "Volledige bewerker"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply text..."
-msgstr ""
+msgstr "Antwoordtekst…"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "unshare"
-msgstr ""
+msgstr "niet meer delen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "share"
-msgstr ""
+msgstr "delen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Replies"
-msgstr ""
+msgstr "Antwoorden"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Shares"
-msgstr ""
+msgstr "Delingen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Hide NSFW content"
-msgstr ""
+msgstr "18+-inhoud verbergen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Show NSFW content"
-msgstr ""
+msgstr "18+-inhoud tonen"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:108
 msgid "Contains public content from around the network."
-msgstr ""
+msgstr "Bevat openbare items van het netwerk."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/enums.py:20
 #: socialhome/templates/base.html:48
 msgid "Followed"
-msgstr ""
+msgstr "Gevolgde gebruikers"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
 msgid "Content from followed users."
-msgstr ""
+msgstr "Items van gevolgde gebruikers."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
 msgid "Contains non-public content where you are recipient."
-msgstr ""
+msgstr "Bevat niet-openbare items waarvan je een ontvanger bent."
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:95
 msgid "Contains content from local users."
-msgstr ""
+msgstr "Bevat items van lokale gebruikers."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content tagged with"
-msgstr ""
+msgstr "Alle items gelabeld met"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
 msgid "Followed tags"
-msgstr ""
+msgstr "Gevolgde labels"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Content from all followed tags."
-msgstr ""
+msgstr "Items met gevolgde labels."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Change picture"
-msgstr ""
+msgstr "Foto wĳzigen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Followers"
-msgstr ""
+msgstr "Volgels"
 
 #: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
 msgid "Following"
-msgstr ""
+msgstr "Volgend"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Organize profile content"
-msgstr ""
+msgstr "Profielitems ordenen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Update profile"
-msgstr ""
+msgstr "Profiel bijwerken"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "User handle or URL on The Federation"
-msgstr ""
+msgstr "Gebruikersnaam of url op de federatie"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned content"
-msgstr ""
+msgstr "Vastgemaakte items"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "All content"
-msgstr ""
+msgstr "Alle items"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "%s new post available"
 msgid_plural "%s new posts available"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Er is %s nieuw bericht"
+msgstr[1] "Er zijn %s nieuwe berichten"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #: socialhome/templates/dynamic_preferences/form.html:14
 #: socialhome/users/templates/users/userpicture_form.html:28
 msgid "Save"
-msgstr ""
+msgstr "Opslaan"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 1"
-msgstr ""
+msgstr "Kop 1"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 2"
-msgstr ""
+msgstr "Kop 2"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 3"
-msgstr ""
+msgstr "Kop 3"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 4"
-msgstr ""
+msgstr "Kop 4"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 5"
-msgstr ""
+msgstr "Kop 5"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Header 6"
-msgstr ""
+msgstr "Kop 6"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "By url"
-msgstr ""
+msgstr "Op url"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Bold"
-msgstr ""
+msgstr "Vetgedrukt"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle fullscreen (F11)"
-msgstr ""
+msgstr "Schermvullende weergave (F11)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Markdown guide"
-msgstr ""
+msgstr "Markdownhandleiding"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Heading"
-msgstr ""
+msgstr "Kop"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert Horizontal Line"
-msgstr ""
+msgstr "Horizontale lijn invoegen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 #, python-format
 msgid "The image %s couldn't be uploaded"
-msgstr ""
+msgstr "‘%s’ kan niet worden geüpload"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "add an image using an url (Ctrl-Alt-I)"
-msgstr ""
+msgstr "voeg een afbeelding toe op basis van een url (Ctrl+Alt+I)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Italic"
-msgstr ""
+msgstr "Cursief"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Create Link"
-msgstr ""
+msgstr "Link maken"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Loading..."
-msgstr ""
+msgstr "Bezig met laden…"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Numbered List"
-msgstr ""
+msgstr "Genummerde lijst"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Insert image"
-msgstr ""
+msgstr "Afbeelding invoegen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle preview (Ctrl-P)"
-msgstr ""
+msgstr "Voorvertoning aan/uit (Ctrl+P)"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid ""
 "You can upload images using the camera icon or by dragging them to the "
 "text area. Valid file types: png/jpg/svg/gif."
 msgstr ""
+"Je kunt afbeeldingen uploaden door op het camerapictogram te klikken of door "
+"ze naar het tekstvak te slepen. Ondersteunde bestandstypes: png/jpg/svg/gif."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Quote"
-msgstr ""
+msgstr "Citaat"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Generic List"
-msgstr ""
+msgstr "Algemene lijst"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Upload image"
-msgstr ""
+msgstr "Afbeelding uploaden"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "Toggle side by side (F9)"
-msgstr ""
+msgstr "Zij-aan-zij tonen"
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible to anyone, even anonymous users and internet search bots."
-msgstr ""
+msgstr "zichtbaar voor iedereen, zelfs voor anonieme gebruikers en zoekrobots."
 
 #: socialhome/static/dist/vue/js/app.js:67
 msgid "visible only to those mentioned in the text and/or your mutuals."
