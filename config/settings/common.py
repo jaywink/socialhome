@@ -398,7 +398,7 @@ SOCIALHOME_CONTENT_SAFE_ATTRS = {
     'td': ['class'],
     'th': ['class'],
     'tr': ['class'],
-    'video': ['class', 'role', 'src', 'loop', 'controls'],
+    'video': ['class', 'role', 'src', 'loop', 'controls', 'poster'],
 }
 # These tags are kept on save for untrusted users
 SOCIALHOME_CONTENT_SAFE_TAGS = [
