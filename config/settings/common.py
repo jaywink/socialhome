@@ -129,7 +129,7 @@ MIGRATION_MODULES = {
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
 DEBUG_TOOLBAR_ENABLED = False
-FEDERATE = env.bool("SOCIALHOME_FEDERATE", True)
+DISABLE_OUTBOUND_FEDERATION = env.bool("SOCIALHOME_DISABLE_OUTBOUND_FEDERATION", False)
 
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -391,7 +391,7 @@ SOCIALHOME_CONTENT_SAFE_ATTRS = {
     'a': ['class', 'href', 'title', 'target', 'data-mention', 'data-hashtag'],
     'abbr': ['title'],
     'acronym': ['title'],
-    'audio': ['controls'],
+    'audio': ['controls', 'src'],
     'canvas': ['class', 'width', 'height'],
     'div': ['class', 'role', 'tabindex', 'style'],
     'i': ['class', 'role'],
@@ -662,7 +662,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
-    "federate": FEDERATE,
+    "disable_outbound_federation": DISABLE_OUTBOUND_FEDERATION,
     "federation_id": f'{SOCIALHOME_URL}/u/{FEDERATION_USER}/',
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",

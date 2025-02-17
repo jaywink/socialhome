@@ -88,6 +88,8 @@ Added
   redirect authenticated users to the SPA UI (see https://codeberg.org/socialhome/socialhome-ui/INSTALLATION.md
   for details). This is implemented using a simple middleware.
 
+* Disable outbound federation when the SOCIALHOME_DISABLE_OUTBOUND_FEDERATION variable is set.
+
 Changed
 .......
 
