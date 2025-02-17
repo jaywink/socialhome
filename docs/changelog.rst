@@ -41,7 +41,7 @@ Added
       was added to preserve the current UI behavior.
 
 * With the intent to eventualy get rid of the `image_urls_[small,medium,large]` properties, add
-  the `avatar_url` property. TODO: remove the former properties in a way that won't break Diaspora.
+  the `avatar_url` property.
 
 * In support of richer AP profiles, these properties were added to users.Profile:
 

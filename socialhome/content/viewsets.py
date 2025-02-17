@@ -94,7 +94,6 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             raise exceptions.ValidationError(e.message)
         except Exception:
             raise exceptions.APIException("Unknown error when creating share.")
-        #return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
         response = {"status": "ok"}
         if self.request.version == '2.0':
             content.refresh_from_db()
