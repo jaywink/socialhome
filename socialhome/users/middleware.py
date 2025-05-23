@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 
 class AdminApprovalMiddleware:
@@ -14,3 +14,26 @@ class AdminApprovalMiddleware:
             return render(request, 'users/admin_approval_required.html')
 
         return self.get_response(request)
+
+
+def use_new_ui(get_response):
+    def middleware(request):
+        if request.user.is_authenticated:
+            if request.user.preferences['generic__use_new_ui']:
+                ap_request = False
+                accept = request.META.get('HTTP_ACCEPT', '')
+                for content_type in (
+                    'application/activity+json', 'application/ld+json',
+                ):
+                    if accept.find(content_type) > -1:
+                        ap_request = True
+                        break
+                if not any((
+                    request.path.split('/')[1] in ('admin', 'api', 'ch', 'django-rq', 'static'),
+                    ap_request,
+                )):
+                    return render(request, 'index.html')
+
+        return get_response(request)
+
+    return middleware

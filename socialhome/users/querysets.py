@@ -35,17 +35,28 @@ class ProfileQuerySet(QuerySet):
         """
         if not extra_lookups:
             extra_lookups = {}
-        try:
-            profile = self.fed(fid, **extra_lookups).get()
-        except ObjectDoesNotExist:
-            if fid.startswith('http'):
-                values['fid'] = fid
+
+        qs1 = self.fed(fid, **extra_lookups)
+        # Some platforms (hello firefish) allow fid updates while keeping
+        # the same finger and remote_url properties. Is it ok to assumes
+        # finger and remote_url are never updated?
+        qs2 = self.filter(finger=values.get('finger', '')) | self.filter(remote_url=values.get('remote_url', ''))
+        if qs1.count():
+            profile = qs1.get()
+        elif qs2.count():
+            profile = qs2.get()
+        else:
+            profile = None
+
+        if fid.startswith('http'):
+            values['fid'] = fid
+        if not profile:
             values.update(extra_lookups)
             return self.create(**values), True
         else:
             changed = False
             for key, value in values.items():
-                if key in ('fid', 'guid', 'handle'):
+                if key in ('guid', 'handle'):
                     continue
                 if getattr(profile, key, None) != value:
                     changed = True

@@ -15,7 +15,7 @@ def notify_listeners(obj: Union[Content, Profile], keys: Set, event: str = "new"
 
     payload = {"event": event}
     if event == 'profile':
-        payload.update({'uuid': obj.uuid.hex})
+        payload.update({'uuid': str(obj.uuid)})
     else:
         payload.update({"id": obj.id, "parentId": getattr(obj.parent, 'id', None)})
 
@@ -45,6 +45,7 @@ class StreamConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
         if data.get("event") == "ping":
+            self.send(text_data=json.dumps({"event": "pong"}))
             user = self.scope["user"]
             if user and user.is_authenticated:
                 async_to_sync(user.mark_recently_active())

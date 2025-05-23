@@ -25,7 +25,7 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     created = kwargs.get("created")
     if created:
-        queue = django_rq.get_queue("low")
+        queue = django_rq.get_queue("lowest")
         # Trigger send_reply_notifications only if root parent is local or it has had local replies
         if instance.content_type == ContentType.REPLY and (
             instance.root_parent.local or instance.root_parent.has_had_local_replies
@@ -56,9 +56,12 @@ def federate_content_retraction(instance, **kwargs):
 @receiver(post_delete, sender=Content)
 def update_counts(instance, **kwargs):
     try:
-        parent = Content.objects.get(id=instance.parent_id)
-        parent.cache_data(commit=True)
-        parent.cache_related_object_data()
+        if instance.content_type == ContentType.REPLY:
+            obj = Content.objects.get(id=instance.parent_id)
+        elif instance.content_type == ContentType.SHARE:
+            obj = Content.objects.get(id=instance.share_of.id)
+        obj.cache_data(commit=True)
+        obj.cache_related_object_data()
     except:
         pass
 

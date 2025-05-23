@@ -34,6 +34,8 @@ class RecipientsField(serializers.Field):
         """
         Add the mentions for public content or
         add the previous values from limited visibilities for existing limited content.
+        TODO: fix finger case sensitivity potentially causing both handle and finger to
+        return a recipient
         """
         if instance.visibility == Visibility.LIMITED:
             fingers = instance.limited_visibilities.filter(finger__isnull=False).order_by("id").values_list("finger", flat=True)
@@ -58,6 +60,7 @@ class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
     content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
     include_following = BooleanField(default=False)
+    notify_key = SerializerMethodField()
     recipients = RecipientsField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
@@ -80,6 +83,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "is_nsfw",
             "include_following",
             "local",
+            "notify_key",
             "order",
             "parent",
             "pinned",
@@ -92,6 +96,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "share_of",
             "shares_count",
             "show_preview",
+            "slug",
             "tags",
             "text",
             "through",
@@ -105,7 +110,7 @@ class ContentSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "author",
-            "content_type"
+            "content_type",
             "edited",
             "uuid",
             "has_twitter_oembed",
@@ -113,12 +118,14 @@ class ContentSerializer(serializers.ModelSerializer):
             "id",
             "is_nsfw",
             "local",
+            "notify_key",
             "remote_created",
             "rendered",
             "reply_count",
             "root_parent",
             "share_of",
             "shares_count",
+            "slug",
             "tags",
             "through",
             "through_author",
@@ -135,6 +142,9 @@ class ContentSerializer(serializers.ModelSerializer):
 
     def get_author_uuid(self, obj):
         return obj.author.uuid
+
+    def get_notify_key(self, obj):
+        return "streams_content__%s" % obj.channel_group_name
 
     def cache_through_authors(self):
         """
@@ -166,8 +176,12 @@ class ContentSerializer(serializers.ModelSerializer):
     def get_through_author(self, obj):
         throughs_authors = self.context.get("throughs_authors")
         if not throughs_authors:
-            return {}
-        through_author = throughs_authors.get(obj.id, obj.author)
+            try:
+                through_author = Content.objects.get(id=self.get_through(obj)).author
+            except Content.DoesNotExist:
+                through_author = obj.author
+        else:
+            through_author = throughs_authors.get(obj.id, obj.author)
         if through_author != obj.author:
             return LimitedProfileSerializer(
                 instance=through_author,

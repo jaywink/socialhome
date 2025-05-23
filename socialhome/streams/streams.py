@@ -74,17 +74,17 @@ def add_to_streams_for_users(content_id, through_id, acting_profile_id):
     qs = get_precache_users_qs(acting_profile)
     cache_keys = []
     notify_keys = set()
-    counter = 0
     for stream_cls in ALL_STREAMS:
+        counter = 0
         # Cache for each active user`
         for user in qs.iterator():
             counter += 1
             check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
-                              through.content_type == ContentType.SHARE)
-    logger.info(
-        "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
-        stream_cls.__name__, counter, len(cache_keys),
-    )
+                                  through.content_type == ContentType.SHARE)
+        logger.info(
+            "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
+            stream_cls.__name__, counter, len(cache_keys),
+        )
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
@@ -110,16 +110,15 @@ def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile,
     # noinspection PyCallingNonCallable
     streams = stream_cls.get_target_streams(content, user, acting_profile)
     for stream in streams:
-        if stream.should_cache_content(content):
-            if stream_cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE:
+        if stream.should_stream_content(content):
+            if stream.should_cache_stream(stream_cls, user):
                 cache_keys.append(stream.key)
-            if is_share and (not stream.notify_for_shares or acting_profile == getattr(user, "profile", None)):
-                continue
-            if user.recently_active:
+            # TODO: fix this when sharing replies will be permitted
+            if not (is_share and acting_profile == getattr(user, "profile", None)) and user.recently_active:
                 notify_keys.add(stream.notify_key)
         # Dynamic update of the reply_count
         if content.content_type == ContentType.REPLY:
-            if stream.should_cache_content(content.root_parent):
+            if stream.should_stream_content(content.root_parent):
                 notify_keys.add(stream.notify_key)
 
 
@@ -183,16 +182,19 @@ def update_streams_with_content(content, event='new'):
 class BaseStream:
     accept_ids = None
     last_id = None
+    first_id = None
     key_base = ["sh", "streams"]
     notify_for_shares = True
     ordering = "-created"
     paginate_by = 15
     redis = None
     stream_type = None
+    unfetched_content = False
 
-    def __init__(self, last_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
+    def __init__(self, last_id: int = None, first_id: int = None, user: User = None, accept_ids: List = None, **kwargs):
         self.accept_ids = accept_ids or []
         self.last_id = last_id
+        self.first_id = first_id
         self.user = user
 
     def __str__(self):
@@ -211,18 +213,39 @@ class BaseStream:
 
     def get_cached_content_ids(self):
         self.init_redis_connection()
-        index = 0
-        if self.last_id:
-            last_index = self.redis.zrevrank(self.key, self.last_id)
-            if not last_index:
-                # This item is outside our cached ids, abort
-                return [], {}
-            index = last_index + 1
-        return self.get_cached_range(index)
+        if not self.last_id and not self.first_id:
+            return self.get_cached_range(0, self.paginate_by - 1)
 
-    def get_cached_range(self, index):
+        first_index = 0
+        last_index = 0
+
+        if self.last_id:
+            first_index = self.redis.zrevrank(self.key, self.last_id)
+            if first_index:
+                first_index = first_index + 1
+                last_index = first_index + self.paginate_by - 1
+            else: return [], {}
+
+        if self.first_id:
+            self.unfetched_content = False
+            last_index = self.redis.zrevrank(self.key, self.first_id)
+            # making the assumption the SPA UI never sends a negative content window
+            if isinstance(last_index, int):
+                if last_index > 0:
+                    last_index = last_index - 1
+                    if last_index - first_index > self.paginate_by:
+                        self.unfetched_content = True
+                    last_index = min(last_index, first_index + self.paginate_by - 1)
+                elif not self.last_id: return [], {}
+            else:
+                last_index = first_index + self.paginate_by - 1
+                self.unfetched_content = True
+
+        return self.get_cached_range(first_index, last_index)
+
+    def get_cached_range(self, first, last):
         self.init_redis_connection()
-        raw_ids = self.redis.zrevrange(self.key, index, index + self.paginate_by)
+        raw_ids = self.redis.zrevrange(self.key, first, last)
         if not raw_ids:
             return [], {}
         ids = [int(x) for x in raw_ids]
@@ -248,7 +271,7 @@ class BaseStream:
         preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
-        update_profiles(content)
+        if not settings.DEBUG: update_profiles(content)
         return content, throughs
 
     def get_content_ids(self):
@@ -257,15 +280,26 @@ class BaseStream:
         throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
-            if len(ids) >= self.paginate_by:
+            if len(ids) >= self.paginate_by or (not self.unfetched_content and self.first_id):
                 return ids, throughs
+
         remaining = self.paginate_by - len(ids)
         qs = self.get_queryset()
         if self.last_id:
             if self.ordering == "-created":
                 qs = qs.filter(through__lt=self.last_id)
+            elif self.ordering == "order":
+                last = Content.objects.filter(id=self.last_id).values_list("order", flat=True)[0]
+                qs = qs.filter(order__gt=last)
             else:
                 qs = qs.filter(through__gt=self.last_id)
+        if self.first_id:
+            through_id = Content.objects.filter(id=self.first_id).values_list('through',flat=True)[0]
+            if self.ordering == "-created":
+                qs = qs.filter(through__gt=through_id)
+            elif self.ordering == "created":
+                qs = qs.filter(through__lt=through_id)
+            self.unfetched_content = (qs.count() + len(ids)) > self.paginate_by
         # Get and fill remaining items
         ids_throughs = qs.values("id", "through").order_by(self.ordering)[:remaining]
         for item in ids_throughs:
@@ -344,9 +378,19 @@ class BaseStream:
     def notify_key_extra(self):
         return None
 
-    def should_cache_content(self, content):
+    def get_context_data(self):
+        return {
+            'is_cached': self.__class__ in CACHED_STREAM_CLASSES,
+            'notify_key': self.notify_key,
+            'unfetched_content': self.unfetched_content,
+        }
+
+    def should_stream_content(self, content):
         return self.get_queryset(single_id=content.id)
 
+    def should_cache_stream(self, cls, user):
+        return cls in CACHED_STREAM_CLASSES and settings.SOCIALHOME_STREAMS_PRECACHE_SIZE
+        
 
 class FollowedStream(BaseStream):
     stream_type = StreamType.FOLLOWED
@@ -397,7 +441,7 @@ class ProfileStreamBase(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class ProfileAllStream(ProfileStreamBase):
@@ -405,6 +449,11 @@ class ProfileAllStream(ProfileStreamBase):
 
     def get_queryset(self, single_id=None):
         return Content.objects.profile(self.profile, self.user, single_id=single_id)
+
+    def should_cache_stream(self, cls, user):
+        # only cache the requesting user's profile stream
+        should_cache = super().should_cache_stream(cls, user)
+        return should_cache and self.user.profile == self.profile
 
 
 class ProfilePinnedStream(ProfileStreamBase):
@@ -437,6 +486,11 @@ class TagStream(BaseStream):
         super().__init__(**kwargs)
         self.tag = tag
 
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['tag_uuid'] = self.tag.uuid
+        return context
+
     def get_queryset(self, single_id=None):
         if not self.tag:
             raise AttributeError("TagStream is missing tag.")
@@ -452,7 +506,7 @@ class TagStream(BaseStream):
 
     @property
     def notify_key_extra(self):
-        return f"{self.key_extra}__{self.user.id or 'anon'}"
+        return self.key_extra + (f"__{self.user.id}" if self.user.id else "")
 
 
 class TagsStream(BaseStream):
@@ -470,15 +524,15 @@ class TagsStream(BaseStream):
 CACHED_STREAM_CLASSES = (
     FollowedStream,
     ProfileAllStream,
+    LimitedStream,
+    LocalStream,
+    PublicStream,
+    TagStream,
     TagsStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
-    LimitedStream,
-    LocalStream,
     ProfilePinnedStream,
-    PublicStream,
-    TagStream,
 )
 
 ALL_STREAMS = CACHED_STREAM_CLASSES + NON_CACHED_STREAM_CLASSES

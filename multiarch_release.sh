@@ -16,11 +16,11 @@
 # 		sudo podman run --rm --privileged multiarch/qemu-user-static --reset -p yes
 #	  if it has not been run since the last reboot
 #
-# Note: building foreign platforms might talk a lot more time.
+# Note: building foreign platforms might take a lot more time.
 
 registry=registry.gitlab.com
 platforms=linux/amd64,linux/arm64
-manifest=$registry/jaywink/socialhome
+manifest=$registry/socialhome/socialhome
 
 if [[ -z "$1" ]]; then
     echo "Usage: $0 tag"

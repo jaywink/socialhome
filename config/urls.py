@@ -14,7 +14,8 @@ from django_js_reverse.views import urls_js
 from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
-from socialhome.viewsets import ImageUploadView
+from socialhome.search.viewsets import SearchViewSet
+from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view 
 from socialhome.views import (
     HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
@@ -29,6 +30,7 @@ from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
+router.register(r"search", SearchViewSet, basename="search")
 router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
 
@@ -84,10 +86,13 @@ urlpatterns = [
     url(r'^api/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     url(r"^api/", include((router.urls, "api"))),
     url(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
+    url(r"^api/media-upload/$", MediaUploadView.as_view(), name="api-media-upload"),
     url(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
-
+    url(r"^api/spa-auth/", include("socialhome.authapi.urls"), name="api-spa-auth"),
+    url(r"^api/settings/", settings_view, name="settings"),
+    
     # Account
     url(r"^account/", include("dynamic_preferences.urls")),
 

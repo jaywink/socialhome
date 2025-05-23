@@ -221,9 +221,11 @@ class TestNotifyListeners(SocialhomeTestCase):
             call(f"streams_profile_all__{share.author.id}__{self.user.id}", data),
             call(f"streams_profile_all__{share.author.id}__{other_user.id}", data),
             call(f"streams_followed__{self.user.id}", data),
+            call(f"streams_public__{self.user.id}", data),
+            call(f"streams_public__{other_user.id}", data),
         ]
         mock_send.assert_has_calls(calls, any_order=True)
-        self.assertEqual(mock_send.call_count, 3)
+        self.assertEqual(mock_send.call_count, 5)
 
     @patch("socialhome.streams.consumers.async_to_sync", autospec=True)
     def test_content_save_calls_streamconsumer_group_send__replies(self, mock_async):

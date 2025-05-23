@@ -10,6 +10,7 @@ from .common import *  # noqa
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
+FEDERATE = env.bool("SOCIALHOME_FEDERATE", False)
 if env.bool("CI", default=False):
     # Required by django_coverage_plugin
     TEMPLATES[0]["OPTIONS"]["debug"] = True
@@ -37,6 +38,18 @@ CACHES = {
         "LOCATION": ""
     }
 }
+
+# CORS headers
+# ------------------------------------------------------------------------------
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_PRIVATE_NETWORK = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "localhost",
+]
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
@@ -78,7 +91,7 @@ RQ_QUEUES["default"]["ASYNC"] = False
 # ------------------------------------------------------------------------------
 # Disable generating RSA keys automatically, otherwise tests become slow
 SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
-SOCIALHOME_HTTPS = False
+SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", False)
 
 # HAYSTACK
 # --------
@@ -107,3 +120,6 @@ if testing:
 
 # Logging
 LOGGING['loggers']['socialhome']['handlers'].append('console')
+
+# So a dev instance can work behind a proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

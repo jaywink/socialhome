@@ -48,6 +48,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "channels",
     "daphne",
+    "corsheaders",
     "crispy_forms",
     "crispy_bootstrap4",
     "allauth",
@@ -90,12 +91,14 @@ if testing:
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "socialhome.users.middleware.AdminApprovalMiddleware",
+    "socialhome.users.middleware.use_new_ui",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
@@ -126,6 +129,7 @@ MIGRATION_MODULES = {
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
 DEBUG_TOOLBAR_ENABLED = False
+DISABLE_OUTBOUND_FEDERATION = env.bool("SOCIALHOME_DISABLE_OUTBOUND_FEDERATION", False)
 
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -387,7 +391,7 @@ SOCIALHOME_CONTENT_SAFE_ATTRS = {
     'a': ['class', 'href', 'title', 'target', 'data-mention', 'data-hashtag'],
     'abbr': ['title'],
     'acronym': ['title'],
-    'audio': ['controls'],
+    'audio': ['controls', 'src'],
     'canvas': ['class', 'width', 'height'],
     'div': ['class', 'role', 'tabindex', 'style'],
     'i': ['class', 'role'],
@@ -615,6 +619,7 @@ REST_FRAMEWORK = {
         "content_create": "100/day",
     },
     "DEFAULT_VERSION": "0.1",
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
 }
 
 # See https://docs.djangoproject.com/en/3.2/releases/3.2/#models
@@ -637,8 +642,8 @@ DYNAMIC_PREFERENCES = {
 # ------
 HAYSTACK_CONNECTIONS = {
     "default": {
-        "ENGINE": "haystack.backends.whoosh_backend.WhooshEngine",
-        "PATH": str(ROOT_DIR("var", "whoosh")),
+        "ENGINE": "xapian_backend.XapianEngine",
+        "PATH": str(ROOT_DIR("var", "xapian-index")),
         "BATCH_SIZE": 100,
     },
 }
@@ -658,6 +663,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 # ----------
 FEDERATION = {
     "base_url": SOCIALHOME_URL,
+    "disable_outbound_federation": DISABLE_OUTBOUND_FEDERATION,
     "federation_id": f'{SOCIALHOME_URL}/u/{FEDERATION_USER}/',
     "get_object_function": "socialhome.federate.utils.entities.get_federable_object",
     "get_private_key_function": "socialhome.federate.utils.entities.get_user_private_key",

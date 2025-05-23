@@ -1,4 +1,10 @@
+import logging
+from uuid import UUID
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, status
 from rest_framework import mixins
 from rest_framework.decorators import action
@@ -9,9 +15,10 @@ from rest_framework.viewsets import GenericViewSet
 
 from socialhome.content.models import Content, Tag
 from socialhome.content.serializers import ContentSerializer, TagSerializer
+from socialhome.users.serializers import LimitedProfileSerializer
 from socialhome.users.utils import update_profiles
 
-
+logger = logging.getLogger("socialhome")
 
 class IsOwnContentOrReadOnly(BasePermission):
     def has_permission(self, request, view):
@@ -87,11 +94,33 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             raise exceptions.ValidationError(e.message)
         except Exception:
             raise exceptions.APIException("Unknown error when creating share.")
-        return Response({"status": "ok"}, status=HTTP_204_NO_CONTENT)
+        response = {"status": "ok"}
+        if self.request.version == '2.0':
+            content.refresh_from_db()
+            response.update({'content_id': content.through, 'through_author': None})
+            if content.id != content.through:
+                response.update({'through_author': LimitedProfileSerializer(Content.objects.get(id=content.through).author,
+                                                                            context={'request': self.request}).data})
+            return Response(response)
+        else: return Response(response, status=HTTP_204_NO_CONTENT)
 
-    def get_queryset(self, parent=None, share_of=None):
-        if parent:
-            return Content.objects.full_conversation(parent.id, self.request.user)
+    def get_object(self):
+        try:
+            uuid = UUID(self.kwargs['pk'])
+            try:
+                return get_object_or_404(Content, uuid=uuid)
+            except ValidationError as ex:
+                logger.debug("ContentViewSet.get_object - failed at get_object_or_404: %s", ex)
+                raise Http404()
+        except (ValueError, TypeError):
+            pass
+        return super().get_object()
+
+    def get_queryset(self, root_parent=None, parent=None, share_of=None):
+        if root_parent:
+            return Content.objects.full_conversation(root_parent.id, self.request.user)
+        elif parent:
+            return Content.objects.children(parent.id, self.request.user)
         elif share_of:
             return Content.objects.shares(share_of.id, self.request.user)
         if self.request.user.is_staff:
@@ -110,9 +139,17 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
     @action(detail=True, methods=["get"])
     def replies(self, request, *args, **kwargs):
         parent = self.get_object()
+        queryset = self.filter_queryset(self.get_queryset(root_parent=parent)).order_by("created")
+        serializer = self.get_serializer(queryset, many=True)
+        if not settings.DEBUG: update_profiles(serializer.child.instance)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def thread(self, request, *args, **kwargs):
+        parent = self.get_object()
         queryset = self.filter_queryset(self.get_queryset(parent=parent)).order_by("created")
         serializer = self.get_serializer(queryset, many=True)
-        update_profiles(serializer.child.instance)
+        if not settings.DEBUG: update_profiles(serializer.child.instance)
         return Response(serializer.data)
 
     @action(detail=True, methods=["delete", "post"])

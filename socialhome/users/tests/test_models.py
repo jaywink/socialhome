@@ -124,7 +124,7 @@ class TestProfile(SocialhomeTestCase):
     def test_home_url(self):
         self.assertEqual(self.profile.home_url, self.profile.remote_url)
         self.assertEqual(
-            self.user.profile.home_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.profile.get_absolute_url()),
+            self.user.profile.home_url, "%s%s" % (settings.SOCIALHOME_URL, self.user.get_absolute_url()),
         )
 
     def test_local_url(self):

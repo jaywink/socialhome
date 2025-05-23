@@ -277,13 +277,14 @@ def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     logger.info("make_federable_profile - Profile: %s", profile)
     try:
         return base.Profile(
-            raw_content="",
+            raw_content=profile.bio,
             public=True,  # A profile is public in the context of federation if it is sent outwards
             name=profile.name_or_handle,
+            image=profile.picture_url,
             image_urls={
                 "small": profile.safer_image_url_small,
                 "medium": profile.safer_image_url_medium,
-                "large": profile.safer_image_url_large,
+                "large": profile.avatar_url or profile.safer_image_url_large,
             },
             public_key=profile.rsa_public_key,
             url=profile.home_url,

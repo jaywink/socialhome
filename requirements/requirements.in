@@ -9,6 +9,7 @@ crispy-bootstrap4
 commonmark_socialhome
 django-allauth
 django-braces
+django-cors-headers<4.6.0
 django-crispy-forms
 django-dynamic-preferences
 django-enumfields
@@ -32,6 +33,7 @@ django-silk
 django-versatileimagefield
 django<4
 djangorestframework
+drf-haystack
 drf-yasg
 federation
 ipython
@@ -48,7 +50,8 @@ rq
 rq-scheduler
 validators
 whitenoise
-whoosh
+xapian-haystack
+xapian-bindings-binary
 pyyaml
 
 # Own markdownx fork for some tweaks:
