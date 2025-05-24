@@ -19,14 +19,13 @@ else
     tag=$1
 fi
 
-# TODO which registry do we use?
-docker login registry.gitlab.com
-docker build -f docker/app/Dockerfile -t registry.gitlab.com/jaywink/socialhome:${tag} .
-docker push registry.gitlab.com/jaywink/socialhome:${tag}
+docker login codeberg.org
+docker build -f docker/app/Dockerfile -t codeberg.org/socialhome/socialhome:${tag} .
+docker push codeberg.org/socialhome/socialhome:${tag}
 
 if [[ "$2" == "nolatest" ]]; then
     exit
 fi
 
-docker tag registry.gitlab.com/jaywink/socialhome:${tag} registry.gitlab.com/jaywink/socialhome:latest
-docker push registry.gitlab.com/jaywink/socialhome:latest
+docker tag codeberg.org/socialhome/socialhome:${tag} codeberg.org/socialhome/socialhome:latest
+docker push codeberg.org/socialhome/socialhome:latest
