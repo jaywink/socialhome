@@ -3,6 +3,14 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Fixed
+.....
+
+* Fix search index rebuild failing due to long field content.
+
 0.21.0 (2025-05-24)
 -------------------
 

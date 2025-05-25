@@ -29,6 +29,26 @@ class ProfileIndex(indexes.ModelSearchIndex, indexes.Indexable):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.exclude(visibility=Visibility.SELF)
 
+    def prepare_finger(self, obj):
+        if not obj.finger:
+            return None
+        if len(obj.finger.encode("utf8")) > 245:
+            # Xapian wont allow documents longer than this, see
+            # https://getting-started-with-xapian.readthedocs.io/en/latest/concepts/indexing/limitations.html
+            # We could do something smarter here, but for now just skip the tag.
+            return None
+        return obj.finger
+
+    def prepare_name(self, obj):
+        if not obj.name:
+            return None
+        if len(obj.name.encode("utf8")) > 245:
+            # Xapian wont allow documents longer than this, see
+            # https://getting-started-with-xapian.readthedocs.io/en/latest/concepts/indexing/limitations.html
+            # We could do something smarter here, but for now just skip the tag.
+            return None
+        return obj.name
+
     def should_update(self, instance, **kwargs):
         """Ensure we don't update SELF profiles to the index."""
         return instance.visibility != Visibility.SELF
