@@ -1,6 +1,6 @@
 [![](https://img.shields.io/badge/docker-image-yellow)](https://gitlab.com/jaywink/socialhome/container_registry) [![](https://img.shields.io/badge/license-AGPLv3-green.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
 
-[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:federator.dev?server_fqdn=federator.modular.im&fetchMode=summary)](https://matrix.to/#/#socialhome:federator.dev) [![issue tracker](https://img.shields.io/badge/issue%20tracker-codeberg-yellow.svg)](https://codeberg.org/socialhome/socialhome/issues) [![Translations](https://translate.codeberg.org/widget/socialhome/svg-badge.svg)](https://translate.codeberg.org/projects/socialhome/)
+[![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:federator.dev?server_fqdn=federator.modular.im&fetchMode=summary)](https://matrix.to/#/#socialhome:federator.dev) [![issue tracker](https://img.shields.io/badge/issue%20tracker-codeberg-yellow.svg)](https://codeberg.org/socialhome/socialhome/issues) [![Translations](https://translate.codeberg.org/widget/socialhome/backendoldui/svg-badge.svg)](https://translate.codeberg.org/projects/socialhome/backendoldui/)
 =======
 Moved to Codeberg
 -----------------
@@ -59,9 +59,9 @@ Socialhome is fully [open source](https://codeberg.org/socialhome), licenced und
 Translations
 ------------
 
-Our translations are handled via [Codeberg Translate](https://translate.codeberg.org/projects/socialhome/).
+Our translations are handled via [Codeberg Translate](https://translate.codeberg.org/projects/socialhome/backendoldui/).
 Please join the translations team by requesting access via there.
 
 Please also read [TRANSLATIONS.md](TRANSLATIONS.md) for information on the translations process.
 
-![Translations status](https://translate.codeberg.org/widget/socialhome/multi-auto.svg)
+![Translations status](https://translate.codeberg.org/widget/socialhome/backendoldui/multi-auto.svg)
