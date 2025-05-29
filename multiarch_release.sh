@@ -18,7 +18,7 @@
 #
 # Note: building foreign platforms might take a lot more time.
 
-registry=registry.gitlab.com
+registry=codeberg.org
 platforms=linux/amd64,linux/arm64
 manifest=$registry/socialhome/socialhome
 

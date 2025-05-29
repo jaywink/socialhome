@@ -6,6 +6,11 @@ Changelog
 unreleased
 ----------
 
+Added
+.....
+
+* Enable a dynamic user preferences api using the django-dynamic-preferences package UserPreferencesViewSet class.
+
 Fixed
 .....
 
