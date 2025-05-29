@@ -10,6 +10,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from django_js_reverse.views import urls_js
+from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
 from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
@@ -33,6 +34,7 @@ router.register(r"profiles", ProfileViewSet)
 router.register(r"search", SearchViewSet, basename="search")
 router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
+router.register(r"preferences/user", UserPreferencesViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
