@@ -1,3 +1,7 @@
+# TODO fix this file for Weblate -> Codeberg Translate move
+
+-------
+
 Requirements
 ------------
 
@@ -48,7 +52,6 @@ for f in locale/*/LC_MESSAGES/django.po; do
 done
 ```
 
-# TODO webplate needs fixing for codeberg?
 Then commit and push. weblate should pick them up automatically via its configured gitlab webhook.
 
 
