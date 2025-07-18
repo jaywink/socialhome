@@ -12,6 +12,8 @@ import os
 import sys
 import warnings
 from datetime import datetime, timedelta
+from rq.serializers import JSONSerializer
+
 
 import environ
 
@@ -305,6 +307,7 @@ rq_queue_config = {
     "DB": REDIS_DB,
     "PASSWORD": REDIS_PASSWORD,
     "DEFAULT_TIMEOUT": 600,
+    "SERIALIZER": JSONSerializer,
 }
 RQ_QUEUES = {
     "highest": rq_queue_config,
