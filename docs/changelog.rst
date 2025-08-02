@@ -3,6 +3,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+Fixed
+.....
+
+* Fix Streams API token auth by ensuring `self.requests.user` is not referenced before `APIView.dispatch` is called.
+
 0.22.0 (2025-07-19)
 -------------------
 

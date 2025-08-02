@@ -25,10 +25,10 @@ class StreamsAPIBaseView(APIView):
         self.first_id = request.GET.get("first_id")
         self.unfetched_count = request.GET.get("unfetched_count", False)
         if self.unfetched_count == '': self.unfetched_count = True
-        self.set_stream()
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, **kwargs):
+        self.set_stream()
         if request.version == '2.0' and self.unfetched_count:
             data = {'count': self.get_content_count()}
             return Response(data)
