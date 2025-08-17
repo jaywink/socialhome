@@ -444,6 +444,7 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'span',
     'strong',
     'sub',
+    'sup',
     'table',
     'tbody',
     'td',
