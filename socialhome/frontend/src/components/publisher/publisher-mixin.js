@@ -107,7 +107,7 @@ const publisherMixin = {
         // TODO: implement search UI
         extractMentions() {
             const cm = this.$refs.editor.$editor.codemirror
-            const cur = cm.getSearchCursor(/@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9]+)[\W\s]?/)
+            const cur = cm.getSearchCursor(/@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9\-]+)[\W\s]?/)
             let match = cur.findNext()
             this.extendedModel.recipients = []
             while (match) {
