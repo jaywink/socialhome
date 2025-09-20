@@ -115,8 +115,6 @@ const publisherMixin = {
                 this.extendedModel.recipients.push(match[1])
                 match = cur.findNext()
             }
-            // eslint-disable-next-line no-console
-            console.log("recipients", this.extendedModel.recipients)
         },
         async onPostForm() {
             if (this.isPosting === true) return
