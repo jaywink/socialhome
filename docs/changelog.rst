@@ -9,7 +9,12 @@ Unreleased
 Fixed
 .....
 
-* Fix Streams API token auth by ensuring `self.requests.user` is not referenced before `APIView.dispatch` is called.
+* Fix Streams API token auth by ensuring `self.request.user` is not referenced before `APIView.dispatch` is called.
+
+* Add a '-' to the last part of domain names in the UI mention pattern regex. This fixes issue #649 by
+  sucessfully matching puyncode domains (xn--). This was preventing punycode encoded mentions from being added
+  to AP comments as Mention objects, which resulted in the OP not being notified (observed only with Mastodon).
+  The same change has been made to the federation MENTION_PATTERN, which the backend also uses.
 
 0.22.0 (2025-07-19)
 -------------------
