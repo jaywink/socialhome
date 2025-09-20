@@ -107,6 +107,7 @@ const publisherMixin = {
         // TODO: implement search UI
         extractMentions() {
             const cm = this.$refs.editor.$editor.codemirror
+            // eslint-disable-next-line no-useless-escape
             const cur = cm.getSearchCursor(/@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9\-]+)[\W\s]?/)
             let match = cur.findNext()
             this.extendedModel.recipients = []
@@ -114,6 +115,8 @@ const publisherMixin = {
                 this.extendedModel.recipients.push(match[1])
                 match = cur.findNext()
             }
+            // eslint-disable-next-line no-console
+            console.log("recipients", this.extendedModel.recipients)
         },
         async onPostForm() {
             if (this.isPosting === true) return
