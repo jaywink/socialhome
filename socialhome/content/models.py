@@ -1,4 +1,5 @@
 import datetime
+import punycode
 import re
 from uuid import uuid4
 
@@ -460,7 +461,9 @@ class Content(models.Model):
 
         # Do mention links
         for link in soup.find_all('a', attrs={'class':'mention'}):
-            profile = self.mentions.get(finger__iexact=link.text.lstrip('@'))
+            puny = link.text.split('@')
+            puny[-1] = punycode.convert(puny[-1])
+            profile = self.mentions.get(finger__iexact='@'.join(puny).lstrip('@'))
             if profile and not profile.is_local:
                 link['href'] = profile.remote_url or profile.fid
 
@@ -563,7 +566,9 @@ class Content(models.Model):
             except Profile.DoesNotExist:
                 continue
             link = self._soup.new_tag('a')
-            link.append(mention.text)
+            puny = mention.text.split('@')
+            puny[-1] = punycode.convert(puny[-1])
+            link.append('@'.join(puny))
             link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
             link['class'] = 'mention'
             mention.replace_with(link)
