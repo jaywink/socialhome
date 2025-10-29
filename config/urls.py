@@ -16,7 +16,7 @@ from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.enums import PolicyDocumentType
 from socialhome.search.viewsets import SearchViewSet
-from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view 
+from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view
 from socialhome.views import (
     HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
@@ -61,6 +61,7 @@ urlpatterns = [
     # User management
     url(r"", include("socialhome.users.urls", namespace="users")),
     url(r"^accounts/", include("allauth.urls")),
+    url(r"^api/allauth/", include("allauth.headless.urls")),
 
     # Markdownx
     # Use our own upload view based on the MarkdownX view
@@ -94,7 +95,7 @@ urlpatterns = [
     url(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
     url(r"^api/spa-auth/", include("socialhome.authapi.urls"), name="api-spa-auth"),
     url(r"^api/settings/", settings_view, name="settings"),
-    
+
     # Account
     url(r"^account/", include("dynamic_preferences.urls")),
 

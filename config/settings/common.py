@@ -55,6 +55,7 @@ THIRD_PARTY_APPS = (
     "crispy_bootstrap4",
     "allauth",
     "allauth.account",
+    "allauth.headless",
     "allauth.socialaccount",
     "markdownx",
     "django_extensions",
@@ -104,6 +105,7 @@ MIDDLEWARE = (
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 )
 
 # SILK
@@ -284,6 +286,7 @@ ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL = env.bool("ACCOUNT_SIGNUP_REQUIRE_ADMIN_A
 ACCOUNT_ADAPTER = "socialhome.users.adapters.AccountAdapter"
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
+HEADLESS_ADAPTER = "socialhome.users.adapters.HeadlessAdapter"
 
 # Select the correct user model
 AUTH_USER_MODEL = "users.User"
