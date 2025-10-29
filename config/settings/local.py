@@ -86,6 +86,10 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 # RQ
 # --
 RQ_QUEUES["default"]["ASYNC"] = False
+RQ_QUEUES["high"]["ASYNC"] = False
+RQ_QUEUES["highest"]["ASYNC"] = False
+RQ_QUEUES["low"]["ASYNC"] = False
+RQ_QUEUES["lowest"]["ASYNC"] = False
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
