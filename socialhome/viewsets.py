@@ -11,8 +11,12 @@ from socialhome.serializers import ImageUploadSerializer, MediaUploadSerializer
 
 @require_http_methods(['GET'])
 def settings_view(request):
+    """
+    Simple API returning global settings relevant to the SPA UI.
+    """
     return JsonResponse({
                         'ACCOUNT_ALLOW_REGISTRATION': settings.ACCOUNT_ALLOW_REGISTRATION,
+                        'ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL': settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL,
                         'SOCIALHOME_ROOT_PROFILE': settings.SOCIALHOME_ROOT_PROFILE,
                         'SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH': settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH
                          })
