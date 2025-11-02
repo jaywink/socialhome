@@ -33,6 +33,10 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
 
     if user:
+        if user.admin_approved == False:
+            return JsonResponse(
+                {'success': False, 'message': 'Admin approval required'}, status=401
+            )
         login(request, user)
         data = ProfileSerializer(user.profile, context={"request": request}).data
         return JsonResponse(data)
