@@ -58,7 +58,8 @@ export default Vue.component("ReplyEditor", {
     methods: {
         saveReply() {
             if (this.replyText) {
-                const re = /@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9]+)[\W\s]?/g
+                // eslint-disable-next-line no-useless-escape
+                const re = /@([\w\-.]+@[\w\-.]+\.[A-Za-z0-9\-]+)[\W\s]?/g
                 const recipients = Array.from(this.replyText.matchAll(re), m => m[1])
                 this.$store.dispatch(
                     "stream/saveReply", {

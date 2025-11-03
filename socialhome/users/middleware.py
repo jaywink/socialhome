@@ -18,21 +18,23 @@ class AdminApprovalMiddleware:
 
 def use_new_ui(get_response):
     def middleware(request):
+        use_new_ui = True
         if request.user.is_authenticated:
-            if request.user.preferences['generic__use_new_ui']:
-                ap_request = False
-                accept = request.META.get('HTTP_ACCEPT', '')
-                for content_type in (
-                    'application/activity+json', 'application/ld+json',
-                ):
-                    if accept.find(content_type) > -1:
-                        ap_request = True
-                        break
-                if not any((
-                    request.path.split('/')[1] in ('admin', 'api', 'ch', 'django-rq', 'static'),
-                    ap_request,
-                )):
-                    return render(request, 'index.html')
+            use_new_ui = request.user.preferences['generic__use_new_ui']
+        if use_new_ui and request.method in ('GET', 'HEAD'):
+            ap_request = False
+            accept = request.META.get('HTTP_ACCEPT', '')
+            for content_type in (
+                'application/activity+json', 'application/ld+json',
+            ):
+                if accept.find(content_type) > -1:
+                    ap_request = True
+                    break
+            if not any((
+                request.path.split('/')[1] in ('accounts', 'admin', 'api', 'ch', 'django-rq', 'static'),
+                ap_request,
+            )):
+                return render(request, 'index.html')
 
         return get_response(request)
 
