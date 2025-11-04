@@ -49,7 +49,7 @@ def use_new_ui(get_response):
                     'static',
                     'webfinger',
                 ),
-                request.path.endswith('.xml')
+                request.path.endswith('.xml'),
                 ap_request,
             )):
                 return render(request, 'index.html')
