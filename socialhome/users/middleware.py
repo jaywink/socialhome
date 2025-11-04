@@ -30,7 +30,6 @@ def use_new_ui(get_response):
                 'application/xml',
                 'application/magic-envelope+xml',
                 'application/xrd+xml',
-                'application/xml',
             ):
                 if accept.find(content_type) > -1:
                     ap_request = True
@@ -38,6 +37,7 @@ def use_new_ui(get_response):
             if not any((
                 request.path.split('/')[1] in (
                     '.well-known',
+                    'account',
                     'accounts',
                     'admin',
                     'api',
@@ -45,6 +45,7 @@ def use_new_ui(get_response):
                     'django-rq',
                     'fetch',
                     'hcard',
+                    'jsi18n',
                     'nodeinfo',
                     'static',
                     'webfinger',
