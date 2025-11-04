@@ -25,13 +25,32 @@ def use_new_ui(get_response):
             ap_request = False
             accept = request.META.get('HTTP_ACCEPT', '')
             for content_type in (
-                'application/activity+json', 'application/ld+json',
+                'application/activity+json',
+                'application/ld+json',
+                'application/xml',
+                'application/magic-envelope+xml',
+                'application/xrd+xml',
             ):
                 if accept.find(content_type) > -1:
                     ap_request = True
                     break
             if not any((
-                request.path.split('/')[1] in ('accounts', 'admin', 'api', 'ch', 'django-rq', 'static'),
+                request.path.split('/')[1] in (
+                    '.well-known',
+                    'account',
+                    'accounts',
+                    'admin',
+                    'api',
+                    'ch',
+                    'django-rq',
+                    'fetch',
+                    'hcard',
+                    'jsi18n',
+                    'nodeinfo',
+                    'static',
+                    'webfinger',
+                ),
+                request.path.endswith('.xml'),
                 ap_request,
             )):
                 return render(request, 'index.html')
