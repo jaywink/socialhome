@@ -27,7 +27,7 @@ def use_new_ui(get_response):
             for content_type in (
                 'application/activity+json',
                 'application/ld+json',
-                'application/xml',
+                #'application/xml',
                 'application/magic-envelope+xml',
                 'application/xrd+xml',
             ):
@@ -37,7 +37,6 @@ def use_new_ui(get_response):
             if not any((
                 request.path.split('/')[1] in (
                     '.well-known',
-                    'account',
                     'accounts',
                     'admin',
                     'api',
