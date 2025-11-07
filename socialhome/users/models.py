@@ -509,7 +509,7 @@ class Profile(TimeStampedModel):
                 profile.handle.split("@")[1], url,
             )
         return url if is_url(url) else ""
-    
+
     @staticmethod
     def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
@@ -541,7 +541,7 @@ class Profile(TimeStampedModel):
         fid = safe_text(remote_profile.id)
         values['handle'] = safe_text(remote_profile.handle)
         values['guid'] = safe_text(remote_profile.guid)
-        values['finger'] = safe_text(remote_profile.finger)
+        values['finger'] = safe_text(remote_profile.finger or remote_profile.handle)
         if fid.startswith('http'):
             # only needed for activitypub profiles
             values['followers_fid'] = safe_text(remote_profile.followers)
@@ -550,7 +550,7 @@ class Profile(TimeStampedModel):
             if remote_profile.image and is_url(remote_profile.image.url):
                 values["picture_url"] = remote_profile.image.url
         else:
-            values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(remote_profile.username))
+            values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(values["handle"].split("@")[0]))
 
         logger.debug("from_remote_profile - values %s", values)
         if values["guid"]:
