@@ -31,7 +31,6 @@ class LimitedProfileSerializer(ModelSerializer):
             "picture_url",
             "is_local",
             "name",
-            "bio",
             "url",
             "user_following",
         )
@@ -49,7 +48,6 @@ class LimitedProfileSerializer(ModelSerializer):
             "picture_url",
             "is_local",
             "name",
-            "bio",
             "url",
             "user_following",
         )
