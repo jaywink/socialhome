@@ -6,6 +6,14 @@ Changelog
 Unreleased
 ----------
 
+Changed
+.......
+
+* Make the SPA UI the default UI. Make sure registrations requests are processed with the backend  accounts/signup form
+  until registration is implemented in the SPA UI.
+
+* Require an authenticated request for scheduled profile updates to limit RQ flooding caused by AI data gatherers.
+
 Fixed
 .....
 
@@ -15,6 +23,9 @@ Fixed
   sucessfully matching puyncode domains (xn--). This was preventing punycode encoded mentions from being added
   to AP comments as Mention objects, which resulted in the OP not being notified (observed only with Mastodon).
   The same change has been made to the federation MENTION_PATTERN, which the backend also uses.
+
+* Fix Diaspora profiles missing the `finger` and `remote_url` properties when profiles are received from a remote
+  Diaspora instance.
 
 0.22.0 (2025-07-19)
 -------------------
