@@ -486,6 +486,7 @@ SOCIALHOME_MATRIX_APPSERVICE_BASE_URL = f"https://{SOCIALHOME_MATRIX_HOMESERVER}
 SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}:443"
 # Valid user name required for get requests signature by federation
 FEDERATION_USER = env("FEDERATION_USER", default=None)
+SOCIALHOME_USE_NEW_UI = env("SOCIALHOME_USE_NEW_UI", default=True)
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------

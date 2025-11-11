@@ -18,7 +18,7 @@ class AdminApprovalMiddleware:
 
 def use_new_ui(get_response):
     def middleware(request):
-        use_new_ui = True
+        use_new_ui = settings.SOCIALHOME_USE_NEW_UI
         if request.user.is_authenticated:
             use_new_ui = request.user.preferences['generic__use_new_ui']
         if use_new_ui and request.method in ('GET', 'HEAD'):

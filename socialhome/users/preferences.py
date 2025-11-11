@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from dynamic_preferences.types import Section, ChoicePreference, BooleanPreference
 from dynamic_preferences.users.registries import user_preferences_registry
@@ -28,6 +29,6 @@ class LandingPage(ChoicePreference):
 class UseNewUI(BooleanPreference):
     section = generic
     name = "use_new_ui"
-    default = True
+    default = settings.SOCIALHOME_USE_NEW_UI
     verbose_name = _("Use new UI")
     help_text = _("Try the new SPA UI.")
