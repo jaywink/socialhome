@@ -2,7 +2,7 @@ from allauth.account.forms import SignupForm
 from allauth.socialaccount.forms import SignupForm as SocialAccountSignupForm
 from django import forms
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from socialhome.content.utils import safe_text
 from socialhome.users.models import Profile, User

@@ -41,7 +41,7 @@ class User(AbstractUser):
     # User approved by an admin
     # If ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL is set to True, the user wont be able to use
     # the system until approved by an admin.
-    admin_approved = models.NullBooleanField(_("Admin approved"), default=None)
+    admin_approved = models.BooleanField(_("Admin approved"), default=None, null=True)
     # Reason for requesting an account, given on signup if approval is required
     account_request_reason = models.CharField(_("Account request reason"), blank=True, max_length=255)
 

@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from socialhome.search.views import GlobalSearchView
 
 app_name = 'search'
 
 urlpatterns = [
-    url(r"", GlobalSearchView.as_view(), name="global"),
+    re_path(r"", GlobalSearchView.as_view(), name="global"),
 ]

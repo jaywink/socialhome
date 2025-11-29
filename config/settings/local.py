@@ -48,7 +48,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_PRIVATE_NETWORK = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "localhost",
+    "http://localhost",
 ]
 
 # django-debug-toolbar
