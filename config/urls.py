@@ -60,6 +60,7 @@ urlpatterns = [
     # User management
     re_path(r"", include("socialhome.users.urls", namespace="users")),
     re_path(r"^accounts/", include("allauth.urls")),
+    re_path(r"^api/allauth/", include("allauth.headless.urls")),
 
     # Markdownx
     # Use our own upload view based on the MarkdownX view
@@ -91,7 +92,6 @@ urlpatterns = [
     re_path(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
-    re_path(r"^api/spa-auth/", include("socialhome.authapi.urls"), name="api-spa-auth"),
     re_path(r"^api/settings/", settings_view, name="settings"),
 
     # Account
