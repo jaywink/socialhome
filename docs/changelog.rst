@@ -6,6 +6,11 @@ Changelog
 Unreleased
 ----------
 
+Added
+.....
+
+* Add SOCIALHOME_USE_NEW_UI setting (default= True). This will be removed when the old UI is decommissioned.
+
 Changed
 .......
 
