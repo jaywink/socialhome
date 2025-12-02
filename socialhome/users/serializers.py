@@ -1,11 +1,10 @@
 from typing import List
 
-from enumfields.drf import EnumField
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
 from socialhome.content.models import Content
-from socialhome.enums import Visibility
+from socialhome.enums import EnumField, Visibility
 from socialhome.users.models import User, Profile
 
 class LimitedProfileSerializer(ModelSerializer):
@@ -67,7 +66,7 @@ class ProfileSerializer(ModelSerializer):
     following_count = SerializerMethodField()
     has_pinned_content = SerializerMethodField()
     user_following = SerializerMethodField()
-    visibility = EnumField(Visibility, lenient=True, ints_as_names=True)
+    visibility = EnumField(Visibility, representation="string")
 
     class Meta:
         model = Profile

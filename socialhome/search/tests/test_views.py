@@ -6,7 +6,6 @@ import haystack
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 from django.urls import reverse
-from django.utils.http import urlquote
 from federation.entities import base
 
 from socialhome.content.tests.factories import ContentFactory
@@ -39,7 +38,7 @@ class TestGlobalSearchViewQuerySet(SocialhomeCBVTestCase):
         queryset_pks = view.get_queryset().values_list("pk", flat=True)
         self.assertEqual(
             set(queryset_pks),
-            {str(self.public_profile.pk), str(self.site_profile.pk)},
+            {self.public_profile.pk, self.site_profile.pk},
         )
 
     def test_profile_visibility_authenticated_staff_user(self):
@@ -49,7 +48,7 @@ class TestGlobalSearchViewQuerySet(SocialhomeCBVTestCase):
         queryset_pks = view.get_queryset().values_list("pk", flat=True)
         self.assertEqual(
             set(queryset_pks),
-            {str(self.public_profile.pk), str(self.site_profile.pk), str(self.limited_profile.pk)},
+            {self.public_profile.pk, self.site_profile.pk, self.limited_profile.pk},
         )
 
     def test_profile_visibility_anonymous_user(self):
@@ -58,7 +57,7 @@ class TestGlobalSearchViewQuerySet(SocialhomeCBVTestCase):
         view = self.get_instance(GlobalSearchView, request=request)
         queryset_pks = view.get_queryset().values_list("pk", flat=True)
         self.assertEqual(
-            set(queryset_pks), {str(self.public_profile.pk)},
+            set(queryset_pks), {self.public_profile.pk},
         )
 
 
@@ -92,7 +91,7 @@ class TestGlobalSearchView(SocialhomeTestCase):
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], self.public_profile)
 
-        self.get("%s?q=%s" % (reverse("search:global"), urlquote(self.public_profile.fid)), follow=True)
+        self.get("%s?q=%s" % (reverse("search:global"), quote(self.public_profile.fid)), follow=True)
         self.assertResponseNotContains("Profiles", html=False)
         self.assertEqual(self.context["view"].__class__, ProfileAllContentView)
         self.assertEqual(self.context["object"], self.public_profile)

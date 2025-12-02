@@ -1,28 +1,37 @@
+import typing
+
+from django_enum.drf import EnumField as BaseEnumField
 from django.utils.translation import gettext_lazy as _
-from enumfields import Enum
+from enum_properties import Symmetric, IntEnumProperties, StrEnumProperties
 
 
-class PolicyDocumentType(Enum):
-    TERMS_OF_SERVICE = 'tos'
-    PRIVACY_POLICY = 'privacypolicy'
+class PolicyDocumentType(StrEnumProperties):
+    label: str
 
-    class Labels:
-        TERMS_OF_SERVICE = _("Terms of service")
-        PRIVACY_POLICY = _("Privacy policy")
+    TERMS_OF_SERVICE = 'tos', _("Terms of service")
+    PRIVACY_POLICY = 'privacypolicy', _("Privacy policy")
 
 
-class Visibility(Enum):
-    PUBLIC = 0
-    LIMITED = 1
-    SITE = 2
-    SELF = 3
+class Visibility(IntEnumProperties):
+    label: str
+    string: typing.Annotated[str, Symmetric(case_fold=True)]
 
-    class Labels:
-        PUBLIC = _("Public")
-        LIMITED = _("Limited")
-        SITE = _("Site")
-        SELF = _("Self")
+    PUBLIC = 0, _("Public"), "public"
+    LIMITED = 1, _("Limited"), "limited",
+    SITE = 2, _("Site"), "site"
+    SELF = 3, _("Self"), "self"
 
-    @property
-    def string_value(self):
-        return {0: "public", 1: "limited", 2: "site", 3: "self"}.get(self.value)
+
+class EnumField(BaseEnumField):
+    """
+    There may be a better way to do this, but I haven't found it.
+    Allows the selection of an arbitrary property for outgoing serialization.
+    """
+    representaton = "value"
+
+    def __init__(self, enum, **kwargs):
+        self.representation = kwargs.pop("representation", "value")
+        super().__init__(enum, **kwargs)
+
+    def to_representation(self, value):
+        return getattr(value, self.representation, value)
