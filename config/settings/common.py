@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = (
     "crispy_bootstrap4",
     "allauth",
     "allauth.account",
+    "allauth.headless",
     "allauth.socialaccount",
     "markdownx",
     "django_extensions",
@@ -97,12 +98,12 @@ MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "socialhome.users.middleware.AdminApprovalMiddleware",
-    "socialhome.users.middleware.use_new_ui",
+#    "socialhome.users.middleware.use_new_ui",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
-    "allauth.account.middleware.AccountMiddleware"
+    "allauth.account.middleware.AccountMiddleware",
+    "socialhome.users.middleware.AdminApprovalMiddleware",
 )
 
 # SILK
@@ -266,13 +267,17 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Some really nice defaults
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*']
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 
-ACCOUNT_FORMS = {
-    "signup": "socialhome.users.forms.UserSignupForm",
-}
+#ACCOUNT_FORMS = {
+#    "signup": "socialhome.users.forms.UserSignupForm",
+#}
+ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
 SOCIALACCOUNT_FORMS = {
     "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
 }
@@ -342,6 +347,13 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
+    "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
+    "account_reset_password_from_key": f'{SOCIALHOME_URL}/account/password/reset/key/{{key}}',
+    "account_signup": f'{SOCIALHOME_URL}/account/signup'
+}
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.
