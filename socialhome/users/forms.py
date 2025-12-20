@@ -1,5 +1,3 @@
-from allauth.account.forms import SignupForm
-from allauth.socialaccount.forms import SignupForm as SocialAccountSignupForm
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -23,7 +21,7 @@ class UserPictureForm(forms.ModelForm):
         fields = ["picture"]
 
 
-class UserSignupFormMixin(forms.Form):
+class UserSignupForm(forms.Form):
     account_request_reason = forms.CharField(
         label=_("Account request reason"),
         max_length=255,
@@ -39,20 +37,10 @@ class UserSignupFormMixin(forms.Form):
         if not settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
             del self.fields['account_request_reason']
 
-    def save(self, request):
+    def signup(self, request, user):
         # noinspection PyUnresolvedReferences
-        user = super().save(request)
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
             # noinspection PyUnresolvedReferences
             account_request_reason = self.cleaned_data.get("account_request_reason")
             user.account_request_reason = account_request_reason
             user.save(update_fields=["account_request_reason"])
-        return user
-
-
-class UserSignupForm(UserSignupFormMixin, SignupForm):
-    pass
-
-
-class UserSocialAccountSignupForm(UserSignupFormMixin, SocialAccountSignupForm):
-    pass
