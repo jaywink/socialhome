@@ -13,6 +13,7 @@ from socialhome.serializers import ImageUploadSerializer, MediaUploadSerializer
 def settings_view(request):
     return JsonResponse({
                         'ACCOUNT_ALLOW_REGISTRATION': settings.ACCOUNT_ALLOW_REGISTRATION,
+                        'ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL': settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL,
                         'SOCIALHOME_ROOT_PROFILE': settings.SOCIALHOME_ROOT_PROFILE,
                         'SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH': settings.SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH
                          })
