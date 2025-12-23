@@ -29,7 +29,7 @@ class StreamConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(self.get_stream_name(), self.channel_name)
         user = self.scope["user"]
         if user and user.is_authenticated:
-            async_to_sync(user.mark_recently_active())
+            user.mark_recently_active()
         super().connect()
 
     def disconnect(self, code):
@@ -45,7 +45,7 @@ class StreamConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
         if data.get("event") == "ping":
-            self.send(text_data=json.dumps({"event": "pong"}))
+            self.send(text_data=json.dumps({"event":"pong"}, separators=(',', ':')))
             user = self.scope["user"]
             if user and user.is_authenticated:
-                async_to_sync(user.mark_recently_active())
+                user.mark_recently_active()
