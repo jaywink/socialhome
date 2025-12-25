@@ -46,7 +46,6 @@ DJANGO_APPS = (
     "django.forms",  # Required by FORM_RENDERER = TemplatesSetting
 )
 THIRD_PARTY_APPS = (
-    "channels",
     "daphne",
     "corsheaders",
     "crispy_forms",
@@ -352,6 +351,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
     "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
     "account_reset_password_from_key": f'{SOCIALHOME_URL}/account/password/reset/key/{{key}}',
+    "account_login": f'{SOCIALHOME_URL}/account/login',
     "account_signup": f'{SOCIALHOME_URL}/account/signup'
 }
 # Admins
