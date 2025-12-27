@@ -165,7 +165,7 @@ class Content(models.Model):
 
     # Cached data on save
     content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
-    local = models.BooleanField(_("Local"), default=False, editable=False)
+    local = models.BooleanField(_("Local"), default=False, db_index=True, editable=False)
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
