@@ -346,7 +346,6 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
-HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
     "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
