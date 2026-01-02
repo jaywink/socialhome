@@ -16,7 +16,7 @@ from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from enumfields import EnumIntegerField
+from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from federation.types import UserType
 from federation.utils.text import validate_handle, decode_if_bytes
@@ -188,7 +188,7 @@ class Profile(TimeStampedModel):
     key_id = models.URLField(_("AP Public Key ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
     # Profile visibility
-    visibility = EnumIntegerField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
+    visibility = EnumField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
     # Image urls
     image_url_large = models.URLField(_("Image - large"), blank=True, max_length=500)

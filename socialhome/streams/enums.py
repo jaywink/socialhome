@@ -1,5 +1,4 @@
 from django.utils.translation import gettext_lazy as _
-from enumfields import Enum
 from enum_properties import StrEnumProperties
 
 

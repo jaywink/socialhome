@@ -19,7 +19,7 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language, gettext_lazy as _
-from enumfields import EnumIntegerField
+from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
 from memoize import memoize, delete_memoized
@@ -101,7 +101,7 @@ class Content(models.Model):
     guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
 
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
-    visibility = EnumIntegerField(Visibility, default=Visibility.PUBLIC, db_index=True)
+    visibility = EnumField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     # Federation identifier
     # Optional
@@ -164,7 +164,7 @@ class Content(models.Model):
     modified = AutoLastModifiedField(_('Modified'))
 
     # Cached data on save
-    content_type = EnumIntegerField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
+    content_type = EnumField(ContentType, default=ContentType.CONTENT, db_index=True, editable=False)
     local = models.BooleanField(_("Local"), default=False, db_index=True, editable=False)
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
