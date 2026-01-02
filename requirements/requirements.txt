@@ -142,6 +142,8 @@ django-dynamic-preferences==1.17.0
     # via -r requirements/requirements.in
 django-enum[properties]==2.3.0
     # via -r requirements/requirements.in
+django-enumfields==2.1.1
+    # via -r requirements/requirements.in
 django-environ==0.12.0
     # via -r requirements/requirements.in
 django-extensions==4.1

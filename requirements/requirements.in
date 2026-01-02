@@ -1,6 +1,5 @@
 arrow
 bleach
-# Waiting for https://github.com/django/channels_redis/pull/347
 channels[daphne]
 channels_redis
 chardet
@@ -14,6 +13,8 @@ django-cors-headers
 django-crispy-forms
 django-dynamic-preferences
 django-enum[properties]
+# needed until the migrations are squashed
+django-enumfields
 django-environ
 django-extensions
 django-floppyforms
