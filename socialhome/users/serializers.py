@@ -1,6 +1,6 @@
 from typing import List
 
-from rest_framework.fields import SerializerMethodField
+from rest_framework.fields import SerializerMethodField, empty
 from rest_framework.serializers import ModelSerializer
 
 from socialhome.content.models import Content
@@ -30,7 +30,6 @@ class LimitedProfileSerializer(ModelSerializer):
             "picture_url",
             "is_local",
             "name",
-            "bio",
             "url",
             "user_following",
         )
@@ -48,7 +47,6 @@ class LimitedProfileSerializer(ModelSerializer):
             "picture_url",
             "is_local",
             "name",
-            "bio",
             "url",
             "user_following",
         )
@@ -65,6 +63,7 @@ class ProfileSerializer(ModelSerializer):
     followers_count = SerializerMethodField()
     following_count = SerializerMethodField()
     has_pinned_content = SerializerMethodField()
+    is_staff = SerializerMethodField()
     user_following = SerializerMethodField()
     visibility = EnumField(Visibility, representation="string")
 
@@ -87,9 +86,11 @@ class ProfileSerializer(ModelSerializer):
             "avatar_url",
             "picture_url",
             "is_local",
+            "is_staff",
             "location",
             "name",
             "bio",
+            "rendered_bio",
             "nsfw",
             "url",
             "user_following",
@@ -110,9 +111,18 @@ class ProfileSerializer(ModelSerializer):
             "image_url_medium",
             "image_url_small",
             "is_local",
+            "is_staff",
+            "rendered_bio",
             "url",
             "user_following",
         )
+
+    def __init__(self, instance=None, data=empty, **kwargs):
+        super().__init__(instance, data, **kwargs)
+        # populate new rendered_bio field if empty
+        # done here to avoid a lengthy migration
+        # TODO: remove from from the release
+        if getattr(self.instance, 'bio', None) and not self.instance.rendered_bio: self.instance.render_bio()
 
     def get_followed_tags(self, obj: Profile) -> List:
         """
@@ -132,6 +142,10 @@ class ProfileSerializer(ModelSerializer):
     def get_has_pinned_content(self, obj):
         user = self.context.get("request").user
         return Content.objects.profile_pinned(obj, user).exists()
+
+    def get_is_staff(self, obj):
+        user = self.context.get("request").user
+        return getattr(user, 'is_staff', False)
 
     def get_user_following(self, obj):
         request = self.context.get("request")
