@@ -186,7 +186,7 @@ class BaseStream:
     key_base = ["sh", "streams"]
     notify_for_shares = True
     ordering = "-created"
-    paginate_by = 15
+    paginate_by = 30
     redis = None
     stream_type = None
     unfetched_content = False
