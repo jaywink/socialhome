@@ -8,6 +8,7 @@ from uuid import uuid4
 import django_rq
 # noinspection PyPackageRequirements
 from bs4 import BeautifulSoup
+from commonmark import commonmark
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -27,12 +28,14 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
+from federation.utils.text import find_elements, TAG_PATTERN
 from socialhome.activities.models import Activity
-from socialhome.content.utils import safe_text, safe_text_for_markdown
+from socialhome.content.utils import (get_and_linkify_tags, linkify_mentions,
+    process_text_links, safe_text, safe_text_for_markdown)
 from socialhome.enums import Visibility
 from socialhome.users.querysets import ProfileQuerySet
 from socialhome.users.utils import get_pony_urls, generate_rsa_private_key
-from socialhome.utils import get_full_media_url, get_redis_connection, is_url
+from socialhome.utils import get_full_url, get_full_media_url, get_redis_connection, is_url
 
 logger = logging.getLogger("socialhome")
 
@@ -112,6 +115,7 @@ class User(AbstractUser):
             self.profile.image_url_small = get_full_media_url(self.picture.crop["50x50"].name)
             self.profile.image_url_medium = get_full_media_url(self.picture.crop["100x100"].name)
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
+            self.profile.avatar = get_full_media_url(self.picture.crop["300x300"].name)
             self.profile.save(update_fields=["image_url_small", "image_url_medium", "image_url_large"])
 
     def init_pictures_on_disk(self):
@@ -162,6 +166,7 @@ class Profile(TimeStampedModel):
     name = models.CharField(_("Name"), blank=True, max_length=255)
     email = models.EmailField(_("email address"), blank=True)
     bio = models.TextField(_("Bio"), blank=True)
+    rendered_bio = models.TextField(_("Rendered bio"), blank=True)
 
     # Federation GUID
     # Optional, related to Diaspora network platforms
@@ -432,6 +437,34 @@ class Profile(TimeStampedModel):
     @property
     def plain_name(self):
         return BeautifulSoup(self.name, 'html.parser').text
+
+    def render_bio_for_federation(self):
+        """Fix tag and mention links."""
+        soup = BeautifulSoup(self.rendered_bio, 'html.parser')
+        # Do tag links. Set the hashtag class in case we're dealing with old profile
+        for link in soup.find_all('a', string=TAG_PATTERN):
+            link['class'] = ['hashtag']
+            if not link['href'].startswith('http'):
+                link['href'] = get_full_url(link['href'])
+
+        # Do mention links
+        for link in soup.find_all('a', attrs={'class':'mention'}):
+            profile = Profile.objects.get(finger__iexact=link.text.lstrip('@'))
+            if profile and not profile.is_local:
+                link['href'] = profile.remote_url or profile.fid
+
+        return str(soup)
+
+    def render_bio(self):
+        self._soup = BeautifulSoup(commonmark(self.bio, ignore_html_blocks=True).strip(), 'html.parser')
+
+        get_and_linkify_tags(self._soup)
+        linkify_mentions(self._soup)
+        process_text_links(self._soup)
+        rendered = str(self._soup)
+
+        self.rendered_bio = rendered
+        Profile.objects.filter(id=self.id).update(rendered_bio=rendered)
 
     def safer_image_url(self, size):
         """Return a most likely more working image url for the profile.

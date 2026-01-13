@@ -67,6 +67,7 @@ def profile_following_change(sender, instance, action, pk_set, **kwargs):
 
 @receiver(post_save, sender=Profile)
 def profile_post_save(instance, **kwargs):
+    render_bio(instance)
     if instance.is_local:
         transaction.on_commit(lambda: federate_profile(instance))
     update_profile_for_streams(instance)
@@ -79,6 +80,14 @@ def federate_profile(profile):
         transaction.on_commit(lambda: queue.enqueue(send_profile, profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
+
+
+def render_bio(profile):
+    profile.refresh_from_db()
+    try:
+        profile.render_bio()
+    except Exception as ex:
+        logger.exception("Failed to render bio for %s: %s", profile, ex)
 
 
 @receiver(pre_delete, sender=Profile)

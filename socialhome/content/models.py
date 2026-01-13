@@ -28,6 +28,7 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
 from socialhome.content.querysets import TagQuerySet, ContentQuerySet
+from socialhome.content.utils import get_and_linkify_tags, linkify_mentions, process_text_links
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.utils import get_full_url
@@ -481,9 +482,9 @@ class Content(models.Model):
         """Pre-render text to Content.rendered."""
         self._soup = BeautifulSoup(commonmark(self.text, ignore_html_blocks=True).strip(), 'html.parser')
 
-        self.get_and_linkify_tags()
-        self.linkify_mentions()
-        self.process_text_links()
+        self.save_tags(get_and_linkify_tags(self._soup))
+        linkify_mentions(self._soup, self.mentions)
+        process_text_links(self._soup)
         rendered = str(self._soup)
 
         if self.show_preview:
@@ -503,93 +504,6 @@ class Content(models.Model):
 
         self.rendered = rendered
         Content.objects.filter(id=self.id).update(rendered=rendered)
-
-    def get_and_linkify_tags(self):
-        """Find tags in text and convert them to HTML links.
-
-        Save found tags to the content.
-        """
-        found_tags = set()
-        # federation sets the data-hashtag attributes on inbound AP HTML payloads
-        for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
-            tag = link['data-hashtag'].lstrip('#')
-            found_tags.add(tag)
-            if 'hashtag' not in link.get('class', []):
-                link['class'] = ['hashtag'] + link.get('class', [])
-
-        for tag in find_elements(self._soup, TAG_PATTERN):
-            # ignore url fragments in link text
-            final = tag.text.lstrip('#').lower()
-            link = tag.find_parent('a')
-            if link:
-                if link.text != tag.text: continue
-                if 'hashtag' not in link.get('class', []):
-                    link['class'] = ['hashtag'] + link.get('class', [])
-            else:
-                sibling = tag.previous_sibling
-                if isinstance(sibling, NavigableString) and re.search(URL_PATTERN.pattern+'$', sibling): continue
-                link = self._soup.new_tag('a')
-                link.append(tag.text)
-                link['class'] = 'hashtag'
-                tag.replace_with(link)
-
-            #  prepare for linkification
-            found_tags.add(final)
-            link['data-hashtag'] = final
-
-        self.save_tags(found_tags)
-        # linkify
-        for link in self._soup.find_all('a', attrs={'data-hashtag':True}):
-            link['href'] = reverse("streams:tag", kwargs={"name": link['data-hashtag']})
-            del link['data-hashtag']
-
-    def linkify_mentions(self):
-        # Linkify mentions
-        # federation sets the data-mention attributes on inbound AP HTML payloads
-        for link in self._soup.find_all('a', attrs={'data-mention':True}):
-            mention = link['data-mention']
-            try:
-                profile = self.mentions.get(finger__iexact=mention)
-            except Profile.DoesNotExist:
-                continue
-            link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
-            if 'mention' not in link.get('class', []):
-                link['class'] = ['mention'] + link.get('class', [])
-            del link['data-mention']
-
-        for mention in find_elements(self._soup, MENTION_PATTERN):
-            try:
-                profile = self.mentions.get(finger__iexact=mention.text.lstrip('@'))
-            except Profile.DoesNotExist:
-                continue
-            link = self._soup.new_tag('a')
-            link.append(mention.text)
-            link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
-            link['class'] = 'mention'
-            mention.replace_with(link)
-
-    def process_text_links(self):
-        """Process links in text, adding some attributes and linkifying textual links."""
-        for link in self._soup.find_all('a', href=True):
-            if link['href'].startswith('/'): continue
-            if 'nofollow' not in link.get('rel', []):
-                link['rel'] = ['nofollow'] + link.get('rel', [])
-            link['target'] = '_blank'
-            if not (link.text or link.next):
-                link.string = link['href']
-
-        for url in find_elements(self._soup, URL_PATTERN):
-            if url.find_parent('a'): continue
-            href = url.text
-            if not href.startswith('http'):
-                href = 'https://' + href
-            if validators.url(href):
-                link = self._soup.new_tag('a')
-                link['href'] = href
-                link.string = url.text
-                link['rel'] = ['nofollow']
-                link['target'] = '_blank'
-                url.replace_with(link)
 
     def fix_local_uploads(self):
         """Fix the markdown URL of local uploads.

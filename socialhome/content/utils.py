@@ -4,10 +4,13 @@ import re
 import bleach
 import validators
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 from commonmark import commonmark
 from django.conf import settings
+from django.urls import reverse
 
-from federation.utils.text import find_elements, URL_PATTERN
+from federation.utils.text import find_elements, MENTION_PATTERN, TAG_PATTERN, URL_PATTERN
+from socialhome.utils import get_full_url
 
 logger = logging.getLogger("socialhome")
 
@@ -90,6 +93,105 @@ def find_urls_in_text(text):
             urls.append(href)
 
     return urls
+
+
+def process_text_links(soup: BeautifulSoup):
+    """Process links in text, adding some attributes and linkifying textual links."""
+    for link in soup.find_all('a', href=True):
+        if link['href'].startswith('/'): continue
+        if 'nofollow' not in link.get('rel', []):
+            link['rel'] = ['nofollow'] + link.get('rel', [])
+        link['target'] = '_blank'
+        if not (link.text or link.next):
+            link.string = link['href']
+
+    for url in find_elements(soup, URL_PATTERN):
+        if url.find_parent('a'): continue
+        href = url.text
+        if not href.startswith('http'):
+            href = 'https://' + href
+        if validators.url(href):
+            link = soup.new_tag('a')
+            link['href'] = href
+            link.string = url.text
+            link['rel'] = ['nofollow']
+            link['target'] = '_blank'
+            url.replace_with(link)
+
+
+def get_and_linkify_tags(soup: BeautifulSoup):
+    """Find tags in text and convert them to HTML links.
+
+    """
+    found_tags = set()
+    # federation sets the data-hashtag attributes on inbound AP HTML payloads
+    for link in soup.find_all('a', attrs={'data-hashtag':True}):
+        tag = link['data-hashtag'].lstrip('#')
+        found_tags.add(tag)
+        if 'hashtag' not in link.get('class', []):
+            link['class'] = ['hashtag'] + link.get('class', [])
+
+    for tag in find_elements(soup, TAG_PATTERN):
+        # ignore url fragments in link text
+        final = tag.text.lstrip('#').lower()
+        link = tag.find_parent('a')
+        if link:
+            if link.text != tag.text: continue
+            if 'hashtag' not in link.get('class', []):
+                link['class'] = ['hashtag'] + link.get('class', [])
+        else:
+            sibling = tag.previous_sibling
+            if isinstance(sibling, NavigableString) and re.search(URL_PATTERN.pattern+'$', sibling): continue
+            link = soup.new_tag('a')
+            link.append(tag.text)
+            link['class'] = 'hashtag'
+            tag.replace_with(link)
+
+        #  prepare for linkification
+        found_tags.add(final)
+        link['data-hashtag'] = final
+
+    # linkify
+    for link in soup.find_all('a', attrs={'data-hashtag':True}):
+        link['href'] = reverse("streams:tag", kwargs={"name": link['data-hashtag']})
+        del link['data-hashtag']
+        link['class'] = 'hashtag'
+
+    return found_tags
+
+
+def linkify_mentions(soup: BeautifulSoup, mentions=None):
+    # Linkify mentions
+    # federation sets the data-mention attributes on inbound AP HTML payloads
+    from federation.fetchers import retrieve_remote_profile
+    from socialhome.users.models import Profile # circulars
+    if not mentions: mentions = Profile.objects
+    for link in soup.find_all('a', attrs={'data-mention':True}):
+        mention = link['data-mention']
+        try:
+            profile = mentions.get(finger__iexact=mention)
+        except Profile.DoesNotExist:
+            remote_profile = retrieve_remote_profile(mention)
+            if not remote_profile:
+                continue
+            profile = Profile.from_remote_profile(remote_profile)
+        link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+        link['class'] = ['mention']
+        del link['data-mention']
+
+    for mention in find_elements(soup, MENTION_PATTERN):
+        try:
+            profile = mentions.get(finger__iexact=mention.text.lstrip('@'))
+        except Profile.DoesNotExist:
+            remote_profile = retrieve_remote_profile(mention.text.lstrip('@'))
+            if not remote_profile:
+                continue
+            profile = Profile.from_remote_profile(remote_profile)
+        link = soup.new_tag('a')
+        link.append(mention.text)
+        link['href'] = get_full_url(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+        link['class'] = 'mention'
+        mention.replace_with(link)
 
 
 def update_counts(content):
