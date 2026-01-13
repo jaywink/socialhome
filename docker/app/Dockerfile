@@ -7,7 +7,7 @@ ENV NODE_VERSION 12.22.12
 WORKDIR /
 
 # Install nvm with node and npm
-RUN apt-get update && apt-get install python3-dev less htop curl git build-essential libmagic1 -y && \
+RUN apt-get update && apt-get install python3-dev less htop curl git build-essential libmagic1 tzdata-legacy -y && \
     rm /bin/sh && ln -s /bin/bash /bin/sh && mkdir /usr/local/nvm && \
     curl https://raw.githubusercontent.com/creationix/nvm/v0.39.3/install.sh | bash
 
