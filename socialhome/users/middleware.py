@@ -58,8 +58,9 @@ class AdminApprovalMiddleware:
                     return response
                 else:
                     return render(request, 'users/admin_approval_required.html')
+            else: return response if response else self.get_response(request)
 
-        return self.get_response(request)
+        else: return self.get_response(request)
 
 
 def use_new_ui(get_response):
