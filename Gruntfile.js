@@ -161,6 +161,15 @@ module.exports = function (grunt) {
                 src: ['<%= paths.bower %>/fontawesome/fonts/*'],
                 dest: '<%= paths.fonts %>'
             },
+            bootstrap: {
+                expand: true,
+                flatten: true,
+                src: [
+                    '<%= paths.bower %>/bootstrap/dist/css/bootstrap.min.css.map',
+                    '<%= paths.bower %>/bootstrap/dist/js/bootstrap.min.js.map',
+                ],
+                dest: '<%= paths.dist %>'
+            }
         },
     });
 
