@@ -37,6 +37,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             verified=True,
         )
 
+        self.save()
 
 class LimitedUserFactory(UserFactory):
     @classmethod
@@ -137,6 +138,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
         if self.fid == "placeholder":
             self.fid = f"{settings.SOCIALHOME_URL}/u/{self.user.username}/" \
                 if self.user else f"{settings.SOCIALHOME_URL}/p/{self.uuid}/"
+            self.save()
 
     # noinspection PyAttributeOutsideInit
     @factory.post_generation
@@ -147,6 +149,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
         # Set handle sometimes, sometimes not, but also allow passing in True to force
         if extracted is True or randint(0, 100) > 50:
             self.handle = self.finger
+            self.save()
 
     @factory.post_generation
     def with_key(self, extracted, created, **kwargs):
@@ -154,6 +157,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
             return
 
         self.generate_new_rsa_key(bits=1024)
+        self.save()
 
 
 class PublicProfileFactory(ProfileFactory):
