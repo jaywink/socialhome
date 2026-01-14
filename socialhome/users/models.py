@@ -196,15 +196,15 @@ class Profile(TimeStampedModel):
     visibility = EnumField(Visibility, verbose_name=_("Profile visibility"), default=Visibility.PUBLIC)
 
     # Image urls
-    image_url_large = models.URLField(_("Image - large"), blank=True, max_length=500)
-    image_url_medium = models.URLField(_("Image - medium"), blank=True, max_length=500)
-    image_url_small = models.URLField(_("Image - small"), blank=True, max_length=500)
+    image_url_large = models.URLField(_("Image - large"), blank=True, max_length=1000)
+    image_url_medium = models.URLField(_("Image - medium"), blank=True, max_length=1000)
+    image_url_small = models.URLField(_("Image - small"), blank=True, max_length=1000)
 
     # Avatar and profile image
     # avatar_url = image_url_large, image_url is the AP profile picture, used by the SPA UI
     # the 3 fields above are kept for legacy
-    avatar_url = models.URLField(_("Avatar"), blank=True, max_length=500)
-    picture_url = models.URLField(_("Picture"), blank=True, max_length=500)
+    avatar_url = models.URLField(_("Avatar"), blank=True, max_length=1000)
+    picture_url = models.URLField(_("Picture"), blank=True, max_length=1000)
 
     # Location
     location = models.CharField(_("Location"), max_length=128, blank=True)
