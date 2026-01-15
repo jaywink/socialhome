@@ -440,6 +440,9 @@ class Profile(TimeStampedModel):
 
     def render_bio_for_federation(self):
         """Fix tag and mention links."""
+        # make_federable_profile is called by federation to verify the existence of a profile
+        # no need to format remote profile for federation because they are never sent out
+        if not self.is_local: return self.rendered_bio
         soup = BeautifulSoup(self.rendered_bio, 'html.parser')
         # Do tag links. Set the hashtag class in case we're dealing with old profile
         for link in soup.find_all('a', string=TAG_PATTERN):
