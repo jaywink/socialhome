@@ -524,15 +524,15 @@ class TagsStream(BaseStream):
 CACHED_STREAM_CLASSES = (
     FollowedStream,
     LimitedStream,
+    LocalStream,
     ProfileAllStream,
+    PublicStream,
     TagStream,
     TagsStream,
 )
 
 NON_CACHED_STREAM_CLASSES = (
-    LocalStream,
     ProfilePinnedStream,
-    PublicStream,
 )
 
 ALL_STREAMS = CACHED_STREAM_CLASSES + NON_CACHED_STREAM_CLASSES
