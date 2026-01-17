@@ -97,7 +97,6 @@ MIDDLEWARE = (
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-#    "socialhome.users.middleware.use_new_ui",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
@@ -274,9 +273,6 @@ ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 
-#ACCOUNT_FORMS = {
-#    "signup": "socialhome.users.forms.UserSignupForm",
-#}
 ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
 SOCIALACCOUNT_FORMS = {
     "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
