@@ -38,7 +38,10 @@ class TestFollowedStreamAPIView(SocialhomeAPITestCase):
         request.version = None
         get_content = Mock()
         get_content.return_value = ([], {})
+        set_stream = Mock()
+        set_stream.return_value = None
         view = StreamsAPIBaseView()
+        view.set_stream = set_stream
         view.get_content = get_content
         view.get(request)
         mock_serializer.assert_called_once_with([], many=True, context={"throughs": {}, "request": request})

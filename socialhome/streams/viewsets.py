@@ -58,7 +58,7 @@ class StreamsAPIBaseView(APIView):
         return len(ids)
 
     def set_stream(self):
-        pass
+        raise NotImplementedError
 
 
 class FollowedStreamAPIView(StreamsAPIBaseView):
