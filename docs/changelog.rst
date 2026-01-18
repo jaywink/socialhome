@@ -14,8 +14,8 @@ Added
 Changed
 .......
 
-* Make the SPA UI the default UI. The legacy UI will remain available but it a site will
-  have to choose one UI or the other. See the install docs.
+* Remove the code related to the `use_new_ui` dynamic preference. The UI choice is now
+  a site decision and must be configured through the reverse proxy.
 
 * Require an authenticated request for scheduled profile updates to limit RQ flooding caused by AI data crawlers.
 
@@ -42,6 +42,8 @@ Changed
 * Increase profile image urls maxlen to 1000.
 
 * Do not delete scheduled jobs on startup.
+
+* Adapt tests to a new `factory_boy` version.
 
 Fixed
 .....
