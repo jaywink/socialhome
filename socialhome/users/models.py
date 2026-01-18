@@ -389,6 +389,7 @@ class Profile(TimeStampedModel):
                 self.inbox_private = f"{self.fid}inbox/"
             if not self.inbox_public:
                 self.inbox_public = f"{settings.SOCIALHOME_URL}{reverse('federate:receive-public')}"
+            self.remote_url = self.user.url
 
         super().save(*args, **kwargs)
 
