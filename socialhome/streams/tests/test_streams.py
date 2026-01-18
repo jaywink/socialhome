@@ -60,7 +60,8 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
             add_to_streams_for_users(self.content.id, self.content.id, self.content.author.id)
         stream1 = FollowedStream(user=self.user)
         stream2 = ProfileAllStream(user=self.user, profile=self.content.author)
-        mock_add.assert_called_once_with(self.content, self.content, [stream1.key])
+        stream3 = PublicStream(user=self.user)
+        mock_add.assert_called_once_with(self.content, self.content, [stream1.key, stream3.key])
 
     @patch("socialhome.streams.streams.check_and_add_to_keys", autospec=True)
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
