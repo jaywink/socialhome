@@ -23,12 +23,3 @@ class LandingPage(ChoicePreference):
     default = "followed"
     verbose_name = _("Landing page")
     help_text = _("Choose which page you want to see as the landing page.")
-
-
-@user_preferences_registry.register
-class UseNewUI(BooleanPreference):
-    section = generic
-    name = "use_new_ui"
-    default = settings.SOCIALHOME_USE_NEW_UI
-    verbose_name = _("Use new UI")
-    help_text = _("Try the new SPA UI.")
