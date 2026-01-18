@@ -121,7 +121,7 @@ class ProfileSerializer(ModelSerializer):
         super().__init__(instance, data, **kwargs)
         # populate new rendered_bio field if empty
         # done here to avoid a lengthy migration
-        # TODO: remove from from the release
+        # TODO: remove from a future release > 0.23
         if getattr(self.instance, 'bio', None) and not self.instance.rendered_bio: self.instance.render_bio()
 
     def get_followed_tags(self, obj: Profile) -> List:
