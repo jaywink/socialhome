@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import django_rq
@@ -7,6 +8,7 @@ from rq.job import JobStatus
 
 from socialhome.streams.tasks import streams_tasks
 
+logger = logging.getLogger("socialhome")
 
 class TasksConfig(AppConfig):
     name = "socialhome.tasks"
@@ -23,8 +25,8 @@ class TasksConfig(AppConfig):
         for job in scheduler.get_jobs():
             try:
                 if job.get_status() != JobStatus.SCHEDULED: job.delete()
-            except InvalidJobOperation:
-                pass # log something here?
+            except InvalidJobOperation as ex:
+               logger.warning("TasksConfig.ready - failed to get scheduled job status: %s", ex)
 
         # Queue tasks
         streams_tasks(scheduler)
