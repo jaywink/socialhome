@@ -5,6 +5,11 @@ Running an instance
 
 Some notes on running a production instance.
 
+Using the SPA UI
+----------------
+
+To enable the new SPA UI follow the (`example instructions <https://https://codeberg.org/socialhome/socialhome-ui/src/branch/main/INSTALLATION.md>`_).
+
 Django admin
 ------------
 
@@ -489,12 +494,3 @@ SOCIALHOME_TOS_JURISDICTION
 Default: ``None``
 
 Define what jurisdiction (country) should be printed on the terms of service document. If not given, jurisdiction will not be included in the terms of service documents.
-
-SOCIALHOME_USE_NEW_UI
-.....................
-
-Default: ``True``
-
-This is used as the default value for the ``use_new_ui`` dynamic preference, as well as the default value to use when ``use_new_ui`` is not set.
-The default value being ``True`` requires that the new UI is installed as per the new UI
-`installation doc <https://codeberg.org/socialhome/socialhome-ui/src/branch/main/INSTALLATION.md>`.
