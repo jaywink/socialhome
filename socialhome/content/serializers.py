@@ -6,7 +6,6 @@ import traceback
 
 from django.db.models import Q
 from django.utils.translation import ngettext as _
-from enumfields.drf import EnumField
 from federation.utils.text import validate_handle
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField, BooleanField
@@ -15,7 +14,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
 from socialhome.content.signals import render_content
 from socialhome.content.utils import safe_text_for_markdown, update_counts
-from socialhome.enums import Visibility
+from socialhome.enums import EnumField, Visibility
 from socialhome.users.models import Profile
 from socialhome.users.serializers import LimitedProfileSerializer
 
@@ -58,7 +57,7 @@ class RecipientsField(serializers.Field):
 
 class ContentSerializer(serializers.ModelSerializer):
     author = LimitedProfileSerializer(read_only=True)
-    content_type = EnumField(ContentType, ints_as_names=True, read_only=True)
+    content_type = EnumField(ContentType, representation="string", read_only=True)
     include_following = BooleanField(default=False)
     notify_key = SerializerMethodField()
     recipients = RecipientsField()
@@ -67,7 +66,7 @@ class ContentSerializer(serializers.ModelSerializer):
     tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     through = SerializerMethodField()
     through_author = SerializerMethodField()
-    visibility = EnumField(Visibility, lenient=True, ints_as_names=True, required=False)
+    visibility = EnumField(Visibility, representation="string", required=False)
 
     class Meta:
         model = Content
@@ -314,7 +313,7 @@ class ContentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Visibility was given but it doesn't match parent.")
             data["visibility"] = parent.visibility
         else:
-            if not self.instance and not data.get("visibility"):
+            if not self.instance and data.get("visibility", None) == None:
                 raise serializers.ValidationError("Visibility is required")
 
         return data

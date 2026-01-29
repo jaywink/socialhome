@@ -23,6 +23,10 @@ class ContentFactory(factory.django.DjangoModelFactory):
     text = factory.Faker("text")
     uuid = factory.Faker('uuid4')
 
+#    @classmethod
+#    def _after_postgeneration(cls, obj, create, results):
+#        if create: obj.save()
+
 
 class PublicContentFactory(ContentFactory):
     visibility = Visibility.PUBLIC
@@ -70,7 +74,7 @@ class LocalContentFactory(ContentFactory):
     def set_profile_with_user(self, create, extracted, **kwargs):
         user = UserFactory()
         self.author = user.profile
-        self.save()
+        self.save(update_fields=["author"])
 
 
 class OEmbedCacheFactory(factory.django.DjangoModelFactory):

@@ -6,13 +6,44 @@ Changelog
 Unreleased
 ----------
 
+Added
+.....
+
+* Add `django-allauth[headless]` in support of the SPA UI
+
 Changed
 .......
 
-* Make the SPA UI the default UI. Make sure registrations requests are processed with the backend  accounts/signup form
-  until registration is implemented in the SPA UI.
+* Remove the code related to the `use_new_ui` dynamic preference. The UI choice is now
+  a site decision and must be configured through the reverse proxy.
 
-* Require an authenticated request for scheduled profile updates to limit RQ flooding caused by AI data gatherers.
+* Require an authenticated request for scheduled profile updates to limit RQ flooding caused by AI data crawlers.
+
+* Update to django 4.2.26:
+
+    * Address relevant deprecation warnings.
+    * Replace `django-enumerations` with `django-enum[properties]`.
+    * Update dependencies.
+    * Ignore bad job entries (likely left overs from rq=1.13.0).
+    * Support python 3.12.
+
+* Removed the custom authentication API.
+
+* Index the `content.local` property to improve local content queries performance.
+
+* Stop cacheing the public and local streams.
+
+* Make the required changes to support profile bio mentions, hashtags and links "linkification".
+
+* Serialize `User.is_local` in `ProfileSerializer`. Used by the SPA UI to enable/disable the `Admin` link.
+
+* Increase `streams.paginate_by` to 30.
+
+* Increase profile image urls maxlen to 1000.
+
+* Do not delete scheduled jobs on startup.
+
+* Adapt tests to a new `factory_boy` version.
 
 Fixed
 .....
@@ -26,6 +57,11 @@ Fixed
 
 * Fix Diaspora profiles missing the `finger` and `remote_url` properties when profiles are received from a remote
   Diaspora instance.
+
+* Do not use space as a separator for the pong heartbeat message.
+
+* In `users.middleware.AdminApprovalMiddleware`, ensure `get_response` is called only once, else a 409 may be returned.
+
 
 0.22.0 (2025-07-19)
 -------------------

@@ -56,9 +56,9 @@ class StreamsAPIBaseView(APIView):
         ids, _ = self.stream.get_content_ids()
         self.stream.paginate_by = paginate_by
         return len(ids)
-    
+
     def set_stream(self):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class FollowedStreamAPIView(StreamsAPIBaseView):

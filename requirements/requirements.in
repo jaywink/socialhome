@@ -1,17 +1,19 @@
 arrow
 bleach
-# Waiting for https://github.com/django/channels_redis/pull/347
-channels<4
-channels_redis<4
+channels[daphne]
+channels_redis
 chardet
 circus
 crispy-bootstrap4
 commonmark_socialhome
-django-allauth
+coreapi
+django-allauth[headless]
 django-braces
-django-cors-headers<4.6.0
+django-cors-headers
 django-crispy-forms
 django-dynamic-preferences
+django-enum[properties]
+# needed until the migrations are squashed
 django-enumfields
 django-environ
 django-extensions
@@ -31,7 +33,7 @@ django-secure
 django-settings-export
 django-silk
 django-versatileimagefield
-django<4
+django<5
 djangorestframework
 drf-haystack
 drf-yasg
@@ -39,7 +41,7 @@ federation
 ipython
 lxml
 Pillow
-psycopg2-binary
+psycopg[binary]
 pyopenssl
 python-opengraph-jaywink
 python-slugify
@@ -52,7 +54,7 @@ validators
 whitenoise
 xapian-haystack
 xapian-bindings-binary
-pyyaml
+PyYAML
 
 # Own markdownx fork for some tweaks:
 # - disable tab when ctrl down (https://github.com/neutronX/django-markdownx/pull/85)
@@ -64,6 +66,4 @@ pyyaml
 
 pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
 
-## NON-DIRECT requirements locked here due to issues
-#https://github.com/ipython/ipython/issues/12740
-jedi==0.17.2
+jedi

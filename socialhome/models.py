@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, transition
-from enumfields import EnumField
+from django_enum import EnumField
 from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
 

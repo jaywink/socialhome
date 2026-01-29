@@ -1,7 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from enumfields import EnumField
+from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from model_utils.fields import AutoCreatedField
 

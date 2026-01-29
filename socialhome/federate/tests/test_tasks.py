@@ -414,14 +414,13 @@ class TestGetLimitedRecipients(SocialhomeTestCase):
         super().setUpTestData()
         cls.profile = ProfileFactory()
         cls.limited_content = LimitedContentFactory(author=cls.profile)
-        cls.profile2 = ProfileFactory(with_key=True)
-        cls.profile3 = ProfileFactory(with_key=True)
+        cls.profile2 = ProfileFactory()
+        cls.profile3 = ProfileFactory()
         cls.limited_content.limited_visibilities.set((cls.profile2, cls.profile3))
 
     def test_correct_recipients_returned(self):
         recipients = _get_limited_recipients(self.profile.fid, self.limited_content)
         expected = {self.profile2.fid, self.profile3.fid}
-        print(recipients)
         self.assertEqual(
             {recipient['fid'] for recipient in recipients},
             expected,

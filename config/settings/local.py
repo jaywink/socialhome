@@ -48,7 +48,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_PRIVATE_NETWORK = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "localhost",
+    "http://localhost",
 ]
 
 # django-debug-toolbar
@@ -101,7 +101,7 @@ if testing:
         os.mkdir("/tmp/socialhome-haystack-test-index")
     HAYSTACK_CONNECTIONS = {
         "default": {
-            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+            "ENGINE": "xapian_backend.XapianEngine",
             "PATH": "/tmp/socialhome-haystack-test-index",
         },
     }
