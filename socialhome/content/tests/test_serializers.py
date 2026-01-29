@@ -119,7 +119,6 @@ class ContentSerializerTestCase(SocialhomeTestCase):
         self.assertEqual(data["url"], self.remote_profile.url)
 
     def test_save__collects_recipients(self):
-        print('>>>>>>>>>', self.user_recipient.handle, self.user_recipient2.handle)
         serializer = ContentSerializer(
             instance=self.limited_content, partial=True, context={"request": Mock(user=self.user)}, data={
                 "recipients": [self.user_recipient.handle, self.user_recipient2.handle],
