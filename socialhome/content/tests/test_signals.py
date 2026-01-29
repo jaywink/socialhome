@@ -201,7 +201,6 @@ class TestNotifyListeners(SocialhomeTestCase):
             call(f"streams_followed__{self.user.id}", data),
             call(f"streams_followed__{other_user.id}", data),
         ]
-        print(mock_send.mock_calls)
         mock_send.assert_has_calls(calls, any_order=True)
         self.assertEqual(mock_send.call_count, 14)
 

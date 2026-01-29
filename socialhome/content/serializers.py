@@ -307,7 +307,6 @@ class ContentSerializer(serializers.ModelSerializer):
 
         If given, make sure it is the same as parent. If not given, use parent visibility.
         """
-        print("visibility", type(data.get("visibility")))
         parent = data.get("parent")
         if parent:
             if data.get("visibility") and parent.visibility != data.get("visibility"):
