@@ -196,7 +196,7 @@ enum-properties==2.4.1
     # via django-enum
 executing==2.2.1
     # via stack-data
-federation==0.26.0
+federation @ git+https://codeberg.org/socialhome/federation.git@c03d4750b2ac9b0ba701cbfccc6cb9c6aabf2dcd
     # via -r requirements/requirements.in
 filelock==3.20.0
     # via xapian-haystack
