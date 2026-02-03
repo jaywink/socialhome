@@ -109,14 +109,22 @@ class User(AbstractUser):
             return "/"
         return reverse("users:detail", kwargs={"username": self.username})
 
-    def copy_picture_to_profile(self):
+    def copy_picture_to_profile(self, save=True):
         """Copy picture to profile image urls"""
         if self.picture:
             self.profile.image_url_small = get_full_media_url(self.picture.crop["50x50"].name)
             self.profile.image_url_medium = get_full_media_url(self.picture.crop["100x100"].name)
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
-            self.profile.avatar = get_full_media_url(self.picture.crop["300x300"].name)
-            self.profile.save(update_fields=["image_url_small", "image_url_medium", "image_url_large"])
+            self.profile.avatar_url = get_full_media_url(self.picture.name)
+            if save:
+                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large"])
+            else:
+                type(self.profile).objects.filter(id=self.profile.id).update(
+                    image_url_small=self.profile.image_url_small,
+                    image_url_medium=self.profile.image_url_medium,
+                    image_url_large=self.profile.image_url_large,
+                    avatar_url=self.profile.avatar_url
+                )
 
     def init_pictures_on_disk(self):
         """Create image versions on disk."""

@@ -5,6 +5,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 
 from socialhome.forms import MarkdownXImageForm
 from socialhome.models import MediaUpload
+from socialhome.users.models import User
 
 
 class ImageUploadSerializer(Serializer):
@@ -44,7 +45,17 @@ class MediaUploadSerializer(ModelSerializer):
         raise ValidationError("Invalid media category")
 
     def create(self, data):
-       self.is_valid(raise_exception=True)
+        self.is_valid(raise_exception=True)
 
-       return MediaUpload.objects.create(**data)
+        obj = MediaUpload.objects.create(**data)
+
+        # Ensure the Profile.image_url_{small,medium,large} properties are updated
+        # Outbound Diaspora payloads and the old UI require this
+        if obj.category == "avatars":
+            user = self.context.get("request").user
+            user.picture.name = obj.media.name
+            User.objects.filter(id=user.id).update(picture=user.picture)
+            user.copy_picture_to_profile(save=False)
+
+        return obj
 
