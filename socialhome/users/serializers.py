@@ -64,6 +64,7 @@ class ProfileSerializer(ModelSerializer):
     following_count = SerializerMethodField()
     has_pinned_content = SerializerMethodField()
     is_staff = SerializerMethodField()
+    protocols = SerializerMethodField()
     user_following = SerializerMethodField()
     visibility = EnumField(Visibility, representation="string")
 
@@ -85,6 +86,7 @@ class ProfileSerializer(ModelSerializer):
             "image_url_small",
             "avatar_url",
             "picture_url",
+            "protocols",
             "is_local",
             "is_staff",
             "location",
@@ -112,6 +114,7 @@ class ProfileSerializer(ModelSerializer):
             "image_url_small",
             "is_local",
             "is_staff",
+            "protocols",
             "rendered_bio",
             "url",
             "user_following",
@@ -146,6 +149,9 @@ class ProfileSerializer(ModelSerializer):
     def get_is_staff(self, obj):
         user = self.context.get("request").user
         return getattr(user, 'is_staff', False)
+
+    def get_protocols(self, obj):
+        return [protocol.string for protocol in obj.protocols]
 
     def get_user_following(self, obj):
         request = self.context.get("request")

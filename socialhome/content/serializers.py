@@ -60,6 +60,7 @@ class ContentSerializer(serializers.ModelSerializer):
     content_type = EnumField(ContentType, representation="string", read_only=True)
     include_following = BooleanField(default=False)
     notify_key = SerializerMethodField()
+    protocols = SerializerMethodField()
     recipients = RecipientsField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
@@ -86,6 +87,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "order",
             "parent",
             "pinned",
+            "protocols",
             "recipients",
             "remote_created",
             "rendered",
@@ -118,6 +120,7 @@ class ContentSerializer(serializers.ModelSerializer):
             "is_nsfw",
             "local",
             "notify_key",
+            "protocols",
             "remote_created",
             "rendered",
             "reply_count",
@@ -144,6 +147,12 @@ class ContentSerializer(serializers.ModelSerializer):
 
     def get_notify_key(self, obj):
         return "streams_content__%s" % obj.channel_group_name
+
+    def get_protocols(self, obj):
+        protocols = []
+        if obj.fid and obj.fid.startswith('http'): protocols.append('activitypub')
+        if obj.guid: protocols.append('diaspora')
+        return protocols
 
     def cache_through_authors(self):
         """

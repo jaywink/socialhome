@@ -12,6 +12,7 @@ from commonmark import commonmark
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models.functions import Upper
 from django.urls import reverse
@@ -28,6 +29,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
+from federation.protocols.enums import ProtocolType
 from federation.utils.text import find_elements, TAG_PATTERN
 from socialhome.activities.models import Activity
 from socialhome.content.utils import (get_and_linkify_tags, linkify_mentions,
@@ -117,7 +119,8 @@ class User(AbstractUser):
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
             self.profile.avatar_url = get_full_media_url(self.picture.name)
             if save:
-                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large"])
+                self.protocols = (ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA)
+                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large", "protocols"])
             else:
                 type(self.profile).objects.filter(id=self.profile.id).update(
                     image_url_small=self.profile.image_url_small,
@@ -238,6 +241,8 @@ class Profile(TimeStampedModel):
 
     # Federation protocol
     protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
+    # Supported protocols
+    protocols = ArrayField(EnumField(ProtocolType), default=list)
 
     remote_url = models.URLField(_("Profile URL"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
@@ -575,6 +580,7 @@ class Profile(TimeStampedModel):
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
+            "protocols": remote_profile.protocols
         }
         public_key = safe_text(remote_profile.public_key)
         if public_key:
