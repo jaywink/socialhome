@@ -124,8 +124,7 @@ def process_entity_post(entity: Any, profile: Profile):
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
-    if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies
+    values["replies_fid"] = getattr(entity, 'replies', None)
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -214,8 +213,7 @@ def process_entity_comment(entity: Any, profile: Profile):
         "parent": parent,
         "root_parent": root_parent,
     }
-    if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies
+    values["replies_fid"] = getattr(entity, 'replies', None)
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
