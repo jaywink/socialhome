@@ -125,7 +125,7 @@ def process_entity_post(entity: Any, profile: Profile):
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies.id
+        values["replies_fid"] = entity.replies
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -215,7 +215,7 @@ def process_entity_comment(entity: Any, profile: Profile):
         "root_parent": root_parent,
     }
     if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies.id
+        values["replies_fid"] = entity.replies
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
