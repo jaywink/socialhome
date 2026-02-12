@@ -12,6 +12,7 @@ class LimitedProfileSerializer(ModelSerializer):
 
     For example for adding to serialized Content.
     """
+    protocols = SerializerMethodField()
     user_following = SerializerMethodField()
 
     class Meta:
@@ -27,7 +28,7 @@ class LimitedProfileSerializer(ModelSerializer):
             "image_url_medium",
             "image_url_large",
             "avatar_url",
-            "picture_url",
+            "protocols",
             "is_local",
             "name",
             "url",
@@ -44,12 +45,15 @@ class LimitedProfileSerializer(ModelSerializer):
             "image_url_medium",
             "image_url_large",
             "avatar_url",
-            "picture_url",
+            "protocols",
             "is_local",
             "name",
             "url",
             "user_following",
         )
+
+    def get_protocols(self, obj):
+        return [protocol.string for protocol in obj.protocols]
 
     def get_user_following(self, obj: Profile) -> bool:
         request = self.context.get("request")
