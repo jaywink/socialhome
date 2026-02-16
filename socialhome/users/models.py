@@ -580,7 +580,7 @@ class Profile(TimeStampedModel):
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
-            "protocols": remote_profile.protocols
+            "protocols": remote_profile._protocols
         }
         public_key = safe_text(remote_profile.public_key)
         if public_key:
