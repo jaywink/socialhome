@@ -24,7 +24,7 @@ class ProfileQuerySet(QuerySet):
         Get Profile by federated ID.
         """
         return self.filter(
-            Q(fid=value) | Q(guid=value) | Q(handle=value) | Q(finger__iexact=value)
+            Q(fid__iexact=value) | Q(guid=value) | Q(handle=value) | Q(finger__iexact=value)
         ).filter(**params)
 
     def fed_update_or_create(
@@ -40,7 +40,7 @@ class ProfileQuerySet(QuerySet):
         # Some platforms (hello firefish) allow fid updates while keeping
         # the same finger and remote_url properties. Is it ok to assumes
         # finger and remote_url are never updated?
-        qs2 = self.filter(finger=values.get('finger', '')) | self.filter(remote_url=values.get('remote_url', ''))
+        qs2 = self.filter(finger__iexact=values.get('finger', '')) | self.filter(remote_url=values.get('remote_url', ''))
         if qs1.count():
             profile = qs1.get()
         elif qs2.count():

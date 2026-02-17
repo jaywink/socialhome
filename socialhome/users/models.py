@@ -251,7 +251,10 @@ class Profile(TimeStampedModel):
     # case-insensitive query optimisation
     # (from https://blog.gitguardian.com/10-tips-to-optimize-postgresql-queries-in-your-django-project/)
     class Meta:
-        indexes = [models.Index(Upper('finger'), name='%(app_label)s_%(class)s_finger_upper')]
+        indexes = [
+            models.Index(Upper('fid'), name='%(app_label)s_%(class)s_fid_upper'),
+            models.Index(Upper('finger'), name='%(app_label)s_%(class)s_finger_upper'),
+        ]
 
     def __str__(self) -> str:
         return f"{self.plain_name} ({self.fid or self.handle})"
