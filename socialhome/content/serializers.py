@@ -60,7 +60,6 @@ class ContentSerializer(serializers.ModelSerializer):
     content_type = EnumField(ContentType, representation="string", read_only=True)
     include_following = BooleanField(default=False)
     notify_key = SerializerMethodField()
-    protocols = SerializerMethodField()
     recipients = RecipientsField()
     user_is_author = SerializerMethodField()
     user_has_shared = SerializerMethodField()
