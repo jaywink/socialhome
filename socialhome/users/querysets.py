@@ -56,8 +56,6 @@ class ProfileQuerySet(QuerySet):
         else:
             changed = False
             for key, value in values.items():
-                if key in ('guid', 'handle'):
-                    continue
                 if getattr(profile, key, None) != value:
                     changed = True
                     setattr(profile, key, value)
