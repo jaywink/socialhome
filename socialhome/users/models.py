@@ -607,7 +607,7 @@ class Profile(TimeStampedModel):
             values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(values["handle"].split("@")[0]))
 
         logger.debug("from_remote_profile - values %s", values)
-        if values["guid"]:
+        if values["guid"] and not fid.startswith('http'):
             extra_lookups = {"guid": values["guid"]}
         else:
             extra_lookups = {}
