@@ -3,9 +3,12 @@ from pprint import pprint
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Q
 
 from socialhome.content.models import Content
 from socialhome.users.models import Profile
+
+from federation.fetchers import retrieve_remote_profile
 
 logger = logging.getLogger("socialhome")
 
@@ -20,6 +23,7 @@ counts = {
     "contents_moved": 0,
     "followers_moved": 0,
     "following_moved": 0,
+    "stale_profiles": 0,
 }
 
 lists = {
@@ -28,6 +32,10 @@ lists = {
     "aborted_guid_handle_mismatch": [],
 }
 
+def spinning_cursor():
+    while True:
+        for cursor in '|/-\\':
+            yield cursor
 
 class Command(BaseCommand):
     help = "Merge remote profiles. Attempts to merge remote profiles where the profile has both " \
@@ -46,6 +54,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        spinner = spinning_cursor()
         max_merges = int(options["max"])
         kwargs = {
             "user__isnull": True,
@@ -56,34 +65,40 @@ class Command(BaseCommand):
 
         for profile in Profile.objects.filter(**kwargs).iterator():
             counts["total"] += 1
-            print(f"Checking #{profile.id}: {profile}")
-            if not profile.rsa_public_key:
-                print(f"   - skipping, profile has no public key")
-                counts["skipped_no_public_key"] += 1
+            print(next(spinner),end='\r',sep='',flush=True)
+
+            # Retrieve the (merged if applicable) remote profile
+            remote_profile = retrieve_remote_profile(profile.fid)
+            if not remote_profile:
+                print(f"Remote profile not available for {profile}, skipping")
+                counts["stale_profiles"] += 1
                 continue
 
-            dupes = Profile.objects.filter(
-                rsa_public_key__contains=profile.rsa_public_key.strip(),
-                user__isnull=True,
-                protocol="diaspora",
-            )
-            if not dupes:
+            profile.handle = remote_profile.handle
+
+            candidate = Profile.objects.filter(Q(fid__iexact=profile.fid)|(Q(finger__iexact=profile.finger)&Q(finger__isnull=False))|(Q(handle__iexact=profile.handle)&Q(handle__isnull=False))).exclude(id=profile.id)
+            if not candidate:
                 counts["no_dupes"] += 1
                 continue
 
             # If dupes found
             # There should only be one dupe, since we've only 2 protocols
-            dupe = dupes[0]
+            if candidate[0].protocol == 'diaspora': dupe = candidate[0]
+            elif candidate[0].modified > profile.modified:
+                dupe = profile
+                profile = candidate[0]
+            else: dupe = candidate[0]
+            print(f"Checking #{profile.id}: {profile}")
             print(f"   - dupe found: {dupe}")
             counts["dupes_found"] += 1
 
             # Last check, ensure no guid / handle weirdness
-            if profile.guid and profile.guid != dupe.guid:
+            if remote_profile.guid and remote_profile.guid != dupe.guid:
                 print(f"   - abort! {profile.guid} in the profile which does not match {dupe.guid}")
                 lists["aborted_guid_handle_mismatch"].append((profile, dupe))
                 counts["aborted_guid_handle_mismatch"] += 1
                 continue
-            if profile.handle and profile.handle != dupe.handle:
+            if remote_profile.handle and remote_profile.handle != dupe.handle:
                 print(f"   - abort! {profile.handle} in the profile which does not match {dupe.handle}")
                 lists["aborted_guid_handle_mismatch"].append((profile, dupe))
                 counts["aborted_guid_handle_mismatch"] += 1
@@ -110,16 +125,17 @@ class Command(BaseCommand):
                     counts["following_moved"] += following_count
 
                     # Store info
-                    profile.guid = dupe.guid
-                    profile.handle = dupe.handle
-                    print(f"   - setting guid {dupe.guid} and handle {dupe.handle}")
+                    if dupe.protocol == 'diaspora':
+                        profile.guid = dupe.guid
+                        profile.handle = dupe.handle
+                        print(f"   - setting guid {dupe.guid} and handle {dupe.handle}")
 
                     # delete the dupe
                     print(f"   - DELETING {dupe}")
                     dupe.delete()
                     # save the profile
                     print(f"   - SAVING {profile}")
-                    profile.save()
+                    Profile.from_remote_profile(remote_profile)
                     counts["merged"] += 1
                     lists["merged"].append(profile)
             except Exception as ex:
