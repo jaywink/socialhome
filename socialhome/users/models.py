@@ -15,6 +15,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models.functions import Upper
+from django.db.utils import IntegrityError
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -611,6 +612,10 @@ class Profile(TimeStampedModel):
             extra_lookups = {"guid": values["guid"]}
         else:
             extra_lookups = {}
-        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
-        logger.info("from_remote_profile - created %s, profile %s", created, profile)
+        try:
+            profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
+            logger.info("from_remote_profile - created %s, profile %s", created, profile)
+        except IntegrityError:
+            profile = Profile.objects.fed(fid).get()
+            logger.warning("from_remote_profile - returning existing profile %s", profile)
         return profile
