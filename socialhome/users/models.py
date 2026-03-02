@@ -390,11 +390,12 @@ class Profile(TimeStampedModel):
             self.followers_fid = None
 
         # Set default pony images if image urls are empty
-        if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
+        if not self.image_url_small or not self.image_url_medium or not self.image_url_large or not self.avatar_url:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
+            self.avatar_url = ponies[0]
 
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
@@ -568,6 +569,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
+        ponies = get_pony_urls
         # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
@@ -575,17 +577,18 @@ class Profile(TimeStampedModel):
                                           if isinstance(remote_profile.raw_content, list)
                                           else remote_profile.raw_content),
             "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public
-            "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
-            "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
-            "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
-            "avatar_url": Profile.absolute_image_url(remote_profile, "large"),
+            "image_url_large": Profile.absolute_image_url(remote_profile, "large") or ponies[0],
+            "image_url_medium": Profile.absolute_image_url(remote_profile, "medium") or ponies[1],
+            "image_url_small": Profile.absolute_image_url(remote_profile, "small") or ponies[2],
+            "avatar_url": Profile.absolute_image_url(remote_profile, "large") or ponies[0],
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
-            "protocols": remote_profile._protocols
+            "protocols": list(remote_profile._protocols)
         }
+
         public_key = safe_text(remote_profile.public_key)
         if public_key:
             # Only update public key if it has a value
@@ -594,14 +597,14 @@ class Profile(TimeStampedModel):
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
         fid = safe_text(remote_profile.id)
-        values['handle'] = safe_text(remote_profile.handle)
-        values['guid'] = safe_text(remote_profile.guid)
-        values['finger'] = safe_text(remote_profile.finger or remote_profile.handle)
+        values['handle'] = safe_text(remote_profile.handle) or None
+        values['guid'] = safe_text(remote_profile.guid) or None
+        values['finger'] = safe_text(remote_profile.finger or remote_profile.handle) or None
         if fid.startswith('http'):
             # only needed for activitypub profiles
-            values['followers_fid'] = safe_text(remote_profile.followers)
-            values["key_id"] = safe_text(remote_profile.key_id)
-            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
+            values['followers_fid'] = safe_text(remote_profile.followers) or None
+            values["key_id"] = safe_text(remote_profile.key_id) or None
+            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id) or None
             if remote_profile.image and is_url(remote_profile.image.url):
                 values["picture_url"] = remote_profile.image.url
         else:
