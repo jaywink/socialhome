@@ -160,16 +160,15 @@ def get_and_linkify_tags(soup: BeautifulSoup):
     return found_tags
 
 
-def linkify_mentions(soup: BeautifulSoup, mentions=None):
+def linkify_mentions(soup: BeautifulSoup):
     # Linkify mentions
     # federation sets the data-mention attributes on inbound AP HTML payloads
     from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile # circulars
-    if not mentions: mentions = Profile.objects
     for link in soup.find_all('a', attrs={'data-mention':True}):
         mention = link['data-mention']
         try:
-            profile = mentions.get(finger__iexact=mention)
+            profile = Profile.objects.get(finger__iexact=mention)
         except Profile.DoesNotExist:
             remote_profile = retrieve_remote_profile(mention)
             if not remote_profile:
@@ -181,7 +180,7 @@ def linkify_mentions(soup: BeautifulSoup, mentions=None):
 
     for mention in find_elements(soup, MENTION_PATTERN):
         try:
-            profile = mentions.get(finger__iexact=mention.text.lstrip('@'))
+            profile = Profile.objects.get(finger__iexact=mention.text.lstrip('@'))
         except Profile.DoesNotExist:
             remote_profile = retrieve_remote_profile(mention.text.lstrip('@'))
             if not remote_profile:
