@@ -618,7 +618,7 @@ class Profile(TimeStampedModel):
         try:
             profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
             logger.info("from_remote_profile - created %s, profile %s", created, profile)
-        except IntegrityError:
+        except IntegrityError as exc:
             profile = Profile.objects.fed(fid).get()
-            logger.warning("from_remote_profile - returning existing profile %s", profile)
+            logger.warning("from_remote_profile - returning existing profile %s - %s", profile, exc)
         return profile
