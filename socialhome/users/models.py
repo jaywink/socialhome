@@ -569,7 +569,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
-        ponies = get_pony_urls
+        ponies = get_pony_urls()
         # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
