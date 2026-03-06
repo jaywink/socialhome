@@ -362,6 +362,7 @@ class Profile(TimeStampedModel):
                 self.fid = self.user.url
             # Default protocol for all new profiles
             self.protocol = "activitypub"
+            self.protocols = [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA]
 
         if not self.fid and not self.handle:
             raise ValueError("Profile must have either a fid or a handle")
@@ -586,7 +587,7 @@ class Profile(TimeStampedModel):
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
-            "protocols": remote_profile._protocols
+            "protocols": remote_profile._protocols or [ProtocolType.ACTIVITYPUB]
         }
 
         public_key = safe_text(remote_profile.public_key)
