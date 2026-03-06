@@ -43,12 +43,12 @@ class TestFetchOgPreview(SocialhomeTestCase):
         OpenGraphCacheFactory(url=self.urls[0])
         with freeze_time(datetime.date.today() + datetime.timedelta(days=8)):
             fetch_og_preview(self.content, self.urls)
-        og.assert_called_once_with(url=self.urls[0], parser="lxml")
+        og.assert_called_once_with(url=self.urls[0])
 
     @patch("socialhome.content.previews.OpenGraph")
     def test_opengraph_fetch_called(self, og):
         fetch_og_preview(self.content, self.urls)
-        og.assert_called_once_with(url=self.urls[0], parser="lxml")
+        og.assert_called_once_with(url=self.urls[0])
 
     @patch("socialhome.content.previews.OpenGraph")
     def test_opengraph_ignored_if_not_enough_attributes(self, og):
