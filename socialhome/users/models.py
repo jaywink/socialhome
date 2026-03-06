@@ -294,14 +294,14 @@ class Profile(TimeStampedModel):
                 "endpoint": self.inbox_public,
                 "fid": self.fid,
                 "public": True,
-                "protocol": self.protocol,
+                "protocols": self.protocols or [ProtocolType(self.protocol)],
             }
         elif visibility == Visibility.LIMITED:
             return {
                 "endpoint": self.inbox_private,
                 "fid": self.fid,
                 "public": False,
-                "protocol": self.protocol,
+                "protocols": self.protocols or [ProtocolType(self.protocol)],
                 "public_key": self.rsa_public_key,
             }
         else:
@@ -586,7 +586,7 @@ class Profile(TimeStampedModel):
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
-            "protocols": list(remote_profile._protocols)
+            "protocols": remote_profile._protocols
         }
 
         public_key = safe_text(remote_profile.public_key)
