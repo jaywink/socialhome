@@ -483,7 +483,7 @@ class Content(models.Model):
         self._soup = BeautifulSoup(commonmark(self.text, ignore_html_blocks=True).strip(), 'html.parser')
 
         self.save_tags(get_and_linkify_tags(self._soup))
-        linkify_mentions(self._soup, self.mentions)
+        linkify_mentions(self._soup)
         process_text_links(self._soup)
         rendered = str(self._soup)
 
