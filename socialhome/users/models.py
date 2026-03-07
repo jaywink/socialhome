@@ -300,6 +300,7 @@ class Profile(TimeStampedModel):
             return {
                 "endpoint": self.inbox_private,
                 "fid": self.fid,
+                "guid": self.guid,
                 "public": False,
                 "protocols": self.protocols or [ProtocolType(self.protocol)],
                 "public_key": self.rsa_public_key,
