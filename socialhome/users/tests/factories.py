@@ -123,6 +123,8 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     image_url_medium = "https://127.0.0.1:8000/static/images/pony100.png"
     image_url_large = "/static/images/pony300.png"
 
+    protocol = "activitypub"
+
     #uuid = factory.Faker('uuid4')
     uuid = factory.LazyAttribute(lambda x: uuid4())
 

@@ -67,6 +67,6 @@ class TestObtainSocialhomeAuthToken(SocialhomeAPITestCase):
                           "name": self.user.profile.name,
                           "url": self.user.profile.url,
                           "avatar_url": self.user.profile.avatar_url,
-                          "picture_url": self.user.profile.picture_url,
+                          "protocols": ["activitypub", "diaspora"],
                           "user_following": False,
                           "token": Token.objects.get(user=self.user).key})
