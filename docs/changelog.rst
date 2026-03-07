@@ -62,6 +62,8 @@ Fixed
 
 * In `users.middleware.AdminApprovalMiddleware`, ensure `get_response` is called only once, else a 409 may be returned.
 
+* Fix `Content.utils.linkify_mentions` that uses the `Content.mentions` property before it is set, causing unnecessary
+  remote profile fetches.
 
 0.22.0 (2025-07-19)
 -------------------
