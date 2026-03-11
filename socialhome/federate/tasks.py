@@ -12,6 +12,7 @@ from federation.entities.activitypub.enums import ActivityType
 from federation.exceptions import NoSuitableProtocolFoundError, NoSenderKeyFoundError, SignatureVerificationError
 from federation.inbound import handle_receive
 from federation.outbound import handle_send
+from federation.protocols.enums import ProtocolType
 
 from socialhome.activities.models import Activity
 from socialhome.content.enums import ContentType
@@ -223,7 +224,9 @@ def send_share(content_id, activity_fid):
             # Send to original author
             recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients, content.share_of.author.protocols, payload_logger=get_outbound_payload_logger())
+        handle_send(entity, content.author.federable, recipients,
+                    content.share_of.author.protocols if content.share_of.content_type == 'content' else [ProtocolType.ACTIVITYPUB],
+                    payload_logger=get_outbound_payload_logger())
         target_content = content.share_of
         if target_content.replies_fid:
             queue = django_rq.get_queue('low')
@@ -258,7 +261,7 @@ def send_content_retraction(content, author_id):
         if content.content_type == ContentType.REPLY:
             target_protocols = content.parent.author.protocols
         elif content.content_type == ContentType.SHARE:
-            target_protocols = content.share_of.author.protocols
+            target_protocols = content.share_of.author.protocols if content.share_of.content_type == 'content' else [ProtocolType.ACTIVITYPUB]
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         # Queue to the background since sending could take a while
