@@ -8,6 +8,7 @@ from factory import fuzzy
 from faker import Faker
 
 from federation.entities import base
+from federation.protocols.enums import ProtocolType
 
 from socialhome.enums import Visibility
 
@@ -124,6 +125,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     image_url_large = "/static/images/pony300.png"
 
     protocol = "activitypub"
+    protocols = [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA]
 
     #uuid = factory.Faker('uuid4')
     uuid = factory.LazyAttribute(lambda x: uuid4())
@@ -169,6 +171,9 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 class PublicProfileFactory(ProfileFactory):
     visibility = Visibility.PUBLIC
 
+class DiasporaPublicProfileFactory(PublicProfileFactory):
+    protocol = "diaspora"
+    protocols = [ProtocolType.DIASPORA]
 
 class SiteProfileFactory(ProfileFactory):
     visibility = Visibility.SITE
