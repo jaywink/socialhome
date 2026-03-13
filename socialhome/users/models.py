@@ -120,7 +120,6 @@ class User(AbstractUser):
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
             self.profile.avatar_url = get_full_media_url(self.picture.name)
             if save:
-                self.protocols = (ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA)
                 self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large", "protocols"])
             else:
                 type(self.profile).objects.filter(id=self.profile.id).update(
@@ -403,13 +402,15 @@ class Profile(TimeStampedModel):
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
 
-        # Set default federation endpoints for local users
+        # Set default federation endpoints for local users as well as the supported protocols
         if self.is_local:
             if not self.inbox_private:
                 self.inbox_private = f"{self.fid}inbox/"
             if not self.inbox_public:
                 self.inbox_public = f"{settings.SOCIALHOME_URL}{reverse('federate:receive-public')}"
             self.remote_url = self.user.url
+            if not self.protocols:
+                self.protocols = (ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA)
 
         super().save(*args, **kwargs)
 
