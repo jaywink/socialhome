@@ -26,6 +26,8 @@ Added
   federation generate Diaspora endpoints dynamically, and sets Activitypub endpoints to
   `users.models.Profile.inbox_[public,private]`.
 
+* Add a data migration to populate local profiles `protocols` field.
+
 * Add and `UPPER` index to `Profile.fid` to make __iexact queries more efficient.
 
 * Add the `delete_stale_profiles` management command that by default deletes profiles for which
@@ -55,8 +57,6 @@ Changed
 
 * Index the `content.local` property to improve local content queries performance.
 
-* Stop cacheing the public and local streams.
-
 * Make the required changes to support profile bio mentions, hashtags and links "linkification".
 
 * Serialize `User.is_local` in `ProfileSerializer`. Used by the SPA UI to enable/disable the `Admin` link.
@@ -78,6 +78,9 @@ Changed
 
 * Make the `merge_remote_profiles` management command refresh selected profiles from remote before
   merging. Handle duplicate Activitypub profiles.
+
+* Set pony urls at creation/update to empty remote profile icon (image_urls, avatar_url). This reduces
+  the schedule profile update calls from the UI.
 
 Fixed
 .....
