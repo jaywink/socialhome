@@ -32,7 +32,7 @@ lists = {
 
 
 class Command(BaseCommand):
-    help = "Delete stale remote profiles. Attempts to update remote profiles. If a profile can't be " \
+    help = "Delete stale remote profiles. Attempts to delete stale remote profiles. If a profile can't be " \
            "retrieved or if it has not been updated since the specified date, delete it."
     status_code = None
 
