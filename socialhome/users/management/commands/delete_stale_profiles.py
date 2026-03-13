@@ -1,5 +1,6 @@
 import datetime
 import logging
+import sys
 from pprint import pprint
 
 from django.core.management.base import BaseCommand
@@ -26,6 +27,7 @@ counts = {
 
 lists = {
     "deleted": [],
+    "to_delete": [],
     "skipped": [],
     "error_saving": [],
 }
@@ -74,7 +76,7 @@ class Command(BaseCommand):
             last_modified = make_aware(datetime.datetime.strptime(options["last-modified"], "%Y%m%d"), timezone=datetime.UTC) if options["last-modified"] else None
             start_from = make_aware(datetime.datetime.strptime(options["start-from"], "%Y%m%d"), timezone=datetime.UTC) if options["start-from"] else None
         except ValueError:
-            print('please use YYYYMMDD format with --last-modified')
+            print('please use YYYYMMDD format with --last-modified or --start-from')
             return
         kwargs = {
             "user__isnull": True,
@@ -87,6 +89,8 @@ class Command(BaseCommand):
         if options.get("start-from"):
             kwargs["modified__gte"] = start_from
 
+        count = 0
+        to_delete = []
         for profile in Profile.objects.filter(*args, **kwargs).order_by("modified").iterator():
             counts["total"] += 1
             no_delete = True
@@ -109,7 +113,21 @@ class Command(BaseCommand):
                 no_delete = False
 
             if no_delete: continue
+            count += 1
+            to_delete.append((profile))
+            if count >= max_deletes: break
 
+        if count == 0:
+            print("Nothing to delete.")
+            sys.exit(0)
+
+        pprint(to_delete)
+        doit = input("About to delete the profiles listed above. Proceed [y/N]? ")
+        if doit.lower() != "y":
+            print("Aborting!")
+            sys.exit(1)
+
+        for profile in to_delete:
             # Do all destructive stuff in a transaction
             try:
                 with transaction.atomic():
