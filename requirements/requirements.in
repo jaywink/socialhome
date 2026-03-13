@@ -37,7 +37,7 @@ django<5
 djangorestframework
 drf-haystack
 drf-yasg
-federation
+federation>=0.27
 ipython
 lxml
 Pillow
