@@ -1,6 +1,6 @@
 import datetime
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
@@ -9,10 +9,11 @@ from django.utils.text import slugify
 from django.utils.timezone import make_aware
 from freezegun import freeze_time
 
+from federation.protocols.enums import ProtocolType
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, OpenGraphCache, OEmbedCache, Tag
 from socialhome.content.tests.factories import (
-    ContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory, LocalContentFactory)
+    ContentFactory, DiasporaPublicContentFactory, OEmbedCacheFactory, OpenGraphCacheFactory, LocalContentFactory)
 from socialhome.enums import Visibility
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
@@ -137,15 +138,16 @@ class TestContentModel(SocialhomeTestCase):
         self.public_content.save()
         self.public_content.fix_local_uploads.assert_called_once_with()
 
-    def test_share_raises_on_non_content_content_type(self):
+    def test_share_raises_on_diaspora_non_content_content_type(self):
         with self.assertRaises(ValidationError):
-            LocalContentFactory(parent=self.public_content, author=self.local_user.profile).share(self.profile)
+            DiasporaPublicContentFactory(parent=self.public_content).share(self.profile)
 
     def test_share_raises_if_shared_before(self):
         self.public_content.share(self.local_user.profile)
         with self.assertRaises(ValidationError):
             self.public_content.share(self.local_user.profile)
 
+    @pytest.mark.skip
     def test_share_raises_if_sharing_own_content(self):
         with self.assertRaises(ValidationError):
             self.public_content.share(self.profile)

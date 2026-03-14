@@ -82,8 +82,8 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
             share = content.share(self.request.user.profile)
         except ValidationError as e:
             raise exceptions.ValidationError(e.message)
-        except Exception:
-            raise exceptions.APIException("Unknown error when creating share.")
+        except Exception as exc:
+            raise exceptions.APIException(f"Unknown error when creating share - {exc}.")
         return Response({"status": "ok", "content_id": share.id}, status=HTTP_201_CREATED)
 
     def _unshare(self):
@@ -93,7 +93,7 @@ class ContentViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.
         except ValidationError as e:
             raise exceptions.ValidationError(e.message)
         except Exception:
-            raise exceptions.APIException("Unknown error when creating share.")
+            raise exceptions.APIException("Unknown error when retracting share.")
         response = {"status": "ok"}
         if self.request.version == '2.0':
             content.refresh_from_db()

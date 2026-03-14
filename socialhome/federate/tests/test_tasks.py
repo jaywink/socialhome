@@ -2,6 +2,7 @@ from unittest.mock import patch, ANY
 
 from django.test import override_settings
 from federation.entities.base import Comment, Post
+from federation.protocols.enums import ProtocolType
 from federation.tests.fixtures.keys import get_dummy_private_key
 from test_plus import TestCase
 
@@ -246,7 +247,7 @@ class TestSendReply(SocialhomeTestCase):
         mock_sender.assert_called_once_with(
             post,
             self.limited_reply.author.federable,
-            [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)],
+            [self.remote_profile.get_recipient_for_visibility(Visibility.LIMITED)], [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA],
             payload_logger=None,
         )
 
@@ -259,7 +260,7 @@ class TestSendReply(SocialhomeTestCase):
         send_reply(self.reply2.id, self.reply2.activities.first().fid)
         mock_sender.assert_called_once_with(post, self.reply2.author.federable, [
             self.remote_content.author.get_recipient_for_visibility(self.reply2.visibility),
-        ], payload_logger=None)
+        ], [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], payload_logger=None)
         self.assertTrue(mock_forward.called is False)
 
     @patch("socialhome.federate.tasks.handle_send")
@@ -271,7 +272,7 @@ class TestSendReply(SocialhomeTestCase):
         send_reply(self.limited_local_reply.id, self.limited_local_reply.activities.first().fid)
         mock_sender.assert_called_once_with(post, self.limited_local_reply.author.federable, [
             self.remote_profile.get_recipient_for_visibility(self.limited_local_reply.visibility),
-        ], payload_logger=None)
+        ], [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], payload_logger=None)
         self.assertTrue(mock_forward.called is False)
 
 
@@ -310,7 +311,7 @@ class TestSendShare(SocialhomeTestCase):
             post,
             self.share.author.federable,
             [self.content.author.get_recipient_for_visibility(self.share.visibility)],
-            payload_logger=None,
+            [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], payload_logger=None,
         )
 
     @patch("socialhome.federate.tasks.make_federable_content", return_value=None)
@@ -331,7 +332,7 @@ class TestSendShare(SocialhomeTestCase):
         post = Post()
         mock_maker.return_value = post
         send_share(self.local_share.id, self.local_share.activities.first().fid)
-        mock_send.assert_called_once_with(post, self.local_share.author.federable, [], payload_logger=None)
+        mock_send.assert_called_once_with(post, self.local_share.author.federable, [], [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], payload_logger=None)
 
 
 class TestForwardEntity(TestCase):
@@ -361,7 +362,7 @@ class TestForwardEntity(TestCase):
             self.share.author.get_recipient_for_visibility(Visibility.PUBLIC)["fid"],
         }
         mock_send.assert_called_once_with(
-            entity, self.reply.author.federable, ANY, parent_user=self.public_content.author.federable,
+            entity, self.reply.author.federable, ANY, [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], parent_user=self.public_content.author.federable,
             payload_logger=None,
         )
         args, kwargs = mock_send.call_args_list[0]
@@ -373,7 +374,7 @@ class TestForwardEntity(TestCase):
         forward_entity(entity, self.limited_content.id)
         mock_send.assert_called_once_with(entity, self.limited_reply.author.federable, [
             self.remote_limited_reply.author.get_recipient_for_visibility(Visibility.LIMITED),
-        ], parent_user=self.limited_content.author.federable, payload_logger=None)
+        ], [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA], parent_user=self.limited_content.author.federable, payload_logger=None)
 
 
 class TestGetRemoteFollowers(TestCase):

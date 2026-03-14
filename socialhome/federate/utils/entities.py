@@ -106,7 +106,7 @@ def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[B
         if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
             profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
         else:
-            profile = Profile.objects.filter(fid=object_id).first()
+            profile = Profile.objects.filter(fid__iexact=object_id).first()
         if profile and profile.visible_to_user(user):
             federable_profile = make_federable_profile(profile)
             return federable_profile
@@ -129,7 +129,7 @@ def _make_federable_collection(fid, path, user):
     else:
         return None
 
-    profile = Profile.objects.filter(fid=fid).first()
+    profile = Profile.objects.filter(fid__iexact=fid).first()
     if profile and profile.is_local and profile.visible_to_user(user):
         if coll in ('followers', 'following'):
             # return item count only until pages are implemented
@@ -207,9 +207,7 @@ def get_user_private_key(identifier: str) -> Optional[RsaKey]:
     if not identifier: return
     from socialhome.users.models import Profile  # Circulars
     try:
-        profile = Profile.objects.only('rsa_private_key').get(
-            Q(fid=identifier) | Q(handle=identifier) | Q(guid=identifier),
-        )
+        profile = Profile.objects.only('rsa_private_key').fed(identifier).get()
     except Profile.DoesNotExist:
         logger.error('get_user_private_key - no profile for %s' % identifier)
         return

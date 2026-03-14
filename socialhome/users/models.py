@@ -12,8 +12,10 @@ from commonmark import commonmark
 from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models.functions import Upper
+from django.db.utils import IntegrityError
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -28,6 +30,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from versatileimagefield.placeholder import OnDiscPlaceholderImage
 
+from federation.protocols.enums import ProtocolType
 from federation.utils.text import find_elements, TAG_PATTERN
 from socialhome.activities.models import Activity
 from socialhome.content.utils import (get_and_linkify_tags, linkify_mentions,
@@ -117,7 +120,7 @@ class User(AbstractUser):
             self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
             self.profile.avatar_url = get_full_media_url(self.picture.name)
             if save:
-                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large"])
+                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large", "protocols"])
             else:
                 type(self.profile).objects.filter(id=self.profile.id).update(
                     image_url_small=self.profile.image_url_small,
@@ -238,6 +241,8 @@ class Profile(TimeStampedModel):
 
     # Federation protocol
     protocol = models.CharField(_("Protocol"), blank=True, max_length=20)
+    # Supported protocols
+    protocols = ArrayField(EnumField(ProtocolType), default=list)
 
     remote_url = models.URLField(_("Profile URL"), editable=False, max_length=255, unique=True, blank=True, null=True)
 
@@ -246,7 +251,10 @@ class Profile(TimeStampedModel):
     # case-insensitive query optimisation
     # (from https://blog.gitguardian.com/10-tips-to-optimize-postgresql-queries-in-your-django-project/)
     class Meta:
-        indexes = [models.Index(Upper('finger'), name='%(app_label)s_%(class)s_finger_upper')]
+        indexes = [
+            models.Index(Upper('fid'), name='%(app_label)s_%(class)s_fid_upper'),
+            models.Index(Upper('finger'), name='%(app_label)s_%(class)s_finger_upper'),
+        ]
 
     def __str__(self) -> str:
         return f"{self.plain_name} ({self.fid or self.handle})"
@@ -285,14 +293,15 @@ class Profile(TimeStampedModel):
                 "endpoint": self.inbox_public,
                 "fid": self.fid,
                 "public": True,
-                "protocol": self.protocol,
+                "protocols": self.protocols or [ProtocolType(self.protocol)],
             }
         elif visibility == Visibility.LIMITED:
             return {
                 "endpoint": self.inbox_private,
                 "fid": self.fid,
+                "guid": self.guid,
                 "public": False,
-                "protocol": self.protocol,
+                "protocols": self.protocols or [ProtocolType(self.protocol)],
                 "public_key": self.rsa_public_key,
             }
         else:
@@ -353,6 +362,7 @@ class Profile(TimeStampedModel):
                 self.fid = self.user.url
             # Default protocol for all new profiles
             self.protocol = "activitypub"
+            self.protocols = [ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA]
 
         if not self.fid and not self.handle:
             raise ValueError("Profile must have either a fid or a handle")
@@ -381,23 +391,26 @@ class Profile(TimeStampedModel):
             self.followers_fid = None
 
         # Set default pony images if image urls are empty
-        if not self.image_url_small or not self.image_url_medium or not self.image_url_large:
+        if not self.image_url_small or not self.image_url_medium or not self.image_url_large or not self.avatar_url:
             ponies = get_pony_urls()
             for idx, attr in enumerate(["image_url_large", "image_url_medium", "image_url_small"]):
                 if not getattr(self, attr, None):
                     setattr(self, attr, ponies[idx])
+            self.avatar_url = ponies[0]
 
         # Ensure keys are converted to str before saving
         self.rsa_private_key = decode_if_bytes(self.rsa_private_key)
         self.rsa_public_key = decode_if_bytes(self.rsa_public_key)
 
-        # Set default federation endpoints for local users
+        # Set default federation endpoints for local users as well as the supported protocols
         if self.is_local:
             if not self.inbox_private:
                 self.inbox_private = f"{self.fid}inbox/"
             if not self.inbox_public:
                 self.inbox_public = f"{settings.SOCIALHOME_URL}{reverse('federate:receive-public')}"
             self.remote_url = self.user.url
+            if not self.protocols:
+                self.protocols = (ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA)
 
         super().save(*args, **kwargs)
 
@@ -559,6 +572,7 @@ class Profile(TimeStampedModel):
     def from_remote_profile(remote_profile, force: bool = False):
         """Create a Profile from a remote Profile entity."""
         logger.info("from_remote_profile - Create or updating %s", remote_profile)
+        ponies = get_pony_urls()
         # noinspection PyProtectedMember
         values = {
             "name": safe_text(remote_profile.name),
@@ -566,16 +580,18 @@ class Profile(TimeStampedModel):
                                           if isinstance(remote_profile.raw_content, list)
                                           else remote_profile.raw_content),
             "visibility": Visibility.PUBLIC,  # Any profile that has been federated has to be public
-            "image_url_large": Profile.absolute_image_url(remote_profile, "large"),
-            "image_url_medium": Profile.absolute_image_url(remote_profile, "medium"),
-            "image_url_small": Profile.absolute_image_url(remote_profile, "small"),
-            "avatar_url": Profile.absolute_image_url(remote_profile, "large"),
+            "image_url_large": Profile.absolute_image_url(remote_profile, "large") or ponies[0],
+            "image_url_medium": Profile.absolute_image_url(remote_profile, "medium") or ponies[1],
+            "image_url_small": Profile.absolute_image_url(remote_profile, "small") or ponies[2],
+            "avatar_url": Profile.absolute_image_url(remote_profile, "large") or ponies[0],
             "location": safe_text(remote_profile.location),
             "email": safe_text(remote_profile.email),
             "inbox_private": safe_text(remote_profile.inboxes.get("private", "")),
             "inbox_public": safe_text(remote_profile.inboxes.get("public", "")),
             "protocol": remote_profile._source_protocol,
+            "protocols": remote_profile._protocols or [ProtocolType.ACTIVITYPUB]
         }
+
         public_key = safe_text(remote_profile.public_key)
         if public_key:
             # Only update public key if it has a value
@@ -584,24 +600,28 @@ class Profile(TimeStampedModel):
             # Possibly fix some broken by bleach urls
             values["image_url_%s" % img_size] = values["image_url_%s" % img_size].replace("&amp;", "&")
         fid = safe_text(remote_profile.id)
-        values['handle'] = safe_text(remote_profile.handle)
-        values['guid'] = safe_text(remote_profile.guid)
-        values['finger'] = safe_text(remote_profile.finger or remote_profile.handle)
+        values['handle'] = safe_text(remote_profile.handle) or None
+        values['guid'] = safe_text(remote_profile.guid) or None
+        values['finger'] = safe_text(remote_profile.finger or remote_profile.handle) or None
         if fid.startswith('http'):
             # only needed for activitypub profiles
-            values['followers_fid'] = safe_text(remote_profile.followers)
-            values["key_id"] = safe_text(remote_profile.key_id)
-            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id)
+            values['followers_fid'] = safe_text(remote_profile.followers) or None
+            values["key_id"] = safe_text(remote_profile.key_id) or None
+            values["remote_url"] = safe_text(remote_profile.url or remote_profile.id) or None
             if remote_profile.image and is_url(remote_profile.image.url):
                 values["picture_url"] = remote_profile.image.url
         else:
             values["remote_url"] = "https://%s/u/%s" % (values["handle"].split("@")[1], safe_text(values["handle"].split("@")[0]))
 
         logger.debug("from_remote_profile - values %s", values)
-        if values["guid"]:
+        if values["guid"] and not fid.startswith('http'):
             extra_lookups = {"guid": values["guid"]}
         else:
             extra_lookups = {}
-        profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
-        logger.info("from_remote_profile - created %s, profile %s", created, profile)
+        try:
+            profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
+            logger.info("from_remote_profile - created %s, profile %s", created, profile)
+        except IntegrityError as exc:
+            profile = Profile.objects.fed(fid).get()
+            logger.warning("from_remote_profile - returning existing profile %s - %s", profile, exc)
         return profile

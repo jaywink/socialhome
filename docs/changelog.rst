@@ -11,6 +11,32 @@ Added
 
 * Add `django-allauth[headless]` in support of the SPA UI
 
+* Add the `users.models.Profile.protocols` property which is an array that includes the list of
+  protocols (Activitypub and/or Diaspora) the profile supports. It is set by federation for
+  remote users which now attempts to merge multi-protocol profiles.
+
+* Using the `protocols` property described above, we can:
+
+  * Select remote recipients based on their ability to handle replies or shares from protocol X.
+  * Pass the property to the UI, allowing it to enable/disable replying or sharing.
+  * Support resharing Activitypub replies (fixes issue #623).
+
+  Note that this implementation currently doesn't handle protocol specific endpoints. It
+  leverages Diaspora's fixed endpoint format by adding the `guid` to recipient dicts and letting
+  federation generate Diaspora endpoints dynamically, and sets Activitypub endpoints to
+  `users.models.Profile.inbox_[public,private]`.
+
+* Add a data migration to populate local profiles `protocols` field.
+
+* Add and `UPPER` index to `Profile.fid` to make __iexact queries more efficient.
+
+* Add the `delete_stale_profiles` management command that by default deletes profiles for which
+  a remote fetch returns a status code indicating the profile is gone (410) or not found (404), or if the
+  instance doesn't return any protocol content. It will **NOT** delete profiles for which the remote fetch
+  times out. Use with care. A safer use is with the `--last-modified` option
+  which deletes profiles that have not been updated since the supplied date.
+  For instances that have been decommissioned, use the `--instance` option.
+
 Changed
 .......
 
@@ -31,8 +57,6 @@ Changed
 
 * Index the `content.local` property to improve local content queries performance.
 
-* Stop cacheing the public and local streams.
-
 * Make the required changes to support profile bio mentions, hashtags and links "linkification".
 
 * Serialize `User.is_local` in `ProfileSerializer`. Used by the SPA UI to enable/disable the `Admin` link.
@@ -44,6 +68,19 @@ Changed
 * Do not delete scheduled jobs on startup.
 
 * Adapt tests to a new `factory_boy` version.
+
+* Use `__iexact` on `Profile.fid` queries to prevent the creation of duplicate remote profiles.
+
+* When known (i.e. fetching AP collections), pass the required protocol to
+  `federation.fetchers.retrieve_remote_content`.
+
+* Allow `Profile.guid` and `Profile.handle` updates to enable merging remote profiles.
+
+* Make the `merge_remote_profiles` management command refresh selected profiles from remote before
+  merging. Handle duplicate Activitypub profiles.
+
+* Set pony urls at creation/update to empty remote profile icon (image_urls, avatar_url). This reduces
+  the schedule profile update calls from the UI.
 
 Fixed
 .....
@@ -62,8 +99,13 @@ Fixed
 
 * In `users.middleware.AdminApprovalMiddleware`, ensure `get_response` is called only once, else a 409 may be returned.
 
-* Fix `Content.utils.linkify_mentions` that uses the `Content.mentions` property before it is set, causing unnecessary
-  remote profile fetches.
+* Fix a potential race condition when a remote profile creation/update happens more than onceat
+  the same time.
+
+* In `content.utils.linkify_mentions`, do not use the `content.models.mentions` property before it
+  is set as this causes a lot of spurious remote profile fetches.
+
+* Stop using the lxml parser with Opengraph as it sometimes causes BeautifulSoup to throw an exception.
 
 0.22.0 (2025-07-19)
 -------------------

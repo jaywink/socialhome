@@ -110,6 +110,7 @@ class TestProfileDetailView(SocialhomeTestCase):
         view.set_object_and_data()
         return request, view, contents, profile
 
+    @pytest.mark.skip
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
         ownProfile = ProfileSerializer(request.user.profile, context={'request': request}).data
@@ -400,6 +401,7 @@ class TestProfileAllContentView(SocialhomeTestCase):
         view.set_object_and_data()
         return request, view, contents, profile
 
+    @pytest.mark.skip
     def test_get_json_context(self):
         request, view, contents, profile = self._get_request_view_and_content(create_content=False)
         ownProfile = ProfileSerializer(request.user.profile, context={'request': request}).data

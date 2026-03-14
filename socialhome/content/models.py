@@ -21,6 +21,7 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language, gettext_lazy as _
 from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
+from federation.protocols.enums import ProtocolType
 from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
 from memoize import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
@@ -373,11 +374,8 @@ class Content(models.Model):
 
     def share(self, profile):
         """Share this content as the profile given."""
-        if self.content_type != ContentType.CONTENT:
-            # TODO: support sharing replies too
-            raise ValidationError("Can only share top level content.")
-        if self.author == profile:
-            raise ValidationError("Cannot share own content") # why not?
+        if self.content_type != ContentType.CONTENT and ProtocolType.ACTIVITYPUB not in self.author.protocols:
+            raise ValidationError("Diaspora can only share top level content.")
         if not self.visible_for_user(profile.user):
             raise ValidationError("Content to be shared is not visible to sharer.")
         if self.shares.filter(author=profile).exists():

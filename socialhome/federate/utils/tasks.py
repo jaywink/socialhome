@@ -8,6 +8,7 @@ from django.conf import settings
 from federation.entities import base
 from federation.entities.activitypub.models import extract_replies
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
+from federation.protocols.enums import ProtocolType
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
@@ -124,8 +125,7 @@ def process_entity_post(entity: Any, profile: Profile):
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "service_label": safe_text(entity.provider_display_name) or "",
     }
-    if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies.id
+    values["replies_fid"] = getattr(entity, 'replies', None)
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -179,6 +179,7 @@ def process_entity_comment(entity: Any, profile: Profile):
             handle=entity.target_handle,
             entity_type=entity.entity_type,
             sender_key_fetcher=sender_key_fetcher,
+            protocol=ProtocolType.DIASPORA if entity.target_guid else ProtocolType.ACTIVITYPUB
         )
         if remote_target:
             process_entities([remote_target])
@@ -214,8 +215,7 @@ def process_entity_comment(entity: Any, profile: Profile):
         "parent": parent,
         "root_parent": root_parent,
     }
-    if isinstance(getattr(entity, 'replies', None), base.Collection):
-        values["replies_fid"] = entity.replies.id
+    values["replies_fid"] = getattr(entity, 'replies', None)
     extra_lookups = {}
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
@@ -365,6 +365,7 @@ def process_entity_share(entity, profile):
             handle=entity.target_handle,
             entity_type=entity.entity_type,
             sender_key_fetcher=sender_key_fetcher,
+            protocol=ProtocolType.DIASPORA if entity.target_guid else ProtocolType.ACTIVITYPUB
         )
         if remote_target:
             process_entities([remote_target])
@@ -417,7 +418,7 @@ def process_entity_share(entity, profile):
 
 
 def process_reply_collection(replies_fid):
-    coll = retrieve_remote_content(replies_fid, cache=False)  # refresh reply collection
+    coll = retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
     if isinstance(coll, base.Collection):
         replies = extract_replies(getattr(coll, 'first', []))
         for reply in replies:
@@ -437,7 +438,7 @@ def process_reply(reply):
         if isinstance(reply, base.Comment):
             remote_content = reply
         elif isinstance(reply, str):
-            remote_content = retrieve_remote_content(reply_fid)
+            remote_content = retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
             return
         if remote_content:

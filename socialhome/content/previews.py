@@ -47,7 +47,7 @@ def fetch_og_preview(content, urls):
             Content.objects.filter(id=content.id).update(opengraph=opengraph)
             return opengraph
         try:
-            og = OpenGraph(url=url, parser="lxml")
+            og = OpenGraph(url=url)
         except AttributeError:
             continue
         if not og or ("title" not in og and "site_name" not in og and "description" not in og and "image" not in og):

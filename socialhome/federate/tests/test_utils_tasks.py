@@ -4,6 +4,7 @@ from django.db import IntegrityError, transaction
 from federation.entities import base
 from federation.entities.activitypub.enums import ActivityType
 from federation.entities.activitypub.models import Comment
+from federation.protocols.enums import ProtocolType
 from federation.tests.factories import entities
 from federation.types import UserType, ReceiverVariant
 
@@ -563,6 +564,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
             handle=entity.target_handle,
             entity_type="Post",
             sender_key_fetcher=sender_key_fetcher,
+            protocol=ProtocolType.ACTIVITYPUB,
         )
         self.assertTrue(Content.objects.fed(entity.target_id, content_type=ContentType.CONTENT).exists())
         self.assertTrue(

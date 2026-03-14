@@ -7,6 +7,7 @@ from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
+from federation.protocols.enums import ProtocolType
 from federation.utils.network import fetch_document
 from socialhome.utils import get_redis_connection
 
@@ -64,15 +65,18 @@ def update_profile(profile, force=False):
     Decide if a profile update should be scheduled if any of the following criteria
     is true:
     - force is True
-    - unset finger property (for local profiles, set and return immediately)
+    - unset listed properties (for local profiles, set and return immediately)
     - unset key_id or followers_fid property for AP profiles
     - more than SOCIALHOME_PROFILE_UPDATE_FREQ days since the last update
     """
     from socialhome.users.models import Profile
 
     if profile.is_local:
-        if not profile.finger:
-            Profile.objects.filter(id=profile.id).update(finger=f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}')
+        kwargs = {}
+        if not profile.finger: kwargs['finger'] = f'{profile.user.username}@{settings.SOCIALHOME_DOMAIN}'
+        if not profile.protocols: kwargs['protocols'] = (ProtocolType.ACTIVITYPUB, ProtocolType.DIASPORA)
+
+        if kwargs: Profile.objects.filter(id=profile.id).update(**kwargs)
         return
 
     if any((
@@ -80,6 +84,7 @@ def update_profile(profile, force=False):
         not profile.avatar_url,
         not profile.finger,
         not profile.remote_url,
+        not profile.protocols,
         profile.fid and not (profile.key_id or profile.followers_fid),
         datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 

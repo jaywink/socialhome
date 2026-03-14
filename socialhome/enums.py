@@ -17,7 +17,7 @@ class Visibility(IntEnumProperties):
     string: typing.Annotated[str, Symmetric(case_fold=True)]
 
     PUBLIC = 0, _("Public"), "public"
-    LIMITED = 1, _("Limited"), "limited",
+    LIMITED = 1, _("Limited"), "limited"
     SITE = 2, _("Site"), "site"
     SELF = 3, _("Self"), "self"
 

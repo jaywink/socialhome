@@ -4,7 +4,7 @@ from django.conf import settings
 from socialhome.content.models import Content, OEmbedCache, OpenGraphCache, Tag
 from socialhome.enums import Visibility
 from socialhome.users.tests.factories import ProfileFactory, UserFactory, PublicProfileFactory, SiteProfileFactory, \
-    LimitedProfileFactory, SelfProfileFactory
+    LimitedProfileFactory, SelfProfileFactory, DiasporaPublicProfileFactory
 
 
 class TagFactory(factory.django.DjangoModelFactory):
@@ -31,6 +31,10 @@ class ContentFactory(factory.django.DjangoModelFactory):
 class PublicContentFactory(ContentFactory):
     visibility = Visibility.PUBLIC
     author = factory.SubFactory(PublicProfileFactory)
+
+
+class DiasporaPublicContentFactory(PublicContentFactory):
+    author = factory.SubFactory(DiasporaPublicProfileFactory)
 
 
 class LimitedContentFactory(ContentFactory):
