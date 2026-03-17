@@ -23,3 +23,13 @@ class LandingPage(ChoicePreference):
     default = "followed"
     verbose_name = _("Landing page")
     help_text = _("Choose which page you want to see as the landing page.")
+
+@user_preferences_registry.register
+class SensitiveContent(BooleanPreference):
+    """If true, always show sensitive and #nsfw content."""
+    section = generic
+    name = "show_sensitive_content"
+    default = False
+    verbose_name = _("Show sensitive content")
+    help_text = _("If selected, always show sensitive content")
+
