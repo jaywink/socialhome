@@ -170,6 +170,7 @@ class Content(models.Model):
     local = models.BooleanField(_("Local"), default=False, db_index=True, editable=False)
     rendered = models.TextField(_("Rendered text"), blank=True, editable=False)
     reply_count = models.PositiveIntegerField(_("Reply count"), default=0, editable=False)
+    sensitive = models.BooleanField(_("Sensitive content"), default=False, db_index=True)
     shares_count = models.PositiveIntegerField(_("Shares count"), default=0, editable=False)
     through = models.PositiveIntegerField(_("Latest share id"), default=0, editable=False, db_index=True)
     # Indirect parent in the hierarchy
@@ -399,10 +400,6 @@ class Content(models.Model):
         else:
             share.delete()
             delete_memoized(Content.has_shared, self.id, profile.id)
-
-    @cached_property
-    def is_nsfw(self):
-        return self.text.lower().find("#nsfw") > -1
 
     @property
     def effective_modified(self):

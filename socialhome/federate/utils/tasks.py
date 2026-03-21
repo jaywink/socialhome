@@ -123,6 +123,7 @@ def process_entity_post(entity: Any, profile: Profile):
         "author": profile,
         "visibility": Visibility.PUBLIC if entity.public else Visibility.LIMITED,
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
+        "sensitive": entity.sensitive,
         "service_label": safe_text(entity.provider_display_name) or "",
     }
     values["replies_fid"] = getattr(entity, 'replies', None)
@@ -214,6 +215,7 @@ def process_entity_comment(entity: Any, profile: Profile):
         "remote_created": safe_make_aware(entity.created_at, "UTC"),
         "parent": parent,
         "root_parent": root_parent,
+        "sensitive": entity.sensitive,
     }
     values["replies_fid"] = getattr(entity, 'replies', None)
     extra_lookups = {}

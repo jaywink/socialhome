@@ -29,6 +29,7 @@ def _make_post(content: Content) -> Optional[base.Post]:
             id=content.fid,
             actor_id=content.author.fid,
             public=True if content.visibility == Visibility.PUBLIC else False,
+            sensitive=content.sensitive,
             provider_display_name="Socialhome",
             created_at=content.effective_modified,
             times = {'created':content.created, 'modified':content.modified, 'edited':content.edited},
