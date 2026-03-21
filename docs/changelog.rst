@@ -37,6 +37,11 @@ Added
   which deletes profiles that have not been updated since the supplied date.
   For instances that have been decommissioned, use the `--instance` option.
 
+* Add the `sensitive` property to the `Content` model.
+
+* Add the `show_sensitive_content` dynamic user preference. The UI uses this preference to always show sensitive
+  content or not.
+
 Changed
 .......
 
@@ -81,6 +86,8 @@ Changed
 
 * Set pony urls at creation/update to empty remote profile icon (image_urls, avatar_url). This reduces
   the schedule profile update calls from the UI.
+
+* Process the `sensitive` property for both inbound and outbound payloads.
 
 Fixed
 .....
