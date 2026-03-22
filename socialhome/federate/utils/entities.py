@@ -48,6 +48,7 @@ def _make_comment(content: Content) -> Optional[base.Comment]:
             rendered_content=content.render_for_federation(),
             id=content.fid,
             actor_id=content.author.fid,
+            sensitive=content.sensitive,
             target_id=content.parent.fid,
             root_target_id=content.root_parent.fid,
             created_at=content.effective_modified,
