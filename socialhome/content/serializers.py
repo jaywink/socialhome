@@ -325,7 +325,7 @@ class ContentSerializer(serializers.ModelSerializer):
         return safe_text_for_markdown(value)
 
     def validate_recipients(self, value: Set[str]) -> Set[str]:
-        if self.initial_data.get("visibility", Visibility.PUBLIC.value) != Visibility.LIMITED.value:
+        if self.initial_data.get("visibility", Visibility.PUBLIC) != Visibility.LIMITED:
             return value
 
         if not value and not self.initial_data.get("include_following"):
