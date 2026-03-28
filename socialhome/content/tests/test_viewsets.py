@@ -181,7 +181,7 @@ class TestContentViewSet(SocialhomeAPITestCase):
     def test_post___limited(self):
         data = {
             "text": "Test", "pinned": False, "order": 1, "service_label": "", "visibility": Visibility.LIMITED,
-            "author": self.user.profile.id,
+            "author": self.user.profile.id, "include_following": True,
         }
         with self.login(self.user):
             self.post("api:content-list", data=data)
