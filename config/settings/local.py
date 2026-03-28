@@ -58,7 +58,7 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
     MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
     INSTALLED_APPS += ("debug_toolbar", "debug_toolbar_user_panel")
 
-    INTERNAL_IPS = ("127.0.0.1", "10.0.2.2",)
+    INTERNAL_IPS = ("127.0.0.1", "10.0.2.2", "192.168.2.84")
 
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TEMPLATE_CONTEXT": True,
@@ -75,7 +75,6 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
         "debug_toolbar.panels.templates.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
 
