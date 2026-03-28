@@ -13,11 +13,6 @@ from rest_framework.views import APIView
 from socialhome.users.serializers import LimitedProfileSerializer
 
 
-@method_decorator(activitypub_object_view, name='dispatch')
-class HomeView(View):
-    pass
-
-
 class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
     # Documenting the API
     schema = AutoSchema(manual_fields=[
