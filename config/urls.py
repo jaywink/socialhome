@@ -10,10 +10,11 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
+from federation.entities.activitypub.django.views import ActivitypubObjectView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.search.viewsets import SearchViewSet
 from socialhome.viewsets import MediaUploadView, settings_view
-from socialhome.views import HomeView, ObtainSocialhomeAuthToken
+from socialhome.views import ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 router = DefaultRouter()
