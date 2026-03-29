@@ -14,10 +14,6 @@ The official account can be found at ``hq@socialhome.network`` (https://socialho
 Feedback and community chat
 ---------------------------
 
-We have a few chat roomts you can join. All of these are bridged so you only need to join
-with which ever is your favourite to use.
-
-* `Matrix room <https://matrix.to/#/#socialhome:federator.dev>`_ ``#socialhome:federator.dev``
-* Libera IRC, channel ``#socialhome``
+We have a Matrix chat room you can join at `#socialhome:federator.dev <https://matrix.to/#/#socialhome:federator.dev>`_.
 
 Join in if you have questions regarding installation, development or usage, or just to say hi!

@@ -5,7 +5,7 @@ Ensure ``pip-tools`` are up to date:
 ::
 
     # Ensure pip and setuptools are up to date as well
-    pip install -U pip pip-tools
+    pip install -U pip pip-tools setuptools
 
 
 Then, update dependencies:

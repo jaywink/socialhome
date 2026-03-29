@@ -5,7 +5,7 @@ To use ``pip-tools``, first install it:
 ::
 
     # Ensure pip and setuptools are up to date as well
-    pip install -U pip pip-tools
+    pip install -U pip pip-tools setuptools
 
 Then install dependencies:
 
