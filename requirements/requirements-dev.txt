@@ -285,6 +285,7 @@ enum-properties==2.4.1
     # via
     #   -r requirements/requirements.txt
     #   django-enum
+    #   federation
 executing==2.2.1
     # via
     #   -r requirements/requirements.txt
@@ -295,7 +296,7 @@ faker==38.2.0
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-federation==0.26.0
+federation==0.27.0
     # via -r requirements/requirements.txt
 filelock==3.20.0
     # via

@@ -193,10 +193,12 @@ drf-haystack==1.9.1
 drf-yasg==1.21.11
     # via -r requirements/requirements.in
 enum-properties==2.4.1
-    # via django-enum
+    # via
+    #   django-enum
+    #   federation
 executing==2.2.1
     # via stack-data
-federation==0.26.0
+federation==0.27.0
     # via -r requirements/requirements.in
 filelock==3.20.0
     # via xapian-haystack
@@ -463,3 +465,6 @@ xapian-haystack==3.1.0
     # via -r requirements/requirements.in
 zope-interface==8.1.1
     # via twisted
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
