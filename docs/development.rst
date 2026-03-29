@@ -267,47 +267,6 @@ Some commands to get nice stats for release posts.
 
     git diff --stat <first release commit>..HEAD
 
-Developing with Docker
-------------------------
-
-If you choose, you may develop Socialhome using Docker, rather than installing Postgres and Redis manually on your computer.
-
-
-Supported versions
-..................
-
-This guide assumes you are running Docker on a GNU/Linux based system such as Ubuntu, Debian or Fedora Linux. It may be possible to run this on other platforms where Docker is supported, but those are untested.
-
-The docker development installation was tested on Docker version 17.09 and docker-compose 1.16.1.
-
-Steps
-.....
-
-The first step is to copy the example docker-compose file ``docker/dev/docker-compose.yml.example`` file to the root of the project. eg
-
-``cp docker/dev/docker-compose.yml.example ./docker-compose.yml``
-
-You also need to set an .env file as per the above instructions. Use the ``.env.example`` as a starting point.
-
-From there, you can build the images:
-
-``docker-compose build``
-
-And then the steps you would normally do, but throught he django image, ala:
-
-``docker-compose run django manage migrate``
-and
-``docker-compose run django manage createsuperuser``
-
-And then just
-
-``docker-compose up``
-
-Defaults
-........
-
-The defaults are that that the Docker image will be running on port 8000 and then exposed to the host OS on the same port (ie you can browse to http;//localhost:8000 to see the Django instance running). Redis and Postgres will be running but not exposed to the host OS by default. These can be changed on the ``docker-compose.yml`` file.
-
 Generating dummy content
 ------------------------
 

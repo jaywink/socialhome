@@ -20,7 +20,7 @@ else
 fi
 
 docker login codeberg.org
-docker build -f docker/app/Dockerfile -t codeberg.org/socialhome/socialhome:${tag} .
+docker build -f docker/Dockerfile -t codeberg.org/socialhome/socialhome:${tag} .
 docker push codeberg.org/socialhome/socialhome:${tag}
 
 if [[ "$2" == "nolatest" ]]; then

@@ -32,7 +32,7 @@ fi
 buildah manifest rm $manifest
 set -e
 
-buildah build -f docker/app/Dockerfile --squash --jobs=2 --platform=$platforms --manifest $manifest .
+buildah build -f docker/Dockerfile --squash --jobs=2 --platform=$platforms --manifest $manifest .
 
 buildah login $registry
 buildah manifest push --all $manifest docker://$manifest:$tag
