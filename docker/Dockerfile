@@ -21,7 +21,7 @@ ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 COPY package.json ./
 COPY bower.json ./
-COPY docker/app/start_socialhome.sh /start_socialhome.sh
+COPY docker/start_socialhome.sh /start_socialhome.sh
 
 RUN npm install && \
     node_modules/.bin/bower --allow-root install && \
