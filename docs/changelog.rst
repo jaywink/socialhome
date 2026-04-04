@@ -3,6 +3,22 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Changed
+.......
+
+* When cleaning keys in Redis that don't have an expiry TTL, also clean up
+  ``rq:results:*`` and ``fed_cache:*`` keys.
+
+Fixed
+.....
+
+* Fix a performance issue when cleaning up keys in Redis that have no expiry.
+
+* Fix crash when trimming streams Redis caches if the amount of streams caches is large.
+
 0.23.0 (2026-03-29)
 -------------------
 
