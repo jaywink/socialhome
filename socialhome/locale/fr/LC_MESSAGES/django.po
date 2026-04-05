@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2025-07-03 17:08+0000\n"
+"PO-Revision-Date: 2026-01-22 16:21+0000\n"
 "Last-Translator: alain <alain@noreply.codeberg.org>\n"
 "Language-Team: French <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.11.4\n"
+"X-Generator: Weblate 5.15.2\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/admin.py:29
@@ -977,7 +977,7 @@ msgstr "Courriels"
 
 #: socialhome/templates/base.html:89
 msgid "Admin"
-msgstr "Administration"
+msgstr "Admin"
 
 #: socialhome/templates/base.html:90
 msgid "Task queue"
