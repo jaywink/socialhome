@@ -48,8 +48,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "daphne",
     "corsheaders",
-    "crispy_forms",
-    "crispy_bootstrap4",
     "allauth",
     "allauth.account",
     "allauth.headless",
@@ -63,7 +61,6 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "haystack",
     "versatileimagefield",
-    "django_js_reverse",
     "memoize",
     "redisboard",
     "robots",
@@ -218,9 +215,6 @@ SETTINGS_EXPORT = [
     "SOCIALHOME_NODE_LIST_URL",
     "SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH",
 ]
-
-# See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------

@@ -128,8 +128,6 @@ coverage[toml]==7.12.0
     #   codecov
     #   django-coverage-plugin
     #   pytest-cov
-crispy-bootstrap4==2025.6
-    # via -r requirements/requirements.txt
 croniter==6.0.0
     # via
     #   -r requirements/requirements.txt
@@ -168,12 +166,10 @@ django==4.2.26
     # via
     #   -r requirements/requirements.txt
     #   channels
-    #   crispy-bootstrap4
     #   django-allauth
     #   django-braces
     #   django-cors-headers
     #   django-coverage-plugin
-    #   django-crispy-forms
     #   django-debug-toolbar
     #   django-dynamic-preferences
     #   django-enum
@@ -205,10 +201,6 @@ django-cors-headers==4.9.0
     # via -r requirements/requirements.txt
 django-coverage-plugin==3.2.0
     # via -r requirements/requirements-dev.in
-django-crispy-forms==2.5
-    # via
-    #   -r requirements/requirements.txt
-    #   crispy-bootstrap4
 django-debug-toolbar==6.1.0
     # via -r requirements/requirements-dev.in
 django-debug-toolbar-user-panel==2.0.0

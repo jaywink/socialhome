@@ -8,7 +8,6 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
-from django_js_reverse.views import urls_js
 from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
 from socialhome.content.views import ContentCreateView
