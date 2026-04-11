@@ -10,13 +10,10 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
-from socialhome.content.views import ContentCreateView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
-from socialhome.enums import PolicyDocumentType
 from socialhome.search.viewsets import SearchViewSet
 from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view
-from socialhome.views import (
-    HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
+from socialhome.views import HomeView, ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 router = DefaultRouter()
@@ -51,18 +48,10 @@ urlpatterns = [
 
     # User management
     re_path(r"", include("socialhome.users.urls", namespace="users")),
-    re_path(r"^accounts/", include("allauth.urls")),
     re_path(r"^api/allauth/", include("allauth.headless.urls")),
-
-    # Markdownx
-    # Use our own upload view based on the MarkdownX view
-    re_path(r"^markdownx/upload/$", MarkdownXImageUploadView.as_view(), name="markdownx_upload"),
-    re_path(r"^markdownx/", include("markdownx.urls")),
 
     # Content
     re_path(r"^content/", include("socialhome.content.urls", namespace="content")),
-    # Fallback for bookmarklet route for cross-project support
-    re_path(r"^bookmarklet/", ContentCreateView.as_view(), name="bookmarklet"),
 
     # JavaScript translations
     path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome'], domain="django") , name="javascript-catalog"),
@@ -82,26 +71,6 @@ urlpatterns = [
     re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
     re_path(r"^api/settings/", settings_view, name="settings"),
-
-    # Account
-    re_path(r"^account/", include("dynamic_preferences.urls")),
-
-    # Search
-    re_path(r"^search/", include("socialhome.search.urls", namespace="search")),
-
-    # Policy docs
-    path(
-        'privacy/',
-        PolicyDocumentView.as_view(),
-        {'document_type': PolicyDocumentType.PRIVACY_POLICY},
-        name="privacy-policy"
-    ),
-    path(
-        'terms/',
-        PolicyDocumentView.as_view(),
-        {'document_type': PolicyDocumentType.TERMS_OF_SERVICE},
-        name="terms-of-service"
-    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.SILKY_INSTALLED:

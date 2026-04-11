@@ -8,7 +8,6 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 
 from federation.protocols.enums import ProtocolType
-from federation.utils.network import fetch_document
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")

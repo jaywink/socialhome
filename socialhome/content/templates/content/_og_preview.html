@@ -1,0 +1,27 @@
+<a class="opengraph-card" href="{{ opengraph.url }}" target="_blank" rel="noopener">
+    <div class="card">
+        <div class="card-block">
+            {% if opengraph.image and not image_in_text %}
+                <div class="opengraph-card-image">
+                    <img src="{{ opengraph.image }}" alt="{{ opengraph.title | default:"" }}">
+                </div>
+            {% endif %}
+            <div class="opengraph-card-text">
+                <p class="card-text">
+                    {% if opengraph.title %}
+                       <b>{{ opengraph.title }}</b>
+                    {% endif %}
+                    {% if opengraph.description and opengraph.description != opengraph.title %}
+                        <br>{{ opengraph.description }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="opengraph-card-url">
+                <p class="card-text">
+                    {{ opengraph.url | truncatechars:"40" }}
+                </p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</a>

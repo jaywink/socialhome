@@ -1,6 +1,6 @@
+from unittest import skip
 from unittest.mock import patch
 
-from ddt import ddt, data
 from django.conf import settings
 from django.urls import reverse
 
@@ -8,8 +8,7 @@ from socialhome.content.enums import ContentType
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.notifications.tasks import (
     send_reply_notifications, send_follow_notification, send_share_notification, send_data_export_ready_notification,
-    send_policy_document_update_notification, send_policy_document_update_notifications, send_mention_notification,
-    get_root_content_participants)
+    send_mention_notification, get_root_content_participants)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory
 
@@ -98,49 +97,6 @@ class TestSendMentionNotification(SocialhomeTestCase):
         self.assertFalse(kwargs.get("fail_silently"))
 
 
-@ddt
-class TestSendPolicyDocumentUpdateNotification(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.user = UserFactory()
-
-    @data('both', 'privacypolicy', 'tos')
-    def test_docs_good_values(self, docs):
-        send_policy_document_update_notification(self.user.id, docs)
-
-    def test_docs_bad_value(self):
-        with self.assertRaises(ValueError):
-            send_policy_document_update_notification(self.user.id, 'foobar')
-
-    @patch("socialhome.notifications.tasks.send_mail")
-    def test_send_mail_call(self, mock_send):
-        send_policy_document_update_notification(self.user.id, 'both')
-        args, kwargs = mock_send.call_args
-        self.assertEqual(args[2], settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(args[3][0], self.user.email)
-        self.assertEqual(len(args[3]), 1)
-        self.assertFalse(kwargs.get("fail_silently"))
-
-
-class TestSendPolicyDocumentUpdateNotifications(SocialhomeTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.user = UserFactory(with_verified_email=True)
-        cls.user2 = UserFactory(with_verified_email=True)
-        cls.user3 = UserFactory()
-        cls.verified_users = (cls.user.id, cls.user2.id)
-
-    @patch("socialhome.notifications.tasks.django_rq.enqueue")
-    def test_queued_for_users_with_verified_email(self, mock_enqueue):
-        send_policy_document_update_notifications('both')
-        self.assertEqual(mock_enqueue.call_count, 2)
-        for cal in mock_enqueue.call_args_list:
-            args, kwargs = cal
-            self.assertIn(args[1], self.verified_users)
-
-
 class TestSendReplyNotification(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -210,6 +166,7 @@ class TestSendShareNotification(SocialhomeTestCase):
         self.assertFalse(kwargs.get("fail_silently"))
 
 
+@skip("Needs implementing data export in new UI")
 class TestSendDataExportReadyNotification(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):

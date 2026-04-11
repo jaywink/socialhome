@@ -281,8 +281,9 @@ SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
 # Select the correct user model
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "home"
-LOGIN_URL = "account_login"
-LOGOUT_URL = "account_logout"
+
+# Disable auth on DRF Swagger API docs
+USE_SESSION_AUTH = False
 
 # REDIS
 # -----
