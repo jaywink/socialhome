@@ -2,8 +2,8 @@
 
 [![Documentation](http://readthedocs.org/projects/socialhome/badge/?version=latest)](http://socialhome.readthedocs.io/en/latest/?badge=latest) [![chat on matrix](https://img.shields.io/matrix/socialhome:federator.dev?server_fqdn=federator.modular.im&fetchMode=summary)](https://matrix.to/#/#socialhome:federator.dev) [![issue tracker](https://img.shields.io/badge/issue%20tracker-codeberg-yellow.svg)](https://codeberg.org/socialhome/socialhome/issues) [![Translations](https://translate.codeberg.org/widget/socialhome/backendoldui/svg-badge.svg)](https://translate.codeberg.org/projects/socialhome/backendoldui/)
 
-Socialhome
-==========
+Socialhome backend
+==================
 
 ![Socialhome](http://socialhome.readthedocs.io/en/latest/_images/socialhome.png)
 
@@ -13,7 +13,7 @@ Description
 Socialhome is best described as a federated personal profile with social networking functionality. 
 Users can create rich content using Markdown and even HTML/JS/CSS (if set as trusted user). 
 All content can be pinned to the user profile and all content will federate to contacts in 
-the federated social web. Currently federation happens using the 
+the federated social web. Currently, federation happens using the 
 [ActivityPub](https://activitypub.rocks/) and 
 [Diaspora](https://diaspora.github.io/diaspora_federation/) protocols.
 
@@ -23,6 +23,9 @@ site is a Socialhome profile itself.
 Official site: [https://socialhome.network](https://socialhome.network).
 
 Documentation: http://socialhome.readthedocs.io/
+
+This repository is for the Socialhome Django backend. See [socialhome-ui](https://codeberg.org/socialhome/socialhome-ui)
+for the frontend repository.
 
 Joining
 -------

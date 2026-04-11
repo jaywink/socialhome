@@ -3,20 +3,22 @@
 Development
 ===========
 
-Socialhome is missing features and needs a lot of polish on the UI side. If you are familiar with Django or Vue (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
+If you are familiar with Django or Vue (or want to learn!) and are interested in getting involved, please don't hesitate to get in touch!
 
 For guidelines how to contribute, please first read the :ref:`contributing` guide.
 
-* `Source code repo <https://codeberg.org/socialhome/socialhome>`_
+* `Backend code repo <https://codeberg.org/socialhome/socialhome>`_
+* `Frontend code repo <https://codeberg.org/socialhome/socialhome-ui>`_
 * `Issue tracker <https://codeberg.org/socialhome/socialhome/issues>`_
 
 NOTE! Due to bugs in the GitLab -> Codeberg migration tool, old issues before October 2024 can
 only be found in the old [GitLab issue tracker](https://gitlab.com/jaywink/socialhome/-/issues).
 
-Environment setup
------------------
+NOTE! These instructions are for the backend codebase, pelase see `the frontend repository <https://codeberg.org/socialhome/socialhome-ui>`_
+for frontend side development.
 
-Instructions are for Ubuntu 16.04+ (+ simple Alpine 3.6 dependencies script). Please contribute via PR's if you notice anything missing or want to contribute instructions for another platform.
+Backend environment setup
+-------------------------
 
 Python Virtualenv
 .................
@@ -24,7 +26,6 @@ Python Virtualenv
 Python 3.10 is the suggested minimum development version. Ensure the following are installed:
 
 * Python system dependencies
-* NodeJS (version 12)
 * PostgreSQL server
 * Redis
 
@@ -38,21 +39,6 @@ Install Python dependencies
 ...........................
 
 .. include:: includes/pip_tools.rst
-
-Do NPM, Bower
-.............
-
-::
-
-    npm install
-    node_modules/.bin/bower install
-    npm run dev
-
-To watch files and build bundles automatically, use this.
-
-::
-
-    npm run watch
 
 Configure
 .........
@@ -183,30 +169,6 @@ Python tests
 
 To also generate profiling information, add ``--profile --profile-svg`` to the command.
 
-API Routes
------------
-
-There is a dependency in the API route URL configurations with the new Vue based frontend tests. If you change or add new API routes during development, you must also do the following:
-
-::
-
-    python manage.py collectstatic_js_reverse
-    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/unit/fixtures/Urls.js
-
-This updates the JavaScript fixtures with the new URL configuration.
-
-Linters
--------
-
-ESLint
-......
-
-There is an ``.eslintrc`` provided. We follow the Airbnb and Vue guidelines with some tweaks. It's recommended to add this configuration to your editor directly. To run ESLint directly, use the following command. NOTE! This is only valid for the new Vue based frontend, not JS in ``socialhome/static``.
-
-::
-
-    npm run lint
-
 Building local documentation
 ----------------------------
 
@@ -246,7 +208,7 @@ Push the tag and master branch.
 Docker images
 .............
 
-Publish a new Docker image by running `./docker_release v<version>`.
+Publish a new Docker image by running `./multiarch_release v<version>`.
 
 Start new development cycle
 ...........................

@@ -3,15 +3,12 @@
 Docker
 ------
 
-This page explains how to setup a Socialhome instance using Docker. While the core
-of Socialhome is in one single container, the setup is a bit more complex due to other
-services required. These can either be other containers, running on the host or other
-machines.
+This page explains how to setup the Socialhome using Docker.
 
 If you have issues following the supported instructions, please contact us via :ref:`community`.
 
-The application
-...............
+The backend application
+.......................
 
 The main application container has the following process controlled by the main Circus process:
 
@@ -19,18 +16,20 @@ The main application container has the following process controlled by the main 
 * The configured number of RQ workers
 * An RQ scheduler
 
-The application container does not serve media.
+The backend application container does not serve media and does not include any frontend.
 
-Docker images
-'''''''''''''
+The backend containers can be found at https://codeberg.org/socialhome/-/packages/container/socialhome
 
-TODO docker registry
-The containers can be found at the `GitLab docker registry <https://gitlab.com/jaywink/socialhome/container_registry>`_.
+The frontend application
+........................
 
-Each version will have a tag and additionally the ``latest`` tag contains the latest version.
+Currently there are no Docker images for the frontend application. You will need to serve
+the extracted frontend files via your chosen web server.
 
-Memory requirements
-'''''''''''''''''''
+The frontend packages can be found at https://codeberg.org/socialhome/-/packages/generic/socialhome-ui
+
+Backend memory requirements
+'''''''''''''''''''''''''''
 
 On average the container will require approximately 360mb of RAM plus approx 75mb per RQ
 worker. The default RQ worker count is 1 though on a busy instance you may need many more. The
@@ -38,12 +37,33 @@ amount of RQ workers can be controlled with the environment variable ``RQWORKER_
 daphne worker count is also 1 and can be controlled with the ``DAPHNE_WORKER_NUM`` environment
 variable.
 
-Networking
-''''''''''
+Routing to the backend
+''''''''''''''''''''''
 
-The following routing needs to be done:
+The following path prefixes need to be routed to port **23564** on the backend container:
 
-* Everything to port **23564**
+* ``/ch``
+* ``/receive``
+* ``/admin``
+* ``/api``
+* ``/django-rq``
+* ``/fetch``
+* ``/hcard``
+* ``/jsi18n``
+* ``/nodeinfo``
+* ``/static``
+* ``/webfinger``
+* ``/.well-know``
+
+Additionally, the following header regexes should be routed to the backend container container
+port **23564** as well:
+
+* ``Accept: .*application/((activity|ld)\\+)?json.*``
+* ``Accept: .*application/(xrd\\+|magic-envelope\\+)xml.*``
+
+It should be safe to default anything not going to the backend to look for a frontend
+package file. See `here <https://codeberg.org/socialhome/socialhome-ui/src/branch/main/INSTALLATION.md#versions-0-9-0-backend-0-22>`_
+for an example NGINX config file.
 
 TLS should be terminated by a load balancer before sending traffic to the application container.
 
@@ -51,16 +71,29 @@ The load balancer should also set the following headers:
 
 * ``X-Forwarded-Proto: https``
 
-Volumes
-'''''''
+Routing to the frontend
+'''''''''''''''''''''''
+
+The following path prefixes and files should serve the frontend:
+
+* ``index.html``
+* ``favicon.ico``
+* ``/assets``
+
+It should be safe to default anything not going to the backend to look for a frontend
+package file. See `here <https://codeberg.org/socialhome/socialhome-ui/src/branch/main/INSTALLATION.md#versions-0-9-0-backend-0-22>`_
+for an example NGINX config file.
+
+Backend container volumes
+'''''''''''''''''''''''''
 
 Two paths should be mounted on the host and persisted over recreation of the container:
 
 * ``/app/socialhome/media`` as read write. The app will write uploaded media to this path.
 * ``/app/var`` as read write. The app will maintain things like search indexes here.
 
-Configuration
-'''''''''''''
+Backend configuration
+'''''''''''''''''''''
 
 Socialhome uses environment variables for configuration. At minimum, you need to modify the following:
 

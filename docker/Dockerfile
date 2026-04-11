@@ -1,41 +1,16 @@
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED 1
-ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 12.22.12
 
 WORKDIR /
 
-# Install nvm with node and npm
+# Install various apt packages
 RUN apt-get update && apt-get install python3-dev less htop curl git build-essential libmagic1 tzdata-legacy -y && \
-    rm /bin/sh && ln -s /bin/bash /bin/sh && mkdir /usr/local/nvm && \
-    curl https://raw.githubusercontent.com/creationix/nvm/v0.39.3/install.sh | bash
+    rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN source $NVM_DIR/nvm.sh && \
-    nvm install $NODE_VERSION && \
-    nvm alias default $NODE_VERSION && \
-    nvm use default
-
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
-COPY package.json ./
-COPY bower.json ./
 COPY docker/start_socialhome.sh /start_socialhome.sh
 
-RUN npm install && \
-    node_modules/.bin/bower --allow-root install && \
-    chmod +x /start_socialhome.sh && \
-    mkdir -p /app/socialhome/frontend
-
-COPY socialhome/frontend/package.json /app/socialhome/frontend
-COPY socialhome/frontend/package-lock.json /app/socialhome/frontend
-
-WORKDIR /app/socialhome/frontend
-
-RUN npm install && \
-    ln -s /node_modules /app/node_modules && \
-    ln -s /bower_components /app/bower_components
+RUN chmod +x /start_socialhome.sh
 
 WORKDIR /app
 
@@ -46,12 +21,7 @@ RUN pip install -U pip setuptools pip-tools && \
 
 COPY . /app
 
-RUN npm run build && \
-    rm -rf /node_modules && \
-    rm -rf /app/socialhome/frontend/node_modules && \
-    rm -rf /bower_components && \
-    rm -rf /root/.cache/Cypress && \
-    apt-get purge python3-dev build-essential -y && \
+RUN apt-get purge python3-dev build-essential -y && \
     apt autoremove -y && \
     cp config/circus_docker.ini config/circus.ini && \
     mkdir -p /logs

@@ -20,13 +20,6 @@ from socialhome.views import (
     HomeView, MarkdownXImageUploadView, ObtainSocialhomeAuthToken, PolicyDocumentView)
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
-# API routes
-# NOTE! If changing or adding API urls, don't forget to update the JS tests URL config fixtures as follows:
-#
-#    python manage.py collectstatic_js_reverse
-#    mv staticfiles/django_js_reverse/js/reverse.js socialhome/frontend/tests/unit/fixtures/Urls.js
-#    rm -rf staticfiles/django_js_reverse
-#
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
@@ -74,9 +67,6 @@ urlpatterns = [
 
     # JavaScript translations
     path("jsi18n/", JavaScriptCatalog.as_view(packages=['socialhome'], domain="django") , name="javascript-catalog"),
-
-    # Django URLs in JS
-    re_path(r"^jsreverse/$", urls_js, name="js_reverse"),
 
     # Admin pages
     re_path(settings.ADMIN_URL, admin.site.urls),

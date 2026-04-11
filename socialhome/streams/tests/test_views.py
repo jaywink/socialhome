@@ -56,11 +56,6 @@ class TestFollowedStreamView(SocialhomeCBVTestCase):
         view = self.get_instance(FollowedStreamView)
         self.assertEqual(view.stream_type_value, StreamType.FOLLOWED.value)
 
-    def test_uses_correct_template(self):
-        response = self.get(FollowedStreamView, request=self.get_request(self.user))
-        template_names = [template.name for template in response.templates]
-        assert "streams/base.html" in template_names
-
     def test_redirects_to_login_if_not_authenticated(self):
         self.assertLoginRequired("streams:followed")
 
@@ -108,12 +103,6 @@ class TestLimitedStreamView(SocialhomeCBVTestCase):
         view = self.get_instance(LimitedStreamView)
         self.assertEqual(view.stream_type_value, StreamType.LIMITED.value)
 
-    def test_uses_correct_template(self):
-        with self.login(self.user):
-            response = self.client.get(reverse("streams:limited"))
-        template_names = [template.name for template in response.templates]
-        self.assertIn("streams/base.html", template_names)
-
 
 class TestLocalStreamView(SocialhomeCBVTestCase):
     @classmethod
@@ -159,12 +148,6 @@ class TestLocalStreamView(SocialhomeCBVTestCase):
     def test_stream_type_value(self):
         view = self.get_instance(LocalStreamView)
         self.assertEqual(view.stream_type_value, StreamType.LOCAL.value)
-
-    def test_uses_correct_template(self):
-        with self.login(self.user):
-            response = self.client.get(reverse("streams:local"))
-        template_names = [template.name for template in response.templates]
-        self.assertIn("streams/base.html", template_names)
 
 
 class TestPublicStreamView(SocialhomeCBVTestCase):
@@ -214,11 +197,6 @@ class TestPublicStreamView(SocialhomeCBVTestCase):
     def test_stream_type_value(self):
         view = self.get_instance(PublicStreamView)
         self.assertEqual(view.stream_type_value, StreamType.PUBLIC.value)
-
-    def test_uses_correct_template(self):
-        response = self.client.get(reverse("streams:public"))
-        template_names = [template.name for template in response.templates]
-        assert "streams/base.html" in template_names
 
     def test_logged_in_user(self):
         self.client.force_login(self.user)
@@ -282,11 +260,6 @@ class TestTagStreamView(SocialhomeCBVTestCase):
         view = self.get_instance(TagStreamView)
         self.assertEqual(view.stream_type_value, StreamType.TAG.value)
 
-    def test_uses_correct_template(self):
-        response = self.client.get(reverse("streams:tag", kwargs={"name": "tagnocontent"}))
-        template_names = [template.name for template in response.templates]
-        assert "streams/base.html" in template_names
-
 
 class TestTagsStreamView(SocialhomeCBVTestCase):
     @classmethod
@@ -328,9 +301,3 @@ class TestTagsStreamView(SocialhomeCBVTestCase):
     def test_stream_type_value(self):
         view = self.get_instance(TagsStreamView)
         self.assertEqual(view.stream_type_value, StreamType.TAGS.value)
-
-    def test_uses_correct_template(self):
-        with self.login(self.user):
-            response = self.client.get(reverse("streams:tags"))
-        template_names = [template.name for template in response.templates]
-        assert "streams/base.html" in template_names

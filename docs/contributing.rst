@@ -77,11 +77,6 @@ Python
 As a general rule, for Python code follow PEP8, except with a 120 character line length. We provide an
 ``.editorconfig`` in the repository root.
 
-JavaScript
-..........
-
-There is an ``.eslintrc`` configuration provided.
-
 Alphabetical ordering
 .....................
 

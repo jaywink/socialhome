@@ -108,8 +108,7 @@ MIDDLEWARE = (
 # ----
 def is_silky_request(request):
     path = request.path.strip('/')
-    if path.startswith('_') or path.startswith('admin') or path.startswith('static') or path.startswith('jsi18n') or \
-            path.startswith('jsreverse'):
+    if path.startswith('_') or path.startswith('admin') or path.startswith('static') or path.startswith('jsi18n'):
         return False
     return True
 
@@ -343,13 +342,6 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
-HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
-    "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
-    "account_reset_password_from_key": f'{SOCIALHOME_URL}/account/password/reset/key/{{key}}',
-    "account_login": f'{SOCIALHOME_URL}/account/login',
-    "account_signup": f'{SOCIALHOME_URL}/account/signup'
-}
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.

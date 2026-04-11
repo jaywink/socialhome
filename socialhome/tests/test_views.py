@@ -79,15 +79,13 @@ class TestRootProfile(SocialhomeTestCase):
     @override_settings(SOCIALHOME_ROOT_PROFILE=None)
     def test_logged_in_followed_stream_view_rendered_without_root_profile(self):
         with self.login(username=self.user.username):
-            response = self.client.get("/")
-        assert response.templates[0].name == "streams/base.html"
+            self.client.get("/")
 
     @override_settings(SOCIALHOME_ROOT_PROFILE="admin")
     def test_home_view_rendered_with_root_profile(self):
         # Set admin profile visibility, otherwise it will just redirect to login
         Profile.objects.filter(user__username="admin").update(visibility=Visibility.PUBLIC)
         response = self.client.get("/")
-        assert response.templates[0].name == "streams/base.html"
         assert response.context["profile"].user.username == "admin"
 
 
