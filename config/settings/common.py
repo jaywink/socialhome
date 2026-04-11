@@ -148,7 +148,8 @@ DATABASES = {
     ),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
+if env.int("DATABASE_CONN_MAX_AGE", default=None):
+    DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE", default=None)
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

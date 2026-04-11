@@ -6,6 +6,12 @@ Changelog
 unreleased
 ----------
 
+Added
+.....
+
+* Allow defining the database ``CONN_MAX_AGE`` value using the ``DATABASE_CONN_MAX_AGE``
+  environment variable.
+
 Changed
 .......
 

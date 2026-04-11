@@ -189,6 +189,13 @@ Default: ``postgres:///socialhome``
 
 This must be set to a proper database URL, for example ``postgres://socialhome:DATABASEPASSWORDHERE@127.0.0.1:5432/socialhome``.
 
+DATABASE_CONN_MAX_AGE
+.....................
+
+Default: not set
+
+Set the default database ``CONN_MAX_AGE``, see https://docs.djangoproject.com/en/dev/ref/settings/#std-setting-CONN_MAX_AGE
+
 DJANGO_ACCOUNT_ALLOW_REGISTRATION
 .................................
 
