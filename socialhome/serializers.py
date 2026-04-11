@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import ImageField, SerializerMethodField
+from rest_framework.fields import ImageField
 from rest_framework.serializers import ModelSerializer, Serializer
 
 from socialhome.forms import MarkdownXImageForm
