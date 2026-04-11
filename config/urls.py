@@ -12,7 +12,7 @@ from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
 from socialhome.search.viewsets import SearchViewSet
-from socialhome.viewsets import ImageUploadView, MediaUploadView, settings_view
+from socialhome.viewsets import MediaUploadView, settings_view
 from socialhome.views import HomeView, ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
@@ -65,7 +65,6 @@ urlpatterns = [
     re_path(r'^api/swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^api/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     re_path(r"^api/", include((router.urls, "api"))),
-    re_path(r"^api/image-upload/$", ImageUploadView.as_view(), name="api-image-upload"),
     re_path(r"^api/media-upload/$", MediaUploadView.as_view(), name="api-media-upload"),
     re_path(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
     re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),

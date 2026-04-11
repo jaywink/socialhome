@@ -266,10 +266,6 @@ ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 
-ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
-SOCIALACCOUNT_FORMS = {
-    "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
-}
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # Require new signups to be approved by an admin

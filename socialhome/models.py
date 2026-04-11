@@ -11,6 +11,7 @@ from socialhome.enums import PolicyDocumentType
 from socialhome.users.models import User
 
 
+# TODO remove
 class ImageUpload(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="imageuploads")
     image = models.ImageField()
@@ -32,6 +33,7 @@ class MediaUpload(TimeStampedModel):
         return self.media.name
 
 
+# TODO remove
 @reversion.register(ignore_duplicates=True)
 class PolicyDocument(TimeStampedModel):
     content = MarkdownxField()
