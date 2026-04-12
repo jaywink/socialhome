@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 from ddt import data, ddt
-from django.test import RequestFactory
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import PublicUserFactory
 
@@ -12,7 +11,6 @@ class TestUserDetailView(SocialhomeTestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = PublicUserFactory()
-        cls.factory = RequestFactory()
 
     def test_get_without_or_with_wrong_headers_is_disallowed(self):
         self.get(self.user.get_absolute_url(), extra={
