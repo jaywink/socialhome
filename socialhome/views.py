@@ -13,10 +13,9 @@ from rest_framework.views import APIView
 from socialhome.users.serializers import LimitedProfileSerializer
 
 
-@method_decorator(activitypub_object_view, name='get')
+@method_decorator(activitypub_object_view, name='dispatch')
 class HomeView(View):
-    def get(self, request, *args, **kwargs):
-        return super(HomeView, self).get(request, *args, **kwargs)
+    pass
 
 
 class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
