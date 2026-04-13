@@ -78,6 +78,9 @@ bower_components/
 # Mocha test statics
 socialhome/static/mocha/
 
+# Collected statics
+staticfiles/
+
 # Test coverage
 .nyc_output/
 
