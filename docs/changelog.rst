@@ -6,17 +6,13 @@ Changelog
 unreleased
 ----------
 
-Added
-.....
-
-* Allow defining the database ``CONN_MAX_AGE`` value using the ``DATABASE_CONN_MAX_AGE``
-  environment variable.
-
 Changed
 .......
 
 * When cleaning keys in Redis that don't have an expiry TTL, also clean up
   ``rq:results:*`` and ``fed_cache:*`` keys.
+
+* Disable persistent database connections as per Django documentation when using ASGI.
 
 Fixed
 .....
