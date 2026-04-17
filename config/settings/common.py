@@ -339,6 +339,7 @@ HEADLESS_FRONTEND_URLS = {
     "account_login": f'{SOCIALHOME_URL}/account/login',
     "account_signup": f'{SOCIALHOME_URL}/account/signup',
 }
+HEADLESS_ONLY = True
 
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
