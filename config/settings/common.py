@@ -148,7 +148,8 @@ DATABASES = {
     ),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
+# When using ASGI, persistent connections should be disabled.
+DATABASES["default"]["CONN_MAX_AGE"] = 0
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

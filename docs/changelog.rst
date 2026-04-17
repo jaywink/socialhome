@@ -12,6 +12,8 @@ Changed
 * When cleaning keys in Redis that don't have an expiry TTL, also clean up
   ``rq:results:*`` and ``fed_cache:*`` keys.
 
+* Disable persistent database connections as per Django documentation when using ASGI.
+
 Fixed
 .....
 
