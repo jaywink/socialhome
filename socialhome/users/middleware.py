@@ -2,10 +2,7 @@ import json
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.shortcuts import redirect, render
-from django.utils.translation import gettext as _
-from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
+from django.shortcuts import render
 
 from socialhome.users.models import User
 

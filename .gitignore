@@ -72,19 +72,14 @@ prof/
 # Socialhome environment file
 env.local
 
-# Collected statics
-socialhome/static/css/*.css
-socialhome/static/css/*.css.map
-socialhome/static/dist
-socialhome/static/fonts/
-!/socialhome/static/fonts/.gitkeep
-staticfiles/
-
 # Bower
 bower_components/
 
 # Mocha test statics
 socialhome/static/mocha/
+
+# Collected statics
+staticfiles/
 
 # Test coverage
 .nyc_output/
@@ -92,7 +87,6 @@ socialhome/static/mocha/
 # DOcs
 /docs/_build/
 /yarn.lock
-/staticfiles/
 
 # Docker
 /docker-compose.yml

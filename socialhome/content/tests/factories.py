@@ -23,10 +23,6 @@ class ContentFactory(factory.django.DjangoModelFactory):
     text = factory.Faker("text")
     uuid = factory.Faker('uuid4')
 
-#    @classmethod
-#    def _after_postgeneration(cls, obj, create, results):
-#        if create: obj.save()
-
 
 class PublicContentFactory(ContentFactory):
     visibility = Visibility.PUBLIC

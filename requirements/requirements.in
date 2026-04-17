@@ -4,13 +4,11 @@ channels[daphne]
 channels_redis
 chardet
 circus
-crispy-bootstrap4
 commonmark_socialhome
 coreapi
 django-allauth[headless]
 django-braces
 django-cors-headers
-django-crispy-forms
 django-dynamic-preferences
 django-enum[properties]
 # needed until the migrations are squashed

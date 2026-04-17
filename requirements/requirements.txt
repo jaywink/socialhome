@@ -78,8 +78,6 @@ coreapi==2.3.3
     # via -r requirements/requirements.in
 coreschema==0.0.4
     # via coreapi
-crispy-bootstrap4==2025.6
-    # via -r requirements/requirements.in
 croniter==6.0.0
     # via rq
 crontab==1.0.5
@@ -103,11 +101,9 @@ django==4.2.26
     # via
     #   -r requirements/requirements.in
     #   channels
-    #   crispy-bootstrap4
     #   django-allauth
     #   django-braces
     #   django-cors-headers
-    #   django-crispy-forms
     #   django-dynamic-preferences
     #   django-enum
     #   django-extensions
@@ -134,10 +130,6 @@ django-braces==1.17.0
     # via -r requirements/requirements.in
 django-cors-headers==4.9.0
     # via -r requirements/requirements.in
-django-crispy-forms==2.5
-    # via
-    #   -r requirements/requirements.in
-    #   crispy-bootstrap4
 django-dynamic-preferences==1.17.0
     # via -r requirements/requirements.in
 django-enum[properties]==2.3.0

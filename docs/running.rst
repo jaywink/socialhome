@@ -5,11 +5,6 @@ Running an instance
 
 Some notes on running a production instance.
 
-Using the SPA UI
-----------------
-
-To enable the new SPA UI follow the (`example instructions <https://https://codeberg.org/socialhome/socialhome-ui/src/branch/main/INSTALLATION.md>`_).
-
 Django admin
 ------------
 

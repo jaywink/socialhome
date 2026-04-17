@@ -48,8 +48,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "daphne",
     "corsheaders",
-    "crispy_forms",
-    "crispy_bootstrap4",
     "allauth",
     "allauth.account",
     "allauth.headless",
@@ -63,7 +61,6 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "haystack",
     "versatileimagefield",
-    "django_js_reverse",
     "memoize",
     "redisboard",
     "robots",
@@ -108,8 +105,7 @@ MIDDLEWARE = (
 # ----
 def is_silky_request(request):
     path = request.path.strip('/')
-    if path.startswith('_') or path.startswith('admin') or path.startswith('static') or path.startswith('jsi18n') or \
-            path.startswith('jsreverse'):
+    if path.startswith('_') or path.startswith('admin') or path.startswith('static') or path.startswith('jsi18n'):
         return False
     return True
 
@@ -205,7 +201,6 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "django_settings_export.settings_export",
-                "socialhome.context_processors.policy_documents",
             ],
         },
     },
@@ -220,9 +215,6 @@ SETTINGS_EXPORT = [
     "SOCIALHOME_NODE_LIST_URL",
     "SOCIALHOME_STREAMS_PUBLIC_STREAM_WITHOUT_AUTH",
 ]
-
-# See: http://django-crispy-forms.readthedocs.org/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -274,10 +266,6 @@ ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 
-ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
-SOCIALACCOUNT_FORMS = {
-    "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
-}
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # Require new signups to be approved by an admin
@@ -289,8 +277,9 @@ SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
 # Select the correct user model
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "home"
-LOGIN_URL = "account_login"
-LOGOUT_URL = "account_logout"
+
+# Disable auth on DRF Swagger API docs
+USE_SESSION_AUTH = False
 
 # REDIS
 # -----
@@ -349,8 +338,10 @@ HEADLESS_FRONTEND_URLS = {
     "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
     "account_reset_password_from_key": f'{SOCIALHOME_URL}/account/password/reset/key/{{key}}',
     "account_login": f'{SOCIALHOME_URL}/account/login',
-    "account_signup": f'{SOCIALHOME_URL}/account/signup'
+    "account_signup": f'{SOCIALHOME_URL}/account/signup',
 }
+HEADLESS_ONLY = True
+
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
 # Uses `settings.ADMINS`.

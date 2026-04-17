@@ -6,6 +6,7 @@ from socialhome.content.search_indexes import TagIndex
 from socialhome.users.search_indexes import ProfileIndex
 from socialhome.search.utils import get_single_object
 
+
 class ProfileSearchSerializer(HaystackSerializer):
     class Meta:
         index_classes = [ProfileIndex, TagIndex]
