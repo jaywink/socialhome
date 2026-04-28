@@ -45,7 +45,7 @@ urlpatterns = [
     # Streams
     re_path(r"^streams/", include("socialhome.streams.urls.views", namespace="streams")),
 
-    re_path(r"^$", HomeView.as_view(), name="home"),
+    re_path(r"^$", ActivitypubObjectView.as_view(), name="home"),
 
     # User management
     re_path(r"", include("socialhome.users.urls", namespace="users")),
