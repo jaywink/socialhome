@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import List
 
+from asgiref.sync import async_to_sync
 import django_rq
 from Crypto import Random
 from Crypto.PublicKey import RSA
@@ -50,7 +51,7 @@ def update_profile_from_fed(profile_id):
         logger.warning('update_profile - profile id %s not found', profile_id)
         return
 
-    remote_profile = retrieve_remote_profile(profile.fid if profile.fid else profile.handle)
+    remote_profile = async_to_sync(retrieve_remote_profile)(profile.fid if profile.fid else profile.handle)
     if remote_profile:
         Profile.from_remote_profile(remote_profile, force=True)
         profile.refresh_from_db()
