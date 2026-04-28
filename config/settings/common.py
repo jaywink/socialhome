@@ -144,9 +144,10 @@ DATABASES = {
         default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome",
     ),
 }
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # When using ASGI, persistent connections should be disabled.
 DATABASES["default"]["CONN_MAX_AGE"] = 0
+DATABASES["default"]["OPTIONS"] = {"pool": True}
+#DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -380,6 +381,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
+HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
     "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
