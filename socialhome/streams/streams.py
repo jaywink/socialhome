@@ -81,10 +81,13 @@ def add_to_streams_for_users(content_id, through_id, acting_profile_id):
             counter += 1
             check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
                                   through.content_type == ContentType.SHARE)
-        logger.info(
-            "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
-            stream_cls.__name__, counter, len(cache_keys),
-        )
+        stream_name = stream_cls.__name__.replace('Stream','').lower()
+        num_keys = len([x for x in cache_keys if stream_name+':' in x])
+        if counter and num_keys:
+            logger.info(
+                "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
+                stream_cls.__name__, counter, num_keys,
+            )
     add_to_redis(content, through, cache_keys)
     notify_listeners(content, notify_keys)
 
