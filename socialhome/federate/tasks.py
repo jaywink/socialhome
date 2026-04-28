@@ -3,8 +3,10 @@ import logging
 from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
+from asgiref.sync import async_to_sync
 import django_rq
 from django.conf import settings
+from django.db import transaction
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
 from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
@@ -30,6 +32,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("socialhome")
 
 
+@transaction.atomic
 def receive_task(request, uuid=None):
     # type: (RequestType, Optional[str]) -> None
     """Process received payload."""
@@ -41,7 +44,7 @@ def receive_task(request, uuid=None):
             logger.warning("No local profile found with uuid")
             return
     try:
-        sender, protocol_name, entities = handle_receive(
+        sender, protocol_name, entities = async_to_sync(handle_receive)(
             request, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
         )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
@@ -77,7 +80,7 @@ def send_content(content_id, activity_fid, recipient_id=None):
     Handle sending a Content object out via the federation layer.
     """
     try:
-        content = Content.objects.get(
+        content = Content.objects.select_related('author').get(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.CONTENT,
@@ -111,7 +114,7 @@ def send_content(content_id, activity_fid, recipient_id=None):
             recipients.extend(_get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
+        async_to_sync(handle_send)(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
         logger.warning("send_content - No entity for %s", content)
 
@@ -163,7 +166,7 @@ def send_reply(content_id, activity_fid):
     Handle sending a Content object that is a reply out via the federation layer.
     """
     try:
-        content = Content.objects.get(
+        content = Content.objects.select_related('author', 'parent', 'root_parent').get(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.REPLY,
@@ -199,7 +202,7 @@ def send_reply(content_id, activity_fid):
         logger.debug("send_reply - no remote recipients for content: %s", content.id)
         return
     logger.debug("send_reply - sending to recipients: %s", recipients)
-    handle_send(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=get_outbound_payload_logger())
+    async_to_sync(handle_send)(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=get_outbound_payload_logger())
 
 
 def send_share(content_id, activity_fid):
@@ -208,7 +211,7 @@ def send_share(content_id, activity_fid):
     Currently we only deliver public shares.
     """
     try:
-        content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
+        content = Content.objects.select_related('author', 'share_of__author').get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
                                       local=True)
     except Content.DoesNotExist:
         logger.warning("No local share found with id %s", content_id)
@@ -224,7 +227,7 @@ def send_share(content_id, activity_fid):
             # Send to original author
             recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
-        handle_send(entity, content.author.federable, recipients,
+        async_to_sync(handle_send)(entity, content.author.federable, recipients,
                     content.share_of.author.protocols if content.share_of.content_type == 'content' else [ProtocolType.ACTIVITYPUB],
                     payload_logger=get_outbound_payload_logger())
         target_content = content.share_of
@@ -267,7 +270,7 @@ def send_content_retraction(content, author_id):
         # Queue to the background since sending could take a while
         queue = django_rq.get_queue("high")
         queue.enqueue(
-            handle_send, entity, author.federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger(),
+            async_to_sync(handle_send), entity, author.federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger(),
             job_timeout=10000,
         )
     else:
@@ -292,7 +295,7 @@ def send_profile_retraction(profile):
             return
         recipients = _get_remote_followers(profile, profile.visibility)
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
-        handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
+        async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
@@ -331,7 +334,7 @@ def forward_entity(entity, target_content_id):
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
-    handle_send(
+    async_to_sync(handle_send)(
         entity, content.author.federable, recipients, content.author.protocols, parent_user=target_content.author.federable,
         payload_logger=get_outbound_payload_logger(),
     )
@@ -364,7 +367,7 @@ def send_follow_change(profile_id, followed_id, follow):
     # Explicitly use limited visibility to force private endpoint
     recipients = [remote_profile.get_recipient_for_visibility(Visibility.LIMITED)]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
-    handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
+    async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     # Also trigger a profile send
     if follow: send_profile(profile_id, recipients=recipients)
 
@@ -402,4 +405,4 @@ def send_profile(profile_id, recipients=None):
     if hasattr(entity, 'to'): entity.to = to
 
     logger.debug("send_profile - sending to recipients: %s", recipients)
-    handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
+    async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
