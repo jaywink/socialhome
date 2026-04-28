@@ -3,6 +3,7 @@ import logging
 from typing import Optional, List, Any
 
 import dramatiq
+from asgiref.sync import async_to_sync
 from django.conf import settings
 
 from federation.entities import base
@@ -32,7 +33,7 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     except Profile.DoesNotExist:
         if not fetch: return
         logger.debug("get_profile_for_object - %s was not found, fetching from remote", owner)
-        remote_profile = retrieve_remote_profile(owner)
+        remote_profile = async_to_sync(retrieve_remote_profile)(owner)
         if not remote_profile:
             logger.warning("get_profile_for_object - Remote profile %s not found locally or remotely.", owner)
             return
@@ -172,7 +173,7 @@ def process_entity_comment(entity: Any, profile: Profile):
             "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = retrieve_remote_content(
+        remote_target = async_to_sync(retrieve_remote_content)(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -358,7 +359,7 @@ def process_entity_share(entity, profile):
             "process_entity_share - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = retrieve_remote_content(
+        remote_target = async_to_sync(retrieve_remote_content)(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -414,9 +415,9 @@ def process_entity_share(entity, profile):
 
 
 def process_reply_collection(replies_fid):
-    coll = retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
+    coll = async_to_sync(retrieve_remote_content)(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
     if isinstance(coll, base.Collection):
-        replies = extract_replies(getattr(coll, 'first', []))
+        replies = async_to_sync(extract_replies)(getattr(coll, 'first', []))
         for reply in replies:
             process_reply.send(reply)
             logger.info("process_reply - queued job for entity %s", reply)
@@ -433,7 +434,7 @@ def process_reply(reply):
         if isinstance(reply, base.Comment):
             remote_content = reply
         elif isinstance(reply, str):
-            remote_content = retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
+            remote_content = async_to_sync(retrieve_remote_content)(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
             return
         if remote_content:
@@ -503,7 +504,7 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
             logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)
 
 
-def sender_key_fetcher(fid):
+async def sender_key_fetcher(fid):
     """Return the RSA public key for a fid, if found.
 
     Fetches the key first from a local Profile and if not found, looks for a remote Profile over the network.
@@ -514,7 +515,12 @@ def sender_key_fetcher(fid):
     :rtype: str
     """
     logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
-    profile = get_profile_for_object(fid)
+    try:
+        logger.debug("sender_key_fetcher - looking from local db using %s", fid)
+        profile = await Profile.objects.fed(owner).exclude(rsa_public_key="").aget()
+    except Profile.DoesNotExist:
+        logger.debug("sender_key_fetcher - %s was not found, fetching from remote", fid)
+        profile = await retrieve_remote_profile(fid)
     if not profile:
         return
     return profile.rsa_public_key
