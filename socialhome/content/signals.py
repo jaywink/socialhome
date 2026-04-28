@@ -21,7 +21,6 @@ logger = logging.getLogger("socialhome")
 @receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
     fetch_preview(instance)
-    render_content(instance)
     created = kwargs.get("created")
     if created:
         # Trigger send_reply_notifications only if root parent is local or it has had local replies
@@ -31,6 +30,7 @@ def content_post_save(instance, **kwargs):
             transaction.on_commit(lambda: send_reply_notifications.send(instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
             transaction.on_commit(lambda: send_share_notification.send(instance.id))
+    transaction.on_commit(lambda: render_content(instance))
     transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
@@ -77,7 +77,6 @@ def on_commit_mentioned(action, pks, instance):
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
             profile = Profile.objects.values('user_id').get(id=id)
             send_mention_notification.send(profile['user_id'], instance.author.id, instance.id)
-    if action == "post_add": render_content(instance)
 
 
 @receiver(m2m_changed, sender=Content.mentions.through)
