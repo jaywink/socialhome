@@ -18,6 +18,7 @@ django-enumfields
 django-environ
 django-extensions
 django-floppyforms
+# needed until the migrations are squashed
 django-fsm
 django-haystack
 django-js-reverse
@@ -33,7 +34,7 @@ django-secure
 django-settings-export
 django-silk
 django-versatileimagefield
-django<5
+django<6
 djangorestframework
 dramatiq[redis]
 drf-haystack
