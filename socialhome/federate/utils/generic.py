@@ -4,6 +4,7 @@ import pickle
 import re
 from typing import Union, Dict, Optional
 
+from asgiref.sync import sync_to_async
 import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -36,7 +37,7 @@ def get_matrix_config() -> Optional[Dict]:
         }
 
 
-def get_nodeinfo2_data():
+async def get_nodeinfo2_data():
     """
     Return data set for a NodeInfo2 document.
     """
@@ -56,13 +57,13 @@ def get_nodeinfo2_data():
     if settings.SOCIALHOME_STATISTICS:
         data.update({"usage": {
             "users": {
-                "total": User.objects.count(),
-                "activeHalfyear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
-                "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
-                "activeWeek": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=7)).count(),
+                "total": await User.objects.acount(),
+                "activeHalfyear": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).acount(),
+                "activeMonth": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).acount(),
+                "activeWeek": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=7)).acount(),
             },
-            "localPosts": Content.objects.filter(author__user__isnull=False, content_type=ContentType.CONTENT).count(),
-            "localComments": Content.objects.filter(author__user__isnull=False, content_type=ContentType.REPLY).count(),
+            "localPosts": await Content.objects.filter(author__user__isnull=False, content_type=ContentType.CONTENT).acount(),
+            "localComments": await Content.objects.filter(author__user__isnull=False, content_type=ContentType.REPLY).acount(),
         }})
     if settings.SOCIALHOME_SHOW_ADMINS:
         data.update({"organization": {
@@ -81,11 +82,11 @@ def get_outbound_payload_logger() -> Optional[callable]:
         return outbound_payload_logger
 
 
-def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: str) -> None:
+async def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: str) -> None:
     """
     Log an outbound payload.
     """
-    Payload.objects.create(
+    Payload.objects.acreate(
         body=str(payload),
         direction="outbound",
         entities_found=1,
