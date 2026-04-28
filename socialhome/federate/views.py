@@ -1,12 +1,13 @@
 import datetime
 import logging
 
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.http.response import Http404, JsonResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import aget_object_or_404, get_object_or_404
 from django.utils.timezone import now
 from django.views.generic import View
 
@@ -33,7 +34,7 @@ def host_meta_view(request):
     return HttpResponse(host_meta, content_type="application/xrd+xml")
 
 
-def webfinger_view(request):
+async def webfinger_view(request):
     """Generate a webfinger document."""
     q = request.GET.get("q")
     if not q:
@@ -41,7 +42,10 @@ def webfinger_view(request):
     username = q.split("@")[0]
     if username.startswith("acct:"):
         username = username.replace("acct:", "", 1)
-    user = get_object_or_404(User, username=username)
+    try:
+        user = await User.objects.select_related('profile').aget(username=username)
+    except:
+        raise Http404()
     # Create webfinger document
     webfinger = generate_legacy_webfinger(
         "diaspora",
@@ -53,13 +57,13 @@ def webfinger_view(request):
     return HttpResponse(webfinger, content_type="application/xrd+xml")
 
 
-def hcard_view(request, uuid):
+async def hcard_view(request, uuid):
     """Generate a hcard document.
 
     For local users only.
     """
     try:
-        profile = get_object_or_404(Profile, uuid=uuid, user__isnull=False)
+        profile = await Profile.objects.select_related('user').aget(uuid=uuid, user__isnull=False)
     except (ValueError, ValidationError):
         raise Http404()
     hcard = generate_hcard(
@@ -117,11 +121,11 @@ def content_xml_view(request, uuid):
     """
     content = get_object_or_404(Content, uuid=uuid, visibility=Visibility.PUBLIC, local=True)
     entity = make_federable_content(content)
-    xml = get_full_xml_representation(entity, content.author.private_key)
+    xml = async_to_sync(get_full_xml_representation)(entity, content.author.private_key)
     return HttpResponse(xml, content_type="application/xml")
 
 
-def content_fetch_view(request, objtype, guid):
+async def content_fetch_view(request, objtype, guid):
     """Diaspora content fetch view.
 
     Returns the signed payload for the public content. Non-public content will return 404.
@@ -135,7 +139,13 @@ def content_fetch_view(request, objtype, guid):
     """
     if objtype not in ["status_message", "post", "reshare", "comment"]:
         raise Http404()
-    content = get_object_or_404(Content, guid=guid, visibility=Visibility.PUBLIC)
+    try:
+        qs = Content.objects.select_related('author__user')
+        if objtype == "reshare": qs = qs.select_related("share_of__author__user")
+        if objtype == "comment": qs = qs.select_related("root_parent__author__user", "parent__author__user")
+        content = await qs.aget(guid=guid, visibility=Visibility.PUBLIC)
+    except:
+        raise Http404()
     if not content.local:
         if content.author.handle is None:
             raise Http404()
@@ -144,8 +154,8 @@ def content_fetch_view(request, objtype, guid):
         )
         return HttpResponseRedirect(url)
     try:
-        entity = make_federable_content(content)
-        message = get_full_xml_representation(entity, content.author.private_key)
+        entity = await sync_to_async(make_federable_content)(content)
+        message = await get_full_xml_representation(entity, content.author.private_key)
         document = MagicEnvelope(
             message=message, private_key=content.author.private_key, author_handle=content.author.handle
         )
