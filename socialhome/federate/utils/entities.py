@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 import logging
 import re
 from typing import Optional, Union, List, Dict, Tuple
@@ -82,7 +83,7 @@ def _make_share(content: Content) -> Optional[base.Share]:
         logger.exception("_make_share - Failed to convert %s: %s", content.fid, ex)
 
 
-def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[BaseEntity]:
+async def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[BaseEntity]:
     """
     Retrieve local object and return it as a federable version.
 
@@ -93,30 +94,30 @@ def get_federable_object(request: HttpRequest, signer: str = None) -> Optional[B
     object_id = request.build_absolute_uri()
     user = getattr(request, 'user', AnonymousUser())
     if request.path.startswith('/content/'):
-        content = Content.objects.filter(fid=object_id).first()
+        content = await Content.objects.filter(fid=object_id).select_related('author__user').afirst()
         if not content: # try with the content id
             try:
                 content_id = int(request.path.split('/')[2])
-                content = Content.objects.filter(id=content_id).first()
+                content = await Content.objects.filter(id=content_id).select_related('author__user').afirst()
             except ValueError:
                 pass
         if content and content.author.is_local and (
                 content.visible_for_user(user) or content.visible_for_fed_user(signer)):
-            federable_content = make_federable_content(content)
+            federable_content = await sync_to_async(make_federable_content)(content)
             return federable_content
     elif request.path.startswith('/u/') or request.path == '/':
         if settings.SOCIALHOME_ROOT_PROFILE and object_id.rstrip('/') == settings.SOCIALHOME_URL.rstrip('/'):
-            profile = Profile.objects.get(user__username=settings.SOCIALHOME_ROOT_PROFILE)
+            profile = await Profile.objects.select_related("user").aget(user__username=settings.SOCIALHOME_ROOT_PROFILE)
         else:
-            profile = Profile.objects.filter(fid__iexact=object_id).first()
+            profile = await Profile.objects.filter(fid__iexact=object_id).select_related('user').afirst()
         if profile and profile.visible_to_user(user):
             federable_profile = make_federable_profile(profile)
             return federable_profile
         else:
-            return _make_federable_collection(object_id, request.path, user)
+            return await _make_federable_collection(object_id, request.path, user)
 
 
-def _make_federable_collection(fid, path, user):
+async def _make_federable_collection(fid, path, user):
     """
     WIP: Provide a response for some AP collection requests
     Should this be done using views?
@@ -131,14 +132,14 @@ def _make_federable_collection(fid, path, user):
     else:
         return None
 
-    profile = Profile.objects.filter(fid__iexact=fid).first()
+    profile = await Profile.objects.filter(fid__iexact=fid).select_related("user").afirst()
     if profile and profile.is_local and profile.visible_to_user(user):
         if coll in ('followers', 'following'):
             # return item count only until pages are implemented
             return base.Collection(
                 id = profile.fid+coll+'/',
                 #items = list(getattr(profile,coll).filter(fid__isnull=False).values_list('fid',flat=True)),
-                total_items = getattr(profile,coll).filter(fid__isnull=False).count(),
+                total_items = await getattr(profile,coll).filter(fid__isnull=False).acount(),
                 ordered = True,
                 )
         elif coll in ('outbox', 'featured'):
@@ -146,13 +147,13 @@ def _make_federable_collection(fid, path, user):
             return None
 
 
-def get_profile(**kwargs) -> base.Profile:
+async def get_profile(**kwargs) -> base.Profile:
     """
     Get federable profile from local profile
     """
     from socialhome.users.models import Profile  # Circulars
     kwargs.pop('request', None)
-    profile = Profile.objects.select_related('user').get(Q(**kwargs, _connector=Q.OR))
+    profile = await Profile.objects.select_related('user').aget(Q(**kwargs, _connector=Q.OR))
     return make_federable_profile(profile)
 
 
@@ -163,7 +164,7 @@ def get_receivers_for_content(content: Content) -> Tuple:
     to = []
     cc = []
 
-    mentions = content.mentions.filter(fid__isnull=False).values_list("fid", flat=True)
+    mentions = [mention for mention in content.mentions.filter(fid__isnull=False).values_list("fid", flat=True).all()]
     followers = content.author.fid + 'followers/'
 
     if content.content_type == ContentType.SHARE:
@@ -171,9 +172,9 @@ def get_receivers_for_content(content: Content) -> Tuple:
         cc = [content.share_of.author.fid, followers]
     elif content.visibility == Visibility.PUBLIC:
         to = [NAMESPACE_PUBLIC]
-        cc = list(mentions) + [followers]
+        cc = mentions + [followers]
     elif content.visibility == Visibility.LIMITED:
-        to = list(mentions)
+        to = mentions
         if content.include_following:
             if to: cc = [followers]
             else: to = [followers]
@@ -202,14 +203,14 @@ def get_profiles_from_receivers(receivers: List[UserType]) -> List[Profile]:
     return Profile.objects.filter(id__in=profile_ids)
 
 
-def get_user_private_key(identifier: str) -> Optional[RsaKey]:
+async def get_user_private_key(identifier: str) -> Optional[RsaKey]:
     """
     Get a local user private key by identifier (fid, handle or guid).
     """
     if not identifier: return
     from socialhome.users.models import Profile  # Circulars
     try:
-        profile = Profile.objects.only('rsa_private_key').fed(identifier).get()
+        profile = await Profile.objects.only('rsa_private_key').fed(identifier).aget()
     except Profile.DoesNotExist:
         logger.error('get_user_private_key - no profile for %s' % identifier)
         return
