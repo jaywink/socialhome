@@ -49,6 +49,7 @@ urlpatterns = [
 
     # User management
     re_path(r"", include("socialhome.users.urls", namespace="users")),
+    re_path(r"^accounts/", include("allauth.urls")),
     re_path(r"^api/allauth/", include("allauth.headless.urls")),
 
     # Content
