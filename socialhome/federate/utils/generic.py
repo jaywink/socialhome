@@ -86,7 +86,7 @@ async def outbound_payload_logger(payload: Union[str, Dict], protocol: str, send
     """
     Log an outbound payload.
     """
-    Payload.objects.acreate(
+    await Payload.objects.acreate(
         body=str(payload),
         direction="outbound",
         entities_found=1,
