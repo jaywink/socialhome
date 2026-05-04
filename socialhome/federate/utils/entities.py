@@ -9,6 +9,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.models.query_utils import Q
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
+from memoize_compat import memoize
+
 from federation.entities import base
 from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
 from federation.entities.mixins import BaseEntity
@@ -273,6 +275,7 @@ def make_federable_retraction(obj: Union[Content, Profile], author: Optional[Pro
         logger.exception("make_federable_retraction - Failed to convert %s: %s", obj.fid, ex)
 
 
+@memoize(timeout=300)
 def make_federable_profile(profile: Profile) -> Optional[base.Profile]:
     """Make a federable profile."""
     logger.info("make_federable_profile - Profile: %s", profile)
