@@ -503,7 +503,7 @@ async def sender_key_fetcher(fid):
     logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
     try:
         logger.debug("sender_key_fetcher - looking from local db using %s", fid)
-        profile = await Profile.objects.fed(owner).exclude(rsa_public_key="").aget()
+        profile = await Profile.objects.fed(fid).exclude(rsa_public_key="").aget()
     except Profile.DoesNotExist:
         logger.debug("sender_key_fetcher - %s was not found, fetching from remote", fid)
         profile = await retrieve_remote_profile(fid)
