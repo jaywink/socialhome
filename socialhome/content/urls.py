@@ -1,7 +1,6 @@
 from django.urls import re_path
 
 from federation.entities.activitypub.django.views import ActivitypubObjectView
-from socialhome.content import views
 
 app_name = 'content'
 
