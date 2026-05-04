@@ -1,5 +1,6 @@
 import django_rq
 import logging
+
 from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed, post_delete, pre_delete
@@ -29,8 +30,9 @@ def user_post_save(sender, **kwargs):
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()
 
+    else:
         # If users require approval, email the admin
-        if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
+        if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL and user.admin_approved == False and "email" in kwargs.get('update_fields', set()):
             queue = django_rq.get_queue("high")
             transaction.on_commit(lambda: queue.enqueue(send_account_approval_admin_notification, user_id=user.id))
     # Initialize and copy pictures to profile
