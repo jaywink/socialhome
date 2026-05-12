@@ -316,6 +316,7 @@ DRAMATIQ_BROKER = {
         "url": REDIS_URL,
     },
     "MIDDLEWARE": [
+        "socialhome.tasks.middleware.QueueOnceMiddleware",
         "dramatiq.middleware.AgeLimit",
         "dramatiq.middleware.AsyncIO",
         "dramatiq.middleware.TimeLimit",

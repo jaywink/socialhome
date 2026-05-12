@@ -86,11 +86,7 @@ def update_profile(profile, force=False):
         profile.fid and not (profile.key_id or profile.followers_fid),
         datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 
-        job_id = f'update_profile_{profile.id}'
-        if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
-            logger.warning("update_profile - job found for profile %s, skipping", profile)
-            return
-        if update_profile_from_fed.send(profile.id):
+        if update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id)):
             logger.info("update_profile - queued profile update job for profile %s", profile)
         else:
             logger.warning("update_profile - failed to queue profile update job for profile %s", profile)
