@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List
 
+import dramatiq
 from django.conf import settings
 from django.utils.timezone import now
 
@@ -128,3 +129,13 @@ def streams_tasks(scheduler):
         interval=60*60*3,  # every 3 hours
         timeout=60*60*2,  # 2 hours
     )
+
+
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM)
+def add_to_streams_for_users(content_id, through_id, acting_profile_id):
+    """
+    FIXME: Once RQ is removed, move the called function code here.
+    It needs to live where it is until RQ queues are processed.
+    """
+    from socialhome.streams import streams
+    streams.add_to_streams_for_users(content_id, through_id, acting_profile_id)

@@ -2,12 +2,13 @@ import logging
 from datetime import datetime
 from typing import List
 
-import dramatiq
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
 from federation.protocols.enums import ProtocolType
+
+from socialhome.users.tasks import federation
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -38,7 +39,6 @@ def get_recently_active_user_ids() -> List[int]:
     return [int(key.decode("utf-8").rsplit(":", 1)[1]) for key in keys]
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
 def update_profile_from_fed(profile_id):
     from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
@@ -86,7 +86,7 @@ def update_profile(profile, force=False):
         profile.fid and not (profile.key_id or profile.followers_fid),
         datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
 
-        if update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id)):
+        if federation.update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id)):
             logger.info("update_profile - queued profile update job for profile %s", profile)
         else:
             logger.warning("update_profile - failed to queue profile update job for profile %s", profile)

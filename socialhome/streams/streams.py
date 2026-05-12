@@ -3,7 +3,6 @@ import logging
 import time
 from typing import List, Tuple, Dict
 
-import dramatiq
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Case, When, Q
@@ -12,6 +11,7 @@ from django.utils.timezone import now
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
+from socialhome.streams import tasks
 from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
 from socialhome.users.models import User, Profile
@@ -48,7 +48,6 @@ def add_to_redis(content, through, keys):
             r.expire(throughs_key, settings.REDIS_DEFAULT_EXPIRY)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM)
 def add_to_streams_for_users(content_id, through_id, acting_profile_id):
     """Add content to all user streams of one type and do notification of streams.
 
@@ -172,7 +171,7 @@ def update_streams_with_content(content, event='new'):
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys, event)
     # Queue rest to task runner
-    add_to_streams_for_users.send(content.id, through.id, acting_profile.id)
+    tasks.add_to_streams_for_users.send(content.id, through.id, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
         # Content reply
