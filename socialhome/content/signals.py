@@ -1,6 +1,5 @@
 import logging
 
-import django_rq
 from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed, pre_delete, post_delete
 from django.dispatch import receiver
@@ -25,14 +24,13 @@ def content_post_save(instance, **kwargs):
     render_content(instance)
     created = kwargs.get("created")
     if created:
-        queue = django_rq.get_queue("lowest")
         # Trigger send_reply_notifications only if root parent is local or it has had local replies
         if instance.content_type == ContentType.REPLY and (
             instance.root_parent.local or instance.root_parent.has_had_local_replies
         ):
-            transaction.on_commit(lambda: queue.enqueue(send_reply_notifications, instance.id))
+            transaction.on_commit(lambda: send_reply_notifications.send(instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
-            transaction.on_commit(lambda: queue.enqueue(send_share_notification, instance.id))
+            transaction.on_commit(lambda: send_share_notification(instance.id))
     transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
@@ -77,9 +75,8 @@ def on_commit_mentioned(action, pks, instance):
     for id in pks:
         # Send out notification only if local mentioned
         if action == "post_add" and Profile.objects.filter(id=id, user__isnull=False).exists():
-            queue = django_rq.get_queue("high")
             profile = Profile.objects.values('user_id').get(id=id)
-            queue.enqueue(send_mention_notification, profile['user_id'], instance.author.id, instance.id)
+            send_mention_notification.send(profile['user_id'], instance.author.id, instance.id)
     if action == "post_add": render_content(instance)
 
 
@@ -138,15 +135,14 @@ def federate_content(content: Content, recipient: Profile = None, activity: Acti
     # TODO also use activity type for federating?
     """
     recipient_id = recipient.id if recipient else None
-    queue = django_rq.get_queue("highest")
     try:
         if content.content_type == ContentType.REPLY:
-            queue.enqueue(send_reply, content.id, activity.fid)
+            send_reply.send(content.id, activity.fid)
         elif content.content_type == ContentType.SHARE:
-            queue.enqueue(send_share, content.id, activity.fid)
+            send_share.send(content.id, activity.fid)
         else:
             if content.visibility == Visibility.LIMITED and not recipient_id:
                 return
-            queue.enqueue(send_content, content.id, activity.fid, recipient_id=recipient_id)
+            send_content.send(content.id, activity.fid, recipient_id=recipient_id)
     except Exception as ex:
         logger.exception("Failed to federate_content %s: %s", content, ex)

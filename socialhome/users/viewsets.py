@@ -1,7 +1,5 @@
 from typing import Any
 
-import django_rq
-from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status
@@ -83,7 +81,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
     @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
     def create_export(self, request, pk=None):
-        django_rq.enqueue(create_user_export, request.user.id, job_timeout=1200)
+        create_user_export.send(request.user.id)
         return Response({"status": "Data export job queued."})
 
     @action(detail=True, methods=["post"])

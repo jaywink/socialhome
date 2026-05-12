@@ -4,6 +4,7 @@ from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
 import django_rq
+import dramatiq
 from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("socialhome")
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def receive_task(request, uuid=None):
     # type: (RequestType, Optional[str]) -> None
     """Process received payload."""
@@ -72,6 +74,7 @@ def receive_task(request, uuid=None):
     process_entities(entities)
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
 def send_content(content_id, activity_fid, recipient_id=None):
     """
     Handle sending a Content object out via the federation layer.
@@ -158,6 +161,7 @@ def _get_limited_recipients(sender: str, content: Content) -> List:
     return profiles
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
 def send_reply(content_id, activity_fid):
     """
     Handle sending a Content object that is a reply out via the federation layer.
@@ -202,6 +206,7 @@ def send_reply(content_id, activity_fid):
     handle_send(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=get_outbound_payload_logger())
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
 def send_share(content_id, activity_fid):
     """Handle sending a share of a Content object to the federation layer.
 
@@ -240,6 +245,11 @@ def send_share(content_id, activity_fid):
         logger.warning("send_share - No entity for %s", content)
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
+def _send_content_retraction_task(entity, federable, recipients, target_protocols):
+    handle_send(entity, federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger())
+
+
 def send_content_retraction(content, author_id):
     """
     Handle sending of retractions for content.
@@ -265,11 +275,7 @@ def send_content_retraction(content, author_id):
 
         logger.debug("send_content_retraction - sending to recipients: %s", recipients)
         # Queue to the background since sending could take a while
-        queue = django_rq.get_queue("high")
-        queue.enqueue(
-            handle_send, entity, author.federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger(),
-            job_timeout=10000,
-        )
+        _send_content_retraction_task.send(entity, author.federable, recipients, target_protocols,)
     else:
         logger.warning("send_content_retraction - No retraction entity for %s", content)
 
@@ -297,6 +303,7 @@ def send_profile_retraction(profile):
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def forward_entity(entity, target_content_id):
     """Handle forwarding of an entity related to a target content.
 
@@ -337,6 +344,7 @@ def forward_entity(entity, target_content_id):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def send_follow_change(profile_id, followed_id, follow):
     """Handle sending of a local follow of a remote profile."""
     try:
@@ -369,6 +377,7 @@ def send_follow_change(profile_id, followed_id, follow):
     if follow: send_profile(profile_id, recipients=recipients)
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
 

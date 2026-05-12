@@ -5,7 +5,6 @@ import time
 from typing import Dict, Optional
 from uuid import uuid4
 
-import django_rq
 # noinspection PyPackageRequirements
 from bs4 import BeautifulSoup
 from commonmark import commonmark
@@ -161,7 +160,7 @@ class User(AbstractUser):
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL and self.admin_approved is True and \
                 self._previous_admin_approved is False:
             from socialhome.notifications.tasks import send_account_approval_user_notification
-            django_rq.enqueue(send_account_approval_user_notification, user_id=self.id)
+            send_account_approval_user_notification.send(user_id=self.id)
 
 
 # noinspection PyCallingNonCallable

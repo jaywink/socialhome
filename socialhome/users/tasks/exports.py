@@ -3,10 +3,9 @@ import json
 import os
 import zipfile
 
-import django_rq
+import dramatiq
 from django.conf import settings
 from django.test import RequestFactory
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -18,6 +17,7 @@ from socialhome.users.models import User
 from socialhome.users.serializers import ProfileSerializer, UserSerializer, LimitedProfileSerializer
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM, time_limit=1200000)
 def create_user_export(user_id):
     user = User.objects.get(id=user_id)
     exporter = UserExporter(user=user)
@@ -113,7 +113,7 @@ class UserExporter:
         return path
 
     def notify(self):
-        django_rq.enqueue(send_data_export_ready_notification, self.user.id)
+        send_data_export_ready_notification.send(self.user.id)
 
     def retrieve(self):
         if self.file_path:

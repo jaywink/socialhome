@@ -2,7 +2,7 @@ import datetime as dt
 import logging
 from typing import Optional, List, Any
 
-import django_rq
+import dramatiq
 from django.conf import settings
 
 from federation.entities import base
@@ -136,9 +136,7 @@ def process_entity_post(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content: %s", content)
         if content.replies_fid:
-            queue = django_rq.get_queue("low")
-            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=120),
-                    process_replies, content.id):
+            if process_replies.send_with_options(args=(content.id,), delay=120000):
                 logger.info("process_entity_post - queued process_replies job for entity %s", entity.id)
             else:
                 logger.warning("process_entity_post - failed to enqueue process_replies job for entity %s", entity.id)
@@ -243,8 +241,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
-        queue = django_rq.get_queue("high")
-        queue.enqueue(forward_entity, entity, root_parent.id)
+        forward_entity.send(entity, root_parent.id)
 
 
 def _embed_entity_medias_to_post(children, text):
@@ -401,10 +398,8 @@ def process_entity_share(entity, profile):
     if created:
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:
-            queue = django_rq.get_queue('low')
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            if django_rq.get_scheduler(queue=queue).enqueue_in(dt.timedelta(seconds=90),
-                    process_replies, content_id, shared_by_id=content.id):
+            if process_replies.send_with_options(args=(content_id,), kwargs={"shared_by_id": content.id}, delay=90000):
                 logger.info("process_entity_share - queued process_replies job for content id %s", content_id)
             else:
                 logger.warn("process_entity_share - failed to enqueue process_replies job for content id %s", content_id)
@@ -415,8 +410,7 @@ def process_entity_share(entity, profile):
     if target_content.local:
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
-        queue = django_rq.get_queue("high")
-        queue.enqueue(forward_entity, entity, target_content.id)
+        forward_entity.send(entity, target_content.id)
 
 
 def process_reply_collection(replies_fid):
@@ -424,12 +418,13 @@ def process_reply_collection(replies_fid):
     if isinstance(coll, base.Collection):
         replies = extract_replies(getattr(coll, 'first', []))
         for reply in replies:
-            queue = django_rq.get_queue('low')
-            if queue.enqueue(process_reply, reply):
+            if process_reply.send(reply):
                 logger.info("process_reply - queued job for entity %s", reply)
             else:
                 logger.warning("process_reply - failed to queue job for entity %s", reply)
 
+
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
 def process_reply(reply):
     reply_fid = getattr(reply, 'id', reply)
     try:
@@ -456,6 +451,8 @@ def process_reply(reply):
                     "process_reply - reply %s for entity %s could not be processed",
                     remote_content.id, remote_content.target_id)
 
+
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
 def process_replies(root_id, shared_by_id=None, delta=None):
     # Process Activitypub reply collection
     try:
@@ -472,18 +469,14 @@ def process_replies(root_id, shared_by_id=None, delta=None):
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
         return
 
-
-
-
     process_reply_collection(root.replies_fid)
 
     # Using a delta increasing by a factor of two, refresh
-    # the replies up to 5 days after publication
+    # the replies up to 3 days after publication
     if settings.DEBUG: return
-    delta = delta * 2 if delta else dt.timedelta(minutes=15)
-    if delta < dt.timedelta(3):
-        queue = django_rq.get_queue('low')
-        if django_rq.get_scheduler(queue=queue).enqueue_in(delta, process_replies, root_id, shared_by_id, delta):
+    delta = dt.timedelta(microseconds=delta) * 2 if delta else dt.timedelta(minutes=15)
+    if delta < dt.timedelta(days=3):
+        if process_replies.send_with_options(args=(root_id, shared_by_id, delta), delay=delta.microseconds):
             logger.info("process_replies - queued refresh job for entity %s", root.fid)
         else:
             logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)

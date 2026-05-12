@@ -104,6 +104,7 @@ django==4.2.26
     #   django-allauth
     #   django-braces
     #   django-cors-headers
+    #   django-dramatiq
     #   django-dynamic-preferences
     #   django-enum
     #   django-extensions
@@ -129,6 +130,8 @@ django-allauth[headless]==65.13.1
 django-braces==1.17.0
     # via -r requirements/requirements.in
 django-cors-headers==4.9.0
+    # via -r requirements/requirements.in
+django-dramatiq==0.15.0
     # via -r requirements/requirements.in
 django-dynamic-preferences==1.17.0
     # via -r requirements/requirements.in
@@ -180,6 +183,10 @@ djangorestframework==3.15.2
     #   -r requirements/requirements.in
     #   drf-haystack
     #   drf-yasg
+dramatiq[redis]==2.1.0
+    # via
+    #   -r requirements/requirements.in
+    #   django-dramatiq
 drf-haystack==1.9.1
     # via -r requirements/requirements.in
 drf-yasg==1.21.11
@@ -367,6 +374,7 @@ redis==7.1.0
     #   django-redis
     #   django-redisboard
     #   django-rq
+    #   dramatiq
     #   federation
     #   rq
 referencing==0.37.0
