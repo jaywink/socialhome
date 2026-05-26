@@ -8,7 +8,7 @@ from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
 from socialhome.federate.tasks import send_content, send_reply, send_share
-from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
+from socialhome.notifications.tasks import send_reply_notifications, send_share_notification
 from socialhome.streams.streams import update_streams_with_content
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
@@ -21,29 +21,29 @@ class TestContentMentionsChange(SocialhomeTransactionTestCase):
         self.user = UserFactory()
         self.profile = self.user.profile
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
-    def test_adding_mention_triggers_notification(self, mock_queue):
+    @patch("socialhome.content.signals.send_mention_notification", autospec=True)
+    def test_adding_mention_triggers_notification(self, mock_send):
         self.content.mentions.add(self.profile)
-        self.assertEqual(mock_queue.method_calls,
-            [call().enqueue(send_mention_notification, self.user.id, self.content.author.id, self.content.id)]
+        self.assertEqual(mock_send.method_calls,
+            [call.send(self.user.id, self.content.author.id, self.content.id)]
         )
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
-    def test_adding_mention_triggers_notification__only_once(self, mock_queue):
+    @patch("socialhome.content.signals.send_mention_notification", autospec=True)
+    def test_adding_mention_triggers_notification__only_once(self, mock_send):
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
         self.content.mentions.add(self.profile)
-        self.assertEqual(mock_queue.method_calls,
-            [call().enqueue(send_mention_notification, self.user.id, self.content.author.id, self.content.id)]
+        self.assertEqual(mock_send.method_calls,
+            [call.send(self.user.id, self.content.author.id, self.content.id)]
         )
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
-    def test_removing_mention_does_not_trigger_notification(self, mock_queue):
+    @patch("socialhome.content.signals.send_mention_notification", autospec=True)
+    def test_removing_mention_does_not_trigger_notification(self, mock_send):
         self.content.mentions.add(self.profile)
-        mock_queue.reset_mock()
+        mock_send.reset_mock()
         self.content.mentions.remove(self.profile)
-        assert len(mock_queue.method_calls) == 0
+        assert len(mock_send.method_calls) == 0
 
 
 class TestContentPostSave(SocialhomeTransactionTestCase):
