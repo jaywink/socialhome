@@ -58,33 +58,25 @@ class TestContentPostSave(SocialhomeTransactionTestCase):
         content.save()
         mock_update.assert_called_once_with(content, event='update')
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    @patch("socialhome.content.signals.send_reply_notifications", autospec=True)
     def test_send_reply_notifications__calls_for_content_with_local_replies(self, mock_send):
         user = UserFactory()
         content = ContentFactory(author=user.profile)
         mock_send.reset_mock()
         reply = ContentFactory(author=user.profile, parent=content)
         self.assertTrue(reply.local)
-        send_reply_notifications_found = False
-        for name, args, kwargs in mock_send.method_calls:
-            if args == (send_reply_notifications, reply.id):
-                send_reply_notifications_found = True
-        self.assertTrue(send_reply_notifications_found)
+        self.assertEqual(mock_send.method_calls, [call.send(reply.id)])
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    @patch("socialhome.content.signals.send_reply_notifications", autospec=True)
     def test_send_reply_notifications__calls_for_local_content_with_remote_reply(self, mock_send):
         user = UserFactory()
         content = ContentFactory(author=user.profile)
         mock_send.reset_mock()
         reply = ContentFactory(parent=content)
         self.assertFalse(reply.local)
-        send_reply_notifications_found = False
-        for name, args, kwargs in mock_send.method_calls:
-            if args == (send_reply_notifications, reply.id):
-                send_reply_notifications_found = True
-        self.assertTrue(send_reply_notifications_found)
+        self.assertEqual(mock_send.method_calls, [call.send(reply.id)])
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    @patch("socialhome.content.signals.send_reply_notifications", autospec=True)
     def test_send_reply_notifications__calls_for_remote_content_with_local_replies(self, mock_send):
         user = UserFactory()
         content = ContentFactory()
@@ -92,23 +84,15 @@ class TestContentPostSave(SocialhomeTransactionTestCase):
         reply = ContentFactory(author=user.profile, parent=content)
         self.assertFalse(content.local)
         self.assertTrue(reply.local)
-        send_reply_notifications_found = False
-        for name, args, kwargs in mock_send.method_calls:
-            if args == (send_reply_notifications, reply.id):
-                send_reply_notifications_found = True
-        self.assertTrue(send_reply_notifications_found)
+        self.assertEqual(mock_send.method_calls, [call.send(reply.id)])
 
-    @patch("socialhome.content.signals.django_rq.queues.DjangoRQ", autospec=True)
+    @patch("socialhome.content.signals.send_reply_notifications", autospec=True)
     def test_send_reply_notifications__does_not_call_for_remote_content_with_no_local_replies(self, mock_send):
         content = ContentFactory()
         mock_send.reset_mock()
         reply = ContentFactory(parent=content)
         self.assertFalse(reply.local)
-        send_reply_notifications_found = False
-        for name, args, kwargs in mock_send.method_calls:
-            if args == (send_reply_notifications, reply.id):
-                send_reply_notifications_found = True
-        self.assertFalse(send_reply_notifications_found)
+        self.assertEqual(mock_send.method_calls,[])
 
 
 class TestNotifyListeners(SocialhomeTestCase):
