@@ -348,6 +348,12 @@ DRAMATIQ_PRIORITY_MEDIUM = 50
 DRAMATIQ_PRIORITY_HIGH = 25
 DRAMATIQ_PRIORITY_HIGHEST = 0
 
+# Our federation payloads are not compatible with the JSON encoder
+# FIXME: We should aim to move to the JSON encoder, stripping any
+# non-JSON compatible attributes from the entities before pushing
+# into the Dramatiq queue.
+DRAMATIQ_ENCODER = "dramatiq.PickleEncoder"
+
 # Location of root django.contrib.admin URL, use {% url "admin:index" %}
 ADMIN_URL = r"^admin/"
 

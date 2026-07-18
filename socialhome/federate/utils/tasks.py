@@ -476,7 +476,7 @@ def process_replies(root_id, shared_by_id=None, delta=None):
     if settings.DEBUG: return
     delta = dt.timedelta(microseconds=delta) * 2 if delta else dt.timedelta(minutes=15)
     if delta < dt.timedelta(days=3):
-        if process_replies.send_with_options(args=(root_id, shared_by_id, delta), delay=delta.microseconds):
+        if process_replies.send_with_options(args=(root_id, shared_by_id, delta.microseconds), delay=delta.microseconds):
             logger.info("process_replies - queued refresh job for entity %s", root.fid)
         else:
             logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)

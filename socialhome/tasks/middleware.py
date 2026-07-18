@@ -24,7 +24,7 @@ class QueueOnceMiddleware(dramatiq.middleware.Middleware):
         r = get_redis_connection()
         key = self.key(message)
         if r.exists(key):
-            raise dramatiq.errors.SkipMessage(f"Queue already has {message.actor_name} unique ID {message.kwargs.get('queue_once_id')} queued")
+            raise dramatiq.middleware.SkipMessage(f"Queue already has {message.actor_name} unique ID {message.kwargs.get('queue_once_id')} queued")
         r.set(key, message.kwargs.get('queue_once_id'))
         r.expire(key, settings.REDIS_DEFAULT_EXPIRY)
 
