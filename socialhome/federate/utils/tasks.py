@@ -136,7 +136,7 @@ def process_entity_post(entity: Any, profile: Profile):
     if created:
         logger.info("Saved Content: %s", content)
         if content.replies_fid:
-            if process_replies.send_with_options(args=(content.id,), delay=120000):
+            if process_replies.send_with_options(args=(content.id,), kwargs={"queue_once_id": content.id}, delay=120000):
                 logger.info("process_entity_post - queued process_replies job for entity %s", entity.id)
             else:
                 logger.warning("process_entity_post - failed to enqueue process_replies job for entity %s", entity.id)
@@ -399,7 +399,7 @@ def process_entity_share(entity, profile):
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            if process_replies.send_with_options(args=(content_id,), kwargs={"shared_by_id": content.id}, delay=90000):
+            if process_replies.send_with_options(args=(content_id,), kwargs={"shared_by_id": content.id, "queue_once_id": content_id}, delay=90000):
                 logger.info("process_entity_share - queued process_replies job for content id %s", content_id)
             else:
                 logger.warn("process_entity_share - failed to enqueue process_replies job for content id %s", content_id)
@@ -453,7 +453,7 @@ def process_reply(reply):
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_replies(root_id, shared_by_id=None, delta=None):
+def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     # Process Activitypub reply collection
     try:
         root = Content.objects.get(id=root_id)
@@ -476,7 +476,7 @@ def process_replies(root_id, shared_by_id=None, delta=None):
     if settings.DEBUG: return
     delta = dt.timedelta(microseconds=delta) * 2 if delta else dt.timedelta(minutes=15)
     if delta < dt.timedelta(days=3):
-        if process_replies.send_with_options(args=(root_id, shared_by_id, delta.microseconds), delay=delta.microseconds):
+        if process_replies.send_with_options(args=(root_id, shared_by_id, delta.microseconds), kwargs={"queue_once_id": root_id}, delay=delta.microseconds):
             logger.info("process_replies - queued refresh job for entity %s", root.fid)
         else:
             logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)

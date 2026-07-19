@@ -18,7 +18,7 @@ class QueueOnceMiddleware(dramatiq.middleware.Middleware):
     def key(message: Union[dramatiq.MessageProxy, dramatiq.Message]) -> str:
         return f"sh:tasks:queue_once:{message.actor_name}:{message.kwargs.get('queue_once_id')}"
 
-    def before_enqueue(self, broker, message, delay):
+    def before_process_message(self, broker, message):
         if not message.kwargs.get("queue_once_id"):
             return
         r = get_redis_connection()

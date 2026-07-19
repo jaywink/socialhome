@@ -3,7 +3,6 @@ import logging
 from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
-import django_rq
 import dramatiq
 from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
@@ -234,10 +233,9 @@ def send_share(content_id, activity_fid):
                     payload_logger=get_outbound_payload_logger())
         target_content = content.share_of
         if target_content.replies_fid:
-            queue = django_rq.get_queue('low')
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            if django_rq.get_scheduler(queue=queue).enqueue_in(timedelta(seconds=90),
-                    process_replies, content_id, shared_by_id=content.id):
+            if process_replies.send_with_options(args=(content_id,), kwargs={"queue_once_id": content_id, "shared_by_id": content.id},
+                                                 delay=90000):
                 logger.info("send_share - queued process_replies job for content id %s", content_id)
             else:
                 logger.warn("send_share - failed to enqueue process_replies job for content id %s", content_id)
