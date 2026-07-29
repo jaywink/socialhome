@@ -454,6 +454,18 @@ def process_reply(reply):
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
 def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
+    """
+    Process ActivityPub replies from a root content.
+
+    If configured, refetches replies over a set of time.
+
+    :param root_id:
+    :param shared_by_id:
+    :param delta: Previous amount of seconds we waited before refetching replies. Each iteration of fetching
+        the replies will increase the delta, until a configured amount of time has passed.
+    :param kwargs:
+    :return:
+    """
     # Process Activitypub reply collection
     try:
         root = Content.objects.get(id=root_id)
@@ -471,12 +483,23 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
 
     process_reply_collection(root.replies_fid)
 
-    # Using a delta increasing by a factor of two, refresh
-    # the replies up to 3 days after publication
-    if settings.DEBUG: return
-    delta = dt.timedelta(microseconds=delta) * 2 if delta else dt.timedelta(minutes=15)
-    if delta < dt.timedelta(days=3):
-        if process_replies.send_with_options(args=(root_id, shared_by_id, delta.microseconds), kwargs={"queue_once_id": root_id}, delay=delta.microseconds):
+    if settings.DEBUG or not settings.SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED:
+        return
+    # Using a delta increasing by a configured factor, refresh
+    # the replies up to a configured amount of days after publication
+    delta = (
+        dt.timedelta(seconds=delta) * settings.SOCIALHOME_REPLY_COLLECTIONS_DELAY_BY_FACTOR
+        if delta else dt.timedelta(minutes=settings.SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES)
+    )
+    if delta < dt.timedelta(days=settings.SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS):
+        if process_replies.send_with_options(
+                args=(root_id, shared_by_id, delta.total_seconds()),
+                kwargs={
+                    "queue_once_id": root_id,
+                },
+                # Delay is milliseconds
+                delay=delta.total_seconds()*1000,
+        ):
             logger.info("process_replies - queued refresh job for entity %s", root.fid)
         else:
             logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)
