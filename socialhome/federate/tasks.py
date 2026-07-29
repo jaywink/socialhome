@@ -73,10 +73,13 @@ def receive_task(request, uuid=None):
     process_entities(entities)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
 def send_content(content_id, activity_fid, recipient_id=None):
     """
     Handle sending a Content object out via the federation layer.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
     """
     try:
         content = Content.objects.get(
@@ -160,10 +163,13 @@ def _get_limited_recipients(sender: str, content: Content) -> List:
     return profiles
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
 def send_reply(content_id, activity_fid):
     """
     Handle sending a Content object that is a reply out via the federation layer.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
     """
     try:
         content = Content.objects.get(
@@ -205,11 +211,14 @@ def send_reply(content_id, activity_fid):
     handle_send(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=get_outbound_payload_logger())
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
 def send_share(content_id, activity_fid):
     """Handle sending a share of a Content object to the federation layer.
 
-    Currently we only deliver public shares.
+    Currently, we only deliver public shares.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
     """
     try:
         content = Content.objects.get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
@@ -243,8 +252,14 @@ def send_share(content_id, activity_fid):
         logger.warning("send_share - No entity for %s", content)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
 def _send_content_retraction_task(entity, federable, recipients, target_protocols):
+    """
+    Actual federation send part of send_content_retraction.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
+    """
     handle_send(entity, federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger())
 
 
@@ -301,11 +316,14 @@ def send_profile_retraction(profile):
         logger.warning("send_profile_retraction - No retraction entity for %s", profile)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
 def forward_entity(entity, target_content_id):
     """Handle forwarding of an entity related to a target content.
 
     For example: remote replies on local content, remote shares on local content.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
     """
     try:
         target_content = Content.objects.get(
@@ -375,9 +393,12 @@ def send_follow_change(profile_id, followed_id, follow):
     if follow: send_profile(profile_id, recipients=recipients)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
 def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
+
+    Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
+    we do all this in async.
 
     :param profile_id: Profile.id of profile to send
     :param recipients: Optional list of recipients, see `federation.outbound.handle_send` parameters
