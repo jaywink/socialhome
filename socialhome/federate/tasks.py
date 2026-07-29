@@ -243,11 +243,14 @@ def send_share(content_id, activity_fid):
         target_content = content.share_of
         if target_content.replies_fid:
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            if process_replies.send_with_options(args=(content_id,), kwargs={"queue_once_id": content_id, "shared_by_id": content.id},
-                                                 delay=90000):
-                logger.info("send_share - queued process_replies job for content id %s", content_id)
-            else:
-                logger.warn("send_share - failed to enqueue process_replies job for content id %s", content_id)
+            process_replies.send_with_options(
+                args=(content_id,), kwargs={
+                    "queue_once_id": content_id,
+                    "shared_by_id": content.id,
+                },
+                delay=90000,  # 90 seconds
+            )
+            logger.info("send_share - queued process_replies job for content id %s", content_id)
     else:
         logger.warning("send_share - No entity for %s", content)
 
@@ -390,7 +393,8 @@ def send_follow_change(profile_id, followed_id, follow):
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
     handle_send(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     # Also trigger a profile send
-    if follow: send_profile(profile_id, recipients=recipients)
+    if follow:
+        send_profile.send(profile_id, recipients=recipients)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)

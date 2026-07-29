@@ -418,10 +418,8 @@ def process_reply_collection(replies_fid):
     if isinstance(coll, base.Collection):
         replies = extract_replies(getattr(coll, 'first', []))
         for reply in replies:
-            if process_reply.send(reply):
-                logger.info("process_reply - queued job for entity %s", reply)
-            else:
-                logger.warning("process_reply - failed to queue job for entity %s", reply)
+            process_reply.send(reply)
+            logger.info("process_reply - queued job for entity %s", reply)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)

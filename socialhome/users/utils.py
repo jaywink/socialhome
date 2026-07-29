@@ -84,12 +84,10 @@ def update_profile(profile, force=False):
         not profile.remote_url,
         not profile.protocols,
         profile.fid and not (profile.key_id or profile.followers_fid),
-        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
-
-        if federation.update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id)):
-            logger.info("update_profile - queued profile update job for profile %s", profile)
-        else:
-            logger.warning("update_profile - failed to queue profile update job for profile %s", profile)
+        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ),
+    ):
+        federation.update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id))
+        logger.info("update_profile - queued profile update job for profile %s", profile)
 
 
 def update_profiles(contents):
