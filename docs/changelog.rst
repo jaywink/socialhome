@@ -3,13 +3,13 @@
 Changelog
 =========
 
-unreleased
-----------
+0.24.0 (2026-08-01)
+-------------------
 
 Update notes
 ............
 
-* The old frontend has been fully removed from the backend code. Updating to this version
+* **Breaking change!** The old frontend has been fully removed from the backend code. Updating to this version
   will require installing the `new frontend <https://codeberg.org/socialhome/socialhome-ui>`_.
 
 Changed
