@@ -14,7 +14,6 @@ The main application container has the following process controlled by the main 
 
 * Daphne for http and websocket traffic
 * The configured number of Dramatiq processes/threads
-* An RQ scheduler
 
 The backend application container does not serve media and does not include any frontend.
 
