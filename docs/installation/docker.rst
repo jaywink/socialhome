@@ -13,7 +13,7 @@ The backend application
 The main application container has the following process controlled by the main Circus process:
 
 * Daphne for http and websocket traffic
-* The configured number of RQ workers
+* The configured number of Dramatiq processes/threads
 * An RQ scheduler
 
 The backend application container does not serve media and does not include any frontend.
@@ -27,15 +27,6 @@ Currently there are no Docker images for the frontend application. You will need
 the extracted frontend files via your chosen web server.
 
 The frontend packages can be found at https://codeberg.org/socialhome/-/packages/generic/socialhome-ui
-
-Backend memory requirements
-'''''''''''''''''''''''''''
-
-On average the container will require approximately 360mb of RAM plus approx 75mb per RQ
-worker. The default RQ worker count is 1 though on a busy instance you may need many more. The
-amount of RQ workers can be controlled with the environment variable ``RQWORKER_NUM``. The default
-daphne worker count is also 1 and can be controlled with the ``DAPHNE_WORKER_NUM`` environment
-variable.
 
 Routing to the backend
 ''''''''''''''''''''''

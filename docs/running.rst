@@ -264,6 +264,21 @@ DJANGO_TIMEZONE
 
 Default: ``UTC``
 
+DRAMATIQ_NPROCS
+...............
+
+Default: ``<number of vcpus>``
+
+Amount of Dramatiq processes to run for background jobs. Defaults to the number
+of vcpus available.
+
+DRAMATIQ_NTHREADS
+.................
+
+Default: ``8``
+
+Amount of threads in each Dramatiq process.
+
 FEDERATION_USER
 ...............
 
