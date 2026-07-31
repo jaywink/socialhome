@@ -1,3 +1,4 @@
+apscheduler
 arrow
 bleach
 channels[daphne]
@@ -9,6 +10,7 @@ coreapi
 django-allauth[headless]
 django-braces
 django-cors-headers
+django-dramatiq
 django-dynamic-preferences
 django-enum[properties]
 # needed until the migrations are squashed
@@ -33,6 +35,7 @@ django-silk
 django-versatileimagefield
 django<5
 djangorestframework
+dramatiq[redis]
 drf-haystack
 drf-yasg
 federation>=0.27
@@ -47,7 +50,6 @@ pytz
 raven
 redis
 rq
-rq-scheduler
 validators
 whitenoise
 xapian-haystack

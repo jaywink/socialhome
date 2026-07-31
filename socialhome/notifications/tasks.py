@@ -1,6 +1,6 @@
 import logging
 
-import django_rq
+import dramatiq
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
@@ -42,6 +42,7 @@ def get_root_content_participants(content, exclude_user=None):
     return set(author_participant + other_replies + shares + replies_on_shares)
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
 def send_account_approval_admin_notification(user_id: int):
     """
     Send account approval request notification to admin.
@@ -74,6 +75,7 @@ def send_account_approval_admin_notification(user_id: int):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST)
 def send_account_approval_user_notification(user_id: int):
     """
     Send account approval request notification to user after approval.
@@ -99,6 +101,7 @@ def send_account_approval_user_notification(user_id: int):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def send_follow_notification(follower_id, followed_id):
     """Super simple you've been followed notification to a user."""
     if settings.DEBUG:
@@ -131,6 +134,7 @@ def send_follow_notification(follower_id, followed_id):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def send_mention_notification(user_id, mention_profile_id, content_id):
     """Super simple you've been mentioned notification email."""
     if settings.DEBUG:
@@ -170,6 +174,7 @@ def send_mention_notification(user_id, mention_profile_id, content_id):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOWEST)
 def send_reply_notifications(content_id):
     """Super simple reply notification to content local participants.
 
@@ -217,6 +222,7 @@ def send_reply_notifications(content_id):
         )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOWEST)
 def send_share_notification(share_id):
     """Super simple you're content has been shared notification to a user."""
     if settings.DEBUG:
@@ -244,6 +250,7 @@ def send_share_notification(share_id):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
 def send_data_export_ready_notification(user_id):
     """
     Send notification to user that their data export is ready.
@@ -273,6 +280,7 @@ def send_data_export_ready_notification(user_id):
     )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM)
 def send_policy_document_update_notification(user_id, docs):
     """
     Send notification to user that policy documents have updates.
@@ -322,6 +330,6 @@ def send_policy_document_update_notifications(docs):
     users = User.objects.filter(emailaddress__verified=True).distinct()
     for user in users:
         try:
-            django_rq.enqueue(send_policy_document_update_notification, user.id, docs)
+            send_policy_document_update_notification.send(user.id, docs)
         except Exception:
             logger.error("Failed to enqueue policy document update to user %s" % user.id)

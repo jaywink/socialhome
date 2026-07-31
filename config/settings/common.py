@@ -46,6 +46,7 @@ DJANGO_APPS = (
     "django.forms",  # Required by FORM_RENDERER = TemplatesSetting
 )
 THIRD_PARTY_APPS = (
+    "django_dramatiq",
     "daphne",
     "corsheaders",
     "allauth",
@@ -288,6 +289,7 @@ REDIS_PORT = env("REDIS_PORT", default=6379)
 REDIS_DB = env("REDIS_DB", default=0)
 REDIS_PASSWORD = env("REDIS_PASSWORD", default=None)
 REDIS_DEFAULT_EXPIRY = 60*60*24*30
+REDIS_URL = "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 
 # RQ
 # --
@@ -306,6 +308,51 @@ RQ_QUEUES = {
     "lowest": rq_queue_config,
 }
 RQ_SHOW_ADMIN_LINK = True
+
+# Dramatiq
+DRAMATIQ_BROKER = {
+    "BROKER": "dramatiq.brokers.redis.RedisBroker",
+    "OPTIONS": {
+        "url": REDIS_URL,
+    },
+    "MIDDLEWARE": [
+        "socialhome.tasks.middleware.QueueOnceMiddleware",
+        "dramatiq.middleware.AgeLimit",
+        "dramatiq.middleware.AsyncIO",
+        "dramatiq.middleware.TimeLimit",
+        "dramatiq.middleware.Callbacks",
+        "dramatiq.middleware.Retries",
+        "django_dramatiq.middleware.DbConnectionsMiddleware",
+        "django_dramatiq.middleware.AdminMiddleware",
+    ]
+}
+
+DRAMATIQ_RESULT_BACKEND = {
+    "BACKEND": "dramatiq.results.backends.redis.RedisBackend",
+    "BACKEND_OPTIONS": {
+        "url": REDIS_URL,
+    },
+    "MIDDLEWARE_OPTIONS": {
+        "result_ttl": 1000 * 60 * 10
+    }
+}
+
+# Defines which database should be used to persist Task objects when the
+# AdminMiddleware is enabled.  The default value is "default".
+DRAMATIQ_TASKS_DATABASE = "default"
+
+# Our queue priorities
+DRAMATIQ_PRIORITY_LOWEST = 100
+DRAMATIQ_PRIORITY_LOW = 75
+DRAMATIQ_PRIORITY_MEDIUM = 50
+DRAMATIQ_PRIORITY_HIGH = 25
+DRAMATIQ_PRIORITY_HIGHEST = 0
+
+# Our federation payloads are not compatible with the JSON encoder
+# FIXME: We should aim to move to the JSON encoder, stripping any
+# non-JSON compatible attributes from the entities before pushing
+# into the Dramatiq queue.
+DRAMATIQ_ENCODER = "dramatiq.PickleEncoder"
 
 # Location of root django.contrib.admin URL, use {% url "admin:index" %}
 ADMIN_URL = r"^admin/"
@@ -479,6 +526,12 @@ SOCIALHOME_MATRIX_APPSERVICE_DOMAIN_WITH_PORT = f"{SOCIALHOME_MATRIX_HOMESERVER}
 # Valid user name required for get requests signature by federation
 FEDERATION_USER = env("FEDERATION_USER", default=None)
 
+# Reply collection fetching
+SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED = env.bool("SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED", default=True)
+SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS = env.int("SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS", default=3)
+SOCIALHOME_REPLY_COLLECTIONS_DELAY_BY_FACTOR = env.int("SOCIALHOME_REPLY_COLLECTIONS_DELAY_BY_FACTOR", default=2)
+SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES = env.int("SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES", default=15)
+
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
@@ -495,7 +548,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB)
+                REDIS_URL
             ],
         },
     },
@@ -674,6 +727,7 @@ FEDERATION = {
     "nodeinfo2_function": "socialhome.federate.utils.generic.get_nodeinfo2_data",
     "process_payload_function": "socialhome.federate.utils.generic.queue_payload",
     "redis": {"host": REDIS_HOST, "port": REDIS_PORT, "db": REDIS_DB, "password": REDIS_PASSWORD},
+    "redis_uri": REDIS_URL,
     "search_path": "/search/?q=",
     "tags_path": "/streams/tag/:tag:/",
 }

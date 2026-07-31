@@ -14,7 +14,7 @@ from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
     BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_streams_for_users,
     update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream, LocalStream, TagsStream,
-    CACHED_STREAM_CLASSES, ALL_STREAMS)
+    ALL_STREAMS)
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -148,10 +148,10 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
         cls.remote_content = PublicContentFactory()
         cls.share = PublicContentFactory(share_of=cls.content)
 
-    @patch("socialhome.streams.streams.django_rq.queues.DjangoRQ")
+    @patch("socialhome.streams.streams.tasks")
     @patch("socialhome.streams.streams.add_to_redis")
     @patch("socialhome.streams.streams.CACHED_STREAM_CLASSES", new=(FollowedStream, PublicStream))
-    def test_adds_with_local_user(self, mock_add, mock_enqueue):
+    def test_adds_with_local_user(self, mock_add, mock_tasks):
         update_streams_with_content(self.remote_content)
         self.assertFalse(mock_add.called)
         self.user.mark_recently_active()

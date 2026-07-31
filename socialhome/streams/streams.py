@@ -3,7 +3,6 @@ import logging
 import time
 from typing import List, Tuple, Dict
 
-import django_rq
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Case, When, Q
@@ -12,6 +11,7 @@ from django.utils.timezone import now
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
+from socialhome.streams import tasks
 from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
 from socialhome.users.models import User, Profile
@@ -170,8 +170,8 @@ def update_streams_with_content(content, event='new'):
                                   through.content_type == ContentType.SHARE)
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys, event)
-    # Queue rest to RQ
-    django_rq.enqueue(add_to_streams_for_users, content.id, through.id, acting_profile.id)
+    # Queue rest to task runner
+    tasks.add_to_streams_for_users.send(content.id, through.id, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
         # Content reply

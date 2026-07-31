@@ -13,12 +13,29 @@ The backend application
 The main application container has the following process controlled by the main Circus process:
 
 * Daphne for http and websocket traffic
-* The configured number of RQ workers
-* An RQ scheduler
+* The configured number of Dramatiq processes/threads
 
 The backend application container does not serve media and does not include any frontend.
 
 The backend containers can be found at https://codeberg.org/socialhome/-/packages/container/socialhome
+
+Backend memory requirements
+'''''''''''''''''''''''''''
+
+On average the container will require approximately 650mb of base level RAM. Additionally,
+depending on the server and configuration, the following will be required:
+
+* Approximately 500mb per vcpu for Dramatiq job runner processes. This can be limited
+  with the configuration values ``DRAMATIQ_NPROCS`` and ``DRAMATIQ_NTHREADS``. The former
+  controls the amount of Dramatiq processes to run (defaulting to the amount of vcpu on
+  the running server). The latter defined how many threads to run in each process,
+  defaulting to 8.
+* Approximately 320mb per Daphne worker configured (default 1) - you'll need to increase
+  these (controlled by ``DAPHNE_WORKER_NUM`` if the site starts responding slowly to network
+  requests.
+
+For example, a server running on a 4vcpu host, without any additional configuration,
+would require approximately 3GB of RAM available.
 
 The frontend application
 ........................
@@ -27,15 +44,6 @@ Currently there are no Docker images for the frontend application. You will need
 the extracted frontend files via your chosen web server.
 
 The frontend packages can be found at https://codeberg.org/socialhome/-/packages/generic/socialhome-ui
-
-Backend memory requirements
-'''''''''''''''''''''''''''
-
-On average the container will require approximately 360mb of RAM plus approx 75mb per RQ
-worker. The default RQ worker count is 1 though on a busy instance you may need many more. The
-amount of RQ workers can be controlled with the environment variable ``RQWORKER_NUM``. The default
-daphne worker count is also 1 and can be controlled with the ``DAPHNE_WORKER_NUM`` environment
-variable.
 
 Routing to the backend
 ''''''''''''''''''''''

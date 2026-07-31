@@ -4,7 +4,6 @@ import pickle
 import re
 from typing import Union, Dict, Optional
 
-import django_rq
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.http import HttpRequest
@@ -131,8 +130,7 @@ def queue_payload(request: HttpRequest, uuid: str = None):
             if match:
                 uuid = match.groups()[0]
 
-        queue = django_rq.get_queue("high")
-        queue.enqueue(receive_task, _request, uuid=uuid)
+        receive_task.send(_request, uuid=uuid)
         return True
     except Exception:
         logger.exception('Failed to enqueue payload')

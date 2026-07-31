@@ -1,4 +1,3 @@
-import django_rq
 import logging
 from django.conf import settings
 from django.db import transaction
@@ -31,8 +30,7 @@ def user_post_save(sender, **kwargs):
 
         # If users require approval, email the admin
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL:
-            queue = django_rq.get_queue("high")
-            transaction.on_commit(lambda: queue.enqueue(send_account_approval_admin_notification, user_id=user.id))
+            transaction.on_commit(lambda: send_account_approval_admin_notification.send(user_id=user.id))
     # Initialize and copy pictures to profile
     user.init_pictures_on_disk()
     user.copy_picture_to_profile()
@@ -48,14 +46,10 @@ def on_commit_profile_following_change(action, pks, instance):
             instance.create_activity(activity_type, object_id=_id)
         # Send out on the federation layer if local follower, remote followed/unfollowed
         if Profile.objects.filter(id=_id, user__isnull=True).exists() and instance.user:
-            queue = django_rq.get_queue("high")
-            queue.enqueue(
-                send_follow_change, instance.id, _id, True if action == "post_add" else False
-            )
+            send_follow_change.send(instance.id, _id, True if action == "post_add" else False)
         # Send out notification if local followed
         if action == "post_add" and Profile.objects.filter(id=_id, user__isnull=False):
-            queue = django_rq.get_queue("low")
-            queue.enqueue(send_follow_notification, instance.id, _id)
+            send_follow_notification.send(instance.id, _id)
 
 
 @receiver(m2m_changed, sender=Profile.following.through)
@@ -76,8 +70,7 @@ def profile_post_save(instance, **kwargs):
 def federate_profile(profile):
     """Send out local profiles to the federation layer."""
     try:
-        queue = django_rq.get_queue("high")
-        transaction.on_commit(lambda: queue.enqueue(send_profile, profile.id))
+        transaction.on_commit(lambda: send_profile.send(profile.id))
     except Exception as ex:
         logger.exception("Failed to federate profile %s: %s", profile, ex)
 

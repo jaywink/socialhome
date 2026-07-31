@@ -2,17 +2,16 @@ import logging
 from datetime import datetime
 from typing import List
 
-import django_rq
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from django.conf import settings
 
 from federation.protocols.enums import ProtocolType
+
+from socialhome.users.tasks import federation
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
-
-workers = django_rq.workers.get_worker_class().all(connection=get_redis_connection())
 
 
 def generate_rsa_private_key(bits=4096):
@@ -85,16 +84,10 @@ def update_profile(profile, force=False):
         not profile.remote_url,
         not profile.protocols,
         profile.fid and not (profile.key_id or profile.followers_fid),
-        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ)):
-
-        queue = django_rq.get_queue("low")
-        job_id = f'update_profile_{profile.id}'
-        if job_id in queue.job_ids or job_id in [w.get_current_job_id() for w in workers]:
-            logger.warning("update_profile - job found for profile %s, skipping", profile)
-        if queue.enqueue(update_profile_from_fed, profile.id, job_id=job_id):
-            logger.info("update_profile - queued profile update job for profile %s", profile)
-        else:
-            logger.warning("update_profile - failed to queue profile update job for profile %s", profile)
+        datetime.now(tz=profile.modified.tzinfo) - profile.modified > settings.SOCIALHOME_PROFILE_UPDATE_FREQ),
+    ):
+        federation.update_profile_from_fed.send(profile.id, queue_once_id=str(profile.id))
+        logger.info("update_profile - queued profile update job for profile %s", profile)
 
 
 def update_profiles(contents):

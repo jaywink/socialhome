@@ -9,8 +9,8 @@ unreleased
 Update notes
 ............
 
-The old frontend has been fully removed from the backend code. Updating to this version
-will require installing the `new frontend <https://codeberg.org/socialhome/socialhome-ui>`_.
+* The old frontend has been fully removed from the backend code. Updating to this version
+  will require installing the `new frontend <https://codeberg.org/socialhome/socialhome-ui>`_.
 
 Changed
 .......
@@ -19,6 +19,13 @@ Changed
   ``rq:results:*`` and ``fed_cache:*`` keys.
 
 * Disable persistent database connections as per Django documentation when using ASGI.
+
+* This release introduces a new task runner, Dramatiq. The reason for this is that our current
+  RQ task runner doesn't support pure async jobs.
+
+  You should already be running Socialhome using the recommended `docker <https://socialhome.readthedocs.io/en/latest/installation/docker.html#installation-docker>`_
+  installation method. In this case, no actions are required, as for this release both RQ
+  and Dramatiq workers will be run, to ensure any potential left over RQ jobs are completed.
 
 Fixed
 .....

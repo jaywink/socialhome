@@ -119,6 +119,20 @@ if testing:
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
 
+    DRAMATIQ_BROKER = {
+        "BROKER": "dramatiq.brokers.stub.StubBroker",
+        "MIDDLEWARE": [
+            "socialhome.tasks.middleware.QueueOnceMiddleware",
+            "dramatiq.middleware.AgeLimit",
+            "dramatiq.middleware.AsyncIO",
+            "dramatiq.middleware.TimeLimit",
+            "dramatiq.middleware.Callbacks",
+            "dramatiq.middleware.Retries",
+            "django_dramatiq.middleware.DbConnectionsMiddleware",
+            "django_dramatiq.middleware.AdminMiddleware",
+        ],
+    }
+
 # Logging
 LOGGING['loggers']['socialhome']['handlers'].append('console')
 

@@ -16,7 +16,8 @@ WORKDIR /app
 
 COPY requirements/requirements.txt ./
 
-RUN pip install -U pip setuptools pip-tools && \
+# FIXME pip 26.2 broken as per https://github.com/jazzband/pip-tools/issues/2436
+RUN pip install -U 'pip<26.2' setuptools pip-tools && \
     pip-sync requirements.txt
 
 COPY . /app

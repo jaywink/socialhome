@@ -264,6 +264,21 @@ DJANGO_TIMEZONE
 
 Default: ``UTC``
 
+DRAMATIQ_NPROCS
+...............
+
+Default: ``<number of vcpus>``
+
+Amount of Dramatiq processes to run for background jobs. Defaults to the number
+of vcpus available.
+
+DRAMATIQ_NTHREADS
+.................
+
+Default: ``8``
+
+Amount of threads in each Dramatiq process.
+
 FEDERATION_USER
 ...............
 
@@ -393,6 +408,43 @@ SOCIALHOME_NODE_LIST_URL
 Default: ``https://the-federation.info/socialhome``
 
 URL to make signup link go to in the case that signups are closed.
+
+SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED
+............................................
+
+Default: ``True``
+
+Disable or enable periodic refetches of reply collections (ActivityPub only).
+If enabled, reply collections will be refetched over a configured amount of days,
+with a configured increasing factor of delay. This ensures remote replies get
+refreshed to local content even if no local users interact with the root level
+content. On busy instances with lots of incoming ActivityPub content, this can
+be very resource intensive.
+
+See below settings for the defaults.
+
+SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS
+.............................................
+
+Default: ``3``
+
+The amount of days to refetch ActivityPub reply collections for.
+
+SOCIALHOME_REPLY_COLLECTIONS_DELAY_BY_FACTOR
+............................................
+
+Default: ``2``
+
+The delay factor for refetching ActivityPub reply collections. For example,
+a value of ``2`` means the delay is doubled on each iteration.
+
+SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES
+....................................................
+
+Default: ``15``
+
+The default initial delay in minutes when triggering the first ActivityPub reply
+collection refresh.
 
 SOCIALHOME_ROOT_PROFILE
 .......................
