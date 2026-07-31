@@ -67,9 +67,9 @@ class TestUserExporter(SocialhomeTestCase):
         self.assertEqual(contents[1].get('uuid'), str(self.reply.uuid))
         self.assertEqual(contents[2].get('uuid'), str(self.share.uuid))
 
-    @patch("socialhome.users.tasks.exports.django_rq.enqueue", autospec=True)
-    def test_notify(self, mock_enqueue):
+    @patch("socialhome.users.tasks.exports.send_data_export_ready_notification", autospec=True)
+    def test_notify(self, mock_send):
         self.exporter.notify()
-        self.assertEqual(mock_enqueue.call_count, 1)
-        args, kwargs = mock_enqueue.call_args
-        self.assertEqual(args[1], self.user.id)
+        self.assertEqual(mock_send.send.call_count, 1)
+        args, kwargs = mock_send.send.call_args
+        self.assertEqual(args[0], self.user.id)
