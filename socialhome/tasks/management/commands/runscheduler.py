@@ -45,7 +45,7 @@ class Command(BaseCommand):
         # Dummy task
         logger.info("tasks - Scheduling dummy task")
         scheduler.add_job(
-            func=dummy_task,
+            func=dummy_task.send,
             trigger=CronTrigger.from_crontab("*/5 * * * *"),
         )
 
