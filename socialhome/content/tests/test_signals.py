@@ -309,7 +309,7 @@ class TestFederateContent(SocialhomeTransactionTestCase):
         share_of = ContentFactory(author=user2.profile)
         mock_send.reset_mock()
         content = ContentFactory(author=user.profile, share_of=share_of)
-        self.assertEqual(mock_notification.mock_calls, [call(content.id,)])
+        self.assertEqual(mock_notification.mock_calls, [call.send(content.id,)])
         name, args, kwargs = mock_send.method_calls[0]
         self.assertEqual(name, 'send')
         self.assertEqual(args[0], content.id)
