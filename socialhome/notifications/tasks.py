@@ -222,6 +222,7 @@ def send_reply_notifications(content_id):
         )
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOWEST)
 def send_share_notification(share_id):
     """Super simple you're content has been shared notification to a user."""
     if settings.DEBUG:

@@ -30,7 +30,7 @@ def content_post_save(instance, **kwargs):
         ):
             transaction.on_commit(lambda: send_reply_notifications.send(instance.id))
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
-            transaction.on_commit(lambda: send_share_notification(instance.id))
+            transaction.on_commit(lambda: send_share_notification.send(instance.id))
     transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
     if instance.federate and instance.local:
         # Get an activity to be used when federating
