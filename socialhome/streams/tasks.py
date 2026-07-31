@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import List
 
 import dramatiq
@@ -11,6 +11,7 @@ from socialhome.utils import get_redis_connection
 logger = logging.getLogger("socialhome")
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOWEST, time_limit=2*60*60*1000)
 def delete_redis_keys(patterns: List[str], only_without_expiry: bool = True):
     """
     Delete any keys matching pattern. Defaults to only those without expiry.
@@ -75,6 +76,7 @@ def get_precache_trim_size(user_activities, key):
     return size
 
 
+@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOWEST, time_limit=2*60*60*1000)
 def groom_redis_precaches():
     """Groom the Redis data for streams precaching."""
     r = get_redis_connection()
@@ -110,25 +112,6 @@ def groom_redis_precaches():
             r.hdel(throughs_key, *delkeys)
             deleted_throughs += len(delkeys)
     logger.info("groom_redis_precaches - Trimmed %s keys, deleted %s keys and %s related throughs", trimmed, deleted_keys, deleted_throughs)
-
-def streams_tasks(scheduler):
-    # Clean up RQ jobs without expiry
-    logger.info("streams_tasks - Scheduling streams task: delete_redis_keys")
-    scheduler.schedule(
-        scheduled_time=datetime.utcnow(),
-        func=delete_redis_keys,
-        args=[["rq:job:*", "rq:results:*", "fed_cache:*"]],
-        interval=60*60*24,  # every 24 hours
-        timeout=60*60*2,  # 2 hours
-    )
-    # Groom redis precaches
-    logger.info("streams_tasks - Scheduling streams task: groom_redis_precaches")
-    scheduler.schedule(
-        scheduled_time=datetime.utcnow(),
-        func=groom_redis_precaches,
-        interval=60*60*3,  # every 3 hours
-        timeout=60*60*2,  # 2 hours
-    )
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM)

@@ -1,23 +1,13 @@
 from datetime import timedelta
-from unittest.mock import Mock
 
 from django.test.utils import override_settings
 from django.utils.timezone import now
 
-from socialhome.streams.tasks import streams_tasks, groom_redis_precaches, delete_redis_keys
+from socialhome.streams.tasks import groom_redis_precaches
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.models import User
 from socialhome.users.tests.factories import UserFactory
 from socialhome.utils import get_redis_connection
-
-
-def test_streams_tasks():
-    mock_scheduler = Mock()
-    streams_tasks(mock_scheduler)
-    _args, kwargs = mock_scheduler.schedule.call_args_list[0]
-    assert kwargs["func"] == delete_redis_keys
-    _args, kwargs = mock_scheduler.schedule.call_args_list[1]
-    assert kwargs["func"] == groom_redis_precaches
 
 
 @override_settings(

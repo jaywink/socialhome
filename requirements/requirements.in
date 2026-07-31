@@ -1,3 +1,4 @@
+apscheduler
 arrow
 bleach
 channels[daphne]
@@ -49,7 +50,6 @@ pytz
 raven
 redis
 rq
-rq-scheduler
 validators
 whitenoise
 xapian-haystack
