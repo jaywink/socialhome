@@ -19,6 +19,24 @@ The backend application container does not serve media and does not include any 
 
 The backend containers can be found at https://codeberg.org/socialhome/-/packages/container/socialhome
 
+Backend memory requirements
+'''''''''''''''''''''''''''
+
+On average the container will require approximately 650mb of base level RAM. Additionally,
+depending on the server and configuration, the following will be required:
+
+* Approximately 500mb per vcpu for Dramatiq job runner processes. This can be limited
+  with the configuration values ``DRAMATIQ_NPROCS`` and ``DRAMATIQ_NTHREADS``. The former
+  controls the amount of Dramatiq processes to run (defaulting to the amount of vcpu on
+  the running server). The latter defined how many threads to run in each process,
+  defaulting to 8.
+* Approximately 320mb per Daphne worker configured (default 1) - you'll need to increase
+  these (controlled by ``DAPHNE_WORKER_NUM`` if the site starts responding slowly to network
+  requests.
+
+For example, a server running on a 4vcpu host, without any additional configuration,
+would require approximately 3GB of RAM available.
+
 The frontend application
 ........................
 
