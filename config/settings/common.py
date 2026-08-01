@@ -83,8 +83,10 @@ LOCAL_APPS = (
 INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
+PYINSTRUMENT_INSTALLED = env.bool("SOCIALHOME_PYINSTRUMENT", False)
 if testing:
     SILKY_INSTALLED = False
+    PYINSTRUMENT_INSTALLED = False
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -114,6 +116,10 @@ if SILKY_INSTALLED:
     SILKY_INTERCEPT_FUNC = is_silky_request
     INSTALLED_APPS = INSTALLED_APPS + ("silk",)
     MIDDLEWARE = ("silk.middleware.SilkyMiddleware",) + MIDDLEWARE
+
+if PYINSTRUMENT_INSTALLED:
+    PYINSTRUMENT_PROFILE_DIR = 'profiles'
+    MIDDLEWARE = ("pyinstrument.middleware.ProfilerMiddleware",) + MIDDLEWARE
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
