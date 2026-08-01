@@ -5,6 +5,7 @@ from typing import Optional, List, Any
 import dramatiq
 from asgiref.sync import async_to_sync
 from django.conf import settings
+from django.db import transaction
 
 from federation.entities import base
 from federation.entities.activitypub.models import extract_replies
@@ -45,6 +46,7 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     return sender_profile
 
 
+@transaction.atomic
 def process_entities(entities: List):
     """Process a list of entities."""
     for entity in entities:
