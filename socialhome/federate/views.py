@@ -167,15 +167,15 @@ async def content_fetch_view(request, objtype, guid):
 
 class ReceivePublicView(View):
     """Generic federation /receive/public view."""
-    def post(self, request, *args, **kwargs):
-        if queue_payload(request):
+    async def post(self, request, *args, **kwargs):
+        if await queue_payload(request):
             return HttpResponse(status=202)
         return HttpResponseBadRequest()
 
 
 class ReceiveUserView(View):
     """Diaspora /receive/users view."""
-    def post(self, request, *args, **kwargs):
-        if queue_payload(request, uuid=kwargs.get('uuid')):
+    async def post(self, request, *args, **kwargs):
+        if await queue_payload(request, uuid=kwargs.get('uuid')):
             return HttpResponse(status=202)
         return HttpResponseBadRequest()
