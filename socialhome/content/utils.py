@@ -3,6 +3,7 @@ import re
 
 import bleach
 import validators
+from asgiref.sync import async_to_sync
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString
 from commonmark import commonmark
@@ -170,7 +171,7 @@ def linkify_mentions(soup: BeautifulSoup):
         try:
             profile = Profile.objects.get(finger__iexact=mention)
         except Profile.DoesNotExist:
-            remote_profile = retrieve_remote_profile(mention)
+            remote_profile = async_to_sync(retrieve_remote_profile)(mention)
             if not remote_profile:
                 continue
             profile = Profile.from_remote_profile(remote_profile)
@@ -182,7 +183,7 @@ def linkify_mentions(soup: BeautifulSoup):
         try:
             profile = Profile.objects.get(finger__iexact=mention.text.lstrip('@'))
         except Profile.DoesNotExist:
-            remote_profile = retrieve_remote_profile(mention.text.lstrip('@'))
+            remote_profile = async_to_sync(retrieve_remote_profile)(mention.text.lstrip('@'))
             if not remote_profile:
                 continue
             profile = Profile.from_remote_profile(remote_profile)
