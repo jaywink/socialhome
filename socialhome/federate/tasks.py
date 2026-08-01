@@ -4,9 +4,8 @@ from typing import List, TYPE_CHECKING, Optional
 from uuid import uuid4
 
 import dramatiq
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
-from django.db import transaction
 from dynamic_preferences.registries import global_preferences_registry
 from federation.entities import base
 from federation.entities.activitypub.constants import NAMESPACE_PUBLIC
@@ -33,34 +32,35 @@ logger = logging.getLogger("socialhome")
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
-@transaction.atomic
-def receive_task(request, uuid=None):
+async def receive_task(request, uuid=None):
     # type: (RequestType, Optional[str]) -> None
     """Process received payload."""
     profile = None
     if uuid:
         try:
-            profile = Profile.objects.get(uuid=uuid, user__isnull=False)
+            profile = await Profile.objects.aget(uuid=uuid, user__isnull=False)
         except Profile.DoesNotExist:
             logger.warning("No local profile found with uuid")
             return
     try:
-        sender, protocol_name, entities = async_to_sync(handle_receive)(
+        sender, protocol_name, entities = await handle_receive(
             request, user=profile.federable if profile else None, sender_key_fetcher=sender_key_fetcher,
         )
         logger.debug("sender=%s, protocol_name=%s, entities=%s" % (sender, protocol_name, entities))
-        preferences = global_preferences_registry.manager()
-        if preferences["admin__log_all_receive_payloads"]:
-            Payload.objects.create(
-                body=request.body,
-                direction="inbound",
-                entities_found=len(entities),
-                headers=request.headers,
-                method=request.method,
-                protocol=protocol_name or "",
-                sender=sender or "",
-                url=request.url,
-            )
+        def log_payloads():
+            preferences = global_preferences_registry.manager()
+            if preferences["admin__log_all_receive_payloads"]:
+                Payload.objects.create(
+                    body=request.body,
+                    direction="inbound",
+                    entities_found=len(entities),
+                    headers=request.headers,
+                    method=request.method,
+                    protocol=protocol_name or "",
+                    sender=sender or "",
+                    url=request.url,
+                )
+        await sync_to_async(log_payloads)()
     except NoSuitableProtocolFoundError:
         logger.warning("No suitable protocol found for payload")
         return
@@ -73,7 +73,7 @@ def receive_task(request, uuid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    process_entities(entities)
+    await sync_to_async(process_entities)(entities)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
