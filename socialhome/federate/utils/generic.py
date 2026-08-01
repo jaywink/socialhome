@@ -96,7 +96,7 @@ async def outbound_payload_logger(payload: Union[str, Dict], protocol: str, send
     )
 
 
-def queue_payload(request: HttpRequest, uuid: str = None):
+async def queue_payload(request: HttpRequest, uuid: str = None):
     """
     Queue payload for processing.
     """
@@ -120,10 +120,11 @@ def queue_payload(request: HttpRequest, uuid: str = None):
             method=request.method,
             url=request.build_absolute_uri(),
         )
-        preferences = global_preferences_registry.manager()
-        if preferences["admin__log_all_receive_payloads"]:
-            logger.debug("queue_payload - Request: %s", _request)
-
+        def log_payload():
+            preferences = global_preferences_registry.manager()
+            if preferences["admin__log_all_receive_payloads"]:
+                logger.debug("queue_payload - Request: %s", _request)
+        await sync_to_async(log_payload)()
         if not uuid:
             # Check if profile path has an uuid
             match = re.match(r"^/p/([0-9a-z-]+)/inbox/$", request.path)
