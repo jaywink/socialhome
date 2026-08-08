@@ -12,12 +12,12 @@ from socialhome.users.serializers import LimitedProfileSerializer
 
 class ObtainSocialhomeAuthToken(ObtainAuthToken, APIView):
     # Documenting the API
-    schema = AutoSchema(manual_fields=[
-        coreapi.Field("username", description="User's username", required=True, location="form",
-                      schema=coreschema.String()),
-        coreapi.Field("password", description="User's password", required=True, location="form",
-                      schema=coreschema.String()),
-    ])
+    #schema = AutoSchema(manual_fields=[
+    #    coreapi.Field("username", description="User's username", required=True, location="form",
+    #                  schema=coreschema.String()),
+    #    coreapi.Field("password", description="User's password", required=True, location="form",
+    #                  schema=coreschema.String()),
+    #])
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={"request": request})
