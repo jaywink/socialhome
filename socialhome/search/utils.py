@@ -16,7 +16,7 @@ from socialhome.users.utils import update_profile
 from socialhome.utils import is_url
 
 
-def get_single_object(q, request, api=False, *args, **kwargs):
+def get_single_object(q, request, api=False):
     if q.startswith('#'):
         q = q.lower()
         try:
