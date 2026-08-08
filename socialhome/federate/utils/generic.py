@@ -2,6 +2,7 @@ import datetime
 import logging
 import pickle
 import re
+from asgiref.sync import sync_to_async
 from typing import Union, Dict, Optional
 
 from django.conf import settings
@@ -131,7 +132,7 @@ async def queue_payload(request: HttpRequest, uuid: str = None):
             if match:
                 uuid = match.groups()[0]
 
-        receive_task.send(_request, uuid=uuid)
+        await sync_to_async(receive_task.send)(_request, uuid=uuid)
         return True
     except Exception:
         logger.exception('Failed to enqueue payload')
