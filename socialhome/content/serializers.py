@@ -4,7 +4,6 @@ from functools import reduce
 from typing import Dict, Any, Set, List
 import traceback
 
-from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ngettext as _
 from federation.utils.text import validate_handle
@@ -13,7 +12,7 @@ from rest_framework.fields import SerializerMethodField, BooleanField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
-from socialhome.content.signals import render_content
+from socialhome.content.signals import content_post_save
 from socialhome.content.utils import safe_text_for_markdown, update_counts
 from socialhome.enums import EnumField, Visibility
 from socialhome.users.models import Profile
@@ -221,7 +220,6 @@ class ContentSerializer(serializers.ModelSerializer):
 
         return result
 
-    @transaction.atomic
     def save(self, **kwargs: Dict):
         """
         Set possible recipients after save.
@@ -254,6 +252,7 @@ class ContentSerializer(serializers.ModelSerializer):
                 pass
 
         content = super().save(mentions=mentions, **kwargs)
+        content_post_save(content, created=not updating)
 
         if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
             return content

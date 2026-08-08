@@ -5,7 +5,6 @@ from typing import Optional, List, Any
 import dramatiq
 from asgiref.sync import async_to_sync
 from django.conf import settings
-from django.db import transaction
 
 from federation.entities import base
 from federation.entities.activitypub.models import extract_replies
@@ -46,7 +45,6 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     return sender_profile
 
 
-@transaction.atomic
 def process_entities(entities: List):
     """Process a list of entities."""
     for entity in entities:
@@ -136,6 +134,8 @@ def process_entity_post(entity: Any, profile: Profile):
         extra_lookups["guid"] = values["guid"]
     content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
     _process_mentions(content, entity)
+    from socialhome.content.signals import content_post_save # circulars
+    content_post_save(content, created=created)
     if created:
         logger.info("Saved Content: %s", content)
         if content.replies_fid:
@@ -225,6 +225,8 @@ def process_entity_comment(entity: Any, profile: Profile):
         extra_lookups["guid"] = values["guid"]
     content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
     _process_mentions(content, entity)
+    from socialhome.content.signals import content_post_save # circulars
+    content_post_save(content, created=created)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
     else:
@@ -398,6 +400,8 @@ def process_entity_share(entity, profile):
         values["guid"] = safe_text(entity.guid)
     content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups={'share_of': target_content})
     _process_mentions(content, entity)
+    from socialhome.content.signals import content_post_save # circulars
+    content_post_save(content, created=created)
     if created:
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:

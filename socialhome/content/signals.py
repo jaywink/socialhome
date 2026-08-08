@@ -18,25 +18,24 @@ from socialhome.users.models import Profile
 logger = logging.getLogger("socialhome")
 
 
-@receiver(post_save, sender=Content)
 def content_post_save(instance, **kwargs):
     fetch_preview(instance)
+    render_content(instance)
     created = kwargs.get("created")
     if created:
         # Trigger send_reply_notifications only if root parent is local or it has had local replies
         if instance.content_type == ContentType.REPLY and (
             instance.root_parent.local or instance.root_parent.has_had_local_replies
         ):
-            transaction.on_commit(lambda: send_reply_notifications.send(instance.id))
+            send_reply_notifications.send(instance.id)
         elif instance.content_type == ContentType.SHARE and instance.share_of.local:
-            transaction.on_commit(lambda: send_share_notification.send(instance.id))
-    transaction.on_commit(lambda: render_content(instance))
-    transaction.on_commit(lambda: update_streams_with_content(instance, event='new' if created else 'update'))
+            send_share_notification.send(instance.id)
+    update_streams_with_content(instance, event='new' if created else 'update')
     if instance.federate and instance.local:
         # Get an activity to be used when federating
         activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
         activity = instance.create_activity(activity_type)
-        transaction.on_commit(lambda: federate_content(instance, activity=activity))
+        federate_content(instance, activity=activity)
 
 
 @receiver(pre_delete, sender=Content)
