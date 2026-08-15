@@ -3,6 +3,14 @@
 Changelog
 =========
 
+unreleased
+----------
+
+Fixed
+.....
+
+* Fix account request reason from not being stored on registration.
+
 0.24.0 (2026-08-01)
 -------------------
 
