@@ -274,6 +274,7 @@ ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL = env.bool("ACCOUNT_SIGNUP_REQUIRE_ADMIN_A
 ACCOUNT_ADAPTER = "socialhome.users.adapters.AccountAdapter"
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 SOCIALACCOUNT_ADAPTER = "socialhome.users.adapters.SocialAccountAdapter"
+ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
 
 # Select the correct user model
 AUTH_USER_MODEL = "users.User"
