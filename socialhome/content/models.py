@@ -385,6 +385,8 @@ class Content(models.Model):
         share, _created = Content.objects.get_or_create(author=profile, share_of=self, defaults={
             "visibility": self.visibility,
         })
+        from socialhome.content.signals import content_post_save # circulars
+        content_post_save(share, created=_created)
         delete_memoized(Content.has_shared, self.id, profile.id)
         return share
 
