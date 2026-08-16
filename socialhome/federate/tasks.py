@@ -73,11 +73,11 @@ async def receive_task(request, uuid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    await sync_to_async(process_entities)(entities)
+    await process_entities(entities)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
-def send_content(content_id, activity_fid, recipient_id=None):
+async def send_content(content_id, activity_fid, recipient_id=None):
     """
     Handle sending a Content object out via the federation layer.
 
@@ -85,7 +85,7 @@ def send_content(content_id, activity_fid, recipient_id=None):
     we do all this in async.
     """
     try:
-        content = Content.objects.select_related('author').get(
+        content = await Content.objects.select_related('author').aget(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.CONTENT,
@@ -96,13 +96,13 @@ def send_content(content_id, activity_fid, recipient_id=None):
         return
     if recipient_id:
         try:
-            recipient = Profile.objects.get(id=recipient_id, user__isnull=True)
+            recipient = await Profile.objects.aget(id=recipient_id, user__isnull=True)
         except Profile.DoesNotExist:
             logger.warning("No remote recipient found with id %s", recipient_id)
             return
     else:
         recipient = None
-    entity = make_federable_content(content)
+    entity = await sync_to_async(make_federable_content)(content)
     if entity:
         entity.activity_id = activity_fid
         if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
@@ -116,15 +116,15 @@ def send_content(content_id, activity_fid, recipient_id=None):
                 # If we have Matrix support enabled, also add the appservice
                 if settings.SOCIALHOME_MATRIX_ENABLED:
                     recipients.append(content.author.get_recipient_for_matrix_appservice())
-            recipients.extend(_get_remote_followers(content.author, content.visibility))
+            recipients.extend(await _get_remote_followers(content.author, content.visibility))
 
         logger.debug("send_content - sending to recipients: %s", recipients)
-        async_to_sync(handle_send)(entity, content.author.federable, recipients, payload_logger=get_outbound_payload_logger())
+        await handle_send(entity, content.author.federable, recipients, payload_logger=await sync_to_async(get_outbound_payload_logger)())
     else:
         logger.warning("send_content - No entity for %s", content)
 
 
-def _get_remote_participants_for_content(target_content, participants=None, exclude=None, include_remote=False):
+async def _get_remote_participants_for_content(target_content, participants=None, exclude=None, include_remote=False):
     """Get remote participants for a target content.
 
     Look at both replies and shares of target local content. Does a recursive call to get also replies of shares,
@@ -134,40 +134,40 @@ def _get_remote_participants_for_content(target_content, participants=None, excl
         participants = []
     if not include_remote and not target_content.local:
         return participants
-    replies = Content.objects.filter(root_parent_id=target_content.id, local=False, author__user__isnull=True)
-    for reply in replies:
+    replies = Content.objects.select_related('author').filter(root_parent_id=target_content.id, local=False, author__user__isnull=True)
+    async for reply in replies:
         if not exclude or (reply.author.fid != exclude and reply.author.handle != exclude):
             participants.append(reply.author.get_recipient_for_visibility(target_content.visibility))
     if target_content.content_type == ContentType.CONTENT:
-        shares = Content.objects.filter(share_of_id=target_content.id, local=False)
-        for share in shares:
+        shares = Content.objects.select_related('author').filter(share_of_id=target_content.id, local=False)
+        async for share in shares:
             if not exclude or (share.author.fid != exclude and share.author.handle != exclude):
                 participants.append(share.author.get_recipient_for_visibility(target_content.visibility))
-            participants = _get_remote_participants_for_content(
+            participants = await _get_remote_participants_for_content(
                 share, participants, exclude=exclude, include_remote=True
             )
     return participants
 
 
-def _get_remote_followers(profile: Profile, visibility: Visibility, exclude=None):
+async def _get_remote_followers(profile: Profile, visibility: Visibility, exclude=None):
     """Get remote followers for a profile."""
     followers = []
-    for follower in Profile.objects.filter(following=profile, user__isnull=True):
+    async for follower in Profile.objects.filter(following=profile, user__isnull=True):
         if not exclude or (follower.fid != exclude and follower.handle != exclude):
             followers.append(follower.get_recipient_for_visibility(visibility))
     return followers
 
 
-def _get_limited_recipients(sender: str, content: Content) -> List:
+async def _get_limited_recipients(sender: str, content: Content) -> List:
     profiles = []
-    for profile in content.limited_visibilities.all():
+    async for profile in content.limited_visibilities.all():
         if profile.fid != sender and profile.handle != sender and profile.guid != sender:
             profiles.append(profile.get_recipient_for_visibility(content.visibility))
     return profiles
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
-def send_reply(content_id, activity_fid):
+async def send_reply(content_id, activity_fid):
     """
     Handle sending a Content object that is a reply out via the federation layer.
 
@@ -175,7 +175,7 @@ def send_reply(content_id, activity_fid):
     we do all this in async.
     """
     try:
-        content = Content.objects.select_related('author', 'parent', 'root_parent').get(
+        content = await Content.objects.select_related('author', 'parent__author', 'root_parent__author').aget(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.REPLY,
@@ -184,7 +184,7 @@ def send_reply(content_id, activity_fid):
     except Content.DoesNotExist:
         logger.warning("No content found with id %s", content_id)
         return
-    entity = make_federable_content(content)
+    entity = await sync_to_async(make_federable_content)(content)
     if not entity:
         logger.warning("send_reply - No entity for %s", content)
     entity.activity_id = activity_fid
@@ -196,26 +196,26 @@ def send_reply(content_id, activity_fid):
         recipients.append(content.root_parent.author.get_recipient_for_visibility(content.visibility))
     if content.visibility == Visibility.PUBLIC:
         recipients.extend(
-            _get_remote_participants_for_content(content, exclude=content.author.fid, include_remote=True),
+            await _get_remote_participants_for_content(content, exclude=content.author.fid, include_remote=True),
         )
-        recipients.extend(_get_remote_followers(
+        recipients.extend(await _get_remote_followers(
             content.author,
             content.visibility,
             exclude=content.author.fid,
         ))
     elif content.visibility == Visibility.LIMITED:
-        recipients.extend(_get_limited_recipients(content.author.fid, content))
+        recipients.extend(await _get_limited_recipients(content.author.fid, content))
     else:
         return
     if not recipients:
         logger.debug("send_reply - no remote recipients for content: %s", content.id)
         return
     logger.debug("send_reply - sending to recipients: %s", recipients)
-    async_to_sync(handle_send)(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=get_outbound_payload_logger())
+    await handle_send(entity, content.author.federable, recipients, content.parent.author.protocols, payload_logger=await sync_to_async(get_outbound_payload_logger)())
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
-def send_share(content_id, activity_fid):
+async def send_share(content_id, activity_fid):
     """Handle sending a share of a Content object to the federation layer.
 
     Currently, we only deliver public shares.
@@ -224,29 +224,29 @@ def send_share(content_id, activity_fid):
     we do all this in async.
     """
     try:
-        content = Content.objects.select_related('author', 'share_of__author').get(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
+        content = await Content.objects.select_related('author', 'share_of__author').aget(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
                                       local=True)
     except Content.DoesNotExist:
         logger.warning("No local share found with id %s", content_id)
         return
-    entity = make_federable_content(content)
+    entity = await sync_to_async(make_federable_content)(content)
     if entity:
         entity.id = activity_fid
         if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
-        recipients = _get_remote_followers(content.author, content.visibility)
+        recipients = await _get_remote_followers(content.author, content.visibility)
         if not content.share_of.local:
             # Send to original author
             recipients.append(content.share_of.author.get_recipient_for_visibility(content.visibility))
         logger.debug("send_share - sending to recipients: %s", recipients)
-        async_to_sync(handle_send)(entity, content.author.federable, recipients,
+        await handle_send(entity, content.author.federable, recipients,
                     content.share_of.author.protocols if content.share_of.content_type == 'content' else [ProtocolType.ACTIVITYPUB],
-                    payload_logger=get_outbound_payload_logger())
+                    payload_logger=await sync_to_async(get_outbound_payload_logger)())
         target_content = content.share_of
         if target_content.replies_fid:
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            process_replies.send_with_options(
+            await sync_to_async(process_replies.send_with_options)(
                 args=(content_id,), kwargs={
                     "queue_once_id": content_id,
                     "shared_by_id": content.id,
@@ -259,14 +259,14 @@ def send_share(content_id, activity_fid):
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
-def _send_content_retraction_task(entity, federable, recipients, target_protocols):
+async def _send_content_retraction_task(entity, federable, recipients, target_protocols):
     """
     Actual federation send part of send_content_retraction.
 
     Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
     we do all this in async.
     """
-    handle_send(entity, federable, recipients, target_protocols, payload_logger=get_outbound_payload_logger())
+    await handle_send(entity, federable, recipients, target_protocols, payload_logger=await sync_to_async(get_outbound_payload_logger)())
 
 
 def send_content_retraction(content, author_id):
@@ -282,9 +282,9 @@ def send_content_retraction(content, author_id):
             # Don't send in development mode
             return
         if content.visibility == Visibility.PUBLIC:
-            recipients = _get_remote_followers(author, content.visibility)
+            recipients = async_to_sync(_get_remote_followers)(author, content.visibility)
         else:
-            recipients = _get_limited_recipients(author.fid, content)
+            recipients = async_to_sync(_get_limited_recipients)(author.fid, content)
 
         target_protocols = []
         if content.content_type == ContentType.REPLY:
@@ -323,7 +323,7 @@ def send_profile_retraction(profile):
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
-def forward_entity(entity, target_content_id):
+async def forward_entity(entity, target_content_id):
     """Handle forwarding of an entity related to a target content.
 
     For example: remote replies on local content, remote shares on local content.
@@ -332,7 +332,7 @@ def forward_entity(entity, target_content_id):
     we do all this in async.
     """
     try:
-        target_content = Content.objects.get(
+        target_content = await Content.objects.aget(
             id=target_content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             local=True,
@@ -341,7 +341,7 @@ def forward_entity(entity, target_content_id):
         logger.warning("forward_entity - No local content found with id %s", target_content_id)
         return
     try:
-        content = Content.objects.fed(entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED)).get()
+        content = await Content.objects.fed(entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED)).aget()
     except Content.DoesNotExist:
         logger.warning("forward_entity - No content found with uuid %s", entity.id)
         return
@@ -349,40 +349,40 @@ def forward_entity(entity, target_content_id):
         # Don't send in development mode
         return
     if target_content.visibility == Visibility.PUBLIC:
-        recipients = _get_remote_participants_for_content(target_content, exclude=entity.actor_id)
+        recipients = await _get_remote_participants_for_content(target_content, exclude=entity.actor_id)
         recipients.extend(_get_remote_followers(
             target_content.author,
             target_content.visibility,
             exclude=entity.actor_id,
         ))
     elif target_content.visibility == Visibility.LIMITED and content.content_type == ContentType.REPLY:
-        recipients = _get_limited_recipients(entity.actor_id, target_content)
+        recipients = await _get_limited_recipients(entity.actor_id, target_content)
     else:
         return
     logger.debug("forward_entity - sending to recipients: %s", recipients)
-    async_to_sync(handle_send)(
+    await handle_send(
         entity, content.author.federable, recipients, content.author.protocols, parent_user=target_content.author.federable,
-        payload_logger=get_outbound_payload_logger(),
+        payload_logger=await sync_to_async(get_outbound_payload_logger)(),
     )
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH)
-def send_follow_change(profile_id, followed_id, follow):
+async def send_follow_change(profile_id, followed_id, follow):
     """Handle sending of a local follow of a remote profile."""
     try:
-        profile = Profile.objects.get(id=profile_id, user__isnull=False)
+        profile = await Profile.objects.aget(id=profile_id, user__isnull=False)
     except Profile.DoesNotExist:
         logger.warning("send_follow_change - No local profile %s found to send follow with", profile_id)
         return
     try:
-        remote_profile = Profile.objects.get(id=followed_id, user__isnull=True)
+        remote_profile = await Profile.objects.aget(id=followed_id, user__isnull=True)
     except Profile.DoesNotExist:
         logger.warning("send_follow_change - No remote profile %s found to send follow for", followed_id)
         return
     if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
         # Don't send in development mode
         return
-    activity = Activity.objects.filter(profile=profile, object_id=remote_profile.id, type=ActivityType.FOLLOW).last()
+    activity = await Activity.objects.filter(profile=profile, object_id=remote_profile.id, type=ActivityType.FOLLOW).alast()
     entity = base.Follow(
         activity_id=getattr(activity, 'fid', f'{profile.fid}#follow-{uuid4()}'),
         actor_id=profile.fid,
@@ -394,14 +394,14 @@ def send_follow_change(profile_id, followed_id, follow):
     # Explicitly use limited visibility to force private endpoint
     recipients = [remote_profile.get_recipient_for_visibility(Visibility.LIMITED)]
     logger.debug("send_follow_change - sending to recipients: %s", recipients)
-    async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
+    await handle_send(entity, profile.federable, recipients, payload_logger=await sync_to_async(get_outbound_payload_logger)())
     # Also trigger a profile send
     if follow:
-        send_profile.send(profile_id, recipients=recipients)
+        await sync_to_async(send_profile.send)(profile_id, recipients=recipients)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGH, time_limit=30*60*1000)
-def send_profile(profile_id, recipients=None):
+async def send_profile(profile_id, recipients=None):
     """Handle sending a Profile object out via the federation layer.
 
     Has a longer timeout of 30 minutes due to a large amount of targets needing time to be looped through until
@@ -411,7 +411,7 @@ def send_profile(profile_id, recipients=None):
     :param recipients: Optional list of recipients, see `federation.outbound.handle_send` parameters
     """
     try:
-        profile = Profile.objects.get(id=profile_id, user__isnull=False)
+        profile = await Profile.objects.select_related('user').aget(id=profile_id, user__isnull=False)
     except Profile.DoesNotExist:
         logger.warning("send_profile - No local profile found with id %s", profile_id)
         return
@@ -430,11 +430,11 @@ def send_profile(profile_id, recipients=None):
             recipients = [profile.get_recipient_for_matrix_appservice()]
         else:
             recipients = []
-        recipients.extend(_get_remote_followers(profile, profile.visibility))
+        recipients.extend(await _get_remote_followers(profile, profile.visibility))
         to = NAMESPACE_PUBLIC
     else:
         to = [recipient['fid'] for recipient in recipients if recipient.get('fid', None)]
     if hasattr(entity, 'to'): entity.to = to
 
     logger.debug("send_profile - sending to recipients: %s", recipients)
-    async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
+    await handle_send(entity, profile.federable, recipients, payload_logger=await sync_to_async(get_outbound_payload_logger)())
