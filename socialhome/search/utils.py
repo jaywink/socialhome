@@ -63,7 +63,7 @@ def get_single_object(q, request, api=False):
                 # Catch various errors parsing the remote content
                 return None
             if remote_content:
-                process_entities([remote_content])
+                async_to_sync(process_entities)([remote_content])
                 # Try again
                 try:
                     content = Content.objects.visible_for_user(request.user).fed(remote_content.id).get()

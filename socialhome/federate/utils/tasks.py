@@ -3,7 +3,7 @@ import logging
 from typing import Optional, List, Any
 
 import dramatiq
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
 
 from federation.entities import base
@@ -22,22 +22,22 @@ from socialhome.users.models import Profile, User
 logger = logging.getLogger("socialhome")
 
 
-def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True) -> Optional[Profile]:
+async def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True) -> Optional[Profile]:
     """Get or create a profile.
 
     Fetch it from federation layer if necessary or if the public key is empty for some reason.
     """
     try:
         logger.debug("get_profile_for_object - looking from local db using %s", owner)
-        sender_profile = Profile.objects.fed(owner).exclude(rsa_public_key="").get()
+        sender_profile = await Profile.objects.fed(owner).exclude(rsa_public_key="").aget()
     except Profile.DoesNotExist:
         if not fetch: return
         logger.debug("get_profile_for_object - %s was not found, fetching from remote", owner)
-        remote_profile = async_to_sync(retrieve_remote_profile)(owner)
+        remote_profile = await retrieve_remote_profile(owner)
         if not remote_profile:
             logger.warning("get_profile_for_object - Remote profile %s not found locally or remotely.", owner)
             return
-        sender_profile = Profile.from_remote_profile(remote_profile)
+        sender_profile = await sync_to_async(Profile.from_remote_profile)(remote_profile)
     else:
         if no_local and sender_profile.is_local:
             logger.warning("get_profile_for_object - %s is local! Skip.", owner)
@@ -45,7 +45,7 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     return sender_profile
 
 
-def process_entities(entities: List):
+async def process_entities(entities: List):
     """Process a list of entities."""
     for entity in entities:
         logger.info("Entity: %s", entity)
@@ -54,46 +54,46 @@ def process_entities(entities: List):
         if not isinstance(entity, base.Profile):
             # Do not fetch and create a profile that's about to be retracted
             fetch = not (isinstance(entity, base.Retraction) and entity.entity_type == 'Profile')
-            profile = get_profile_for_object(entity.actor_id, fetch=fetch)
+            profile = await get_profile_for_object(entity.actor_id, fetch=fetch)
             if not profile:
                 logger.warning("No sender profile for entity %s, skipping", entity)
                 continue
         try:
             if isinstance(entity, base.Post):
-                process_entity_post(entity, profile)
+                await process_entity_post(entity, profile)
             elif isinstance(entity, base.Retraction):
-                process_entity_retraction(entity, profile)
+                await sync_to_async(process_entity_retraction)(entity, profile)
             elif isinstance(entity, base.Comment):
-                process_entity_comment(entity, profile)
+                await process_entity_comment(entity, profile)
             elif isinstance(entity, base.Follow):
-                process_entity_follow(entity, profile)
+                await process_entity_follow(entity, profile)
             elif isinstance(entity, base.Profile):
-                Profile.from_remote_profile(entity)
+                await sync_to_async(Profile.from_remote_profile)(entity)
             elif isinstance(entity, base.Share):
-                process_entity_share(entity, profile)
+                await process_entity_share(entity, profile)
         except Exception as ex:
             logger.exception("Failed to handle %s: %s", entity.id, ex)
 
 
-def process_entity_follow(entity, profile):
+async def process_entity_follow(entity, profile):
     """Process entity of type Follow."""
     try:
-        user = User.objects.get(profile=Profile.objects.fed(entity.target_id).get(), is_active=True)
+        user = await User.objects.aget(profile=Profile.objects.fed(entity.target_id).aget(), is_active=True)
     except (Profile.DoesNotExist, User.DoesNotExist):
         logger.warning("Could not find local user %s for follow entity %s", entity.target_id, entity)
         return
     if entity.following:
-        profile.following.add(user.profile)
+        await profile.following.aadd(user.profile)
         logger.info("Profile %s now follows user %s", profile, user)
     else:
-        profile.following.remove(user.profile)
+        await profile.following.aremove(user.profile)
         logger.info("Profile %s has unfollowed user %s", profile, user)
 
 
-def validate_against_old_content(fid, entity, profile):
+async def validate_against_old_content(fid, entity, profile):
     """Do some validation against a possible local object."""
     try:
-        old_content = Content.objects.fed(fid).get()
+        old_content = await Content.objects.fed(fid).select_related('author__user').aget()
     except Content.DoesNotExist:
         return True
     # Do some validation
@@ -112,10 +112,10 @@ def validate_against_old_content(fid, entity, profile):
 
 
 # noinspection PyProtectedMember
-def process_entity_post(entity: Any, profile: Profile):
+async def process_entity_post(entity: Any, profile: Profile):
     """Process an entity of type Post."""
     fid = safe_text(entity.id)
-    if not validate_against_old_content(fid, entity, profile):
+    if not await validate_against_old_content(fid, entity, profile):
         return
     values = {
         "fid": fid,
@@ -132,14 +132,14 @@ def process_entity_post(entity: Any, profile: Profile):
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
         extra_lookups["guid"] = values["guid"]
-    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
-    _process_mentions(content, entity)
+    content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups=extra_lookups)
+    await _process_mentions(content, entity)
     from socialhome.content.signals import content_post_save # circulars
-    content_post_save(content, created=created)
+    await sync_to_async(content_post_save)(content, created=created)
     if created:
         logger.info("Saved Content: %s", content)
         if content.replies_fid:
-            if process_replies.send_with_options(args=(content.id,), kwargs={"queue_once_id": content.id}, delay=120000):
+            if await sync_to_async(process_replies.send_with_options)(args=(content.id,), kwargs={"queue_once_id": content.id}, delay=120000):
                 logger.info("process_entity_post - queued process_replies job for entity %s", entity.id)
             else:
                 logger.warning("process_entity_post - failed to enqueue process_replies job for entity %s", entity.id)
@@ -149,9 +149,9 @@ def process_entity_post(entity: Any, profile: Profile):
         # add author to visibilities for local reply retractions to work.
         receivers = [profile]
         if entity._receivers:
-            receivers.extend(get_profiles_from_receivers(entity._receivers))
+            receivers.extend([r async for r in await sync_to_async(get_profiles_from_receivers)(entity._receivers)])
             if len(receivers):
-                content.limited_visibilities.set(receivers)
+                await content.limited_visibilities.aset(receivers)
                 logger.info("Added visibility to Post %s to %s", content.fid, receivers)
             else:
                 logger.warning("No local receivers found for limited Post %s", content.fid)
@@ -160,13 +160,13 @@ def process_entity_post(entity: Any, profile: Profile):
 
 
 # noinspection PyProtectedMember
-def process_entity_comment(entity: Any, profile: Profile):
+async def process_entity_comment(entity: Any, profile: Profile):
     """Process an entity of type Comment."""
     fid = safe_text(entity.id)
-    if not validate_against_old_content(fid, entity, profile):
+    if not await validate_against_old_content(fid, entity, profile):
         return
     try:
-        parent = Content.objects.fed(entity.target_id).get()
+        parent = await Content.objects.fed(entity.target_id).aget()
     except Content.DoesNotExist:
         # Try fetching. If found, process and then try again
         # This maybe useless as federation should walk up to the root
@@ -175,7 +175,7 @@ def process_entity_comment(entity: Any, profile: Profile):
             "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = async_to_sync(retrieve_remote_content)(
+        remote_target = await retrieve_remote_content(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -184,12 +184,12 @@ def process_entity_comment(entity: Any, profile: Profile):
             protocol=ProtocolType.DIASPORA if entity.target_guid else ProtocolType.ACTIVITYPUB
         )
         if remote_target:
-            process_entities([remote_target])
+            await process_entities([remote_target])
             # pixelfed uses the @ form in reply collections
             if getattr(remote_target, 'url', None) == entity.target_id:
                 entity.target_id = remote_target.id
             try:
-                parent = Content.objects.fed(entity.target_id).get()
+                parent = await Content.objects.fed(entity.target_id).aget()
             except Content.DoesNotExist:
                 logger.warning("Comment target was fetched from remote, but it is still missing locally! Comment: %s",
                                entity)
@@ -202,7 +202,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     root_parent = parent
     if entity.root_target_id:
         try:
-            root_parent = Content.objects.fed(entity.root_target_id).get()
+            root_parent = await Content.objects.fed(entity.root_target_id).aget()
         except Content.DoesNotExist:
             pass
     visibility = None
@@ -223,10 +223,10 @@ def process_entity_comment(entity: Any, profile: Profile):
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
         extra_lookups["guid"] = values["guid"]
-    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups=extra_lookups)
-    _process_mentions(content, entity)
+    content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups=extra_lookups)
+    await _process_mentions(content, entity)
     from socialhome.content.signals import content_post_save # circulars
-    content_post_save(content, created=created)
+    await sync_to_async(content_post_save)(content, created=created)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
     else:
@@ -234,9 +234,9 @@ def process_entity_comment(entity: Any, profile: Profile):
 
     if visibility == Visibility.LIMITED or (visibility is None and parent.visibility == Visibility.LIMITED):
         if entity._receivers:
-            receivers = get_profiles_from_receivers(entity._receivers)
+            receivers = [r async for r in await sync_to_async(get_profiles_from_receivers)(entity._receivers)]
             if len(receivers):
-                content.limited_visibilities.add(*receivers)
+                await content.limited_visibilities.aadd(*receivers)
                 logger.info("Added visibility to Comment %s to %s", content.fid, receivers)
             else:
                 logger.warning("No local receivers found for limited Comment %s", content.fid)
@@ -246,7 +246,7 @@ def process_entity_comment(entity: Any, profile: Profile):
     if parent.local:
         # We should relay this to participants we know of
         from socialhome.federate.tasks import forward_entity
-        forward_entity.send(entity, root_parent.id)
+        await sync_to_async(forward_entity.send)(entity, root_parent.id)
 
 
 def _embed_entity_medias_to_post(children, text):
@@ -283,23 +283,23 @@ def _embed_entity_medias_to_post(children, text):
     return text
 
 
-def _process_mentions(content, entity):
+async def _process_mentions(content, entity):
     """
     Link mentioned profiles to the content.
     """
     fids = set(entity._mentions)
-    existing_fids = set(content.mentions.values_list('finger', flat=True))
+    existing_fids = set([mention async for mention in content.mentions.values_list('finger', flat=True)])
     to_remove = existing_fids.difference(fids)
     to_add = fids.difference(existing_fids)
     for fid in to_remove:
         try:
-            content.mentions.remove(Profile.objects.fed(fid).get())
+            await content.mentions.aremove(await Profile.objects.fed(fid).aget())
         except Profile.DoesNotExist:
             pass
     for fid in to_add:
-        profile = get_profile_for_object(fid, no_local=False)
+        profile = await get_profile_for_object(fid, no_local=False)
         if profile:
-            content.mentions.add(profile)
+            await content.mentions.aadd(profile)
 
 
 def _retract_content(target_fid, profile):
@@ -353,17 +353,17 @@ def process_entity_retraction(entity, profile):
         logger.debug("Ignoring retraction of entity_type %s from %s", entity_type, profile)
 
 
-def process_entity_share(entity, profile):
+async def process_entity_share(entity, profile):
     """Process an entity of type Share."""
     try:
-        target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
+        target_content = await Content.objects.fed(entity.target_id, share_of__isnull=True).aget()
     except Content.DoesNotExist:
         # Try fetching. If found, process and then try again
         logger.debug(
             "process_entity_share - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = async_to_sync(retrieve_remote_content)(
+        remote_target = await retrieve_remote_content(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -372,9 +372,9 @@ def process_entity_share(entity, profile):
             protocol=ProtocolType.DIASPORA if entity.target_guid else ProtocolType.ACTIVITYPUB
         )
         if remote_target:
-            process_entities([remote_target])
+            await process_entities([remote_target])
             try:
-                target_content = Content.objects.fed(entity.target_id, share_of__isnull=True).get()
+                target_content = await Content.objects.fed(entity.target_id, share_of__isnull=True).aget()
             except Content.DoesNotExist:
                 logger.warning("Share target was fetched from remote, but it is still missing locally! Share: %s",
                                entity)
@@ -398,15 +398,15 @@ def process_entity_share(entity, profile):
     fid = safe_text(entity.id)
     if getattr(entity, "guid", None):
         values["guid"] = safe_text(entity.guid)
-    content, created = Content.objects.fed_update_or_create(fid, values, extra_lookups={'share_of': target_content})
-    _process_mentions(content, entity)
+    content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups={'share_of': target_content})
+    await _process_mentions(content, entity)
     from socialhome.content.signals import content_post_save # circulars
-    content_post_save(content, created=created)
+    await sync_to_async(content_post_save)(content, created=created)
     if created:
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:
             content_id = target_content.id if target_content.content_type == ContentType.CONTENT else target_content.root_parent_id
-            if process_replies.send_with_options(args=(content_id,), kwargs={"shared_by_id": content.id, "queue_once_id": content_id}, delay=90000):
+            if await sync_to_async(process_replies.send_with_options)(args=(content_id,), kwargs={"shared_by_id": content.id, "queue_once_id": content_id}, delay=90000):
                 logger.info("process_entity_share - queued process_replies job for content id %s", content_id)
             else:
                 logger.warn("process_entity_share - failed to enqueue process_replies job for content id %s", content_id)
@@ -417,40 +417,40 @@ def process_entity_share(entity, profile):
     if target_content.local:
         # We should relay this share entity to participants we know of
         from socialhome.federate.tasks import forward_entity
-        forward_entity.send(entity, target_content.id)
+        await sync_to_async(forward_entity.send)(entity, target_content.id)
 
 
-def process_reply_collection(replies_fid):
-    coll = async_to_sync(retrieve_remote_content)(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
+async def process_reply_collection(replies_fid):
+    coll = await retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
     if isinstance(coll, base.Collection):
-        replies = async_to_sync(extract_replies)(getattr(coll, 'first', []))
+        replies = await extract_replies(getattr(coll, 'first', []))
         for reply in replies:
-            process_reply.send(reply)
+            await sync_to_async(process_reply.send)(reply)
             logger.info("process_reply - queued job for entity %s", reply)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_reply(reply):
+async def process_reply(reply):
     reply_fid = getattr(reply, 'id', reply)
     try:
-        content = Content.objects.fed(reply_fid).get()
-        if content.replies_fid: process_reply_collection(content.replies_fid)
+        content = await Content.objects.fed(reply_fid).aget()
+        if content.replies_fid: await process_reply_collection(content.replies_fid)
     except Content.DoesNotExist:
         # Try to fetch and process
         if isinstance(reply, base.Comment):
             remote_content = reply
         elif isinstance(reply, str):
-            remote_content = async_to_sync(retrieve_remote_content)(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
+            remote_content = await retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
             return
         if remote_content:
             logger.info(
                 "process_reply - processing reply %s for entity %s",
                 remote_content.id, remote_content.target_id)
-            process_entities([remote_content])
+            await process_entities([remote_content])
             try:
-                content = Content.objects.fed(reply_fid).get()
-                if content.replies_fid: process_reply_collection(content.replies_fid)
+                content = await Content.objects.fed(reply_fid).aget()
+                if content.replies_fid: await process_reply_collection(content.replies_fid)
             except Content.DoesNotExist:
                 logger.warning(
                     "process_reply - reply %s for entity %s could not be processed",
@@ -458,7 +458,7 @@ def process_reply(reply):
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
+async def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     """
     Process ActivityPub replies from a root content.
 
@@ -473,20 +473,20 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     """
     # Process Activitypub reply collection
     try:
-        root = Content.objects.get(id=root_id)
+        root = await Content.objects.aget(id=root_id)
     except Content.DoesNotExist:
         # Retracted?
         return
     # A job might have been scheduled from process_entity_shares
     if shared_by_id:
-        if getattr(root.shares.last(), 'id', None) != shared_by_id:
+        if getattr(await root.shares.alast(), 'id', None) != shared_by_id:
             logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root.fid)
             return
     elif root.shares_count > 0:
         logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
         return
 
-    process_reply_collection(root.replies_fid)
+    await process_reply_collection(root.replies_fid)
 
     if settings.DEBUG or not settings.SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED:
         return
@@ -497,7 +497,7 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
         if delta else dt.timedelta(minutes=settings.SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES)
     )
     if delta < dt.timedelta(days=settings.SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS):
-        if process_replies.send_with_options(
+        if await sync_to_async(process_replies.send_with_options)(
                 args=(root_id, shared_by_id, delta.total_seconds()),
                 kwargs={
                     "queue_once_id": root_id,
