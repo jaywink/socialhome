@@ -12,7 +12,6 @@ from rest_framework.fields import SerializerMethodField, BooleanField
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content, Tag
-from socialhome.content.signals import content_post_save
 from socialhome.content.utils import safe_text_for_markdown, update_counts
 from socialhome.enums import EnumField, Visibility
 from socialhome.users.models import Profile
@@ -252,7 +251,7 @@ class ContentSerializer(serializers.ModelSerializer):
                 pass
 
         content = super().save(mentions=mentions, **kwargs)
-        content_post_save(content, created=not updating)
+        content.post_save(created=not updating)
 
         if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
             return content

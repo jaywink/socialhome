@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 from uuid import uuid4
 
@@ -33,6 +34,8 @@ from socialhome.content.utils import get_and_linkify_tags, linkify_mentions, pro
 from socialhome.enums import Visibility
 from socialhome.users.models import Profile
 from socialhome.utils import get_full_url
+
+logger = logging.getLogger("socialhome")
 
 
 class OpenGraphCache(models.Model):
@@ -271,6 +274,26 @@ class Content(models.Model):
             except Profile.DoesNotExist:
                 pass
 
+    def federate_content(self, recipient: Profile = None, activity: Activity = None):
+        """Send out local content to the federation layer.
+
+        Yes, edits also. The federation layer should decide whether these are really worth sending out.
+        # TODO also use activity type for federating?
+        """
+        from socialhome.federate.tasks import send_content, send_reply, send_share # circulars
+        recipient_id = recipient.id if recipient else None
+        try:
+            if self.content_type == ContentType.REPLY:
+                send_reply.send(self.id, activity.fid)
+            elif self.content_type == ContentType.SHARE:
+                send_share.send(self.id, activity.fid)
+            else:
+                if self.visibility == Visibility.LIMITED and not recipient_id:
+                    return
+                send_content.send(self.id, activity.fid, recipient_id=recipient_id)
+        except Exception as ex:
+            logger.exception("Failed to federate_content %s: %s", self, ex)
+
     def get_absolute_url(self):
         if self.slug:
             return reverse("content:view-by-slug", kwargs={"pk": self.id, "slug": self.slug})
@@ -288,6 +311,37 @@ class Content(models.Model):
         except ValueError:
             humanized = arrow.get(self.modified).humanize()
         return humanized
+
+    def post_save(self, **kwargs):
+        """ TODO: Add comment """
+        from socialhome.content.previews import fetch_content_preview # circulars
+        from socialhome.notifications.tasks import send_reply_notifications, send_share_notification, send_mention_notification
+        from socialhome.streams.streams import update_streams_with_content
+        try:
+            fetch_content_preview(self)
+        except Exception as ex:
+            logger.exception("Failed to fetch content preview for %s: %s", self, ex)
+
+        try:
+            self.render()
+        except Exception as ex:
+            logger.exception("Failed to render text for %s: %s", self, ex)
+
+        created = kwargs.get("created")
+        if created:
+            # Trigger send_reply_notifications only if root parent is local or it has had local replies
+            if self.content_type == ContentType.REPLY and (
+                self.root_parent.local or self.root_parent.has_had_local_replies
+            ):
+                send_reply_notifications.send(self.id)
+            elif self.content_type == ContentType.SHARE and self.share_of.local:
+                send_share_notification.send(self.id)
+        update_streams_with_content(self, event='new' if created else 'update')
+        if self.federate and self.local:
+            # Get an activity to be used when federating
+            activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
+            activity = self.create_activity(activity_type)
+            self.federate_content(activity=activity)
 
     @property
     def timestamp_epoch(self):
@@ -385,8 +439,7 @@ class Content(models.Model):
         share, _created = Content.objects.get_or_create(author=profile, share_of=self, defaults={
             "visibility": self.visibility,
         })
-        from socialhome.content.signals import content_post_save # circulars
-        content_post_save(share, created=_created)
+        share.post_save(created=_created)
         delete_memoized(Content.has_shared, self.id, profile.id)
         return share
 

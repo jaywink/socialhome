@@ -18,26 +18,6 @@ from socialhome.users.models import Profile
 logger = logging.getLogger("socialhome")
 
 
-def content_post_save(instance, **kwargs):
-    fetch_preview(instance)
-    render_content(instance)
-    created = kwargs.get("created")
-    if created:
-        # Trigger send_reply_notifications only if root parent is local or it has had local replies
-        if instance.content_type == ContentType.REPLY and (
-            instance.root_parent.local or instance.root_parent.has_had_local_replies
-        ):
-            send_reply_notifications.send(instance.id)
-        elif instance.content_type == ContentType.SHARE and instance.share_of.local:
-            send_share_notification.send(instance.id)
-    update_streams_with_content(instance, event='new' if created else 'update')
-    if instance.federate and instance.local:
-        # Get an activity to be used when federating
-        activity_type = ActivityType.CREATE if created else ActivityType.UPDATE
-        activity = instance.create_activity(activity_type)
-        federate_content(instance, activity=activity)
-
-
 @receiver(pre_delete, sender=Content)
 def federate_content_retraction(instance, **kwargs):
     """Send out local content retractions to the federation layer."""
@@ -99,7 +79,7 @@ def on_commit_limited_visibilities(action, pks, instance):
 
         if action == "post_add":
             try:
-                federate_content(instance, recipient=profile, activity=activity)
+                instance.federate_content(recipient=profile, activity=activity)
             except Exception:
                 logger.exception("Failed to federate limited visibility content %s to %s", instance.uuid, profile.uuid)
         elif action == "post_remove":

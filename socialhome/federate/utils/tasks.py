@@ -134,8 +134,7 @@ async def process_entity_post(entity: Any, profile: Profile):
         extra_lookups["guid"] = values["guid"]
     content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups=extra_lookups)
     await _process_mentions(content, entity)
-    from socialhome.content.signals import content_post_save # circulars
-    await sync_to_async(content_post_save)(content, created=created)
+    await sync_to_async(content.post_save)(created=created)
     if created:
         logger.info("Saved Content: %s", content)
         if content.replies_fid:
@@ -225,8 +224,7 @@ async def process_entity_comment(entity: Any, profile: Profile):
         extra_lookups["guid"] = values["guid"]
     content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups=extra_lookups)
     await _process_mentions(content, entity)
-    from socialhome.content.signals import content_post_save # circulars
-    await sync_to_async(content_post_save)(content, created=created)
+    await sync_to_async(content.post_save)(created=created)
     if created:
         logger.info("Saved Content from comment entity: %s", content)
     else:
@@ -400,8 +398,7 @@ async def process_entity_share(entity, profile):
         values["guid"] = safe_text(entity.guid)
     content, created = await sync_to_async(Content.objects.fed_update_or_create)(fid, values, extra_lookups={'share_of': target_content})
     await _process_mentions(content, entity)
-    from socialhome.content.signals import content_post_save # circulars
-    await sync_to_async(content_post_save)(content, created=created)
+    await sync_to_async(content.post_save)(created=created)
     if created:
         logger.info("Saved share: %s", content)
         if target_content.replies_fid:
