@@ -100,14 +100,14 @@ class Content(models.Model):
 
     # Federation GUID
     # Optional, related to Diaspora network platforms
-    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True, db_index=True)
 
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     # Federation identifier
     # Optional
-    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True, db_index=True)
 
     # Reply collection  identifier (some AP platforms)
     # Optional
