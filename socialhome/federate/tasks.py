@@ -73,7 +73,7 @@ async def receive_task(request, uuid=None):
     if not entities:
         logger.warning("No entities in payload")
         return
-    await process_entities(entities)
+    await sync_to_async(process_entities)(entities)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_HIGHEST, time_limit=30*60*1000)
