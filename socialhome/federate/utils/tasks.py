@@ -3,7 +3,7 @@ import logging
 from typing import Optional, List, Any
 
 import dramatiq
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
 from django.db import transaction
 
@@ -416,45 +416,38 @@ def process_entity_share(entity, profile):
         forward_entity.send(entity, target_content.id)
 
 
-def process_reply_collection(replies_fid):
-    coll = async_to_sync(retrieve_remote_content)(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
+async def process_reply_collection(replies_fid):
+    coll = await retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
     if isinstance(coll, base.Collection):
-        replies = async_to_sync(extract_replies)(getattr(coll, 'first', []))
+        replies = await extract_replies(getattr(coll, 'first', []))
         for reply in replies:
-            process_reply.send(reply)
+            await sync_to_async(process_reply.send)(reply)
             logger.info("process_reply - queued job for entity %s", reply)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_reply(reply):
+async def process_reply(reply):
     reply_fid = getattr(reply, 'id', reply)
-    try:
-        content = Content.objects.fed(reply_fid).get()
-        if content.replies_fid: process_reply_collection(content.replies_fid)
-    except Content.DoesNotExist:
+    content = await Content.objects.filter(fid=reply_fid).values('replies_fid').alast()
+    if content and content['replies_fid']: await process_reply_collection(content['replies_fid'])
+    else:
         # Try to fetch and process
         if isinstance(reply, base.Comment):
             remote_content = reply
         elif isinstance(reply, str):
-            remote_content = async_to_sync(retrieve_remote_content)(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
+            remote_content = await retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
             return
         if remote_content:
             logger.info(
                 "process_reply - processing reply %s for entity %s",
                 remote_content.id, remote_content.target_id)
-            process_entities([remote_content])
-            try:
-                content = Content.objects.fed(reply_fid).get()
-                if content.replies_fid: process_reply_collection(content.replies_fid)
-            except Content.DoesNotExist:
-                logger.warning(
-                    "process_reply - reply %s for entity %s could not be processed",
-                    remote_content.id, remote_content.target_id)
+            await sync_to_async(process_entities)([remote_content])
+            if remote_content.replies: await process_reply_collection(remote_content.replies)
 
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
+async def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     """
     Process ActivityPub replies from a root content.
 
@@ -468,21 +461,20 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     :return:
     """
     # Process Activitypub reply collection
-    try:
-        root = Content.objects.get(id=root_id)
-    except Content.DoesNotExist:
+    root = await Content.objects.filter(id=root_id).values('fid', 'replies_fid', 'shares', 'shares_count').alast()
+    if not root:
         # Retracted?
         return
-    # A job might have been scheduled from process_entity_shares
+    # A job might have been scheduled from process_entity_share
     if shared_by_id:
-        if getattr(root.shares.last(), 'id', None) != shared_by_id:
-            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root.fid)
+        if root['shares'] != shared_by_id:
+            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root['fid'])
             return
-    elif root.shares_count > 0:
-        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
+    elif root['shares_count'] > 0:
+        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root['fid'])
         return
 
-    process_reply_collection(root.replies_fid)
+    await process_reply_collection(root['replies_fid'])
 
     if settings.DEBUG or not settings.SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED:
         return
@@ -493,7 +485,7 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
         if delta else dt.timedelta(minutes=settings.SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES)
     )
     if delta < dt.timedelta(days=settings.SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS):
-        if process_replies.send_with_options(
+        if await sync_to_async(process_replies.send_with_options)(
                 args=(root_id, shared_by_id, delta.total_seconds()),
                 kwargs={
                     "queue_once_id": root_id,
@@ -501,9 +493,9 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
                 # Delay is milliseconds
                 delay=delta.total_seconds()*1000,
         ):
-            logger.info("process_replies - queued refresh job for entity %s", root.fid)
+            logger.info("process_replies - queued refresh job for entity %s", root['fid'])
         else:
-            logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)
+            logger.warning("process_replies - failed to enqueue refresh job for entity %s", root['fid'])
 
 
 async def sender_key_fetcher(fid):
