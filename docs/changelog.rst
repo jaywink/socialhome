@@ -6,6 +6,16 @@ Changelog
 unreleased
 ----------
 
+Changed
+.......
+
+* RQ has been removed. Since 0.24.0, no jobs should have been queued to RQ.
+
+  Important! If upgrading from below 0.24.0, upgrade to that version first, ensure
+  the RQ queues are emptied, and then upgrade further.
+
+* Update Dramatiq dependency.
+
 Fixed
 .....
 
