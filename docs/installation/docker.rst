@@ -110,7 +110,9 @@ Socialhome uses environment variables for configuration. At minimum, you need to
 * ``DJANGO_ALLOWED_HOSTS`` your Socialhome domain
 * ``SOCIALHOME_DOMAIN`` your Socialhome domain
 * ``REDIS_HOST`` hostname of your Redis instance
-* ``DAPHNE_WORKER_NUM`` the amount of daphne processes you want to run (default 1)
+* ``DAPHNE_WORKER_NUM`` the amount of Daphne processes you want to run (default 1)
+* ``DRAMATIQ_NPROCS`` the amount of Dramatiq processes you want to run (defaults to number of vcpus)
+* ``DRAMATIQ_NTHREADS`` the amount of threads in each Dramatiq process (defaults to 8)
 * ``DJANGO_ACCOUNT_ALLOW_REGISTRATION`` either "True" or "False" depending whether you
   want to allow signups.
 
