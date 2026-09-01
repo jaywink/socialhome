@@ -11,11 +11,9 @@ from django.utils.timezone import now
 
 from socialhome.content.enums import ContentType
 from socialhome.content.models import Content
-from socialhome.streams import tasks
 from socialhome.streams.consumers import notify_listeners
 from socialhome.streams.enums import StreamType
-from socialhome.users.models import User, Profile
-from socialhome.users.utils import update_profiles
+from socialhome.users.models import User
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -46,47 +44,6 @@ def add_to_redis(content, through, keys):
             throughs_key = BaseStream.get_throughs_key(key)
             r.hset(throughs_key, content.id, through.id)
             r.expire(throughs_key, settings.REDIS_DEFAULT_EXPIRY)
-
-
-def add_to_streams_for_users(content_id, through_id, acting_profile_id):
-    """Add content to all user streams of one type and do notification of streams.
-
-    Excludes author of content.
-
-    This function is designed to be queued to RQ.
-    """
-    try:
-        content = Content.objects.get(id=content_id)
-    except Content.DoesNotExist:
-        logger.warning("Stream.add_to_streams_for_users - content %s does not exist!", content_id)
-        return
-    try:
-        through = Content.objects.get(id=through_id)
-    except Content.DoesNotExist:
-        logger.warning("Stream.add_to_streams_for_users - through content %s does not exist!", through_id)
-        return
-    try:
-        acting_profile = Profile.objects.select_related("user").get(id=acting_profile_id)
-    except Profile.DoesNotExist:
-        logger.warning("Stream.add_to_streams_for_users - acting profile %s does not exist!", acting_profile_id)
-        return
-
-    qs = get_precache_users_qs(acting_profile)
-    cache_keys = []
-    notify_keys = set()
-    for stream_cls in ALL_STREAMS:
-        counter = 0
-        # Cache for each active user`
-        for user in qs.iterator():
-            counter += 1
-            check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
-                                  through.content_type == ContentType.SHARE)
-        logger.info(
-            "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
-            stream_cls.__name__, counter, len(cache_keys),
-        )
-    add_to_redis(content, through, cache_keys)
-    notify_listeners(content, notify_keys)
 
 
 def check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys, is_share):
@@ -171,7 +128,8 @@ def update_streams_with_content(content, event='new'):
         add_to_redis(content, through, keys)
         notify_listeners(content, notify_keys, event)
     # Queue rest to task runner
-    tasks.add_to_streams_for_users.send(content.id, through.id, acting_profile.id)
+    from socialhome.streams.tasks import add_to_streams_for_users
+    add_to_streams_for_users.send(content.id, through.id, acting_profile.id)
     # Notify about reply separately
     if content.content_type == ContentType.REPLY:
         # Content reply
@@ -271,7 +229,9 @@ class BaseStream:
         preserved = Case(*[When(id=id, then=pos) for pos, id in enumerate(ids)])
         content = Content.objects.filter(id__in=ids)\
             .select_related("author__user", "share_of").prefetch_related("tags").order_by(preserved)
-        if not settings.DEBUG: update_profiles(content)
+        if not settings.DEBUG:
+            from socialhome.users.utils import update_profiles
+            update_profiles(content)
         return content, throughs
 
     def get_content_ids(self):

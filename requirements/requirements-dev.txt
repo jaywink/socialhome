@@ -102,9 +102,7 @@ circus==0.19.0
     # via -r requirements/requirements.txt
 click==8.3.1
     # via
-    #   -r requirements/requirements.txt
     #   pip-tools
-    #   rq
     #   uvicorn
 codecov==2.1.13
     # via -r requirements/requirements-dev.in
@@ -130,10 +128,6 @@ coverage[toml]==7.12.0
     #   codecov
     #   django-coverage-plugin
     #   pytest-cov
-croniter==6.0.0
-    # via
-    #   -r requirements/requirements.txt
-    #   rq
 cryptography==46.0.3
     # via
     #   -r requirements/requirements.txt
@@ -181,7 +175,6 @@ django==4.2.26
     #   django-redis
     #   django-redisboard
     #   django-reversion
-    #   django-rq
     #   django-secure
     #   django-settings-export
     #   django-silk
@@ -242,8 +235,6 @@ django-redisboard==9.0.0
 django-reversion==6.0.0
     # via -r requirements/requirements.txt
 django-robots==6.1
-    # via -r requirements/requirements.txt
-django-rq==3.2.1
     # via -r requirements/requirements.txt
 django-secure==1.0.2
     # via -r requirements/requirements.txt
@@ -560,7 +551,6 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/requirements.txt
     #   arrow
-    #   croniter
     #   drf-haystack
     #   federation
     #   freezegun
@@ -586,7 +576,6 @@ python-xrd==0.1
 pytz==2025.2
     # via
     #   -r requirements/requirements.txt
-    #   croniter
     #   drf-yasg
     #   federation
 pyyaml==6.0.3
@@ -610,10 +599,8 @@ redis==7.1.0
     #   channels-redis
     #   django-redis
     #   django-redisboard
-    #   django-rq
     #   dramatiq
     #   federation
-    #   rq
 referencing==0.37.0
     # via
     #   -r requirements/requirements.txt
@@ -641,10 +628,6 @@ rpds-py==0.29.0
     #   -r requirements/requirements.txt
     #   jsonschema
     #   referencing
-rq==2.6.1
-    # via
-    #   -r requirements/requirements.txt
-    #   django-rq
 service-identity==24.2.0
     # via
     #   -r requirements/requirements.txt

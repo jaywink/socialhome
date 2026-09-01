@@ -6,6 +6,11 @@ import dramatiq
 from django.conf import settings
 from django.utils.timezone import now
 
+from socialhome.content.enums import ContentType
+from socialhome.content.models import Content
+from socialhome.streams.consumers import notify_listeners
+from socialhome.streams.streams import get_precache_users_qs, ALL_STREAMS, check_and_add_to_keys, add_to_redis
+from socialhome.users.models import Profile
 from socialhome.utils import get_redis_connection
 
 logger = logging.getLogger("socialhome")
@@ -116,9 +121,39 @@ def groom_redis_precaches():
 
 @dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_MEDIUM)
 def add_to_streams_for_users(content_id, through_id, acting_profile_id):
+    """Add content to all user streams of one type and do notification of streams.
+
+    Excludes author of content.
     """
-    FIXME: Once RQ is removed, move the called function code here.
-    It needs to live where it is until RQ queues are processed.
-    """
-    from socialhome.streams import streams
-    streams.add_to_streams_for_users(content_id, through_id, acting_profile_id)
+    try:
+        content = Content.objects.get(id=content_id)
+    except Content.DoesNotExist:
+        logger.warning("Stream.add_to_streams_for_users - content %s does not exist!", content_id)
+        return
+    try:
+        through = Content.objects.get(id=through_id)
+    except Content.DoesNotExist:
+        logger.warning("Stream.add_to_streams_for_users - through content %s does not exist!", through_id)
+        return
+    try:
+        acting_profile = Profile.objects.select_related("user").get(id=acting_profile_id)
+    except Profile.DoesNotExist:
+        logger.warning("Stream.add_to_streams_for_users - acting profile %s does not exist!", acting_profile_id)
+        return
+
+    qs = get_precache_users_qs(acting_profile)
+    cache_keys = []
+    notify_keys = set()
+    for stream_cls in ALL_STREAMS:
+        counter = 0
+        # Cache for each active user`
+        for user in qs.iterator():
+            counter += 1
+            check_and_add_to_keys(stream_cls, user, content, cache_keys, acting_profile, notify_keys,
+                                  through.content_type == ContentType.SHARE)
+        logger.info(
+            "Stream.add_to_streams_for_users - checked stream %s for %s users, adding to %s cache keys",
+            stream_cls.__name__, counter, len(cache_keys),
+        )
+    add_to_redis(content, through, cache_keys)
+    notify_listeners(content, notify_keys)

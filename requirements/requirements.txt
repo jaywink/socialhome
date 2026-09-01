@@ -68,8 +68,6 @@ charset-normalizer==3.4.4
     # via requests
 circus==0.19.0
     # via -r requirements/requirements.in
-click==8.3.1
-    # via rq
 commonmark-socialhome==0.9.1.post2
     # via
     #   -r requirements/requirements.in
@@ -80,8 +78,6 @@ coreapi==2.3.3
     # via -r requirements/requirements.in
 coreschema==0.0.4
     # via coreapi
-croniter==6.0.0
-    # via rq
 cryptography==46.0.3
     # via
     #   autobahn
@@ -116,7 +112,6 @@ django==4.2.26
     #   django-redis
     #   django-redisboard
     #   django-reversion
-    #   django-rq
     #   django-secure
     #   django-settings-export
     #   django-silk
@@ -167,8 +162,6 @@ django-redisboard==9.0.0
 django-reversion==6.0.0
     # via -r requirements/requirements.in
 django-robots==6.1
-    # via -r requirements/requirements.in
-django-rq==3.2.1
     # via -r requirements/requirements.in
 django-secure==1.0.2
     # via -r requirements/requirements.in
@@ -329,7 +322,6 @@ pyparsing==3.2.5
 python-dateutil==2.9.0.post0
     # via
     #   arrow
-    #   croniter
     #   drf-haystack
     #   federation
 python-httpsig-socialhome==1.6.0
@@ -349,7 +341,6 @@ python-xrd==0.1
 pytz==2025.2
     # via
     #   -r requirements/requirements.in
-    #   croniter
     #   drf-yasg
     #   federation
 pyyaml==6.0.3
@@ -369,10 +360,8 @@ redis==7.1.0
     #   channels-redis
     #   django-redis
     #   django-redisboard
-    #   django-rq
     #   dramatiq
     #   federation
-    #   rq
 referencing==0.37.0
     # via
     #   jsonschema
@@ -390,10 +379,6 @@ rpds-py==0.29.0
     # via
     #   jsonschema
     #   referencing
-rq==2.6.1
-    # via
-    #   -r requirements/requirements.in
-    #   django-rq
 service-identity==24.2.0
     # via twisted
 six==1.17.0

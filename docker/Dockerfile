@@ -28,7 +28,6 @@ RUN apt-get purge python3-dev build-essential -y && \
     mkdir -p /logs
 
 ENV POSTGRES_PASSWORD postgres
-ENV RQWORKER_NUM 1
 ENV DAPHNE_WORKER_NUM 1
 ENV DJANGO_SETTINGS_MODULE config.settings.production
 ENV REDIS_HOST redis

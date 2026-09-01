@@ -95,10 +95,6 @@ CACHES = {
     }
 }
 
-# RQ
-# --
-RQ_QUEUES["default"]["USE_REDIS_CACHE"] = "default"
-
 # VERSATILEIMAGEFIELD
 # -------------------
 VERSATILEIMAGEFIELD_SETTINGS = {
@@ -124,7 +120,6 @@ if env('SENTRY_DSN', default=None):
     }
     LOGGING['loggers']['socialhome']['handlers'].append('sentry')
     LOGGING['loggers']['federation']['handlers'].append('sentry')
-    LOGGING['loggers']['rq_scheduler.scheduler']['handlers'].append('sentry')
     LOGGING['root'] = {
         'level': env("SOCIALHOME_LOG_LEVEL", default="INFO"),
         'handlers': ['sentry', log_target],

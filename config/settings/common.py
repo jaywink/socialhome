@@ -55,7 +55,6 @@ THIRD_PARTY_APPS = (
     "allauth.socialaccount",
     "markdownx",
     "django_extensions",
-    "django_rq",
     "rest_framework",
     "rest_framework.authtoken",
     "dynamic_preferences",
@@ -291,24 +290,6 @@ REDIS_DB = env("REDIS_DB", default=0)
 REDIS_PASSWORD = env("REDIS_PASSWORD", default=None)
 REDIS_DEFAULT_EXPIRY = 60*60*24*30
 REDIS_URL = "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB)
-
-# RQ
-# --
-rq_queue_config = {
-    "HOST": REDIS_HOST,
-    "PORT": REDIS_PORT,
-    "DB": REDIS_DB,
-    "PASSWORD": REDIS_PASSWORD,
-    "DEFAULT_TIMEOUT": 600,
-}
-RQ_QUEUES = {
-    "highest": rq_queue_config,
-    "high": rq_queue_config,
-    "default": rq_queue_config,
-    "low": rq_queue_config,
-    "lowest": rq_queue_config,
-}
-RQ_SHOW_ADMIN_LINK = True
 
 # Dramatiq
 DRAMATIQ_BROKER = {
@@ -628,11 +609,6 @@ LOGGING = {
             "propagate": False,
         },
         "federation": {
-            "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
-            "handlers": [log_target],
-            "propagate": False,
-        },
-        "rq_scheduler.scheduler": {
             "level": env("SOCIALHOME_LOG_LEVEL", default="INFO"),
             "handlers": [log_target],
             "propagate": False,

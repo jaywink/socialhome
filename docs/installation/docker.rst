@@ -54,7 +54,6 @@ The following path prefixes need to be routed to port **23564** on the backend c
 * ``/receive``
 * ``/admin``
 * ``/api``
-* ``/django-rq``
 * ``/fetch``
 * ``/hcard``
 * ``/jsi18n``
@@ -111,7 +110,6 @@ Socialhome uses environment variables for configuration. At minimum, you need to
 * ``DJANGO_ALLOWED_HOSTS`` your Socialhome domain
 * ``SOCIALHOME_DOMAIN`` your Socialhome domain
 * ``REDIS_HOST`` hostname of your Redis instance
-* ``RQWORKER_NUM`` the amount of RQ worker processes you want to run (default 1)
 * ``DAPHNE_WORKER_NUM`` the amount of daphne processes you want to run (default 1)
 * ``DJANGO_ACCOUNT_ALLOW_REGISTRATION`` either "True" or "False" depending whether you
   want to allow signups.

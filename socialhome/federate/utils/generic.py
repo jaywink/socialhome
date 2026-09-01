@@ -102,7 +102,7 @@ def queue_payload(request: HttpRequest, uuid: str = None):
     """
     from socialhome.federate.tasks import receive_task  # Circulars
     try:
-        # Create a simpler request object we can push to RQ
+        # Create a simpler request object we can push to the task runner
         headers = {}
         for key, value in request.META.items():
             key = key.replace('HTTP_', '').lower().replace('_', '-').capitalize()
