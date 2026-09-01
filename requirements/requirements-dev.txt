@@ -261,7 +261,7 @@ djangorestframework-stubs==3.16.5
     # via -r requirements/requirements-dev.in
 docutils==0.21.2
     # via sphinx
-dramatiq[redis]==2.1.0
+dramatiq[redis]==2.2.0
     # via
     #   -r requirements/requirements.txt
     #   django-dramatiq
