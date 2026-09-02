@@ -23,7 +23,7 @@ from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from federation.protocols.enums import ProtocolType
 from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
-from memoize import memoize, delete_memoized
+from memoize_compat import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.activities.models import Activity
