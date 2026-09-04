@@ -152,7 +152,11 @@ DATABASES = {
 }
 # When using ASGI, persistent connections should be disabled.
 DATABASES["default"]["CONN_MAX_AGE"] = 0
-DATABASES["default"]["OPTIONS"] = {"pool": True}
+DATABASES["default"]["OPTIONS"] = {"pool": {
+                                        "max_size": env.int("PSYCOPG_MAX_POOL_SIZE", 4)
+                                        }
+                                    }
+# Atomic requests are not supportd with async views
 #DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # GENERAL CONFIGURATION
