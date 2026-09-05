@@ -83,11 +83,6 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
 # ------------------------------------------------------------------------------
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
-# RQ
-# --
-for queue_config in RQ_QUEUES.values():
-    queue_config['ASYNC'] = False
-
 # SOCIALHOME
 # ------------------------------------------------------------------------------
 # Disable generating RSA keys automatically, otherwise tests become slow

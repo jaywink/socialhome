@@ -31,7 +31,7 @@ class Command(BaseCommand):
         scheduler.add_job(
             func=delete_redis_keys.send,
             trigger=CronTrigger.from_crontab("15 */12 * * *"),
-            args=[["rq:job:*", "rq:results:*", "fed_cache:*"]],
+            args=[["fed_cache:*"]],
             max_instances=1,
         )
         # Groom redis precaches

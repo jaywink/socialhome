@@ -12,9 +12,10 @@ from socialhome.content.tests.factories import (
     ContentFactory, PublicContentFactory, SiteContentFactory, SelfContentFactory, LimitedContentFactory)
 from socialhome.streams.enums import StreamType
 from socialhome.streams.streams import (
-    BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis, add_to_streams_for_users,
+    BaseStream, FollowedStream, PublicStream, TagStream, add_to_redis,
     update_streams_with_content, check_and_add_to_keys, ProfileAllStream, ProfilePinnedStream, LocalStream, TagsStream,
     ALL_STREAMS)
+from socialhome.streams.tasks import add_to_streams_for_users
 from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory
 
@@ -54,7 +55,7 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         cls.limited_content = LimitedContentFactory()
         cls.reply = PublicContentFactory(parent=cls.content)
 
-    @patch("socialhome.streams.streams.add_to_redis")
+    @patch("socialhome.streams.tasks.add_to_redis")
     def test_calls_add_to_redis(self, mock_add):
         with patch("socialhome.users.models.User.recently_active", new_callable=mock.PropertyMock, return_value=True):
             add_to_streams_for_users(self.content.id, self.content.id, self.content.author.id)
@@ -63,14 +64,14 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         stream3 = PublicStream(user=self.user)
         mock_add.assert_called_once_with(self.content, self.content, [stream1.key, stream3.key])
 
-    @patch("socialhome.streams.streams.check_and_add_to_keys", autospec=True)
+    @patch("socialhome.streams.tasks.check_and_add_to_keys", autospec=True)
     def test_calls_check_and_add_to_keys_for_each_user(self, mock_check):
         add_to_streams_for_users(self.content.id, self.content.id, self.content.author.id)
         calls = [call(cls, self.user, self.content, [], self.content.author, set(), False) for cls in ALL_STREAMS]
         assert mock_check.call_count == len(ALL_STREAMS)
         mock_check.assert_has_calls(calls, any_order=True)
 
-    @patch("socialhome.streams.streams.check_and_add_to_keys", autospec=True)
+    @patch("socialhome.streams.tasks.check_and_add_to_keys", autospec=True)
     @override_settings(SOCIALHOME_STREAMS_PRECACHE_INACTIVE_DAYS=2)
     @freeze_time('2018-02-01')
     def test_calls_check_and_add_to_keys_for_each_user__skipping_inactives(self, mock_check):
@@ -148,10 +149,9 @@ class TestUpdateStreamsWithContent(SocialhomeTestCase):
         cls.remote_content = PublicContentFactory()
         cls.share = PublicContentFactory(share_of=cls.content)
 
-    @patch("socialhome.streams.streams.tasks")
     @patch("socialhome.streams.streams.add_to_redis")
     @patch("socialhome.streams.streams.CACHED_STREAM_CLASSES", new=(FollowedStream, PublicStream))
-    def test_adds_with_local_user(self, mock_add, mock_tasks):
+    def test_adds_with_local_user(self, mock_add):
         update_streams_with_content(self.remote_content)
         self.assertFalse(mock_add.called)
         self.user.mark_recently_active()

@@ -7,7 +7,8 @@ from socialhome.content.enums import ContentType
 from socialhome.content.models import Tag
 from socialhome.content.tests.factories import ContentFactory
 from socialhome.enums import Visibility
-from socialhome.streams.streams import update_streams_with_content, add_to_streams_for_users
+from socialhome.streams.streams import update_streams_with_content
+from socialhome.streams.tasks import add_to_streams_for_users
 from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
 

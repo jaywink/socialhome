@@ -17,7 +17,6 @@ def forward(apps, schema_editor):
         Url.objects.create(pattern='/content/bookmarklet'),
         Url.objects.create(pattern='/content/create'),
         Url.objects.create(pattern='/delete-account'),
-        Url.objects.create(pattern='/django-rq'),
         Url.objects.create(pattern='/fetch'),
         Url.objects.create(pattern='/followed'),
         Url.objects.create(pattern='/hcard'),

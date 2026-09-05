@@ -28,7 +28,6 @@ django-redis
 django-redisboard
 django-reversion
 django-robots
-django-rq
 django-secure
 django-settings-export
 django-silk
@@ -49,7 +48,6 @@ python-slugify
 pytz
 raven
 redis
-rq
 validators
 whitenoise
 xapian-haystack
