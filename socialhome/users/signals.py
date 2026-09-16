@@ -19,7 +19,7 @@ def user_post_save(sender, **kwargs):
     user = kwargs.get("instance")
     if kwargs.get("created"):
         # Create the user profile
-        profile = Profile.objects.create(
+        profile = Profile(
             user=user,
             name=user.name,
             email=user.email,
@@ -28,6 +28,7 @@ def user_post_save(sender, **kwargs):
         )
         if settings.SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE:
             profile.generate_new_rsa_key()
+        profile.save()
 
     else:
         # If users require approval, email the admin
