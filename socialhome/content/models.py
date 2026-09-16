@@ -527,15 +527,15 @@ class Content(models.Model):
                 return True
         return False
 
-    def visible_for_fed_user(self, fid):
+    async def visible_for_fed_user(self, fid):
         """
         Filter by visibiity to given remote fid
         Assumes the fid is extracted from a signed AP request
         """
         if self.visibility == Visibility.PUBLIC:
             return True
-        profile = Profile.objects.filter(fid=fid).first()
+        profile = await Profile.objects.filter(fid=fid).afirst()
         if profile:
-            if self.limited_visibilities.filter(id=profile.id).exists():
+            if await self.limited_visibilities.filter(id=profile.id).aexists():
                 return True
         return False

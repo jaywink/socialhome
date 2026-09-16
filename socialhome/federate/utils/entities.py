@@ -104,7 +104,7 @@ async def get_federable_object(request: HttpRequest, signer: str = None) -> Opti
             except ValueError:
                 pass
         if content and content.author.is_local and (
-                content.visible_for_user(user) or content.visible_for_fed_user(signer)):
+                content.visible_for_user(user) or await content.visible_for_fed_user(signer)):
             federable_content = await sync_to_async(make_federable_content)(content)
             return federable_content
     elif request.path.startswith('/u/') or request.path == '/':
