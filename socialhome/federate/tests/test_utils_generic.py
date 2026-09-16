@@ -10,9 +10,9 @@ class TestQueuePayload(SocialhomeTestCase):
         super().setUp()
         self.request = self.get_request(None)
 
-    def test_calls_enqueue(self):
+    async def test_calls_enqueue(self):
         with patch.object(tasks, "receive_task", autospec=True) as mock_enqueue:
-            queue_payload(self.request)
+            await queue_payload(self.request)
         assert len(mock_enqueue.method_calls) == 1
         name, args, kwargs = mock_enqueue.method_calls[0]
         self.assertEqual(name, 'send')
@@ -24,18 +24,18 @@ class TestQueuePayload(SocialhomeTestCase):
         self.assertEqual(request.url, self.request.build_absolute_uri())
         self.assertIsNone(kwargs['uuid'])
 
-    def test_calls_enqueue__with_uuid(self):
+    async def test_calls_enqueue__with_uuid(self):
         with patch.object(tasks, "receive_task", autospec=True) as mock_enqueue:
-            queue_payload(self.request, uuid='1234')
+            await queue_payload(self.request, uuid='1234')
         assert len(mock_enqueue.method_calls) == 1
         name, _args, kwargs = mock_enqueue.method_calls[0]
         self.assertEqual(name, 'send')
         self.assertEqual(kwargs['uuid'], '1234')
 
-    def test_calls_enqueue__with_uuid_from_path(self):
+    async def test_calls_enqueue__with_uuid_from_path(self):
         request = self.get_request(None, path="/p/1234/inbox/")
         with patch.object(tasks, "receive_task", autospec=True) as mock_enqueue:
-            queue_payload(request)
+            await queue_payload(request)
         assert len(mock_enqueue.method_calls) == 1
         name, _args, kwargs = mock_enqueue.method_calls[0]
         self.assertEqual(name, 'send')

@@ -2,6 +2,7 @@ from unittest import skip
 from unittest.mock import patch
 
 from django.conf import settings
+from django.db import transaction
 from django.urls import reverse
 
 from socialhome.content.enums import ContentType
@@ -97,6 +98,7 @@ class TestSendMentionNotification(SocialhomeTestCase):
         self.assertFalse(kwargs.get("fail_silently"))
 
 
+@transaction.atomic
 class TestSendReplyNotification(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):

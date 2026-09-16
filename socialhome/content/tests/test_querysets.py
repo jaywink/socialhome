@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
 
 from socialhome.content.models import Content, Tag
 from socialhome.content.tests.factories import (
@@ -8,6 +9,7 @@ from socialhome.tests.utils import SocialhomeTestCase
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
 
 
+@transaction.atomic
 class TestContentQuerySet(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):

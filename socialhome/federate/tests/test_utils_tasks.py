@@ -735,24 +735,23 @@ class TestSenderKeyFetcher(SocialhomeTestCase):
         super().setUpTestData()
         cls.create_local_and_remote_user()
 
-    def test_existing_remote_profile_public_key_is_returned(self):
-        self.assertEqual(sender_key_fetcher(self.remote_profile.fid), self.remote_profile.rsa_public_key)
+    async def test_existing_remote_profile_public_key_is_returned(self):
+        self.assertEqual(await sender_key_fetcher(self.remote_profile.fid), self.remote_profile.rsa_public_key)
 
-    def test_local_profile_is_skipped(self):
-        self.assertIsNone(sender_key_fetcher(self.profile.fid), self.profile.rsa_public_key)
+    async def test_local_profile_is_skipped(self):
+        self.assertIsNone(await sender_key_fetcher(self.profile.fid), self.profile.rsa_public_key)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile")
     @patch("socialhome.federate.utils.tasks.Profile.from_remote_profile")
-    def test_remote_profile_public_key_is_returned(self, mock_from_remote, mock_retrieve):
-        remote_profile = Mock(rsa_public_key="foo")
-        mock_retrieve.return_value = mock_from_remote.return_value = remote_profile
-        self.assertEqual(sender_key_fetcher("https://example.com/foo"), "foo")
+    async def test_remote_profile_public_key_is_returned(self, mock_from_remote, mock_retrieve):
+        remote_profile = Mock(public_key="foo")
+        mock_retrieve.return_value = remote_profile
+        self.assertEqual(await sender_key_fetcher("https://example.com/foo"), "foo")
         mock_retrieve.assert_called_once_with("https://example.com/foo")
-        mock_from_remote.assert_called_once_with(remote_profile)
 
     @patch("socialhome.federate.utils.tasks.retrieve_remote_profile", return_value=None)
     @patch("socialhome.federate.utils.tasks.logger.warning")
-    def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
-        self.assertEqual(sender_key_fetcher("https://example.com/foo"), None)
-        mock_logger.assert_called_once_with("get_profile_for_object - Remote profile %s not found locally "
+    async def test_nonexisting_remote_profile_is_logged(self, mock_logger, mock_retrieve):
+        self.assertEqual(await sender_key_fetcher("https://example.com/foo"), None)
+        mock_logger.assert_called_once_with("sender_key_fetcher - Remote profile %s not found locally "
                                             "or remotely.", "https://example.com/foo")
