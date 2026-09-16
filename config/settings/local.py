@@ -84,8 +84,6 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
-# Disable generating RSA keys automatically, otherwise tests become slow
-SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
 SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", False)
 
 # HAYSTACK
@@ -106,6 +104,9 @@ MIDDLEWARE += ("querycount.middleware.QueryCountMiddleware",)
 
 # Tests
 if testing:
+    # Disable generating RSA keys automatically, otherwise tests become slow
+    SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
+
     # Possibly wont conflict with anything..
     REDIS_DB = 15
 
@@ -115,6 +116,7 @@ if testing:
 
     DRAMATIQ_BROKER = {
         "BROKER": "dramatiq.brokers.stub.StubBroker",
+        "OPTIONS": {},
         "MIDDLEWARE": [
             "socialhome.tasks.middleware.QueueOnceMiddleware",
             "dramatiq.middleware.AgeLimit",
