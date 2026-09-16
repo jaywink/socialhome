@@ -38,7 +38,7 @@ async def receive_task(request, uuid=None):
     profile = None
     if uuid:
         try:
-            profile = await Profile.objects.aget(uuid=uuid, user__isnull=False)
+            profile = await Profile.objects.select_related("user").aget(uuid=uuid, user__isnull=False)
         except Profile.DoesNotExist:
             logger.warning("No local profile found with uuid")
             return
@@ -85,7 +85,7 @@ async def send_content(content_id, activity_fid, recipient_id=None):
     we do all this in async.
     """
     try:
-        content = await Content.objects.select_related('author').aget(
+        content = await Content.objects.select_related('author__user').aget(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.CONTENT,
@@ -175,7 +175,7 @@ async def send_reply(content_id, activity_fid):
     we do all this in async.
     """
     try:
-        content = await Content.objects.select_related('author', 'parent__author', 'root_parent__author').aget(
+        content = await Content.objects.select_related('author__user', 'parent__author__user', 'root_parent__author__user').aget(
             id=content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             content_type=ContentType.REPLY,
@@ -224,7 +224,7 @@ async def send_share(content_id, activity_fid):
     we do all this in async.
     """
     try:
-        content = await Content.objects.select_related('author', 'share_of__author').aget(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
+        content = await Content.objects.select_related('author__user', 'share_of__author__user').aget(id=content_id, visibility=Visibility.PUBLIC, content_type=ContentType.SHARE,
                                       local=True)
     except Content.DoesNotExist:
         logger.warning("No local share found with id %s", content_id)
@@ -315,7 +315,7 @@ def send_profile_retraction(profile):
         if settings.DEBUG and settings.SOCIALHOME_DOMAIN.startswith('127.0'):
             # Don't send in development mode
             return
-        recipients = _get_remote_followers(profile, profile.visibility)
+        recipients = async_to_sync(_get_remote_followers)(profile, profile.visibility)
         logger.debug("send_profile_retraction - sending to recipients: %s", recipients)
         async_to_sync(handle_send)(entity, profile.federable, recipients, payload_logger=get_outbound_payload_logger())
     else:
@@ -332,7 +332,7 @@ async def forward_entity(entity, target_content_id):
     we do all this in async.
     """
     try:
-        target_content = await Content.objects.aget(
+        target_content = await Content.objects.select_related("author__user").aget(
             id=target_content_id,
             visibility__in=(Visibility.PUBLIC, Visibility.LIMITED),
             local=True,
@@ -341,7 +341,7 @@ async def forward_entity(entity, target_content_id):
         logger.warning("forward_entity - No local content found with id %s", target_content_id)
         return
     try:
-        content = await Content.objects.fed(entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED)).aget()
+        content = await Content.objects.fed(entity.id, visibility__in=(Visibility.PUBLIC, Visibility.LIMITED)).select_related("author").aget()
     except Content.DoesNotExist:
         logger.warning("forward_entity - No content found with uuid %s", entity.id)
         return
@@ -350,7 +350,7 @@ async def forward_entity(entity, target_content_id):
         return
     if target_content.visibility == Visibility.PUBLIC:
         recipients = await _get_remote_participants_for_content(target_content, exclude=entity.actor_id)
-        recipients.extend(_get_remote_followers(
+        recipients.extend(await _get_remote_followers(
             target_content.author,
             target_content.visibility,
             exclude=entity.actor_id,
@@ -370,7 +370,7 @@ async def forward_entity(entity, target_content_id):
 async def send_follow_change(profile_id, followed_id, follow):
     """Handle sending of a local follow of a remote profile."""
     try:
-        profile = await Profile.objects.aget(id=profile_id, user__isnull=False)
+        profile = await Profile.objects.select_related("user").aget(id=profile_id, user__isnull=False)
     except Profile.DoesNotExist:
         logger.warning("send_follow_change - No local profile %s found to send follow with", profile_id)
         return
