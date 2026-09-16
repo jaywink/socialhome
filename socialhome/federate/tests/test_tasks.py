@@ -15,7 +15,7 @@ from socialhome.enums import Visibility
 from socialhome.federate.tasks import (
     receive_task, send_content, send_content_retraction, send_reply, forward_entity, _get_remote_followers,
     send_follow_change, send_profile, send_share, send_profile_retraction, _get_limited_recipients)
-from socialhome.tests.utils import SocialhomeTestCase, SocialhomeDramatiqTestCase, SocialhomeTransactionTestCase
+from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTestCase
 from socialhome.users.models import Profile
 import socialhome.users.signals as signals
 from socialhome.users.tests.factories import (
