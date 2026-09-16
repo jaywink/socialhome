@@ -518,5 +518,6 @@ async def sender_key_fetcher(fid):
         profile = await retrieve_remote_profile(fid)
         key = getattr(profile, 'public_key', None)
     if not profile:
+        logger.warning("sender_key_fetcher - Remote profile %s not found locally or remotely.", fid)
         return
     return key
