@@ -59,17 +59,6 @@ class User(AbstractUser):
     # with unlimited usage of HTML tags.
     trusted_editor = models.BooleanField(_("Trusted editor"), default=False)
 
-    # Picture
-    picture = VersatileImageField(
-        _("Picture"), upload_to="profiles/", width_field="picture_width", height_field="picture_height",
-        placeholder_image=OnDiscPlaceholderImage(path=os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "static", "images", "pony300.png",
-        )), blank=True, null=True, max_length=255, ppoi_field="picture_ppoi",
-    )
-    picture_height = models.PositiveIntegerField(_("Picture height"), blank=True, null=True)
-    picture_width = models.PositiveIntegerField(_("Picture width"), blank=True, null=True)
-    picture_ppoi = PPOIField("Picture PPOI")
-
     _previous_admin_approved: bool
 
     def __init__(self, *args, **kwargs):
@@ -110,32 +99,6 @@ class User(AbstractUser):
         if settings.SOCIALHOME_ROOT_PROFILE == self.username:
             return "/"
         return reverse("users:detail", kwargs={"username": self.username})
-
-    def copy_picture_to_profile(self, save=True):
-        """Copy picture to profile image urls"""
-        if self.picture:
-            self.profile.image_url_small = get_full_media_url(self.picture.crop["50x50"].name)
-            self.profile.image_url_medium = get_full_media_url(self.picture.crop["100x100"].name)
-            self.profile.image_url_large = get_full_media_url(self.picture.crop["300x300"].name)
-            self.profile.avatar_url = get_full_media_url(self.picture.name)
-            if save:
-                self.profile.save(update_fields=["avatar_url", "image_url_small", "image_url_medium", "image_url_large", "protocols"])
-            else:
-                type(self.profile).objects.filter(id=self.profile.id).update(
-                    image_url_small=self.profile.image_url_small,
-                    image_url_medium=self.profile.image_url_medium,
-                    image_url_large=self.profile.image_url_large,
-                    avatar_url=self.profile.avatar_url
-                )
-
-    def init_pictures_on_disk(self):
-        """Create image versions on disk."""
-        picture_warmer = VersatileImageFieldWarmer(
-            instance_or_queryset=self,
-            rendition_key_set="profile_picture",
-            image_attr="picture",
-        )
-        picture_warmer.warm()
 
     def mark_recently_active(self) -> None:
         """

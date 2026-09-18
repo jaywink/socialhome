@@ -34,9 +34,6 @@ def user_post_save(sender, **kwargs):
         # If users require approval, email the admin
         if settings.ACCOUNT_SIGNUP_REQUIRE_ADMIN_APPROVAL and user.admin_approved == False and "email" in kwargs.get('update_fields', set()):
             transaction.on_commit(lambda: send_account_approval_admin_notification.send(user_id=user.id))
-    # Initialize and copy pictures to profile
-    user.init_pictures_on_disk()
-    user.copy_picture_to_profile()
 
 
 def on_commit_profile_following_change(action, pks, instance):
@@ -96,19 +93,3 @@ def federate_profile_retraction(instance, **kwargs):
             send_profile_retraction(instance)
         except Exception as ex:
             logger.exception("Failed to federate_profile_retraction %s: %s", instance, ex)
-
-
-@receiver(post_delete, sender=User, dispatch_uid='delete_user_pictures')
-def delete_user_pictures(sender, instance, **kwargs):
-    """
-    Deletes all user picture copies from disk.
-    """
-    if instance.picture:
-        try:
-            logger.debug('delete_user_pictures: Deleting user pictures for %s', instance)
-            # Deletes Image Renditions
-            instance.picture.delete_all_created_images()
-            # Deletes Original Image
-            instance.picture.delete(save=False)
-        except Exception:
-            logger.exception('delet_user_pictures: Failed to delete %s user pictures from disk', instance)
