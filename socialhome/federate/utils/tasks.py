@@ -434,9 +434,10 @@ async def process_reply(reply):
         # Try to fetch and process
         if isinstance(reply, base.Comment):
             remote_content = reply
-        elif isinstance(reply, str):
+        elif isinstance(reply, str) and reply.startswith("http"):
             remote_content = await retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
+            logger.warning("process_reply - reply %s can not be processed", reply)
             return
         if remote_content:
             logger.info(
