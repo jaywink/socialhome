@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 import dramatiq
 import logging
 from django.conf import settings
