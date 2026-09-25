@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-01-07 17:32+0000\n"
-"PO-Revision-Date: 2026-01-23 22:21+0000\n"
-"Last-Translator: Atalanttore <atalanttore@noreply.codeberg.org>\n"
+"PO-Revision-Date: 2026-09-26 05:25+0000\n"
+"Last-Translator: tct123 <tct123@noreply.codeberg.org>\n"
 "Language-Team: German <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/de/>\n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.15.2\n"
+"X-Generator: Weblate 2026.9.1\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/admin.py:29
@@ -29,6 +29,8 @@ msgstr ""
 #: socialhome/admin.py:38
 msgid "Policy document update emails queued for sending."
 msgstr ""
+"E-Mails zur Aktualisierung von Richtlinien stehen in der Warteschlange zum "
+"Versand."
 
 #: socialhome/admin.py:40
 msgid "Send email update to all users"
@@ -174,7 +176,7 @@ msgstr "Föderations-ID"
 
 #: socialhome/content/models.py:110
 msgid "Reply Collection ID"
-msgstr ""
+msgstr "Antwort-Sammlungs-ID"
 
 #: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
 msgid "Pinned to profile"
