@@ -119,6 +119,8 @@ Multiple ``uuid``'s can be passed in by separating them with commas. A confirmat
 Policy documents
 ----------------
 
+**Note**: this feature is currently unavailable and will be restored in a future version.
+
 Terms of Service and Privacy policy documents are good to have. These tell people visiting your site what rules you operate with. Socialhome provides default templates you can activate with a few clicks.
 
 To review and enable the policy documents, log in as admin and access the admin pages through the navigation bar cogs menu. Scroll down and locate "Policy documents". There are two types of documents, the Terms of Service and Privacy Policy. Each one can be edited in draft mode and then published. Further updates in draft mode will not overwrite the last published version, until published.
@@ -283,6 +285,15 @@ FEDERATION_USER
 ...............
 
 If set to a valid local user name, that user's private key will be used to sign federation get requests.
+
+PSYCOPG_MAX_POOL_SIZE
+......................
+
+Default: ``None``
+
+Set the maximum psycopg connection pool size. Using the default value effectively means a maximum size = 4,
+which is the default minimum pool size. If set, this value should be > 4.
+
 
 REDIS_DB
 ........
