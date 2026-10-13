@@ -425,7 +425,7 @@ async def process_reply_collection(replies_fid):
             logger.info("process_reply - queued job for entity %s", reply)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
+@dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
 async def process_reply(reply):
     reply_fid = getattr(reply, 'id', reply)
     content = await Content.objects.filter(fid=reply_fid).values('replies_fid').alast()
@@ -447,7 +447,7 @@ async def process_reply(reply):
             if remote_content.replies: await process_reply_collection(remote_content.replies)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
+@dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
 async def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     """
     Process ActivityPub replies from a root content.

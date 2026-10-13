@@ -6,7 +6,7 @@ from django.conf import settings
 logger = logging.getLogger("socialhome")
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
+@dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
 async def update_profile_from_fed(profile_id, **kwargs):
     from federation.fetchers import retrieve_remote_profile
     from socialhome.users.models import Profile
