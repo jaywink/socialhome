@@ -299,7 +299,7 @@ class Content(models.Model):
         if self.content_type == ContentType.CONTENT:
             return self
         elif self.content_type == ContentType.REPLY:
-            return self.parent.root
+            return self.parent.root_parent if self.parent.root_parent else self.parent
         elif self.content_type == ContentType.SHARE:
             return self.share_of.root
 
