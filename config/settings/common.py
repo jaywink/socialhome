@@ -155,8 +155,6 @@ DATABASES["default"]["OPTIONS"] = {"pool": {
                                         "max_size": env.int("PSYCOPG_MAX_POOL_SIZE", 4)
                                         }
                                     }
-# Atomic requests are not supportd with async views
-#DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

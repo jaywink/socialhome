@@ -39,11 +39,6 @@ SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 # Make sure djangosecure.middleware.SecurityMiddleware is listed first
 MIDDLEWARE = PRODUCTION_MIDDLEWARE + MIDDLEWARE
 
-# Static Assets
-# ------------------------
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
 # EMAIL
 # ------------------------------------------------------------------------------
 DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL',
