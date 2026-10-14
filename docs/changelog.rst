@@ -12,7 +12,7 @@ Added
 .....
 
 * ``psycopg3``` connection pooling was enabled and a configurable option to contol the maximum pool size
-  (``PSYCOPG_MAX_POOL_SIZE```) was added.
+  (``PSYCOPG_MAX_POOL_SIZE```, default=4) was added.
 
 Changed
 .......

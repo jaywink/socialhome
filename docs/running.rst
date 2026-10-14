@@ -289,7 +289,7 @@ If set to a valid local user name, that user's private key will be used to sign 
 PSYCOPG_MAX_POOL_SIZE
 ......................
 
-Default: ``None``
+Default: ``4``
 
 Set the maximum psycopg connection pool size. Using the default value effectively means a maximum size = 4,
 which is the default minimum pool size. If set, this value should be > 4.
