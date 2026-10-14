@@ -49,7 +49,6 @@ pytz
 raven
 redis<7.2
 validators
-whitenoise
 xapian-haystack
 xapian-bindings-binary
 PyYAML
