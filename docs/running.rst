@@ -114,6 +114,23 @@ To only delete remote profile content and then lock the profile, run as follows:
 
 Multiple ``uuid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
 
+.. _delete-old-tasks:
+
+Deleting old django-dramatiq task records
+-----------------------------------------
+
+To delete old django-dramatiq task records, a Django management command has been provided. This command should be used in place of the django-dramatiq supplied task which may consume a very large amout of memory.
+
+Run the command as folows:
+
+::
+
+    python manage.py delete_old_tasks --before-date YYYYMMDD
+
+The records are deleted --chunk-size (defaults to 1000) at a time, to minimize memory consumption.
+
+It is suggested to run this command regularly (using a cron job for example) to avoid filling disk space.
+
 .. _policy-docs:
 
 Policy documents
