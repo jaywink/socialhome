@@ -1,46 +1,32 @@
-# TODO fix this file for Weblate -> Codeberg Translate move
+Initialisation
+--------------
 
--------
-
-Requirements
-------------
-
-pybabel (already installed)
-pip install django-babel
-
-Patch django-babel with (assuming you are using virtualenv):
-```
-patch -p1 ~/.virtualenvs/socialhome/lib/python3.XX/site-packages/django_babel/extract.py < ~/socialhome/translate/django_babel.patch
-```
-where XX is your python version.
-
-TODO: create an issue for this
-
-Workflow
---------
-
-From project directory,
-
-Create or update the pot file using:
-```
-PYTHONPATH=. pybabel extract -F babel.cfg -o socialhome/locale/django.pot .
-```
-
-Translations are hosted at https://hosted.weblate.org/projects/socialhome. During the initial setup, weblate will pull the django.pot file.
+Translations are hosted at https://translate.codeberg.org/projects/socialhome. During the initial setup, weblate will pull the django.pot file.
 Then new translations can be started using weblate's UI. The pattern to configure for po files is socialhome/locale/*/LC_MESSAGES/django.po.
 
-weblate can be configure to automatically compile mo files, but until we figure out how it works, use the following:
-```
-django-admin compilemessages
-```
-
-or (bash script example):
+From the project directory, run the following command to create the initial pot file:
 
 ```
-for f in locale/*/LC_MESSAGES/django.po; do
-  msgfmt -o ${f/.po/.mo} $f
-done
+./manage.py makemessages -a --keep-pot
 ```
+
+Then commit and push the modified files to master.
+
+Note: this step should needed only once. If a pot file already exists, go to the next section.
+
+Note: see the django documentation to learn how to localize the code.
+
+
+Updating
+--------
+
+When new strings are added/updated/deleted to/from the code, update the pot file and existing po files using:
+```
+./manage.py makemessages --keep-pot $(find socialhome/locale -maxdepth 1 -type d|tail -n +2|xargs -n1 basename|sed 's/^/-l /')
+```
+
+Then commit and push the modified files to master.
+
 
 Saving and archiving from the weblate project will push the updated po files to socialhome's repository.
 
@@ -52,15 +38,15 @@ for f in locale/*/LC_MESSAGES/django.po; do
 done
 ```
 
-Then commit and push. weblate should pick them up automatically via its configured gitlab webhook.
+Then commit and push. weblate should pick them up automatically via its configured webhook.
 
+Building
+--------
 
+weblate can be configure to automatically compile mo files, but until we figure out how it works, use the following:
+```
+./manage.py compilemessages
 
-Hack
-----
+If a docker used, this should be built-in into the image.
+```
 
-~/socialhome/translate/extract.py is a wrapper around pybabel's javascript extractor to deal with template literal placeholders and filters.
-
-TODO: create an issue for this.
-
-NOTE: pybabel is configured to parse compiled js only. If changes are made to js or vue files, npm run dev should be run before updating the translation files.

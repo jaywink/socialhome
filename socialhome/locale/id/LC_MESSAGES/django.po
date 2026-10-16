@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-07 17:32+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-16 15:58-0400\n"
 "PO-Revision-Date: 2021-12-30 00:51+0000\n"
 "Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/socialhome/"
@@ -20,73 +20,11 @@ msgstr ""
 "X-Generator: Weblate 4.10.1\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: socialhome/admin.py:29
-msgid "Choose policy document types to send emails about first!"
-msgstr "Pilih tipe dokumen kebijakan untuk mengirim email terlebih dahulu!"
-
-#: socialhome/admin.py:38
-msgid "Policy document update emails queued for sending."
-msgstr ""
-
-#: socialhome/admin.py:40
-msgid "Send email update to all users"
-msgstr "Kirim email pembaruan ke semua pengguna"
-
-#: socialhome/enums.py:10 socialhome/templates/base.html:100
-msgid "Terms of service"
-msgstr "Kebijakan layanan"
-
-#: socialhome/enums.py:11 socialhome/templates/base.html:97
-msgid "Privacy policy"
-msgstr "Kebijakan privasi"
-
-#: socialhome/enums.py:21 socialhome/static/dist/vue/js/app.js:67
-#: socialhome/streams/enums.py:25 socialhome/templates/base.html:54
-msgid "Public"
-msgstr "Publik"
-
-#: socialhome/enums.py:22 socialhome/static/dist/vue/js/app.js:67
-#: socialhome/streams/enums.py:21 socialhome/templates/base.html:50
-msgid "Limited"
-msgstr "Terbatas"
-
-#: socialhome/enums.py:23 socialhome/static/dist/vue/js/app.js:67
-msgid "Site"
-msgstr "Situs"
-
-#: socialhome/enums.py:24 socialhome/static/dist/vue/js/app.js:67
-msgid "Self"
-msgstr "Sendiri"
-
-#: socialhome/preferences.py:13
-msgid "Log all outbound payloads"
-msgstr ""
-
-#: socialhome/preferences.py:14
-msgid ""
-"If set to true, all outbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should only "
-"be turned on for temporary debugging."
-msgstr ""
-
-#: socialhome/preferences.py:24
-msgid "Log all receive payloads"
-msgstr ""
-
-#: socialhome/preferences.py:25
-msgid ""
-"If set to true, all inbound payloads will be saved as federate.Payload "
-"instances (available in the admin). This is a performance hit so should only "
-"be turned on for temporary debugging."
-msgstr ""
-
-#: socialhome/content/enums.py:17 socialhome/streams/enums.py:18
+#: socialhome/content/enums.py:17 socialhome/streams/enums.py:8
 msgid "Content"
 msgstr "Isi"
 
 #: socialhome/content/enums.py:18
-#: socialhome/content/templates/content/_edit_title.html:7
-#: socialhome/static/dist/vue/js/app.js:67
 msgid "Reply"
 msgstr "Balas"
 
@@ -94,249 +32,258 @@ msgstr "Balas"
 msgid "Share"
 msgstr "Bagikan"
 
-#: socialhome/content/forms.py:18 socialhome/static/dist/vue/js/app.js:67
-msgid "Recipients"
-msgstr "Penerima"
-
-#: socialhome/content/forms.py:53
-msgid "Recipients cannot be empty if not including followed users."
-msgstr ""
-
-#: socialhome/content/forms.py:66
-#, python-format
-msgid "Recipient %s is not in the correct format."
-msgstr "Format penerima %s keliru."
-
-#: socialhome/content/forms.py:72
-msgid "Not all recipients could be found."
-msgstr "Tidak semua penerima dapat ditemukan."
-
-#: socialhome/content/models.py:35 socialhome/content/models.py:48
+#: socialhome/content/models.py:39 socialhome/content/models.py:52
 msgid "URL"
 msgstr "URL"
 
-#: socialhome/content/models.py:36
+#: socialhome/content/models.py:40
 msgid "Title"
 msgstr "Judul"
 
-#: socialhome/content/models.py:37
+#: socialhome/content/models.py:41
 msgid "Description"
 msgstr "Keterangan"
 
-#: socialhome/content/models.py:38
+#: socialhome/content/models.py:42
 msgid "Image URL"
 msgstr "URL Gambar"
 
-#: socialhome/content/models.py:39 socialhome/content/models.py:50
-#: socialhome/content/models.py:162
+#: socialhome/content/models.py:43 socialhome/content/models.py:54
+#: socialhome/content/models.py:166
 msgid "Modified"
 msgstr "Dimodifikasi"
 
-#: socialhome/content/models.py:49
+#: socialhome/content/models.py:53
 msgid "OEmbed HTML content"
 msgstr "Konten OEmbed HTML"
 
-#: socialhome/content/models.py:57 socialhome/users/models.py:138
+#: socialhome/content/models.py:61 socialhome/users/models.py:139
 msgid "Name"
 msgstr "Nama"
 
-#: socialhome/content/models.py:58 socialhome/content/models.py:161
+#: socialhome/content/models.py:62 socialhome/content/models.py:165
 msgid "Created"
 msgstr "Dibuat"
 
-#: socialhome/content/models.py:95
+#: socialhome/content/models.py:99
 msgid "Text"
 msgstr "Teks"
 
-#: socialhome/content/models.py:99 socialhome/users/models.py:143
+#: socialhome/content/models.py:103 socialhome/users/models.py:146
 msgid "GUID"
 msgstr "GUID"
 
-#: socialhome/content/models.py:101
+#: socialhome/content/models.py:105
 msgid "Author"
 msgstr "Penulis"
 
-#: socialhome/content/models.py:106 socialhome/users/models.py:151
+#: socialhome/content/models.py:110 socialhome/users/models.py:154
 msgid "Federation ID"
 msgstr "ID Federasi"
 
-#: socialhome/content/models.py:110
+#: socialhome/content/models.py:114
 #, fuzzy
 msgid "Reply Collection ID"
 msgstr "Jumlah balasan"
 
-#: socialhome/content/models.py:113 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:117
 msgid "Pinned to profile"
 msgstr "Disematkan ke profil"
 
-#: socialhome/content/models.py:115
+#: socialhome/content/models.py:119
 msgid "Order"
 msgstr "Perintah"
 
-#: socialhome/content/models.py:118
+#: socialhome/content/models.py:122
 msgid "Service label"
 msgstr "Label layanan"
 
-#: socialhome/content/models.py:122 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:126
 msgid "Show OEmbed or OpenGraph preview"
 msgstr "Tampilkan pratinjau OEmbed atau OpenGraph"
 
-#: socialhome/content/models.py:123 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:127
 msgid ""
 "Disable to turn off fetching and showing an OEmbed or OpenGraph preview "
 "using the links in the text."
 msgstr ""
 
-#: socialhome/content/models.py:127
+#: socialhome/content/models.py:131
 msgid "OEmbed cache"
 msgstr "Cache OEmbed"
 
-#: socialhome/content/models.py:130
+#: socialhome/content/models.py:134
 msgid "OpenGraph cache"
 msgstr "Cache OpenGraph"
 
-#: socialhome/content/models.py:133
+#: socialhome/content/models.py:137
 msgid "Mentions"
 msgstr "Sebutan"
 
-#: socialhome/content/models.py:134
-#: socialhome/search/templates/search/search.html:68
-#: socialhome/streams/enums.py:27 socialhome/templates/base.html:51
+#: socialhome/content/models.py:138 socialhome/streams/enums.py:17
 msgid "Tags"
 msgstr ""
 
-#: socialhome/content/models.py:137
+#: socialhome/content/models.py:141
 msgid "Parent"
 msgstr ""
 
-#: socialhome/content/models.py:141
+#: socialhome/content/models.py:145
 msgid "Share of"
 msgstr ""
 
-#: socialhome/content/models.py:145 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:149
 msgid "Federate to remote servers"
 msgstr ""
 
-#: socialhome/content/models.py:146 socialhome/static/dist/vue/js/app.js:67
+#: socialhome/content/models.py:150
 msgid ""
 "Disable to skip federating this version to remote servers. Note, saved "
 "content version will still be updated to local streams."
 msgstr ""
 
-#: socialhome/content/models.py:152
+#: socialhome/content/models.py:156
 msgid "Limitied visibilities"
 msgstr ""
 
-#: socialhome/content/models.py:155
+#: socialhome/content/models.py:159
 msgid "Include people I follow"
 msgstr ""
 
-#: socialhome/content/models.py:156
+#: socialhome/content/models.py:160
 msgid "Automatically includes all the people you follow as recipients."
 msgstr ""
 
-#: socialhome/content/models.py:160
+#: socialhome/content/models.py:164
 msgid "Remote created"
 msgstr ""
 
-#: socialhome/content/models.py:166 socialhome/static/dist/vue/js/app.js:67
-#: socialhome/streams/enums.py:22 socialhome/templates/base.html:53
+#: socialhome/content/models.py:170 socialhome/streams/enums.py:12
 msgid "Local"
 msgstr "Lokal"
 
-#: socialhome/content/models.py:167
+#: socialhome/content/models.py:171
 msgid "Rendered text"
 msgstr ""
 
-#: socialhome/content/models.py:168
+#: socialhome/content/models.py:172
 msgid "Reply count"
 msgstr "Jumlah balasan"
 
-#: socialhome/content/models.py:169
+#: socialhome/content/models.py:173
+#, fuzzy
+#| msgid "Organize content"
+msgid "Sensitive content"
+msgstr "Atur konten"
+
+#: socialhome/content/models.py:174
 msgid "Shares count"
 msgstr ""
 
-#: socialhome/content/models.py:172
+#: socialhome/content/models.py:175
+msgid "Latest share id"
+msgstr ""
+
+#: socialhome/content/models.py:178
 msgid "Root parent"
 msgstr ""
 
-#: socialhome/content/serializers.py:317
+#: socialhome/content/models.py:183
+msgid "Has root content had local replies"
+msgstr ""
+
+#: socialhome/content/serializers.py:336
 msgid "This recipient couldn't be found (please check the format)."
 msgstr ""
 
-#: socialhome/content/templates/content/_edit_title.html:5
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Update reply"
+#: socialhome/enums.py:11
+msgid "Terms of service"
+msgstr "Kebijakan layanan"
+
+#: socialhome/enums.py:12
+msgid "Privacy policy"
+msgstr "Kebijakan privasi"
+
+#: socialhome/enums.py:19 socialhome/streams/enums.py:15
+msgid "Public"
+msgstr "Publik"
+
+#: socialhome/enums.py:20 socialhome/streams/enums.py:11
+msgid "Limited"
+msgstr "Terbatas"
+
+#: socialhome/enums.py:21
+msgid "Site"
+msgstr "Situs"
+
+#: socialhome/enums.py:22
+msgid "Self"
+msgstr "Sendiri"
+
+#: socialhome/models.py:24
+#, fuzzy
+#| msgid "Upload image"
+msgid "Upload Category"
+msgstr "Unggah gambar"
+
+#: socialhome/notifications/tasks.py:57
+msgid "New user approval request"
 msgstr ""
 
-#: socialhome/content/templates/content/_edit_title.html:10
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Update"
+#: socialhome/notifications/tasks.py:88
+msgid "Your account has been approved"
 msgstr ""
 
-#: socialhome/content/templates/content/_edit_title.html:12
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/templates/base.html:59
-msgid "Create"
-msgstr "Buat"
-
-#: socialhome/content/templates/content/delete.html:5
-#: socialhome/content/templates/content/delete.html:10
-msgid "Confirm delete"
-msgstr "Konfirmasi penghapusan"
-
-#: socialhome/content/templates/content/delete.html:17
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Delete"
-msgstr "Hapus"
-
-#: socialhome/content/templates/content/delete.html:18
-msgid "Cancel"
-msgstr "Batal"
-
-#: socialhome/content/templates/content/vue.html:18
-msgid "Tip! Share pages easily by bookmarking our"
-msgstr ""
-
-#: socialhome/content/templates/content/vue.html:18
-msgid "bookmarklet"
-msgstr ""
-
-#: socialhome/notifications/tasks.py:59
+#: socialhome/notifications/tasks.py:120
 #, python-format
 msgid "New follower: %s"
 msgstr "Pengikut baru: %s"
 
-#: socialhome/notifications/tasks.py:96
+#: socialhome/notifications/tasks.py:160
 msgid "You have been mentioned"
 msgstr "Kamu telah disebut"
 
-#: socialhome/notifications/tasks.py:130
+#: socialhome/notifications/tasks.py:195
 #, python-format
 msgid "New reply to: %s"
 msgstr "Balasan baru ke:%s"
 
-#: socialhome/notifications/tasks.py:168
+#: socialhome/notifications/tasks.py:236
 #, python-format
 msgid "New share of: %s"
 msgstr "Bagikan baru dari: %s"
 
-#: socialhome/notifications/tasks.py:197
+#: socialhome/notifications/tasks.py:266
 msgid "Data export is ready for download"
 msgstr "Hasil pengeksporan data siap diunduh"
 
-#: socialhome/notifications/tasks.py:227
-msgid "Important updates to our Terms of Service and Privacy Policy documents"
+#: socialhome/notifications/templates/notifications/admin_account_approval.html:6
+#: socialhome/notifications/templates/notifications/admin_account_approval.txt:5
+msgid "There is a new account approval request waiting."
 msgstr ""
-"Pembaruan penting terhadap dokumen Kebijakan Layanan dan Kebijakan Privasi "
-"kami"
 
-#: socialhome/notifications/tasks.py:229
-msgid "Important updates to our Privacy Policy document"
-msgstr "Pembaruan penting terhadap dokumen Kebijakan Privasi kami"
+#: socialhome/notifications/templates/notifications/admin_account_approval.html:10
+#: socialhome/notifications/templates/notifications/admin_account_approval.txt:7
+msgid "User"
+msgstr ""
 
-#: socialhome/notifications/tasks.py:231
-msgid "Important updates to our Terms of Service document"
-msgstr "Pembaruan penting terhadap dokumen Kebijakan Layanan kami"
+#: socialhome/notifications/templates/notifications/admin_account_approval.html:14
+#: socialhome/notifications/templates/notifications/admin_account_approval.txt:9
+msgid "Reason"
+msgstr ""
+
+#: socialhome/notifications/templates/notifications/admin_account_approval.html:18
+msgid "Approve or delete the user"
+msgstr ""
+
+#: socialhome/notifications/templates/notifications/admin_account_approval.html:22
+#: socialhome/notifications/templates/notifications/admin_account_approval.txt:13
+msgid "The user will be notified if approved."
+msgstr ""
+
+#: socialhome/notifications/templates/notifications/admin_account_approval.txt:11
+msgid "Approve or delete the user via the following url"
+msgstr ""
 
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
@@ -433,1014 +380,624 @@ msgstr ""
 msgid "Your content has received a new share by"
 msgstr ""
 
-#: socialhome/search/views.py:136
-msgid "Search string is invalid, please try another one."
+#: socialhome/notifications/templates/notifications/user_account_approved.html:6
+#: socialhome/notifications/templates/notifications/user_account_approved.txt:5
+msgid "Congrats! Your account has been approved."
 msgstr ""
 
-#: socialhome/search/templates/search/search.html:5
-#: socialhome/search/templates/search/search.html:8
-#: socialhome/search/templates/search/search.html:15
-#: socialhome/templates/base.html:107 socialhome/templates/base.html:109
-msgid "Search"
-msgstr "Cari"
-
-#: socialhome/search/templates/search/search.html:12
-msgid "Search term"
-msgstr "Istilah pencarian"
-
-#: socialhome/search/templates/search/search.html:13
-msgid "Type a search term"
-msgstr "Ketik istilah pencarian"
-
-#: socialhome/search/templates/search/search.html:22
-msgid "Profiles"
-msgstr "Profil"
-
-#: socialhome/search/templates/search/search.html:47
-#: socialhome/static/dist/vue/js/app.js:67
-#: socialhome/users/templates/users/_actions_column.html:4
-msgid "Unfollow"
-msgstr "Berhenti mengikuti"
-
-#: socialhome/search/templates/search/search.html:48
-#: socialhome/static/dist/vue/js/app.js:67
-#: socialhome/users/templates/users/_actions_column.html:5
-msgid "Follow"
-msgstr "Ikuti"
-
-#: socialhome/search/templates/search/search.html:55
-#: socialhome/search/templates/search/search.html:85
-msgid "No results found."
-msgstr "Tak ada hasil yang ditemukan."
-
-#: socialhome/search/templates/search/search.html:61
-msgid "Previous"
-msgstr "Sebelum"
-
-#: socialhome/search/templates/search/search.html:63
-msgid "Next"
-msgstr "Sesudah"
-
-#: socialhome/search/templates/search/search.html:90
-msgid "There are more tags results. Please refine the query."
+#: socialhome/notifications/templates/notifications/user_account_approved.html:10
+#: socialhome/notifications/templates/notifications/user_account_approved.txt:7
+msgid "Login and say hello!"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "edited"
-msgstr "disunting"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Home"
-msgstr "Beranda"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/preferences.py:15
-msgid "Profile"
-msgstr "Profil"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "reply"
-msgstr "balas"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Full editor"
+#: socialhome/preferences.py:13
+msgid "Log all outbound payloads"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Reply text..."
-msgstr "Teks balasan..."
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "unshare"
-msgstr "Batal bagikan"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "share"
-msgstr "bagikan"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Replies"
-msgstr "Balasan"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Shares"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Hide NSFW content"
-msgstr "Sembunyikan konten NSFW"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Show NSFW content"
-msgstr "Tampilkan konten NSFW"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:108
-msgid "Contains public content from around the network."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/enums.py:20
-#: socialhome/templates/base.html:48
-msgid "Followed"
-msgstr "Diikuti"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:170
-msgid "Content from followed users."
-msgstr "Konten dari pengguna yang diikuti."
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:82
-msgid "Contains non-public content where you are recipient."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/streams/views.py:95
-msgid "Contains content from local users."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "All content tagged with"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:180
-msgid "Followed tags"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Content from all followed tags."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Change picture"
-msgstr "Ubah gambar"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Followers"
-msgstr "Pengikut"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/models.py:176
-msgid "Following"
-msgstr "Diikuti"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Organize profile content"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Update profile"
-msgstr "Perbarui profil"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "User handle or URL on The Federation"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Pinned content"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "All content"
-msgstr "Semua konten"
-
-#: socialhome/static/dist/vue/js/app.js:67
-#, python-format
-msgid "%s new post available"
-msgid_plural "%s new posts available"
-msgstr[0] "%s postingan baru tersedia"
-
-#: socialhome/static/dist/vue/js/app.js:67
-#: socialhome/templates/dynamic_preferences/form.html:14
-#: socialhome/users/templates/users/userpicture_form.html:28
-msgid "Save"
-msgstr "Simpan"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 1"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 2"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 3"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 4"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 5"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Header 6"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "By url"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Bold"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Toggle fullscreen (F11)"
-msgstr "Beralih ke layar penuh (F11)"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Markdown guide"
-msgstr "Panduan Markdown"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Heading"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Insert Horizontal Line"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-#, python-format
-msgid "The image %s couldn't be uploaded"
-msgstr "Gambar %s tidak dapat diunggah"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "add an image using an url (Ctrl-Alt-I)"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Italic"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-#, fuzzy
-msgid "Create Link"
-msgstr "Buat"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Loading..."
-msgstr "Memuat..."
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Numbered List"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Insert image"
-msgstr "Sisipkan gambar"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Toggle preview (Ctrl-P)"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
+#: socialhome/preferences.py:14
 msgid ""
-"You can upload images using the camera icon or by dragging them to the text "
-"area. Valid file types: png/jpg/svg/gif."
+"If set to true, all outbound payloads will be saved as federate.Payload "
+"instances (available in the admin). This is a performance hit so should only "
+"be turned on for temporary debugging."
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Quote"
+#: socialhome/preferences.py:24
+msgid "Log all receive payloads"
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Generic List"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Upload image"
-msgstr "Unggah gambar"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Toggle side by side (F9)"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "visible to anyone, even anonymous users and internet search bots."
-msgstr ""
-"terlihat oleh siapapun, termasuk pengguna anonim serta bot pencarian "
-"internet."
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "visible only to those mentioned in the text and/or your mutuals."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
+#: socialhome/preferences.py:25
 msgid ""
-"visible to only users who are logged in. Does not federate to other servers."
+"If set to true, all inbound payloads will be saved as federate.Payload "
+"instances (available in the admin). This is a performance hit so should only "
+"be turned on for temporary debugging."
 msgstr ""
 
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "visible to only self. Does not federate to other servers."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Edit"
-msgstr "Sunting"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Hidden textarea"
-msgstr "Textarea tersembunyi"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Include your mutuals"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid ""
-"Automatically include people you follow that also follow you as recipients."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid ""
-"Enter the recipients' handles (eg @user@example.com) in the editor window. "
-"Sorry, no search yet... "
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Visibility"
-msgstr "Visibilitas"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid ""
-"Tip: You can use the \"Self\" visibility to create draft content and then "
-"change the visibility to for example \"Public\" when you want to publish it."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid ""
-"Pinned content will be shown on your personal profile in the order you want. "
-"Reorder pinned content from the profile menu. Pinned content will federate "
-"and otherwise function as any other content."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Error saving content."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid ""
-"When visibility is set to 'Limited', you must either mention recipients in "
-"the text or include your mutuals."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Some recipients couldn't be found."
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Validation error"
-msgstr "Galat validasi"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "Avatar of"
-msgstr "Avatar dari"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:226
-msgid "Contacts - following"
-msgstr "Kontak - mengikuti"
-
-#: socialhome/static/dist/vue/js/app.js:67 socialhome/users/views.py:234
-msgid "Contacts - followers"
-msgstr "Kontak - pengikut"
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "An error happened while trying to follow."
-msgstr "Galat saat mencoba mengikuti."
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "An error happened while trying to unfollow."
-msgstr "Galat saat mencoba batal mengikuti."
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "An error happened while fetching new content"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "An error happened while sharing the content"
-msgstr ""
-
-#: socialhome/static/dist/vue/js/app.js:67
-msgid "An error happened while unsharing the content"
-msgstr ""
-
-#: socialhome/streams/enums.py:19
+#: socialhome/streams/enums.py:9
 msgid "Custom"
 msgstr "Kustom"
 
-#: socialhome/streams/enums.py:23
+#: socialhome/streams/enums.py:10
+msgid "Followed"
+msgstr "Diikuti"
+
+#: socialhome/streams/enums.py:13
 msgid "Profile (all)"
 msgstr "Profil (semua)"
 
-#: socialhome/streams/enums.py:24
+#: socialhome/streams/enums.py:14
 msgid "Profile (pinned)"
 msgstr "Profil (disematkan)"
 
-#: socialhome/streams/enums.py:26
+#: socialhome/streams/enums.py:16
 msgid "Tag"
 msgstr "Tag"
 
-#: socialhome/streams/views.py:52 socialhome/templates/base.html:13
-#: socialhome/templates/base.html:16
+#: socialhome/templates/base.html:9
 msgid "A federated social home."
 msgstr ""
 
-#: socialhome/streams/views.py:80
-msgid "Limited stream"
+#: socialhome/users/forms.py:20 socialhome/users/models.py:51
+msgid "Account request reason"
 msgstr ""
 
-#: socialhome/streams/views.py:93 socialhome/users/preferences.py:18
-msgid "Local stream"
-msgstr ""
-
-#: socialhome/streams/views.py:106 socialhome/users/preferences.py:19
-msgid "Public stream"
-msgstr ""
-
-#: socialhome/streams/views.py:138
-#, python-format
-msgid "#%s stream"
-msgstr ""
-
-#: socialhome/streams/views.py:140
-#, python-format
-msgid "All content tagged with #%s."
-msgstr ""
-
-#: socialhome/streams/views.py:155
-msgid "Followed tags stream"
-msgstr ""
-
-#: socialhome/streams/views.py:157
-msgid "Content from followed tags."
-msgstr ""
-
-#: socialhome/streams/views.py:168 socialhome/users/preferences.py:17
-msgid "Followed stream"
-msgstr ""
-
-#: socialhome/templates/base.html:45
-msgid "Streams"
-msgstr ""
-
-#: socialhome/templates/base.html:49
-msgid "My content"
-msgstr "Konten saya"
-
-#: socialhome/templates/base.html:62
-msgid "Contacts"
-msgstr "Kontak"
-
-#: socialhome/templates/base.html:65
-msgid "My Profile"
-msgstr "Profile saya"
-
-#: socialhome/templates/account/signup.html:12
-#: socialhome/templates/account/signup.html:22
-#: socialhome/templates/base.html:70
-msgid "Sign Up"
-msgstr "Daftar"
-
-#: socialhome/templates/base.html:74
-msgid "Log In"
-msgstr "Masuk"
-
-#: socialhome/templates/base.html:80
-msgid "Menu"
-msgstr "Menu"
-
-#: socialhome/templates/account/email.html:6 socialhome/templates/base.html:84
-#: socialhome/templates/dynamic_preferences/form.html:6
-#: socialhome/templates/dynamic_preferences/form.html:9
-msgid "Account"
-msgstr "Akun"
-
-#: socialhome/templates/base.html:85
-#: socialhome/users/templates/users/user_api_token.html:4
-#: socialhome/users/templates/users/user_api_token.html:7
-msgid "API token"
-msgstr "token API"
-
-#: socialhome/templates/base.html:86
-msgid "Emails"
-msgstr "Email"
-
-#: socialhome/templates/base.html:89
-msgid "Admin"
-msgstr "Admin"
-
-#: socialhome/templates/base.html:90
-msgid "Task queue"
-msgstr ""
-
-#: socialhome/templates/base.html:93
-#: socialhome/templates/rest_framework_swagger/index.html:27
-msgid "Logout"
-msgstr "Keluar"
-
-#: socialhome/templates/account/email.html:11
-msgid "E-mail Addresses"
-msgstr "Alamat email"
-
-#: socialhome/templates/account/email.html:13
-msgid "The following e-mail addresses are associated with your account:"
-msgstr ""
-
-#: socialhome/templates/account/email.html:27
-msgid "Verified"
-msgstr "Terverifikasi"
-
-#: socialhome/templates/account/email.html:29
-msgid "Unverified"
-msgstr "Belum terverifikasi"
-
-#: socialhome/templates/account/email.html:31
-msgid "Primary"
-msgstr "Utama"
-
-#: socialhome/templates/account/email.html:37
-msgid "Make Primary"
-msgstr "Jadikan Utama"
-
-#: socialhome/templates/account/email.html:38
-msgid "Re-send Verification"
-msgstr "Kirim ulang Verifikasi"
-
-#: socialhome/templates/account/email.html:39
-msgid "Remove"
-msgstr "Buang"
-
-#: socialhome/templates/account/email.html:46
-msgid "Warning:"
-msgstr "Peringatan:"
-
-#: socialhome/templates/account/email.html:46
+#: socialhome/users/forms.py:24
 msgid ""
-"You currently do not have any e-mail address set up. You should really add "
-"an e-mail address so you can receive notifications, reset your password, etc."
+"This instance requires admin approval for new accounts. Tell us why you "
+"would want to have an account? Be descriptive with a few sentences to "
+"improve the chance of admins approving your request."
 msgstr ""
 
-#: socialhome/templates/account/email.html:51
-msgid "Add E-mail Address"
-msgstr "Tambah alamat email"
-
-#: socialhome/templates/account/email.html:56
-msgid "Add E-mail"
-msgstr "Tambah email"
-
-#: socialhome/templates/account/email.html:66
-msgid "Do you really want to remove the selected e-mail address?"
+#: socialhome/users/models.py:49
+msgid "Admin approved"
 msgstr ""
 
-#: socialhome/templates/account/email_confirm.html:6
-#: socialhome/templates/account/email_confirm.html:12
-#: socialhome/templates/account/email_confirmed.html:6
-#: socialhome/templates/account/email_confirmed.html:12
-msgid "Confirm E-mail Address"
-msgstr "Konfirmasi alamat email"
-
-#: socialhome/templates/account/email_confirm.html:18
-#, python-format
-msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
-"address for user %(user_display)s."
-msgstr ""
-
-#: socialhome/templates/account/email_confirm.html:22
-msgid "Confirm"
-msgstr ""
-
-#: socialhome/templates/account/email_confirm.html:29
-#, python-format
-msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
-msgstr ""
-
-#: socialhome/templates/account/email_confirmed.html:16
-#, python-format
-msgid ""
-"You have confirmed that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-"
-"mail address for user %(user_display)s."
-msgstr ""
-
-#: socialhome/templates/account/login.html:8
-#: socialhome/templates/account/login.html:13
-#: socialhome/templates/account/login.html:40
-msgid "Sign In"
-msgstr "Masuk"
-
-#: socialhome/templates/account/login.html:18
-#, python-format
-msgid ""
-"Please sign in with one\n"
-"      of your existing third party accounts. Or, <a "
-"href=\"%(signup_url)s\">sign up</a>\n"
-"      for a %(site_name)s account and sign in below:"
-msgstr ""
-
-#: socialhome/templates/account/login.html:26
-msgid "or"
-msgstr ""
-
-#: socialhome/templates/account/login.html:41
-msgid "Forgot Password?"
-msgstr "Lupa kata sandi?"
-
-#: socialhome/templates/account/logout.html:5
-#: socialhome/templates/account/logout.html:11
-#: socialhome/templates/account/logout.html:20
-msgid "Sign Out"
-msgstr "Keluar"
-
-#: socialhome/templates/account/logout.html:13
-msgid "Are you sure you want to sign out?"
-msgstr "Yakin ingin keluar?"
-
-#: socialhome/templates/account/password_change.html:5
-#: socialhome/templates/account/password_change.html:10
-#: socialhome/templates/account/password_change.html:15
-#: socialhome/templates/account/password_reset_from_key.html:6
-#: socialhome/templates/account/password_reset_from_key.html:11
-#: socialhome/templates/account/password_reset_from_key_done.html:4
-#: socialhome/templates/account/password_reset_from_key_done.html:9
-msgid "Change Password"
-msgstr "Ganti Kata sandi"
-
-#: socialhome/templates/account/password_reset.html:7
-#: socialhome/templates/account/password_reset.html:13
-#: socialhome/templates/account/password_reset_done.html:6
-#: socialhome/templates/account/password_reset_done.html:11
-msgid "Password Reset"
-msgstr "Setel ulang kata sandi"
-
-#: socialhome/templates/account/password_reset.html:18
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll send you "
-"an e-mail allowing you to reset it."
-msgstr ""
-
-#: socialhome/templates/account/password_reset.html:23
-msgid "Reset My Password"
-msgstr "Atur ulang kata sandi"
-
-#: socialhome/templates/account/password_reset.html:26
-msgid "Please contact us if you have any trouble resetting your password."
-msgstr ""
-
-#: socialhome/templates/account/password_reset_done.html:17
-msgid ""
-"We have sent you an e-mail. Please contact us if you do not receive it "
-"within a few minutes."
-msgstr ""
-"Kami sudah mengirimkan surel ke kamu. Hubungi kami jika kamu belum "
-"menerimanya setelah beberapa menit."
-
-#: socialhome/templates/account/password_reset_from_key.html:11
-msgid "Bad Token"
-msgstr ""
-
-#: socialhome/templates/account/password_reset_from_key.html:15
-#, python-format
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
-"a>."
-msgstr ""
-
-#: socialhome/templates/account/password_reset_from_key.html:21
-msgid "change password"
-msgstr "ubah kata sandi"
-
-#: socialhome/templates/account/password_reset_from_key.html:24
-#: socialhome/templates/account/password_reset_from_key_done.html:10
-msgid "Your password is now changed."
-msgstr "Kata sandi kamu sudah diubah."
-
-#: socialhome/templates/account/password_set.html:6
-#: socialhome/templates/account/password_set.html:11
-#: socialhome/templates/account/password_set.html:16
-msgid "Set Password"
-msgstr "Atur Kata Sandi"
-
-#: socialhome/templates/account/signup.html:6
-msgid "Signup"
-msgstr "Daftar"
-
-#: socialhome/templates/account/signup.html:14
-#, python-format
-msgid ""
-"Already have an account? Then please <a href=\"%(login_url)s\">sign in</a>."
-msgstr "Sudah punya akun? Silakan <a href=\"%(login_url)s\">masuk</a>."
-
-#: socialhome/templates/account/signup_closed.html:5
-#: socialhome/templates/account/signup_closed.html:10
-msgid "Sign Up Closed"
-msgstr "Pendaftaran Ditutup"
-
-#: socialhome/templates/account/signup_closed.html:12
-msgid "We are sorry, but the sign up is currently closed."
-msgstr "Kami minta maaf, tapi pendaftaran saat ini ditutup."
-
-#: socialhome/templates/account/verification_sent.html:5
-#: socialhome/templates/account/verification_sent.html:10
-#: socialhome/templates/account/verified_email_required.html:5
-#: socialhome/templates/account/verified_email_required.html:10
-msgid "Verify Your E-mail Address"
-msgstr "Verifikasi Alamat Surelmu"
-
-#: socialhome/templates/account/verification_sent.html:12
-#, python-format
-msgid ""
-"We have sent an e-mail to <a href=\"mailto:%(email)s\">%(email)s</a> for "
-"verification. Follow the link provided to finalize the signup process. "
-"Please contact us if you do not receive it within a few minutes."
-msgstr ""
-"Kami sudah mengirim surel ke <a href=\"mailto:%(email)s\">%(email)s</a> "
-"untuk diverifikasi. Ikuti tautan yang diberikan untuk menyelesaikan proses "
-"pendaftaran. Harap hubungi kami jika kamu belum menerima nya setelah "
-"beberapa menit."
-
-#: socialhome/templates/account/verified_email_required.html:16
-msgid ""
-"This part of the site requires us to verify that\n"
-"        you are who you claim to be. For this purpose, we require that you\n"
-"        verify ownership of your e-mail address. "
-msgstr ""
-
-#: socialhome/templates/account/verified_email_required.html:20
-msgid ""
-"We have sent an e-mail to you for\n"
-"        verification. Please click on the link inside this e-mail. Please\n"
-"        contact us if you do not receive it within a few minutes."
-msgstr ""
-"Kami sudah mengirimkan surel ke kamu untuk\n"
-"        diverifikasi. Harap klik tautan di dalam surelnya. Harap\n"
-"        hubungi kami jika kamu belum mendapatkannya setelah beberapa menit."
-
-#: socialhome/templates/account/verified_email_required.html:22
-#, python-format
-msgid ""
-"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
-"mail address</a>."
-msgstr ""
-"<strong>Catatan:</strong> kamu masih bisa <a "
-"href=\"%(email_url)s\">mengganti alamat surelmu</a>."
-
-#: socialhome/templates/dynamic_preferences/form.html:10
-msgid "Preferences"
-msgstr "Preferensi"
-
-#: socialhome/templates/dynamic_preferences/form.html:17
-msgid "Export data"
-msgstr "Ekspor data"
-
-#: socialhome/templates/dynamic_preferences/form.html:20
-msgid "Download export"
-msgstr "Unduh hasil pengeksporan"
-
-#: socialhome/templates/dynamic_preferences/form.html:21
-msgid "created"
-msgstr "dibuat"
-
-#: socialhome/templates/dynamic_preferences/form.html:23
-msgid "Request new export"
-msgstr "Minta ekspor baru"
-
-#: socialhome/templates/dynamic_preferences/form.html:29
-msgid "Delete account"
-msgstr "Hapus akun"
-
-#: socialhome/templates/dynamic_preferences/form.html:31
-msgid "Back to profile"
-msgstr "Kembali ke profil"
-
-#: socialhome/templates/dynamic_preferences/form.html:46
-msgid "Export request failed. Please try again later or contact the admin."
-msgstr "Permintaan ekspor gagal. Silakan coba lagi nanti atau hubungi admin."
-
-#: socialhome/templates/dynamic_preferences/form.html:51
-msgid ""
-"Export has been requested. You will receive an email when it is ready for "
-"download."
-msgstr ""
-"Pengeksporan sudah diminta. Kamu akan mendapat surel saat hasilnya siap "
-"diunduh."
-
-#: socialhome/templates/dynamic_preferences/form.html:52
-msgid "The export can also be downloaded from this page when it is ready."
-msgstr ""
-"Hasil pengeksporan juga bisa diunduh dari halaman ini jika hasilnya sudah "
-"siap."
-
-#: socialhome/templates/rest_framework_swagger/index.html:29
-msgid "Session Login"
-msgstr "Sesi login"
-
-#: socialhome/templates/rest_framework_swagger/index.html:40
-msgid "You are logged in as: "
-msgstr "Kamu masuk sebagai: "
-
-#: socialhome/templates/rest_framework_swagger/index.html:42
-msgid "Viewing as an anoymous user"
-msgstr "Melihat sebagai pengguna anonim"
-
-#: socialhome/templates/rest_framework_swagger/index.html:54
-msgid "Powered by "
-msgstr "Didukung oleh "
-
-#: socialhome/templates/socialhome/policy_document.html:8
-msgid "Version"
-msgstr "Versi"
-
-#: socialhome/users/models.py:41
+#: socialhome/users/models.py:55
 msgid "Name of User"
 msgstr "Nama Pengguna"
 
-#: socialhome/users/models.py:46
+#: socialhome/users/models.py:60
 msgid "Trusted editor"
 msgstr "Editor terpercaya"
 
-#: socialhome/users/models.py:50
-msgid "Picture"
-msgstr "Gambar"
-
-#: socialhome/users/models.py:55
-msgid "Picture height"
-msgstr "Tinggi gambar"
-
-#: socialhome/users/models.py:56
-msgid "Picture width"
-msgstr "Lebar gambar"
-
-#: socialhome/users/models.py:139
+#: socialhome/users/models.py:140
 msgid "email address"
 msgstr "alamat surel"
 
-#: socialhome/users/models.py:147
+#: socialhome/users/models.py:141
+msgid "Bio"
+msgstr ""
+
+#: socialhome/users/models.py:142
+msgid "Rendered bio"
+msgstr ""
+
+#: socialhome/users/models.py:150
 msgid "Handle"
 msgstr "Penanganan"
 
-#: socialhome/users/models.py:155
+#: socialhome/users/models.py:158
 msgid "Webfinger subject"
 msgstr ""
 
-#: socialhome/users/models.py:158
+#: socialhome/users/models.py:161
 msgid "RSA private key"
 msgstr "Kunci pribadi RSA"
 
-#: socialhome/users/models.py:159
+#: socialhome/users/models.py:162
 msgid "RSA public key"
 msgstr "Kunci publik RSA"
 
-#: socialhome/users/models.py:162
+#: socialhome/users/models.py:166
+#, fuzzy
+#| msgid "RSA public key"
+msgid "AP Public Key ID"
+msgstr "Kunci publik RSA"
+
+#: socialhome/users/models.py:169
 msgid "Profile visibility"
 msgstr "Visibilitas Profil"
 
-#: socialhome/users/models.py:165
+#: socialhome/users/models.py:172
 msgid "Image - large"
 msgstr "Gambar - besar"
 
-#: socialhome/users/models.py:166
+#: socialhome/users/models.py:173
 msgid "Image - medium"
 msgstr "Gambar - sedang"
 
-#: socialhome/users/models.py:167
+#: socialhome/users/models.py:174
 msgid "Image - small"
 msgstr "Gambar - kecil"
 
-#: socialhome/users/models.py:170
+#: socialhome/users/models.py:179
+#, fuzzy
+#| msgid "Avatar of"
+msgid "Avatar"
+msgstr "Avatar dari"
+
+#: socialhome/users/models.py:180
+msgid "Picture"
+msgstr "Gambar"
+
+#: socialhome/users/models.py:183
 msgid "Location"
 msgstr "Lokasi"
 
-#: socialhome/users/models.py:173
+#: socialhome/users/models.py:186
 msgid "NSFW"
 msgstr "NSFW"
 
-#: socialhome/users/models.py:173
+#: socialhome/users/models.py:186
 msgid "Should users content be considered NSFW?"
 msgstr "Apakah konten pengguna dinyatakan sebagai NSFW?"
 
-#: socialhome/users/models.py:184
+#: socialhome/users/models.py:189
+msgid "Following"
+msgstr "Diikuti"
+
+#: socialhome/users/models.py:193
+#, fuzzy
+#| msgid "Followers"
+msgid "AP Followers FID"
+msgstr "Pengikut"
+
+#: socialhome/users/models.py:197
+msgid "Followed tags"
+msgstr ""
+
+#: socialhome/users/models.py:201
 msgid "Private inbox"
 msgstr "Kotak masuk privat"
 
-#: socialhome/users/models.py:185
+#: socialhome/users/models.py:202
 msgid "Public inbox"
 msgstr "Kotak masuk publik"
 
-#: socialhome/users/models.py:188
+#: socialhome/users/models.py:205
 msgid "Protocol"
 msgstr "Protokol"
 
+#: socialhome/users/models.py:209
+#, fuzzy
+#| msgid "Profile"
+msgid "Profile URL"
+msgstr "Profil"
+
 #: socialhome/users/preferences.py:16
+msgid "Profile"
+msgstr "Profil"
+
+#: socialhome/users/preferences.py:17
 msgid "Profile - all content"
 msgstr "Profil - semua konten"
 
+#: socialhome/users/preferences.py:18
+msgid "Followed stream"
+msgstr ""
+
+#: socialhome/users/preferences.py:19
+msgid "Local stream"
+msgstr ""
+
 #: socialhome/users/preferences.py:20
+msgid "Public stream"
+msgstr ""
+
+#: socialhome/users/preferences.py:21
 msgid "Tags stream"
 msgstr ""
 
-#: socialhome/users/preferences.py:23
+#: socialhome/users/preferences.py:24
 msgid "Landing page"
 msgstr ""
 
-#: socialhome/users/preferences.py:24
+#: socialhome/users/preferences.py:25
 msgid "Choose which page you want to see as the landing page."
 msgstr ""
 
-#: socialhome/users/views.py:87
+#: socialhome/users/preferences.py:33
+#, fuzzy
+#| msgid "Show NSFW content"
+msgid "Show sensitive content"
+msgstr "Tampilkan konten NSFW"
+
+#: socialhome/users/preferences.py:34
+msgid "If selected, always show sensitive content"
+msgstr ""
+
+#~ msgid "Choose policy document types to send emails about first!"
+#~ msgstr "Pilih tipe dokumen kebijakan untuk mengirim email terlebih dahulu!"
+
+#~ msgid "Send email update to all users"
+#~ msgstr "Kirim email pembaruan ke semua pengguna"
+
+#~ msgid "Recipients"
+#~ msgstr "Penerima"
+
 #, python-format
-msgid "Profile of %s."
-msgstr "Profil %s."
+#~ msgid "Recipient %s is not in the correct format."
+#~ msgstr "Format penerima %s keliru."
 
-#: socialhome/users/templates/users/profile_detail_organize.html:4
-#: socialhome/users/templates/users/profile_detail_organize.html:9
-msgid "Organize content"
-msgstr "Atur konten"
+#~ msgid "Not all recipients could be found."
+#~ msgstr "Tidak semua penerima dapat ditemukan."
 
-#: socialhome/users/templates/users/profile_detail_organize.html:32
-msgid "Save order"
-msgstr ""
+#~ msgid "Create"
+#~ msgstr "Buat"
 
-#: socialhome/users/templates/users/user_api_token.html:9
-msgid ""
-"Copy the token to a client or tool which you want to use for interacting "
-"with your Socialhome account."
-msgstr ""
+#~ msgid "Confirm delete"
+#~ msgstr "Konfirmasi penghapusan"
 
-#: socialhome/users/templates/users/user_api_token.html:12
-msgid ""
-"Important! Do not give anyone access to the token or they will be able to "
-"use your account through client apps! If you lose your token or need a new "
-"one, click 'Regenerate'."
-msgstr ""
+#~ msgid "Delete"
+#~ msgstr "Hapus"
 
-#: socialhome/users/templates/users/user_api_token.html:25
-msgid "Regenerate"
-msgstr ""
+#~ msgid "Cancel"
+#~ msgstr "Batal"
 
-#: socialhome/users/templates/users/user_api_token.html:30
-#: socialhome/users/templates/users/userpicture_form.html:29
-msgid "Return to profile"
-msgstr "Kembali ke profil"
+#~ msgid ""
+#~ "Important updates to our Terms of Service and Privacy Policy documents"
+#~ msgstr ""
+#~ "Pembaruan penting terhadap dokumen Kebijakan Layanan dan Kebijakan "
+#~ "Privasi kami"
 
-#: socialhome/users/templates/users/user_confirm_delete.html:4
-#: socialhome/users/templates/users/user_confirm_delete.html:7
-msgid "Delete account 😯"
-msgstr "Hapus akun 😯"
+#~ msgid "Important updates to our Privacy Policy document"
+#~ msgstr "Pembaruan penting terhadap dokumen Kebijakan Privasi kami"
 
-#: socialhome/users/templates/users/user_confirm_delete.html:8
-msgid "Are you completely sure? This cannot be undone..."
-msgstr "Kamu benar-benar yakin? Ini nggak bisa dibatalin..."
+#~ msgid "Important updates to our Terms of Service document"
+#~ msgstr "Pembaruan penting terhadap dokumen Kebijakan Layanan kami"
 
-#: socialhome/users/templates/users/user_confirm_delete.html:17
-msgid ""
-"\n"
-"            Hey! Please note that if you <i>do</i> go ahead with this, might "
-"we say, drastic action, we will of course\n"
-"            delete any content you have created on <i>this server</i>. "
-"Additionally, we will try to delete the content\n"
-"            that <i>this server</i> has sent to <i>other servers</i> as "
-"requested by <i>you</i>. These servers are owned\n"
-"            by other people (decentralization <3). If these other servers "
-"choose to ignore the delete request or they\n"
-"            happen to have technical difficulties in deleting the content as "
-"requested by us, please contact the\n"
-"            administrators of the other servers. Thanks <3\n"
-"        "
-msgstr ""
+#~ msgid "Search"
+#~ msgstr "Cari"
 
-#: socialhome/users/templates/users/user_confirm_delete.html:21
-msgid "Nah, take me back!"
-msgstr "Jangan, bawa aku kembali!"
+#~ msgid "Search term"
+#~ msgstr "Istilah pencarian"
 
-#: socialhome/users/templates/users/user_confirm_delete.html:22
-msgid "I'm leaving, bye"
-msgstr "Aku pergi, sampai jumpa"
+#~ msgid "Type a search term"
+#~ msgstr "Ketik istilah pencarian"
 
-#: socialhome/users/templates/users/userpicture_form.html:4
-#: socialhome/users/templates/users/userpicture_form.html:7
-msgid "Change profile picture"
-msgstr "Ubah gambar profil"
+#~ msgid "Profiles"
+#~ msgstr "Profil"
 
-#: socialhome/users/templates/users/userpicture_form.html:8
-msgid "Uploading a new picture"
-msgstr "Mengunggah gambar baru"
+#~ msgid "Unfollow"
+#~ msgstr "Berhenti mengikuti"
 
-#: socialhome/users/templates/users/userpicture_form.html:9
-msgid ""
-"Click the file browse button and choose an image file from your computer. "
-"Click 'Save'."
-msgstr ""
+#~ msgid "Follow"
+#~ msgstr "Ikuti"
 
-#: socialhome/users/templates/users/userpicture_form.html:10
-msgid "Cropping an existing picture"
-msgstr "Memotong gambar yang ada"
+#~ msgid "No results found."
+#~ msgstr "Tak ada hasil yang ditemukan."
 
-#: socialhome/users/templates/users/userpicture_form.html:11
-msgid ""
-"Profile pictures are square shaped. If your picture is not square shaped, "
-"you can choose a 'point of interest' by clicking the full image preview on "
-"the right. Click on the center point you would like your profile picture be "
-"around, then click 'Save'."
-msgstr ""
+#~ msgid "Previous"
+#~ msgstr "Sebelum"
+
+#~ msgid "Next"
+#~ msgstr "Sesudah"
+
+#~ msgid "edited"
+#~ msgstr "disunting"
+
+#~ msgid "Home"
+#~ msgstr "Beranda"
+
+#~ msgid "reply"
+#~ msgstr "balas"
+
+#~ msgid "Reply text..."
+#~ msgstr "Teks balasan..."
+
+#~ msgid "unshare"
+#~ msgstr "Batal bagikan"
+
+#~ msgid "share"
+#~ msgstr "bagikan"
+
+#~ msgid "Replies"
+#~ msgstr "Balasan"
+
+#~ msgid "Hide NSFW content"
+#~ msgstr "Sembunyikan konten NSFW"
+
+#~ msgid "Content from followed users."
+#~ msgstr "Konten dari pengguna yang diikuti."
+
+#~ msgid "Change picture"
+#~ msgstr "Ubah gambar"
+
+#~ msgid "Update profile"
+#~ msgstr "Perbarui profil"
+
+#~ msgid "All content"
+#~ msgstr "Semua konten"
+
+#, python-format
+#~ msgid "%s new post available"
+#~ msgid_plural "%s new posts available"
+#~ msgstr[0] "%s postingan baru tersedia"
+
+#~ msgid "Save"
+#~ msgstr "Simpan"
+
+#~ msgid "Toggle fullscreen (F11)"
+#~ msgstr "Beralih ke layar penuh (F11)"
+
+#~ msgid "Markdown guide"
+#~ msgstr "Panduan Markdown"
+
+#, python-format
+#~ msgid "The image %s couldn't be uploaded"
+#~ msgstr "Gambar %s tidak dapat diunggah"
+
+#, fuzzy
+#~ msgid "Create Link"
+#~ msgstr "Buat"
+
+#~ msgid "Loading..."
+#~ msgstr "Memuat..."
+
+#~ msgid "Insert image"
+#~ msgstr "Sisipkan gambar"
+
+#~ msgid "visible to anyone, even anonymous users and internet search bots."
+#~ msgstr ""
+#~ "terlihat oleh siapapun, termasuk pengguna anonim serta bot pencarian "
+#~ "internet."
+
+#~ msgid "Edit"
+#~ msgstr "Sunting"
+
+#~ msgid "Hidden textarea"
+#~ msgstr "Textarea tersembunyi"
+
+#~ msgid "Visibility"
+#~ msgstr "Visibilitas"
+
+#~ msgid "Validation error"
+#~ msgstr "Galat validasi"
+
+#~ msgid "Contacts - following"
+#~ msgstr "Kontak - mengikuti"
+
+#~ msgid "Contacts - followers"
+#~ msgstr "Kontak - pengikut"
+
+#~ msgid "An error happened while trying to follow."
+#~ msgstr "Galat saat mencoba mengikuti."
+
+#~ msgid "An error happened while trying to unfollow."
+#~ msgstr "Galat saat mencoba batal mengikuti."
+
+#~ msgid "My content"
+#~ msgstr "Konten saya"
+
+#~ msgid "Contacts"
+#~ msgstr "Kontak"
+
+#~ msgid "My Profile"
+#~ msgstr "Profile saya"
+
+#~ msgid "Sign Up"
+#~ msgstr "Daftar"
+
+#~ msgid "Log In"
+#~ msgstr "Masuk"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "Account"
+#~ msgstr "Akun"
+
+#~ msgid "API token"
+#~ msgstr "token API"
+
+#~ msgid "Emails"
+#~ msgstr "Email"
+
+#~ msgid "Admin"
+#~ msgstr "Admin"
+
+#~ msgid "Logout"
+#~ msgstr "Keluar"
+
+#~ msgid "E-mail Addresses"
+#~ msgstr "Alamat email"
+
+#~ msgid "Verified"
+#~ msgstr "Terverifikasi"
+
+#~ msgid "Unverified"
+#~ msgstr "Belum terverifikasi"
+
+#~ msgid "Primary"
+#~ msgstr "Utama"
+
+#~ msgid "Make Primary"
+#~ msgstr "Jadikan Utama"
+
+#~ msgid "Re-send Verification"
+#~ msgstr "Kirim ulang Verifikasi"
+
+#~ msgid "Remove"
+#~ msgstr "Buang"
+
+#~ msgid "Warning:"
+#~ msgstr "Peringatan:"
+
+#~ msgid "Add E-mail Address"
+#~ msgstr "Tambah alamat email"
+
+#~ msgid "Add E-mail"
+#~ msgstr "Tambah email"
+
+#~ msgid "Confirm E-mail Address"
+#~ msgstr "Konfirmasi alamat email"
+
+#~ msgid "Sign In"
+#~ msgstr "Masuk"
+
+#~ msgid "Forgot Password?"
+#~ msgstr "Lupa kata sandi?"
+
+#~ msgid "Sign Out"
+#~ msgstr "Keluar"
+
+#~ msgid "Are you sure you want to sign out?"
+#~ msgstr "Yakin ingin keluar?"
+
+#~ msgid "Change Password"
+#~ msgstr "Ganti Kata sandi"
+
+#~ msgid "Password Reset"
+#~ msgstr "Setel ulang kata sandi"
+
+#~ msgid "Reset My Password"
+#~ msgstr "Atur ulang kata sandi"
+
+#~ msgid ""
+#~ "We have sent you an e-mail. Please contact us if you do not receive it "
+#~ "within a few minutes."
+#~ msgstr ""
+#~ "Kami sudah mengirimkan surel ke kamu. Hubungi kami jika kamu belum "
+#~ "menerimanya setelah beberapa menit."
+
+#~ msgid "change password"
+#~ msgstr "ubah kata sandi"
+
+#~ msgid "Your password is now changed."
+#~ msgstr "Kata sandi kamu sudah diubah."
+
+#~ msgid "Set Password"
+#~ msgstr "Atur Kata Sandi"
+
+#~ msgid "Signup"
+#~ msgstr "Daftar"
+
+#, python-format
+#~ msgid ""
+#~ "Already have an account? Then please <a href=\"%(login_url)s\">sign in</"
+#~ "a>."
+#~ msgstr "Sudah punya akun? Silakan <a href=\"%(login_url)s\">masuk</a>."
+
+#~ msgid "Sign Up Closed"
+#~ msgstr "Pendaftaran Ditutup"
+
+#~ msgid "We are sorry, but the sign up is currently closed."
+#~ msgstr "Kami minta maaf, tapi pendaftaran saat ini ditutup."
+
+#~ msgid "Verify Your E-mail Address"
+#~ msgstr "Verifikasi Alamat Surelmu"
+
+#, python-format
+#~ msgid ""
+#~ "We have sent an e-mail to <a href=\"mailto:%(email)s\">%(email)s</a> for "
+#~ "verification. Follow the link provided to finalize the signup process. "
+#~ "Please contact us if you do not receive it within a few minutes."
+#~ msgstr ""
+#~ "Kami sudah mengirim surel ke <a href=\"mailto:%(email)s\">%(email)s</a> "
+#~ "untuk diverifikasi. Ikuti tautan yang diberikan untuk menyelesaikan "
+#~ "proses pendaftaran. Harap hubungi kami jika kamu belum menerima nya "
+#~ "setelah beberapa menit."
+
+#~ msgid ""
+#~ "We have sent an e-mail to you for\n"
+#~ "        verification. Please click on the link inside this e-mail. "
+#~ "Please\n"
+#~ "        contact us if you do not receive it within a few minutes."
+#~ msgstr ""
+#~ "Kami sudah mengirimkan surel ke kamu untuk\n"
+#~ "        diverifikasi. Harap klik tautan di dalam surelnya. Harap\n"
+#~ "        hubungi kami jika kamu belum mendapatkannya setelah beberapa "
+#~ "menit."
+
+#, python-format
+#~ msgid ""
+#~ "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change "
+#~ "your e-mail address</a>."
+#~ msgstr ""
+#~ "<strong>Catatan:</strong> kamu masih bisa <a "
+#~ "href=\"%(email_url)s\">mengganti alamat surelmu</a>."
+
+#~ msgid "Preferences"
+#~ msgstr "Preferensi"
+
+#~ msgid "Export data"
+#~ msgstr "Ekspor data"
+
+#~ msgid "Download export"
+#~ msgstr "Unduh hasil pengeksporan"
+
+#~ msgid "created"
+#~ msgstr "dibuat"
+
+#~ msgid "Request new export"
+#~ msgstr "Minta ekspor baru"
+
+#~ msgid "Delete account"
+#~ msgstr "Hapus akun"
+
+#~ msgid "Back to profile"
+#~ msgstr "Kembali ke profil"
+
+#~ msgid "Export request failed. Please try again later or contact the admin."
+#~ msgstr ""
+#~ "Permintaan ekspor gagal. Silakan coba lagi nanti atau hubungi admin."
+
+#~ msgid ""
+#~ "Export has been requested. You will receive an email when it is ready for "
+#~ "download."
+#~ msgstr ""
+#~ "Pengeksporan sudah diminta. Kamu akan mendapat surel saat hasilnya siap "
+#~ "diunduh."
+
+#~ msgid "The export can also be downloaded from this page when it is ready."
+#~ msgstr ""
+#~ "Hasil pengeksporan juga bisa diunduh dari halaman ini jika hasilnya sudah "
+#~ "siap."
+
+#~ msgid "Session Login"
+#~ msgstr "Sesi login"
+
+#~ msgid "You are logged in as: "
+#~ msgstr "Kamu masuk sebagai: "
+
+#~ msgid "Viewing as an anoymous user"
+#~ msgstr "Melihat sebagai pengguna anonim"
+
+#~ msgid "Powered by "
+#~ msgstr "Didukung oleh "
+
+#~ msgid "Version"
+#~ msgstr "Versi"
+
+#~ msgid "Picture height"
+#~ msgstr "Tinggi gambar"
+
+#~ msgid "Picture width"
+#~ msgstr "Lebar gambar"
+
+#, python-format
+#~ msgid "Profile of %s."
+#~ msgstr "Profil %s."
+
+#~ msgid "Return to profile"
+#~ msgstr "Kembali ke profil"
+
+#~ msgid "Delete account 😯"
+#~ msgstr "Hapus akun 😯"
+
+#~ msgid "Are you completely sure? This cannot be undone..."
+#~ msgstr "Kamu benar-benar yakin? Ini nggak bisa dibatalin..."
+
+#~ msgid "Nah, take me back!"
+#~ msgstr "Jangan, bawa aku kembali!"
+
+#~ msgid "I'm leaving, bye"
+#~ msgstr "Aku pergi, sampai jumpa"
+
+#~ msgid "Change profile picture"
+#~ msgstr "Ubah gambar profil"
+
+#~ msgid "Uploading a new picture"
+#~ msgstr "Mengunggah gambar baru"
+
+#~ msgid "Cropping an existing picture"
+#~ msgstr "Memotong gambar yang ada"
