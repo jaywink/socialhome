@@ -10,16 +10,16 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
+from federation.entities.activitypub.django.views import ActivitypubObjectView
 from socialhome.content.viewsets import ContentViewSet, TagViewSet
-from socialhome.search.viewsets import SearchViewSet
+from socialhome.search.viewsets import SearchAPIViewSet
 from socialhome.viewsets import MediaUploadView, settings_view
-from socialhome.views import HomeView, ObtainSocialhomeAuthToken
+from socialhome.views import ObtainSocialhomeAuthToken
 from socialhome.users.viewsets import UserViewSet, ProfileViewSet
 
 router = DefaultRouter()
 router.register(r"content", ContentViewSet)
 router.register(r"profiles", ProfileViewSet)
-router.register(r"search", SearchViewSet, basename="search")
 router.register(r"tags", TagViewSet)
 router.register(r"users", UserViewSet)
 router.register(r"preferences/user", UserPreferencesViewSet)
@@ -44,10 +44,11 @@ urlpatterns = [
     # Streams
     re_path(r"^streams/", include("socialhome.streams.urls.views", namespace="streams")),
 
-    re_path(r"^$", HomeView.as_view(), name="home"),
+    re_path(r"^$", ActivitypubObjectView.as_view(), name="home"),
 
     # User management
     re_path(r"", include("socialhome.users.urls", namespace="users")),
+    re_path(r"^accounts/", include("allauth.urls")),
     re_path(r"^api/allauth/", include("allauth.headless.urls")),
     re_path(r"^accounts/", include("allauth.urls")),
 
@@ -67,6 +68,7 @@ urlpatterns = [
     re_path(r"^api/", include((router.urls, "api"))),
     re_path(r"^api/media-upload/$", MediaUploadView.as_view(), name="api-media-upload"),
     re_path(r"^api/streams/", include("socialhome.streams.urls.api", namespace="api-streams")),
+    re_path(r"^api/search/", SearchAPIViewSet.as_view({'get': 'list'}), name="api-search"),
     re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^api-token-auth/", ObtainSocialhomeAuthToken.as_view(), name="api-token-auth"),
     re_path(r"^api/settings/", settings_view, name="settings"),

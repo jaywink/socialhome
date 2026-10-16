@@ -3,7 +3,9 @@ import logging
 from typing import Optional, List, Any
 
 import dramatiq
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
+from django.db import transaction
 
 from federation.entities import base
 from federation.entities.activitypub.models import extract_replies
@@ -32,7 +34,7 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     except Profile.DoesNotExist:
         if not fetch: return
         logger.debug("get_profile_for_object - %s was not found, fetching from remote", owner)
-        remote_profile = retrieve_remote_profile(owner)
+        remote_profile = async_to_sync(retrieve_remote_profile)(owner)
         if not remote_profile:
             logger.warning("get_profile_for_object - Remote profile %s not found locally or remotely.", owner)
             return
@@ -44,6 +46,7 @@ def get_profile_for_object(owner: str, fetch: bool = True, no_local:bool = True)
     return sender_profile
 
 
+@transaction.atomic
 def process_entities(entities: List):
     """Process a list of entities."""
     for entity in entities:
@@ -172,7 +175,7 @@ def process_entity_comment(entity: Any, profile: Profile):
             "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = retrieve_remote_content(
+        remote_target = async_to_sync(retrieve_remote_content)(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -358,7 +361,7 @@ def process_entity_share(entity, profile):
             "process_entity_share - trying to fetch %s, %s, %s, %s, %s",
             entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
         )
-        remote_target = retrieve_remote_content(
+        remote_target = async_to_sync(retrieve_remote_content)(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
@@ -413,45 +416,39 @@ def process_entity_share(entity, profile):
         forward_entity.send(entity, target_content.id)
 
 
-def process_reply_collection(replies_fid):
-    coll = retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
+async def process_reply_collection(replies_fid):
+    coll = await retrieve_remote_content(replies_fid, cache=False, protocol=ProtocolType.ACTIVITYPUB)  # refresh reply collection
     if isinstance(coll, base.Collection):
-        replies = extract_replies(getattr(coll, 'first', []))
+        replies = await extract_replies(getattr(coll, 'first', []))
         for reply in replies:
-            process_reply.send(reply)
+            await sync_to_async(process_reply.send)(reply)
             logger.info("process_reply - queued job for entity %s", reply)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_reply(reply):
+@dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
+async def process_reply(reply):
     reply_fid = getattr(reply, 'id', reply)
-    try:
-        content = Content.objects.fed(reply_fid).get()
-        if content.replies_fid: process_reply_collection(content.replies_fid)
-    except Content.DoesNotExist:
+    content = await Content.objects.filter(fid=reply_fid).values('replies_fid').alast()
+    if content and content['replies_fid']: await process_reply_collection(content['replies_fid'])
+    else:
         # Try to fetch and process
         if isinstance(reply, base.Comment):
             remote_content = reply
-        elif isinstance(reply, str):
-            remote_content = retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
+        elif isinstance(reply, str) and reply.startswith("http"):
+            remote_content = await retrieve_remote_content(reply_fid, protocol=ProtocolType.ACTIVITYPUB)
         else:
+            logger.warning("process_reply - reply %s can not be processed", reply)
             return
         if remote_content:
             logger.info(
                 "process_reply - processing reply %s for entity %s",
                 remote_content.id, remote_content.target_id)
-            process_entities([remote_content])
-            try:
-                content = Content.objects.fed(reply_fid).get()
-                if content.replies_fid: process_reply_collection(content.replies_fid)
-            except Content.DoesNotExist:
-                logger.warning(
-                    "process_reply - reply %s for entity %s could not be processed",
-                    remote_content.id, remote_content.target_id)
+            await sync_to_async(process_entities)([remote_content])
+            if remote_content.replies: await process_reply_collection(remote_content.replies)
 
 
-@dramatiq.actor(priority=settings.DRAMATIQ_PRIORITY_LOW)
-def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
+@dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
+async def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     """
     Process ActivityPub replies from a root content.
 
@@ -465,21 +462,20 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
     :return:
     """
     # Process Activitypub reply collection
-    try:
-        root = Content.objects.get(id=root_id)
-    except Content.DoesNotExist:
+    root = await Content.objects.filter(id=root_id).values('fid', 'replies_fid', 'shares', 'shares_count').alast()
+    if not root:
         # Retracted?
         return
-    # A job might have been scheduled from process_entity_shares
+    # A job might have been scheduled from process_entity_share
     if shared_by_id:
-        if getattr(root.shares.last(), 'id', None) != shared_by_id:
-            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root.fid)
+        if root['shares'] != shared_by_id:
+            logger.info("process_replies - job replaced by one scheduled from process_entity_share for most recent share of content id %s", root['fid'])
             return
-    elif root.shares_count > 0:
-        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root.fid)
+    elif root['shares_count'] > 0:
+        logger.info("process_replies - job replaced by one scheduled from process_entity_share for content id %s", root['fid'])
         return
 
-    process_reply_collection(root.replies_fid)
+    await process_reply_collection(root['replies_fid'])
 
     if settings.DEBUG or not settings.SOCIALHOME_REPLY_COLLECTIONS_REFETCH_ENABLED:
         return
@@ -490,7 +486,7 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
         if delta else dt.timedelta(minutes=settings.SOCIALHOME_REPLY_COLLECTIONS_INITIAL_REFETCH_MINUTES)
     )
     if delta < dt.timedelta(days=settings.SOCIALHOME_REPLY_COLLECTIONS_FETCH_UNTIL_DAYS):
-        if process_replies.send_with_options(
+        if await sync_to_async(process_replies.send_with_options)(
                 args=(root_id, shared_by_id, delta.total_seconds()),
                 kwargs={
                     "queue_once_id": root_id,
@@ -498,12 +494,12 @@ def process_replies(root_id, shared_by_id=None, delta=None, **kwargs):
                 # Delay is milliseconds
                 delay=delta.total_seconds()*1000,
         ):
-            logger.info("process_replies - queued refresh job for entity %s", root.fid)
+            logger.info("process_replies - queued refresh job for entity %s", root['fid'])
         else:
-            logger.warning("process_replies - failed to enqueue refresh job for entity %s", root.fid)
+            logger.warning("process_replies - failed to enqueue refresh job for entity %s", root['fid'])
 
 
-def sender_key_fetcher(fid):
+async def sender_key_fetcher(fid):
     """Return the RSA public key for a fid, if found.
 
     Fetches the key first from a local Profile and if not found, looks for a remote Profile over the network.
@@ -514,7 +510,15 @@ def sender_key_fetcher(fid):
     :rtype: str
     """
     logger.debug("sender_key_fetcher - Checking for fid '%s'", fid)
-    profile = get_profile_for_object(fid)
+    try:
+        logger.debug("sender_key_fetcher - looking from local db using %s", fid)
+        profile = await Profile.objects.fed(fid).exclude(rsa_public_key="").aget()
+        key =  profile.rsa_public_key
+    except Profile.DoesNotExist:
+        logger.debug("sender_key_fetcher - %s was not found, fetching from remote", fid)
+        profile = await retrieve_remote_profile(fid)
+        key = getattr(profile, 'public_key', None)
     if not profile:
+        logger.warning("sender_key_fetcher - Remote profile %s not found locally or remotely.", fid)
         return
-    return profile.rsa_public_key
+    return key

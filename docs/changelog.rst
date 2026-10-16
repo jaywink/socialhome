@@ -6,6 +6,14 @@ Changelog
 unreleased
 ----------
 
+* **Note** async adaptations require federation > 0.27.
+
+Added
+.....
+
+* ``psycopg3``` connection pooling was enabled and a configurable option to contol the maximum pool size
+  (``PSYCOPG_MAX_POOL_SIZE```, default=4) was added.
+
 Changed
 .......
 
@@ -16,10 +24,49 @@ Changed
 
 * Update Dramatiq dependency.
 
+* Django has been upgraded to 5.2.x. To comply with this version, the following changes were
+  required:
+
+    * The unsuported ``drf-haystack``` package was replaced with a custom search viewset, still based on
+      ``Haystack```.
+    * ``pytz``` was replaced with ``zoneinfo```.
+
+* The changes above allowed for an upgrade of most required packages. The requirements were recompiled.
+
+* Most views and outbound functions were made  async, enabling concurrent processing by leveraging ``federation``,
+  ``daphne``` and ``Dramatiq`` asyncio capabilities. **Note**: the current state of the  Django async ORM implementation
+  forces us to keep the drf api fully synchronous, as well as using asigref.sync functions in some places, to process
+  synchronous code called from an async context in a seperate synchronous thread.
+
+* Use ``select_related``` to avoid lazy loading of DB queries so that Django doesn't throw a synchonous db operation
+  exception in async contexts.
+
+* The ``User.picture``` properties and related methods were removed as they were only required by the legacy UI. A
+  side effect of this change is that user profiles are no longer sent outbound at each login.
+
+* ``django.fsm``` being unsupported since Django 3.1 and ``viewflow``` being overkill, remove everything related to policy
+  documents. We'll revisit later.
+
+* Our custom admin approval middleware was made both sync and async aware.
+
+* As a side effect of ``ATOMIC_REQUESTS``` being unsupported in async contexts, ensure profile rsa keys are created before
+  ``federate_profile`` is called.
+
+* To minimize context switching, ``sender_key_fetcher`` doesn't create missing profiles anymore. Rely on the federation
+  aiohttp cache when the if remote profile is required in a later stage.
+
+* Where required, tests were adapted to an async context.
+
 Fixed
 .....
 
 * Fix account request reason from not being stored on registration.
+
+* Send admin approval email only after the new user's email address has been verified.
+
+* Do not log cached streams messages when the number of new cache keys is zero.
+
+* Do not try to retrieve ActivityPub replies when the ``fid``` doesn't start with http.
 
 0.24.0 (2026-08-01)
 -------------------

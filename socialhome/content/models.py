@@ -23,7 +23,7 @@ from django_enum import EnumField
 from federation.entities.activitypub.enums import ActivityType
 from federation.protocols.enums import ProtocolType
 from federation.utils.text import find_elements, TAG_PATTERN, MENTION_PATTERN, URL_PATTERN
-from memoize import memoize, delete_memoized
+from memoize_compat import memoize, delete_memoized
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from socialhome.activities.models import Activity
@@ -100,14 +100,14 @@ class Content(models.Model):
 
     # Federation GUID
     # Optional, related to Diaspora network platforms
-    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True)
+    guid = models.CharField(_("GUID"), max_length=255, unique=True, editable=False, blank=True, null=True, db_index=True)
 
     author = models.ForeignKey("users.Profile", on_delete=models.CASCADE, verbose_name=_("Author"))
     visibility = EnumField(Visibility, default=Visibility.PUBLIC, db_index=True)
 
     # Federation identifier
     # Optional
-    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True)
+    fid = models.URLField(_("Federation ID"), editable=False, max_length=255, unique=True, blank=True, null=True, db_index=True)
 
     # Reply collection  identifier (some AP platforms)
     # Optional
@@ -299,7 +299,7 @@ class Content(models.Model):
         if self.content_type == ContentType.CONTENT:
             return self
         elif self.content_type == ContentType.REPLY:
-            return self.parent.root
+            return self.parent.root_parent if self.parent.root_parent else self.parent
         elif self.content_type == ContentType.SHARE:
             return self.share_of.root
 
@@ -527,15 +527,15 @@ class Content(models.Model):
                 return True
         return False
 
-    def visible_for_fed_user(self, fid):
+    async def visible_for_fed_user(self, fid):
         """
         Filter by visibiity to given remote fid
         Assumes the fid is extracted from a signed AP request
         """
         if self.visibility == Visibility.PUBLIC:
             return True
-        profile = Profile.objects.filter(fid=fid).first()
+        profile = await Profile.objects.filter(fid=fid).afirst()
         if profile:
-            if self.limited_visibilities.filter(id=profile.id).exists():
+            if await self.limited_visibilities.filter(id=profile.id).aexists():
                 return True
         return False

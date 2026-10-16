@@ -15,12 +15,6 @@ class ProfileForm(forms.ModelForm):
         return safe_text(self.cleaned_data["name"])
 
 
-class UserPictureForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["picture"]
-
-
 class UserSignupForm(forms.Form):
     account_request_reason = forms.CharField(
         label=_("Account request reason"),

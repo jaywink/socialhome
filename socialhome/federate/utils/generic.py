@@ -2,6 +2,7 @@ import datetime
 import logging
 import pickle
 import re
+from asgiref.sync import sync_to_async
 from typing import Union, Dict, Optional
 
 from django.conf import settings
@@ -35,7 +36,7 @@ def get_matrix_config() -> Optional[Dict]:
         }
 
 
-def get_nodeinfo2_data():
+async def get_nodeinfo2_data():
     """
     Return data set for a NodeInfo2 document.
     """
@@ -55,13 +56,13 @@ def get_nodeinfo2_data():
     if settings.SOCIALHOME_STATISTICS:
         data.update({"usage": {
             "users": {
-                "total": User.objects.count(),
-                "activeHalfyear": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).count(),
-                "activeMonth": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).count(),
-                "activeWeek": User.objects.filter(last_login__gte=now() - datetime.timedelta(days=7)).count(),
+                "total": await User.objects.acount(),
+                "activeHalfyear": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=180)).acount(),
+                "activeMonth": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=30)).acount(),
+                "activeWeek": await User.objects.filter(last_login__gte=now() - datetime.timedelta(days=7)).acount(),
             },
-            "localPosts": Content.objects.filter(author__user__isnull=False, content_type=ContentType.CONTENT).count(),
-            "localComments": Content.objects.filter(author__user__isnull=False, content_type=ContentType.REPLY).count(),
+            "localPosts": await Content.objects.filter(author__user__isnull=False, content_type=ContentType.CONTENT).acount(),
+            "localComments": await Content.objects.filter(author__user__isnull=False, content_type=ContentType.REPLY).acount(),
         }})
     if settings.SOCIALHOME_SHOW_ADMINS:
         data.update({"organization": {
@@ -80,11 +81,11 @@ def get_outbound_payload_logger() -> Optional[callable]:
         return outbound_payload_logger
 
 
-def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: str) -> None:
+async def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: str) -> None:
     """
     Log an outbound payload.
     """
-    Payload.objects.create(
+    await Payload.objects.acreate(
         body=str(payload),
         direction="outbound",
         entities_found=1,
@@ -96,7 +97,7 @@ def outbound_payload_logger(payload: Union[str, Dict], protocol: str, sender: st
     )
 
 
-def queue_payload(request: HttpRequest, uuid: str = None):
+async def queue_payload(request: HttpRequest, uuid: str = None):
     """
     Queue payload for processing.
     """
@@ -120,17 +121,18 @@ def queue_payload(request: HttpRequest, uuid: str = None):
             method=request.method,
             url=request.build_absolute_uri(),
         )
-        preferences = global_preferences_registry.manager()
-        if preferences["admin__log_all_receive_payloads"]:
-            logger.debug("queue_payload - Request: %s", _request)
-
+        def log_payload():
+            preferences = global_preferences_registry.manager()
+            if preferences["admin__log_all_receive_payloads"]:
+                logger.debug("queue_payload - Request: %s", _request)
+        await sync_to_async(log_payload)()
         if not uuid:
             # Check if profile path has an uuid
             match = re.match(r"^/p/([0-9a-z-]+)/inbox/$", request.path)
             if match:
                 uuid = match.groups()[0]
 
-        receive_task.send(_request, uuid=uuid)
+        await sync_to_async(receive_task.send)(_request, uuid=uuid)
         return True
     except Exception:
         logger.exception('Failed to enqueue payload')

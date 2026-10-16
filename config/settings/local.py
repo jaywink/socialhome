@@ -58,7 +58,7 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
     MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
     INSTALLED_APPS += ("debug_toolbar", "debug_toolbar_user_panel")
 
-    INTERNAL_IPS = ("127.0.0.1", "10.0.2.2",)
+    INTERNAL_IPS = ("127.0.0.1", "10.0.2.2", "192.168.2.84")
 
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TEMPLATE_CONTEXT": True,
@@ -75,7 +75,6 @@ if env.bool("DJANGO_DEBUG_TOOLBAR", default=True):
         "debug_toolbar.panels.templates.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
 
@@ -85,8 +84,6 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # SOCIALHOME
 # ------------------------------------------------------------------------------
-# Disable generating RSA keys automatically, otherwise tests become slow
-SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
 SOCIALHOME_HTTPS = env.bool("SOCIALHOME_HTTPS", False)
 
 # HAYSTACK
@@ -107,6 +104,9 @@ MIDDLEWARE += ("querycount.middleware.QueryCountMiddleware",)
 
 # Tests
 if testing:
+    # Disable generating RSA keys automatically, otherwise tests become slow
+    SOCIALHOME_GENERATE_USER_RSA_KEYS_ON_SAVE = False
+
     # Possibly wont conflict with anything..
     REDIS_DB = 15
 
@@ -116,6 +116,7 @@ if testing:
 
     DRAMATIQ_BROKER = {
         "BROKER": "dramatiq.brokers.stub.StubBroker",
+        "OPTIONS": {},
         "MIDDLEWARE": [
             "socialhome.tasks.middleware.QueueOnceMiddleware",
             "dramatiq.middleware.AgeLimit",

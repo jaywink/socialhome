@@ -1,6 +1,7 @@
 from unittest.mock import patch, Mock
 
 from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
 from django.test import RequestFactory
 from django.urls import reverse
 
@@ -199,6 +200,7 @@ class TestPublicStreamAPIView(SocialhomeAPITestCase):
         mock_stream.assert_called_once_with(last_id=None, accept_ids=None, first_id=None, user=AnonymousUser())
 
 
+@transaction.atomic
 class TestTagStreamAPIView(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -224,6 +226,7 @@ class TestTagStreamAPIView(SocialhomeAPITestCase):
         )
 
 
+@transaction.atomic
 class TestTagsStreamAPIView(SocialhomeAPITestCase):
     @classmethod
     def setUpTestData(cls):

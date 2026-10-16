@@ -17,11 +17,11 @@ class TestUserDetailView(SocialhomeTestCase):
             "HTTP_ACCEPT": "text/html",
             "SERVER_NAME": "127.0.0.1:8000",
         })
-        self.response_405()
+        self.response_400()
         self.get(self.user.get_absolute_url(), extra={
             "SERVER_NAME": "127.0.0.1:8000",
         })
-        self.response_405()
+        self.response_400()
 
     @data(
         "application/json", "application/activity+json", "application/ld+json",

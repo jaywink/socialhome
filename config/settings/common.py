@@ -82,8 +82,10 @@ LOCAL_APPS = (
 INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 SILKY_INSTALLED = env.bool("SOCIALHOME_SILKY", False)
+PYINSTRUMENT_INSTALLED = env.bool("SOCIALHOME_PYINSTRUMENT", False)
 if testing:
     SILKY_INSTALLED = False
+    PYINSTRUMENT_INSTALLED = False
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -114,6 +116,10 @@ if SILKY_INSTALLED:
     INSTALLED_APPS = INSTALLED_APPS + ("silk",)
     MIDDLEWARE = ("silk.middleware.SilkyMiddleware",) + MIDDLEWARE
 
+if PYINSTRUMENT_INSTALLED:
+    PYINSTRUMENT_PROFILE_DIR = 'profiles'
+    MIDDLEWARE = ("pyinstrument.middleware.ProfilerMiddleware",) + MIDDLEWARE
+
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
 MIGRATION_MODULES = {
@@ -143,9 +149,12 @@ DATABASES = {
         default="postgres://socialhome:socialhome@127.0.0.1:5432/socialhome",
     ),
 }
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # When using ASGI, persistent connections should be disabled.
 DATABASES["default"]["CONN_MAX_AGE"] = 0
+DATABASES["default"]["OPTIONS"] = {"pool": {
+                                        "max_size": env.int("PSYCOPG_MAX_POOL_SIZE", 4)
+                                        }
+                                    }
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -164,11 +173,11 @@ SITE_ID = 1
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
-USE_L10N = True
-
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
+
+# Turn off swagger deprecation warning
+SWAGGER_USE_COMPAT_RENDERERS = False
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -266,6 +275,10 @@ ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_PASSWORD_RESET_BY_CODE_ENABLED = True
 
+ACCOUNT_SIGNUP_FORM_CLASS = "socialhome.users.forms.UserSignupForm"
+SOCIALACCOUNT_FORMS = {
+    "signup": "socialhome.users.forms.UserSocialAccountSignupForm",
+}
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # Require new signups to be approved by an admin
@@ -362,6 +375,7 @@ SOCIALHOME_URL = "{protocol}://{domain}".format(
     protocol="https" if SOCIALHOME_HTTPS else "http",
     domain=SOCIALHOME_DOMAIN
 )
+HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS = {
     "account_confirm_email": f'{SOCIALHOME_URL}/account/email/verify/{{key}}',
     "account_reset_password": f'{SOCIALHOME_URL}/account/password/reset',
@@ -369,7 +383,6 @@ HEADLESS_FRONTEND_URLS = {
     "account_login": f'{SOCIALHOME_URL}/account/login',
     "account_signup": f'{SOCIALHOME_URL}/account/signup',
 }
-HEADLESS_ONLY = True
 
 # Admins
 # Boolean whether to show admin contact information to users and in server metadata
@@ -638,7 +651,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 100,
-    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",

@@ -1,5 +1,6 @@
 import xml
 
+from asgiref.sync import async_to_sync
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -15,7 +16,7 @@ from socialhome.users.utils import update_profile
 from socialhome.utils import is_url
 
 
-def get_single_object(q, request, api=False, *args, **kwargs):
+def get_single_object(q, request, api=False):
     if q.startswith('#'):
         q = q.lower()
         try:
@@ -40,7 +41,7 @@ def get_single_object(q, request, api=False, *args, **kwargs):
         # Try a remote search
         if is_url(q) or validate_handle(q):
             try:
-                remote_profile = retrieve_remote_profile(q)
+                remote_profile = async_to_sync(retrieve_remote_profile)(q)
             except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
                 # Catch various errors parsing the remote profile
                 return None
@@ -57,7 +58,7 @@ def get_single_object(q, request, api=False, *args, **kwargs):
         # Try a remote search
         if is_url(q):
             try:
-                remote_content = retrieve_remote_content(q)
+                remote_content = async_to_sync(retrieve_remote_content)(q)
             except (AttributeError, ValueError):
                 # Catch various errors parsing the remote content
                 return None

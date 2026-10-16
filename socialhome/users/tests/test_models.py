@@ -53,24 +53,6 @@ class TestUser(SocialhomeTestCase):
         self.user.name = ""
         assert self.user.get_last_name() == ""
 
-    @patch("socialhome.users.models.User.picture")
-    def test_copy_picture_to_profile(self, mock_picture):
-        class MockCropped(object):
-            def __init__(self, name):
-                self.name = name
-
-        self.profile.image_url_small = self.profile.image_url_medium = self.profile.image_url_large = "foo"
-        self.user.picture = Mock(crop={
-            "50x50": MockCropped("small"),
-            "100x100": MockCropped("medium"),
-            "300x300": MockCropped("large"),
-        })
-        self.user.copy_picture_to_profile()
-        self.profile.refresh_from_db()
-        self.assertEqual(self.profile.image_url_small, "http://127.0.0.1:8000/media/small")
-        self.assertEqual(self.profile.image_url_medium, "http://127.0.0.1:8000/media/medium")
-        self.assertEqual(self.profile.image_url_large, "http://127.0.0.1:8000/media/large")
-
     @patch("socialhome.users.models.get_redis_connection", autospec=True)
     def test_mark_recently_active(self, mock_conn):
         mock_r = Mock()

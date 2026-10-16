@@ -1,6 +1,8 @@
 from unittest import mock
 from unittest.mock import patch, Mock, call
 
+from django.db import transaction
+
 from federation.entities.activitypub.enums import ActivityType
 
 from socialhome.content.enums import ContentType
@@ -13,6 +15,7 @@ from socialhome.tests.utils import SocialhomeTestCase, SocialhomeTransactionTest
 from socialhome.users.tests.factories import UserFactory, PublicUserFactory, ProfileFactory
 
 
+@transaction.atomic
 class TestContentMentionsChange(SocialhomeTransactionTestCase):
     def setUp(self):
         super().setUp()
@@ -45,6 +48,7 @@ class TestContentMentionsChange(SocialhomeTransactionTestCase):
         assert len(mock_send.method_calls) == 0
 
 
+@transaction.atomic
 class TestContentPostSave(SocialhomeTransactionTestCase):
     @patch("socialhome.content.signals.update_streams_with_content")
     def test_calls_update_streams_with_content(self, mock_update):
@@ -94,6 +98,7 @@ class TestContentPostSave(SocialhomeTransactionTestCase):
         self.assertEqual(mock_send.method_calls,[])
 
 
+@transaction.atomic
 class TestNotifyListeners(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls) -> None:
@@ -357,6 +362,7 @@ class TestFetchPreview(SocialhomeTestCase):
         self.assertTrue(logger.called)
 
 
+@transaction.atomic
 class TestRenderContent(SocialhomeTestCase):
     def test_render_content_called(self):
         content = ContentFactory()

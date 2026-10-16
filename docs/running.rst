@@ -114,10 +114,29 @@ To only delete remote profile content and then lock the profile, run as follows:
 
 Multiple ``uuid``'s can be passed in by separating them with commas. A confirmation dialog is produced for each user or profile to be deleted.
 
+.. _delete-old-tasks:
+
+Deleting old django-dramatiq task records
+-----------------------------------------
+
+To delete old django-dramatiq task records, a Django management command has been provided. This command should be used in place of the django-dramatiq supplied task which may consume a very large amout of memory.
+
+Run the command as folows:
+
+::
+
+    python manage.py delete_old_tasks --before-date YYYYMMDD
+
+The records are deleted --chunk-size (defaults to 1000) at a time, to minimize memory consumption.
+
+It is suggested to run this command regularly (using a cron job for example) to avoid filling disk space.
+
 .. _policy-docs:
 
 Policy documents
 ----------------
+
+**Note**: this feature is currently unavailable and will be restored in a future version.
 
 Terms of Service and Privacy policy documents are good to have. These tell people visiting your site what rules you operate with. Socialhome provides default templates you can activate with a few clicks.
 
@@ -283,6 +302,15 @@ FEDERATION_USER
 ...............
 
 If set to a valid local user name, that user's private key will be used to sign federation get requests.
+
+PSYCOPG_MAX_POOL_SIZE
+......................
+
+Default: ``4``
+
+Set the maximum psycopg connection pool size. Using the default value effectively means a maximum size = 4,
+which is the default minimum pool size. If set, this value should be > 4.
+
 
 REDIS_DB
 ........

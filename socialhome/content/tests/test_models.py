@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 from django.utils.timezone import make_aware
@@ -20,6 +21,7 @@ from socialhome.users.tests.factories import UserFactory
 
 
 @freeze_time("2017-03-11")
+@transaction.atomic
 class TestContentModel(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -303,6 +305,7 @@ class TestContentModel(SocialhomeTestCase):
         self.assertEqual(share.content_type, ContentType.SHARE)
 
 
+@transaction.atomic
 class TestContentRendered(SocialhomeTestCase):
     def test_renders(self):
         content = ContentFactory(text="# Foobar <img src='localhost'>")
@@ -330,6 +333,7 @@ class TestContentRendered(SocialhomeTestCase):
         self.assertEqual(content.rendered, "<p>foobar</p>")
 
 
+@transaction.atomic
 class TestContentSaveTags(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):

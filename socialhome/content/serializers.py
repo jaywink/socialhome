@@ -4,6 +4,7 @@ from functools import reduce
 from typing import Dict, Any, Set, List
 import traceback
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ngettext as _
 from federation.utils.text import validate_handle
@@ -220,6 +221,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
         return result
 
+    @transaction.atomic
     def save(self, **kwargs: Dict):
         """
         Set possible recipients after save.
@@ -243,24 +245,15 @@ class ContentSerializer(serializers.ModelSerializer):
                 # HAXX to ensure visibility is empty when going in to save
                 self.instance.visibility = None
 
-        content = super().save(**kwargs)
-
         # Mentions now == recipients entered through the UI
-        existing_handles = set(content.mentions.values_list('finger', flat=True))
-        to_remove = existing_handles.difference(raw_recipients)
-        to_add = raw_recipients.difference(existing_handles)
-        for handle in to_remove:
+        mentions = []
+        for handle in raw_recipients:
             try:
-                content.mentions.remove(Profile.objects.get(finger__iexact=handle))
+                mentions.append(Profile.objects.get(finger__iexact=handle))
             except Profile.DoesNotExist:
                 pass
-        for handle in to_add:
-            try:
-                content.mentions.add(Profile.objects.get(finger__iexact=handle))
-            except Profile.DoesNotExist:
-                pass
-        # Linkify mentions
-        render_content(content)
+
+        content = super().save(mentions=mentions, **kwargs)
 
         if content.visibility != Visibility.LIMITED or content.content_type == ContentType.SHARE:
             return content
@@ -325,7 +318,7 @@ class ContentSerializer(serializers.ModelSerializer):
         return safe_text_for_markdown(value)
 
     def validate_recipients(self, value: Set[str]) -> Set[str]:
-        if self.initial_data.get("visibility", Visibility.PUBLIC.value) != Visibility.LIMITED.value:
+        if self.initial_data.get("visibility", Visibility.PUBLIC) != Visibility.LIMITED:
             return value
 
         if not value and not self.initial_data.get("include_following"):

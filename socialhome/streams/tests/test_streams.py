@@ -3,6 +3,7 @@ from unittest import mock, skip
 from unittest.mock import patch, Mock, call
 
 from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
 from django.db.models import Max
 from django.test import override_settings
 from freezegun import freeze_time
@@ -91,6 +92,7 @@ class TestAddToStreamForUsers(SocialhomeTestCase):
         self.assertFalse(mock_filter.called)
 
 
+@transaction.atomic
 class TestCheckAndAddToKeys(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -511,6 +513,7 @@ class TestPublicStream(SocialhomeTestCase):
         self.assertFalse(self.stream.should_stream_content(self.self_content))
 
 
+@transaction.atomic
 class TestTagStream(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -601,6 +604,7 @@ class TestTagStream(SocialhomeTestCase):
         self.assertFalse(self.local_stream.should_stream_content(self.self_content))
 
 
+@transaction.atomic
 class TestTagsStream(SocialhomeTestCase):
     @classmethod
     def setUpTestData(cls):

@@ -19,6 +19,7 @@ freezegun
 ipdb<0.13.5
 pip-tools
 pytest
+pytest-asyncio
 pytest-blockage
 pytest-cov
 pytest-django
