@@ -61,7 +61,6 @@ THIRD_PARTY_APPS = (
     "dynamic_preferences.users.apps.UserPreferencesConfig",
     "haystack",
     "versatileimagefield",
-    "memoize",
     "redisboard",
     "robots",
     "reversion",
