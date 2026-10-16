@@ -30,6 +30,7 @@ Changed
     * The unsuported ``drf-haystack``` package was replaced with a custom search viewset, still based on
       ``Haystack```.
     * ``pytz``` was replaced with ``zoneinfo```.
+    * The obsolete ``django-memoize`` was replaced with ``django-memoize-compat``.`
 
 * The changes above allowed for an upgrade of most required packages. The requirements were recompiled.
 
@@ -56,6 +57,9 @@ Changed
   aiohttp cache when the if remote profile is required in a later stage.
 
 * Where required, tests were adapted to an async context.
+
+* The translation workflow now mostly uses django management commands since we maintain the VueJS UI in a different
+  project. ``TRANSLATIONS.md``` was updated accordingly.
 
 Fixed
 .....
