@@ -587,25 +587,3 @@ msgstr ""
 #: socialhome/users/preferences.py:34
 msgid "If selected, always show sensitive content"
 msgstr ""
-
-#~ msgid "Choose policy document types to send emails about first!"
-#~ msgstr ""
-#~ "Vyberte si typy dokumentov o nariadeniach, ktoré posielať emailom ako "
-#~ "prvé!"
-
-#~ msgid "Policy document update emails queued for sending."
-#~ msgstr "Dokument o úprave pravidiel zaradený na odosielanie emailom."
-
-#~ msgid "Send email update to all users"
-#~ msgstr "Poslať email o úpravách všetkým užívateľom"
-
-#~ msgid "Recipients"
-#~ msgstr "Prijemcovia"
-
-#~ msgid "Recipients cannot be empty if not including followed users."
-#~ msgstr ""
-#~ "Prijemcovia nemôžu byť prázdni, keď nezahrňujete nasledovaních užívateľov."
-
-#, fuzzy
-#~ msgid "Create Link"
-#~ msgstr "Vytvorený"

@@ -587,6 +587,3 @@ msgstr ""
 #: socialhome/users/preferences.py:34
 msgid "If selected, always show sensitive content"
 msgstr ""
-
-#~ msgid "Choose policy document types to send emails about first!"
-#~ msgstr "Velg dokumenttyper å sende e-poster om først."

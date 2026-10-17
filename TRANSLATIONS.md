@@ -22,7 +22,7 @@ Updating
 
 When new strings are added/updated/deleted to/from the code, update the pot file and existing po files using:
 ```
-./manage.py makemessages --keep-pot $(find socialhome/locale -maxdepth 1 -type d|tail -n +2|xargs -n1 basename|sed 's/^/-l /')
+./manage.py makemessages --keep-pot --no-obsolete $(find socialhome/locale -maxdepth 1 -type d|tail -n +2|xargs -n1 basename|sed 's/^/-l /')
 ```
 
 Then commit and push the modified files to master.
