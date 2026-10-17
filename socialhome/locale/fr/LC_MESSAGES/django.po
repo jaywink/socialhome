@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 15:58-0400\n"
-"PO-Revision-Date: 2026-01-22 16:21+0000\n"
+"PO-Revision-Date: 2026-10-17 13:31+0000\n"
 "Last-Translator: alain <alain@noreply.codeberg.org>\n"
 "Language-Team: French <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.15.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 "Generated-By: Babel 2.9.0\n"
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:8
@@ -176,10 +176,8 @@ msgid "Reply count"
 msgstr "Nombre de réponses"
 
 #: socialhome/content/models.py:173
-#, fuzzy
-#| msgid "Organize content"
 msgid "Sensitive content"
-msgstr "Organiser les publications"
+msgstr "Contenu sensible"
 
 #: socialhome/content/models.py:174
 msgid "Shares count"
@@ -187,7 +185,7 @@ msgstr "Nombre de partages"
 
 #: socialhome/content/models.py:175
 msgid "Latest share id"
-msgstr ""
+msgstr "Id du plus récent partage"
 
 #: socialhome/content/models.py:178
 msgid "Root parent"
@@ -195,7 +193,7 @@ msgstr "Racine du parent"
 
 #: socialhome/content/models.py:183
 msgid "Has root content had local replies"
-msgstr ""
+msgstr "Existe-t-il des répliques locales au contenu initial"
 
 #: socialhome/content/serializers.py:336
 msgid "This recipient couldn't be found (please check the format)."
@@ -223,23 +221,19 @@ msgstr "Site"
 
 #: socialhome/enums.py:22
 msgid "Self"
-msgstr "Moi seul"
+msgstr "Soi-même"
 
 #: socialhome/models.py:24
-#, fuzzy
-#| msgid "Upload image"
 msgid "Upload Category"
-msgstr "Téléverser une image"
+msgstr "Type de téléversement"
 
 #: socialhome/notifications/tasks.py:57
 msgid "New user approval request"
-msgstr ""
+msgstr "Demande d'approbation d'un nouvel utilisateur"
 
 #: socialhome/notifications/tasks.py:88
-#, fuzzy
-#| msgid "Your content has received a new share by"
 msgid "Your account has been approved"
-msgstr "Votre publication a été partagée par"
+msgstr "Votre compte a été approuvé"
 
 #: socialhome/notifications/tasks.py:120
 #, python-format
@@ -267,30 +261,30 @@ msgstr "L'exportation des données est prête à être téléchargée"
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:6
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:5
 msgid "There is a new account approval request waiting."
-msgstr ""
+msgstr "Une demande d'approbation d'un nouveau compte est en attente."
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:10
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:7
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:14
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:9
 msgid "Reason"
-msgstr ""
+msgstr "Justification"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:18
 msgid "Approve or delete the user"
-msgstr ""
+msgstr "Approuver ou supprimer le compte"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:22
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:13
 msgid "The user will be notified if approved."
-msgstr ""
+msgstr "Si approuvé, l'utilisateur sera avisé."
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:11
 msgid "Approve or delete the user via the following url"
-msgstr ""
+msgstr "Approuver ou supprimer le compte via l'URL suivant"
 
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
@@ -397,12 +391,12 @@ msgstr "Votre publication a été partagée par"
 #: socialhome/notifications/templates/notifications/user_account_approved.html:6
 #: socialhome/notifications/templates/notifications/user_account_approved.txt:5
 msgid "Congrats! Your account has been approved."
-msgstr ""
+msgstr "Félicitations ! Votre compte a été approuvé."
 
 #: socialhome/notifications/templates/notifications/user_account_approved.html:10
 #: socialhome/notifications/templates/notifications/user_account_approved.txt:7
 msgid "Login and say hello!"
-msgstr ""
+msgstr "Connectez-vous et dites bonjour !"
 
 #: socialhome/preferences.py:13
 msgid "Log all outbound payloads"
@@ -460,7 +454,7 @@ msgstr "Un site social fédéré."
 
 #: socialhome/users/forms.py:20 socialhome/users/models.py:51
 msgid "Account request reason"
-msgstr ""
+msgstr "Justification pour la demande de compte"
 
 #: socialhome/users/forms.py:24
 msgid ""
@@ -468,10 +462,14 @@ msgid ""
 "would want to have an account? Be descriptive with a few sentences to "
 "improve the chance of admins approving your request."
 msgstr ""
+"Sur cette instance, la création de nouveaux comptes doit être validée par un "
+"administrateur. Expliquez-nous pourquoi vous souhaitez créer un compte. "
+"Donnez des précisions en quelques phrases afin d'augmenter vos chances que "
+"les administrateurs approuvent votre demande."
 
 #: socialhome/users/models.py:49
 msgid "Admin approved"
-msgstr ""
+msgstr "Approuvé par un administrateur"
 
 #: socialhome/users/models.py:55
 msgid "Name of User"
@@ -487,13 +485,11 @@ msgstr "adresse courriel"
 
 #: socialhome/users/models.py:141
 msgid "Bio"
-msgstr ""
+msgstr "Biographie"
 
 #: socialhome/users/models.py:142
-#, fuzzy
-#| msgid "Rendered text"
 msgid "Rendered bio"
-msgstr "Texte animé"
+msgstr "Biographie mise en forme"
 
 #: socialhome/users/models.py:150
 msgid "Handle"
@@ -512,10 +508,8 @@ msgid "RSA public key"
 msgstr "Clé RSA publique"
 
 #: socialhome/users/models.py:166
-#, fuzzy
-#| msgid "RSA public key"
 msgid "AP Public Key ID"
-msgstr "Clé RSA publique"
+msgstr "ID de la clé publique AP"
 
 #: socialhome/users/models.py:169
 msgid "Profile visibility"
@@ -534,10 +528,8 @@ msgid "Image - small"
 msgstr "Image - petite"
 
 #: socialhome/users/models.py:179
-#, fuzzy
-#| msgid "Avatar of"
 msgid "Avatar"
-msgstr "Avatar de"
+msgstr "Avatar"
 
 #: socialhome/users/models.py:180
 msgid "Picture"
@@ -557,13 +549,11 @@ msgstr "Le contenu des utilisateurs doit-il être considéré comme NSFW ?"
 
 #: socialhome/users/models.py:189
 msgid "Following"
-msgstr "Abonnements"
+msgstr "Abonné-e-s"
 
 #: socialhome/users/models.py:193
-#, fuzzy
-#| msgid "Followers"
 msgid "AP Followers FID"
-msgstr "Abonné-e-s"
+msgstr "FID des abonné-e-s AP"
 
 #: socialhome/users/models.py:197
 msgid "Followed tags"
@@ -582,10 +572,8 @@ msgid "Protocol"
 msgstr "Protocole"
 
 #: socialhome/users/models.py:209
-#, fuzzy
-#| msgid "Profile"
 msgid "Profile URL"
-msgstr "Profil"
+msgstr "URL du profil"
 
 #: socialhome/users/preferences.py:16
 msgid "Profile"
@@ -621,11 +609,9 @@ msgstr ""
 "Choisissez la page que vous souhaitez voir apparaître comme page d'accueil."
 
 #: socialhome/users/preferences.py:33
-#, fuzzy
-#| msgid "Show NSFW content"
 msgid "Show sensitive content"
-msgstr "Afficher le contenu NSFW"
+msgstr "Afficher le contenu sensible"
 
 #: socialhome/users/preferences.py:34
 msgid "If selected, always show sensitive content"
-msgstr ""
+msgstr "Si sélectionné, toujours montrer le contenu sensible"
