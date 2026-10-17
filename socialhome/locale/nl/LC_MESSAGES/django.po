@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 15:58-0400\n"
-"PO-Revision-Date: 2025-02-15 11:21+0000\n"
-"Last-Translator: Vistaus <vistaus@users.noreply.translate.codeberg.org>\n"
+"PO-Revision-Date: 2026-10-18 18:27+0000\n"
+"Last-Translator: Vistaus <vistaus@noreply.codeberg.org>\n"
 "Language-Team: Dutch <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/nl/>\n"
 "Language: nl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.9.2\n"
+"X-Generator: Weblate 2026.10.1\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: socialhome/content/enums.py:17 socialhome/streams/enums.py:8
@@ -172,10 +172,8 @@ msgid "Reply count"
 msgstr "Aantal antwoorden"
 
 #: socialhome/content/models.py:173
-#, fuzzy
-#| msgid "Organize content"
 msgid "Sensitive content"
-msgstr "Items ordenen"
+msgstr "Gevoelige inhoud"
 
 #: socialhome/content/models.py:174
 msgid "Shares count"
@@ -183,7 +181,7 @@ msgstr "Aantal keer gedeeld"
 
 #: socialhome/content/models.py:175
 msgid "Latest share id"
-msgstr ""
+msgstr "Recentste deel-id"
 
 #: socialhome/content/models.py:178
 msgid "Root parent"
@@ -191,7 +189,7 @@ msgstr "Hoofdbericht"
 
 #: socialhome/content/models.py:183
 msgid "Has root content had local replies"
-msgstr ""
+msgstr "Bevat hoofdinhoud en lokale antwoorden"
 
 #: socialhome/content/serializers.py:336
 msgid "This recipient couldn't be found (please check the format)."
@@ -222,20 +220,16 @@ msgid "Self"
 msgstr "Alleen ik"
 
 #: socialhome/models.py:24
-#, fuzzy
-#| msgid "Upload image"
 msgid "Upload Category"
-msgstr "Afbeelding uploaden"
+msgstr "Uploadcategorie"
 
 #: socialhome/notifications/tasks.py:57
 msgid "New user approval request"
-msgstr ""
+msgstr "Goedkeuringsverzoek nieuwe gebruiker"
 
 #: socialhome/notifications/tasks.py:88
-#, fuzzy
-#| msgid "Your content has received a new share by"
 msgid "Your account has been approved"
-msgstr "Je item is gedeeld door"
+msgstr "Je account is goedgekeurd"
 
 #: socialhome/notifications/tasks.py:120
 #, python-format
@@ -263,30 +257,30 @@ msgstr "Je gegevensexport is samengesteld"
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:6
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:5
 msgid "There is a new account approval request waiting."
-msgstr ""
+msgstr "Er staat een goedkeuringsverzoek klaar."
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:10
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:7
 msgid "User"
-msgstr ""
+msgstr "Gebruiker"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:14
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:9
 msgid "Reason"
-msgstr ""
+msgstr "Reden"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:18
 msgid "Approve or delete the user"
-msgstr ""
+msgstr "Gebruiker goedkeuren of afwijzen"
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.html:22
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:13
 msgid "The user will be notified if approved."
-msgstr ""
+msgstr "De gebruiker wordt van de goedkeuring op de hoogte gebracht."
 
 #: socialhome/notifications/templates/notifications/admin_account_approval.txt:11
 msgid "Approve or delete the user via the following url"
-msgstr ""
+msgstr "Gebruiker goedkeuren of afwijzen aan de hand van de url"
 
 #: socialhome/notifications/templates/notifications/base.html:11
 #: socialhome/notifications/templates/notifications/base.txt:3
@@ -386,12 +380,12 @@ msgstr "Je item is gedeeld door"
 #: socialhome/notifications/templates/notifications/user_account_approved.html:6
 #: socialhome/notifications/templates/notifications/user_account_approved.txt:5
 msgid "Congrats! Your account has been approved."
-msgstr ""
+msgstr "Gefeliciteerd! Je account is goedgekeurd."
 
 #: socialhome/notifications/templates/notifications/user_account_approved.html:10
 #: socialhome/notifications/templates/notifications/user_account_approved.txt:7
 msgid "Login and say hello!"
-msgstr ""
+msgstr "Log in en groet de anderen!"
 
 #: socialhome/preferences.py:13
 msgid "Log all outbound payloads"
@@ -447,7 +441,7 @@ msgstr "Een gefedereerd buurthuis."
 
 #: socialhome/users/forms.py:20 socialhome/users/models.py:51
 msgid "Account request reason"
-msgstr ""
+msgstr "Reden voor accountverzoek"
 
 #: socialhome/users/forms.py:24
 msgid ""
@@ -455,10 +449,12 @@ msgid ""
 "would want to have an account? Be descriptive with a few sentences to "
 "improve the chance of admins approving your request."
 msgstr ""
+"Deze instantie vereist dat beheerders nieuwe accounts goedkeuren. Vertel ze "
+"in een paar duidelijke zinnen waarom je een account wilt hebben."
 
 #: socialhome/users/models.py:49
 msgid "Admin approved"
-msgstr ""
+msgstr "Goedgekeurd door beheerder"
 
 #: socialhome/users/models.py:55
 msgid "Name of User"
@@ -474,13 +470,11 @@ msgstr "e-mailadres"
 
 #: socialhome/users/models.py:141
 msgid "Bio"
-msgstr ""
+msgstr "Biografie"
 
 #: socialhome/users/models.py:142
-#, fuzzy
-#| msgid "Rendered text"
 msgid "Rendered bio"
-msgstr "Getoonde tekst"
+msgstr "Getoonde biografie"
 
 #: socialhome/users/models.py:150
 msgid "Handle"
@@ -499,10 +493,8 @@ msgid "RSA public key"
 msgstr "RSA - openbare sleutel"
 
 #: socialhome/users/models.py:166
-#, fuzzy
-#| msgid "RSA public key"
 msgid "AP Public Key ID"
-msgstr "RSA - openbare sleutel"
+msgstr "AP - openbare id"
 
 #: socialhome/users/models.py:169
 msgid "Profile visibility"
@@ -521,10 +513,8 @@ msgid "Image - small"
 msgstr "Afbeelding - klein"
 
 #: socialhome/users/models.py:179
-#, fuzzy
-#| msgid "Avatar of"
 msgid "Avatar"
-msgstr "Profielfoto van"
+msgstr "Profielfoto"
 
 #: socialhome/users/models.py:180
 msgid "Picture"
@@ -547,10 +537,8 @@ msgid "Following"
 msgstr "Volgend"
 
 #: socialhome/users/models.py:193
-#, fuzzy
-#| msgid "Followers"
 msgid "AP Followers FID"
-msgstr "Volgels"
+msgstr "AP - volgers-FID"
 
 #: socialhome/users/models.py:197
 msgid "Followed tags"
@@ -569,10 +557,8 @@ msgid "Protocol"
 msgstr "Protocol"
 
 #: socialhome/users/models.py:209
-#, fuzzy
-#| msgid "Profile"
 msgid "Profile URL"
-msgstr "Profiel"
+msgstr "Profiel-url"
 
 #: socialhome/users/preferences.py:16
 msgid "Profile"
@@ -607,11 +593,9 @@ msgid "Choose which page you want to see as the landing page."
 msgstr "Kies welke pagina je wilt instellen als startpagina."
 
 #: socialhome/users/preferences.py:33
-#, fuzzy
-#| msgid "Show NSFW content"
 msgid "Show sensitive content"
-msgstr "18+-inhoud tonen"
+msgstr "Gevoelige inhoud tonen"
 
 #: socialhome/users/preferences.py:34
 msgid "If selected, always show sensitive content"
-msgstr ""
+msgstr "Schakel in om gevoelige inhoud altijd te tonen"
