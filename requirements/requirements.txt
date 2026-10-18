@@ -4,6 +4,16 @@
 #
 #    ./compile-requirements.sh
 #
+aiofiles==25.1.0
+    # via federation
+aiohappyeyeballs==2.7.1
+    # via aiohttp
+aiohttp==3.14.5
+    # via aiohttp-client-cache
+aiohttp-client-cache==0.15.0
+    # via federation
+aiosignal==1.4.0
+    # via aiohttp
 apscheduler==3.11.3
     # via -r requirements/requirements.in
 arrow==1.4.0
@@ -16,10 +26,13 @@ asgiref==3.12.1
     #   django
     #   django-allauth
     #   django-cors-headers
+    #   federation
 asttokens==3.0.2
     # via stack-data
 attrs==26.1.0
     # via
+    #   aiohttp
+    #   aiohttp-client-cache
     #   cattrs
     #   django-redisboard
     #   federation
@@ -65,7 +78,9 @@ channels-redis==4.3.0
 chardet==7.6.0
     # via -r requirements/requirements.in
 charset-normalizer==3.5.1
-    # via requests
+    # via
+    #   federation
+    #   requests
 circus==0.19.0
     # via -r requirements/requirements.in
 commonmark-socialhome==0.9.1.post2
@@ -183,12 +198,16 @@ enum-properties==2.8.1
     #   federation
 executing==2.2.1
     # via stack-data
-federation==0.27.0
+federation==0.28.0
     # via -r requirements/requirements.in
 filelock==4.0.1
     # via xapian-haystack
 frozendict==2.4.7
     # via pyld
+frozenlist==1.8.0
+    # via
+    #   aiohttp
+    #   aiosignal
 funcy==2.1
     # via federation
 gprof2dot==2025.4.14
@@ -203,6 +222,7 @@ idna==3.20
     #   requests
     #   twisted
     #   url-normalize
+    #   yarl
 incremental==24.11.0
     # via twisted
 inflection==0.5.1
@@ -217,6 +237,8 @@ isodate==0.6.1
     #   rdflib
 iteration-utilities==0.13.0
     # via federation
+itsdangerous==2.2.0
+    # via aiohttp-client-cache
 itypes==1.2.0
     # via coreapi
 jedi==0.20.0
@@ -250,6 +272,10 @@ msgpack==1.2.2
     # via
     #   autobahn
     #   channels-redis
+multidict==7.1.0
+    # via
+    #   aiohttp
+    #   yarl
 packaging==26.3
     # via
     #   django-haystack
@@ -271,6 +297,10 @@ platformdirs==4.11.11
     # via requests-cache
 prompt-toolkit==3.0.53
     # via ipython
+propcache==0.5.4
+    # via
+    #   aiohttp
+    #   yarl
 psutil==7.2.2
     # via
     #   circus
@@ -288,9 +318,7 @@ pure-eval==0.2.4
 pycparser==3.0
     # via cffi
 pycryptodome==3.23.0
-    # via
-    #   federation
-    #   python-httpsig-socialhome
+    # via federation
 pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
     # via -r requirements/requirements.in
 pygments==2.21.0
@@ -311,8 +339,6 @@ python-dateutil==2.9.0.post0
     # via
     #   arrow
     #   federation
-python-httpsig-socialhome==1.6.0
-    # via federation
 python-magic==0.4.27
     # via
     #   django-versatileimagefield
@@ -370,10 +396,10 @@ service-identity==26.1.0
     # via twisted
 six==1.17.0
     # via
+    #   federation
     #   isodate
     #   markdownify
     #   python-dateutil
-    #   python-httpsig-socialhome
 soupsieve==2.9.2
     # via beautifulsoup4
 sqlparse==0.6.0
@@ -396,6 +422,8 @@ txaio==26.6.1
     # via autobahn
 typing-extensions==4.16.0
     # via
+    #   aiohttp
+    #   aiosignal
     #   beautifulsoup4
     #   cattrs
     #   django-redis
@@ -415,7 +443,9 @@ uritemplate==4.2.0
     #   coreapi
     #   drf-yasg
 url-normalize==3.0.0
-    # via requests-cache
+    # via
+    #   aiohttp-client-cache
+    #   requests-cache
 urllib3==2.8.0
     # via
     #   requests
@@ -430,6 +460,8 @@ xapian-bindings-binary==1.4.26
     # via -r requirements/requirements.in
 xapian-haystack==4.0.0
     # via -r requirements/requirements.in
+yarl==1.25.1
+    # via aiohttp
 zope-interface==8.6
     # via twisted
 

@@ -6,8 +6,6 @@ Changelog
 unreleased
 ----------
 
-* **Note** async adaptations require federation > 0.27.
-
 Added
 .....
 
@@ -23,6 +21,8 @@ Changed
   the RQ queues are emptied, and then upgrade further.
 
 * Update Dramatiq dependency.
+
+* Update `federation`, which is now fully async for the ActivityPub and Diaspora protocols.
 
 * Django has been upgraded to 5.2.x. To comply with this version, the following changes were
   required:

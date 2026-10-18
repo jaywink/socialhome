@@ -4,6 +4,26 @@
 #
 #    ./compile-requirements.sh
 #
+aiofiles==25.1.0
+    # via
+    #   -r requirements/requirements.txt
+    #   federation
+aiohappyeyeballs==2.7.1
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
+aiohttp==3.14.5
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp-client-cache
+aiohttp-client-cache==0.15.0
+    # via
+    #   -r requirements/requirements.txt
+    #   federation
+aiosignal==1.4.0
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
 alabaster==1.0.0
     # via sphinx
 anyio==4.15.1
@@ -23,6 +43,7 @@ asgiref==3.12.1
     #   django
     #   django-allauth
     #   django-cors-headers
+    #   federation
 asttokens==3.0.2
     # via
     #   -r requirements/requirements.txt
@@ -30,6 +51,8 @@ asttokens==3.0.2
 attrs==26.1.0
     # via
     #   -r requirements/requirements.txt
+    #   aiohttp
+    #   aiohttp-client-cache
     #   cattrs
     #   django-redisboard
     #   federation
@@ -97,6 +120,7 @@ chardet==7.6.0
 charset-normalizer==3.5.1
     # via
     #   -r requirements/requirements.txt
+    #   federation
     #   requests
 circus==0.19.0
     # via -r requirements/requirements.txt
@@ -275,7 +299,7 @@ faker==40.39.0
     # via
     #   -r requirements/requirements-dev.in
     #   factory-boy
-federation==0.27.0
+federation==0.28.0
     # via -r requirements/requirements.txt
 filelock==4.0.1
     # via
@@ -289,6 +313,11 @@ frozendict==2.4.7
     # via
     #   -r requirements/requirements.txt
     #   pyld
+frozenlist==1.8.0
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
+    #   aiosignal
 funcy==2.1
     # via
     #   -r requirements/requirements.txt
@@ -313,6 +342,7 @@ idna==3.20
     #   requests
     #   twisted
     #   url-normalize
+    #   yarl
 imagesize==2.0.1
     # via sphinx
 incremental==24.11.0
@@ -344,6 +374,10 @@ iteration-utilities==0.13.0
     # via
     #   -r requirements/requirements.txt
     #   federation
+itsdangerous==2.2.0
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp-client-cache
 itypes==1.2.0
     # via
     #   -r requirements/requirements.txt
@@ -402,6 +436,11 @@ msgpack==1.2.2
     #   -r requirements/requirements.txt
     #   autobahn
     #   channels-redis
+multidict==7.1.0
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
+    #   yarl
 packaging==26.3
     # via
     #   -r requirements/requirements.txt
@@ -444,6 +483,11 @@ prompt-toolkit==3.0.53
     # via
     #   -r requirements/requirements.txt
     #   ipython
+propcache==0.5.4
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
+    #   yarl
 psutil==7.2.2
     # via
     #   -r requirements/requirements.txt
@@ -477,7 +521,6 @@ pycryptodome==3.23.0
     # via
     #   -r requirements/requirements.txt
     #   federation
-    #   python-httpsig-socialhome
 pyembed @ git+https://github.com/jaywink/pyembed.git@f79ce0b8acd6d0dbe93809ed4c92c764792d5627
     # via -r requirements/requirements.txt
 pyflakes==3.4.0
@@ -541,10 +584,6 @@ python-dateutil==2.9.0.post0
     #   freezegun
 python-dotenv==1.2.3
     # via pytest-env
-python-httpsig-socialhome==1.6.0
-    # via
-    #   -r requirements/requirements.txt
-    #   federation
 python-magic==0.4.27
     # via
     #   -r requirements/requirements.txt
@@ -621,11 +660,11 @@ service-identity==26.1.0
 six==1.17.0
     # via
     #   -r requirements/requirements.txt
+    #   federation
     #   isodate
     #   markdownify
     #   pytest-profiling
     #   python-dateutil
-    #   python-httpsig-socialhome
 snowballstemmer==3.1.1
     # via sphinx
 soupsieve==2.9.2
@@ -692,6 +731,8 @@ types-pyyaml==6.0.12.20260906
 typing-extensions==4.16.0
     # via
     #   -r requirements/requirements.txt
+    #   aiohttp
+    #   aiosignal
     #   anyio
     #   beautifulsoup4
     #   cattrs
@@ -726,6 +767,7 @@ uritemplate==4.2.0
 url-normalize==3.0.0
     # via
     #   -r requirements/requirements.txt
+    #   aiohttp-client-cache
     #   requests-cache
 urllib3==2.8.0
     # via
@@ -756,6 +798,10 @@ xapian-bindings-binary==1.4.26
     # via -r requirements/requirements.txt
 xapian-haystack==4.0.0
     # via -r requirements/requirements.txt
+yarl==1.25.1
+    # via
+    #   -r requirements/requirements.txt
+    #   aiohttp
 zope-interface==8.6
     # via
     #   -r requirements/requirements.txt

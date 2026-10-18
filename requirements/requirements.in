@@ -37,7 +37,7 @@ django<6
 djangorestframework
 dramatiq[redis]
 drf-yasg
-federation>=0.27
+federation>=0.28
 ipython
 lxml
 Pillow
