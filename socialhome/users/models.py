@@ -12,7 +12,7 @@ from Crypto.PublicKey import RSA
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, transaction
 from django.db.models.functions import Upper
 from django.db.utils import IntegrityError
 from django.urls import reverse
@@ -580,8 +580,9 @@ class Profile(TimeStampedModel):
         else:
             extra_lookups = {}
         try:
-            profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
-            logger.info("from_remote_profile - created %s, profile %s", created, profile)
+            with transaction.atomic():
+                profile, created = Profile.objects.fed_update_or_create(fid, values, extra_lookups, force)
+                logger.info("from_remote_profile - created %s, profile %s", created, profile)
         except IntegrityError as exc:
             profile = Profile.objects.fed(fid).get()
             logger.warning("from_remote_profile - returning existing profile %s - %s", profile, exc)
