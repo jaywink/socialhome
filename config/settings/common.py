@@ -463,6 +463,8 @@ SOCIALHOME_CONTENT_SAFE_TAGS = [
     'dl',
     'dt',
     'em',
+    'figure',
+    'figcaption',
     'h1',
     'h2',
     'h3',
