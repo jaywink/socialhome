@@ -61,6 +61,8 @@ Changed
 * The translation workflow now mostly uses django management commands since we maintain the VueJS UI in a different
   project. ``TRANSLATIONS.md``` was updated accordingly.
 
+* Limit unauthenticated users searches to content and profiles available locally.
+
 Fixed
 .....
 

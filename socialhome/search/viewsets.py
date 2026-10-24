@@ -1,6 +1,5 @@
 from haystack.query import SearchQuerySet
 from rest_framework.mixins import ListModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import BaseSerializer
 from rest_framework.viewsets import GenericViewSet
 
@@ -20,7 +19,6 @@ class SearchSerializer(BaseSerializer):
 
 class SearchAPIViewSet(ListModelMixin, GenericViewSet):
     serializer_class = SearchSerializer
-    permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         q = safe_text(request.GET.get('name__startswith'))
