@@ -38,8 +38,8 @@ def get_single_object(q, request, api=False):
         profile = Profile.objects.visible_for_user(request.user).fed(q).get()
         update_profile(profile)
     except Profile.DoesNotExist:
-        # Try a remote search
-        if is_url(q) or validate_handle(q):
+        # Try a remote search if this is an authenticated user
+        if request.user.is_authenticated and (is_url(q) or validate_handle(q)):
             try:
                 remote_profile = async_to_sync(retrieve_remote_profile)(q)
             except (AttributeError, ValueError, xml.parsers.expat.ExpatError):
@@ -55,8 +55,8 @@ def get_single_object(q, request, api=False):
     try:
         content = Content.objects.visible_for_user(request.user).fed(q).get()
     except Content.DoesNotExist:
-        # Try a remote search
-        if is_url(q):
+        # Try a remote search if this is an authenticated user
+        if request.user.is_authenticated and is_url(q):
             try:
                 remote_content = async_to_sync(retrieve_remote_content)(q)
             except (AttributeError, ValueError):
@@ -72,4 +72,4 @@ def get_single_object(q, request, api=False):
     if content:
         return Response({'count':1, 'next':None, 'results': [{'id': content.id}]}) \
             if api else redirect(reverse("content:view", kwargs={"pk": content.id}))
-
+    return None
