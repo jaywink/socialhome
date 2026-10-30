@@ -1,6 +1,6 @@
 from typing import Dict, Tuple, TYPE_CHECKING, Any
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q, F, OuterRef, Subquery, Case, When, ObjectDoesNotExist
 from django.db.utils import IntegrityError
 
@@ -64,13 +64,13 @@ class ContentQuerySet(models.QuerySet):
         if not extra_lookups:
             extra_lookups = {}
         try:
+            with transaction.atomic():
+                if fid.startswith('http'):
+                    values['fid'] = fid
+                values.update(extra_lookups)
+                return self.create(**values), True
+        except IntegrityError:
             content = self.fed(fid, **extra_lookups).get()
-        except ObjectDoesNotExist:
-            if fid.startswith('http'):
-                values['fid'] = fid
-            values.update(extra_lookups)
-            return self.create(**values), True
-        else:
             for key, value in values.items():
                 if key in ('fid', 'guid'):
                     continue
