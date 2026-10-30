@@ -172,14 +172,13 @@ def process_entity_comment(entity: Any, profile: Profile):
         # This maybe useless as federation should walk up to the root
         # and down the reply collection
         logger.debug(
-            "process_entity_comment - trying to fetch %s, %s, %s, %s, %s",
-            entity.target_id, entity.target_guid, entity.target_handle, entity.entity_type, sender_key_fetcher,
+            "process_entity_comment - trying to fetch %s, %s, %s, %s",
+            entity.target_id, entity.target_guid, entity.target_handle, sender_key_fetcher,
         )
         remote_target = async_to_sync(retrieve_remote_content)(
             entity.target_id,
             guid=entity.target_guid,
             handle=entity.target_handle,
-            entity_type=entity.entity_type,
             sender_key_fetcher=sender_key_fetcher,
             protocol=ProtocolType.DIASPORA if entity.target_guid else ProtocolType.ACTIVITYPUB
         )
@@ -440,11 +439,14 @@ async def process_reply(reply):
             logger.warning("process_reply - reply %s can not be processed", reply)
             return
         if remote_content:
-            logger.info(
-                "process_reply - processing reply %s for entity %s",
-                remote_content.id, remote_content.target_id)
-            await sync_to_async(process_entities)([remote_content])
-            if remote_content.replies: await process_reply_collection(remote_content.replies)
+            if isinstance(remote_content, base.Comment):
+                logger.info(
+                    "process_reply - processing reply %s for entity %s",
+                    remote_content.id, remote_content.target_id)
+                await sync_to_async(process_entities)([remote_content])
+                if remote_content.replies: await process_reply_collection(remote_content.replies)
+            else:
+                logger.error('process_reply - expected a Comment object, got a %s', remote_content.__class__.__name__)
 
 
 @dramatiq.actor(max_retries=0, priority=settings.DRAMATIQ_PRIORITY_LOW)
