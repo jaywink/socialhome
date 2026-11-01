@@ -538,7 +538,7 @@ class TestProcessEntityShare(SocialhomeTestCase):
             raw_content="this should never get saved",
         )
         current_text = self.local_content2.text
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(Content.DoesNotExist):
             with transaction.atomic():
                 process_entity_share(entity, self.remote_profile)
         self.local_content2.refresh_from_db()

@@ -71,11 +71,14 @@ class ContentQuerySet(models.QuerySet):
                 return self.create(**values), True
         except IntegrityError:
             content = self.fed(fid, **extra_lookups).get()
+            changed = False
             for key, value in values.items():
                 if key in ('fid', 'guid'):
                     continue
-                setattr(content, key, value)
-            content.save()
+                if getattr(content, key, None) != value:
+                    changed = True
+                    setattr(content, key, value)
+            if changed: content.save()
             return content, False
 
     def followed(self, user, single_id: int = None):
