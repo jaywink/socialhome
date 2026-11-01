@@ -2,13 +2,12 @@ import xml
 
 from asgiref.sync import async_to_sync
 from django.db.models import Count
-from django.shortcuts import redirect
-from django.urls import reverse
 from rest_framework.response import Response
 
 from federation.entities import base
 from federation.fetchers import retrieve_remote_profile, retrieve_remote_content
 from federation.utils.text import validate_handle
+from socialhome.content.enums import ContentType
 from socialhome.content.models import Tag, Content
 from socialhome.federate.utils import process_entities
 from socialhome.users.models import Profile
@@ -16,7 +15,7 @@ from socialhome.users.utils import update_profile
 from socialhome.utils import is_url
 
 
-def get_single_object(q, request, api=False):
+def get_single_object(q, request):
     if q.startswith('#'):
         q = q.lower()
         try:
@@ -30,8 +29,7 @@ def get_single_object(q, request, api=False):
         except Tag.DoesNotExist:
             pass
         else:
-            return Response({'count':1, 'next':None, 'results':[{'name': tag.name}]}) \
-                if api else redirect(tag.get_absolute_url())
+            return Response({'count':1, 'next':None, 'results':[{'name': tag.name}]})
     # Check if profile matches
     profile = None
     try:
@@ -48,8 +46,7 @@ def get_single_object(q, request, api=False):
             if remote_profile and isinstance(remote_profile, base.Profile):
                 profile = Profile.from_remote_profile(remote_profile)
     if profile:
-        return Response({'count':1, 'next':None, 'results':[{'finger': profile.finger, 'uuid': profile.uuid}]}) \
-            if api else redirect(reverse("users:profile-detail", kwargs={"uuid": profile.uuid}))
+        return Response({'count':1, 'next':None, 'results':[{'finger': profile.finger, 'uuid': profile.uuid}]})
     # Check if content matches
     content = None
     try:
@@ -70,6 +67,8 @@ def get_single_object(q, request, api=False):
                 except Content.DoesNotExist:
                     return None
     if content:
-        return Response({'count':1, 'next':None, 'results': [{'id': content.id}]}) \
-            if api else redirect(reverse("content:view", kwargs={"pk": content.id}))
+        if content.content_type == ContentType.REPLY: id = content.root_parent.id
+        elif content.content_type == ContentType.SHARE: id = content.share_of.id
+        else: id = content.id
+        return Response({'count':1, 'next':None, 'results': [{'id': id}]})
     return None

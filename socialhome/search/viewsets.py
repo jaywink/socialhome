@@ -25,7 +25,7 @@ class SearchAPIViewSet(ListModelMixin, GenericViewSet):
         if q:
             q = q.strip().strip("@")
 
-        resp = get_single_object(q, request, api=True)
+        resp = get_single_object(q, request)
         if not resp:
             self.queryset = SearchQuerySet().filter(name__startswith=q) if q else SearchQuerySet().none()
             resp = super().list(request, *args, **kwargs)
