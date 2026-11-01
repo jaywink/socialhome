@@ -24,7 +24,8 @@ class TestSearchViewSet(SocialhomeAPITestCase):
             self.get("api-search")
             self.response_200()
 
-    def test_search_returns_content(self):
+    @patch("socialhome.search.utils.async_to_sync", side_effect=None)
+    def test_search_returns_content(self, mock_util):
         with self.login(self.user):
             results = self.get("api-search", data={"name__startswith": self.local_content.fid})
             self.assertEqual(results.json()["results"], [{"id": self.local_content.id}])
