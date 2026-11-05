@@ -240,7 +240,7 @@ class BaseStream:
         throughs = {}
         if self.__class__ in CACHED_STREAM_CLASSES:
             ids, throughs = self.get_cached_content_ids()
-            if len(ids) >= self.paginate_by or (not self.unfetched_content and self.first_id):
+            if len(ids) >= self.paginate_by or (not self.unfetched_content and self.first_id and not self.last_id):
                 return ids, throughs
 
         remaining = self.paginate_by - len(ids)
@@ -254,7 +254,12 @@ class BaseStream:
             else:
                 qs = qs.filter(through__gt=self.last_id)
         if self.first_id:
-            through_id = Content.objects.filter(id=self.first_id).values_list('through',flat=True)[0]
+            try:
+                through_id = Content.objects.filter(id=self.first_id).values_list('through',flat=True)[0]
+            except IndexError:
+                # this may happen when content has been retracted
+                # TODO: revisit this when retraction notifications are implemented
+                through_id = self.first_id
             if self.ordering == "-created":
                 qs = qs.filter(through__gt=through_id)
             elif self.ordering == "created":
