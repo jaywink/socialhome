@@ -12,6 +12,15 @@ Added
 * ``psycopg3``` connection pooling was enabled and a configurable option to contol the maximum pool size
   (``PSYCOPG_MAX_POOL_SIZE```, default=4) was added.
 
+* Add ``PSYCOPG_POOL_TIMEOUT`` option to control how long a connection request from the pool will be waited
+  upon, before raising an error. Defaults to 10 seconds.
+
+* Add ``--application-close-timeout 60`` to the provided Daphne Circus configuration to ensure Daphne has
+  more time to close its database connections in the event of long running requests.
+
+* The provided Circus configuration now restarts the Daphne processes once a day. This is done to recycle
+  potential lost Postgres connections due to long running requests on busy instances.
+
 Changed
 .......
 

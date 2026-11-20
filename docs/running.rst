@@ -311,6 +311,13 @@ Default: ``4``
 Set the maximum psycopg connection pool size. Using the default value effectively means a maximum size = 4,
 which is the default minimum pool size. If set, this value should be > 4.
 
+PSYCOPG_POOL_TIMEOUT
+....................
+
+Default: ``10``
+
+Seconds to wait for a free connection from the pool before raising an error.
+
 
 REDIS_DB
 ........
