@@ -123,7 +123,13 @@ class ContentQuerySet(models.QuerySet):
             qs = qs.filter(id=single_id)
         ids = qs.filter(author=profile).values_list("id", flat=True)
         if include_shares:
-            ids = list(ids) + list(Content.objects.filter(shares__author=profile).values_list("id", flat=True))
+            shared = Content.objects.filter(shares__author=profile)
+            if single_id:
+                # Match the content itself or content it's a share of
+                shared = shared.filter(
+                    Q(id=single_id) | Q(id__in=Content.objects.filter(id=single_id).values("share_of_id"))
+                )
+            ids = list(ids) + list(shared.values_list("id", flat=True))
         qs = qs.filter(
             Q(id__in=ids) | Q(share_of_id__in=ids)
         )

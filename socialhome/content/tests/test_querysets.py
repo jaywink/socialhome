@@ -1,5 +1,8 @@
+import re
+
 from django.contrib.auth.models import AnonymousUser
-from django.db import transaction
+from django.db import connection, transaction
+from django.test.utils import CaptureQueriesContext
 
 from socialhome.content.models import Content, Tag
 from socialhome.content.tests.factories import (
@@ -384,6 +387,37 @@ class TestContentQuerySetShares(SocialhomeTestCase):
         self.assertEqual(contents, {self.public_content, self.site_content})
         contents = set(Content.objects.profile(self.other_user.profile, self.limited_content_user))
         self.assertEqual(contents, {self.public_content, self.site_content, self.limited_content})
+
+    def test_profile__single_id(self):
+        not_shared = PublicContentFactory()
+        contents = set(Content.objects.profile(
+            self.other_user.profile, self.other_user, single_id=self.public_content.id,
+        ))
+        self.assertEqual(contents, {self.public_content})
+        contents = set(Content.objects.profile(
+            self.other_user.profile, self.other_user, single_id=self.site_content.id,
+        ))
+        self.assertEqual(contents, {self.site_content})
+        contents = set(Content.objects.profile(self.other_user.profile, self.other_user, single_id=not_shared.id))
+        self.assertEqual(contents, set())
+        contents = set(Content.objects.profile(
+            self.other_user.profile, self.other_user, single_id=self.public_content.id, include_shares=False,
+        ))
+        self.assertEqual(contents, set())
+
+    def test_profile__single_id_only_fetches_matching_shared_ids(self):
+        many_shared = [PublicContentFactory() for _ in range(3)]
+        for content in many_shared:
+            PublicContentFactory(share_of=content, author=self.other_user.profile)
+        with CaptureQueriesContext(connection) as queries:
+            contents = set(Content.objects.profile(
+                self.other_user.profile, self.other_user, single_id=self.public_content.id,
+            ))
+        self.assertEqual(contents, {self.public_content})
+        # Ensure none of the other shared content ids end up in the query
+        sql = " ".join(query["sql"] for query in queries.captured_queries)
+        for content in many_shared:
+            self.assertIsNone(re.search(rf"\b{content.id}\b", sql))
 
     def test_profile_by_attr(self):
         contents = set(Content.objects.profile_by_attr("uuid", self.other_user.profile.uuid, self.anonymous_user))
