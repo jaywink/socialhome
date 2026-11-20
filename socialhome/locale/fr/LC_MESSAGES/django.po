@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-16 15:58-0400\n"
-"PO-Revision-Date: 2026-10-17 13:31+0000\n"
+"PO-Revision-Date: 2026-10-18 18:27+0000\n"
 "Last-Translator: alain <alain@noreply.codeberg.org>\n"
 "Language-Team: French <https://translate.codeberg.org/projects/socialhome/"
 "backendoldui/fr/>\n"
@@ -549,7 +549,7 @@ msgstr "Le contenu des utilisateurs doit-il être considéré comme NSFW ?"
 
 #: socialhome/users/models.py:189
 msgid "Following"
-msgstr "Abonné-e-s"
+msgstr "Abonnements"
 
 #: socialhome/users/models.py:193
 msgid "AP Followers FID"
