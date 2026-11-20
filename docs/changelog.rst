@@ -83,6 +83,8 @@ Fixed
 
 * Do not try to retrieve ActivityPub replies when the ``fid``` doesn't start with http.
 
+* Fix performance issues in the `ContentQuerySet.profile` method.
+
 0.24.0 (2026-08-01)
 -------------------
 
